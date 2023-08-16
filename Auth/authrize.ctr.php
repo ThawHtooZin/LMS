@@ -22,6 +22,22 @@ Class auth{
             }
         }
     }
+
+    function checksale(){
+        if(empty($_SESSION['username']) || empty($_SESSION['logged_in']) || empty($_SESSION['role'])){
+            if($_SESSION['role'] != 3){
+                header('location:../../Index.php');
+            }
+        }
+    }
+
+    function checkpurchase(){
+        if(empty($_SESSION['username']) || empty($_SESSION['logged_in']) || empty($_SESSION['role'])){
+            if($_SESSION['role'] != 4){
+                header('location:../../Index.php');
+            }
+        }
+    }
 }
 
 ?>

@@ -28,6 +28,9 @@ class Bootstrap
           margin: 0 !important;
           margin-left: -12px !important;
         }
+        th{
+          background-color: #D9D9D9 !important;
+        }
       </style>
     ';
   }
