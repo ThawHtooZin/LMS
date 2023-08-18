@@ -37,9 +37,10 @@ class Bootstrap
   function javascript()
   {
     echo '
-      <script src="../../Resources\bootstrap-5.3.1-dist\js\bootstrap.bundle.min.js" charset="utf-8"></script>
+    <script src="../../Resources\bootstrap-5.3.1-dist\js\bootstrap.bundle.min.js" charset="utf-8"></script>
     ';
   }
+
 }
 
 

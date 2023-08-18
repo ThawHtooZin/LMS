@@ -124,6 +124,12 @@
           Logestic
         </a>
       </li>
+      <li class="nav-item  rounded" style=" border: 2px solid black; ">
+        <a href="logout.php" class="nav-link salereports text-light" aria-current="page">
+          <svg class="bi" width="16" height="16"><i class="bi bi-card-list"></i></svg>
+          Logout
+        </a>
+      </li> 
     </ul>
     <hr>
     <h5>Time:</h5>

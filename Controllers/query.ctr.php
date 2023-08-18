@@ -48,9 +48,9 @@ Class Query{
     return $stmt->fetchall();
   }
 
-  function select($table, $id){
+  function select($table, $id, $select_id){
     global $pdo;
-    $stmt = $pdo->prepare("SELECT * FROM $table WHERE id=$id");
+    $stmt = $pdo->prepare("SELECT * FROM $table WHERE $select_id='$id'");
     $stmt->execute();
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
@@ -122,6 +122,177 @@ Class Query{
       return $errmessage = "Error accors when deleted Accounts";
     }
   }
+
+  function addcashbookdata($table, $date, $account_no, $voucher_no, $account_type, $debit, $credit, $description){
+    global $pdo;
+    if(empty($date) || empty($account_no) || empty($voucher_no) || empty($account_type) || empty($debit) || empty($credit) || empty($description)){
+      $errormessage = "The following field is required. ";
+      if(empty($date)){
+        $errormessage = $errormessage . "Date Field, ";
+      }
+      if(empty($account_no)){
+        $errormessage = $errormessage . "Account No Field, ";
+      }
+      if(empty($voucher_no)){
+        $errormessage = $errormessage . "Voucher No Field, ";
+      }
+      if(empty($account_type)){
+        $errormessage = $errormessage . "Account Type Field. ";
+      }
+      if(empty($debit)){
+        $errormessage = $errormessage . "Debit Field. ";
+      }
+      if(empty($credit)){
+        $errormessage = $errormessage . "Credit Field. ";
+      }
+      if(empty($description)){
+        $errormessage = $errormessage . "Description Field. ";
+      }
+      return $errormessage;
+    }else{
+      $balance = 0;
+      $stmt = $pdo->prepare("INSERT INTO $table(date, account_no, voucher_no, account_type, debit, credit, description, balance) VALUES('$date', '$account_no', '$voucher_no', '$account_type', '$debit', '$credit', '$description', '$balance')");
+      $stmt->execute();
+      if($stmt){
+        return $successmessage = "Account Deleted Successfully";
+      }else{
+        return $errmessage = "Error accors when deleted Accounts";
+      }
+    }
+  }
+
+  function addcategory($table, $category_name){
+    global $pdo;
+    $stmt = $pdo->prepare("INSERT INTO $table(category_name) VALUES('$category_name');");
+    $stmt->execute();
+    if($stmt){
+      return $successmessage = "Category Added Successfully";
+    }else{
+      return $errmessage = "Error accors when adding Category";
+    }
+  }
+  
+  function updatecategory($table, $category_name, $category_id){
+    global $pdo;
+    $stmt = $pdo->prepare("UPDATE $table SET category_name='$category_name' WHERE category_id=$category_id");
+    $stmt->execute();
+    if($stmt){
+      return $successmessage = "Category Update Successfully";
+    }else{
+      return $errmessage = "Error accors when updating Category";
+    }
+  }
+
+  function deletecategory($table, $deleteid){
+    global $pdo;
+    $stmt = $pdo->prepare("DELETE FROM $table WHERE category_id=$deleteid");
+    $stmt->execute();
+    if($stmt){
+      return $successmessage = "Category Deleted Successfully";
+    }else{
+      return $errmessage = "Error accors when deleted Category";
+    }
+  }
+
+  function additem($table, $category_id, $item_code, $item_name){
+    global $pdo;
+    $stmt = $pdo->prepare("INSERT INTO $table(category_id, item_id, item_name) VALUES('$category_id', '$item_code', '$item_name');");
+    $stmt->execute();
+    if($stmt){
+      return $successmessage = "Item Added Successfully";
+    }else{
+      return $errmessage = "Error accors when adding Item";
+    }
+  }
+
+  function updateitem($table, $category_id, $item_name, $item_code ,$item_id){
+    global $pdo;
+    $stmt = $pdo->prepare("UPDATE $table SET category_id='$category_id', item_name='$item_name', item_id='$item_code' WHERE item_id='$item_id'");
+    $stmt->execute();
+    if($stmt){
+      return $successmessage = "Item Update Successfully";
+    }else{
+      return $errmessage = "Error accors when updating Item";
+    }
+  }
+
+  function deleteitem($table, $deleteid){
+    global $pdo;
+    $stmt = $pdo->prepare("DELETE FROM $table WHERE item_id='$deleteid'");
+    $stmt->execute();
+    if($stmt){
+      return $successmessage = "Item Deleted Successfully";
+    }else{
+      return $errmessage = "Error accors when deleted Item";
+    }
+  }
+
+  function addcustomer($table, $customer_id, $customer_name, $customer_phone, $customer_address){
+    global $pdo;
+    $stmt = $pdo->prepare("INSERT INTO $table(customer_id, customer_name, customer_phone, customer_address) VALUES('$customer_id', '$customer_name', '$customer_phone', '$customer_address');");
+    $stmt->execute();
+    if($stmt){
+      return $successmessage = "Customer Added Successfully";
+    }else{
+      return $errmessage = "Error accors when adding Customer";
+    }
+  }
+
+  function updatecustomer($table, $customer_id, $customer_name, $customer_phone, $customer_address, $updateid){
+    global $pdo;
+    $stmt = $pdo->prepare("UPDATE $table SET customer_id='$customer_id', customer_name='$customer_name', customer_phone='$customer_phone', customer_address='$customer_address' WHERE customer_id='$updateid'");
+    $stmt->execute();
+    if($stmt){
+      return $successmessage = "Item Update Successfully";
+    }else{
+      return $errmessage = "Error accors when updating Item";
+    }
+  }
+
+  function deletecustomer($table, $deleteid){
+    global $pdo;
+    $stmt = $pdo->prepare("DELETE FROM $table WHERE customer_id='$deleteid'");
+    $stmt->execute();
+    if($stmt){
+      return $successmessage = "Item Deleted Successfully";
+    }else{
+      return $errmessage = "Error accors when deleted Item";
+    }
+  }
+
+  function addsupplier($table, $supplier_id, $supplier_name, $supplier_phone, $supplier_address){
+    global $pdo;
+    $stmt = $pdo->prepare("INSERT INTO $table(supplier_id, supplier_name, supplier_phone, supplier_address) VALUES('$supplier_id', '$supplier_name', '$supplier_phone', '$supplier_address');");
+    $stmt->execute();
+    if($stmt){
+      return $successmessage = "Supplier Added Successfully";
+    }else{
+      return $errmessage = "Error accors when adding Supplier";
+    }
+  }
+
+  function updatesupplier($table, $supplier_id, $supplier_name, $supplier_phone, $supplier_address, $updateid){
+    global $pdo;
+    $stmt = $pdo->prepare("UPDATE $table SET supplier_id='$supplier_id', supplier_name='$supplier_name', supplier_phone='$supplier_phone', supplier_address='$supplier_address' WHERE supplier_id='$updateid'");
+    $stmt->execute();
+    if($stmt){
+      return $successmessage = "Supplier Update Successfully";
+    }else{
+      return $errmessage = "Error accors when updating Supplier";
+    }
+  }
+
+  function deletesupplier($table, $deleteid){
+    global $pdo;
+    $stmt = $pdo->prepare("DELETE FROM $table WHERE supplier_id='$deleteid'");
+    $stmt->execute();
+    if($stmt){
+      return $successmessage = "Supplier Deleted Successfully";
+    }else{
+      return $errmessage = "Error accors when deleted Supplier";
+    }
+  }
+
 }
 
 ?>

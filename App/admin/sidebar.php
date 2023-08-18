@@ -1,6 +1,6 @@
 <div class="d-flex flex-column flex-shrink-0 p-1 text-white bg-secondary" style="width: 16%; height:100%; position:fixed;">
-      <div class="text-center bg-light text-dark p-3">
-        <b class="fs-5">Link Mark System</b>
+      <div class="text-center bg-light text-dark pt-3 pb-3">
+        <b class="fs-4">Link Mark System</b>
         <br>
         <b class="text-warning">Version 1.0.0</b>
       </div>
@@ -75,18 +75,7 @@
         </a>
         <div class="collapse" id="products-collapse">
           <ul class="btn-toggle-nav list-unstyled fw-normal ms-2">
-            <li class="nav-item  rounded">
-              <a href="category.php" class="nav-link h category text-light show" aria-current="page">
-                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-tags"></i></svg>
-                - Category
-              </a>
-            </li>
-            <li class="nav-item  rounded">
-              <a href="item.php" class="nav-link item h text-light" aria-current="page">
-                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
-                - Items
-              </a>
-            </li>
+
           </ul>
         </div>
       </li>
@@ -104,9 +93,21 @@
             </a>
           </li>
           <li class="nav-item  rounded">
-            <a href="item.php" class="nav-link item h suppliers text-light" aria-current="page">
+            <a href="supplier.php" class="nav-link item h suppliers text-light" aria-current="page">
               <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
               - Suppliers
+            </a>
+          </li>
+          <li class="nav-item  rounded">
+            <a href="category.php" class="nav-link h category text-light show" aria-current="page">
+              <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-tags"></i></svg>
+              - Category
+            </a>
+          </li>
+          <li class="nav-item  rounded">
+            <a href="item.php" class="nav-link item h text-light" aria-current="page">
+              <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+              - Items
             </a>
           </li>
         </ul>
@@ -119,9 +120,15 @@
         </a>
       </li>
       <li class="nav-item  rounded" style=" border: 2px solid black; ">
-        <a href="salereport.php" class="nav-link salereports text-light disabled" aria-current="page">
+        <a href="salereport.php" class="nav-link salereports text-light" aria-current="page">
           <svg class="bi" width="16" height="16"><i class="bi bi-card-list"></i></svg>
           Logestic
+        </a>
+      </li>
+      <li class="nav-item  rounded" style=" border: 2px solid black; ">
+        <a href="logout.php" class="nav-link salereports text-light" aria-current="page">
+          <svg class="bi" width="16" height="16"><i class="bi bi-card-list"></i></svg>
+          Logout
         </a>
       </li>
     </ul>

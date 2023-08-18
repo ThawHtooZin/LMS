@@ -13,7 +13,7 @@ $query = new Query();
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>Admin | Dashboard</title>
+    <title>Admin | Cash Book</title>
   </head>
   <?php
   $bootstrap->css();
@@ -26,65 +26,205 @@ $query = new Query();
         ?>
       </div>
       <div class="col-10">
-        <div class="card mt-3 text-light">
-          <div class="card-header  bg-warning">
-            <h4>Cash Book</h4>
-            <br>
+        <div class="card mt-3">
+          <div class="card-header bg-warning text-light"  style="padding:-10px;">
+            <h5>Manage Cash Book</h5>
           </div>
           <div class="card-body">
-            <button type="button" class="btn btn-outline-success float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
-              Add Debit Or Credit
+            <?php
+            if(isset($_POST['deletebutton'])){
+              $deleteid = $_POST['deleteid'];
+              $message = $query->deleteaccount('accounts', $deleteid);
+            }
+            if(isset($_POST['updateaccount'])){
+              $username = $_POST['username'];
+              $password = $_POST['password'];
+              $email = $_POST['email'];
+              $role = $_POST['role'];
+              $id = $_POST['updateid'];
+
+              $message = $query->updateaccount('accounts', $username, $password, $email, $role, $id);
+            }
+            ?>
+            <?php
+            if(isset($_POST['adddata'])){
+              $date = $_POST['date'];
+              $account_no = $_POST['account_no'];
+              $voucher_no = $_POST['voucher_no'];
+              $account_type = $_POST['account_type'];
+              $debit = $_POST['debit'];
+              $credit = $_POST['credit'];
+              $description = $_POST['description'];
+
+              $message = $query->addcashbookdata('cashbook', $date, $account_no, $voucher_no, $account_type, $debit, $credit, $description);
+            }
+            ?>
+            <?php
+            if(!empty($message)){
+              if(strpos($message, 'Successfully')){
+                $successmessage = $message;
+              }
+
+              if(strpos($message, 'Error')){
+                $errmessage = $message;
+              }
+
+              if(strpos($message, 'following')){
+                $errormessage = $message;
+              }
+            }
+
+            ?>
+            <?php
+              if(!empty($errormessage)){
+              ?>
+              <div class="alert alert-danger alert-dismissible fade show">
+                <strong>Error! </strong> <?php echo $errormessage; ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+              <?php
+            }
+            if(!empty($errmessage)){
+              ?>
+              <div class="alert alert-danger alert-dismissible fade show">
+                <strong>Error! </strong> <?php echo $errmessage; ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+              <?php
+            }
+            if(!empty($successmessage)){
+              ?>
+              <div class="alert alert-success alert-dismissible fade show">
+                <strong>Success! </strong> <?php echo $successmessage; ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+              <?php
+            }
+            ?>
+            <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
+              Add New Cash Data
             </button>
-            <table class="table table-striped table-bordered mt-5">
+            <table class="mt-5 table table-bordered table-striped rounded">
               <tr>
+                <th>#</th>
                 <th>Date</th>
+                <th>Account No</th>
+                <th>Voucher No</th>
+                <th>Account Type</th>
                 <th>Description</th>
                 <th>Debit</th>
-                <th>Creadit</th>
+                <th>Credit</th>
+                <th>Balance</th>
                 <th>Action</th>
               </tr>
               <?php
-              $cashbookdatas =  $query->selectall('cashbook');
-              foreach ($cashbookdatas as $cashbookdata) {
-              ?>
+              $cashdatas = $query->selectall('cashbook');
+              foreach ($cashdatas as $cashdata) {
+                ?>
               <tr>
-                <td><?php  echo $cashbookdata['date']; ?></td>
-                <td><?php  echo $cashbookdata['description']; ?></td>
-                <td><?php  echo $cashbookdata['debit']; ?></td>
-                <td><?php  echo $cashbookdata['credit']; ?></td>
+                <td><?php echo $cashdata['id']; ?></td>
+                <td><?php echo $cashdata['date']; ?></td>
+                <td><?php echo $cashdata['account_no']; ?></td>
+                <td><?php echo $cashdata['voucher_no']; ?></td>
+                <td><?php echo $cashdata['account_type']; ?></td>
+                <td><?php echo $cashdata['description']; ?></td>
+                <td><?php echo $cashdata['debit']; ?></td>
+                <td><?php echo $cashdata['credit']; ?></td>
+                <td><?php echo $cashdata['balance']; ?></td>
                 <td>
-                  <button type="submit" class="btn btn-warning"></button>
-                  <button type="submit" class="btn btn-danger"></button>
-                </td>
+                  <input type="hidden" name="updateid" value="<?php echo $cashdata['id']; ?>">
+                  <button type="submit" class="btn btn-warning text-light" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $cashdata['id']; ?>">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+  <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+  <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+</svg>
+                  </button>
+                <form action="manageaccounts.php" method="post" style="display: inline !important;">
+                  <input type="hidden" name="deleteid" value="<?php echo $cashdata['id']; ?>">
+                  <button type="submit" name="deletebutton" class="btn btn-danger">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
+                  </button>
+                </form>
+              </td>
               </tr>
+              <!-- Data Update Modal -->
+              <div class="modal fade" id="updatemodal<?php echo $cashdata['id']; ?>" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header bg-warning text-light">
+                      <h5 class="modal-title" id="updatemodallabel">Update An Account</h5>
+                      <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="h3">&times;</span>
+                      </button>
+                    </div>
+                    <form action="" method="post" autocomplete="off">
+                      <div class="modal-body">
+                        <?php
+                        $id = $cashdata['id'];
+                        $updatedata = $query->select('cashbook', $id, 'id');
+                        ?>
+                        <input type="hidden" name="updateid" value="<?php echo $cashdata['id']; ?>">
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-warning" name="updateaccount">Update</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <!-- Update Modal -->
               <?php
-            }
+              }
               ?>
             </table>
           </div>
         </div>
       </div>
     </div>
-<!-- Add Modal -->
-<div class="modal fade" id="addmodal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Add Debit Or Credit</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+  <!-- Data Add Modal -->
+  <div class="modal fade" id="addmodal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-light">
+          <h5 class="modal-title" id="addmodellabel">Create New Account</h5>
+          <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true" class="h3">&times;</span>
+          </button>
+        </div>
+        <form action="cashbook.php" method="post" autocomplete="off">
+          <div class="modal-body">
+            <label>Date</label>
+            <input type="date" name="date" class="form-control" placeholder="Date">
+            <label>Account No</label>
+            <input type="text" name="account_no" class="form-control" placeholder="Account No">
+            <label>Voucher No</label>
+            <input type="text" name="voucher_no" class="form-control" placeholder="Voucher No">
+            <label>Account Type</label>
+            <input type="text" name="account_type" class="form-control" placeholder="Account Type">
+            <label>Debit</label>
+            <input type="number" name="debit" class="form-control" placeholder="Debit">
+            <label>Credit</label>
+            <input type="number" name="credit" class="form-control" placeholder="Credit">
+            <label>Description</label>
+            <textarea name="description" rows="3" cols="80" class="form-control" placeholder="Description"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-success" name="adddata">Add Data</button>
+          </div>
+        </form>
       </div>
-      <form class="" action="index.html" method="post">
-      <div class="modal-body">
-        
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-success">Add</button>
-      </div>
-    </form>
     </div>
   </div>
-</div>
+  <!-- Add Modal -->
+
+    <script type="text/javascript">
+      function inoroutchange(){
+
+      }
+    </script>
     <?php
     $bootstrap->javascript();
     ?>
