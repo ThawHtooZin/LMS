@@ -19,6 +19,18 @@ $query = new Query();
   $bootstrap->css();
   ?>
   <body>
+    <?php
+    if(isset($_POST['searchsupplier'])){
+      if(!empty($_POST['search_id'])){
+        $search_id = $_POST['search_id'];
+        $supplierdatas = $query->search('supplier', 'supplier_id', $search_id);
+      }else {
+        $supplierdatas = $query->selectall('supplier');
+      }
+    }else {
+      $supplierdatas = $query->selectall('supplier');
+    }
+     ?>
     <div class="row">
       <div class="col-2">
         <?php
@@ -98,6 +110,20 @@ $query = new Query();
             }
             ?>
 
+            <form action="supplier.php" method="post" class=" d-inline">
+              <span>Search Supplier:</span>
+              <select name="search_id" class="form-control w-25 d-inline">
+                <?php
+                $supplierdatasfs = $query->selectall('supplier');
+                foreach ($supplierdatasfs as $supplierdatafs) {
+                  ?>
+                  <option value="<?php echo $supplierdatafs['supplier_id']; ?>"><?php echo $supplierdatafs['supplier_name']; ?></option>
+                  <?php
+                }
+                 ?>
+              </select>
+              <button type="submit" name="searchsupplier" class="btn btn-info">Search</button>
+            </form>
             <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
               Add Supplier
             </button>
@@ -110,7 +136,6 @@ $query = new Query();
                 <th>Action</th>
               </tr>
               <?php
-              $supplierdatas = $query->selectall('supplier');
               foreach ($supplierdatas as $supplierdata) {
               ?>
 

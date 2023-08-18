@@ -19,6 +19,18 @@ $query = new Query();
   $bootstrap->css();
   ?>
   <body>
+    <?php
+    if(isset($_POST['searchcustomer'])){
+      if(!empty($_POST['search_id'])){
+        $search_id = $_POST['search_id'];
+        $customerdatas = $query->search('customers', 'customer_id', $search_id);
+      }else {
+        $customerdatas = $query->selectall('customers');
+      }
+    }else {
+      $customerdatas = $query->selectall('customers');
+    }
+     ?>
     <div class="row">
       <div class="col-2">
         <?php
@@ -97,8 +109,21 @@ $query = new Query();
               <?php
             }
             ?>
-
-            <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
+            <form action="customer.php" method="post" class=" d-inline">
+              <span>Search Customer:</span>
+              <select name="search_id" class="form-control w-25 d-inline">
+                <?php
+                $customerdatasfs = $query->selectall('customers');
+                foreach ($customerdatasfs as $customerdatafs) {
+                  ?>
+                  <option value="<?php echo $customerdatafs['customer_id']; ?>"><?php echo $customerdatafs['customer_name']; ?></option>
+                  <?php
+                }
+                 ?>
+              </select>
+              <button type="submit" name="searchcustomer" class="btn btn-info">Search</button>
+            </form>
+            <button type="button" class="btn btn-success float-end d-inline" data-bs-toggle="modal" data-bs-target="#addmodal">
               Add Customer
             </button>
             <table class="mt-5 table table-bordered table-striped rounded">
@@ -110,7 +135,6 @@ $query = new Query();
                 <th>Action</th>
               </tr>
               <?php
-              $customerdatas = $query->selectall('customers');
               foreach ($customerdatas as $customerdata) {
               ?>
 

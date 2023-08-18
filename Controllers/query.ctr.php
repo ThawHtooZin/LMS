@@ -9,7 +9,7 @@ Class Query{
     $stmt = $pdo->prepare("SELECT * FROM accounts WHERE username='$username'");
     $stmt->execute();
     $userdata = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+
     if(!empty($userdata)){
       if($userdata['password'] == $password){
         if($userdata['role'] == 1){
@@ -36,7 +36,7 @@ Class Query{
           $_SESSION['logged_in'] = true;
           header('location:App/purchase/');
         }
-        
+
       }
     }
   }
@@ -111,7 +111,7 @@ Class Query{
     }
 
   }
-  
+
   function deleteaccount($table, $deleteid){
     global $pdo;
     $stmt = $pdo->prepare("DELETE FROM $table WHERE id=$deleteid");
@@ -171,7 +171,7 @@ Class Query{
       return $errmessage = "Error accors when adding Category";
     }
   }
-  
+
   function updatecategory($table, $category_name, $category_id){
     global $pdo;
     $stmt = $pdo->prepare("UPDATE $table SET category_name='$category_name' WHERE category_id=$category_id");
@@ -292,6 +292,15 @@ Class Query{
       return $errmessage = "Error accors when deleted Supplier";
     }
   }
+
+  function search($table, $search_row, $search_name){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM $table WHERE $search_row='$search_name'");
+    $stmt->execute();
+    return $stmt->fetchall();
+  }
+
+
 
 }
 
