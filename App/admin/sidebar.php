@@ -7,7 +7,7 @@
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
       <li class="nav-item  rounded" style=" border: 2px solid black; ">
-        <a href="/Big Projects/Business Projects/LMS/App/admin/" class="nav-link home text-light" aria-current="page">
+        <a href="../admin/" class="nav-link home text-light" aria-current="page">
           <svg class="bi" width="16" height="16"><i class="bi bi-speedometer2"></i></svg>
           Dashboard
         </a>
