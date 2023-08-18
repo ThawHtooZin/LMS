@@ -75,7 +75,18 @@
         </a>
         <div class="collapse" id="products-collapse">
           <ul class="btn-toggle-nav list-unstyled fw-normal ms-2">
-
+            <li class="nav-item  rounded">
+              <a href="category.php" class="nav-link h category text-light show" aria-current="page">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-tags"></i></svg>
+                - Category
+              </a>
+            </li>
+            <li class="nav-item  rounded">
+              <a href="item.php" class="nav-link item h text-light" aria-current="page">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - Items
+              </a>
+            </li>
           </ul>
         </div>
       </li>
