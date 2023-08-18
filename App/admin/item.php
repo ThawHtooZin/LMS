@@ -99,6 +99,17 @@ $query = new Query();
             <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
               Add Item
             </button>
+
+            <?php
+
+            if (!empty($_GET['pageno'])) {
+              $pageno = $_GET['pageno'];
+            }else{
+              $pageno = 1;
+            }
+            $numOfrecs = 2;
+            $offset = ($pageno -1) * $numOfrecs;
+            ?>
             <table class="mt-5 table table-bordered table-striped rounded">
               <tr>
                 <th>Category Name</th>
@@ -106,8 +117,18 @@ $query = new Query();
                 <th>Item Name</th>
                 <th>Action</th>
               </tr>
+
               <?php
-              $itemdatas = $query->selectall('item');
+              $stmt = $pdo->prepare("SELECT * FROM item ORDER BY item_id");
+              $stmt->execute();
+              $rawResult = $stmt->fetchAll();
+              $total_pages = ceil(count($rawResult) / $numOfrecs);
+
+              $stmt = $pdo->prepare("SELECT * FROM item ORDER BY item_id LIMIT $offset,$numOfrecs ");
+              $stmt->execute();
+              $itemdatas = $stmt->fetchAll();
+              ?>
+              <?php
               foreach ($itemdatas as $itemdata) {
                 $category_id = $itemdata['category_id'];
                 $category_name = $query->select('category', $category_id, 'category_id');
@@ -180,6 +201,20 @@ $query = new Query();
               ?>
 
             </table>
+            <br>
+            <div aria-label="Page navigation example" style="float:right;">
+              <ul class="pagination">
+                <li class="page-item"><a class="page-link" href="?pageno=1">First</a></li>
+                <li class="page-item <?php if($pageno <= 1){echo 'disabled';} ?>">
+                  <a class="page-link" href="<?php if($pageno <= 1){echo '#';} else {echo "?pageno=".($pageno-1);} ?>">Previous</a>
+                </li>
+                <li class="page-item"><a class="page-link" href="#"><?php echo $pageno; ?></a></li>
+                <li class="page-item <?php if($pageno >= $total_pages){echo 'disabled';}; ?>">
+                  <a class="page-link" href="<?php if($pageno >= $total_pages){echo '#';}else{echo "?pageno=".($pageno+1);} ?>">Next</a>
+                </li>
+                <li class="page-item"><a class="page-link" href="?pageno=<?php echo $total_pages; ?>">Last</a> </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
