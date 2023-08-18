@@ -19,6 +19,18 @@ $query = new Query();
   $bootstrap->css();
   ?>
   <body>
+    <?php
+    if(isset($_POST['searchsupplier'])){
+      if(!empty($_POST['search_id'])){
+        $search_id = $_POST['search_id'];
+        $supplierdatas = $query->search('supplier', 'supplier_id', $search_id);
+      }else {
+        $supplierdatas = $query->selectall('supplier');
+      }
+    }else {
+      $supplierdatas = $query->selectall('supplier');
+    }
+     ?>
     <div class="row">
       <div class="col-2">
         <?php
@@ -99,6 +111,7 @@ $query = new Query();
             ?>
             <?php
 
+<<<<<<< HEAD
             if (!empty($_GET['pageno'])) {
               $pageno = $_GET['pageno'];
             }else{
@@ -107,6 +120,22 @@ $query = new Query();
             $numOfrecs = 2;
             $offset = ($pageno -1) * $numOfrecs;
             ?>
+=======
+            <form action="supplier.php" method="post" class=" d-inline">
+              <span>Search Supplier:</span>
+              <select name="search_id" class="form-control w-25 d-inline">
+                <?php
+                $supplierdatasfs = $query->selectall('supplier');
+                foreach ($supplierdatasfs as $supplierdatafs) {
+                  ?>
+                  <option value="<?php echo $supplierdatafs['supplier_id']; ?>"><?php echo $supplierdatafs['supplier_name']; ?></option>
+                  <?php
+                }
+                 ?>
+              </select>
+              <button type="submit" name="searchsupplier" class="btn btn-info">Search</button>
+            </form>
+>>>>>>> ec6110d612d31b93bb5f78f5015948fdc3a324e8
             <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
               Add Supplier
             </button>
@@ -119,6 +148,7 @@ $query = new Query();
                 <th>Action</th>
               </tr>
               <?php
+<<<<<<< HEAD
               $stmt = $pdo->prepare("SELECT * FROM supplier ORDER BY supplier_id");
               $stmt->execute();
               $rawResult = $stmt->fetchAll();
@@ -129,6 +159,8 @@ $query = new Query();
               $supplierdatas = $stmt->fetchAll();
               ?>
               <?php
+=======
+>>>>>>> ec6110d612d31b93bb5f78f5015948fdc3a324e8
               foreach ($supplierdatas as $supplierdata) {
               ?>
 
