@@ -5,6 +5,11 @@
         <b class="text-warning">Version 1.0.0</b>
       </div>
     <hr>
+    <p class=" h6 pb-2 text-center">
+      <?php
+      echo $_SESSION['username'];
+      ?>
+    </p>
     <ul class="nav nav-pills flex-column mb-auto">
       <li class="nav-item  rounded" style=" border: 2px solid black; ">
         <a href="../admin/" class="nav-link home text-light" aria-current="page">
@@ -35,32 +40,32 @@
         </a>
         <div class="collapse" id="account-collapse">
           <ul class="btn-toggle-nav list-unstyled fw-normal">
-            <li class="nav-item  rounded">
-              <a href="sales.php" class="nav-link h sales text-light show" aria-current="page">
+            <li class="nav-item  rounded" style="cursor: not-allowed !important;">
+              <a href="sales.php" class="nav-link h sales text-light show disabled"  aria-current="page">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-tags"></i></svg>
                 - Sales
               </a>
             </li>
-            <li class="nav-item  rounded">
-              <a href="purchase.php" class="nav-link purchase h text-light" aria-current="page">
+            <li class="nav-item  rounded" style="cursor: not-allowed !important;">
+              <a href="purchase.php" class="nav-link purchase h text-light disabled" aria-current="page">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Purchase
               </a>
             </li>
-            <li class="nav-item  rounded">
+            <li class="nav-item  rounded" style="cursor: not-allowed !important;">
               <a href="cashbook.php" class="nav-link cashbook h text-light" aria-current="page">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Cash Book
               </a>
             </li>
-            <li class="nav-item  rounded">
-              <a href="accountpayable.php" class="nav-link accountpayable h text-light" aria-current="page">
+            <li class="nav-item  rounded" style="cursor: not-allowed !important;">
+              <a href="accountpayable.php" class="nav-link accountpayable h text-light disabled" aria-current="page">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Account Payable
               </a>
             </li>
-            <li class="nav-item  rounded">
-              <a href="accountreceivable.php" class="nav-link accountreceivable h text-light" aria-current="page">
+            <li class="nav-item  rounded" style="cursor: not-allowed !important;">
+              <a href="accountreceivable.php" class="nav-link accountreceivable h text-light disabled" aria-current="page">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Account Receivable
               </a>
@@ -69,12 +74,24 @@
         </div>
       </li>
       <li style=" border: 2px solid black; " class="rounded">
-        <a href="#" class="nav-link text-white patient" data-bs-toggle="collapse" data-bs-target="#products-collapse" aria-expanded="false">
+        <a href="#" class="nav-link text-white patient" data-bs-toggle="collapse" data-bs-target="#config-collapse" aria-expanded="false">
           <svg class="bi" width="16" height="16"><i class="bi bi-card-list"></i></svg>
-          Products >
+          Configration >
         </a>
-        <div class="collapse" id="products-collapse">
+        <div class="collapse" id="config-collapse">
           <ul class="btn-toggle-nav list-unstyled fw-normal ms-2">
+            <li class="nav-item  rounded">
+              <a href="customer.php" class="nav-link h customer text-light show" aria-current="page">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-tags"></i></svg>
+                - Customers
+              </a>
+            </li>
+            <li class="nav-item  rounded">
+              <a href="supplier.php" class="nav-link item h suppliers text-light" aria-current="page">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - Suppliers
+              </a>
+            </li>
             <li class="nav-item  rounded">
               <a href="category.php" class="nav-link h category text-light show" aria-current="page">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-tags"></i></svg>
@@ -90,51 +107,21 @@
           </ul>
         </div>
       </li>
-    <li style=" border: 2px solid black; " class="rounded">
-      <a href="#" class="nav-link text-white patient" data-bs-toggle="collapse" data-bs-target="#config-collapse" aria-expanded="false">
-        <svg class="bi" width="16" height="16"><i class="bi bi-card-list"></i></svg>
-        Configration >
-      </a>
-      <div class="collapse" id="config-collapse">
-        <ul class="btn-toggle-nav list-unstyled fw-normal ms-2">
-          <li class="nav-item  rounded">
-            <a href="customer.php" class="nav-link h customer text-light show" aria-current="page">
-              <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-tags"></i></svg>
-              - Customers
-            </a>
-          </li>
-          <li class="nav-item  rounded">
-            <a href="supplier.php" class="nav-link item h suppliers text-light" aria-current="page">
-              <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
-              - Suppliers
-            </a>
-          </li>
-          <li class="nav-item  rounded">
-            <a href="category.php" class="nav-link h category text-light show" aria-current="page">
-              <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-tags"></i></svg>
-              - Category
-            </a>
-          </li>
-          <li class="nav-item  rounded">
-            <a href="item.php" class="nav-link item h text-light" aria-current="page">
-              <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
-              - Items
-            </a>
-          </li>
-        </ul>
-      </div>
-    </li>
-      <li class="nav-item  rounded" style=" border: 2px solid black; ">
-        <a href="suppliers.php" class="nav-link suppliers text-light" aria-current="page">
-          <svg class="bi" width="16" height="16"><i class="bi bi-person-check"></i></svg>
-          Production
-        </a>
+      <li class="nav-item  rounded" style=" border: 2px solid black;">
+        <span style="cursor: not-allowed !important;">
+          <a href="suppliers.php" class="nav-link suppliers text-light disabled" aria-current="page">
+            <svg class="bi" width="16" height="16"><i class="bi bi-person-check"></i></svg>
+            Production
+          </a>
+        </span>
       </li>
-      <li class="nav-item  rounded" style=" border: 2px solid black; ">
-        <a href="salereport.php" class="nav-link salereports text-light" aria-current="page">
+      <li class="nav-item  rounded" style=" border: 2px solid black; " style="cursor: not-allowed !important;">
+        <span style="cursor: not-allowed !important;">
+        <a href="salereport.php" class="nav-link salereports text-light disabled" aria-current="page">
           <svg class="bi" width="16" height="16"><i class="bi bi-card-list"></i></svg>
           Logestic
         </a>
+      </span>
       </li>
       <li class="nav-item  rounded" style=" border: 2px solid black; ">
         <a href="logout.php" class="nav-link salereports text-light" aria-current="page">
