@@ -5,6 +5,11 @@
         <b class="text-warning">Version 1.0.0</b>
       </div>
     <hr>
+    <p class=" h6 pb-2 text-center">
+      <?php
+      echo $_SESSION['username'];
+      ?>
+    </p>
     <ul class="nav nav-pills flex-column mb-auto">
       <li class="nav-item  rounded" style=" border: 2px solid black; ">
         <a href="../sale/" class="nav-link home text-light" aria-current="page">
@@ -19,14 +24,14 @@
         </a>
         <div class="collapse" id="account-collapse">
           <ul class="btn-toggle-nav list-unstyled fw-normal">
-            <li class="nav-item  rounded">
-              <a href="sales.php" class="nav-link h sales text-light show" aria-current="page">
+            <li class="nav-item  rounded"  style="cursor: not-allowed !important;">
+              <a href="sales.php" class="nav-link h sales text-light show disabled" aria-current="page">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-tags"></i></svg>
                 - Sales
               </a>
             </li>
-            <li class="nav-item  rounded">
-              <a href="accountreceivable.php" class="nav-link accountreceivable h text-light" aria-current="page">
+            <li class="nav-item  rounded"  style="cursor: not-allowed !important;">
+              <a href="accountreceivable.php" class="nav-link accountreceivable h text-light disabled" aria-current="page">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Account Receivable
               </a>
