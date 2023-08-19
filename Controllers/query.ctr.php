@@ -293,6 +293,13 @@ Class Query{
     }
   }
 
+  function addpurchase($table, $date, $voucher_no, $tclfrozen, $commodity, $size, $viss, $pcs, $price){
+    global $pdo;
+    $amount = $price * $pcs;
+    $stmt = $pdo->prepare("INSERT INTO $table(date, voucher_no, tclfrozen, commodity, size, viss, pcs, price, amount) VALUES('$date', '$voucher_no', '$tclfrozen', '$commodity', '$size', '$viss', '$pcs', '$price', '$amount')");
+
+  }
+
 }
 
 ?>

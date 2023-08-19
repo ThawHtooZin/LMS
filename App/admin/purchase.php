@@ -32,34 +32,41 @@ $query = new Query();
           </div>
           <div class="card-body">
             <?php
-            // if(isset($_POST['deletebutton'])){
-            //   $deleteid = $_POST['deleteid'];
-            //   $message = $query->deletecategory('category', $deleteid);
-            // }
-            // if(isset($_POST['updatebutton'])){
-            //   $category_name = $_POST['category_name'];
-            //   $category_id = $_POST['category_id'];
-            //
-            //   $message = $query->updatecategory('category', $category_name, $category_id);
-            // }
-            // if(isset($_POST['addbutton'])){
-            //   $category_name = $_POST['category_name'];
-            //
-            //   $message = $query->addcategory('category', $category_name);
-            // }
-            // if(!empty($message)){
-            //   if(strpos($message, 'Successfully')){
-            //     $successmessage = $message;
-            //   }
-            //
-            //   if(strpos($message, 'Error')){
-            //     $errmessage = $message;
-            //   }
-            //
-            //   if(strpos($message, 'following')){
-            //     $errormessage = $message;
-            //   }
-            // }
+            if(isset($_POST['deletebutton'])){
+              $deleteid = $_POST['deleteid'];
+              $message = $query->deletepurchase('category', $deleteid);
+            }
+            if(isset($_POST['updatebutton'])){
+              $category_name = $_POST['category_name'];
+              $category_id = $_POST['category_id'];
+
+              $message = $query->updatecategory('category', $category_name, $category_id);
+            }
+            if(isset($_POST['addbutton'])){
+              $date = $_POST['date'];
+              $voucher_no = $_POST['voucher_no'];
+              $tclfrozen = $_POST['tclfrozen'];
+              $commodity = $_POST['commodity'];
+              $size = $_POST['size'];
+              $viss = $_POST['viss'];
+              $pcs = $_POST['pcs'];
+              $price = $_POST['price'];
+
+              $message = $query->addpurchase('purchase', $date, $voucher_no, $tclfrozen, $commodity, $size, $viss, $pcs, $price);
+            }
+            if(!empty($message)){
+              if(strpos($message, 'Successfully')){
+                $successmessage = $message;
+              }
+
+              if(strpos($message, 'Error')){
+                $errmessage = $message;
+              }
+
+              if(strpos($message, 'following')){
+                $errormessage = $message;
+              }
+            }
 
             ?>
 
@@ -235,7 +242,7 @@ $query = new Query();
             <div class="row">
               <div class="col">
                 <label style="font-weight: bold;">TCL (or) Frozen</label>
-                <select class="form-control inpv2 mb-2" name="tclorfrozen">
+                <select class="form-control inpv2 mb-2" name="tclfrozen">
                   <option value="">Select</option>
                   <option value="tcl">TCL</option>
                   <option value="frozen">Frozen</option>
@@ -258,7 +265,7 @@ $query = new Query();
             <div class="row">
               <div class="col">
                 <label style="font-weight: bold;">Commodity</label>
-                <select class="form-control inpv2 mb-2" name="supplier_name">
+                <select class="form-control inpv2 mb-2" name="commodity">
                   <?php
                   $itemdatas = $query->selectall('item');
                   foreach ($itemdatas as $itemdata) {
@@ -277,7 +284,7 @@ $query = new Query();
             <div class="row">
               <div class="col">
                 <label style="font-weight: bold;">Viss</label>
-                <input type="number" name="viss" class="form-control inpv2 mb-2">
+                <input type="text" name="viss" class="form-control inpv2 mb-2">
               </div>
               <div class="col">
                 <label style="font-weight: bold;">Pcs</label>
