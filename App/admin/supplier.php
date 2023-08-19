@@ -144,6 +144,8 @@ $query = new Query();
                 <th>Action</th>
               </tr>
               <?php
+              if(!isset($_POST['search_id'])){
+
               $stmt = $pdo->prepare("SELECT * FROM supplier ORDER BY supplier_id");
               $stmt->execute();
               $rawResult = $stmt->fetchAll();
@@ -152,6 +154,7 @@ $query = new Query();
               $stmt = $pdo->prepare("SELECT * FROM supplier ORDER BY supplier_id LIMIT $offset,$numOfrecs ");
               $stmt->execute();
               $supplierdatas = $stmt->fetchAll();
+            }
               ?>
               <?php
               foreach ($supplierdatas as $supplierdata) {

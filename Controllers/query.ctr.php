@@ -55,6 +55,13 @@ Class Query{
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
+  function search($table, $search_row, $serach_id){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM $table WHERE $search_row='$serach_id'");
+    $stmt->execute();
+    return $stmt->fetchall();
+  }
+
   function createaccount($table, $username, $password, $email, $role){
     global $pdo;
     if(empty($username) || empty($password) || empty($email) || empty($role)){
@@ -293,11 +300,39 @@ Class Query{
     }
   }
 
-  function addpurchase($table, $date, $voucher_no, $tclfrozen, $commodity, $size, $viss, $pcs, $price){
+  function addpurchase($table, $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price){
     global $pdo;
     $amount = $price * $pcs;
-    $stmt = $pdo->prepare("INSERT INTO $table(date, voucher_no, tclfrozen, commodity, size, viss, pcs, price, amount) VALUES('$date', '$voucher_no', '$tclfrozen', '$commodity', '$size', '$viss', '$pcs', '$price', '$amount')");
+    $stmt = $pdo->prepare("INSERT INTO $table(date, voucher_no, tclfrozen, supplier_id, commodity, size, viss, pcs, price, amount) VALUES('$date', '$voucher_no', '$tclfrozen', '$supplier_name', '$commodity', '$size', '$viss', '$pcs', '$price', '$amount')");
+    $stmt->execute();
+    if($stmt){
+      return $successmessage = "Purchase Voucher Added Successfully";
+    }else{
+      return $errmessage = "Error accors when added Purchase Voucher";
+    }
+  }
 
+  function updatepurchase($table, $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price, $no){
+    global $pdo;
+    $amount = $price * $pcs;
+    $stmt = $pdo->prepare("UPDATE $table SET date='$date', voucher_no='$voucher_no', tclfrozen='$tclfrozen', supplier_id='$supplier_name', commodity='$commodity', size='$size', viss='$viss', pcs='$pcs', price='$price', amount='$amount' WHERE no='$no'");
+    $stmt->execute();
+    if($stmt){
+      return $successmessage = "Purchase Voucher Update Successfully";
+    }else{
+      return $errmessage = "Error accors when updating Purchase Voucher";
+    }
+  }
+
+  function deletepurchase($table, $deleteid){
+    global $pdo;
+    $stmt = $pdo->prepare("DELETE FROM $table WHERE no='$deleteid'");
+    $stmt->execute();
+    if($stmt){
+      return $successmessage = "Purchase Voucher Deleted Successfully";
+    }else{
+      return $errmessage = "Error accors when deleted Purchase Voucher";
+    }
   }
 
 }

@@ -109,7 +109,6 @@ $query = new Query();
               <?php
             }
             ?>
-<<<<<<< HEAD
             <?php
 
             if (!empty($_GET['pageno'])) {
@@ -120,8 +119,6 @@ $query = new Query();
             $numOfrecs = 2;
             $offset = ($pageno -1) * $numOfrecs;
             ?>
-            <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
-=======
             <form action="customer.php" method="post" class=" d-inline">
               <span>Search Customer:</span>
               <select name="search_id" class="form-control w-25 d-inline">
@@ -137,7 +134,6 @@ $query = new Query();
               <button type="submit" name="searchcustomer" class="btn btn-info">Search</button>
             </form>
             <button type="button" class="btn btn-success float-end d-inline" data-bs-toggle="modal" data-bs-target="#addmodal">
->>>>>>> ec6110d612d31b93bb5f78f5015948fdc3a324e8
               Add Customer
             </button>
             <table class="mt-5 table table-bordered table-striped rounded">
@@ -149,19 +145,20 @@ $query = new Query();
                 <th>Action</th>
               </tr>
               <?php
-<<<<<<< HEAD
-              $stmt = $pdo->prepare("SELECT * FROM customers ORDER BY customer_id");
-              $stmt->execute();
-              $rawResult = $stmt->fetchAll();
-              $total_pages = ceil(count($rawResult) / $numOfrecs);
+              if(!isset($_POST['search_id'])){
+                $stmt = $pdo->prepare("SELECT * FROM customers ORDER BY customer_id");
+                $stmt->execute();
+                $rawResult = $stmt->fetchAll();
+                $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-              $stmt = $pdo->prepare("SELECT * FROM customers ORDER BY customer_id LIMIT $offset,$numOfrecs ");
-              $stmt->execute();
-              $customerdatas = $stmt->fetchAll();
+                $stmt = $pdo->prepare("SELECT * FROM customers ORDER BY customer_id LIMIT $offset,$numOfrecs ");
+                $stmt->execute();
+                $customerdatas = $stmt->fetchAll();
+              }
               ?>
               <?php
-=======
->>>>>>> ec6110d612d31b93bb5f78f5015948fdc3a324e8
+
+
               foreach ($customerdatas as $customerdata) {
               ?>
 

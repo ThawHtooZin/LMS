@@ -34,25 +34,34 @@ $query = new Query();
             <?php
             if(isset($_POST['deletebutton'])){
               $deleteid = $_POST['deleteid'];
-              $message = $query->deletepurchase('category', $deleteid);
+              $message = $query->deletepurchase('purchase', $deleteid);
             }
             if(isset($_POST['updatebutton'])){
-              $category_name = $_POST['category_name'];
-              $category_id = $_POST['category_id'];
+              $date = $_POST['date'];
+              $voucher_no = $_POST['voucher_no'];
+              $tclfrozen = $_POST['tclfrozen'];
+              $supplier_name = $_POST['supplier_name'];
+              $commodity = $_POST['commodity'];
+              $size = $_POST['size'];
+              $viss = $_POST['viss'];
+              $pcs = $_POST['pcs'];
+              $price = $_POST['price'];
+              $no = $_POST['updateid'];
 
-              $message = $query->updatecategory('category', $category_name, $category_id);
+              $message = $query->updatepurchase('purchase', $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price, $no);
             }
             if(isset($_POST['addbutton'])){
               $date = $_POST['date'];
               $voucher_no = $_POST['voucher_no'];
               $tclfrozen = $_POST['tclfrozen'];
+              $supplier_name = $_POST['supplier_name'];
               $commodity = $_POST['commodity'];
               $size = $_POST['size'];
               $viss = $_POST['viss'];
               $pcs = $_POST['pcs'];
               $price = $_POST['price'];
 
-              $message = $query->addpurchase('purchase', $date, $voucher_no, $tclfrozen, $commodity, $size, $viss, $pcs, $price);
+              $message = $query->addpurchase('purchase', $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price);
             }
             if(!empty($message)){
               if(strpos($message, 'Successfully')){
@@ -126,39 +135,43 @@ $query = new Query();
                 <th>Action</th>
               </tr>
               <?php
-              // $stmt = $pdo->prepare("SELECT * FROM category ORDER BY category_id");
-              // $stmt->execute();
-              // $rawResult = $stmt->fetchAll();
-              // $total_pages = ceil(count($rawResult) / $numOfrecs);
-              //
-              // $stmt = $pdo->prepare("SELECT * FROM category ORDER BY category_id LIMIT $offset,$numOfrecs ");
-              // $stmt->execute();
-              // $categorydatas = $stmt->fetchAll();
-              // foreach ($categorydatas as $categorydata) {
+              $stmt = $pdo->prepare("SELECT * FROM purchase ORDER BY no");
+              $stmt->execute();
+              $rawResult = $stmt->fetchAll();
+              $total_pages = ceil(count($rawResult) / $numOfrecs);
+
+              $stmt = $pdo->prepare("SELECT * FROM purchase ORDER BY no LIMIT $offset,$numOfrecs ");
+              $stmt->execute();
+              $purchasedatas = $stmt->fetchAll();
+              foreach ($purchasedatas as $purchasedata) {
+                $supplierid = $purchasedata['supplier_id'];
+                $supplier_name = $query->select('supplier', $supplierid, 'supplier_id');
+                $itemid = $purchasedata['commodity'];
+                $item_name = $query->select('item', $itemid, 'item_id');
               ?>
 
               <tr>
-                <td>1</td>
-                <td>2/2/23</td>
-                <td>2852</td>
-                <td>Frozen</td>
-                <td>Mg Phyu</td>
-                <td>Hialsa</td>
-                <td>10/12</td>
-                <td>289.6</td>
-                <td>1</td>
-                <td>18000</td>
-                <td>18000</td>
+                <td><?php echo $purchasedata['no']; ?></td>
+                <td><?php echo date('d-m-Y', strtotime($purchasedata['date'])); ?></td>
+                <td><?php echo $purchasedata['voucher_no']; ?></td>
+                <td><?php echo $purchasedata['tclfrozen']; ?></td>
+                <td><?php echo $supplier_name['supplier_name']; ?></td>
+                <td><?php echo $item_name['item_name']; ?></td>
+                <td><?php echo $purchasedata['size']; ?></td>
+                <td><?php echo $purchasedata['viss']; ?></td>
+                <td><?php echo $purchasedata['pcs']; ?></td>
+                <td><?php echo $purchasedata['price']; ?></td>
+                <td><?php echo $purchasedata['amount']; ?></td>
                 <td>
-                  <input type="hidden" name="updateid" value="<?php// echo $categorydata['category_id']; ?>">
+                  <input type="hidden" name="updateid" value="<?php echo $purchasedata['no']; ?>">
                   <button type="submit" class="btn btn-warning text-light" data-bs-toggle="modal" data-bs-target="#updatemodal">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
   <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
   <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
 </svg>
                   </button>
-                <form action="category.php" method="post" style="display: inline !important;">
-                  <input type="hidden" name="deleteid" value="<?php// echo $categorydata['category_id']; ?>">
+                <form action="purchase.php" method="post" style="display: inline !important;">
+                  <input type="hidden" name="deleteid" value="<?php echo $purchasedata['no']; ?>">
                   <button type="submit" name="deletebutton" class="btn btn-danger">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
                   </button>
@@ -166,9 +179,9 @@ $query = new Query();
               </td>
               </tr>
               <!-- Data Update Modal -->
-              <div class="modal fade" id="updatemodal" tabindex="-1" role="dialog" >
+              <div class="modal fade" id="updatemodal" tabindex="-1" role="dialog"  style="margin-left:auto !important; margin-right: auto !important;">
                 <div class="modal-dialog" role="document">
-                  <div class="modal-content">
+                  <div class="modal-content" style="width: 750px; !important; margin-top:70px !important;">
                     <div class="modal-header bg-warning text-light">
                       <h5 class="modal-title" id="updatemodallabel">Update An Category</h5>
                       <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
@@ -178,16 +191,82 @@ $query = new Query();
                     <form action="" method="post" autocomplete="off">
                       <div class="modal-body">
                         <?php
-                        //  $id = $categorydata['category_id'];
-                        //  $updatedata = $query->select('category', $id, 'category_id');
+                         $id = $purchasedata['no'];
+                         $updatedata = $query->select('purchase', $id, 'no');
                         ?>
-                        <input type="hidden" name="category_id" value="">
-                        <label>Category Name</label>
-                        <input type="text" name="category_name" class="form-control" placeholder="Category Name" value="">
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-warning" name="updatebutton">Update</button>
+                        <input type="hidden" name="updateid" value="<?php echo $purchasedata['no']; ?>">
+                        <div class="row">
+                          <div class="col">
+                            <label style="font-weight: bold;">Date</label>
+                            <input type="date" name="date" class="form-control inpv2" value="<?php echo $updatedata['date']; ?>">
+                          </div>
+                          <div class="col">
+                            <label style="font-weight: bold;">Voucher No</label>
+                            <input type="number" name="voucher_no" class="form-control inpv2 mb-2" value="<?php echo $updatedata['voucher_no']; ?>">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <label style="font-weight: bold;">TCL (or) Frozen</label>
+                            <select class="form-control inpv2 mb-2" name="tclfrozen">
+                              <option value="">Select</option>
+                              <option value="tcl" <?php if($updatedata['tclfrozen'] == 'tcl'){ echo 'selected'; } ?>>TCL</option>
+                              <option value="frozen" <?php if($updatedata['tclfrozen'] == 'frozen'){ echo 'selected'; } ?>>Frozen</option>
+                            </select>
+                          </div>
+                          <div class="col">
+                            <label style="font-weight: bold;">Supplier Name</label>
+                            <select class="form-control inpv2 mb-2" name="supplier_name">
+                              <?php
+                              $supplierdatas = $query->selectall('supplier');
+                              foreach ($supplierdatas as $supplierdata) {
+                                ?>
+                                <option value="<?php echo $supplierdata['supplier_id']; ?>"  <?php if($updatedata['supplier_id'] == $supplierdata['supplier_id']){ echo 'selected'; } ?>><?php echo $supplierdata['supplier_name']; ?></option>
+                                <?php
+                              }
+                              ?>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <label style="font-weight: bold;">Commodity</label>
+                            <select class="form-control inpv2 mb-2" name="commodity">
+                              <?php
+                              $itemdatas = $query->selectall('item');
+                              foreach ($itemdatas as $itemdata) {
+                                ?>
+                                <option value="<?php echo $itemdata['item_id']; ?>"  <?php if($updatedata['commodity'] == $itemdata['item_id']){ echo 'selected'; } ?>><?php echo $itemdata['item_name']; ?></option>
+                                <?php
+                              }
+                              ?>
+                            </select>
+                          </div>
+                          <div class="col">
+                            <label style="font-weight: bold;">Size</label>
+                            <input type="text" name="size" class="form-control inpv2 mb-2" value="<?php echo $updatedata['size']; ?>">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <label style="font-weight: bold;">Viss</label>
+                            <input type="text" name="viss" class="form-control inpv2 mb-2" value="<?php echo $updatedata['viss']; ?>">
+                          </div>
+                          <div class="col">
+                            <label style="font-weight: bold;">Pcs</label>
+                            <input type="number" name="pcs" class="form-control inpv2 mb-2" value="<?php echo $updatedata['pcs']; ?>">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <label style="font-weight: bold;">Price</label>
+                            <input type="number" name="price" class="form-control inpv2 mb-2" value="<?php echo $updatedata['price']; ?>">
+                          </div>
+                          <div class="col mt-4">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-warning" name="updatebutton">Update</button>
+                          </div>
+                        </div>
                       </div>
                     </form>
                   </div>
@@ -195,7 +274,7 @@ $query = new Query();
               </div>
               <!-- Update Modal -->
               <?php
-              // };
+              };
               ?>
 
             </table>
@@ -255,7 +334,7 @@ $query = new Query();
                   $supplierdatas = $query->selectall('supplier');
                   foreach ($supplierdatas as $supplierdata) {
                     ?>
-                    <option value="<?php echo $supplierdata['id']; ?>"><?php echo $supplierdata['supplier_name']; ?></option>
+                    <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplierdata['supplier_name']; ?></option>
                     <?php
                   }
                   ?>
@@ -270,7 +349,7 @@ $query = new Query();
                   $itemdatas = $query->selectall('item');
                   foreach ($itemdatas as $itemdata) {
                     ?>
-                    <option value="<?php echo $itemdata['id']; ?>"><?php echo $itemdata['item_name']; ?></option>
+                    <option value="<?php echo $itemdata['item_id']; ?>"><?php echo $itemdata['item_name']; ?></option>
                     <?php
                   }
                   ?>
