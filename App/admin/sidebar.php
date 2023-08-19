@@ -46,8 +46,8 @@
                 - Sales
               </a>
             </li>
-            <li class="nav-item  rounded" style="cursor: not-allowed !important;">
-              <a href="purchase.php" class="nav-link purchase h text-light disabled" aria-current="page">
+            <li class="nav-item  rounded">
+              <a href="purchase.php" class="nav-link purchase h text-light" aria-current="page">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Purchase
               </a>
@@ -104,24 +104,52 @@
                 - Items
               </a>
             </li>
+            <li class="nav-item  rounded" style="cursor: not-allowed !important;">
+              <a href="unit.php" class="nav-link item h text-light disabled" aria-current="page">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - Unit
+              </a>
+            </li>
           </ul>
         </div>
       </li>
-      <li class="nav-item  rounded" style=" border: 2px solid black;">
-        <span style="cursor: not-allowed !important;">
-          <a href="suppliers.php" class="nav-link suppliers text-light disabled" aria-current="page">
-            <svg class="bi" width="16" height="16"><i class="bi bi-person-check"></i></svg>
-            Production
-          </a>
-        </span>
-      </li>
-      <li class="nav-item  rounded" style=" border: 2px solid black; " style="cursor: not-allowed !important;">
-        <span style="cursor: not-allowed !important;">
-        <a href="salereport.php" class="nav-link salereports text-light disabled" aria-current="page">
+      <li style=" border: 2px solid black; " class="rounded">
+        <a href="#" class="nav-link text-white report" data-bs-toggle="collapse" data-bs-target="#production-collapse" aria-expanded="false">
           <svg class="bi" width="16" height="16"><i class="bi bi-card-list"></i></svg>
-          Logestic
+          Production >
         </a>
-      </span>
+        <div class="collapse" id="production-collapse">
+          <ul class="btn-toggle-nav list-unstyled fw-normal ms-2">
+            <li class="nav-item  rounded" style="cursor: not-allowed !important;">
+              <a href="product.php" class="nav-link product h text-light disabled" aria-current="page">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - Product
+              </a>
+            </li>
+          </ul>
+        </div>
+      </li>
+      <li style=" border: 2px solid black; " class="rounded">
+        <a href="#" class="nav-link text-white report" data-bs-toggle="collapse" data-bs-target="#report-collapse" aria-expanded="false">
+          <svg class="bi" width="16" height="16"><i class="bi bi-card-list"></i></svg>
+          Reports >
+        </a>
+        <div class="collapse" id="report-collapse">
+          <ul class="btn-toggle-nav list-unstyled fw-normal ms-2">
+            <li class="nav-item  rounded" style="cursor: not-allowed !important;">
+              <a href="salereport.php" class="nav-link salereport h text-light disabled" aria-current="page">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - Sale Report
+              </a>
+            </li>
+            <li class="nav-item  rounded" style="cursor: not-allowed !important;">
+              <a href="purchasereport.php" class="nav-link purchasereport h text-light disabled" aria-current="page">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - Purchase Report
+              </a>
+            </li>
+          </ul>
+        </div>
       </li>
       <li class="nav-item  rounded" style=" border: 2px solid black; ">
         <a href="logout.php" class="nav-link salereports text-light" aria-current="page">

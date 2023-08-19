@@ -31,6 +31,9 @@ class Bootstrap
         th{
           background-color: #D9D9D9 !important;
         }
+        .inpv2{
+          border: 1px solid gray !important;
+        }
       </style>
     ';
   }

@@ -110,8 +110,6 @@ $query = new Query();
             }
             ?>
             <?php
-
-<<<<<<< HEAD
             if (!empty($_GET['pageno'])) {
               $pageno = $_GET['pageno'];
             }else{
@@ -120,7 +118,6 @@ $query = new Query();
             $numOfrecs = 2;
             $offset = ($pageno -1) * $numOfrecs;
             ?>
-=======
             <form action="supplier.php" method="post" class=" d-inline">
               <span>Search Supplier:</span>
               <select name="search_id" class="form-control w-25 d-inline">
@@ -135,7 +132,6 @@ $query = new Query();
               </select>
               <button type="submit" name="searchsupplier" class="btn btn-info">Search</button>
             </form>
->>>>>>> ec6110d612d31b93bb5f78f5015948fdc3a324e8
             <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
               Add Supplier
             </button>
@@ -148,7 +144,6 @@ $query = new Query();
                 <th>Action</th>
               </tr>
               <?php
-<<<<<<< HEAD
               $stmt = $pdo->prepare("SELECT * FROM supplier ORDER BY supplier_id");
               $stmt->execute();
               $rawResult = $stmt->fetchAll();
@@ -159,8 +154,6 @@ $query = new Query();
               $supplierdatas = $stmt->fetchAll();
               ?>
               <?php
-=======
->>>>>>> ec6110d612d31b93bb5f78f5015948fdc3a324e8
               foreach ($supplierdatas as $supplierdata) {
               ?>
 

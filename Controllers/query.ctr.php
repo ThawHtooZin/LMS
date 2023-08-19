@@ -293,19 +293,6 @@ Class Query{
     }
   }
 
-<<<<<<< HEAD
-  
-=======
-  function search($table, $search_row, $search_name){
-    global $pdo;
-    $stmt = $pdo->prepare("SELECT * FROM $table WHERE $search_row='$search_name'");
-    $stmt->execute();
-    return $stmt->fetchall();
-  }
-
-
->>>>>>> ec6110d612d31b93bb5f78f5015948fdc3a324e8
-
 }
 
 ?>
