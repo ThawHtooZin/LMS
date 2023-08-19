@@ -302,7 +302,11 @@ Class Query{
 
   function addpurchase($table, $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price){
     global $pdo;
-    $amount = $price * $pcs;
+    if(!empty($viss) || !empty($price)){
+      $amount = $price * $viss;
+    }else{
+      $amount = 0;
+    }
     $stmt = $pdo->prepare("INSERT INTO $table(date, voucher_no, tclfrozen, supplier_id, commodity, size, viss, pcs, price, amount) VALUES('$date', '$voucher_no', '$tclfrozen', '$supplier_name', '$commodity', '$size', '$viss', '$pcs', '$price', '$amount')");
     $stmt->execute();
     if($stmt){
@@ -314,7 +318,7 @@ Class Query{
 
   function updatepurchase($table, $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price, $no){
     global $pdo;
-    $amount = $price * $pcs;
+    $amount = $price * $viss;
     $stmt = $pdo->prepare("UPDATE $table SET date='$date', voucher_no='$voucher_no', tclfrozen='$tclfrozen', supplier_id='$supplier_name', commodity='$commodity', size='$size', viss='$viss', pcs='$pcs', price='$price', amount='$amount' WHERE no='$no'");
     $stmt->execute();
     if($stmt){
@@ -333,6 +337,13 @@ Class Query{
     }else{
       return $errmessage = "Error accors when deleted Purchase Voucher";
     }
+  }
+
+  function selectsum($table, $supplier_id){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT SUM(amount) AS total_amount FROM $table WHERE supplier_id='$supplier_id'");
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
 }

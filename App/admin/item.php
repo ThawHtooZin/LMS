@@ -107,7 +107,7 @@ $query = new Query();
             }else{
               $pageno = 1;
             }
-            $numOfrecs = 2;
+            $numOfrecs = 6;
             $offset = ($pageno -1) * $numOfrecs;
             ?>
             <table class="mt-5 table table-bordered table-striped rounded">

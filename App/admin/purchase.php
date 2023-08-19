@@ -26,11 +26,11 @@ $query = new Query();
         ?>
       </div>
       <div class="col-10">
-        <div class="card mt-3">
+        <div class="card mt-1">
           <div class="card-header bg-warning text-light"  style="padding:-10px;">
-            <h5>Manage Purchase</h5>
+            <b>Manage Purchase</b>
           </div>
-          <div class="card-body">
+          <div class="card-body" style="margin-top:-8px !important;">
             <?php
             if(isset($_POST['deletebutton'])){
               $deleteid = $_POST['deleteid'];
@@ -63,6 +63,12 @@ $query = new Query();
 
               $message = $query->addpurchase('purchase', $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price);
             }
+
+            if(isset($_POST['total'])){
+              $supplier_id = $_POST['supplier_id'];
+              $purchasedatas = $query->search('purchase', 'supplier_id', $supplier_id);
+            }
+
             if(!empty($message)){
               if(strpos($message, 'Successfully')){
                 $successmessage = $message;
@@ -105,8 +111,21 @@ $query = new Query();
               <?php
             }
             ?>
-
-            <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
+            <a href="purchase_report.php" class="btn btn-primary btn-sm">Report</a>
+            <form  action="purchase.php" method="post" class="d-inline">
+              <select class="form-control d-inline" name="supplier_id" style="width:15%;">
+                <?php
+                $supplierdatas = $query->selectall('supplier');
+                foreach ($supplierdatas as $supplierdata) {
+                  ?>
+                  <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplierdata['supplier_name']; ?></option>
+                  <?php
+                }
+                ?>
+              </select>
+              <button type="submit" name="total" class="btn btn-primary btn-sm">Total</button>
+            </form>
+            <button type="button" class="btn btn-success float-end btn-sm" data-bs-toggle="modal" data-bs-target="#addmodal">
               Add Purchase Voucher
             </button>
             <?php
@@ -116,10 +135,10 @@ $query = new Query();
             }else{
               $pageno = 1;
             }
-            $numOfrecs = 2;
+            $numOfrecs = 8;
             $offset = ($pageno -1) * $numOfrecs;
             ?>
-            <table class="mt-5 table table-bordered table-striped rounded">
+            <table class="mt-1 table table-bordered table-striped rounded">
               <tr>
                 <th>#</th>
                 <th>Date</th>
@@ -129,20 +148,26 @@ $query = new Query();
                 <th>Commodity</th>
                 <th>Size</th>
                 <th>Viss</th>
+                <th>Kg</th>
                 <th>Pcs</th>
                 <th>Price</th>
                 <th>Amount</th>
                 <th>Action</th>
               </tr>
               <?php
-              $stmt = $pdo->prepare("SELECT * FROM purchase ORDER BY no");
-              $stmt->execute();
-              $rawResult = $stmt->fetchAll();
-              $total_pages = ceil(count($rawResult) / $numOfrecs);
+              if(isset($_POST['total'])){
+                $supplier_id = $_POST['supplier_id'];
+                $total_amount = $query->selectsum('purchase', $supplier_id);
+              }else{
+                $stmt = $pdo->prepare("SELECT * FROM purchase ORDER BY no");
+                $stmt->execute();
+                $rawResult = $stmt->fetchAll();
+                $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-              $stmt = $pdo->prepare("SELECT * FROM purchase ORDER BY no LIMIT $offset,$numOfrecs ");
-              $stmt->execute();
-              $purchasedatas = $stmt->fetchAll();
+                $stmt = $pdo->prepare("SELECT * FROM purchase ORDER BY no LIMIT $offset,$numOfrecs ");
+                $stmt->execute();
+                $purchasedatas = $stmt->fetchAll();
+              }
               foreach ($purchasedatas as $purchasedata) {
                 $supplierid = $purchasedata['supplier_id'];
                 $supplier_name = $query->select('supplier', $supplierid, 'supplier_id');
@@ -159,12 +184,13 @@ $query = new Query();
                 <td><?php echo $item_name['item_name']; ?></td>
                 <td><?php echo $purchasedata['size']; ?></td>
                 <td><?php echo $purchasedata['viss']; ?></td>
+                <td><?php echo $purchasedata['viss'] * 1.634; ?></td>
                 <td><?php echo $purchasedata['pcs']; ?></td>
                 <td><?php echo $purchasedata['price']; ?></td>
                 <td><?php echo $purchasedata['amount']; ?></td>
                 <td>
                   <input type="hidden" name="updateid" value="<?php echo $purchasedata['no']; ?>">
-                  <button type="submit" class="btn btn-warning text-light" data-bs-toggle="modal" data-bs-target="#updatemodal">
+                  <button type="submit" class="btn btn-warning text-light" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $purchasedata['no'];  ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
   <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
   <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
@@ -179,7 +205,7 @@ $query = new Query();
               </td>
               </tr>
               <!-- Data Update Modal -->
-              <div class="modal fade" id="updatemodal" tabindex="-1" role="dialog"  style="margin-left:auto !important; margin-right: auto !important;">
+              <div class="modal fade" id="updatemodal<?php echo $purchasedata['no'];  ?>" tabindex="-1" role="dialog"  style="margin-left:auto !important; margin-right: auto !important;">
                 <div class="modal-dialog" role="document">
                   <div class="modal-content" style="width: 750px; !important; margin-top:70px !important;">
                     <div class="modal-header bg-warning text-light">
@@ -276,7 +302,29 @@ $query = new Query();
               <?php
               };
               ?>
-
+              <?php
+              if (isset($_POST['total'])) {
+                $supplier_id = $_POST['supplier_id'];
+                $total_amount = $query->selectsum('purchase', $supplier_id);
+                ?>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td>Total Amount:</td>
+                  <td><?php echo $total_amount['total_amount'];  ?></td>
+                  <td></td>
+                </tr>
+                <?php
+              }
+              ?>
             </table>
             <br>
             <div aria-label="Page navigation example" style="float:right;">

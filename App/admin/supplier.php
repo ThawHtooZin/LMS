@@ -38,9 +38,9 @@ $query = new Query();
         ?>
       </div>
       <div class="col-10">
-        <div class="card mt-3">
+        <div class="card mt-1">
           <div class="card-header bg-warning text-light"  style="padding:-10px;">
-            <h5>Manage Supplier</h5>
+            <b>Manage Supplier</b>
           </div>
           <div class="card-body">
             <?php
@@ -115,12 +115,11 @@ $query = new Query();
             }else{
               $pageno = 1;
             }
-            $numOfrecs = 2;
+            $numOfrecs = 7;
             $offset = ($pageno -1) * $numOfrecs;
             ?>
             <form action="supplier.php" method="post" class=" d-inline">
-              <span>Search Supplier:</span>
-              <select name="search_id" class="form-control w-25 d-inline">
+              <select name="search_id" class="form-control d-inline" style="width:15%; padding: 0px !important; margin: 0 !important; font-size: 15px !important;">
                 <?php
                 $supplierdatasfs = $query->selectall('supplier');
                 foreach ($supplierdatasfs as $supplierdatafs) {
@@ -130,12 +129,13 @@ $query = new Query();
                 }
                  ?>
               </select>
-              <button type="submit" name="searchsupplier" class="btn btn-info">Search</button>
+              <button type="submit" name="searchsupplier" class="btn btn-info btn-sm">Search</button>
+              <a href="supplier_report.php" class="btn btn-primary btn-sm">Report</a>
             </form>
-            <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
+            <button type="button" class="btn btn-success float-end btn-sm" data-bs-toggle="modal" data-bs-target="#addmodal">
               Add Supplier
             </button>
-            <table class="mt-5 table table-bordered table-striped rounded">
+            <table class="mt-1 table table-bordered table-striped rounded">
               <tr>
                 <th>Supplier ID</th>
                 <th>Supplier Name</th>
