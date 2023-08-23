@@ -35,12 +35,25 @@ class Bootstrap
           border: 1px solid gray !important;
         }
       </style>
+      <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.css">
     ';
   }
   function javascript()
   {
     echo '
+
     <script src="../../Resources\bootstrap-5.3.1-dist\js\bootstrap.bundle.min.js" charset="utf-8"></script>
+
+    <script src="http://code.jquery.com/jquery-1.8.3.js"></script>
+    <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.js"></script>
+
+    <script type="text/javascript">
+    $(function() {
+      $(".chzn-select").chosen();
+    });
+    </script>
     ';
   }
 

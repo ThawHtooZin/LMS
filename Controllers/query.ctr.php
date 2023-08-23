@@ -36,14 +36,21 @@ Class Query{
           $_SESSION['logged_in'] = true;
           header('location:App/purchase/');
         }
-
       }
     }
   }
+  
 
   function selectall($table){
     global $pdo;
     $stmt = $pdo->prepare("SELECT * FROM $table");
+    $stmt->execute();
+    return $stmt->fetchall();
+  }
+
+  function selectdesc($table){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT DISTINCT (voucher_no) FROM $table");
     $stmt->execute();
     return $stmt->fetchall();
   }
@@ -346,6 +353,13 @@ Class Query{
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
+  function selectsumviss($table, $id, $selectwhat){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM $table WHERE $selectwhat='$id'");
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+  }
+
   function selectallsum($table, $row, $selectas){
     global $pdo;
     $stmt = $pdo->prepare("SELECT SUM($row) AS $selectas FROM $table");
@@ -367,6 +381,47 @@ Class Query{
     return $stmt->fetchall();
   }
 
+  function selectsupplierdbw($table, $supplier_id, $startdate, $enddate){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM $table WHERE supplier_id='$supplier_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
+    $stmt->execute();
+    return $stmt->fetchall();
+  }
+
+  function selectsupplierdbwsum($table, $row, $selectas, $supplier_id, $startdate, $enddate){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT SUM($row) AS $selectas FROM $table WHERE supplier_id='$supplier_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+  }
+
+  function selectcommoditydbw($table, $commodity, $startdate, $enddate){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM $table WHERE commodity='$commodity' AND `date` BETWEEN '$startdate' AND '$enddate'");
+    $stmt->execute();
+    return $stmt->fetchall();
+  }
+
+  function selectcommoditydbwsum($table, $row, $selectas, $commodity, $startdate, $enddate){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT SUM($row) AS $selectas FROM $table WHERE commodity='$commodity' AND `date` BETWEEN '$startdate' AND '$enddate'");
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+  }
+
+  function selectvoucher($table, $voucher_no){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM $table WHERE voucher_no='$voucher_no'");
+    $stmt->execute();
+    return $stmt->fetchall();
+  }
+
+  function selectvouchersum($table, $row, $selectas, $voucher_no){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT SUM($row) AS $selectas FROM $table WHERE voucher_no='$voucher_no'");
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+  }
 }
 
 ?>

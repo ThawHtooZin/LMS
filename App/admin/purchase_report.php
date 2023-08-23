@@ -41,7 +41,9 @@ $query = new Query();
                   <option value="tdysearch">Today Search</option>
                   <option value="suppliersearch">Supplier Search</option>
                   <option value="commoditysearch">Commodity Search</option>
-                  <option value="supplierdbwsearch">Supplier And Date Between Search</option>
+                  <option value="supplierdbwsearch">Supplier & Date Between Search</option>
+                  <option value="commoditydbwsearch">Commodity & Date Between Search</option>
+                  <option value="vouchersearch">Voucher Search</option>
                 </select>
                 <button type="submit" name="ok" class="btn btn-primary">Ok</button>
               </div>
@@ -153,6 +155,71 @@ $query = new Query();
                 <?php
                 }
                 ?>
+                <!-- Commodity and Date Between Search -->
+                <?php
+                if(isset($_POST['ok']) && $_POST['reportselect'] == 'commoditydbwsearch'){
+                ?>
+                <label>Commodity</label>
+                <div class="row">
+                  <div class="col-4">
+                    <select class="form-control inpv2 mb-2" name="item_id">
+                      <?php
+                      $itemdatas = $query->selectall('item');
+                      foreach ($itemdatas as $itemdata) {
+                        ?>
+                        <option value="<?php echo $itemdata['item_id']; ?>"><?php echo $itemdata['item_name']; ?></option>
+                        <?php
+                      }
+                      ?>
+                    </select>
+                  </div>
+                  <div class="col-6">
+                    <div class="row">
+                      <div class="col-6">
+                        <input type="date" name="dbwstartdate" class="form-control inpv2">
+                        <label>Start Date</label>
+                      </div>
+                      <div class="col-1 text-center">
+                        To
+                      </div>
+                      <div class="col-5">
+                        <input type="date" name="dbwenddate" class="form-control inpv2">
+                        <label>End Date</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-2">
+                    <button type="submit" name="commoditydbwsearch" class="btn btn-primary">Search Report</button>
+                  </div>
+                </div>
+                <?php
+                }
+                ?>
+                <!-- Voucher Search -->
+                <?php
+                if(isset($_POST['ok']) && $_POST['reportselect'] == 'vouchersearch'){
+                ?>
+                <label>Voucher Search</label>
+                <div class="row">
+                  <div class="col-4">
+                    <select class="form-control inpv2 mb-2 chzn-select" name="voucher_no" data-placeholder="Select Voucher">
+                      <?php
+                      $voucherdatas = $query->selectdesc('purchase');
+                      foreach ($voucherdatas as $voucherdata) {
+                        ?>
+                        <option value="<?php echo $voucherdata['voucher_no']; ?>"><?php echo $voucherdata['voucher_no']; ?></option>
+                        <?php
+                      }
+                      ?>
+                    </select>
+                  </div>
+                  <div class="col-2">
+                    <button type="submit" name="vouchersearch" class="btn btn-primary">Search Report</button>
+                  </div>
+                </div>
+                <?php
+                }
+                ?>
             </form>
 
             <!-- Reports Table -->
@@ -187,6 +254,19 @@ $query = new Query();
                 $startdate = date('Y-m-d');
                 $enddate = date('Y-m-d');
                 $purchasedatas = $query->selectdbw('purchase', $startdate, $enddate);
+              }elseif(isset($_POST['supplierdbwsearch'])){
+                $startdate = $_POST['dbwstartdate'];
+                $enddate = $_POST['dbwenddate'];
+                $supplier_id = $_POST['supplier_name'];
+                $purchasedatas = $query->selectsupplierdbw('purchase', $supplier_id, $startdate, $enddate);
+              }elseif(isset($_POST['commoditydbwsearch'])){
+                $startdate = $_POST['dbwstartdate'];
+                $enddate = $_POST['dbwenddate'];
+                $commodity = $_POST['item_id'];
+                $purchasedatas = $query->selectcommoditydbw('purchase', $commodity, $startdate, $enddate);
+              }elseif(isset($_POST['vouchersearch'])){
+                $voucher_no = $_POST['voucher_no'];
+                $purchasedatas = $query->selectvoucher("purchase", $voucher_no);
               }else{
                 $purchasedatas = $query->selectall("purchase");
               }
@@ -198,6 +278,7 @@ $query = new Query();
               if(isset($_POST['commoditysearch'])){
                 $item_id = $_POST['item_id'];
                 $total_amount_commodity_search = $query->selectsum('purchase', $item_id, 'commodity');
+                $total_amount_commodity_search_viss = $query->selectsumviss('purchase', $item_id, 'commodity');
               }
               if(isset($_POST['dbwsearch'])){
                 $startdate = $_POST['dbwstartdate'];
@@ -208,6 +289,22 @@ $query = new Query();
                 $startdate = date('Y-m-d');
                 $enddate = date('Y-m-d');
                 $total_amount_dbw_search = $query->selectsumdbw('purchase', 'amount', 'total_amount', $startdate, $enddate, 'date');
+              }
+              if(isset($_POST['supplierdbwsearch'])){
+                $startdate = $_POST['dbwstartdate'];
+                $enddate = $_POST['dbwenddate'];
+                $supplier_id = $_POST['supplier_name'];
+                $total_amount_dbw_supplier_search = $query->selectsupplierdbwsum('purchase', 'amount', 'total_amount', $supplier_id, $startdate, $enddate);
+              }
+              if(isset($_POST['commoditydbwsearch'])){
+                $startdate = $_POST['dbwstartdate'];
+                $enddate = $_POST['dbwenddate'];
+                $commodity = $_POST['item_id'];
+                $total_amount_dbw_commodity_search = $query->selectcommoditydbwsum('purchase', 'amount', 'total_amount', $commodity, $startdate, $enddate);
+              }
+              if(isset($_POST['vouchersearch'])){
+                $voucher_no = $_POST['voucher_no'];
+                $total_amount_commodity_search = $query->selectvouchersum('purchase', 'amount', 'total_amount', $voucher_no,);
               }
               foreach ($purchasedatas as $purchasedata) {
                 $supplierid = $purchasedata['supplier_id'];
@@ -271,6 +368,34 @@ $query = new Query();
                     <td>Total Amount:</td>
                     <td><?php echo $total_amount_commodity_search['total_amount']; ?></td>
                   </tr>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>Total Viss:</td>
+                    <td><?php echo $total_amount_commodity_search_viss['total_viss']; ?></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>Total Kg:</td>
+                    <td><?php echo $total_amount_commodity_search_viss['total_viss'] * 1.634; ?></td>
+                  </tr>
                   <?php
                 }
                   ?>
@@ -295,6 +420,48 @@ $query = new Query();
                     <?php
                   }
                     ?>
+
+                    <?php
+                    if (!empty($total_amount_dbw_supplier_search)) {
+                      ?>
+                      <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>Total Amount:</td>
+                        <td><?php echo $total_amount_dbw_supplier_search['total_amount']; ?></td>
+                      </tr>
+                      <?php
+                    }
+                      ?>
+
+                      <?php
+                      if (!empty($total_amount_dbw_commodity_search)) {
+                        ?>
+                        <tr>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td>Total Amount:</td>
+                          <td><?php echo $total_amount_dbw_commodity_search['total_amount']; ?></td>
+                        </tr>
+                        <?php
+                      }
+                        ?>
 
             </table>
           </div>
