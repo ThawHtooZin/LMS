@@ -339,11 +339,32 @@ Class Query{
     }
   }
 
-  function selectsum($table, $supplier_id){
+  function selectsum($table, $id, $selectwhat){
     global $pdo;
-    $stmt = $pdo->prepare("SELECT SUM(amount) AS total_amount FROM $table WHERE supplier_id='$supplier_id'");
+    $stmt = $pdo->prepare("SELECT SUM(amount) AS total_amount FROM $table WHERE $selectwhat='$id'");
     $stmt->execute();
     return $stmt->fetch(PDO::FETCH_ASSOC);
+  }
+
+  function selectallsum($table, $row, $selectas){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT SUM($row) AS $selectas FROM $table");
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+  }
+
+  function selectsumdbw($table, $row, $selectas, $startdate, $enddate){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT SUM($row) AS $selectas FROM $table WHERE `date` BETWEEN '$startdate' AND '$enddate'");
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+  }
+
+  function selectdbw($table, $startdate, $enddate){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM $table WHERE `date` BETWEEN '$startdate' AND '$enddate'");
+    $stmt->execute();
+    return $stmt->fetchall();
   }
 
 }

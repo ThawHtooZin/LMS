@@ -69,6 +69,11 @@ $query = new Query();
               $purchasedatas = $query->search('purchase', 'supplier_id', $supplier_id);
             }
 
+            if(isset($_POST['commodity'])){
+              $item_id = $_POST['item_id'];
+              $purchasedatas = $query->search('purchase', 'commodity', $item_id);
+            }
+
             if(!empty($message)){
               if(strpos($message, 'Successfully')){
                 $successmessage = $message;
@@ -113,6 +118,7 @@ $query = new Query();
             ?>
             <a href="purchase_report.php" class="btn btn-primary btn-sm">Report</a>
             <form  action="purchase.php" method="post" class="d-inline">
+              <span>Supplier Name:</span>
               <select class="form-control d-inline" name="supplier_id" style="width:15%;">
                 <?php
                 $supplierdatas = $query->selectall('supplier');
@@ -124,6 +130,18 @@ $query = new Query();
                 ?>
               </select>
               <button type="submit" name="total" class="btn btn-primary btn-sm">Total</button>
+              <span>Commodity:</span>
+              <select class="form-control d-inline" name="item_id" style="width:15%;">
+                <?php
+                $itemdatas = $query->selectall('item');
+                foreach ($itemdatas as $itemdata) {
+                  ?>
+                  <option value="<?php echo $itemdata['item_id']; ?>"><?php echo $itemdata['item_name']; ?></option>
+                  <?php
+                }
+                ?>
+              </select>
+              <button type="submit" name="commodity" class="btn btn-primary btn-sm">Find Commodity</button>
             </form>
             <button type="button" class="btn btn-success float-end btn-sm" data-bs-toggle="modal" data-bs-target="#addmodal">
               Add Purchase Voucher
@@ -157,7 +175,10 @@ $query = new Query();
               <?php
               if(isset($_POST['total'])){
                 $supplier_id = $_POST['supplier_id'];
-                $total_amount = $query->selectsum('purchase', $supplier_id);
+                $total_amount = $query->selectsum('purchase', $supplier_id, 'supplier_id');
+              }elseif(isset($_POST['commodity'])){
+                $item_id = $_POST['item_id'];
+                $total_amount = $query->selectsum('purchase', $item_id, 'commodity');
               }else{
                 $stmt = $pdo->prepare("SELECT * FROM purchase ORDER BY no");
                 $stmt->execute();
@@ -189,19 +210,21 @@ $query = new Query();
                 <td><?php echo $purchasedata['price']; ?></td>
                 <td><?php echo $purchasedata['amount']; ?></td>
                 <td>
-                  <input type="hidden" name="updateid" value="<?php echo $purchasedata['no']; ?>">
-                  <button type="submit" class="btn btn-warning text-light" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $purchasedata['no'];  ?>">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-  <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-  <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-</svg>
-                  </button>
-                <form action="purchase.php" method="post" style="display: inline !important;">
-                  <input type="hidden" name="deleteid" value="<?php echo $purchasedata['no']; ?>">
-                  <button type="submit" name="deletebutton" class="btn btn-danger">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
-                  </button>
-                </form>
+                  <div class="d-flex">
+                    <input type="hidden" name="updateid" value="<?php echo $purchasedata['no']; ?>">
+                    <button type="submit" class="btn btn-warning text-light" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $purchasedata['no'];  ?>">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+  </svg>
+                    </button>
+                  <form action="purchase.php" method="post" style="display: inline !important;">
+                    <input type="hidden" name="deleteid" value="<?php echo $purchasedata['no']; ?>">
+                    <button type="submit" name="deletebutton" class="btn btn-danger">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
+                    </button>
+                  </form>
+                  </div>
               </td>
               </tr>
               <!-- Data Update Modal -->
@@ -305,7 +328,7 @@ $query = new Query();
               <?php
               if (isset($_POST['total'])) {
                 $supplier_id = $_POST['supplier_id'];
-                $total_amount = $query->selectsum('purchase', $supplier_id);
+                $total_amount = $query->selectsum('purchase', $supplier_id, 'supplier_id');
                 ?>
                 <tr>
                   <td></td>
@@ -325,7 +348,52 @@ $query = new Query();
                 <?php
               }
               ?>
+              <?php
+              if (isset($_POST['commodity'])) {
+                $id = $_POST['item_id'];
+                $total_amount = $query->selectsum('purchase', $id, 'commodity');
+                ?>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td>Total Amount:</td>
+                  <td><?php echo $total_amount['total_amount'];  ?></td>
+                  <td></td>
+                </tr>
+                <?php
+              }
+              ?>
+              <?php
+              if(!$_POST){
+                $total_amount = $query->selectallsum('purchase', 'amount', 'total_amount');
+                ?>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td>Total Amount:</td>
+                  <td><?php echo $total_amount['total_amount'];  ?></td>
+                  <td></td>
+                </tr>
             </table>
+            <?php
+            }
+            ?>
             <br>
             <div aria-label="Page navigation example" style="float:right;">
               <ul class="pagination">

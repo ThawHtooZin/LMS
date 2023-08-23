@@ -142,8 +142,8 @@
                 - Sale Report
               </a>
             </li>
-            <li class="nav-item  rounded" style="cursor: not-allowed !important;">
-              <a href="purchasereport.php" class="nav-link purchasereport h text-light disabled" aria-current="page">
+            <li class="nav-item  rounded">
+              <a href="purchase_report.php" class="nav-link purchasereport h text-light" aria-current="page">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Purchase Report
               </a>
