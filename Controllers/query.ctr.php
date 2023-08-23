@@ -422,6 +422,27 @@ Class Query{
     $stmt->execute();
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
+
+  function selectcommodityandsize($table, $item_id, $size){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM $table WHERE commodity='$item_id' AND size='$size';");
+    $stmt->execute();
+    return $stmt->fetchall();
+  }
+
+  function selectcommodityandsizesum($table, $row, $selectas, $item_id, $size){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT SUM($row) AS $selectas FROM $table WHERE commodity='$item_id' AND size='$size';");
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+  }
+
+  function selectsumvisswithsize($table, $item_id, $size){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM $table WHERE commodity='$item_id' AND size='$size'");
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+  }
 }
 
 ?>

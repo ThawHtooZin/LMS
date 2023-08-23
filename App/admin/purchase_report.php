@@ -44,6 +44,7 @@ $query = new Query();
                   <option value="supplierdbwsearch">Supplier & Date Between Search</option>
                   <option value="commoditydbwsearch">Commodity & Date Between Search</option>
                   <option value="vouchersearch">Voucher Search</option>
+                  <option value="commodityandsizesearch">Commodity & Size Search</option>
                 </select>
                 <button type="submit" name="ok" class="btn btn-primary">Ok</button>
               </div>
@@ -220,6 +221,33 @@ $query = new Query();
                 <?php
                 }
                 ?>
+                <!-- Commodity & Size Search -->
+                <?php
+                if(isset($_POST['ok']) && $_POST['reportselect'] == 'commodityandsizesearch'){
+                ?>
+                <div class="row">
+                  <div class="col-5">
+                    <select class="form-control  mb-2 inpv2" name="item_id">
+                      <?php
+                      $itemdatas = $query->selectall('item');
+                      foreach ($itemdatas as $itemdata) {
+                        ?>
+                        <option value="<?php echo $itemdata['item_id']; ?>"><?php echo $itemdata['item_name']; ?></option>
+                        <?php
+                      }
+                      ?>
+                    </select>
+                  </div>
+                  <div class="col-5">
+                    <input type="number" name="size" class="form-control inpv2" placeholder="Enter Size">
+                  </div>
+                  <div class="col-2">
+                    <button type="submit" name="commodityandsizesearch" class="btn btn-primary">Search Report</button>
+                  </div>
+                </div>
+                <?php
+                }
+                ?>
             </form>
 
             <!-- Reports Table -->
@@ -267,6 +295,10 @@ $query = new Query();
               }elseif(isset($_POST['vouchersearch'])){
                 $voucher_no = $_POST['voucher_no'];
                 $purchasedatas = $query->selectvoucher("purchase", $voucher_no);
+              }elseif(isset($_POST['commodityandsizesearch'])){
+                $item_id = $_POST['item_id'];
+                $size = $_POST['size'];
+                $purchasedatas = $query->selectcommodityandsize('purchase', $item_id, $size);
               }else{
                 $purchasedatas = $query->selectall("purchase");
               }
@@ -305,6 +337,12 @@ $query = new Query();
               if(isset($_POST['vouchersearch'])){
                 $voucher_no = $_POST['voucher_no'];
                 $total_amount_commodity_search = $query->selectvouchersum('purchase', 'amount', 'total_amount', $voucher_no,);
+              }
+              if(isset($_POST['commodityandsizesearch'])){
+                $item_id = $_POST['item_id'];
+                $size = $_POST['size'];
+                $total_amount_commodity_and_size_search = $query->selectcommodityandsizesum('purchase', 'amount', 'total_amount', $item_id, $size);
+                $total_amount_commodity_and_size_search_viss = $query->selectsumvisswithsize('purchase', $item_id, $size);
               }
               foreach ($purchasedatas as $purchasedata) {
                 $supplierid = $purchasedata['supplier_id'];
@@ -462,6 +500,55 @@ $query = new Query();
                         <?php
                       }
                         ?>
+
+                        <?php
+                        if (!empty($total_amount_commodity_and_size_search)) {
+                          ?>
+                          <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>Total Amount:</td>
+                            <td><?php echo $total_amount_commodity_and_size_search['total_amount']; ?></td>
+                          </tr>
+                          <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>Total Viss:</td>
+                            <td><?php echo $total_amount_commodity_and_size_search_viss['total_viss']; ?></td>
+                          </tr>
+                          <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>Total Kg:</td>
+                            <td><?php echo $total_amount_commodity_and_size_search_viss['total_viss'] * 1.634; ?></td>
+                          </tr>
+                          <?php
+                        }
+                          ?>
 
             </table>
           </div>
