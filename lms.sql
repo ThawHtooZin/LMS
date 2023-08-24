@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 19, 2023 at 07:30 AM
+-- Generation Time: Aug 24, 2023 at 06:28 AM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 7.4.29
 
@@ -131,14 +131,16 @@ CREATE TABLE `item` (
 --
 
 INSERT INTO `item` (`item_id`, `category_id`, `item_name`) VALUES
-('1001', 5, 'Ga nan Pyw'),
-('1002', 5, 'Ga nan A Khon Mr'),
-('2001', 4, 'Na Tha Loute'),
-('2002', 4, 'Nya Gyin'),
-('C001', 8, 'Cocacola'),
-('C002', 8, 'SPEED'),
-('S001', 9, 'Nya Monte Kyaw'),
-('S002', 9, 'Ar Lu Kyaw');
+('BJ123', 4, 'Baby Koral'),
+('BJ536', 4, 'Boal'),
+('HG184', 4, 'D-Puti'),
+('HJ275', 4, 'Taboshi'),
+('HL123', 4, 'Hilsa'),
+('JK167', 4, 'Tilapia'),
+('KJ243', 4, 'Poa'),
+('LK123', 4, 'Batashi'),
+('OJ247', 4, 'Puti'),
+('UT216', 4, 'Rohu');
 
 -- --------------------------------------------------------
 
@@ -150,15 +152,31 @@ CREATE TABLE `purchase` (
   `no` int(11) NOT NULL,
   `date` date NOT NULL,
   `voucher_no` int(11) NOT NULL,
-  `supplier_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `supplier_id` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `tclfrozen` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `commodity` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `size` int(11) NOT NULL,
-  `viss` int(11) NOT NULL,
+  `viss` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `pcs` int(11) NOT NULL,
   `price` int(11) NOT NULL,
   `amount` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `purchase`
+--
+
+INSERT INTO `purchase` (`no`, `date`, `voucher_no`, `supplier_id`, `tclfrozen`, `commodity`, `size`, `viss`, `pcs`, `price`, `amount`) VALUES
+(3, '2023-08-01', 230001, 'DK123', 'frozen', 'HL123', 10, '289.6', 0, 28000, 8108800),
+(4, '2023-08-01', 230001, 'DK123', 'frozen', 'HL123', 10, '50', 0, 280, 14000),
+(5, '2023-08-01', 230001, 'DK123', 'frozen', 'OJ247', 8, '10', 0, 5000, 50000),
+(6, '2023-08-01', 230001, 'DK123', 'frozen', 'OJ247', 9, '100', 0, 5000, 500000),
+(7, '2023-08-01', 230002, 'NS123', 'frozen', 'HL123', 10, '10', 0, 36000, 360000),
+(8, '2023-08-01', 230002, 'NS123', 'frozen', 'HL123', 10, '50', 0, 36000, 1800000),
+(9, '2023-08-01', 230002, 'NS123', 'frozen', 'LK123', 15, '10', 0, 7000, 70000),
+(10, '2023-08-01', 230002, 'NS123', 'frozen', 'LK123', 15, '100', 0, 7000, 700000),
+(11, '2023-08-22', 111, 'KJ122', 'frozen', 'HL123', 10, '257', 12, 1000, 257000),
+(12, '2023-08-23', 264, 'DG214', 'frozen', 'HL123', 10, '275', 25, 1900, 522500);
 
 -- --------------------------------------------------------
 
@@ -178,7 +196,17 @@ CREATE TABLE `supplier` (
 --
 
 INSERT INTO `supplier` (`supplier_id`, `supplier_name`, `supplier_phone`, `supplier_address`) VALUES
-('DK123', 'Naung Naung', '09123123', 'Mandalay');
+('DK123', 'Naung Naung', '09123123', 'Mandalay'),
+('NS123', 'Tun Naing', '0923423423', 'Yangon'),
+('DG214', 'Thaung Htun', '09234234', 'Mandalay'),
+('KJ122', 'Soe Naing', '09342124', 'Nay Pyi Daw'),
+('OP123', 'Pho Zaw', '092342342', 'Ayar Wa Di'),
+('HE132', 'Bar Bulay', '09123123', 'India'),
+('KJ126', 'Soe Thain', '091324124', 'Na Kya Pa Noung'),
+('JK909', 'Phyo Lay', '09976476', 'Nay Pyi Daw'),
+('KJ234', 'Ko Myo', '0938757878', 'Ka Chin'),
+('KH122', 'Soe Myint', '09234234', 'Mandalay'),
+('JH123', 'Thar Hla', '0924234345', 'Thi Li Lin Kar');
 
 --
 -- Indexes for dumped tables
@@ -246,7 +274,7 @@ ALTER TABLE `category`
 -- AUTO_INCREMENT for table `purchase`
 --
 ALTER TABLE `purchase`
-  MODIFY `no` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
