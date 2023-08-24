@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.1.3
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 24, 2023 at 06:28 AM
+-- Generation Time: Aug 24, 2023 at 01:22 PM
 -- Server version: 10.4.24-MariaDB
--- PHP Version: 7.4.29
+-- PHP Version: 8.0.17
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -56,12 +56,11 @@ INSERT INTO `accounts` (`id`, `username`, `password`, `email`, `role`) VALUES
 CREATE TABLE `cashbook` (
   `id` int(11) NOT NULL,
   `date` date NOT NULL,
-  `account_no` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
-  `voucher_no` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
-  `account_type` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `debit` bigint(20) NOT NULL,
-  `credit` bigint(20) NOT NULL,
-  `description` text COLLATE utf8_unicode_ci NOT NULL,
+  `serial_no` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
+  `ac_name` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
+  `particular` text COLLATE utf8_unicode_ci NOT NULL,
+  `debit` bigint(20) DEFAULT NULL,
+  `credit` bigint(20) DEFAULT NULL,
   `balance` bigint(25) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -69,8 +68,12 @@ CREATE TABLE `cashbook` (
 -- Dumping data for table `cashbook`
 --
 
-INSERT INTO `cashbook` (`id`, `date`, `account_no`, `voucher_no`, `account_type`, `debit`, `credit`, `description`, `balance`) VALUES
-(3, '2023-08-16', 'AS112', 'BS121', 'general', 1000, 100, 'desc', 0);
+INSERT INTO `cashbook` (`id`, `date`, `serial_no`, `ac_name`, `particular`, `debit`, `credit`, `balance`) VALUES
+(6, '2023-08-24', 'Mr.Myat', 'Supplier', 'Paid to Supplier BoBo vno EG123', NULL, 1000000, -1000000),
+(8, '2023-08-24', 'Mrs.Phyo', 'Receive', 'Received from USA', 10000000, 0, 9000000),
+(9, '2023-08-24', 'Mr.Jphn', 'Supplier', 'Paid to Supplier Mg Mg vno SS123', 0, 40000000, -31000000),
+(10, '2023-08-23', 'Mrs.Que', 'receive', 'received from Canada', 40000000, 0, 9000000),
+(11, '2023-08-24', 'Mr.Jumbo', 'Supplier', 'Paid to Supplier JoJo vno SB140', 0, 5000000, 4000000);
 
 -- --------------------------------------------------------
 
@@ -141,6 +144,33 @@ INSERT INTO `item` (`item_id`, `category_id`, `item_name`) VALUES
 ('LK123', 4, 'Batashi'),
 ('OJ247', 4, 'Puti'),
 ('UT216', 4, 'Rohu');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `payable`
+--
+
+CREATE TABLE `payable` (
+  `id` int(11) NOT NULL,
+  `purchase_date` date NOT NULL,
+  `supplier_id` varchar(14) COLLATE utf8_unicode_ci NOT NULL,
+  `voucher_no` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
+  `amount` bigint(25) NOT NULL,
+  `paid_date` date NOT NULL,
+  `paid_amount` bigint(25) NOT NULL,
+  `balance_payable` bigint(25) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `payable`
+--
+
+INSERT INTO `payable` (`id`, `purchase_date`, `supplier_id`, `voucher_no`, `amount`, `paid_date`, `paid_amount`, `balance_payable`) VALUES
+(4, '2023-08-24', 'NS123', '230002', 1000000, '0000-00-00', 0, 0),
+(5, '2023-08-24', 'NS123', '230002', 1000000, '0000-00-00', 0, 1000000),
+(6, '2023-08-24', 'DK123', '230001', 1000000, '0000-00-00', 0, 1000000),
+(8, '2023-08-25', 'NS123', '230002', 500000, '0000-00-00', 0, 1500000);
 
 -- --------------------------------------------------------
 
@@ -243,6 +273,12 @@ ALTER TABLE `item`
   ADD PRIMARY KEY (`item_id`);
 
 --
+-- Indexes for table `payable`
+--
+ALTER TABLE `payable`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `purchase`
 --
 ALTER TABLE `purchase`
@@ -256,19 +292,25 @@ ALTER TABLE `purchase`
 -- AUTO_INCREMENT for table `accounts`
 --
 ALTER TABLE `accounts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `cashbook`
 --
 ALTER TABLE `cashbook`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `category`
 --
 ALTER TABLE `category`
   MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `payable`
+--
+ALTER TABLE `payable`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `purchase`
