@@ -39,7 +39,7 @@ Class Query{
       }
     }
   }
-  
+
 
   function selectall($table){
     global $pdo;
@@ -137,42 +137,50 @@ Class Query{
     }
   }
 
-  function addcashbookdata($table, $date, $account_no, $voucher_no, $account_type, $debit, $credit, $description){
+  function addcashbookdata($table, $date, $serial_no, $ac_name, $particular, $debit, $credit){
     global $pdo;
-    if(empty($date) || empty($account_no) || empty($voucher_no) || empty($account_type) || empty($debit) || empty($credit) || empty($description)){
-      $errormessage = "The following field is required. ";
-      if(empty($date)){
-        $errormessage = $errormessage . "Date Field, ";
+      $stmt = $pdo->prepare("SELECT balance FROM cashbook ORDER BY id DESC");
+      $stmt->execute();
+      $balance = $stmt->fetch(PDO::FETCH_ASSOC);
+      if(!empty($debit)){
+        $balance = $balance['balance'] + $debit;
+      }elseif(!empty($credit)){
+        $balance = $balance['balance'] - $credit;
       }
-      if(empty($account_no)){
-        $errormessage = $errormessage . "Account No Field, ";
-      }
-      if(empty($voucher_no)){
-        $errormessage = $errormessage . "Voucher No Field, ";
-      }
-      if(empty($account_type)){
-        $errormessage = $errormessage . "Account Type Field. ";
-      }
-      if(empty($debit)){
-        $errormessage = $errormessage . "Debit Field. ";
-      }
-      if(empty($credit)){
-        $errormessage = $errormessage . "Credit Field. ";
-      }
-      if(empty($description)){
-        $errormessage = $errormessage . "Description Field. ";
-      }
-      return $errormessage;
-    }else{
-      $balance = 0;
-      $stmt = $pdo->prepare("INSERT INTO $table(date, account_no, voucher_no, account_type, debit, credit, description, balance) VALUES('$date', '$account_no', '$voucher_no', '$account_type', '$debit', '$credit', '$description', '$balance')");
+      $stmt = $pdo->prepare("INSERT INTO $table(date, serial_no, ac_name, particular, debit, credit, balance) VALUES('$date', '$serial_no', '$ac_name', '$particular', '$debit', '$credit', '$balance')");
       $stmt->execute();
       if($stmt){
-        return $successmessage = "Account Deleted Successfully";
+        return $successmessage = "Data Added Successfully";
       }else{
-        return $errmessage = "Error accors when deleted Accounts";
+        return $errmessage = "Error accors when adding Data";
       }
-    }
+      // if(empty($date) || empty($account_no) || empty($voucher_no) || empty($account_type) || empty($debit) || empty($credit) || empty($description)){
+      //   $errormessage = "The following field is required. ";
+    //   if(empty($date)){
+    //     $errormessage = $errormessage . "Date Field, ";
+    //   }
+    //   if(empty($account_no)){
+    //     $errormessage = $errormessage . "Account No Field, ";
+    //   }
+    //   if(empty($voucher_no)){
+    //     $errormessage = $errormessage . "Voucher No Field, ";
+    //   }
+    //   if(empty($account_type)){
+    //     $errormessage = $errormessage . "Account Type Field. ";
+    //   }
+    //   if(empty($debit)){
+    //     $errormessage = $errormessage . "Debit Field. ";
+    //   }
+    //   if(empty($credit)){
+    //     $errormessage = $errormessage . "Credit Field. ";
+    //   }
+    //   if(empty($description)){
+    //     $errormessage = $errormessage . "Description Field. ";
+    //   }
+    //   return $errormessage;
+    // }else{
+    //   $balance = 0;
+    // }
   }
 
   function addcategory($table, $category_name){
@@ -345,6 +353,28 @@ Class Query{
       return $errmessage = "Error accors when deleted Purchase Voucher";
     }
   }
+
+  function addpayabledata($table, $purchase_date, $supplier_id, $voucher_no, $amount, $paid_date, $paid_amount){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT balance_payable FROM payable ORDER BY id DESC");
+    $stmt->execute();
+    $balance = $stmt->fetch(PDO::FETCH_ASSOC);
+    if(!empty($paid_amount)){
+      $balance = $balance['balance_payable'] - $paid_amount;
+    }else{
+      $balance = $balance['balance_payable'] + $amount;
+    }
+    $stmt = $pdo->prepare("INSERT INTO payable(purchase_date, supplier_id, voucher_no, amount, paid_date, paid_amount,balance_payable) VALUES('$purchase_date', '$supplier_id', '$voucher_no', '$amount', '$paid_date', '$paid_amount', '$balance')");
+    $stmt->execute();
+    if($stmt){
+      return $successmessage = "Payable Data Added Successfully";
+    }else{
+      return $errmessage = "Error accors when adding payable data";
+    }
+  }
+
+
+  // MORE SELECTS
 
   function selectsum($table, $id, $selectwhat){
     global $pdo;

@@ -28,7 +28,7 @@ $query = new Query();
       <div class="col-10">
         <div class="card mt-3">
           <div class="card-header bg-warning text-light"  style="padding:-10px;">
-            <h5>Manage Cash Book</h5>
+            <h5>Manage Account Payable</h5>
           </div>
           <div class="card-body">
             <?php
@@ -48,14 +48,14 @@ $query = new Query();
             ?>
             <?php
             if(isset($_POST['adddata'])){
-              $date = $_POST['date'];
-              $serial_no = $_POST['serial_no'];
-              $ac_name = $_POST['ac_name'];
-              $particular = $_POST['particular'];
-              $debit = $_POST['debit'];
-              $credit = $_POST['credit'];
+              $purchase_date = $_POST['purchase_date'];
+              $supplier_id = $_POST['supplier_id'];
+              $voucher_no = $_POST['voucher_no'];
+              $amount = $_POST['amount'];
+              $paid_date = $_POST['paid_date'];
+              $paid_amount = $_POST['paid_amount'];
 
-              $message = $query->addcashbookdata('cashbook', $date, $serial_no, $ac_name, $particular, $debit, $credit);
+              $message = $query->addpayabledata('payable', $purchase_date, $supplier_id, $voucher_no, $amount, $paid_date, $paid_amount);
             }
             ?>
             <?php
@@ -111,42 +111,44 @@ $query = new Query();
             $offset = ($pageno -1) * $numOfrecs;
             ?>
             <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
-              Add New Cash Data
+              Add Payable Data
             </button>
             <table class="mt-5 table table-bordered table-striped rounded">
               <tr>
                 <th>#</th>
                 <th>Date</th>
-                <th>Sr.No</th>
-                <th>A/C Name</th>
-                <th>Particular</th>
-                <th>Debit</th>
-                <th>Credit</th>
-                <th>Balance</th>
+                <th>Supplier</th>
+                <th>Voucher No</th>
+                <th>Amount</th>
+                <th>Paid Date</th>
+                <th>Paid Amount</th>
+                <th>Balance Payable</th>
                 <th>Action</th>
               </tr>
               <?php
-              $stmt = $pdo->prepare("SELECT * FROM cashbook ORDER BY id");
+              $stmt = $pdo->prepare("SELECT * FROM payable ORDER BY id");
               $stmt->execute();
               $rawResult = $stmt->fetchAll();
               $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-              $stmt = $pdo->prepare("SELECT * FROM cashbook ORDER BY id LIMIT $offset,$numOfrecs ");
+              $stmt = $pdo->prepare("SELECT * FROM payable ORDER BY id LIMIT $offset,$numOfrecs ");
               $stmt->execute();
-              $cashdatas = $stmt->fetchAll();
+              $paydatas = $stmt->fetchAll();
               ?>
               <?php
-              foreach ($cashdatas as $cashdata) {
+              foreach ($paydatas as $paydata) {
+                $supplierid = $paydata['supplier_id'];
+                $supplier_name = $query->select('supplier', $supplierid, 'supplier_id');
                 ?>
               <tr>
-                <td><?php echo $cashdata['id']; ?></td>
-                <td><?php echo $cashdata['date']; ?></td>
-                <td><?php echo $cashdata['serial_no']; ?></td>
-                <td><?php echo $cashdata['ac_name']; ?></td>
-                <td><?php echo $cashdata['particular']; ?></td>
-                <td><?php if($cashdata['debit'] == 0){echo "";}else{echo $cashdata['debit'];}; ?></td>
-                <td><?php if($cashdata['credit'] == 0){echo "";}else{echo $cashdata['credit'];}; ?></td>
-                <td><?php echo $cashdata['balance']; ?></td>
+                <td><?php echo $paydata['id']; ?></td>
+                <td><?php echo $paydata['purchase_date']; ?></td>
+                <td><?php echo $supplier_name['supplier_name']; ?></td>
+                <td><?php echo $paydata['voucher_no']; ?></td>
+                <td><?php echo $paydata['amount']; ?></td>
+                <td><?php if($paydata['paid_date'] == "0000-00-00"){echo "";}else{ echo $paydata['paid_date']; }; ?></td>
+                <td><?php if($paydata['paid_amount'] == "0"){echo "";}else{ echo $paydata['paid_amount']; }; ?></td>
+                <td><?php echo $paydata['balance_payable']; ?></td>
                 <td>
                   <input type="hidden" name="updateid" value="<?php echo $cashdata['id']; ?>">
                   <button type="submit" class="btn btn-warning text-light" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $cashdata['id']; ?>">
@@ -223,39 +225,59 @@ $query = new Query();
             <span aria-hidden="true" class="h3">&times;</span>
           </button>
         </div>
-        <form action="cashbook.php" method="post" autocomplete="off">
+        <form action="accountpayable.php" method="post" autocomplete="off">
           <div class="modal-body">
             <div class="row">
               <div class="col">
                 <label style="font-weight:bold;">Date</label>
-                <input type="date" name="date" class="form-control inpv2" placeholder="Date">
+                <input type="date" name="purchase_date" class="form-control inpv2" placeholder="Date">
               </div>
               <div class="col">
-                <label style="font-weight:bold;">Sr.No</label>
-                <input type="text" name="serial_no" class="form-control inpv2" placeholder="Sr.No">
+                <label style="font-weight:bold;">Supplier Name</label>
+                <select class="form-control inpv2 mb-2" name="supplier_id">
+                  <?php
+                  $supplierdatas = $query->selectall('supplier');
+                  foreach ($supplierdatas as $supplierdata) {
+                    ?>
+                    <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplierdata['supplier_name']; ?></option>
+                    <?php
+                  }
+                  ?>
+                </select>
               </div>
             </div>
             <div class="row">
               <div class="col">
-                <label class="mt-2" style="font-weight:bold;">A/C Name</label>
-                <input type="text" name="ac_name" class="form-control inpv2" placeholder="A/C Name">
-                <label class="mt-2" style="font-weight:bold;">Debit</label>
-                <input type="number" name="debit" class="form-control inpv2" placeholder="Debit">
+                <label class="mt-2" style="font-weight:bold;">Voucher No</label>
+                <select class="form-control inpv2 mb-2" name="voucher_no">
+                  <?php
+                  $voucherdatas = $query->selectdesc('purchase', 'voucher_no');
+                  foreach ($voucherdatas as $voucherdata) {
+                    ?>
+                    <option value="<?php echo $voucherdata['voucher_no']; ?>"><?php echo $voucherdata['voucher_no']; ?></option>
+                    <?php
+                  }
+                  ?>
+                </select>
               </div>
               <div class="col">
-                <label class="mt-2" style="font-weight:bold;">Particular</label>
-                <textarea name="particular" rows="4" cols="80" class="form-control inpv2" placeholder="Particular"></textarea>
+                <label class="mt-2" style="font-weight:bold;">Amount</label>
+                <input type="number" name="amount" class="form-control inpv2" placeholder="Amount">
               </div>
             </div>
             <div class="row">
               <div class="col">
-                <label class="mt-2" style="font-weight:bold;">Credit</label>
-                <input type="number" name="credit" class="form-control inpv2" placeholder="Credit">
+                <label class="mt-2" style="font-weight:bold;">Paid Date</label>
+                <input type="date" name="paid_date" class="form-control inpv2">
               </div>
-              <div class="col mt-4">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-success" name="adddata">Add Data</button>
+              <div class="col">
+                <label class="mt-2" style="font-weight:bold;">Paid Amount</label>
+                <input type="number" name="paid_amount" class="form-control inpv2" placeholder="Paid Amount">
               </div>
+            </div>
+            <div class="mt-2">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-success" name="adddata">Add Data</button>
             </div>
           </div>
           <div class="modal-footer">

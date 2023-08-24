@@ -58,8 +58,8 @@
                 - Cash Book
               </a>
             </li>
-            <li class="nav-item  rounded" style="cursor: not-allowed !important;">
-              <a href="accountpayable.php" class="nav-link accountpayable h text-light disabled" aria-current="page">
+            <li class="nav-item  rounded">
+              <a href="accountpayable.php" class="nav-link accountpayable h text-light" aria-current="page">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Account Payable
               </a>
