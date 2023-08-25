@@ -116,39 +116,57 @@ $query = new Query();
             <table class="mt-5 table table-bordered table-striped rounded">
               <tr>
                 <th>#</th>
-                <th>Date</th>
+                <th>Paid Date</th>
                 <th>Supplier</th>
                 <th>Voucher No</th>
                 <th>Amount</th>
-                <th>Paid Date</th>
                 <th>Paid Amount</th>
                 <th>Balance Payable</th>
                 <th>Action</th>
               </tr>
               <?php
-              $stmt = $pdo->prepare("SELECT * FROM payable ORDER BY id");
-              $stmt->execute();
-              $rawResult = $stmt->fetchAll();
-              $total_pages = ceil(count($rawResult) / $numOfrecs);
+              if(!empty($_POST['pageno'])){
+                $stmt = $pdo->prepare("SELECT * FROM payable ORDER BY id");
+                $stmt->execute();
+                $rawResult = $stmt->fetchAll();
+                $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-              $stmt = $pdo->prepare("SELECT * FROM payable ORDER BY id LIMIT $offset,$numOfrecs ");
-              $stmt->execute();
-              $paydatas = $stmt->fetchAll();
+                $stmt = $pdo->prepare("SELECT * FROM payable ORDER BY id LIMIT $offset,$numOfrecs ");
+                $stmt->execute();
+                $paydatas = $stmt->fetchAll();
+              }else{
+
+
+                $purchasestmt = $pdo->prepare("SELECT DISTINCT voucher_no FROM purchase ");
+                $purchasestmt->execute();
+                $purchaseDatas = $purchasestmt->fetchall();
+              }
               ?>
               <?php
-              foreach ($paydatas as $paydata) {
-                $supplierid = $paydata['supplier_id'];
-                $supplier_name = $query->select('supplier', $supplierid, 'supplier_id');
+              foreach ($purchaseDatas as $purchasedata) {
+                $voucher_no = $purchasedata['voucher_no'];
+                $stmt = $pdo->prepare("SELECT SUM(amount) AS amount FROM purchase WHERE voucher_no='$voucher_no'");
+                $stmt->execute();
+                $purchasedatasum = $stmt->fetchall();
+
+                $supplierstmt = $pdo->prepare("SELECT supplier_id FROM purchase WHERE voucher_no='$voucher_no'");
+                $supplierstmt->execute();
+                $supplier_id = $supplierstmt->fetch(PDO::FETCH_ASSOC);
+
+
+                $supplier_id = $supplier_id['supplier_id'];
+                $suppliernamestmt = $pdo->prepare("SELECT supplier_name FROM supplier WHERE supplier_id='$supplier_id'");
+                $suppliernamestmt->execute();
+                $supplier_name = $suppliernamestmt->fetch(PDO::FETCH_ASSOC);
                 ?>
               <tr>
-                <td><?php echo $paydata['id']; ?></td>
-                <td><?php echo $paydata['purchase_date']; ?></td>
+                <td><?php // echo $purchasedata['id']; ?></td>
+                <td><?php // if($payabledata['paid_date'] == "0000-00-00"){echo "";}else{ echo $paydata['paid_date']; }; ?></td>
                 <td><?php echo $supplier_name['supplier_name']; ?></td>
-                <td><?php echo $paydata['voucher_no']; ?></td>
-                <td><?php echo $paydata['amount']; ?></td>
-                <td><?php if($paydata['paid_date'] == "0000-00-00"){echo "";}else{ echo $paydata['paid_date']; }; ?></td>
-                <td><?php if($paydata['paid_amount'] == "0"){echo "";}else{ echo $paydata['paid_amount']; }; ?></td>
-                <td><?php echo $paydata['balance_payable']; ?></td>
+                <td><?php echo $purchasedata['voucher_no']; ?></td>
+                <td><?php echo $purchasedatasum[0]['amount']; ?></td>
+                <td><?php //if($payabledata['paid_amount'] == "0"){echo "";}else{ echo $paydata['paid_amount']; }; ?></td>
+                <td><?php //echo $payabledata['balance_payable']; ?></td>
                 <td>
                   <input type="hidden" name="updateid" value="<?php echo $cashdata['id']; ?>">
                   <button type="submit" class="btn btn-warning text-light" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $cashdata['id']; ?>">
