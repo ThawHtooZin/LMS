@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 24, 2023 at 01:22 PM
+-- Generation Time: Aug 25, 2023 at 12:44 PM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.0.17
 
@@ -153,24 +153,27 @@ INSERT INTO `item` (`item_id`, `category_id`, `item_name`) VALUES
 
 CREATE TABLE `payable` (
   `id` int(11) NOT NULL,
-  `purchase_date` date NOT NULL,
-  `supplier_id` varchar(14) COLLATE utf8_unicode_ci NOT NULL,
+  `supplier_id` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
   `voucher_no` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
-  `amount` bigint(25) NOT NULL,
   `paid_date` date NOT NULL,
   `paid_amount` bigint(25) NOT NULL,
-  `balance_payable` bigint(25) NOT NULL
+  `balance` bigint(25) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `payable`
 --
 
-INSERT INTO `payable` (`id`, `purchase_date`, `supplier_id`, `voucher_no`, `amount`, `paid_date`, `paid_amount`, `balance_payable`) VALUES
-(4, '2023-08-24', 'NS123', '230002', 1000000, '0000-00-00', 0, 0),
-(5, '2023-08-24', 'NS123', '230002', 1000000, '0000-00-00', 0, 1000000),
-(6, '2023-08-24', 'DK123', '230001', 1000000, '0000-00-00', 0, 1000000),
-(8, '2023-08-25', 'NS123', '230002', 500000, '0000-00-00', 0, 1500000);
+INSERT INTO `payable` (`id`, `supplier_id`, `voucher_no`, `paid_date`, `paid_amount`, `balance`) VALUES
+(14, 'DK123', '230001', '2023-08-25', 1000000, 7672800),
+(19, 'KJ126', '230004', '2023-08-25', 1000000, 100000),
+(38, 'DG214', '264', '2023-08-25', 22500, 500000),
+(39, 'DG214', '264', '2023-08-25', 100000, 400000),
+(40, 'DG214', '264', '2023-08-25', 100000, 300000),
+(41, 'DG214', '264', '2023-08-25', 100000, 200000),
+(42, 'DG214', '264', '2023-08-25', 100000, 100000),
+(43, 'DG214', '264', '2023-08-25', 100000, 0),
+(44, 'DK123', '230001', '2023-08-25', 672800, 7000000);
 
 -- --------------------------------------------------------
 
@@ -206,7 +209,9 @@ INSERT INTO `purchase` (`no`, `date`, `voucher_no`, `supplier_id`, `tclfrozen`, 
 (9, '2023-08-01', 230002, 'NS123', 'frozen', 'LK123', 15, '10', 0, 7000, 70000),
 (10, '2023-08-01', 230002, 'NS123', 'frozen', 'LK123', 15, '100', 0, 7000, 700000),
 (11, '2023-08-22', 111, 'KJ122', 'frozen', 'HL123', 10, '257', 12, 1000, 257000),
-(12, '2023-08-23', 264, 'DG214', 'frozen', 'HL123', 10, '275', 25, 1900, 522500);
+(12, '2023-08-23', 264, 'DG214', 'frozen', 'HL123', 10, '275', 25, 1900, 522500),
+(14, '2023-08-25', 230004, 'KJ126', 'tcl', 'HL123', 10, '100', 0, 1000, 100000),
+(15, '2023-08-25', 230004, 'KJ126', 'tcl', 'HG184', 10, '200', 0, 5000, 1000000);
 
 -- --------------------------------------------------------
 
@@ -310,13 +315,13 @@ ALTER TABLE `category`
 -- AUTO_INCREMENT for table `payable`
 --
 ALTER TABLE `payable`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- AUTO_INCREMENT for table `purchase`
 --
 ALTER TABLE `purchase`
-  MODIFY `no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
