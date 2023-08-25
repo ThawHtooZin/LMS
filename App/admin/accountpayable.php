@@ -110,18 +110,15 @@ $query = new Query();
             $numOfrecs = 5;
             $offset = ($pageno -1) * $numOfrecs;
             ?>
-            <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
+            <!-- <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
               Add Payable Data
-            </button>
+            </button> -->
             <table class="mt-5 table table-bordered table-striped rounded">
               <tr>
                 <th>#</th>
-                <th>Paid Date</th>
                 <th>Supplier</th>
                 <th>Voucher No</th>
                 <th>Amount</th>
-                <th>Paid Amount</th>
-                <th>Balance Payable</th>
                 <th>Action</th>
               </tr>
               <?php
@@ -143,6 +140,7 @@ $query = new Query();
               }
               ?>
               <?php
+              $i=1;
               foreach ($purchaseDatas as $purchasedata) {
                 $voucher_no = $purchasedata['voucher_no'];
                 $stmt = $pdo->prepare("SELECT SUM(amount) AS amount FROM purchase WHERE voucher_no='$voucher_no'");
@@ -158,59 +156,28 @@ $query = new Query();
                 $suppliernamestmt = $pdo->prepare("SELECT supplier_name FROM supplier WHERE supplier_id='$supplier_id'");
                 $suppliernamestmt->execute();
                 $supplier_name = $suppliernamestmt->fetch(PDO::FETCH_ASSOC);
+
+                $stmt = $pdo->prepare("SELECT balance FROM payable WHERE voucher_no='$voucher_no' ORDER BY id DESC");
+                $stmt->execute();
+                $payableamount = $stmt->fetch(PDO::FETCH_ASSOC);
                 ?>
               <tr>
-                <td><?php // echo $purchasedata['id']; ?></td>
-                <td><?php // if($payabledata['paid_date'] == "0000-00-00"){echo "";}else{ echo $paydata['paid_date']; }; ?></td>
+                <td><?php echo $i; ?></td>
                 <td><?php echo $supplier_name['supplier_name']; ?></td>
                 <td><?php echo $purchasedata['voucher_no']; ?></td>
-                <td><?php echo $purchasedatasum[0]['amount']; ?></td>
-                <td><?php //if($payabledata['paid_amount'] == "0"){echo "";}else{ echo $paydata['paid_amount']; }; ?></td>
-                <td><?php //echo $payabledata['balance_payable']; ?></td>
-                <td>
-                  <input type="hidden" name="updateid" value="<?php echo $cashdata['id']; ?>">
-                  <button type="submit" class="btn btn-warning text-light" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $cashdata['id']; ?>">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-  <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-  <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                <td><?php if(empty($payableamount)){ echo $purchasedatasum[0]['amount']; }else{ echo $payableamount['balance']; } ?></td>
+                <td class="text-center">
+                  <a href="payableinfo.php?voucher_no=<?php echo $purchasedata['voucher_no']; ?>" class="btn btn-info btn-sm text-light" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $cashdata['id']; ?>">
+                    Detail
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-check" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
 </svg>
                   </button>
-                <form action="manageaccounts.php" method="post" style="display: inline !important;">
-                  <input type="hidden" name="deleteid" value="<?php echo $cashdata['id']; ?>">
-                  <button type="submit" name="deletebutton" class="btn btn-danger">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
-                  </button>
-                </form>
               </td>
               </tr>
-              <!-- Data Update Modal -->
-              <div class="modal fade" id="updatemodal<?php echo $cashdata['id']; ?>" tabindex="-1" role="dialog" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                  <div class="modal-content">
-                    <div class="modal-header bg-warning text-light">
-                      <h5 class="modal-title" id="updatemodallabel">Update An Account</h5>
-                      <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true" class="h3">&times;</span>
-                      </button>
-                    </div>
-                    <form action="" method="post" autocomplete="off">
-                      <div class="modal-body">
-                        <?php
-                        $id = $cashdata['id'];
-                        $updatedata = $query->select('cashbook', $id, 'id');
-                        ?>
-                        <input type="hidden" name="updateid" value="<?php echo $cashdata['id']; ?>">
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-warning" name="updateaccount">Update</button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
               <!-- Update Modal -->
               <?php
+              $i++;
               }
               ?>
             </table>
@@ -234,7 +201,7 @@ $query = new Query();
     </div>
 
   <!-- Data Add Modal -->
-  <div class="modal fade" id="addmodal" tabindex="-1" role="dialog" aria-hidden="true" style="margin-left:auto !important; margin-right: auto !important;">
+  <!-- <div class="modal fade" id="addmodal" tabindex="-1" role="dialog" aria-hidden="true" style="margin-left:auto !important; margin-right: auto !important;">
     <div class="modal-dialog" role="document">
       <div class="modal-content" style="width: 750px; !important; margin-top:70px !important;">
         <div class="modal-header bg-primary text-light">
@@ -254,12 +221,12 @@ $query = new Query();
                 <label style="font-weight:bold;">Supplier Name</label>
                 <select class="form-control inpv2 mb-2" name="supplier_id">
                   <?php
-                  $supplierdatas = $query->selectall('supplier');
-                  foreach ($supplierdatas as $supplierdata) {
+                  // $supplierdatas = $query->selectall('supplier');
+                  // foreach ($supplierdatas as $supplierdata) {
                     ?>
-                    <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplierdata['supplier_name']; ?></option>
+                    <option value="<?php //echo $supplierdata['supplier_id']; ?>"><?php //echo $supplierdata['supplier_name']; ?></option>
                     <?php
-                  }
+                  // }
                   ?>
                 </select>
               </div>
@@ -269,12 +236,12 @@ $query = new Query();
                 <label class="mt-2" style="font-weight:bold;">Voucher No</label>
                 <select class="form-control inpv2 mb-2" name="voucher_no">
                   <?php
-                  $voucherdatas = $query->selectdesc('purchase', 'voucher_no');
-                  foreach ($voucherdatas as $voucherdata) {
+                  // $voucherdatas = $query->selectdesc('purchase', 'voucher_no');
+                  // foreach ($voucherdatas as $voucherdata) {
                     ?>
-                    <option value="<?php echo $voucherdata['voucher_no']; ?>"><?php echo $voucherdata['voucher_no']; ?></option>
+                    <option value="<?php //echo $voucherdata['voucher_no']; ?>"><?php //echo $voucherdata['voucher_no']; ?></option>
                     <?php
-                  }
+                  // }
                   ?>
                 </select>
               </div>
@@ -303,7 +270,7 @@ $query = new Query();
         </form>
       </div>
     </div>
-  </div>
+  </div> -->
   <!-- Add Modal -->
 
     <script type="text/javascript">

@@ -373,6 +373,25 @@ Class Query{
     }
   }
 
+  function addpayable($table, $paid_date, $paid_amount, $supplier_id, $voucher_no, $totalbalance)
+  {
+    global $pdo;
+    $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE voucher_no='$voucher_no' ORDER BY id DESC");
+    $payablestmt->execute();
+    $payabledata = $payablestmt->fetch(PDO::FETCH_ASSOC);
+    if(empty($payabledata)){
+      $balance = $totalbalance - $paid_amount;
+    }else{
+      $balance = $payabledata['balance'] - $paid_amount;
+    }
+    $stmt = $pdo->prepare("INSERT INTO payable(paid_date, paid_amount, supplier_id, voucher_no, balance) VALUES('$paid_date', '$paid_amount', '$supplier_id', '$voucher_no', '$balance')");
+    $stmt->execute();
+    if($stmt){
+      return $successmessage = "Added Pay Amount Successfully";
+    }else{
+      return $errmessage = "Error accors when adding paying Data";
+    }
+  }
 
   // MORE SELECTS
 
