@@ -322,8 +322,26 @@ Class Query{
     }else{
       $amount = 0;
     }
+    $idstmt = $pdo->prepare("SELECT no FROM $table ORDER BY no DESC");
+    $idstmt->execute();
+    $iddata = $idstmt->fetch(PDO::FETCH_ASSOC);
     $stmt = $pdo->prepare("INSERT INTO $table(date, voucher_no, tclfrozen, supplier_id, commodity, size, viss, pcs, price, amount) VALUES('$date', '$voucher_no', '$tclfrozen', '$supplier_name', '$commodity', '$size', '$viss', '$pcs', '$price', '$amount')");
     $stmt->execute();
+    $balstmt = $pdo->prepare("SELECT balance FROM payable ORDER BY id DESC");
+    $balstmt->execute();
+    $baldata = $balstmt->fetch(PDO::FETCH_ASSOC);
+    $balance = $baldata['balance'];
+    if($balance != 1){
+       $total_balance = $balance + $amount;
+    }else{
+      $total_balance = $balance;
+    }
+    $idstmt = $pdo->prepare("SELECT * FROM $table ORDER BY no DESC");
+    $idstmt->execute();
+    $iddata = $idstmt->fetch(PDO::FETCH_ASSOC);
+    $id = $iddata['no'];
+    $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, purchase_amount, balance, link_id) VALUES('$supplier_name', '$voucher_no', '$amount', '$total_balance', '$id')");
+    $payablestmt->execute();
     if($stmt){
       return $successmessage = "Purchase Voucher Added Successfully";
     }else{
@@ -354,42 +372,25 @@ Class Query{
     }
   }
 
-  function addpayabledata($table, $purchase_date, $supplier_id, $voucher_no, $amount, $paid_date, $paid_amount){
+  function deletepayable($table, $deleteid){
     global $pdo;
-    $stmt = $pdo->prepare("SELECT balance_payable FROM payable ORDER BY id DESC");
-    $stmt->execute();
-    $balance = $stmt->fetch(PDO::FETCH_ASSOC);
-    if(!empty($paid_amount)){
-      $balance = $balance['balance_payable'] - $paid_amount;
-    }else{
-      $balance = $balance['balance_payable'] + $amount;
-    }
-    $stmt = $pdo->prepare("INSERT INTO payable(purchase_date, supplier_id, voucher_no, amount, paid_date, paid_amount,balance_payable) VALUES('$purchase_date', '$supplier_id', '$voucher_no', '$amount', '$paid_date', '$paid_amount', '$balance')");
+    $stmt = $pdo->prepare("DELETE FROM $table WHERE link_id='$deleteid'");
     $stmt->execute();
     if($stmt){
-      return $successmessage = "Payable Data Added Successfully";
+      return $successmessage = "Purchase Voucher Deleted Successfully";
     }else{
-      return $errmessage = "Error accors when adding payable data";
+      return $errmessage = "Error accors when deleted Purchase Voucher";
     }
   }
 
-  function addpayable($table, $paid_date, $paid_amount, $supplier_id, $voucher_no, $totalbalance)
-  {
+  function addpayable($table, $paid_date, $paid_voucher, $paid_amount){
     global $pdo;
-    $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE voucher_no='$voucher_no' ORDER BY id DESC");
-    $payablestmt->execute();
-    $payabledata = $payablestmt->fetch(PDO::FETCH_ASSOC);
-    if(empty($payabledata)){
-      $balance = $totalbalance - $paid_amount;
-    }else{
-      $balance = $payabledata['balance'] - $paid_amount;
-    }
-    $stmt = $pdo->prepare("INSERT INTO payable(paid_date, paid_amount, supplier_id, voucher_no, balance) VALUES('$paid_date', '$paid_amount', '$supplier_id', '$voucher_no', '$balance')");
+    $stmt = $pdo->prepare("INSERT INTO $table(paid_date, paid_voucher, paid_amount) VALUES('$paid_date', '$paid_voucher', '$paid_amount')");
     $stmt->execute();
     if($stmt){
-      return $successmessage = "Added Pay Amount Successfully";
+      return $successmessage = "Payable Voucher Added Successfully";
     }else{
-      return $errmessage = "Error accors when adding paying Data";
+      return $errmessage = "Error accors when adding Payable Voucher";
     }
   }
 

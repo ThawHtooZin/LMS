@@ -35,6 +35,7 @@ $query = new Query();
             if(isset($_POST['deletebutton'])){
               $deleteid = $_POST['deleteid'];
               $message = $query->deletepurchase('purchase', $deleteid);
+              $message = $query->deletepayable('payable', $deleteid);
             }
             if(isset($_POST['updatebutton'])){
               $date = $_POST['date'];
@@ -61,7 +62,7 @@ $query = new Query();
               $pcs = $_POST['pcs'];
               $price = $_POST['price'];
 
-              $message = $query->addpurchase('purchase', $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price);
+              $message = $query->addpurchase('purchase' , $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price);
             }
 
             if(isset($_POST['total'])){
@@ -69,7 +70,7 @@ $query = new Query();
               $purchasedatas = $query->search('purchase', 'supplier_id', $supplier_id);
             }
 
-            if(isset($_POST['commodity'])){
+            if(isset($_POST['commoditybtn'])){
               $item_id = $_POST['item_id'];
               $purchasedatas = $query->search('purchase', 'commodity', $item_id);
             }
@@ -141,7 +142,7 @@ $query = new Query();
                 }
                 ?>
               </select>
-              <button type="submit" name="commodity" class="btn btn-primary btn-sm">Find Commodity</button>
+              <button type="submit" name="commoditybtn" class="btn btn-primary btn-sm">Find Commodity</button>
             </form>
             <button type="button" class="btn btn-success float-end btn-sm" data-bs-toggle="modal" data-bs-target="#addmodal">
               Add Purchase Voucher
@@ -176,7 +177,7 @@ $query = new Query();
               if(isset($_POST['total'])){
                 $supplier_id = $_POST['supplier_id'];
                 $total_amount = $query->selectsum('purchase', $supplier_id, 'supplier_id');
-              }elseif(isset($_POST['commodity'])){
+              }elseif(isset($_POST['commoditybtn'])){
                 $item_id = $_POST['item_id'];
                 $total_amount = $query->selectsum('purchase', $item_id, 'commodity');
               }else{
@@ -349,7 +350,7 @@ $query = new Query();
               }
               ?>
               <?php
-              if (isset($_POST['commodity'])) {
+              if (isset($_POST['commoditybtn'])) {
                 $id = $_POST['item_id'];
                 $total_amount = $query->selectsum('purchase', $id, 'commodity');
                 ?>
