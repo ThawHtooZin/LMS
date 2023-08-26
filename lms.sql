@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 25, 2023 at 12:44 PM
+-- Generation Time: Aug 26, 2023 at 02:40 PM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.0.17
 
@@ -154,26 +154,30 @@ INSERT INTO `item` (`item_id`, `category_id`, `item_name`) VALUES
 CREATE TABLE `payable` (
   `id` int(11) NOT NULL,
   `supplier_id` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
-  `voucher_no` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
+  `purchase_voucher_no` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
+  `purchase_amount` bigint(19) NOT NULL,
   `paid_date` date NOT NULL,
+  `paid_voucher` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
   `paid_amount` bigint(25) NOT NULL,
-  `balance` bigint(25) NOT NULL
+  `balance` bigint(25) NOT NULL,
+  `link_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `payable`
 --
 
-INSERT INTO `payable` (`id`, `supplier_id`, `voucher_no`, `paid_date`, `paid_amount`, `balance`) VALUES
-(14, 'DK123', '230001', '2023-08-25', 1000000, 7672800),
-(19, 'KJ126', '230004', '2023-08-25', 1000000, 100000),
-(38, 'DG214', '264', '2023-08-25', 22500, 500000),
-(39, 'DG214', '264', '2023-08-25', 100000, 400000),
-(40, 'DG214', '264', '2023-08-25', 100000, 300000),
-(41, 'DG214', '264', '2023-08-25', 100000, 200000),
-(42, 'DG214', '264', '2023-08-25', 100000, 100000),
-(43, 'DG214', '264', '2023-08-25', 100000, 0),
-(44, 'DK123', '230001', '2023-08-25', 672800, 7000000);
+INSERT INTO `payable` (`id`, `supplier_id`, `purchase_voucher_no`, `purchase_amount`, `paid_date`, `paid_voucher`, `paid_amount`, `balance`, `link_id`) VALUES
+(57, 'DK123', '2001', 800000, '0000-00-00', '', 0, 800000, 25),
+(58, 'DK123', '', 0, '2023-08-26', 'AP0001', 500000, 0, 0),
+(59, 'DK123', '2001', 3000000, '0000-00-00', '', 0, 3000000, 26),
+(60, 'DK123', '', 0, '2023-08-26', 'AP0002', 200000, 0, 0),
+(62, 'DK123', '2001', 600000, '0000-00-00', '', 0, 2100000, 28),
+(64, 'DK123', '', 0, '2023-08-26', 'AP0003', 2400000, 0, 0),
+(65, 'DK123', '', 0, '2023-08-26', 'AP0004', 100000, 0, 0),
+(66, 'NS123', '2002', 200000, '0000-00-00', '', 0, 200000, 29),
+(67, 'NS123', '2002', 900000, '0000-00-00', '', 0, 1100000, 30),
+(68, 'NS123', '', 0, '2023-08-26', 'AP0006', 100000, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -200,18 +204,11 @@ CREATE TABLE `purchase` (
 --
 
 INSERT INTO `purchase` (`no`, `date`, `voucher_no`, `supplier_id`, `tclfrozen`, `commodity`, `size`, `viss`, `pcs`, `price`, `amount`) VALUES
-(3, '2023-08-01', 230001, 'DK123', 'frozen', 'HL123', 10, '289.6', 0, 28000, 8108800),
-(4, '2023-08-01', 230001, 'DK123', 'frozen', 'HL123', 10, '50', 0, 280, 14000),
-(5, '2023-08-01', 230001, 'DK123', 'frozen', 'OJ247', 8, '10', 0, 5000, 50000),
-(6, '2023-08-01', 230001, 'DK123', 'frozen', 'OJ247', 9, '100', 0, 5000, 500000),
-(7, '2023-08-01', 230002, 'NS123', 'frozen', 'HL123', 10, '10', 0, 36000, 360000),
-(8, '2023-08-01', 230002, 'NS123', 'frozen', 'HL123', 10, '50', 0, 36000, 1800000),
-(9, '2023-08-01', 230002, 'NS123', 'frozen', 'LK123', 15, '10', 0, 7000, 70000),
-(10, '2023-08-01', 230002, 'NS123', 'frozen', 'LK123', 15, '100', 0, 7000, 700000),
-(11, '2023-08-22', 111, 'KJ122', 'frozen', 'HL123', 10, '257', 12, 1000, 257000),
-(12, '2023-08-23', 264, 'DG214', 'frozen', 'HL123', 10, '275', 25, 1900, 522500),
-(14, '2023-08-25', 230004, 'KJ126', 'tcl', 'HL123', 10, '100', 0, 1000, 100000),
-(15, '2023-08-25', 230004, 'KJ126', 'tcl', 'HG184', 10, '200', 0, 5000, 1000000);
+(25, '2023-08-26', 2001, 'DK123', 'frozen', 'HL123', 10, '200', 0, 4000, 800000),
+(26, '2023-08-26', 2001, 'DK123', 'frozen', 'HG184', 10, '100', 0, 30000, 3000000),
+(28, '2023-08-26', 2001, 'DK123', 'frozen', 'HG184', 10, '200', 0, 3000, 600000),
+(29, '2023-08-26', 2002, 'NS123', 'frozen', 'BJ123', 10, '100', 0, 2000, 200000),
+(30, '2023-08-26', 2002, 'NS123', 'frozen', 'BJ123', 10, '100', 0, 9000, 900000);
 
 -- --------------------------------------------------------
 
@@ -315,13 +312,13 @@ ALTER TABLE `category`
 -- AUTO_INCREMENT for table `payable`
 --
 ALTER TABLE `payable`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 
 --
 -- AUTO_INCREMENT for table `purchase`
 --
 ALTER TABLE `purchase`
-  MODIFY `no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
