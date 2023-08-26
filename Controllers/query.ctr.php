@@ -383,14 +383,26 @@ Class Query{
     }
   }
 
-  function addpayable($table, $paid_date, $paid_voucher, $paid_amount){
+  function addpayable($table, $supplier_id, $paid_date, $paid_voucher, $paid_amount){
     global $pdo;
-    $stmt = $pdo->prepare("INSERT INTO $table(paid_date, paid_voucher, paid_amount) VALUES('$paid_date', '$paid_voucher', '$paid_amount')");
+    $stmt = $pdo->prepare("INSERT INTO $table(supplier_id ,paid_date, paid_voucher, paid_amount) VALUES('$supplier_id', '$paid_date', '$paid_voucher', '$paid_amount')");
     $stmt->execute();
     if($stmt){
       return $successmessage = "Payable Voucher Added Successfully";
     }else{
       return $errmessage = "Error accors when adding Payable Voucher";
+    }
+  }
+
+  function updatepayable($paid_date, $paid_voucher, $paid_amount, $id)
+  {
+    global $pdo;
+    $stmt = $pdo->prepare("UPDATE payable SET paid_date='$paid_date', paid_voucher='$paid_voucher', paid_amount='$paid_amount' WHERE id='$id';");
+    $stmt->execute();
+    if($stmt){
+      return $successmessage = "Payable Voucher Updated Successfully";
+    }else{
+      return $errmessage = "Error accors when updaing Payable Voucher";
     }
   }
 
@@ -413,6 +425,13 @@ Class Query{
   function selectallsum($table, $row, $selectas){
     global $pdo;
     $stmt = $pdo->prepare("SELECT SUM($row) AS $selectas FROM $table");
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+  }
+
+  function selectallsumpayable($table, $row, $selectas, $supplier_id){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT SUM($row) AS $selectas FROM $table WHERE supplier_id='$supplier_id'");
     $stmt->execute();
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
