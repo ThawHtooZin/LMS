@@ -45,8 +45,6 @@ $query = new Query();
 
               $message = $query->updateaccount('accounts', $username, $password, $email, $role, $id);
             }
-            ?>
-            <?php
             if(isset($_POST['adddata'])){
               $date = $_POST['date'];
               $serial_no = $_POST['serial_no'];
@@ -100,14 +98,45 @@ $query = new Query();
               <?php
             }
             ?>
+            <div class="row">
+              <div class="col-3">
+                <form class="d-flex" action="cashbook.php" method="post">
+                  <select class="form-control w-50" name="monthlysearch">
+                    <option value="">Select Month</option>
+                    <option value="01">January</option>
+                    <option value="02">Feburary</option>
+                    <option value="03">March</option>
+                    <option value="04">April</option>
+                    <option value="05">May</option>
+                    <option value="06">June</option>
+                    <option value="07">July</option>
+                    <option value="08">August</option>
+                    <option value="09">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                  </select>
+                  <button type="submit" name="monthsearchbtn" class="btn btn-primary btn-sm">Search Monthly</button>
+                </form>
+              </div>
+              <div class="col-9">
+                <form class="d-flex" action="cashbook.php" method="post">
+                  <span class="mt-2">Start Date:</span>
+                  <input type="date" name="startdate" class="form-control" style="width: 35%;">
+                  <span class="mt-2">End Date</span>
+                  <input type="date" name="enddate" class="form-control" style="width: 35%;">
+                  <button type="submit" name="dbwsearch" class="btn btn-primary btn-sm">Search</button>
+                </form>
+              </div>
+            </div>
+            <br>
             <?php
-
             if (!empty($_GET['pageno'])) {
               $pageno = $_GET['pageno'];
             }else{
               $pageno = 1;
             }
-            $numOfrecs = 5;
+            $numOfrecs = 8;
             $offset = ($pageno -1) * $numOfrecs;
             ?>
             <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
@@ -126,14 +155,27 @@ $query = new Query();
                 <th>Action</th>
               </tr>
               <?php
-              $stmt = $pdo->prepare("SELECT * FROM cashbook ORDER BY id");
-              $stmt->execute();
-              $rawResult = $stmt->fetchAll();
-              $total_pages = ceil(count($rawResult) / $numOfrecs);
+              if(isset($_POST['dbwsearch'])){
+                $startdate = $_POST['startdate'];
+                $enddate = $_POST['enddate'];
+                $cashdatas = $query->selectdbw('cashbook', $startdate, $enddate);
+              }elseif(isset($_POST['monthsearchbtn'])){
+                $month = $_POST['monthlysearch'];
+                $year = date('Y');
+                $search = $year . "-" . $month;
+                $stmt = $pdo->prepare("SELECT * FROM CASHBOOK WHERE date LIKE '%$search%'");
+                $stmt->execute();
+                $cashdatas = $stmt->fetchall();
+              }else{
+                $stmt = $pdo->prepare("SELECT * FROM cashbook ORDER BY id");
+                $stmt->execute();
+                $rawResult = $stmt->fetchAll();
+                $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-              $stmt = $pdo->prepare("SELECT * FROM cashbook ORDER BY id LIMIT $offset,$numOfrecs ");
-              $stmt->execute();
-              $cashdatas = $stmt->fetchAll();
+                $stmt = $pdo->prepare("SELECT * FROM cashbook ORDER BY id LIMIT $offset,$numOfrecs ");
+                $stmt->execute();
+                $cashdatas = $stmt->fetchAll();
+              }
               ?>
               <?php
               foreach ($cashdatas as $cashdata) {
@@ -208,6 +250,7 @@ $query = new Query();
                 <li class="page-item"><a class="page-link" href="?pageno=<?php echo $total_pages; ?>">Last</a> </li>
               </ul>
             </div>
+            <a href="cashbookexport.php?forment=excel" class="btn btn-success">Export to Excel</a>
           </div>
         </div>
       </div>

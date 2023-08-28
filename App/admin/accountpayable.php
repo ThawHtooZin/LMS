@@ -218,6 +218,7 @@ $query = new Query();
                     <td></td>
                   </tr>
                   <?php
+                }
                 ?>
 
             </table>
