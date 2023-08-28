@@ -28,7 +28,26 @@ $query = new Query();
       <div class="col-10">
         <div class="card mt-3">
           <div class="card-header bg-warning text-light"  style="padding:-10px;">
-            <h5>Manage Cash Book</h5>
+            <h5 class="d-inline">Manage Cash Book</h5>
+            <div class="float-end">
+              <?php
+                if($_POST){
+                  if (!empty($_POST['startdate']) || !empty($_POST['enddate'])) {
+                    ?>
+                    <a href="#" class="btn btn-primary float-end" onclick="window.open('print/cashbookprint.php?startdate=<?php echo $_POST['startdate']; ?>&enddate=<?php echo $_POST['enddate']; ?>')">Print</a>
+                    <?php
+                  }elseif(!empty($_POST['monthlysearch'])){
+                    ?>
+                    <a href="#" class="btn btn-primary float-end" onclick="window.open('print/cashbookprint.php?monthly=<?php echo $_POST['monthlysearch']; ?>')">Print</a>
+                    <?php
+                  }
+                }else{
+                  ?>
+                  <a href="" class="btn btn-primary">Print</a>
+                  <?php
+                }
+               ?>
+            </div>
           </div>
           <div class="card-body">
             <?php

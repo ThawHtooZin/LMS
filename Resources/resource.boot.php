@@ -14,6 +14,18 @@ class Bootstrap
       <script src="Resources/bootstrap-5.3.1-dist/js/bootstrap.min.js" charset="utf-8"></script>
     ';
   }
+  function cssprint()
+  {
+    echo '
+      <link rel="stylesheet" href="../../../Resources\bootstrap-5.3.1-dist\css\bootstrap.css">
+    ';
+  }
+  function javascriptprint()
+  {
+    echo '
+      <script src="../../../Resources/bootstrap-5.3.1-dist/js/bootstrap.min.js" charset="utf-8"></script>
+    ';
+  }
   function css()
   {
     echo '

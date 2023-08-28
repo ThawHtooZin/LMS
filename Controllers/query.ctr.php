@@ -406,6 +406,71 @@ Class Query{
     }
   }
 
+  function addcoldstore($indate, $outdate, $mc, $kg, $coldstorerate, $labourrate, $processingrate){
+    global $pdo;
+
+
+    $datastmt = $pdo->prepare("SELECT * FROM coldstore ORDER BY id DESC");
+    $datastmt->execute();
+    $data = $datastmt->fetch(PDO::FETCH_ASSOC);
+    if(!empty($data)){
+      $dtotal_mc = $data['total_mc'];
+      $dtotal_kg = $data['total_kg'] + $kg;
+      $date1 = strtotime($indate);
+      $date2 = strtotime($outdate);
+      $diff = $date2 - $date1;
+      $day = floor($diff / (60 * 60 * 24));
+      $charges = $day * $coldstorerate * $kg;
+      $total_charges = $data['total_charges'] + $charges;
+    }else{
+      $dtotal_mc = $mc;
+      $dtotal_kg = $kg;
+      $date1 = strtotime($indate);
+      $date2 = strtotime($outdate);
+      $diff = $date2 - $date1;
+      $day = floor($diff / (60 * 60 * 24));
+      $charges = $day * $coldstorerate * $kg;
+      $total_charges = $charges;
+    }
+
+    $labourstmt = $pdo->prepare("SELECT * FROM labour ORDER BY id DESC");
+    $labourstmt->execute();
+    $labour = $labourstmt->fetch(PDO::FETCH_ASSOC);
+    if(!empty($labour)){
+      $ltotal_mc = $labour['total_mc'];
+      $ltotal_kg = $labour['total_kg'] + $kg;
+      $lcharges = $labourrate * $kg;
+      $totallabourcharges = $labour['total_charges'] + $lcharges;
+    }else{
+      $ltotal_mc = $mc;
+      $ltotal_kg = $kg;
+      $lcharges = $labourrate * $kg;
+      $totallabourcharges = $lcharges;
+    }
+
+    $processingstmt = $pdo->prepare("SELECT * FROM processing ORDER BY id DESC");
+    $processingstmt->execute();
+    $processing = $processingstmt->fetch(PDO::FETCH_ASSOC);
+    if(!empty($processing)){
+      $ptotal_mc = $processing['total_mc'];
+      $ptotal_kg = $processing['total_kg'] + $kg;
+      $pcharges = $processingrate * $kg;
+      $totalprocessingcharges = $processing['total_charges'] + $pcharges;
+    }else{
+      $ptotal_mc = $mc;
+      $ptotal_kg = $kg;
+      $pcharges = $processingrate * $kg;
+      $totalprocessingcharges = $pcharges;
+    }
+
+    $coldstorestmt = $pdo->prepare("INSERT INTO coldstore(indate, outdate, mc, total_mc, kg, total_kg, day, rate, charges, total_charges) VALUES('$indate','$outdate','$mc','$dtotal_mc','$kg','$dtotal_kg','$day','$coldstorerate','$charges','$total_charges')");
+    $coldstorestmt->execute();
+    $labourstmt = $pdo->prepare("INSERT INTO labour(indate, outdate, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$mc','$ltotal_mc','$kg','$ltotal_kg','$labourrate','$lcharges','$totallabourcharges')");
+    $labourstmt->execute();
+    $processingstmt = $pdo->prepare("INSERT INTO processing(indate, outdate, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$mc','$ptotal_mc','$kg','$ptotal_kg','$processingrate','$pcharges','$totalprocessingcharges')");
+    $processingstmt->execute();
+  }
+
   // MORE SELECTS
 
   function selectsum($table, $id, $selectwhat){

@@ -1,4 +1,4 @@
-<div class="d-flex flex-column flex-shrink-0 p-1 text-white bg-secondary" style="width: 16%; height:100%; position:fixed;">
+<div class="d-flex flex-column flex-shrink-0 p-1 text-white bg-secondary" style="width: 16.5%; height:100%; position:fixed;">
       <div class="text-center bg-light text-dark pt-3 pb-3">
         <b class="fs-4">Link Mark System</b>
         <br>
@@ -25,7 +25,7 @@
         <div class="collapse" id="system-collapse">
           <ul class="btn-toggle-nav list-unstyled fw-normal ms-2">
             <li class="nav-item  rounded">
-              <a href="manageaccounts.php" class="nav-link h users text-light show" aria-current="page">
+              <a href="manageaccounts.php" class="nav-link h users text-light show" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-tags"></i></svg>
                 - Manage Accounts
               </a>
@@ -41,31 +41,31 @@
         <div class="collapse" id="account-collapse">
           <ul class="btn-toggle-nav list-unstyled fw-normal">
             <li class="nav-item  rounded" style="cursor: not-allowed !important;">
-              <a href="sales.php" class="nav-link h sales text-light show disabled"  aria-current="page">
+              <a href="sales.php" class="nav-link h sales text-light show disabled"  aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-tags"></i></svg>
                 - Sales
               </a>
             </li>
             <li class="nav-item  rounded">
-              <a href="purchase.php" class="nav-link purchase h text-light" aria-current="page">
+              <a href="purchase.php" class="nav-link purchase h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Purchase
               </a>
             </li>
             <li class="nav-item  rounded" style="cursor: not-allowed !important;">
-              <a href="cashbook.php" class="nav-link cashbook h text-light" aria-current="page">
+              <a href="cashbook.php" class="nav-link cashbook h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Cash Book
               </a>
             </li>
             <li class="nav-item  rounded">
-              <a href="accountpayable.php" class="nav-link accountpayable h text-light" aria-current="page">
+              <a href="accountpayable.php" class="nav-link accountpayable h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Account Payable
               </a>
             </li>
             <li class="nav-item  rounded" style="cursor: not-allowed !important;">
-              <a href="accountreceivable.php" class="nav-link accountreceivable h text-light disabled" aria-current="page">
+              <a href="accountreceivable.php" class="nav-link accountreceivable h text-light disabled" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Account Receivable
               </a>
@@ -81,31 +81,31 @@
         <div class="collapse" id="config-collapse">
           <ul class="btn-toggle-nav list-unstyled fw-normal ms-2">
             <li class="nav-item  rounded">
-              <a href="customer.php" class="nav-link h customer text-light show" aria-current="page">
+              <a href="customer.php" class="nav-link h customer text-light show" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-tags"></i></svg>
                 - Customers
               </a>
             </li>
             <li class="nav-item  rounded">
-              <a href="supplier.php" class="nav-link item h suppliers text-light" aria-current="page">
+              <a href="supplier.php" class="nav-link item h suppliers text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Suppliers
               </a>
             </li>
             <li class="nav-item  rounded">
-              <a href="category.php" class="nav-link h category text-light show" aria-current="page">
+              <a href="category.php" class="nav-link h category text-light show" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-tags"></i></svg>
                 - Category
               </a>
             </li>
             <li class="nav-item  rounded">
-              <a href="item.php" class="nav-link item h text-light" aria-current="page">
+              <a href="item.php" class="nav-link item h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Items
               </a>
             </li>
             <li class="nav-item  rounded" style="cursor: not-allowed !important;">
-              <a href="unit.php" class="nav-link item h text-light disabled" aria-current="page">
+              <a href="unit.php" class="nav-link item h text-light disabled" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Unit
               </a>
@@ -120,10 +120,10 @@
         </a>
         <div class="collapse" id="production-collapse">
           <ul class="btn-toggle-nav list-unstyled fw-normal ms-2">
-            <li class="nav-item  rounded" style="cursor: not-allowed !important;">
-              <a href="product.php" class="nav-link product h text-light disabled" aria-current="page">
+            <li class="nav-item  rounded">
+              <a href="coldstorecharges.php" class="nav-link product h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
-                - Product
+                - Cold Store Charges
               </a>
             </li>
           </ul>
@@ -137,13 +137,13 @@
         <div class="collapse" id="report-collapse">
           <ul class="btn-toggle-nav list-unstyled fw-normal ms-2">
             <li class="nav-item  rounded" style="cursor: not-allowed !important;">
-              <a href="salereport.php" class="nav-link salereport h text-light disabled" aria-current="page">
+              <a href="salereport.php" class="nav-link salereport h text-light disabled" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Sale Report
               </a>
             </li>
             <li class="nav-item  rounded">
-              <a href="purchase_report.php" class="nav-link purchasereport h text-light" aria-current="page">
+              <a href="purchase_report.php" class="nav-link purchasereport h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Purchase Report
               </a>
