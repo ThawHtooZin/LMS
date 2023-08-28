@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 26, 2023 at 02:40 PM
+-- Generation Time: Aug 28, 2023 at 09:35 AM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.0.17
 
@@ -73,7 +73,10 @@ INSERT INTO `cashbook` (`id`, `date`, `serial_no`, `ac_name`, `particular`, `deb
 (8, '2023-08-24', 'Mrs.Phyo', 'Receive', 'Received from USA', 10000000, 0, 9000000),
 (9, '2023-08-24', 'Mr.Jphn', 'Supplier', 'Paid to Supplier Mg Mg vno SS123', 0, 40000000, -31000000),
 (10, '2023-08-23', 'Mrs.Que', 'receive', 'received from Canada', 40000000, 0, 9000000),
-(11, '2023-08-24', 'Mr.Jumbo', 'Supplier', 'Paid to Supplier JoJo vno SB140', 0, 5000000, 4000000);
+(11, '2023-08-24', 'Mr.Jumbo', 'Supplier', 'Paid to Supplier JoJo vno SB140', 0, 5000000, 4000000),
+(14, '2023-09-01', 'Mr.JohnDoe', 'Buyer', 'Buy Product', 1000000, 0, 5000000),
+(15, '2023-09-01', 'Mr.Broke', 'Buyer', 'Buy Product\r\n', 100000, 0, 5100000),
+(16, '2023-09-02', 'Mr.Haven', 'Buyer', 'Buy Product', 900000, 0, 6000000);
 
 -- --------------------------------------------------------
 
@@ -300,7 +303,7 @@ ALTER TABLE `accounts`
 -- AUTO_INCREMENT for table `cashbook`
 --
 ALTER TABLE `cashbook`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `category`
