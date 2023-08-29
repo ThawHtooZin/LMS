@@ -30,6 +30,12 @@
                 - Manage Accounts
               </a>
             </li>
+            <li class="nav-item  rounded">
+              <a href="backupandrestore.php" class="nav-link h users text-light show" aria-current="page" style="font-size:14px !important; font-weight:bold;">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-tags"></i></svg>
+                - Backup And Restore
+              </a>
+            </li>
           </ul>
         </div>
       </li>
