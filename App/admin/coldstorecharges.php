@@ -34,7 +34,7 @@ $query = new Query();
             <a href="daterangecharges.php" class="btn btn-default border border-3" style="padding: 100px !important;">Date Range Cold Store Charge</a>
           </div>
           <div class="col text-center">
-            <a href="#" class="btn btn-default border border-3" style="padding: 100px !important;">Monthly Cold Store Charge</a>
+            <a href="monthlycharges.php" class="btn btn-default border border-3" style="padding: 100px !important;">Monthly Cold Store Charge</a>
           </div>
         </div>
       </div>

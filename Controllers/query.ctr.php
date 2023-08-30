@@ -585,8 +585,73 @@ Class Query{
           }
   }
 
-  function deletecoldstore(){
+  function addcoldstoretotal($date, $total_coldstore_charges, $total_labour_charges, $total_processing_charges, $repacking_charges, $ice_charges){
     global $pdo;
+
+    $datastmt = $pdo->prepare("SELECT * FROM total_charges ORDER BY id DESC");
+    $datastmt->execute();
+    $data = $datastmt->fetch(PDO::FETCH_ASSOC);
+    if(!empty($data)){
+      $total_charges = $total_coldstore_charges + $total_labour_charges + $total_processing_charges + $repacking_charges + $ice_charges;
+      $grand_total_charges = $data['total_charges'] + $total_charges;
+    }else{
+      $total_charges = $total_coldstore_charges + $total_labour_charges + $total_processing_charges + $repacking_charges + $ice_charges;
+      $grand_total_charges = $total_charges;
+    }
+
+    $stmt = $pdo->prepare("INSERT INTO total_charges(date, total_coldstore_charges, total_labour_charges, total_processing_charges, repacking_charges, ice_charges, total_charges, grand_total_charges) VALUES('$date','$total_coldstore_charges', '$total_labour_charges', '$total_processing_charges', '$repacking_charges', '$ice_charges', '$total_charges', '$grand_total_charges')");
+    $stmt->execute();
+
+  }
+
+  function addfishcharges($date, $ite, $mc, $kg, $coldstorerate, $labourrate, $damagekg){
+    global $pdo;
+
+    $fishcoldstorestmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore ORDER BY id DESC");
+    $fishcoldstorestmt->execute();
+    $fishcoldstore = $fishcoldstorestmt->fetch(PDO::FETCH_ASSOC);
+    if(!empty($fishcoldstore)){
+      $totalchargesstmt = $pdo->prepare("SELECT MAX(total_kg) AS maxkg FROM gfcfishcoldstore WHERE date='$date'");
+      $totalchargesstmt->execute();
+      $totalchargesdata = $totalchargesstmt->fetch(PDO::FETCH_ASSOC);
+      if($ite == 'import'){
+        $total_mc = $fishcoldstore['total_mc'] + $mc;
+        $total_kg = $fishcoldstorestmt['total_kg'] + $kg;
+        $coldstorecharges = $coldstorerate * $maxkg;
+      }elseif($ite == 'export'){
+        $total_mc = $fishcoldstore['total_mc'] - $mc;
+        $total_kg = $fishcoldstorestmt['total_kg'] - $kg;
+        $coldstorecharges = $coldstorerate * $maxkg;
+      }elseif($ite == 'takeout'){
+        $total_mc = $fishcoldstore['total_mc'] - $mc;
+        if(!empty($damagekg)){
+          $total_kg = $fishcoldstorestmt['total_kg'] - $damagekg;
+          $coldstorecharges = $coldstorerate * $maxkg;
+          $total_charges = $coldstorecharges + $fishcoldstoredata['total_charges'];
+        }
+      }
+    }else{
+      $total_mc = $mc;
+      $total_kg = $kg;
+      $coldstorecharges = $coldstorerate * $kg;
+      $total_charges = $coldstorecharges;
+    }
+
+    $coldstorestmt = $pdo->prepare("INSERT INTO gfcfishcoldstore(date, ite, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$date', '$ite', '$mc', '$total_mc', '$kg', '$total_kg', '$coldstorerate', '$coldstorecharges', '$total_charges')");
+    $coldstorestmt->execute();
+
+    // $fishlabourstmt = $pdo->prepare("SELECT * FROM gfcfishlabour ORDER BY id DESC");
+    // $fishlabourstmt->execute();
+    // $fishlabour = $fishlabourstmt->fetch(PDO::FETCH_ASSOC);
+    // if(!empty($fishlabour)){
+    //   $total_mc = $fishlabour['total_mc'] + $mc;
+    //   $total_kg = $fishlabour['total_kg'] + $kg;
+    //   $charges = $labourrate * $kg;
+    //   $total_charges = $fishlabour['total_charges'] + $charges;
+    // }else{
+    //
+    // }
+
   }
 
   // MORE SELECTS
