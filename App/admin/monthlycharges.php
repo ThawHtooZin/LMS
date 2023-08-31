@@ -55,16 +55,31 @@ $query = new Query();
       $query->addfishcharges($date, $ite, $mc, $kg, $coldstorerate, $labourrate, $damagekg);
     }
 
-    if(isset($_POST['update'])){
-      $indate = $_POST['indate'];
-      $outdate = $_POST['outdate'];
-      $mc = $_POST['mc'];
+    if(isset($_POST['adddryfishcharges'])){
+      $date = $_POST['date'];
+      $ite = $_POST['ite'];
       $kg = $_POST['kg'];
-      $coldstorerate = $_POST['coldstorerate'];
+      $drycoldstorerate = $_POST['drycoldstorerate'];
       $labourrate = $_POST['labourrate'];
-      $processingrate = $_POST['processingrate'];
-      $updateid = $_POST['updateid'];
-      $query->updatecoldstore($indate, $outdate, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $updateid);
+      $damagekg = $_POST['damagekg'];
+      $query->adddryfishcharges($date, $ite, $kg, $drycoldstorerate, $labourrate, $damagekg);
+    }
+
+    if(isset($_POST['addrepackingoutbtn'])){
+      $date = $_POST['date'];
+      $outkg = $_POST['outkg'];
+      $rate = $_POST['rate'];
+
+      $query->addrepackingout($date, $outkg, $rate);
+    }
+
+    if(isset($_POST['addtotalbtn'])){
+      $date = $_POST['date'];
+      $plugoncharges = $_POST['plugoncharges'];
+      $payment_date = $_POST['payment_date'];
+      $payment_amount = $_POST['payment_amount'];
+
+      $query->addtotal($date, $plugoncharges, $payment_date, $payment_amount);
     }
 
      ?>
@@ -85,12 +100,12 @@ $query = new Query();
           </div>
           <div class="card-body">
             <div class="text-center">
-              <button class="pb-2 pt-2 ps-5 pe-5 text-dark fishcoldstorelink" style="text-decoration:none; border:none;" onclick="showfishcoldstore()">Fish C-S</button>
-              <button class="pb-2 pt-2 ps-5 pe-5 text-dark fishlabourlink" style="text-decoration:none; border:none;" onclick="showfishlabour()">Fish L-B</button>
-              <button class="pb-2 pt-2 ps-5 pe-5 text-dark dryfishcoldstorelink" style="text-decoration:none; border:none;" onclick="showdryfishcoldstore()">Dry Fish C-S</button>
-              <button class="pb-2 pt-2 ps-5 pe-5 text-dark dryfishlabourlink" style="text-decoration:none; border:none;" onclick="showdryfishlabour()">Dry Fish L-B</button>
-              <button class="pb-2 pt-2 ps-5 pe-5 text-dark repackingoutlink" style="text-decoration:none; border:none;" onclick="showrepackingout()">RP Out</button>
-              <button class="pb-2 pt-2 ps-5 pe-5 text-dark totalamountlink" style="text-decoration:none; border:none;" onclick="showtotal()">Total Amount Balance</button>
+              <button class="pb-2 pt-2 ps-4 pe-4 text-dark fishcoldstorelink" style="text-decoration:none; border:none;" onclick="showfishcoldstore()">Fish C-S</button>
+              <button class="pb-2 pt-2 ps-4 pe-4 text-dark fishlabourlink" style="text-decoration:none; border:none;" onclick="showfishlabour()">Fish L-B</button>
+              <button class="pb-2 pt-2 ps-4 pe-4 text-dark dryfishcoldstorelink" style="text-decoration:none; border:none;" onclick="showdryfishcoldstore()">Dry Fish C-S</button>
+              <button class="pb-2 pt-2 ps-4 pe-4 text-dark dryfishlabourlink" style="text-decoration:none; border:none;" onclick="showdryfishlabour()">Dry Fish L-B</button>
+              <button class="pb-2 pt-2 ps-4 pe-4 text-dark repackingoutlink" style="text-decoration:none; border:none;" onclick="showrepackingout()">RP Out</button>
+              <button class="pb-2 pt-2 ps-4 pe-4 text-dark totalamountlink" style="text-decoration:none; border:none;" onclick="showtotal()">Total Amount Balance</button>
             </div>
             <hr>
             <div class="fishcoldstore hide">
@@ -115,13 +130,13 @@ $query = new Query();
                   <td><?php echo $fishcoldstoredata['id']; ?></td>
                   <td><?php echo $fishcoldstoredata['date']; ?></td>
                   <td><?php echo $fishcoldstoredata['ite']; ?></td>
-                  <td><?php echo $fishcoldstoredata['mc']; ?></td>
+                  <td><?php if($fishcoldstoredata['mc'] == '0'){ echo "";}else{ echo $fishcoldstoredata['mc']; }; ?></td>
                   <td><?php echo $fishcoldstoredata['total_mc']; ?></td>
                   <td><?php echo $fishcoldstoredata['kg']; ?></td>
                   <td><?php echo $fishcoldstoredata['total_kg']; ?></td>
                   <td><?php echo $fishcoldstoredata['rate']; ?></td>
-                  <td><?php echo $fishcoldstoredata['charges']; ?></td>
-                  <td><?php echo $fishcoldstoredata['total_charges']; ?></td>
+                  <td><?php if ($fishcoldstoredata['charges'] == '0'){echo "";}else{ echo $fishcoldstoredata['charges'];}; ?></td>
+                  <td><?php if ($fishcoldstoredata['total_charges'] == '0'){echo "";}else{ echo $fishcoldstoredata['total_charges'];}; ?></td>
                 </tr>
                 <?php
                 }
@@ -139,15 +154,22 @@ $query = new Query();
                   <th class="text-center">Charges</th>
                   <th class="text-center">Total Charges</th>
                 </tr>
+                <?php
+                $fishlabourdatas = $query->selectall("gfcfishlabour");
+                foreach ($fishlabourdatas as $fishlabourdata) {
+                 ?>
                 <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
+                  <td><?php echo $fishlabourdata['id']; ?></td>
+                  <td><?php echo $fishlabourdata['date']; ?></td>
+                  <td><?php echo $fishlabourdata['ite']; ?></td>
+                  <td><?php echo $fishlabourdata['kg']; ?></td>
+                  <td><?php echo $fishlabourdata['rate']; ?></td>
+                  <td><?php echo $fishlabourdata['charges']; ?></td>
+                  <td><?php echo $fishlabourdata['total_charges']; ?></td>
                 </tr>
+                <?php
+                }
+                 ?>
               </table>
             </div>
             <div class="dryfishcoldstore hide">
@@ -155,21 +177,30 @@ $query = new Query();
                 <tr>
                   <th class="text-center">Id</th>
                   <th class="text-center">Date</th>
+                  <th class="text-center">I.T.E</th>
                   <th class="text-center">Kg</th>
                   <th class="text-center">Total Kg</th>
                   <th class="text-center">Rate</th>
                   <th class="text-center">Charges</th>
                   <th class="text-center">Total Charges</th>
                 </tr>
+                <?php
+                $dryfishcoldstoredatas = $query->selectall("gfcdryfishcoldstore");
+                foreach ($dryfishcoldstoredatas as $dryfishcoldstoredata) {
+                 ?>
                 <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
+                  <td><?php echo $dryfishcoldstoredata['id']; ?></td>
+                  <td><?php echo $dryfishcoldstoredata['date']; ?></td>
+                  <td><?php echo $dryfishcoldstoredata['ite']; ?></td>
+                  <td><?php echo $dryfishcoldstoredata['kg']; ?></td>
+                  <td><?php echo $dryfishcoldstoredata['total_kg']; ?></td>
+                  <td><?php echo $dryfishcoldstoredata['rate']; ?></td>
+                  <td><?php echo $dryfishcoldstoredata['charges']; ?></td>
+                  <td><?php echo $dryfishcoldstoredata['total_charges']; ?></td>
                 </tr>
+                <?php
+                }
+                 ?>
               </table>
             </div>
             <div class="dryfishlabour hide">
@@ -183,14 +214,22 @@ $query = new Query();
                   <th class="text-center">Charges</th>
                   <th class="text-center">Total Charges</th>
                 </tr>
+                <?php
+                $dryfishlabourdatas = $query->selectall("gfcdryfishlabour");
+                foreach ($dryfishlabourdatas as $dryfishlabourdata) {
+                 ?>
                 <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
+                  <td><?php echo $dryfishlabourdata['id']; ?></td>
+                  <td><?php echo $dryfishlabourdata['date']; ?></td>
+                  <td><?php echo $dryfishlabourdata['ite']; ?></td>
+                  <td><?php echo $dryfishlabourdata['kg']; ?></td>
+                  <td><?php echo $dryfishlabourdata['rate']; ?></td>
+                  <td><?php echo $dryfishlabourdata['charges']; ?></td>
+                  <td><?php echo $dryfishlabourdata['total_charges']; ?></td>
                 </tr>
+                <?php
+                }
+                 ?>
               </table>
             </div>
             <div class="repackingout hide">
@@ -203,48 +242,60 @@ $query = new Query();
                   <th class="text-center">Charges</th>
                   <th class="text-center">Total Charges</th>
                 </tr>
+                <?php
+                $repackingoutdatas = $query->selectall('repackingout');
+                foreach ($repackingoutdatas as $repackingoutdata) {
+                 ?>
                 <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
+                  <td><?php echo $repackingoutdata['id']; ?></td>
+                  <td><?php echo $repackingoutdata['date']; ?></td>
+                  <td><?php echo $repackingoutdata['outkg']; ?></td>
+                  <td><?php echo $repackingoutdata['rate']; ?></td>
+                  <td><?php echo $repackingoutdata['charges']; ?></td>
+                  <td><?php echo $repackingoutdata['total_charges']; ?></td>
                 </tr>
+                <?php
+                }
+                 ?>
               </table>
             </div>
             <div class="totalamount hide">
               <table class="table table-striped table-bordered table-hover">
                 <tr>
-                  <th style="font-size:11px;" class="text-center">Id</th>
-                  <th style="font-size:11px;" class="text-center">Date</th>
-                  <th style="font-size:11px;" class="text-center">Total Cold Store Charges</th>
-                  <th style="font-size:11px;" class="text-center">Total Labour Charges</th>
-                  <th style="font-size:11px;" class="text-center">Total Repacking Charges</th>
-                  <th style="font-size:11px;" class="text-center">Total Dry Fish CS Charges</th>
-                  <th style="font-size:11px;" class="text-center">Total Dry FIsh LB Charges</th>
-                  <th style="font-size:11px;" class="text-center">Total Charges</th>
-                  <th style="font-size:11px;" class="text-center">Plugon Charges</th>
-                  <th style="font-size:11px;" class="text-center">Total Charges</th>
-                  <th style="font-size:11px;" class="text-center">Payment Date</th>
-                  <th style="font-size:11px;" class="text-center">Payment Amount</th>
-                  <th style="font-size:11px;" class="text-center">Balance Amount</th>
+                  <th style="font-size:13px; padding-top: 17px;" class="text-center">Id</th>
+                  <th style="font-size:13px; padding-top: 17px;" class="text-center">Date</th>
+                  <th style="font-size:13px;" class="text-center">Total Cold Store Charges</th>
+                  <th style="font-size:13px;" class="text-center">Total Labour Charges</th>
+                  <th style="font-size:13px;" class="text-center">Total Repacking Charges</th>
+                  <th style="font-size:13px;" class="text-center">Total Dry Fish CS Charges</th>
+                  <th style="font-size:13px;" class="text-center">Total Dry FIsh LB Charges</th>
+                  <th style="font-size:13px;" class="text-center">Plug On Charges</th>
+                  <th style="font-size:13px;" class="text-center">Total Charges</th>
+                  <th style="font-size:13px;" class="text-center">Payment Date</th>
+                  <th style="font-size:13px;" class="text-center">Payment Amount</th>
+                  <th style="font-size:13px;" class="text-center">Balance Amount</th>
                 </tr>
-                <tr>
-                  <td style="font-size:13px;">asdfasdf</td>
-                  <td style="font-size:13px;">asdfasdf</td>
-                  <td style="font-size:13px;">asdfasdf</td>
-                  <td style="font-size:13px;">asdfasdf</td>
-                  <td style="font-size:13px;">asdfasdf</td>
-                  <td style="font-size:13px;">asdfasdf</td>
-                  <td style="font-size:13px;">asdfasdf</td>
-                  <td style="font-size:13px;">asdfasdf</td>
-                  <td style="font-size:13px;">asdfasdf</td>
-                  <td style="font-size:13px;">asdfasdf</td>
-                  <td style="font-size:13px;">asdfasdf</td>
-                  <td style="font-size:13px;">asdfasdf</td>
-                  <td style="font-size:13px;">asdfasdf</td>
-                </tr>
+                <?php
+                $totaldatas = $query->selectall('gfctotal');
+                foreach ($totaldatas as $totaldata) {
+                  ?>
+                  <tr>
+                    <td style="font-size:13px;"><?php echo $totaldata['id']; ?></td>
+                    <td style="font-size:13px;"><?php echo $totaldata['date']; ?></td>
+                    <td style="font-size:13px;"><?php echo $totaldata['totalfishcoldstorecharges']; ?></td>
+                    <td style="font-size:13px;"><?php echo $totaldata['totalfishlabourcharges']; ?></td>
+                    <td style="font-size:13px;"><?php echo $totaldata['totalrepackingcharges']; ?></td>
+                    <td style="font-size:13px;"><?php echo $totaldata['totaldryfishcoldstorecharges']; ?></td>
+                    <td style="font-size:13px;"><?php echo $totaldata['totaldryfishlabourcharges']; ?></td>
+                    <td style="font-size:13px;"><?php echo $totaldata['plugoncharges']; ?></td>
+                    <td style="font-size:13px;"><?php echo $totaldata['total_charges']; ?></td>
+                    <td style="font-size:13px;"><?php if($totaldata['payment_date'] != "0000-00-00"){ echo $date['payment_date']; }; ?></td>
+                    <td style="font-size:13px;"><?php if($totaldata['payment_amount'] != "0"){ echo $date['payment_amount']; }; ?></td>
+                    <td style="font-size:13px;"><?php echo $totaldata['balance_amount']; ?></td>
+                  </tr>
+                <?php
+                }
+                 ?>
               </table>
             </div>
           </div>
