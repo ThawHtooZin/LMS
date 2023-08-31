@@ -16,7 +16,7 @@
             <label>I.T.E</label>
             <select class="form-control inpv2 mb-2" name="ite">
               <option value="import">Import</option>
-              <option value="output">Output</option>
+              <option value="export">Export</option>
               <option value="takeout">TakeOut</option>
             </select>
           </div>

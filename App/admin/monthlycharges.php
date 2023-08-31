@@ -108,22 +108,23 @@ $query = new Query();
                   <th class="text-center">Total Charges</th>
                 </tr>
                 <?php
-                // foreach ($fishcoldstoredatas as $fishcoldstoredata) {
+                $fishcoldstoredatas = $query->selectall('gfcfishcoldstore');
+                foreach ($fishcoldstoredatas as $fishcoldstoredata) {
                  ?>
                 <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
+                  <td><?php echo $fishcoldstoredata['id']; ?></td>
+                  <td><?php echo $fishcoldstoredata['date']; ?></td>
+                  <td><?php echo $fishcoldstoredata['ite']; ?></td>
+                  <td><?php echo $fishcoldstoredata['mc']; ?></td>
+                  <td><?php echo $fishcoldstoredata['total_mc']; ?></td>
+                  <td><?php echo $fishcoldstoredata['kg']; ?></td>
+                  <td><?php echo $fishcoldstoredata['total_kg']; ?></td>
+                  <td><?php echo $fishcoldstoredata['rate']; ?></td>
+                  <td><?php echo $fishcoldstoredata['charges']; ?></td>
+                  <td><?php echo $fishcoldstoredata['total_charges']; ?></td>
                 </tr>
                 <?php
-                // }
+                }
                  ?>
               </table>
             </div>
