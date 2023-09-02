@@ -29,7 +29,7 @@ class Bootstrap
   function css()
   {
     echo '
-      <link rel="stylesheet" href="../../Resources\bootstrap-5.3.1-dist\css\bootstrap.css">
+      <link rel="stylesheet" href="../../Resources\bootstrap-5.3.1-dist\css\bootstrap.min.css">
       <style>
         .h:hover{
           color:  black !important;
@@ -43,8 +43,21 @@ class Bootstrap
         th{
           background-color: #D9D9D9 !important;
         }
+        tr.info>*{
+           background-color:lightblue !important;
+        }
         .inpv2{
           border: 1px solid gray !important;
+        }
+        .table-hover>tbody>tr:hover>*{
+          background-color: lightblue !important;
+          color:white;
+        }
+        label{
+          font-weight: bold;
+        }
+        .hide{
+          display: none;
         }
       </style>
       <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">

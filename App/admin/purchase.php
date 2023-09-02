@@ -157,12 +157,12 @@ $query = new Query();
             $numOfrecs = 8;
             $offset = ($pageno -1) * $numOfrecs;
             ?>
-            <table class="mt-1 table table-bordered table-striped rounded">
+            <table class="mt-1 table table-bordered table-striped rounded table-hover">
               <tr>
                 <th>#</th>
                 <th>Date</th>
                 <th>Voucher No</th>
-                <th>TCL (or) Frozen</th>
+                <th>Type</th>
                 <th>Supplier Name</th>
                 <th>Commodity</th>
                 <th>Size</th>
@@ -171,7 +171,6 @@ $query = new Query();
                 <th>Pcs</th>
                 <th>Price</th>
                 <th>Amount</th>
-                <th>Action</th>
               </tr>
               <?php
               if(isset($_POST['total'])){
@@ -196,8 +195,9 @@ $query = new Query();
                 $itemid = $purchasedata['commodity'];
                 $item_name = $query->select('item', $itemid, 'item_id');
               ?>
+              <input type="hidden" name="updateid" value="<?php echo $purchasedata['no']; ?>">
 
-              <tr>
+              <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $purchasedata['no'];  ?>" style="cursor: pointer !important;">
                 <td><?php echo $purchasedata['no']; ?></td>
                 <td><?php echo date('d-m-Y', strtotime($purchasedata['date'])); ?></td>
                 <td><?php echo $purchasedata['voucher_no']; ?></td>
@@ -210,35 +210,28 @@ $query = new Query();
                 <td><?php echo $purchasedata['pcs']; ?></td>
                 <td><?php echo $purchasedata['price']; ?></td>
                 <td><?php echo $purchasedata['amount']; ?></td>
-                <td>
-                  <div class="d-flex">
-                    <input type="hidden" name="updateid" value="<?php echo $purchasedata['no']; ?>">
-                    <button type="submit" class="btn btn-warning text-light" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $purchasedata['no'];  ?>">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-  </svg>
-                    </button>
-                  <form action="purchase.php" method="post" style="display: inline !important;">
-                    <input type="hidden" name="deleteid" value="<?php echo $purchasedata['no']; ?>">
-                    <button type="submit" name="deletebutton" class="btn btn-danger">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
-                    </button>
-                  </form>
-                  </div>
-              </td>
               </tr>
               <!-- Data Update Modal -->
               <div class="modal fade" id="updatemodal<?php echo $purchasedata['no'];  ?>" tabindex="-1" role="dialog"  style="margin-left:auto !important; margin-right: auto !important;">
                 <div class="modal-dialog" role="document">
                   <div class="modal-content" style="width: 750px; !important; margin-top:70px !important;">
+                    <form action="" method="post" autocomplete="off">
                     <div class="modal-header bg-warning text-light">
                       <h5 class="modal-title" id="updatemodallabel">Update An Category</h5>
-                      <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true" class="h3">&times;</span>
-                      </button>
+                      <div class="row">
+                        <div class="col">
+                          <button type="submit" class="btn btn-success d-inline" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                              <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                              <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                            </svg>
+                          </button>
+                          <button type="submit" name="deletebutton d-inline" class="btn btn-danger">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
+                          </button>
+                          <button type="button" class="btn btn-primary d-inline" data-bs-toggle="modal">&times;</button>
+                        </div>
+                      </div>
                     </div>
-                    <form action="" method="post" autocomplete="off">
                       <div class="modal-body">
                         <?php
                          $id = $purchasedata['no'];
@@ -312,9 +305,8 @@ $query = new Query();
                             <label style="font-weight: bold;">Price</label>
                             <input type="number" name="price" class="form-control inpv2 mb-2" value="<?php echo $updatedata['price']; ?>">
                           </div>
-                          <div class="col mt-4">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-warning" name="updatebutton">Update</button>
+                          <div class="col">
+
                           </div>
                         </div>
                       </div>
@@ -332,7 +324,6 @@ $query = new Query();
                 $total_amount = $query->selectsum('purchase', $supplier_id, 'supplier_id');
                 ?>
                 <tr>
-                  <td></td>
                   <td></td>
                   <td></td>
                   <td></td>
@@ -364,7 +355,6 @@ $query = new Query();
                   <td></td>
                   <td></td>
                   <td></td>
-                  <td></td>
                   <td>Total Amount:</td>
                   <td><?php echo $total_amount['total_amount'];  ?></td>
                   <td></td>
@@ -377,7 +367,6 @@ $query = new Query();
                 $total_amount = $query->selectallsum('purchase', 'amount', 'total_amount');
                 ?>
                 <tr>
-                  <td></td>
                   <td></td>
                   <td></td>
                   <td></td>

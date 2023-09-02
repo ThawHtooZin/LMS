@@ -48,7 +48,7 @@ Class Query{
     return $stmt->fetchall();
   }
 
-  function selectdesc($table){
+  function selectdist($table){
     global $pdo;
     $stmt = $pdo->prepare("SELECT DISTINCT (voucher_no) FROM $table");
     $stmt->execute();
@@ -933,6 +933,46 @@ Class Query{
       $addtotalstmt = $pdo->prepare("INSERT INTO gfctotal(date, totalfishcoldstorecharges, totalfishlabourcharges, totalrepackingcharges, totaldryfishcoldstorecharges, totaldryfishlabourcharges, plugoncharges, total_charges, balance_amount) VALUES('$date', '$totalfishcoldstorecharges', '$totalfishlabourcharges', '$totalrepackingcharges', '$totaldryfishcoldstorecharges', '$totaldryfishlabourcharges', '$plugoncharges', '$total_charges', '$balance')");
       $addtotalstmt->execute();
     }
+  }
+
+  function addpayment($payment_date, $payment_amount, $id){
+    global $pdo;
+
+    $totalchargesstmt = $pdo->prepare("SELECT * FROM gfctotal ORDER BY id DESC");
+    $totalchargesstmt->execute();
+    $totalchargesdata = $totalchargesstmt->fetch(PDO::FETCH_ASSOC);
+
+    $balance = $totalchargesdata['balance_amount'] - $payment_amount;
+
+    $addpaymentstmt = $pdo->prepare("INSERT INTO gfctotal(payment_date, payment_amount, balance_amount) VALUES('$payment_date', '$payment_amount', '$balance')");
+    $addpaymentstmt->execute();
+  }
+
+  function addcontainer($container_no, $country, $date){
+    global $pdo;
+
+    $addcontainerstmt = $pdo->prepare("INSERT INTO container(container_no, country, date) VALUES('$container_no', '$country', '$date')");
+    $addcontainerstmt->execute();
+  }
+
+  function addpackingmaterial($commondity_id, $fish_size, $plastic, $jcv, $inner_box, $sticker, $mc_plastic, $carton_box, $tape, $penon, $p_sticker, $plastic_rope, $micellion, $processing, $plastic_size, $pcsperlb, $pcspermc, $tdydollorprice){
+    global $pdo;
+
+    $plastic = intval($plastic) * intval($pcspermc) / intval($pcsperlb) / 20;
+    $jcv = intval($jcv) / 300 / 20;
+    $sticker = intval($sticker) * intval($pcspermc) / 20;
+    $mc_plastic = intval($mc_plastic) / 5 / 20;
+    $carton_box = intval($carton_box) / 20;
+    $tape = intval($tape) / 70 / 20;
+    $penon = intval($penon) / 20;
+    $p_sticker = intval($p_sticker) / 20;
+    $plastic_rope = intval($plastic_rope) / 70 / 20;
+    $total = intval($plastic) + intval($jcv) + intval($inner_box) + intval($sticker) + intval($mc_plastic) + intval($carton_box) + intval($tape) + intval($penon) + intval($p_sticker) + intval($plastic_rope) + intval($micellion) + intval($processing);
+    $perkgcost = $total / $tdydollorprice;
+
+    $addpackingmaterialstmt = $pdo->prepare("INSERT INTO packingmaterial(commondity_id, fish_size, plastic, jcv, inner_box, sticker, mc_plastic, carton_box, tape, penon, p_sticker, plastic_rope, micellion, processing, total, perkgcost, plastic_size, pcsperlb, pcspermc)
+    VALUES('$commondity_id', '$fish_size', '$plastic', '$jcv', '$inner_box', '$sticker', '$mc_plastic', '$carton_box', '$tape', '$penon', '$p_sticker', '$plastic_rope', '$micellion', '$processing', '$total', '$perkgcost', '$plastic_size', '$pcsperlb', '$pcspermc')");
+    $addpackingmaterialstmt->execute();
   }
 
   // MORE SELECTS

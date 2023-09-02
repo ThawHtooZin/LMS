@@ -1,0 +1,15 @@
+Purchase
+=======
+VoucherNo
+VoucherDate
+ReferNo(Actual Voucher No)
+SupplierId
+TotalAmount
+DiscountPer
+DiscountAmt
+NetAmount
+Remark
+CreatedBy
+CreatedAt
+ModifiedBy
+ModifiedAt

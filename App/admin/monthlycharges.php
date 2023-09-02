@@ -82,6 +82,13 @@ $query = new Query();
       $query->addtotal($date, $plugoncharges, $payment_date, $payment_amount);
     }
 
+    if(isset($_POST['addpaymentbtn'])){
+      $payment_date = $_POST['payment_date'];
+      $payment_amount = $_POST['payment_amount'];
+      $id = $_POST['id'];
+      $query->addpayment($payment_date, $payment_amount, $id);
+    }
+
      ?>
     <div class="row">
       <div class="col-2">
@@ -279,21 +286,22 @@ $query = new Query();
                 $totaldatas = $query->selectall('gfctotal');
                 foreach ($totaldatas as $totaldata) {
                   ?>
-                  <tr>
-                    <td style="font-size:13px;"><?php echo $totaldata['id']; ?></td>
-                    <td style="font-size:13px;"><?php echo $totaldata['date']; ?></td>
-                    <td style="font-size:13px;"><?php echo $totaldata['totalfishcoldstorecharges']; ?></td>
-                    <td style="font-size:13px;"><?php echo $totaldata['totalfishlabourcharges']; ?></td>
-                    <td style="font-size:13px;"><?php echo $totaldata['totalrepackingcharges']; ?></td>
-                    <td style="font-size:13px;"><?php echo $totaldata['totaldryfishcoldstorecharges']; ?></td>
-                    <td style="font-size:13px;"><?php echo $totaldata['totaldryfishlabourcharges']; ?></td>
-                    <td style="font-size:13px;"><?php echo $totaldata['plugoncharges']; ?></td>
-                    <td style="font-size:13px;"><?php echo $totaldata['total_charges']; ?></td>
-                    <td style="font-size:13px;"><?php if($totaldata['payment_date'] != "0000-00-00"){ echo $date['payment_date']; }; ?></td>
-                    <td style="font-size:13px;"><?php if($totaldata['payment_amount'] != "0"){ echo $date['payment_amount']; }; ?></td>
+                  <tr data-bs-toggle="modal" data-bs-target="#addpayment<?php echo $totaldata['id']; ?>">
+                    <td style="font-size:13px;"><?php if($totaldata['date'] != '0000-00-00'){echo $totaldata['id'];} ?></td>
+                    <td style="font-size:13px;"><?php if($totaldata['date'] != '0000-00-00'){echo $totaldata['date'];} ?></td>
+                    <td style="font-size:13px;"><?php if($totaldata['totalfishcoldstorecharges'] != '0'){echo $totaldata['totalfishcoldstorecharges'];} ?></td>
+                    <td style="font-size:13px;"><?php if($totaldata['totalfishlabourcharges'] != '0'){echo $totaldata['totalfishlabourcharges'];} ?></td>
+                    <td style="font-size:13px;"><?php if($totaldata['totalrepackingcharges'] != '0'){echo $totaldata['totalrepackingcharges'];} ?></td>
+                    <td style="font-size:13px;"><?php if($totaldata['totaldryfishcoldstorecharges'] != '0'){echo $totaldata['totaldryfishcoldstorecharges'];} ?></td>
+                    <td style="font-size:13px;"><?php if($totaldata['totaldryfishlabourcharges'] != '0'){echo $totaldata['totaldryfishlabourcharges'];} ?></td>
+                    <td style="font-size:13px;"><?php if($totaldata['plugoncharges'] != '0'){echo $totaldata['plugoncharges'];} ?></td>
+                    <td style="font-size:13px;"><?php if($totaldata['total_charges'] != '0'){echo $totaldata['total_charges'];} ?></td>
+                    <td style="font-size:13px;"><?php if($totaldata['payment_date'] != "0000-00-00"){ echo $totaldata['payment_date']; }; ?></td>
+                    <td style="font-size:13px;"><?php if($totaldata['payment_amount'] != "0"){ echo $totaldata['payment_amount']; }; ?></td>
                     <td style="font-size:13px;"><?php echo $totaldata['balance_amount']; ?></td>
                   </tr>
                 <?php
+                include 'updatemodals.php';
                 }
                  ?>
               </table>
@@ -303,7 +311,7 @@ $query = new Query();
       </div>
     </div>
     <?php
-    include 'modals.php';
+    include 'addmodals.php';
      ?>
     <script type="text/javascript">
     showfishcoldstore();
