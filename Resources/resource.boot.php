@@ -6,12 +6,24 @@ class Bootstrap
   {
     echo '
       <link rel="stylesheet" href="Resources\bootstrap-5.3.1-dist\css\bootstrap.css">
+      <!-- Font Awesome -->
+      <link rel="stylesheet" href="Resources/plugins/fontawesome-free/css/all.min.css">
+      <!-- icheck bootstrap -->
+      <link rel="stylesheet" href="Resources/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+      <!-- Theme style -->
+      <link rel="stylesheet" href="Resources/dist/css/adminlte.min.css">
     ';
   }
   function javascriptindex()
   {
     echo '
       <script src="Resources/bootstrap-5.3.1-dist/js/bootstrap.min.js" charset="utf-8"></script>
+      <!-- jQuery -->
+      <script src="Resources/plugins/jquery/jquery.min.js"></script>
+      <!-- Bootstrap 4 -->
+      <script src="Resources/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+      <!-- AdminLTE App -->
+      <script src="Resources/dist/js/adminlte.min.js"></script>
     ';
   }
   function cssprint()
