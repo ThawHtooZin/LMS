@@ -14,7 +14,7 @@
       <li class="nav-item  rounded" style=" border: 2px solid black; ">
         <a href="../admin/" class="nav-link text-light" aria-current="page">
           <svg class="bi" width="16" height="16"><i class="bi bi-speedometer2"></i></svg>
-          Dashboard
+          Home
         </a>
       </li>
       <li style=" border: 2px solid black; " class="rounded">

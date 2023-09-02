@@ -29,11 +29,10 @@ $query = new Query();
         ?>
       </div>
       <div class="col-10">
-        <h1 class="p-3 pt-4 text-center text-warning" style="font-family: 'Caprasimo', cursive;
-font-family: 'Cormorant Garamond', serif;
-font-family: 'Teko', sans-serif; font-size: 65px;"> <span style="font-size:70px;">LINK MARK </span> <br> COMPANY LIMITED</h1>
-        <div class="container text-center w-50" style="margin-top:100px; margin-left:auto; margin-right:auto;">
+        <h1 class="p-3 pt-4 text-center text-warning" style="font-family: 'Caprasimo', cursive;font-family: 'Cormorant Garamond', serif;font-family: 'Teko', sans-serif; font-size: 65px; text-shadow:-5px 5px gray;"> <span style="font-size:70px;">LINK MARK </span> <br> COMPANY LIMITED</h1>
+        <div class="container text-center w-50" style="margin-top:50px; margin-left:auto; margin-right:auto;">
           <img src="../../Images/Personal-computer.jpg" alt="" width="50%">
+          <br><br><br>
           <h3>LINK MARK SYSTEM</h3>
         </div>
       </div>
