@@ -87,10 +87,11 @@ $query = new Query();
                 <th>Id</th>
                 <th>Commondity</th>
                 <th>Fish Size</th>
+                <th>Total Packing</th>
                 <th>Micellion</th>
                 <th>Processing</th>
-                <th>Per Kg Cost</th>
                 <th>Total</th>
+                <th>Per Kg Cost</th>
               </tr>
               <?php
               $packingmaterialdatas = $query->selectall("packingmaterial");
@@ -101,10 +102,14 @@ $query = new Query();
                 <td><?php echo $packingmaterialdata['id']; ?></td>
                 <td><?php echo $itemdata['item_name']; ?></td>
                 <td><?php echo $packingmaterialdata['fish_size']; ?></td>
+                <?php
+                $micandpro = $packingmaterialdata['micellion'] + $packingmaterialdata['processing'];
+                 ?>
+                <td><?php echo $packingmaterialdata['total'] - $micandpro; ?></td>
                 <td><?php echo $packingmaterialdata['micellion']; ?></td>
                 <td><?php echo $packingmaterialdata['processing']; ?></td>
-                <td><?php echo $packingmaterialdata['perkgcost']; ?></td>
                 <td><?php echo $packingmaterialdata['total']; ?></td>
+                <td><?php echo $packingmaterialdata['perkgcost']; ?></td>
               </tr>
               <?php
               };
@@ -134,7 +139,7 @@ $query = new Query();
               ?>
               <tr>
                 <td><?php echo $packingmaterialdata['id']; ?></td>
-                <td><?php echo $packingmaterialdata['plastic']; ?></td>
+                <td><?php echo round($packingmaterialdata['plastic'], 2); ?></td>
                 <td><?php echo $packingmaterialdata['jcv']; ?></td>
                 <td><?php echo $packingmaterialdata['inner_box']; ?></td>
                 <td><?php echo $packingmaterialdata['sticker']; ?></td>
@@ -143,7 +148,7 @@ $query = new Query();
                 <td><?php echo $packingmaterialdata['tape']; ?></td>
                 <td><?php echo $packingmaterialdata['penon']; ?></td>
                 <td><?php echo $packingmaterialdata['p_sticker']; ?></td>
-                <td><?php echo $packingmaterialdata['plastic_rope']; ?></td>
+                <td><?php echo round($packingmaterialdata['plastic_rope'], 2); ?></td>
                 <td><?php echo $packingmaterialdata['plastic_size']; ?></td>
                 <td><?php echo $packingmaterialdata['pcsperlb']; ?></td>
                 <td><?php echo $packingmaterialdata['pcspermc']; ?></td>

@@ -223,59 +223,59 @@
             </div>
             <div class="col">
               <label>Plastic Costing</label>
-              <input type="text" name="plastic" class="form-control inpv2 mb-2">
+              <input type="text" name="plastic" class="form-control inpv2 mb-2" value="2450">
             </div>
           </div>
           <div class="row">
             <div class="col">
               <label>JCV Cost</label>
-              <input type="text" name="jcv" class="form-control inpv2 mb-2">
+              <input type="text" name="jcv" class="form-control inpv2 mb-2" value="18.099">
             </div>
             <div class="col">
               <label>Inner Box</label>
-              <input type="text" name="inner_box" class="form-control inpv2 mb-2">
+              <input type="text" name="inner_box" class="form-control inpv2 mb-2" value="">
             </div>
             <div class="col">
               <label>Sticker Cost</label>
-              <input type="text" name="sticker" class="form-control inpv2 mb-2">
+              <input type="text" name="sticker" class="form-control inpv2 mb-2" value="35">
             </div>
           </div>
           <div class="row">
             <div class="col">
               <label>MC Plastic Cost</label>
-              <input type="text" name="mc_plastic" class="form-control inpv2 mb-2">
+              <input type="text" name="mc_plastic" class="form-control inpv2 mb-2" value="2450">
             </div>
             <div class="col">
               <label>Carton Box Cost</label>
-              <input type="text" name="carton_box" class="form-control inpv2 mb-2">
+              <input type="text" name="carton_box" class="form-control inpv2 mb-2" value="1440">
             </div>
             <div class="col">
               <label>Tape Cost</label>
-              <input type="number" name="tape" class="form-control inpv2 mb-2">
+              <input type="number" name="tape" class="form-control inpv2 mb-2" value="4600">
             </div>
           </div>
           <div class="row">
             <div class="col">
               <label>Penon Cost</label>
-              <input type="number" name="penon" class="form-control inpv2 mb-2">
+              <input type="number" name="penon" class="form-control inpv2 mb-2" value="310">
             </div>
             <div class="col">
               <label>P-Sticker Cost</label>
-              <input type="number" name="p_sticker" class="form-control inpv2 mb-2">
+              <input type="number" name="p_sticker" class="form-control inpv2 mb-2" value="75">
             </div>
             <div class="col">
               <label>Plastic Rope Cost</label>
-              <input type="text" name="plastic_rope" class="form-control inpv2 mb-2">
+              <input type="text" name="plastic_rope" class="form-control inpv2 mb-2" value="6400">
             </div>
           </div>
           <div class="row">
             <div class="col">
               <label>Micellion Cost</label>
-              <input type="number" name="micellion" class="form-control inpv2 mb-2">
+              <input type="number" name="micellion" class="form-control inpv2 mb-2" value="50">
             </div>
             <div class="col">
               <label>Processing Cost</label>
-              <input type="number" name="processing" class="form-control inpv2 mb-2">
+              <input type="number" name="processing" class="form-control inpv2 mb-2" value="350">
             </div>
             <div class="col">
               <label>Plastic Size</label>

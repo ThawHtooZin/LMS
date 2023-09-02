@@ -959,7 +959,7 @@ Class Query{
     global $pdo;
 
     $plastic = intval($plastic) * intval($pcspermc) / intval($pcsperlb) / 20;
-    $jcv = intval($jcv) / 300 / 20;
+    $jcv = intval($jcv) * $tdydollorprice / 300 / 20;
     $sticker = intval($sticker) * intval($pcspermc) / 20;
     $mc_plastic = intval($mc_plastic) / 5 / 20;
     $carton_box = intval($carton_box) / 20;
@@ -969,7 +969,7 @@ Class Query{
     $plastic_rope = intval($plastic_rope) / 70 / 20;
     $total = intval($plastic) + intval($jcv) + intval($inner_box) + intval($sticker) + intval($mc_plastic) + intval($carton_box) + intval($tape) + intval($penon) + intval($p_sticker) + intval($plastic_rope) + intval($micellion) + intval($processing);
     $perkgcost = $total / $tdydollorprice;
-
+    $perkgcost = round($perkgcost, 2);
     $addpackingmaterialstmt = $pdo->prepare("INSERT INTO packingmaterial(commondity_id, fish_size, plastic, jcv, inner_box, sticker, mc_plastic, carton_box, tape, penon, p_sticker, plastic_rope, micellion, processing, total, perkgcost, plastic_size, pcsperlb, pcspermc)
     VALUES('$commondity_id', '$fish_size', '$plastic', '$jcv', '$inner_box', '$sticker', '$mc_plastic', '$carton_box', '$tape', '$penon', '$p_sticker', '$plastic_rope', '$micellion', '$processing', '$total', '$perkgcost', '$plastic_size', '$pcsperlb', '$pcspermc')");
     $addpackingmaterialstmt->execute();
