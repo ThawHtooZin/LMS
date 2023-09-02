@@ -43,7 +43,6 @@ $query = new Query();
                   }
                 }else{
                   ?>
-                  <a href="" class="btn btn-primary">Print</a>
                   <?php
                 }
                ?>
