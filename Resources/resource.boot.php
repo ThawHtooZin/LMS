@@ -62,14 +62,17 @@ class Bootstrap
           border: 1px solid gray !important;
         }
         .table-hover>tbody>tr:hover>*{
-          background-color: lightblue !important;
-          color:white;
+          background-color: rgb(0,0,0,0.1) !important;
+          color:black;
         }
         label{
           font-weight: bold;
         }
         .hide{
           display: none;
+        }
+        .table>tbody>tr>*{
+          background-color: transparent !important;
         }
       </style>
       <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">

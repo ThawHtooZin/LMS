@@ -4,7 +4,6 @@
     <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
       <div class="modal-header bg-secondary text-light">
         <h1 class="modal-title fs-5">New Fish Charges</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
     <form action="monthlycharges.php" method="post">
       <div class="modal-body">
