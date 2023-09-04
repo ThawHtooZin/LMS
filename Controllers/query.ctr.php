@@ -703,7 +703,6 @@ Class Query{
   function updatecoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $updateid){
     global $pdo;
 
-
     $datastmt = $pdo->prepare("SELECT * FROM coldstore WHERE id < '$updateid'");
     $datastmt->execute();
     $data = $datastmt->fetch(PDO::FETCH_ASSOC);
@@ -814,21 +813,47 @@ Class Query{
           }
   }
 
-  function addcoldstoretotal($date, $total_coldstore_charges, $total_labour_charges, $total_processing_charges, $repacking_charges, $ice_charges){
+  function addcoldstoretotal($date, $commondity_id, $ice_charges){
     global $pdo;
 
     $datastmt = $pdo->prepare("SELECT * FROM total_charges ORDER BY id DESC");
     $datastmt->execute();
     $data = $datastmt->fetch(PDO::FETCH_ASSOC);
+
+    $totalcoldstorestmt = $pdo->prepare("SELECT total_charges FROM coldstore WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+    $totalcoldstorestmt->execute();
+    $totalcoldstoredata = $totalcoldstorestmt->fetch(PDO::FETCH_ASSOC);
+
+    $totallabourstmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+    $totallabourstmt->execute();
+    $totallabourdata = $totallabourstmt->fetch(PDO::FETCH_ASSOC);
+
+    $totalprocessingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+    $totalprocessingstmt->execute();
+    $totalprocessingdata = $totalprocessingstmt->fetch(PDO::FETCH_ASSOC);
+
+    $totalrepackingstmt = $pdo->prepare("SELECT * FROM repacking ORDER BY id DESC");
+    $totalrepackingstmt->execute();
+    $totalrepackingdata = $totalrepackingstmt->fetch(PDO::FETCH_ASSOC);
     if(!empty($data)){
-      $total_charges = $total_coldstore_charges + $total_labour_charges + $total_processing_charges + $repacking_charges + $ice_charges;
+      $total_coldstore_charges = $totalcoldstoredata['total_charges'];
+      $total_labour_charges = $totallabourdata['total_charges'];
+      $total_processing_charges = $totalprocessingdata['total_charges'];
+      $total_repacking_charges = $totalrepackingdata['total_charges'];
+      $total_charges = $totalcoldstoredata['total_charges'] + $totallabourdata['total_charges'] + $totalprocessingdata['total_charges'] + $totalrepackingdata['total_charges'] + $ice_charges;
       $grand_total_charges = $data['total_charges'] + $total_charges;
+      $balance_amount = $grand_total_charges;
     }else{
-      $total_charges = $total_coldstore_charges + $total_labour_charges + $total_processing_charges + $repacking_charges + $ice_charges;
+      $total_coldstore_charges = $totalcoldstoredata['total_charges'];
+      $total_labour_charges = $totallabourdata['total_charges'];
+      $total_processing_charges = $totalprocessingdata['total_charges'];
+      $total_repacking_charges = $totalrepackingdata['total_charges'];
+      $total_charges = $totalcoldstoredata['total_charges'] + $totallabourdata['total_charges'] + $totalprocessingdata['total_charges'] + $totalrepackingdata['total_charges'] + $ice_charges;
       $grand_total_charges = $total_charges;
+      $balance_amount = $grand_total_charges;
     }
 
-    $stmt = $pdo->prepare("INSERT INTO total_charges(date, total_coldstore_charges, total_labour_charges, total_processing_charges, repacking_charges, ice_charges, total_charges, grand_total_charges) VALUES('$date','$total_coldstore_charges', '$total_labour_charges', '$total_processing_charges', '$repacking_charges', '$ice_charges', '$total_charges', '$grand_total_charges')");
+    $stmt = $pdo->prepare("INSERT INTO total_charges(date, commondity_id, total_coldstore_charges, total_labour_charges, total_processing_charges, repacking_charges, ice_charges, total_charges, grand_total_charges, balance_amount) VALUES('$date','$commondity_id','$total_coldstore_charges', '$total_labour_charges', '$total_processing_charges', '$total_repacking_charges', '$ice_charges', '$total_charges', '$grand_total_charges', '$balance_amount')");
     $stmt->execute();
 
   }
@@ -1235,6 +1260,43 @@ Class Query{
     $addpackingmaterialstmt = $pdo->prepare("INSERT INTO packingmaterial(commondity_id, fish_size, plastic, jcv, inner_box, sticker, mc_plastic, carton_box, tape, penon, p_sticker, plastic_rope, micellion, processing, total, perkgcost, plastic_size, pcsperlb, pcspermc)
     VALUES('$commondity_id', '$fish_size', '$plastic', '$jcv', '$inner_box', '$sticker', '$mc_plastic', '$carton_box', '$tape', '$penon', '$p_sticker', '$plastic_rope', '$micellion', '$processing', '$total', '$perkgcost', '$plastic_size', '$pcsperlb', '$pcspermc')");
     $addpackingmaterialstmt->execute();
+  }
+
+  function addrepacking($date, $in_mc, $in_kg, $out_mc, $out_kg, $rate){
+    global $pdo;
+
+    $repackingstmt = $pdo->prepare("SELECT * FROM repacking ORDER BY id DESC");
+    $repackingstmt->execute();
+    $repackingdata = $repackingstmt->fetch(PDO::FETCH_ASSOC);
+    if(!empty($repackingdata)) {
+      $diff_mc = $in_mc - $out_mc;
+      $diff_kg = $in_kg - $out_kg;
+      $charges = $rate * $in_kg;
+      $total_charges = $charges + $repackingdata['total_charges'];
+
+      $repackingaddstmt = $pdo->prepare("INSERT INTO repacking(date,in_mc, in_kg, out_mc, out_kg, diff_mc, diff_kg, rate, charges, total_charges) VALUES('$date','$in_mc', '$in_kg', '$out_mc', '$out_kg', '$diff_mc', '$diff_kg', '$rate', '$charges', '$total_charges')");
+      $repackingaddstmt->execute();
+    }else{
+      $diff_mc = $in_mc - $out_mc;
+      $diff_kg = $in_kg - $out_kg;
+      $charges = $rate * $in_kg;
+      $total_charges = $charges;
+
+      $repackingaddstmt = $pdo->prepare("INSERT INTO repacking(date,in_mc, in_kg, out_mc, out_kg, diff_mc, diff_kg, rate, charges, total_charges) VALUES('$date','$in_mc', '$in_kg', '$out_mc', '$out_kg', '$diff_mc', '$diff_kg', '$rate', '$charges', '$total_charges')");
+      $repackingaddstmt->execute();
+    }
+  }
+
+  function paytotalcharges($payment_date, $payment_amount, $commondity_id){
+    global $pdo;
+
+    $balancestmt = $pdo->prepare("SELECT balance_amount FROM total_charges WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+    $balancestmt->execute();
+    $balancedata = $balancestmt->fetch(PDO::FETCH_ASSOC);
+    $balance = $balancedata['balance_amount'] - $payment_amount;
+
+    $paytotalchargesstmt = $pdo->prepare("INSERT INTO total_charges(commondity_id, payment_date, payment_amount, balance_amount) VALUES('$commondity_id', '$payment_date', '$payment_amount', '$balance')");
+    $paytotalchargesstmt->execute();
   }
 
   // MORE SELECTS

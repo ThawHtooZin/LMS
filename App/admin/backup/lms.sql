@@ -246,8 +246,10 @@ CREATE TABLE `gfctotal` (
   `payment_amount` bigint(15) NOT NULL,
   `balance_amount` bigint(15) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4;
 
+INSERT INTO gfctotal VALUES("18","0000-00-00","1470","5670","1575","0","4980","10000","23695","0000-00-00","0","23695");
+INSERT INTO gfctotal VALUES("19","0000-00-00","0","0","0","0","0","0","0","2023-09-05","20000","3695");
 
 
 
@@ -419,6 +421,28 @@ INSERT INTO purchase VALUES("31","2023-09-27","2008","KJ122","frozen","UT216","1
 
 
 
+DROP TABLE repacking;
+
+CREATE TABLE `repacking` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `date` date NOT NULL,
+  `in_mc` int(10) NOT NULL,
+  `in_kg` varchar(10) NOT NULL,
+  `out_mc` int(11) NOT NULL,
+  `out_kg` varchar(11) NOT NULL,
+  `diff_mc` int(11) NOT NULL,
+  `diff_kg` varchar(11) NOT NULL,
+  `rate` varchar(11) NOT NULL,
+  `charges` varchar(11) NOT NULL,
+  `total_charges` varchar(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO repacking VALUES("1","2023-09-05","150","300","100","150","50","150","7","2100","2100");
+INSERT INTO repacking VALUES("3","2023-09-06","150","300","100","150","50","150","7","2100","4200");
+
+
+
 DROP TABLE repackingout;
 
 CREATE TABLE `repackingout` (
@@ -509,6 +533,7 @@ DROP TABLE total_charges;
 CREATE TABLE `total_charges` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `date` date NOT NULL,
+  `commondity_id` int(11) NOT NULL,
   `total_coldstore_charges` bigint(19) NOT NULL,
   `total_labour_charges` bigint(19) NOT NULL,
   `total_processing_charges` bigint(19) NOT NULL,
@@ -521,9 +546,14 @@ CREATE TABLE `total_charges` (
   `balance_amount` bigint(19) NOT NULL,
   `remark` bigint(19) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO total_charges VALUES("2","2023-08-31","10000000","5000000","4000000","1000000","100000","20100000","20100000","0000-00-00","0","0","0");
+INSERT INTO total_charges VALUES("14","2023-09-01","4","13800","3750","202500","4200","10000","234250","234250","0000-00-00","0","234250","0");
+INSERT INTO total_charges VALUES("18","0000-00-00","4","0","0","0","0","0","0","0","2023-09-02","34250","200000","0");
+INSERT INTO total_charges VALUES("21","2023-09-02","11","19800","5250","493500","4200","100000","622750","622750","0000-00-00","0","622750","0");
+INSERT INTO total_charges VALUES("27","0000-00-00","11","0","0","0","0","0","0","0","2023-09-02","100000","522750","0");
+INSERT INTO total_charges VALUES("30","2023-09-01","13","24600","6750","472500","4200","100000","608050","608050","0000-00-00","0","608050","0");
+INSERT INTO total_charges VALUES("32","0000-00-00","13","0","0","0","0","0","0","0","2023-09-02","8050","600000","0");
 
 
 

@@ -47,12 +47,28 @@ $query = new Query();
 
     if(isset($_POST['totaladd'])){
       $date = $_POST['date'];
-      $total_coldstore_charges = $_POST['total_coldstore_charges'];
-      $total_labour_charges = $_POST['total_labour_charges'];
-      $total_processing_charges = $_POST['total_processing_charges'];
-      $repacking_charges = $_POST['repacking_charges'];
+      $commondity_id = $_POST['commondity_id'];
       $ice_charges = $_POST['ice_charges'];
-      $query->addcoldstoretotal($date, $total_coldstore_charges, $total_labour_charges, $total_processing_charges, $repacking_charges, $ice_charges);
+      $query->addcoldstoretotal($date, $commondity_id, $ice_charges);
+    }
+
+    if(isset($_POST['paytotalchargesbtn'])){
+      $payment_date = $_POST['payment_date'];
+      $payment_amount = $_POST['payment_amount'];
+      $commondity_id = $_POST['commondity_id'];
+
+      $query->paytotalcharges($payment_date, $payment_amount, $commondity_id);
+    }
+
+    if(isset($_POST['repackingadd'])){
+      $date = $_POST['date'];
+      $in_mc = $_POST['in_mc'];
+      $in_kg = $_POST['in_kg'];
+      $out_mc = $_POST['out_mc'];
+      $out_kg = $_POST['out_kg'];
+      $rate = $_POST['rate'];
+
+      $query->addrepacking($date, $in_mc, $in_kg, $out_mc, $out_kg, $rate);
     }
 
     if(isset($_POST['update'])){
@@ -80,13 +96,30 @@ $query = new Query();
             <h4 class="d-inline">Date Range Cold Store Charges</h4>
             <button type="submit" class="btn btn-success float-end addnewcharges" data-bs-toggle="modal" data-bs-target="#newcharges">Add New Charges</button>
             <button type="submit" class="btn btn-success float-end hide addtotalcharges" data-bs-toggle="modal" data-bs-target="#totalcharges">Add Total Charges</button>
+            <button type="submit" class="btn btn-success float-end hide addrepackingcharges" data-bs-toggle="modal" data-bs-target="#repackingcharges">Add Repacking Charges</button>
           </div>
           <div class="card-body">
             <div class="text-center">
-              <button class="pb-2 pt-2 ps-5 pe-5 text-dark coldstorelink" style="text-decoration:none; border:none;" onclick="showcoldstore()">Cold Store Charges</button>
-              <button class="pb-2 pt-2 ps-5 pe-5 text-dark labourlink" style="text-decoration:none; border:none;" onclick="showlabour()">Labour Charges</button>
-              <button class="pb-2 pt-2 ps-5 pe-5 text-dark processinglink" style="text-decoration:none; border:none;" onclick="showprocessing()">Processing Charges</button>
-              <button class="pb-2 pt-2 ps-5 pe-5 text-dark totallink" style="text-decoration:none; border:none;" onclick="showtotal()">Total Charges</button>
+              <?php
+              if(isset($_POST['coldstorebtn'])){
+                $_SESSION['tabs'] = "coldstore";
+              }elseif(isset($_POST['labourbtn'])){
+                $_SESSION['tabs'] = "labour";
+              }elseif(isset($_POST['processingbtn'])){
+                $_SESSION['tabs'] = "processing";
+              }elseif(isset($_POST['repackingbtn'])){
+                $_SESSION['tabs'] = "repacking";
+              }elseif(isset($_POST['totalchargesbtn'])){
+                $_SESSION['tabs'] = "totalcharges";
+              }
+               ?>
+              <form action="" method="post">
+                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark coldstorelink" style="text-decoration:none; border:none;" name="coldstorebtn">Cold Store Charges</button>
+                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark labourlink" style="text-decoration:none; border:none;" name="labourbtn">Labour Charges</button>
+                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark processinglink" style="text-decoration:none; border:none;" name="processingbtn">Processing Charges</button>
+                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark repackinglink" style="text-decoration:none; border:none;" name="repackingbtn">Repacking Charges</button>
+                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark totallink" style="text-decoration:none; border:none;" name="totalchargesbtn">Total Charges</button>
+              </form>
             </div>
             <hr>
             <div class="coldstorecharges hide">
@@ -350,27 +383,113 @@ $query = new Query();
                   <th class="text-center">Remark</th>
                 </tr>
                 <?php
-                $total_charges_datas = $query->selectall('total_charges');
-                foreach ($total_charges_datas as $total_charges_data) {
+                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM total_charges");
+                $commonditycountstmt->execute();
+                $commonditycountdatas = $commonditycountstmt->fetchColumn();
+                for ($i=0; $i < $commonditycountdatas; $i++) {
+                  $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM total_charges");
+                  $commonditystmt->execute();
+                  $commonditydata = $commonditystmt->fetchall();
+                  $commondity_id = $commonditydata[$i]['commondity_id'];
+
+                $totalstmt = $pdo->prepare("SELECT * FROM total_charges WHERE commondity_id='$commondity_id'");
+                $totalstmt->execute();
+                $totaldatas = $totalstmt->fetchall();
+                foreach ($totaldatas as $total_charges_data) {
+                  $item_id = $total_charges_data['commondity_id'];
+                  $commonditydata = $query->select('category', $item_id, 'category_id');
                 ?>
-                <tr>
-                  <td><?php echo $total_charges_data['id']; ?></td>
-                  <td><?php echo $total_charges_data['date']; ?></td>
-                  <td><?php echo $total_charges_data['total_coldstore_charges']; ?></td>
-                  <td><?php echo $total_charges_data['total_labour_charges']; ?></td>
-                  <td><?php echo $total_charges_data['total_processing_charges']; ?></td>
-                  <td><?php echo $total_charges_data['repacking_charges']; ?></td>
-                  <td><?php echo $total_charges_data['ice_charges']; ?></td>
-                  <td><?php echo $total_charges_data['total_charges']; ?></td>
-                  <td><?php echo $total_charges_data['grand_total_charges']; ?></td>
+                <tr style="<?php if($commonditydata['category_name'] == "IQF"){echo "background-color: #6ef757 !important;";}elseif($commonditydata['category_name'] == "Block"){echo "background-color: #f5764c !important;";}elseif($commonditydata['category_name'] == "Pujanut"){echo "background-color: lightblue !important;";} ?>" data-bs-toggle="modal" data-bs-target="#paytotalcharges<?php echo $total_charges_data['commondity_id']; ?>">
+                  <td><?php if($total_charges_data['total_coldstore_charges'] != "0"){ echo $total_charges_data['id'];} ; ?></td>
+                  <td><?php if($total_charges_data['date'] != "0000-00-00"){ echo $total_charges_data['date'];} ; ?></td>
+                  <td><?php if($total_charges_data['total_coldstore_charges'] != "0"){ echo $total_charges_data['total_coldstore_charges'];} ; ?></td>
+                  <td><?php if($total_charges_data['total_labour_charges'] != "0"){ echo $total_charges_data['total_labour_charges'];} ; ?></td>
+                  <td><?php if($total_charges_data['total_processing_charges'] != "0"){ echo $total_charges_data['total_processing_charges'];} ; ?></td>
+                  <td><?php if($total_charges_data['repacking_charges'] != "0"){ echo $total_charges_data['repacking_charges'];} ; ?></td>
+                  <td><?php if($total_charges_data['ice_charges'] != "0"){ echo $total_charges_data['ice_charges'];} ; ?></td>
+                  <td><?php if($total_charges_data['total_charges'] != "0"){ echo $total_charges_data['total_charges'];} ; ?></td>
+                  <td><?php if($total_charges_data['grand_total_charges'] != "0"){ echo $total_charges_data['grand_total_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['payment_date'] != "0000-00-00"){ echo $total_charges_data['payment_date']; } ; ?></td>
                   <td><?php if($total_charges_data['payment_amount'] != "0"){ echo $total_charges_data['payment_amount']; }; ?></td>
                   <td><?php if($total_charges_data['balance_amount'] != "0"){ echo $total_charges_data['balance_amount'];}; ?></td>
                   <td><?php if($total_charges_data['remark'] != "0"){ echo $total_charges_data['remark'];}; ?></td>
                 </tr>
+                <!-- Add Modal -->
+                <div class="modal fade" id="paytotalcharges<?php echo $total_charges_data['commondity_id']; ?>">
+                  <div class="modal-dialog">
+                    <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                      <div class="modal-header bg-secondary text-light">
+                        <h1 class="modal-title fs-5">Pay Total Charges</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <form action="daterangecharges.php" method="post">
+                      <div class="modal-body">
+                        <input type="hidden" name="commondity_id" value="<?php echo $total_charges_data['commondity_id']; ?>">
+                        <div class="row">
+                          <div class="col">
+                            <label>Payment Date</label>
+                            <input type="date" name="payment_date" class="form-control inpv2 mb-2">
+                          </div>
+                          <div class="col">
+                            <label>Payment Amount</label>
+                            <input type="number" name="payment_amount" class="form-control inpv2">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                          </div>
+                          <div class="col mt-4">
+                            <button type="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
+                            <button type="submit" name="paytotalchargesbtn" class="btn btn-success">Add</button>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                    </div>
+                  </div>
+                </div>
+                <!-- Add Modal -->
                 <?php
                 }
+                }
                  ?>
+              </table>
+            </div>
+            <div class="repackingcharges hide">
+              <table class="table table-striped table-bordered table-hover">
+                <tr>
+                  <th>Id</th>
+                  <th>Date</th>
+                  <th>In MC</th>
+                  <th>In Kg</th>
+                  <th>Out MC</th>
+                  <th>Out Kg</th>
+                  <th>Diff MC</th>
+                  <th>Diff Kg</th>
+                  <th>Rate</th>
+                  <th>Charges</th>
+                  <th>Total Charges</th>
+                </tr>
+                <?php
+                $repackingdatas = $query->selectall('repacking');
+                foreach ($repackingdatas as $repackingdata) {
+                 ?>
+                 <tr>
+                   <td><?php echo $repackingdata['id']; ?></td>
+                   <td><?php echo $repackingdata['date']; ?></td>
+                   <td><?php echo $repackingdata['in_mc']; ?></td>
+                   <td><?php echo $repackingdata['in_kg']; ?></td>
+                   <td><?php echo $repackingdata['out_mc']; ?></td>
+                   <td><?php echo $repackingdata['out_kg']; ?></td>
+                   <td><?php echo $repackingdata['diff_mc']; ?></td>
+                   <td><?php echo $repackingdata['diff_kg']; ?></td>
+                   <td><?php echo $repackingdata['rate']; ?></td>
+                   <td><?php echo $repackingdata['charges']; ?></td>
+                   <td><?php echo $repackingdata['total_charges']; ?></td>
+                 </tr>
+                <?php
+                }
+                ?>
               </table>
             </div>
           </div>
@@ -458,37 +577,80 @@ $query = new Query();
           <div class="modal-body">
             <div class="row">
               <div class="col">
-                <label style="font-weight:bold;">Date</label>
+                <label>Date</label>
                 <input type="date" name="date" class="form-control inpv2 mb-2">
               </div>
               <div class="col">
-                <label style="font-weight:bold;">Total Cold Store Charges</label>
-                <input type="number" name="total_coldstore_charges" class="form-control inpv2 mb-2" placeholder="Total Cold Store Charges">
+                <label>Commondity</label>
+                <select class="form-control inpv2 mb-2" name="commondity_id">
+                  <?php
+                  $commonditydatas = $query->selectall('category');
+                  foreach ($commonditydatas as $commonditydata) {
+                    ?>
+                    <option value="<?php echo $commonditydata['category_id']; ?>"><?php echo $commonditydata['category_name']; ?></option>
+                    <?php
+                    }
+                   ?>
+                </select>
               </div>
             </div>
             <div class="row">
               <div class="col">
-                <label style="font-weight:bold;">Total Labour Charges</label>
-                <input type="number" name="total_labour_charges" class="form-control inpv2 mb-2" placeholder="Total Labour Charges">
-              </div>
-              <div class="col">
-                <label style="font-weight:bold;">Total Processing Charges</label>
-                <input type="number" name="total_processing_charges" class="form-control inpv2 mb-2" placeholder="Total Processing Charges">
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <label style="font-weight:bold;">Repacking Charges</label>
-                <input type="number" name="repacking_charges" class="form-control inpv2" placeholder="Repacking Charges">
-              </div>
-              <div class="col">
-                <label style="font-weight:bold;">Ice Charges</label>
+                <label>Ice Charges</label>
                 <input type="number" name="ice_charges" class="form-control inpv2" placeholder="Ice Charges">
               </div>
+              <div class="col mt-4">
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
+                <button type="submit" name="totaladd" class="btn btn-success">Add</button>
+              </div>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
-              <button type="submit" name="totaladd" class="btn btn-success">Add</button>
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
+    <!-- Add Modal -->
+    <!-- Add Modal -->
+    <div class="modal fade" id="repackingcharges">
+      <div class="modal-dialog">
+        <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+          <div class="modal-header bg-secondary text-light">
+            <h1 class="modal-title fs-5">Repacking Charges</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form action="daterangecharges.php" method="post">
+          <div class="modal-body">
+            <label>Date</label>
+            <input type="date" name="date" class="form-control inpv2 mb-2">
+            <div class="row">
+              <div class="col">
+                <label>In Mc</label>
+                <input type="number" name="in_mc" class="form-control inpv2 mb-2">
+              </div>
+              <div class="col">
+                <label>In Kg</label>
+                <input type="text" name="in_kg" class="form-control inpv2 mb-2">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>Out Mc</label>
+                <input type="number" name="out_mc" class="form-control inpv2 mb-2">
+              </div>
+              <div class="col">
+                <label>Out Kg</label>
+                <input type="text" name="out_kg" class="form-control inpv2 mb-2">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>Rate</label>
+                <input type="text" name="rate" class="form-control inpv2 mb-2">
+              </div>
+              <div class="col mt-4">
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
+                <button type="submit" name="repackingadd" class="btn btn-success">Add</button>
+              </div>
             </div>
           </div>
         </form>
@@ -497,10 +659,23 @@ $query = new Query();
     </div>
     <!-- Add Modal -->
     <script type="text/javascript">
-    showcoldstore();
+    <?php
+      if($_SESSION['tabs'] == "coldstore"){
+        echo "showcoldstore();";
+      }elseif($_SESSION['tabs'] == "labour"){
+        echo "showlabour();";
+      }elseif($_SESSION['tabs'] == "processing"){
+        echo "showprocessing();";
+      }elseif($_SESSION['tabs'] == "repacking"){
+        echo "showrepacking();";
+      }elseif($_SESSION['tabs'] == "totalcharges"){
+        echo "showtotal();";
+      }
+    ?>
     function showtotal(){
       document.querySelector(".addtotalcharges").classList.remove("hide");
       document.querySelector(".addnewcharges").classList.add("hide");
+      document.querySelector(".addrepackingcharges").classList.add('hide');
       document.querySelector(".totallink").classList.add('color');
       document.querySelector(".totalcharges").classList.remove('hide');
       document.querySelector(".coldstorelink").classList.remove('color');
@@ -509,10 +684,13 @@ $query = new Query();
       document.querySelector(".labourcharges").classList.add('hide');
       document.querySelector(".processinglink").classList.remove('color');
       document.querySelector(".processingcharges").classList.add('hide');
+      document.querySelector(".repackinglink").classList.remove('color');
+      document.querySelector(".repackingcharges").classList.add('hide');
     }
     function showcoldstore(){
       document.querySelector(".addtotalcharges").classList.add("hide");
       document.querySelector(".addnewcharges").classList.remove("hide");
+      document.querySelector(".addrepackingcharges").classList.add('hide');
       document.querySelector(".coldstorelink").classList.add('color');
       document.querySelector(".coldstorecharges").classList.remove('hide');
       document.querySelector(".labourlink").classList.remove('color');
@@ -521,10 +699,13 @@ $query = new Query();
       document.querySelector(".processingcharges").classList.add('hide');
       document.querySelector(".totallink").classList.remove('color');
       document.querySelector(".totalcharges").classList.add('hide');
+      document.querySelector(".repackinglink").classList.remove('color');
+      document.querySelector(".repackingcharges").classList.add('hide');
     }
     function showlabour(){
       document.querySelector(".addtotalcharges").classList.add("hide");
       document.querySelector(".addnewcharges").classList.remove("hide");
+      document.querySelector(".addrepackingcharges").classList.add('hide');
       document.querySelector(".coldstorelink").classList.remove('color');
       document.querySelector(".coldstorecharges").classList.add('hide');
       document.querySelector(".labourlink").classList.add('color');
@@ -533,10 +714,13 @@ $query = new Query();
       document.querySelector(".processingcharges").classList.add('hide');
       document.querySelector(".totallink").classList.remove('color');
       document.querySelector(".totalcharges").classList.add('hide');
+      document.querySelector(".repackinglink").classList.remove('color');
+      document.querySelector(".repackingcharges").classList.add('hide');
     }
     function showprocessing(){
       document.querySelector(".addtotalcharges").classList.add("hide");
       document.querySelector(".addnewcharges").classList.remove("hide");
+      document.querySelector(".addrepackingcharges").classList.add('hide');
       document.querySelector(".coldstorelink").classList.remove('color');
       document.querySelector(".coldstorecharges").classList.add('hide');
       document.querySelector(".labourlink").classList.remove('color');
@@ -545,6 +729,23 @@ $query = new Query();
       document.querySelector(".processingcharges").classList.remove('hide');
       document.querySelector(".totallink").classList.remove('color');
       document.querySelector(".totalcharges").classList.add('hide');
+      document.querySelector(".repackinglink").classList.remove('color');
+      document.querySelector(".repackingcharges").classList.add('hide');
+    }
+    function showrepacking(){
+      document.querySelector(".addtotalcharges").classList.add("hide");
+      document.querySelector(".addnewcharges").classList.add("hide");
+      document.querySelector(".addrepackingcharges").classList.remove('hide');
+      document.querySelector(".coldstorelink").classList.remove('color');
+      document.querySelector(".coldstorecharges").classList.add('hide');
+      document.querySelector(".labourlink").classList.remove('color');
+      document.querySelector(".labourcharges").classList.add('hide');
+      document.querySelector(".processinglink").classList.remove('color');
+      document.querySelector(".processingcharges").classList.add('hide');
+      document.querySelector(".totallink").classList.remove('color');
+      document.querySelector(".totalcharges").classList.add('hide');
+      document.querySelector(".repackinglink").classList.add('color');
+      document.querySelector(".repackingcharges").classList.remove('hide');
     }
     </script>
     <?php
