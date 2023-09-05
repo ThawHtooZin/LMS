@@ -45,19 +45,18 @@ $query = new Query();
       $query->addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate);
     }
 
-    if(isset($_POST['totaladd'])){
-      $date = $_POST['date'];
-      $commondity_id = $_POST['commondity_id'];
+    if(isset($_POST['updatetotalcharges'])){
+      $id = $_POST['id'];
+      $repacking_charges = $_POST['repacking_charges'];
       $ice_charges = $_POST['ice_charges'];
-      $query->addcoldstoretotal($date, $commondity_id, $ice_charges);
+      $query->updatecoldstoretotal($id, $repacking_charges, $ice_charges);
     }
 
-    if(isset($_POST['paytotalchargesbtn'])){
+    if(isset($_POST['paymentbtn'])){
       $payment_date = $_POST['payment_date'];
       $payment_amount = $_POST['payment_amount'];
-      $commondity_id = $_POST['commondity_id'];
 
-      $query->paytotalcharges($payment_date, $payment_amount, $commondity_id);
+      $query->paytotalcharges($payment_date, $payment_amount);
     }
 
     if(isset($_POST['repackingadd'])){
@@ -95,8 +94,8 @@ $query = new Query();
           <div class="card-header bg-warning text-light">
             <h4 class="d-inline">Date Range Cold Store Charges</h4>
             <button type="submit" class="btn btn-success float-end addnewcharges" data-bs-toggle="modal" data-bs-target="#newcharges">Add New Charges</button>
-            <button type="submit" class="btn btn-success float-end hide addtotalcharges" data-bs-toggle="modal" data-bs-target="#totalcharges">Add Total Charges</button>
             <button type="submit" class="btn btn-success float-end hide addrepackingcharges" data-bs-toggle="modal" data-bs-target="#repackingcharges">Add Repacking Charges</button>
+            <button type="submit" class="btn btn-info text-light float-end hide addtotalcharges" data-bs-toggle="modal" data-bs-target="#addpayment">Add Payment</button>
           </div>
           <div class="card-body">
             <div class="text-center">
@@ -111,9 +110,12 @@ $query = new Query();
                 $_SESSION['tabs'] = "repacking";
               }elseif(isset($_POST['totalchargesbtn'])){
                 $_SESSION['tabs'] = "totalcharges";
+              }elseif(isset($_POST['remainingstockbtn'])){
+                $_SESSION['tabs'] = "remainingstock";
               }
                ?>
               <form action="" method="post">
+                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark remainingstocklink" style="text-decoration:none; border:none;" name="remainingstockbtn">Remaining Stock</button>
                 <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark coldstorelink" style="text-decoration:none; border:none;" name="coldstorebtn">Cold Store Charges</button>
                 <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark labourlink" style="text-decoration:none; border:none;" name="labourbtn">Labour Charges</button>
                 <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark processinglink" style="text-decoration:none; border:none;" name="processingbtn">Processing Charges</button>
@@ -128,6 +130,7 @@ $query = new Query();
                     <th class="text-center">Id</th>
                     <th class="text-center">In Date</th>
                     <th class="text-center">Out Date</th>
+                    <th class="text-center">Commondity</th>
                     <th class="text-center">Mc</th>
                     <th class="text-center">Total Mc</th>
                     <th class="text-center">Kg</th>
@@ -156,10 +159,12 @@ $query = new Query();
                     $item_id = $data['commondity_id'];
                     $commonditydata = $query->select('category', $item_id, 'category_id');
                   ?>
-                  <tr style="<?php if($commonditydata['category_name'] == "IQF"){echo "background-color: #6ef757 !important;";}elseif($commonditydata['category_name'] == "Block"){echo "background-color: #f5764c !important;";}elseif($commonditydata['category_name'] == "Pujanut"){echo "background-color: lightblue !important;";} ?>">
+                  <!-- <tr style="<?php //if($commonditydata['category_name'] == "IQF"){echo "background-color: #6ef757 !important;";}elseif($commonditydata['category_name'] == "Block"){echo "background-color: #f5764c !important;";}elseif($commonditydata['category_name'] == "Pujanut"){echo "background-color: lightblue !important;";} ?>"> -->
+                  <tr>
                     <td><?php echo $data['id']; ?></td>
                     <td><?php echo $data['indate']; ?></td>
                     <td><?php echo $data['outdate']; ?></td>
+                    <td><?php echo $commonditydata['category_name']; ?></td>
                     <td><?php echo $data['mc']; ?></td>
                     <td><?php echo $data['total_mc']; ?></td>
                     <td><?php echo $data['kg']; ?></td>
@@ -253,6 +258,7 @@ $query = new Query();
                   <th class="text-center">Id</th>
                   <th class="text-center">In Date</th>
                   <th class="text-center">Out Date</th>
+                  <th class="text-center">Commondity</th>
                   <th class="text-center">Mc</th>
                   <th class="text-center">Total Mc</th>
                   <th class="text-center">Kg</th>
@@ -279,10 +285,11 @@ $query = new Query();
                   $item_id = $labourdata['commondity_id'];
                   $commonditydata = $query->select('category', $item_id, 'category_id');
                 ?>
-                <tr style="<?php if($commonditydata['category_name'] == "IQF"){echo "background-color: #6ef757 !important;";}elseif($commonditydata['category_name'] == "Block"){echo "background-color: #f5764c !important;";}elseif($commonditydata['category_name'] == "Pujanut"){echo "background-color: lightblue !important;";} ?>">
+                <tr>
                   <td><?php echo $labourdata['id']; ?></td>
                   <td><?php echo $labourdata['indate']; ?></td>
                   <td><?php echo $labourdata['outdate']; ?></td>
+                  <td><?php echo $commonditydata['category_name']; ?></td>
                   <td><?php echo $labourdata['mc']; ?></td>
                   <td><?php echo $labourdata['total_mc']; ?></td>
                   <td><?php echo $labourdata['kg']; ?></td>
@@ -312,6 +319,7 @@ $query = new Query();
                   <th class="text-center">Id</th>
                   <th class="text-center">In Date</th>
                   <th class="text-center">Out Date</th>
+                  <th class="text-center">Commondity</th>
                   <th class="text-center">Mc</th>
                   <th class="text-center">Total Mc</th>
                   <th class="text-center">Kg</th>
@@ -338,10 +346,11 @@ $query = new Query();
                   $item_id = $processingdata['commondity_id'];
                   $commonditydata = $query->select('category', $item_id, 'category_id');
                 ?>
-                <tr style="<?php if($commonditydata['category_name'] == "IQF"){echo "background-color: #6ef757 !important;";}elseif($commonditydata['category_name'] == "Block"){echo "background-color: #f5764c !important;";}elseif($commonditydata['category_name'] == "Pujanut"){echo "background-color: lightblue !important;";} ?>">
+                <tr>
                   <td><?php echo $processingdata['id']; ?></td>
                   <td><?php echo $processingdata['indate']; ?></td>
                   <td><?php echo $processingdata['outdate']; ?></td>
+                  <td><?php echo $commonditydata['category_name']; ?></td>
                   <td><?php echo $processingdata['mc']; ?></td>
                   <td><?php echo $processingdata['total_mc']; ?></td>
                   <td><?php echo $processingdata['kg']; ?></td>
@@ -369,7 +378,7 @@ $query = new Query();
               <table class="table table-striped table-bordered table-hover">
                 <tr style="font-size:13px;">
                   <th class="text-center">Id</th>
-                  <th class="text-center">Date</th>
+                  <th class="text-center">Commondity</th>
                   <th class="text-center">Total Cold Store Charges</th>
                   <th class="text-center">Total Labour Charges</th>
                   <th class="text-center">Total Processing Charges</th>
@@ -383,25 +392,17 @@ $query = new Query();
                   <th class="text-center">Remark</th>
                 </tr>
                 <?php
-                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM total_charges");
-                $commonditycountstmt->execute();
-                $commonditycountdatas = $commonditycountstmt->fetchColumn();
-                for ($i=0; $i < $commonditycountdatas; $i++) {
-                  $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM total_charges");
-                  $commonditystmt->execute();
-                  $commonditydata = $commonditystmt->fetchall();
-                  $commondity_id = $commonditydata[$i]['commondity_id'];
-
-                $totalstmt = $pdo->prepare("SELECT * FROM total_charges WHERE commondity_id='$commondity_id'");
+                $totalstmt = $pdo->prepare("SELECT * FROM total_charges");
                 $totalstmt->execute();
                 $totaldatas = $totalstmt->fetchall();
+                $no = 1;
                 foreach ($totaldatas as $total_charges_data) {
                   $item_id = $total_charges_data['commondity_id'];
                   $commonditydata = $query->select('category', $item_id, 'category_id');
                 ?>
-                <tr style="<?php if($commonditydata['category_name'] == "IQF"){echo "background-color: #6ef757 !important;";}elseif($commonditydata['category_name'] == "Block"){echo "background-color: #f5764c !important;";}elseif($commonditydata['category_name'] == "Pujanut"){echo "background-color: lightblue !important;";} ?>" data-bs-toggle="modal" data-bs-target="#paytotalcharges<?php echo $total_charges_data['commondity_id']; ?>">
-                  <td><?php if($total_charges_data['total_coldstore_charges'] != "0"){ echo $total_charges_data['id'];} ; ?></td>
-                  <td><?php if($total_charges_data['date'] != "0000-00-00"){ echo $total_charges_data['date'];} ; ?></td>
+                <tr data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>">
+                  <td><?php echo $no; ?></td>
+                  <td><?php if(!empty($commonditydata['category_name'])){ echo $commonditydata['category_name'];} ; ?></td>
                   <td><?php if($total_charges_data['total_coldstore_charges'] != "0"){ echo $total_charges_data['total_coldstore_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['total_labour_charges'] != "0"){ echo $total_charges_data['total_labour_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['total_processing_charges'] != "0"){ echo $total_charges_data['total_processing_charges'];} ; ?></td>
@@ -415,24 +416,31 @@ $query = new Query();
                   <td><?php if($total_charges_data['remark'] != "0"){ echo $total_charges_data['remark'];}; ?></td>
                 </tr>
                 <!-- Add Modal -->
-                <div class="modal fade" id="paytotalcharges<?php echo $total_charges_data['commondity_id']; ?>">
+                <div class="modal fade" id="updatetotalcharges<?php echo $total_charges_data['id']; ?>">
                   <div class="modal-dialog">
                     <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
                       <div class="modal-header bg-secondary text-light">
-                        <h1 class="modal-title fs-5">Pay Total Charges</h1>
+                        <h1 class="modal-title fs-5">Edit Total Charges</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <form action="daterangecharges.php" method="post">
                       <div class="modal-body">
-                        <input type="hidden" name="commondity_id" value="<?php echo $total_charges_data['commondity_id']; ?>">
+                        <input type="hidden" name="id" value="<?php echo $total_charges_data['id']; ?>">
+                        <?php
+                        $updateid = $total_charges_data['id'];
+
+                        $updatestmt = $pdo->prepare("SELECT * FROM total_charges WHERE id='$updateid'");
+                        $updatestmt->execute();
+                        $updatedata = $updatestmt->fetch(PDO::FETCH_ASSOC);
+                        ?>
                         <div class="row">
                           <div class="col">
-                            <label>Payment Date</label>
-                            <input type="date" name="payment_date" class="form-control inpv2 mb-2">
+                            <label>Repacking Charges</label>
+                            <input type="number" name="repacking_charges" class="form-control inpv2 mb-2" value="<?php if(!empty($updatedata['repacking_charges'])){ echo $updatedata['repacking_charges']; } ?>">
                           </div>
                           <div class="col">
-                            <label>Payment Amount</label>
-                            <input type="number" name="payment_amount" class="form-control inpv2">
+                            <label>Ice Charges</label>
+                            <input type="number" name="ice_charges" class="form-control inpv2 mb-2" value="<?php if(!empty($updatedata['ice_charges'])){ echo $updatedata['ice_charges']; } ?>">
                           </div>
                         </div>
                         <div class="row">
@@ -440,7 +448,7 @@ $query = new Query();
                           </div>
                           <div class="col mt-4">
                             <button type="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
-                            <button type="submit" name="paytotalchargesbtn" class="btn btn-success">Add</button>
+                            <button type="submit" name="updatetotalcharges" class="btn btn-warning">Update</button>
                           </div>
                         </div>
                       </div>
@@ -450,7 +458,7 @@ $query = new Query();
                 </div>
                 <!-- Add Modal -->
                 <?php
-                }
+                $no++;
                 }
                  ?>
               </table>
@@ -490,6 +498,30 @@ $query = new Query();
                 <?php
                 }
                 ?>
+              </table>
+            </div>
+            <div class="remainingstock hide">
+              <table class="table table-hover table-striped table-bordered">
+                <tr>
+                  <th>In Date</th>
+                  <th>Out Date</th>
+                  <th>Commondity</th>
+                  <th>Mc</th>
+                  <th>Total Mc</th>
+                  <th>Kg</th>
+                  <th>Total Kg</th>
+                  <th>Balance</th>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
               </table>
             </div>
           </div>
@@ -566,44 +598,29 @@ $query = new Query();
     </div>
     <!-- Add Modal -->
     <!-- Add Modal -->
-    <div class="modal fade" id="totalcharges">
+    <div class="modal fade" id="addpayment">
       <div class="modal-dialog">
         <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
           <div class="modal-header bg-secondary text-light">
-            <h1 class="modal-title fs-5">Total Charges</h1>
+            <h1 class="modal-title fs-5">Add Payment</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <form action="daterangecharges.php" method="post">
           <div class="modal-body">
             <div class="row">
               <div class="col">
-                <label>Date</label>
-                <input type="date" name="date" class="form-control inpv2 mb-2">
+                <label>Payment Date</label>
+                <input type="date" name="payment_date" class="form-control inpv2 mb-2">
               </div>
               <div class="col">
-                <label>Commondity</label>
-                <select class="form-control inpv2 mb-2" name="commondity_id">
-                  <?php
-                  $commonditydatas = $query->selectall('category');
-                  foreach ($commonditydatas as $commonditydata) {
-                    ?>
-                    <option value="<?php echo $commonditydata['category_id']; ?>"><?php echo $commonditydata['category_name']; ?></option>
-                    <?php
-                    }
-                   ?>
-                </select>
+                <label>Payment Amount</label>
+                <input type="number" name="payment_amount" class="form-control inpv2 mb-2">
               </div>
             </div>
-            <div class="row">
-              <div class="col">
-                <label>Ice Charges</label>
-                <input type="number" name="ice_charges" class="form-control inpv2" placeholder="Ice Charges">
-              </div>
-              <div class="col mt-4">
-                <button type="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
-                <button type="submit" name="totaladd" class="btn btn-success">Add</button>
-              </div>
-            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
+            <button type="submit" name="paymentbtn" class="btn btn-success">Add</button>
           </div>
         </form>
         </div>
@@ -670,6 +687,8 @@ $query = new Query();
         echo "showrepacking();";
       }elseif($_SESSION['tabs'] == "totalcharges"){
         echo "showtotal();";
+      }elseif($_SESSION['tabs'] == "remainingstock"){
+        echo "showstock();";
       }
     ?>
     function showtotal(){
@@ -746,6 +765,23 @@ $query = new Query();
       document.querySelector(".totalcharges").classList.add('hide');
       document.querySelector(".repackinglink").classList.add('color');
       document.querySelector(".repackingcharges").classList.remove('hide');
+    }
+    function showstock(){
+      document.querySelector(".addtotalcharges").classList.add("hide");
+      document.querySelector(".addnewcharges").classList.add("hide");
+      document.querySelector(".addrepackingcharges").classList.remove('hide');
+      document.querySelector(".coldstorelink").classList.remove('color');
+      document.querySelector(".coldstorecharges").classList.add('hide');
+      document.querySelector(".labourlink").classList.remove('color');
+      document.querySelector(".labourcharges").classList.add('hide');
+      document.querySelector(".processinglink").classList.remove('color');
+      document.querySelector(".processingcharges").classList.add('hide');
+      document.querySelector(".totallink").classList.remove('color');
+      document.querySelector(".totalcharges").classList.add('hide');
+      document.querySelector(".repackinglink").classList.remove('color');
+      document.querySelector(".repackingcharges").classList.add('hide');
+      document.querySelector(".remainingstocklink").classList.add('color');
+      document.querySelector(".remainingstock").classList.remove('hide');
     }
     </script>
     <?php
