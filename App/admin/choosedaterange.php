@@ -31,10 +31,10 @@ $query = new Query();
       <div class="col-10" style="margin-top: 200px;">
         <div class="row">
           <div class="col text-center">
-            <a href="choosedaterange.php" class="btn btn-default border border-3" style="padding: 100px !important;">Date Range Cold Store Charge</a>
+            <a href="daterangecharges.php" class="btn btn-default border border-3" style="padding: 100px !important;">Hlaing Htate Khaung Cold Store Charge</a>
           </div>
           <div class="col text-center">
-            <a href="monthlycharges.php" class="btn btn-default border border-3" style="padding: 100px !important;">Monthly Cold Store Charge</a>
+            <a href="msldaterangecharges.php" class="btn btn-default border border-3" style="padding: 100px !important;">MSL Cold Store Charge</a>
           </div>
         </div>
       </div>

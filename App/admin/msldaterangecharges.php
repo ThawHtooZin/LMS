@@ -36,47 +36,46 @@ $query = new Query();
     if(isset($_POST['add'])){
       $indate = $_POST['indate'];
       $outdate = $_POST['outdate'];
-      $commondity_id = $_POST['commondity_id'];
+      $item_id = $_POST['item_id'];
       $mc = $_POST['mc'];
       $kg = $_POST['kg'];
       $coldstorerate = $_POST['coldstorerate'];
-      $labourrate = $_POST['labourrate'];
-      $processingrate = $_POST['processingrate'];
-      $query->addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate);
+      $freezingrate = $_POST['freezingrate'];
+      $exportrate = $_POST['exportrate'];
+      $query->addmslcoldstore($indate, $outdate, $item_id, $mc, $kg, $coldstorerate, $freezingrate, $exportrate);
     }
 
     if(isset($_POST['updatetotalcharges'])){
       $id = $_POST['id'];
       $repacking_charges = $_POST['repacking_charges'];
       $ice_charges = $_POST['ice_charges'];
-      $query->updatecoldstoretotal($id, $repacking_charges, $ice_charges);
+      $query->updatemslcoldstoretotal($id, $repacking_charges, $ice_charges);
     }
 
     if(isset($_POST['paymentbtn'])){
       $payment_date = $_POST['payment_date'];
       $payment_amount = $_POST['payment_amount'];
 
-      $query->paytotalcharges($payment_date, $payment_amount);
+      $query->paymsltotalcharges($payment_date, $payment_amount);
     }
 
     if(isset($_POST['repackingadd'])){
       $date = $_POST['date'];
-      $in_mc = $_POST['in_mc'];
-      $in_kg = $_POST['in_kg'];
-      $out_mc = $_POST['out_mc'];
-      $out_kg = $_POST['out_kg'];
-      $rate = $_POST['rate'];
+      $description = $_POST['description'];
+      $sheet = $_POST['sheet'];
+      $plastic = $_POST['plastic'];
+      $price = $_POST['price'];
 
-      $query->addrepacking($date, $in_mc, $in_kg, $out_mc, $out_kg, $rate);
+      $query->addmslrepacking($date, $description, $sheet, $plastic, $price);
     }
 
     if(isset($_POST['addstockbtn'])){
       $indate = $_POST['indate'];
-      $commondity_id = $_POST['commondity_id'];
+      $item_id = $_POST['item_id'];
       $mc = $_POST['mc'];
       $kg = $_POST['kg'];
 
-      $query->addnewstock($indate, $commondity_id, $mc, $kg);
+      $query->addmslnewstock($indate, $item_id, $mc, $kg);
     }
 
     if(isset($_POST['update'])){
@@ -88,7 +87,7 @@ $query = new Query();
       $labourrate = $_POST['labourrate'];
       $processingrate = $_POST['processingrate'];
       $updateid = $_POST['updateid'];
-      $query->updatecoldstore($indate, $outdate, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $updateid);
+      $query->updatemslcoldstore($indate, $outdate, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $updateid);
     }
 
      ?>
@@ -101,7 +100,7 @@ $query = new Query();
       <div class="col-10">
         <div class="card">
           <div class="card-header bg-warning text-light">
-            <h4 class="d-inline">HHK Date Range Cold Store Charges</h4>
+            <h4 class="d-inline">MSL Date Range Cold Store Charges</h4>
             <button type="submit" class="btn btn-success float-end addnewstock" data-bs-toggle="modal" data-bs-target="#newstock">Add New Stock</button>
             <button type="submit" class="btn btn-success float-end addnewcharges" data-bs-toggle="modal" data-bs-target="#newcharges">Add New Charges</button>
             <button type="submit" class="btn btn-success float-end hide addrepackingcharges" data-bs-toggle="modal" data-bs-target="#repackingcharges">Add Repacking Charges</button>
@@ -127,8 +126,8 @@ $query = new Query();
               <form action="" method="post">
                 <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark remainingstocklink" style="text-decoration:none; border:none;" name="remainingstockbtn">Remaining Stock</button>
                 <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark coldstorelink" style="text-decoration:none; border:none;" name="coldstorebtn">Cold Store Charges</button>
-                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark labourlink" style="text-decoration:none; border:none;" name="labourbtn">Labour Charges</button>
-                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark processinglink" style="text-decoration:none; border:none;" name="processingbtn">Processing Charges</button>
+                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark labourlink" style="text-decoration:none; border:none;" name="labourbtn">Freezing Charges</button>
+                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark processinglink" style="text-decoration:none; border:none;" name="processingbtn">Export Handling Charges</button>
                 <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark repackinglink" style="text-decoration:none; border:none;" name="repackingbtn">Repacking Charges</button>
                 <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark totallink" style="text-decoration:none; border:none;" name="totalchargesbtn">Total Charges</button>
               </form>
@@ -140,7 +139,7 @@ $query = new Query();
                     <th class="text-center">Id</th>
                     <th class="text-center">In Date</th>
                     <th class="text-center">Out Date</th>
-                    <th class="text-center">Commondity</th>
+                    <th class="text-center">Fish Name</th>
                     <th class="text-center">Mc</th>
                     <th class="text-center">Total Mc</th>
                     <th class="text-center">Kg</th>
@@ -153,28 +152,28 @@ $query = new Query();
                   </tr>
                   <?php
 
-                  $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM coldstore");
+                  $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM mslcoldstore");
                   $commonditycountstmt->execute();
                   $commonditycountdatas = $commonditycountstmt->fetchColumn();
                   for ($i=0; $i < $commonditycountdatas; $i++) {
-                    $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM coldstore");
+                    $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM mslcoldstore");
                     $commonditystmt->execute();
                     $commonditydata = $commonditystmt->fetchall();
-                    $commondity_id = $commonditydata[$i]['commondity_id'];
+                    $commondity_id = $commonditydata[$i]['item_id'];
 
-                  $stmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='$commondity_id'");
+                  $stmt = $pdo->prepare("SELECT * FROM mslcoldstore WHERE item_id='$commondity_id'");
                   $stmt->execute();
                   $datas = $stmt->fetchall();
                   foreach ($datas as $data) {
-                    $item_id = $data['commondity_id'];
-                    $commonditydata = $query->select('category', $item_id, 'category_id');
+                    $item_id = $data['item_id'];
+                    $commonditydata = $query->select('item', $item_id, 'item_id');
                   ?>
                   <!-- <tr style="<?php //if($commonditydata['category_name'] == "IQF"){echo "background-color: #6ef757 !important;";}elseif($commonditydata['category_name'] == "Block"){echo "background-color: #f5764c !important;";}elseif($commonditydata['category_name'] == "Pujanut"){echo "background-color: lightblue !important;";} ?>"> -->
                   <tr>
                     <td><?php echo $data['id']; ?></td>
                     <td><?php echo $data['indate']; ?></td>
                     <td><?php echo $data['outdate']; ?></td>
-                    <td><?php echo $commonditydata['category_name']; ?></td>
+                    <td><?php echo $commonditydata['item_name']; ?></td>
                     <td><?php echo $data['mc']; ?></td>
                     <td><?php echo $data['total_mc']; ?></td>
                     <td><?php echo $data['kg']; ?></td>
@@ -183,7 +182,7 @@ $query = new Query();
                     <td><?php echo $data['rate']; ?></td>
                     <td><?php echo $data['charges']; ?></td>
                     <td><?php echo $data['total_charges']; ?></td>
-                    <td><a href="daterangecharges.php" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#coldstoreupdatemodal<?php echo $data['id']; ?>">
+                    <td><a href="msldaterangecharges.php" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#coldstoreupdatemodal<?php echo $data['id']; ?>">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
     <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
     <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
@@ -201,7 +200,7 @@ $query = new Query();
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                          <form action="daterangecharges.php" method="post">
+                          <form action="msldaterangecharges.php" method="post">
                           <div class="modal-body">
                             <div class="row" style="margin-bottom: 10px !important;">
                               <input type="hidden" name="updateid" value="<?php echo $data['id']; ?>">
@@ -268,7 +267,7 @@ $query = new Query();
                   <th class="text-center">Id</th>
                   <th class="text-center">In Date</th>
                   <th class="text-center">Out Date</th>
-                  <th class="text-center">Commondity</th>
+                  <th class="text-center">Fish Name</th>
                   <th class="text-center">Mc</th>
                   <th class="text-center">Total Mc</th>
                   <th class="text-center">Kg</th>
@@ -279,27 +278,27 @@ $query = new Query();
                   <th class="text-center">Action</th>
                 </tr>
                 <?php
-                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM labour");
+                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM mslfreezing");
                 $commonditycountstmt->execute();
                 $commonditycountdatas = $commonditycountstmt->fetchColumn();
                 for ($i=0; $i < $commonditycountdatas; $i++) {
-                  $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM labour");
+                  $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM mslfreezing");
                   $commonditystmt->execute();
                   $commonditydata = $commonditystmt->fetchall();
-                  $commondity_id = $commonditydata[$i]['commondity_id'];
+                  $commondity_id = $commonditydata[$i]['item_id'];
 
-                $labourstmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id'");
+                $labourstmt = $pdo->prepare("SELECT * FROM mslfreezing WHERE item_id='$commondity_id'");
                 $labourstmt->execute();
                 $labourdatas = $labourstmt->fetchall();
                 foreach ($labourdatas as $labourdata) {
-                  $item_id = $labourdata['commondity_id'];
-                  $commonditydata = $query->select('category', $item_id, 'category_id');
+                  $item_id = $labourdata['item_id'];
+                  $commonditydata = $query->select('item', $item_id, 'item_id');
                 ?>
                 <tr>
                   <td><?php echo $labourdata['id']; ?></td>
                   <td><?php echo $labourdata['indate']; ?></td>
                   <td><?php echo $labourdata['outdate']; ?></td>
-                  <td><?php echo $commonditydata['category_name']; ?></td>
+                  <td><?php echo $commonditydata['item_name']; ?></td>
                   <td><?php echo $labourdata['mc']; ?></td>
                   <td><?php echo $labourdata['total_mc']; ?></td>
                   <td><?php echo $labourdata['kg']; ?></td>
@@ -307,7 +306,7 @@ $query = new Query();
                   <td><?php echo $labourdata['rate']; ?></td>
                   <td><?php echo $labourdata['charges']; ?></td>
                   <td><?php echo $labourdata['total_charges']; ?></td>
-                  <td><a href="daterangecharges.php" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#coldstoreupdatemodal<?php echo $data['id']; ?>">
+                  <td><a href="msldaterangecharges.php" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#coldstoreupdatemodal<?php echo $data['id']; ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
   <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
   <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
@@ -329,7 +328,7 @@ $query = new Query();
                   <th class="text-center">Id</th>
                   <th class="text-center">In Date</th>
                   <th class="text-center">Out Date</th>
-                  <th class="text-center">Commondity</th>
+                  <th class="text-center">Fish Name</th>
                   <th class="text-center">Mc</th>
                   <th class="text-center">Total Mc</th>
                   <th class="text-center">Kg</th>
@@ -340,27 +339,27 @@ $query = new Query();
                   <th class="text-center">Action</th>
                 </tr>
                 <?php
-                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM processing");
+                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM mslexportcharges");
                 $commonditycountstmt->execute();
                 $commonditycountdatas = $commonditycountstmt->fetchColumn();
                 for ($i=0; $i < $commonditycountdatas; $i++) {
-                  $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM processing");
+                  $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM mslexportcharges");
                   $commonditystmt->execute();
                   $commonditydata = $commonditystmt->fetchall();
-                  $commondity_id = $commonditydata[$i]['commondity_id'];
+                  $commondity_id = $commonditydata[$i]['item_id'];
 
-                $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id'");
+                $processingstmt = $pdo->prepare("SELECT * FROM mslexportcharges WHERE item_id='$commondity_id'");
                 $processingstmt->execute();
                 $processingdatas = $processingstmt->fetchall();
                 foreach ($processingdatas as $processingdata) {
-                  $item_id = $processingdata['commondity_id'];
-                  $commonditydata = $query->select('category', $item_id, 'category_id');
+                  $item_id = $processingdata['item_id'];
+                  $commonditydata = $query->select('item', $item_id, 'item_id');
                 ?>
                 <tr>
                   <td><?php echo $processingdata['id']; ?></td>
                   <td><?php echo $processingdata['indate']; ?></td>
                   <td><?php echo $processingdata['outdate']; ?></td>
-                  <td><?php echo $commonditydata['category_name']; ?></td>
+                  <td><?php echo $commonditydata['item_name']; ?></td>
                   <td><?php echo $processingdata['mc']; ?></td>
                   <td><?php echo $processingdata['total_mc']; ?></td>
                   <td><?php echo $processingdata['kg']; ?></td>
@@ -368,7 +367,7 @@ $query = new Query();
                   <td><?php echo $processingdata['rate']; ?></td>
                   <td><?php echo $processingdata['charges']; ?></td>
                   <td><?php echo $processingdata['total_charges']; ?></td>
-                  <td><a href="daterangecharges.php" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#coldstoreupdatemodal<?php echo $data['id']; ?>">
+                  <td><a href="msldaterangecharges.php" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#coldstoreupdatemodal<?php echo $data['id']; ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
   <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
   <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
@@ -388,10 +387,10 @@ $query = new Query();
               <table class="table table-striped table-bordered table-hover">
                 <tr style="font-size:13px;">
                   <th class="text-center">Id</th>
-                  <th class="text-center">Commondity</th>
+                  <th class="text-center">Fish Name</th>
                   <th class="text-center">Total Cold Store Charges</th>
-                  <th class="text-center">Total Labour Charges</th>
-                  <th class="text-center">Total Processing Charges</th>
+                  <th class="text-center">Total Freezing Charges</th>
+                  <th class="text-center">Total Export Charges</th>
                   <th class="text-center">Repacking Charges</th>
                   <th class="text-center">Ice Charges</th>
                   <th class="text-center">Total Charges</th>
@@ -402,20 +401,20 @@ $query = new Query();
                   <th class="text-center">Remark</th>
                 </tr>
                 <?php
-                $totalstmt = $pdo->prepare("SELECT * FROM total_charges");
+                $totalstmt = $pdo->prepare("SELECT * FROM msl_total_charges");
                 $totalstmt->execute();
                 $totaldatas = $totalstmt->fetchall();
                 $no = 1;
                 foreach ($totaldatas as $total_charges_data) {
-                  $item_id = $total_charges_data['commondity_id'];
-                  $commonditydata = $query->select('category', $item_id, 'category_id');
+                  $item_id = $total_charges_data['item_id'];
+                  $commonditydata = $query->select('item', $item_id, 'item_id');
                 ?>
                 <tr data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>">
                   <td><?php echo $no; ?></td>
-                  <td><?php if(!empty($commonditydata['category_name'])){ echo $commonditydata['category_name'];} ; ?></td>
+                  <td><?php if(!empty($commonditydata['item_name'])){ echo $commonditydata['item_name'];} ; ?></td>
                   <td><?php if($total_charges_data['total_coldstore_charges'] != "0"){ echo $total_charges_data['total_coldstore_charges'];} ; ?></td>
-                  <td><?php if($total_charges_data['total_labour_charges'] != "0"){ echo $total_charges_data['total_labour_charges'];} ; ?></td>
-                  <td><?php if($total_charges_data['total_processing_charges'] != "0"){ echo $total_charges_data['total_processing_charges'];} ; ?></td>
+                  <td><?php if($total_charges_data['total_freezing_charges'] != "0"){ echo $total_charges_data['total_freezing_charges'];} ; ?></td>
+                  <td><?php if($total_charges_data['total_export_charges'] != "0"){ echo $total_charges_data['total_export_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['repacking_charges'] != "0"){ echo $total_charges_data['repacking_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['ice_charges'] != "0"){ echo $total_charges_data['ice_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['total_charges'] != "0"){ echo $total_charges_data['total_charges'];} ; ?></td>
@@ -433,7 +432,7 @@ $query = new Query();
                         <h1 class="modal-title fs-5">Edit Total Charges</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
-                      <form action="daterangecharges.php" method="post">
+                      <form action="msldaterangecharges.php" method="post">
                       <div class="modal-body">
                         <input type="hidden" name="id" value="<?php echo $total_charges_data['id']; ?>">
                         <?php
@@ -478,31 +477,25 @@ $query = new Query();
                 <tr>
                   <th>Id</th>
                   <th>Date</th>
-                  <th>In MC</th>
-                  <th>In Kg</th>
-                  <th>Out MC</th>
-                  <th>Out Kg</th>
-                  <th>Diff MC</th>
-                  <th>Diff Kg</th>
-                  <th>Rate</th>
-                  <th>Charges</th>
+                  <th>Description</th>
+                  <th>Sheet</th>
+                  <th>Plastic</th>
+                  <th>Price</th>
+                  <th>Amount</th>
                   <th>Total Charges</th>
                 </tr>
                 <?php
-                $repackingdatas = $query->selectall('repacking');
+                $repackingdatas = $query->selectall('mslrepacking');
                 foreach ($repackingdatas as $repackingdata) {
                  ?>
                  <tr>
                    <td><?php echo $repackingdata['id']; ?></td>
                    <td><?php echo $repackingdata['date']; ?></td>
-                   <td><?php echo $repackingdata['in_mc']; ?></td>
-                   <td><?php echo $repackingdata['in_kg']; ?></td>
-                   <td><?php echo $repackingdata['out_mc']; ?></td>
-                   <td><?php echo $repackingdata['out_kg']; ?></td>
-                   <td><?php echo $repackingdata['diff_mc']; ?></td>
-                   <td><?php echo $repackingdata['diff_kg']; ?></td>
-                   <td><?php echo $repackingdata['rate']; ?></td>
-                   <td><?php echo $repackingdata['charges']; ?></td>
+                   <td><?php echo $repackingdata['description']; ?></td>
+                   <td><?php if($repackingdata['sheet'] != '0'){ echo $repackingdata['sheet']; }; ?></td>
+                   <td><?php if($repackingdata['plastic'] != '0'){ echo $repackingdata['plastic']; }; ?></td>
+                   <td><?php echo $repackingdata['price']; ?></td>
+                   <td><?php echo $repackingdata['amount']; ?></td>
                    <td><?php echo $repackingdata['total_charges']; ?></td>
                  </tr>
                 <?php
@@ -515,7 +508,7 @@ $query = new Query();
                 <tr>
                   <th>In Date</th>
                   <th>Out Date</th>
-                  <th>Commondity</th>
+                  <th>Fish Name</th>
                   <th>Mc</th>
                   <th>Total Mc</th>
                   <th>Kg</th>
@@ -523,26 +516,26 @@ $query = new Query();
                   <th>Balance Kg</th>
                 </tr>
                 <?php
-                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM hhkstock");
+                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM mslstock");
                 $commonditycountstmt->execute();
                 $commonditycountdatas = $commonditycountstmt->fetchColumn();
                 for ($i=0; $i < $commonditycountdatas; $i++) {
-                  $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkstock");
+                  $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM mslstock");
                   $commonditystmt->execute();
                   $commonditydata = $commonditystmt->fetchall();
-                  $commondity_id = $commonditydata[$i]['commondity_id'];
+                  $commondity_id = $commonditydata[$i]['item_id'];
 
-                $hhkstockstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE commondity_id='$commondity_id'");
+                $hhkstockstmt = $pdo->prepare("SELECT * FROM mslstock WHERE item_id='$commondity_id'");
                 $hhkstockstmt->execute();
                 $hhkstockdatas = $hhkstockstmt->fetchall();
                 foreach ($hhkstockdatas as $hhkstockdata) {
-                  $item_id = $hhkstockdata['commondity_id'];
-                  $commonditydata = $query->select('category', $item_id, 'category_id');
+                  $item_id = $hhkstockdata['item_id'];
+                  $commonditydata = $query->select('item', $item_id, 'item_id');
                   ?>
                 <tr>
                   <td><?php if($hhkstockdata['indate'] != "0000-00-00"){ echo $hhkstockdata['indate']; }; ?></td>
                   <td><?php if($hhkstockdata['outdate'] != "0000-00-00"){ echo $hhkstockdata['outdate']; }; ?></td>
-                  <td><?php echo $commonditydata['category_name']; ?></td>
+                  <td><?php echo $commonditydata['item_name']; ?></td>
                   <td><?php echo $hhkstockdata['mc']; ?></td>
                   <td><?php echo $hhkstockdata['total_mc']; ?></td>
                   <td><?php echo $hhkstockdata['kg']; ?></td>
@@ -567,7 +560,7 @@ $query = new Query();
             <h1 class="modal-title fs-5">New Charges</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <form action="daterangecharges.php" method="post">
+          <form action="msldaterangecharges.php" method="post">
           <div class="modal-body">
             <div class="row" style="margin-bottom: 10px !important;">
               <div class="col">
@@ -581,13 +574,13 @@ $query = new Query();
             </div>
             <div class="row" style="margin-bottom: 10px !important;">
               <div class="col">
-                <label>Commondity</label>
-                <select class="form-control inpv2" name="commondity_id">
+                <label>Fish Name</label>
+                <select class="form-control inpv2" name="item_id">
                   <?php
-                  $commonditydatas = $query->selectall('category');
+                  $commonditydatas = $query->selectall('item');
                   foreach ($commonditydatas as $commonditydata) {
                     ?>
-                    <option value="<?php echo $commonditydata['category_id']; ?>"><?php echo $commonditydata['category_name']; ?></option>
+                    <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
                     <?php
                     }
                    ?>
@@ -610,12 +603,12 @@ $query = new Query();
             </div>
             <div class="row">
               <div class="col">
-                <label style="font-weight: bold;">Labour Rate</label>
-                <input type="text" name="labourrate" class="form-control inpv2">
+                <label style="font-weight: bold;">Freezing Rate</label>
+                <input type="text" name="freezingrate" class="form-control inpv2">
               </div>
             <div class="col">
-              <label style="font-weight: bold;">Processing Rate</label>
-              <input type="text" name="processingrate" class="form-control inpv2">
+              <label style="font-weight: bold;">Export Handling Rate</label>
+              <input type="text" name="exportrate" class="form-control inpv2">
               </div>
             </div>
           </div>
@@ -636,7 +629,7 @@ $query = new Query();
             <h1 class="modal-title fs-5">Add Payment</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <form action="daterangecharges.php" method="post">
+          <form action="msldaterangecharges.php" method="post">
           <div class="modal-body">
             <div class="row">
               <div class="col">
@@ -666,34 +659,32 @@ $query = new Query();
             <h1 class="modal-title fs-5">Repacking Charges</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <form action="daterangecharges.php" method="post">
+          <form action="msldaterangecharges.php" method="post">
           <div class="modal-body">
-            <label>Date</label>
-            <input type="date" name="date" class="form-control inpv2 mb-2">
             <div class="row">
               <div class="col">
-                <label>In Mc</label>
-                <input type="number" name="in_mc" class="form-control inpv2 mb-2">
+                <label>Date</label>
+                <input type="date" name="date" class="form-control inpv2 mb-2">
               </div>
               <div class="col">
-                <label>In Kg</label>
-                <input type="text" name="in_kg" class="form-control inpv2 mb-2">
+                <label>Description</label>
+                <input type="text" name="description" class="form-control inpv2 mb-2">
               </div>
             </div>
             <div class="row">
               <div class="col">
-                <label>Out Mc</label>
-                <input type="number" name="out_mc" class="form-control inpv2 mb-2">
+                <label>Plastic</label>
+                <input type="text" name="plastic" class="form-control inpv2 mb-2">
               </div>
               <div class="col">
-                <label>Out Kg</label>
-                <input type="text" name="out_kg" class="form-control inpv2 mb-2">
+                <label>Sheet</label>
+                <input type="number" name="sheet" class="form-control inpv2 mb-2">
               </div>
             </div>
             <div class="row">
               <div class="col">
-                <label>Rate</label>
-                <input type="text" name="rate" class="form-control inpv2 mb-2">
+                <label>Price</label>
+                <input type="number" name="price" class="form-control inpv2 mb-2">
               </div>
               <div class="col mt-4">
                 <button type="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
@@ -714,7 +705,7 @@ $query = new Query();
             <h1 class="modal-title fs-5">Add New Stock</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <form action="daterangecharges.php" method="post">
+          <form action="msldaterangecharges.php" method="post">
           <div class="modal-body">
             <div class="row">
               <div class="col">
@@ -722,13 +713,13 @@ $query = new Query();
                 <input type="date" name="indate" class="form-control inpv2 mb-2">
               </div>
               <div class="col">
-                <label>Commondity</label>
-                <select class="form-control inpv2" name="commondity_id">
+                <label>Fish Name</label>
+                <select class="form-control inpv2" name="item_id">
                   <?php
-                  $commonditydatas = $query->selectall('category');
+                  $commonditydatas = $query->selectall('item');
                   foreach ($commonditydatas as $commonditydata) {
                     ?>
-                    <option value="<?php echo $commonditydata['category_id']; ?>"><?php echo $commonditydata['category_name']; ?></option>
+                    <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
                     <?php
                     }
                    ?>

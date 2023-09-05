@@ -75,18 +75,12 @@ CREATE TABLE `coldstore` (
   `charges` int(11) NOT NULL,
   `total_charges` bigint(16) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=84 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO coldstore VALUES("37","2023-09-01","2023-09-05","4","100","100","300","300","4","4","4800","4800");
-INSERT INTO coldstore VALUES("38","2023-09-06","2023-09-10","4","150","250","450","750","5","4","9000","13800");
-INSERT INTO coldstore VALUES("46","2023-09-05","2023-09-10","11","150","150","300","300","5","4","6000","6000");
-INSERT INTO coldstore VALUES("47","2023-09-11","2023-09-13","11","100","250","150","450","3","4","1800","7800");
-INSERT INTO coldstore VALUES("48","2023-09-16","2023-09-20","11","300","550","600","1050","5","4","12000","19800");
-INSERT INTO coldstore VALUES("49","2023-09-16","2023-09-20","13","300","300","600","600","4","4","9600","9600");
-INSERT INTO coldstore VALUES("50","2023-09-06","2023-09-10","13","200","500","600","1200","5","4","12000","21600");
-INSERT INTO coldstore VALUES("51","2023-09-06","2023-09-10","13","50","550","150","1350","5","4","3000","24600");
-INSERT INTO coldstore VALUES("52","2023-09-06","2023-09-10","12","150","150","300","300","4","4","4800","4800");
-INSERT INTO coldstore VALUES("54","2023-09-11","2023-09-15","12","150","300","300","600","5","4","6000","10800");
+INSERT INTO coldstore VALUES("79","2023-09-05","2023-09-10","4","50","50","150","150","5","4","3000","3000");
+INSERT INTO coldstore VALUES("81","2023-09-02","2023-09-06","4","100","150","300","450","5","4","6000","9000");
+INSERT INTO coldstore VALUES("82","2023-09-04","2023-09-07","11","50","50","150","150","3","4","1800","1800");
+INSERT INTO coldstore VALUES("83","2023-09-01","2023-09-05","4","50","100","150","300","5","4","3000","4800");
 
 
 
@@ -253,6 +247,33 @@ INSERT INTO gfctotal VALUES("19","0000-00-00","0","0","0","0","0","0","0","2023-
 
 
 
+DROP TABLE hhkstock;
+
+CREATE TABLE `hhkstock` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `indate` date NOT NULL,
+  `outdate` date NOT NULL,
+  `commondity_id` varchar(11) NOT NULL,
+  `mc` int(11) NOT NULL,
+  `total_mc` int(11) NOT NULL,
+  `kg` varchar(11) NOT NULL,
+  `total_kg` varchar(11) NOT NULL,
+  `balance` varchar(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO hhkstock VALUES("3","2023-09-01","0000-00-00","4","200","200","600","600","600");
+INSERT INTO hhkstock VALUES("5","0000-00-00","2023-09-10","4","50","150","150","450","450");
+INSERT INTO hhkstock VALUES("7","2023-09-02","0000-00-00","4","100","250","300","750","1200");
+INSERT INTO hhkstock VALUES("9","0000-00-00","2023-09-06","4","100","150","300","450","750");
+INSERT INTO hhkstock VALUES("11","2023-09-03","0000-00-00","11","100","100","300","300","300");
+INSERT INTO hhkstock VALUES("12","0000-00-00","2023-09-07","11","50","50","150","150","150");
+INSERT INTO hhkstock VALUES("13","2023-09-04","0000-00-00","11","100","150","300","450","600");
+INSERT INTO hhkstock VALUES("14","0000-00-00","2023-09-05","4","50","100","150","300","450");
+INSERT INTO hhkstock VALUES("15","2023-09-02","0000-00-00","4","100","200","300","600","1050");
+
+
+
 DROP TABLE item;
 
 CREATE TABLE `item` (
@@ -289,18 +310,146 @@ CREATE TABLE `labour` (
   `charges` int(11) NOT NULL,
   `total_charges` bigint(16) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=84 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO labour VALUES("37","2023-09-01","2023-09-05","4","100","100","300","300","5","1500","1500");
-INSERT INTO labour VALUES("38","2023-09-06","2023-09-10","4","150","250","450","750","5","2250","3750");
-INSERT INTO labour VALUES("46","2023-09-05","2023-09-10","11","150","150","300","300","5","1500","1500");
-INSERT INTO labour VALUES("47","2023-09-11","2023-09-13","11","100","250","150","450","5","750","2250");
-INSERT INTO labour VALUES("48","2023-09-16","2023-09-20","11","300","550","600","1050","5","3000","5250");
-INSERT INTO labour VALUES("49","2023-09-16","2023-09-20","13","300","300","600","600","5","3000","3000");
-INSERT INTO labour VALUES("50","2023-09-06","2023-09-10","13","200","500","600","1200","5","3000","6000");
-INSERT INTO labour VALUES("51","2023-09-06","2023-09-10","13","50","550","150","1350","5","750","6750");
-INSERT INTO labour VALUES("52","2023-09-06","2023-09-10","12","150","150","300","300","5","1500","1500");
-INSERT INTO labour VALUES("54","2023-09-11","2023-09-15","12","150","300","300","600","5","1500","3000");
+INSERT INTO labour VALUES("79","2023-09-05","2023-09-10","4","50","50","150","150","5","750","750");
+INSERT INTO labour VALUES("81","2023-09-02","2023-09-06","4","100","150","300","450","5","1500","2250");
+INSERT INTO labour VALUES("82","2023-09-04","2023-09-07","11","50","50","150","150","5","750","750");
+INSERT INTO labour VALUES("83","2023-09-01","2023-09-05","4","50","200","150","600","5","750","3000");
+
+
+
+DROP TABLE msl_total_charges;
+
+CREATE TABLE `msl_total_charges` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `date` date NOT NULL,
+  `item_id` varchar(11) NOT NULL,
+  `total_coldstore_charges` bigint(19) NOT NULL,
+  `total_freezing_charges` bigint(19) NOT NULL,
+  `total_export_charges` bigint(19) NOT NULL,
+  `repacking_charges` bigint(19) NOT NULL,
+  `ice_charges` bigint(19) NOT NULL,
+  `total_charges` bigint(19) NOT NULL,
+  `grand_total_charges` bigint(19) NOT NULL,
+  `payment_date` date NOT NULL,
+  `payment_amount` bigint(19) NOT NULL,
+  `balance_amount` bigint(19) NOT NULL,
+  `remark` bigint(19) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO msl_total_charges VALUES("67","0000-00-00","BJ123","4800","36000","600","0","0","41400","41400","0000-00-00","0","41400","0");
+INSERT INTO msl_total_charges VALUES("68","0000-00-00","HG184","4800","36000","600","10000","10000","61400","102800","0000-00-00","0","102800","0");
+INSERT INTO msl_total_charges VALUES("69","0000-00-00","","0","0","0","0","0","0","0","2023-09-02","2800","100000","0");
+
+
+
+DROP TABLE mslcoldstore;
+
+CREATE TABLE `mslcoldstore` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `indate` date NOT NULL,
+  `outdate` date NOT NULL,
+  `item_id` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `mc` int(11) NOT NULL,
+  `total_mc` int(11) NOT NULL,
+  `kg` varchar(12) COLLATE utf8_unicode_ci NOT NULL,
+  `total_kg` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `day` int(11) NOT NULL,
+  `rate` varchar(12) COLLATE utf8_unicode_ci NOT NULL,
+  `charges` int(11) NOT NULL,
+  `total_charges` bigint(16) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=89 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO mslcoldstore VALUES("87","2023-09-02","2023-09-06","BJ123","50","50","150","150","4","3","1800","1800");
+INSERT INTO mslcoldstore VALUES("88","2023-09-02","2023-09-06","HG184","50","50","150","150","4","3","1800","1800");
+
+
+
+DROP TABLE mslexportcharges;
+
+CREATE TABLE `mslexportcharges` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `indate` date NOT NULL,
+  `outdate` date NOT NULL,
+  `item_id` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `mc` int(11) NOT NULL,
+  `total_mc` int(11) NOT NULL,
+  `kg` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `total_kg` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `rate` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `charges` int(11) NOT NULL,
+  `total_charges` bigint(16) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=89 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO mslexportcharges VALUES("87","2023-09-02","2023-09-06","BJ123","50","50","150","150","4","600","600");
+INSERT INTO mslexportcharges VALUES("88","2023-09-02","2023-09-06","HG184","50","50","150","150","4","600","600");
+
+
+
+DROP TABLE mslfreezing;
+
+CREATE TABLE `mslfreezing` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `indate` date NOT NULL,
+  `outdate` date NOT NULL,
+  `item_id` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `mc` int(11) NOT NULL,
+  `total_mc` int(11) NOT NULL,
+  `kg` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `total_kg` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `rate` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `charges` int(11) NOT NULL,
+  `total_charges` bigint(16) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=89 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO mslfreezing VALUES("87","2023-09-02","2023-09-06","BJ123","50","50","150","150","240","36000","36000");
+INSERT INTO mslfreezing VALUES("88","2023-09-02","2023-09-06","HG184","50","50","150","150","240","36000","36000");
+
+
+
+DROP TABLE mslrepacking;
+
+CREATE TABLE `mslrepacking` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `date` date NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `sheet` int(11) NOT NULL,
+  `plastic` varchar(11) NOT NULL,
+  `price` varchar(11) NOT NULL,
+  `amount` varchar(11) NOT NULL,
+  `total_charges` varchar(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO mslrepacking VALUES("1","2023-09-01","Master Carton Charges","32","","1500","48000","48000");
+INSERT INTO mslrepacking VALUES("2","2023-09-02","Plastic Bag Charges","0","54.4","2000","108000","156000");
+
+
+
+DROP TABLE mslstock;
+
+CREATE TABLE `mslstock` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `indate` date NOT NULL,
+  `outdate` date NOT NULL,
+  `item_id` varchar(11) NOT NULL,
+  `mc` int(11) NOT NULL,
+  `total_mc` int(11) NOT NULL,
+  `kg` varchar(11) NOT NULL,
+  `total_kg` varchar(11) NOT NULL,
+  `balance` varchar(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO mslstock VALUES("21","2023-09-01","0000-00-00","BJ123","100","100","300","300","300");
+INSERT INTO mslstock VALUES("24","0000-00-00","2023-09-06","BJ123","50","50","150","150","150");
+INSERT INTO mslstock VALUES("25","2023-09-01","0000-00-00","HG184","100","100","300","300","300");
+INSERT INTO mslstock VALUES("26","0000-00-00","2023-09-06","HG184","50","50","150","150","150");
 
 
 
@@ -380,18 +529,12 @@ CREATE TABLE `processing` (
   `charges` int(11) NOT NULL,
   `total_charges` bigint(16) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=84 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO processing VALUES("37","2023-09-01","2023-09-05","4","100","100","300","300","270","81000","81000");
-INSERT INTO processing VALUES("38","2023-09-06","2023-09-10","4","150","250","450","750","270","121500","202500");
-INSERT INTO processing VALUES("46","2023-09-05","2023-09-10","11","150","150","300","300","470","141000","141000");
-INSERT INTO processing VALUES("47","2023-09-11","2023-09-13","11","100","100","150","150","470","70500","211500");
-INSERT INTO processing VALUES("48","2023-09-16","2023-09-20","11","300","400","600","750","470","282000","493500");
-INSERT INTO processing VALUES("49","2023-09-16","2023-09-20","13","300","300","600","600","350","210000","210000");
-INSERT INTO processing VALUES("50","2023-09-06","2023-09-10","13","200","500","600","1200","350","210000","420000");
-INSERT INTO processing VALUES("51","2023-09-06","2023-09-10","13","50","550","150","1350","350","52500","472500");
-INSERT INTO processing VALUES("52","2023-09-06","2023-09-10","12","150","150","300","300","500","150000","150000");
-INSERT INTO processing VALUES("54","2023-09-11","2023-09-15","12","150","300","300","600","500","150000","300000");
+INSERT INTO processing VALUES("79","2023-09-05","2023-09-10","4","50","50","150","150","270","40500","40500");
+INSERT INTO processing VALUES("81","2023-09-02","2023-09-06","4","100","150","300","450","270","81000","121500");
+INSERT INTO processing VALUES("82","2023-09-04","2023-09-07","11","50","50","150","150","470","70500","70500");
+INSERT INTO processing VALUES("83","2023-09-01","2023-09-05","4","50","200","150","600","270","40500","162000");
 
 
 
@@ -438,8 +581,6 @@ CREATE TABLE `repacking` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO repacking VALUES("1","2023-09-05","150","300","100","150","50","150","7","2100","2100");
-INSERT INTO repacking VALUES("3","2023-09-06","150","300","100","150","50","150","7","2100","4200");
 
 
 
@@ -546,14 +687,13 @@ CREATE TABLE `total_charges` (
   `balance_amount` bigint(19) NOT NULL,
   `remark` bigint(19) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO total_charges VALUES("14","2023-09-01","4","13800","3750","202500","4200","10000","234250","234250","0000-00-00","0","234250","0");
-INSERT INTO total_charges VALUES("18","0000-00-00","4","0","0","0","0","0","0","0","2023-09-02","34250","200000","0");
-INSERT INTO total_charges VALUES("21","2023-09-02","11","19800","5250","493500","4200","100000","622750","622750","0000-00-00","0","622750","0");
-INSERT INTO total_charges VALUES("27","0000-00-00","11","0","0","0","0","0","0","0","2023-09-02","100000","522750","0");
-INSERT INTO total_charges VALUES("30","2023-09-01","13","24600","6750","472500","4200","100000","608050","608050","0000-00-00","0","608050","0");
-INSERT INTO total_charges VALUES("32","0000-00-00","13","0","0","0","0","0","0","0","2023-09-02","8050","600000","0");
+INSERT INTO total_charges VALUES("61","0000-00-00","4","3000","750","40500","0","0","44250","44250","0000-00-00","0","44250","0");
+INSERT INTO total_charges VALUES("63","0000-00-00","4","9000","2250","121500","0","0","132750","177000","0000-00-00","0","177000","0");
+INSERT INTO total_charges VALUES("64","0000-00-00","11","1800","750","70500","0","0","73050","250050","0000-00-00","0","250050","0");
+INSERT INTO total_charges VALUES("65","0000-00-00","4","4800","3000","162000","10000","10000","199800","449850","0000-00-00","0","449850","0");
+INSERT INTO total_charges VALUES("66","0000-00-00","0","0","0","0","0","0","0","0","2023-09-10","49850","400000","0");
 
 
 
