@@ -1,4 +1,4 @@
-<div class="d-flex flex-column flex-shrink-0 p-1 text-white bg-secondary" style="width: 16.5%; height:100%; position:fixed;">
+<div class="d-flex flex-column flex-shrink-0 p-1 text-white bg-secondary" style="width: 112%; height:109%;">
       <div class="text-center bg-light text-dark pt-3 pb-3">
         <b class="fs-4">Link Mark System</b>
         <br>
@@ -142,6 +142,12 @@
               <a href="packingmeterial.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - PM Cost
+              </a>
+            </li>
+            <li class="nav-item rounded">
+              <a href="stockcontrol.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - Stock Control
               </a>
             </li>
           </ul>

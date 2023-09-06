@@ -74,6 +74,12 @@ class Bootstrap
         .table>tbody>tr>*{
           background-color: transparent !important;
         }
+        .col-2{
+          width: 16%;
+        }
+        .col-10{
+          width: 84%;
+        }
       </style>
       <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.css">

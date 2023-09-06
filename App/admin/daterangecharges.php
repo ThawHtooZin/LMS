@@ -100,12 +100,12 @@ $query = new Query();
       </div>
       <div class="col-10">
         <div class="card">
-          <div class="card-header bg-warning text-light">
+          <div class="card-header bg-info text-light">
             <h4 class="d-inline">HHK Date Range Cold Store Charges</h4>
             <button type="submit" class="btn btn-success float-end addnewstock" data-bs-toggle="modal" data-bs-target="#newstock">Add New Stock</button>
             <button type="submit" class="btn btn-success float-end addnewcharges" data-bs-toggle="modal" data-bs-target="#newcharges">Add New Charges</button>
             <button type="submit" class="btn btn-success float-end hide addrepackingcharges" data-bs-toggle="modal" data-bs-target="#repackingcharges">Add Repacking Charges</button>
-            <button type="submit" class="btn btn-info text-light float-end hide addtotalcharges" data-bs-toggle="modal" data-bs-target="#addpayment">Add Payment</button>
+            <button type="submit" class="btn btn-dark text-light float-end hide addtotalcharges" data-bs-toggle="modal" data-bs-target="#addpayment">Add Payment</button>
           </div>
           <div class="card-body">
             <div class="text-center">
@@ -172,8 +172,8 @@ $query = new Query();
                   <!-- <tr style="<?php //if($commonditydata['category_name'] == "IQF"){echo "background-color: #6ef757 !important;";}elseif($commonditydata['category_name'] == "Block"){echo "background-color: #f5764c !important;";}elseif($commonditydata['category_name'] == "Pujanut"){echo "background-color: lightblue !important;";} ?>"> -->
                   <tr>
                     <td><?php echo $data['id']; ?></td>
-                    <td><?php echo $data['indate']; ?></td>
-                    <td><?php echo $data['outdate']; ?></td>
+                    <td><?php echo date('d-m-Y', strtotime($data['indate'])); ?></td>
+                    <td><?php echo date('d-m-Y', strtotime($data['outdate'])); ?></td>
                     <td><?php echo $commonditydata['category_name']; ?></td>
                     <td><?php echo $data['mc']; ?></td>
                     <td><?php echo $data['total_mc']; ?></td>
@@ -297,8 +297,8 @@ $query = new Query();
                 ?>
                 <tr>
                   <td><?php echo $labourdata['id']; ?></td>
-                  <td><?php echo $labourdata['indate']; ?></td>
-                  <td><?php echo $labourdata['outdate']; ?></td>
+                  <td><?php echo date('d-m-Y', strtotime($labourdata['indate']));  ?></td>
+                  <td><?php echo date('d-m-Y', strtotime($labourdata['outdate'])); ?></td>
                   <td><?php echo $commonditydata['category_name']; ?></td>
                   <td><?php echo $labourdata['mc']; ?></td>
                   <td><?php echo $labourdata['total_mc']; ?></td>
@@ -358,8 +358,8 @@ $query = new Query();
                 ?>
                 <tr>
                   <td><?php echo $processingdata['id']; ?></td>
-                  <td><?php echo $processingdata['indate']; ?></td>
-                  <td><?php echo $processingdata['outdate']; ?></td>
+                  <td><?php echo date('d-m-Y', strtotime($processingdata['indate']));  ?></td>
+                  <td><?php echo date('d-m-Y', strtotime($processingdata['outdate'])); ?></td>
                   <td><?php echo $commonditydata['category_name']; ?></td>
                   <td><?php echo $processingdata['mc']; ?></td>
                   <td><?php echo $processingdata['total_mc']; ?></td>
@@ -420,7 +420,7 @@ $query = new Query();
                   <td><?php if($total_charges_data['ice_charges'] != "0"){ echo $total_charges_data['ice_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['total_charges'] != "0"){ echo $total_charges_data['total_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['grand_total_charges'] != "0"){ echo $total_charges_data['grand_total_charges'];} ; ?></td>
-                  <td><?php if($total_charges_data['payment_date'] != "0000-00-00"){ echo $total_charges_data['payment_date']; } ; ?></td>
+                  <td><?php if($total_charges_data['payment_date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($total_charges_data['payment_date'])); } ; ?></td>
                   <td><?php if($total_charges_data['payment_amount'] != "0"){ echo $total_charges_data['payment_amount']; }; ?></td>
                   <td><?php if($total_charges_data['balance_amount'] != "0"){ echo $total_charges_data['balance_amount'];}; ?></td>
                   <td><?php if($total_charges_data['remark'] != "0"){ echo $total_charges_data['remark'];}; ?></td>
@@ -494,7 +494,7 @@ $query = new Query();
                  ?>
                  <tr>
                    <td><?php echo $repackingdata['id']; ?></td>
-                   <td><?php echo $repackingdata['date']; ?></td>
+                   <td><?php echo date('d-m-Y', strtotime($repackingdata['date'])); ?></td>
                    <td><?php echo $repackingdata['in_mc']; ?></td>
                    <td><?php echo $repackingdata['in_kg']; ?></td>
                    <td><?php echo $repackingdata['out_mc']; ?></td>
@@ -519,7 +519,6 @@ $query = new Query();
                   <th>Mc</th>
                   <th>Total Mc</th>
                   <th>Kg</th>
-                  <th>Total Kg</th>
                   <th>Balance Kg</th>
                 </tr>
                 <?php
@@ -540,14 +539,13 @@ $query = new Query();
                   $commonditydata = $query->select('category', $item_id, 'category_id');
                   ?>
                 <tr>
-                  <td><?php if($hhkstockdata['indate'] != "0000-00-00"){ echo $hhkstockdata['indate']; }; ?></td>
-                  <td><?php if($hhkstockdata['outdate'] != "0000-00-00"){ echo $hhkstockdata['outdate']; }; ?></td>
+                  <td><?php if($hhkstockdata['indate'] != "0000-00-00"){ echo date('d-m-Y', strtotime($hhkstockdata['indate'])); }; ?></td>
+                  <td><?php if($hhkstockdata['outdate'] != "0000-00-00"){ echo date('d-m-Y', strtotime($hhkstockdata['outdate'])); }; ?></td>
                   <td><?php echo $commonditydata['category_name']; ?></td>
                   <td><?php echo $hhkstockdata['mc']; ?></td>
                   <td><?php echo $hhkstockdata['total_mc']; ?></td>
                   <td><?php echo $hhkstockdata['kg']; ?></td>
                   <td><?php echo $hhkstockdata['total_kg']; ?></td>
-                  <td><?php echo $hhkstockdata['balance']; ?></td>
                 </tr>
                 <?php
                   }

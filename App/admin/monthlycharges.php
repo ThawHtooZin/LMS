@@ -98,7 +98,7 @@ $query = new Query();
       </div>
       <div class="col-10">
         <div class="card">
-          <div class="card-header bg-warning text-light">
+          <div class="card-header bg-info text-light">
             <h4 class="d-inline">Monthly Cold Store Charges</h4>
             <button type="submit" class="btn btn-success float-end addfishcharges" data-bs-toggle="modal" data-bs-target="#addfishcharges">Add Fish Charges</button>
             <button type="submit" class="btn btn-success float-end hide adddryfishcharges" data-bs-toggle="modal" data-bs-target="#adddryfishcharges">Add Dry Fish Charges</button>
@@ -135,7 +135,7 @@ $query = new Query();
                  ?>
                 <tr>
                   <td><?php echo $fishcoldstoredata['id']; ?></td>
-                  <td><?php echo $fishcoldstoredata['date']; ?></td>
+                  <td><?php echo date('d-m-Y', strtotime($fishcoldstoredata['date'])); ?></td>
                   <td><?php echo $fishcoldstoredata['ite']; ?></td>
                   <td><?php if($fishcoldstoredata['mc'] == '0'){ echo "";}else{ echo $fishcoldstoredata['mc']; }; ?></td>
                   <td><?php echo $fishcoldstoredata['total_mc']; ?></td>
@@ -167,7 +167,7 @@ $query = new Query();
                  ?>
                 <tr>
                   <td><?php echo $fishlabourdata['id']; ?></td>
-                  <td><?php echo $fishlabourdata['date']; ?></td>
+                  <td><?php echo date('d-m-Y', strtotime($fishlabourdata['date'])); ?></td>
                   <td><?php echo $fishlabourdata['ite']; ?></td>
                   <td><?php echo $fishlabourdata['kg']; ?></td>
                   <td><?php echo $fishlabourdata['rate']; ?></td>
@@ -197,7 +197,7 @@ $query = new Query();
                  ?>
                 <tr>
                   <td><?php echo $dryfishcoldstoredata['id']; ?></td>
-                  <td><?php echo $dryfishcoldstoredata['date']; ?></td>
+                  <td><?php echo date('d-m-Y', strtotime($dryfishcoldstoredata['date'])); ?></td>
                   <td><?php echo $dryfishcoldstoredata['ite']; ?></td>
                   <td><?php echo $dryfishcoldstoredata['kg']; ?></td>
                   <td><?php echo $dryfishcoldstoredata['total_kg']; ?></td>
@@ -227,7 +227,7 @@ $query = new Query();
                  ?>
                 <tr>
                   <td><?php echo $dryfishlabourdata['id']; ?></td>
-                  <td><?php echo $dryfishlabourdata['date']; ?></td>
+                  <td><?php echo date('d-m-Y', strtotime($dryfishlabourdata['date'])); ?></td>
                   <td><?php echo $dryfishlabourdata['ite']; ?></td>
                   <td><?php echo $dryfishlabourdata['kg']; ?></td>
                   <td><?php echo $dryfishlabourdata['rate']; ?></td>
@@ -255,7 +255,7 @@ $query = new Query();
                  ?>
                 <tr>
                   <td><?php echo $repackingoutdata['id']; ?></td>
-                  <td><?php echo $repackingoutdata['date']; ?></td>
+                  <td><?php echo date('d-m-Y', strtotime($repackingoutdata['date'])); ?></td>
                   <td><?php echo $repackingoutdata['outkg']; ?></td>
                   <td><?php echo $repackingoutdata['rate']; ?></td>
                   <td><?php echo $repackingoutdata['charges']; ?></td>
@@ -288,7 +288,7 @@ $query = new Query();
                   ?>
                   <tr data-bs-toggle="modal" data-bs-target="#addpayment<?php echo $totaldata['id']; ?>">
                     <td style="font-size:13px;"><?php if($totaldata['date'] != '0000-00-00'){echo $totaldata['id'];} ?></td>
-                    <td style="font-size:13px;"><?php if($totaldata['date'] != '0000-00-00'){echo $totaldata['date'];} ?></td>
+                    <td style="font-size:13px;"><?php if($totaldata['date'] != '0000-00-00'){echo date('d-m-Y', strtotime($totaldata['date']));} ?></td>
                     <td style="font-size:13px;"><?php if($totaldata['totalfishcoldstorecharges'] != '0'){echo $totaldata['totalfishcoldstorecharges'];} ?></td>
                     <td style="font-size:13px;"><?php if($totaldata['totalfishlabourcharges'] != '0'){echo $totaldata['totalfishlabourcharges'];} ?></td>
                     <td style="font-size:13px;"><?php if($totaldata['totalrepackingcharges'] != '0'){echo $totaldata['totalrepackingcharges'];} ?></td>
@@ -296,7 +296,7 @@ $query = new Query();
                     <td style="font-size:13px;"><?php if($totaldata['totaldryfishlabourcharges'] != '0'){echo $totaldata['totaldryfishlabourcharges'];} ?></td>
                     <td style="font-size:13px;"><?php if($totaldata['plugoncharges'] != '0'){echo $totaldata['plugoncharges'];} ?></td>
                     <td style="font-size:13px;"><?php if($totaldata['total_charges'] != '0'){echo $totaldata['total_charges'];} ?></td>
-                    <td style="font-size:13px;"><?php if($totaldata['payment_date'] != "0000-00-00"){ echo $totaldata['payment_date']; }; ?></td>
+                    <td style="font-size:13px;"><?php if($totaldata['payment_date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($totaldata['payment_date'])); }; ?></td>
                     <td style="font-size:13px;"><?php if($totaldata['payment_amount'] != "0"){ echo $totaldata['payment_amount']; }; ?></td>
                     <td style="font-size:13px;"><?php echo $totaldata['balance_amount']; ?></td>
                   </tr>

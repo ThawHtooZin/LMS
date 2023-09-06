@@ -342,11 +342,15 @@ Class Query{
     $id = $iddata['no'];
     $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, purchase_amount, balance, link_id) VALUES('$supplier_name', '$voucher_no', '$amount', '$total_balance', '$id')");
     $payablestmt->execute();
+    $kg = $viss * 1.634;
+    $formstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, size, viss, kg, pcsperf7) VALUES('$date', '$commodity', '$supplier_name', '$size', '$viss', '$kg', '$pcs')");
+    $formstmt->execute();
     if($stmt){
       return $successmessage = "Purchase Voucher Added Successfully";
     }else{
       return $errmessage = "Error accors when added Purchase Voucher";
     }
+
   }
 
   function updatepurchase($table, $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price, $no){
@@ -1376,7 +1380,7 @@ Class Query{
     $newstockstmt->execute();
   }
 
-  function addmslcoldstore($indate, $outdate, $item_id, $mc, $kg, $coldstorerate, $freezingrate, $exportrate){
+  function addmslcoldstore($indate, $outdate, $item_id, $mc, $kg, $coldstorerate, $freezingrate, $exportrate, $loose_kg, $loose_mc){
     global $pdo;
 
     $datastmt = $pdo->prepare("SELECT * FROM mslcoldstore ORDER BY id DESC");
@@ -1488,7 +1492,6 @@ Class Query{
     $skg = $kg;
     $total_mc = $stockdata['total_mc'] - $mc;
     $total_kg = $stockdata['total_kg'] - $kg;
-    $balance = $stockdata['balance'] - $total_kg;
 
     $coldstorestmt = $pdo->prepare("INSERT INTO mslcoldstore(indate, outdate, item_id, mc, total_mc, kg, total_kg, day, rate, charges, total_charges) VALUES('$indate','$outdate','$item_id', '$mc','$dtotal_mc','$kg','$dtotal_kg','$day','$coldstorerate','$charges','$total_charges')");
     $coldstorestmt->execute();
@@ -1496,14 +1499,49 @@ Class Query{
     $labourstmt->execute();
     $processingstmt = $pdo->prepare("INSERT INTO mslexportcharges(indate, outdate, item_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$item_id', '$mc','$etotal_mc','$kg','$etotal_kg','$exportrate','$echarges','$totalexportcharges')");
     $processingstmt->execute();
-    $stockstmt = $pdo->prepare("INSERT INTO mslstock(outdate, item_id, mc, total_mc, kg, total_kg, balance) VALUES('$outdate', '$item_id', '$smc', '$total_mc', '$skg', '$total_kg', '$balance')");
+    $stockstmt = $pdo->prepare("INSERT INTO mslstock(outdate, item_id, mc, total_mc, kg, total_kg) VALUES('$outdate', '$item_id', '$smc', '$total_mc', '$skg', '$total_kg')");
     $stockstmt->execute();
 
     $datastmt = $pdo->prepare("SELECT * FROM msl_total_charges ORDER BY id DESC");
     $datastmt->execute();
     $data = $datastmt->fetch(PDO::FETCH_ASSOC);
 
-    $totalcoldstorestmt = $pdo->prepare("SELECT total_charges FROM coldstore ORDER BY id DESC");
+    if(!empty($loose_kg) && !empty($loose_mc)){
+      $totalcoldstorestmt = $pdo->prepare("SELECT * FROM mslcoldstore ORDER BY id DESC");
+      $totalcoldstorestmt->execute();
+      $totalcoldstoredata = $totalcoldstorestmt->fetch(PDO::FETCH_ASSOC);
+
+      $totalfreezingstmt = $pdo->prepare("SELECT * FROM mslfreezing  ORDER BY id DESC");
+      $totalfreezingstmt->execute();
+      $totalfreezingdata = $totalfreezingstmt->fetch(PDO::FETCH_ASSOC);
+
+      $totalexportstmt = $pdo->prepare("SELECT * FROM mslexportcharges ORDER BY id DESC");
+      $totalexportstmt->execute();
+      $totalexportdata = $totalexportstmt->fetch(PDO::FETCH_ASSOC);
+      $coldstoretotal_mc = $totalcoldstoredata['total_mc'] + intval($loose_mc);
+      $coldstoretotal_kg = $totalcoldstoredata['total_kg'] + intval($loose_kg);
+      $freezingtotal_mc = $totalfreezingdata['total_mc'] + intval($loose_mc);
+      $freezingtotal_kg = $totalfreezingdata['total_kg'] + intval($loose_kg);
+      $exporttotal_mc = $totalexportdata['total_mc'] + intval($loose_mc);
+      $exporttotal_kg = $totalexportdata['total_kg'] + intval($loose_kg);
+
+      $loose_total_charges = $loose_kg * $day * $coldstorerate;
+      $loosetotalfreezingcharges = $loose_kg * $freezingrate;
+      $loosetotalexportcharges = $loose_kg * $exportrate;
+
+      $totalcoldstorecharges = $totalcoldstoredata['total_charges'] + $loose_total_charges;
+      $totalfreezingdatacharges = $totalfreezingdata['total_charges'] + $loosetotalfreezingcharges;
+      $totalexportdatacharges = $totalexportdata['total_charges'] + $loosetotalexportcharges;
+
+      $coldstorestmt = $pdo->prepare("INSERT INTO mslcoldstore(indate, item_id, mc, total_mc, kg, total_kg, day, rate, charges, total_charges) VALUES('$indate','$item_id', '$loose_mc','$coldstoretotal_mc','$loose_kg','$coldstoretotal_kg','$day','$coldstorerate','$loose_total_charges','$totalcoldstorecharges')");
+      $coldstorestmt->execute();
+      $labourstmt = $pdo->prepare("INSERT INTO mslfreezing(indate, item_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$item_id', '$loose_mc','$freezingtotal_mc','$loose_kg','$ftotal_kg','$freezingtotal_kg','$loosetotalfreezingcharges','$totalfreezingdatacharges')");
+      $labourstmt->execute();
+      $processingstmt = $pdo->prepare("INSERT INTO mslexportcharges(indate, item_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$item_id', '$loose_mc','$exporttotal_mc','$loose_kg','$etotal_kg','$exporttotal_kg','$loosetotalexportcharges','$totalexportdatacharges')");
+      $processingstmt->execute();
+    }
+
+    $totalcoldstorestmt = $pdo->prepare("SELECT * FROM mslcoldstore ORDER BY id DESC");
     $totalcoldstorestmt->execute();
     $totalcoldstoredata = $totalcoldstorestmt->fetch(PDO::FETCH_ASSOC);
 
@@ -1518,6 +1556,7 @@ Class Query{
     $totalchargesstmt = $pdo->prepare("SELECT * FROM msl_total_charges ORDER BY id DESC");
     $totalchargesstmt->execute();
     $totalchargesdata = $totalchargesstmt->fetch(PDO::FETCH_ASSOC);
+
 
     if(!empty($totalchargesdata)){
       $total_coldstore_charges = $totalcoldstoredata['total_charges'];
@@ -1608,6 +1647,13 @@ Class Query{
   }
 
   // MSL QUERIES
+
+  function updatecountry($country, $updateid){
+    global $pdo;
+
+    $countryupdatestmt = $pdo->prepare("UPDATE form7stock SET country='$country' WHERE id='$updateid'");
+    $countryupdatestmt->execute();
+  }
 
   // MORE SELECTS
 

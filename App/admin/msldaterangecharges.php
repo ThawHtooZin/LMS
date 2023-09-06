@@ -42,7 +42,9 @@ $query = new Query();
       $coldstorerate = $_POST['coldstorerate'];
       $freezingrate = $_POST['freezingrate'];
       $exportrate = $_POST['exportrate'];
-      $query->addmslcoldstore($indate, $outdate, $item_id, $mc, $kg, $coldstorerate, $freezingrate, $exportrate);
+      $loose_mc = $_POST['loose_mc'];
+      $loose_kg = $_POST['loose_kg'];
+      $query->addmslcoldstore($indate, $outdate, $item_id, $mc, $kg, $coldstorerate, $freezingrate, $exportrate, $loose_mc, $loose_kg);
     }
 
     if(isset($_POST['updatetotalcharges'])){
@@ -97,14 +99,14 @@ $query = new Query();
         include 'sidebar.php';
         ?>
       </div>
-      <div class="col-10">
+      <div class="col-10" style="">
         <div class="card">
-          <div class="card-header bg-warning text-light">
+          <div class="card-header bg-info text-light">
             <h4 class="d-inline">MSL Date Range Cold Store Charges</h4>
             <button type="submit" class="btn btn-success float-end addnewstock" data-bs-toggle="modal" data-bs-target="#newstock">Add New Stock</button>
             <button type="submit" class="btn btn-success float-end addnewcharges" data-bs-toggle="modal" data-bs-target="#newcharges">Add New Charges</button>
             <button type="submit" class="btn btn-success float-end hide addrepackingcharges" data-bs-toggle="modal" data-bs-target="#repackingcharges">Add Repacking Charges</button>
-            <button type="submit" class="btn btn-info text-light float-end hide addtotalcharges" data-bs-toggle="modal" data-bs-target="#addpayment">Add Payment</button>
+            <button type="submit" class="btn btn-dark text-light float-end hide addtotalcharges" data-bs-toggle="modal" data-bs-target="#addpayment">Add Payment</button>
           </div>
           <div class="card-body">
             <div class="text-center">
@@ -124,12 +126,12 @@ $query = new Query();
               }
                ?>
               <form action="" method="post">
-                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark remainingstocklink" style="text-decoration:none; border:none;" name="remainingstockbtn">Remaining Stock</button>
-                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark coldstorelink" style="text-decoration:none; border:none;" name="coldstorebtn">Cold Store Charges</button>
-                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark labourlink" style="text-decoration:none; border:none;" name="labourbtn">Freezing Charges</button>
-                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark processinglink" style="text-decoration:none; border:none;" name="processingbtn">Export Handling Charges</button>
-                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark repackinglink" style="text-decoration:none; border:none;" name="repackingbtn">Repacking Charges</button>
-                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark totallink" style="text-decoration:none; border:none;" name="totalchargesbtn">Total Charges</button>
+                <button type="submit" class="pb-2 pt-2 text-dark remainingstocklink" style="padding-left:20px; padding-right: 20px; text-decoration:none; border:none;" name="remainingstockbtn">Remaining Stock</button>
+                <button type="submit" class="pb-2 pt-2 text-dark coldstorelink" style="padding-left:20px; padding-right: 20px; text-decoration:none; border:none;" name="coldstorebtn">Cold Store Charges</button>
+                <button type="submit" class="pb-2 pt-2 text-dark labourlink" style="padding-left:20px; padding-right: 20px; text-decoration:none; border:none;" name="labourbtn">Freezing Charges</button>
+                <button type="submit" class="pb-2 pt-2 text-dark processinglink" style="padding-left:20px; padding-right: 20px; text-decoration:none; border:none;" name="processingbtn">Export Handling Charges</button>
+                <button type="submit" class="pb-2 pt-2 text-dark repackinglink" style="padding-left:20px; padding-right: 20px; text-decoration:none; border:none;" name="repackingbtn">Repacking Charges</button>
+                <button type="submit" class="pb-2 pt-2 text-dark totallink" style="padding-left:20px; padding-right: 20px; text-decoration:none; border:none;" name="totalchargesbtn">Total Charges</button>
               </form>
             </div>
             <hr>
@@ -171,8 +173,8 @@ $query = new Query();
                   <!-- <tr style="<?php //if($commonditydata['category_name'] == "IQF"){echo "background-color: #6ef757 !important;";}elseif($commonditydata['category_name'] == "Block"){echo "background-color: #f5764c !important;";}elseif($commonditydata['category_name'] == "Pujanut"){echo "background-color: lightblue !important;";} ?>"> -->
                   <tr>
                     <td><?php echo $data['id']; ?></td>
-                    <td><?php echo $data['indate']; ?></td>
-                    <td><?php echo $data['outdate']; ?></td>
+                    <td><?php echo date("d-m-Y", strtotime($data['indate'])); ?></td>
+                    <td><?php if($data['outdate'] != '0000-00-00'){ echo date("d-m-Y", strtotime($data['outdate']));}else{echo "Loose";}; ?></td>
                     <td><?php echo $commonditydata['item_name']; ?></td>
                     <td><?php echo $data['mc']; ?></td>
                     <td><?php echo $data['total_mc']; ?></td>
@@ -296,8 +298,8 @@ $query = new Query();
                 ?>
                 <tr>
                   <td><?php echo $labourdata['id']; ?></td>
-                  <td><?php echo $labourdata['indate']; ?></td>
-                  <td><?php echo $labourdata['outdate']; ?></td>
+                  <td><?php echo date('d-m-Y', strtotime($labourdata['indate'])); ?></td>
+                  <td><?php echo date('d-m-Y', strtotime($labourdata['outdate'])); ?></td>
                   <td><?php echo $commonditydata['item_name']; ?></td>
                   <td><?php echo $labourdata['mc']; ?></td>
                   <td><?php echo $labourdata['total_mc']; ?></td>
@@ -357,8 +359,8 @@ $query = new Query();
                 ?>
                 <tr>
                   <td><?php echo $processingdata['id']; ?></td>
-                  <td><?php echo $processingdata['indate']; ?></td>
-                  <td><?php echo $processingdata['outdate']; ?></td>
+                  <td><?php echo date('d-m-Y', strtotime($processingdata['indate'])); ?></td>
+                  <td><?php echo date('d-m-Y', strtotime($processingdata['outdate'])); ?></td>
                   <td><?php echo $commonditydata['item_name']; ?></td>
                   <td><?php echo $processingdata['mc']; ?></td>
                   <td><?php echo $processingdata['total_mc']; ?></td>
@@ -419,7 +421,7 @@ $query = new Query();
                   <td><?php if($total_charges_data['ice_charges'] != "0"){ echo $total_charges_data['ice_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['total_charges'] != "0"){ echo $total_charges_data['total_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['grand_total_charges'] != "0"){ echo $total_charges_data['grand_total_charges'];} ; ?></td>
-                  <td><?php if($total_charges_data['payment_date'] != "0000-00-00"){ echo $total_charges_data['payment_date']; } ; ?></td>
+                  <td><?php if($total_charges_data['payment_date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($total_charges_data['payment_date'])); } ; ?></td>
                   <td><?php if($total_charges_data['payment_amount'] != "0"){ echo $total_charges_data['payment_amount']; }; ?></td>
                   <td><?php if($total_charges_data['balance_amount'] != "0"){ echo $total_charges_data['balance_amount'];}; ?></td>
                   <td><?php if($total_charges_data['remark'] != "0"){ echo $total_charges_data['remark'];}; ?></td>
@@ -490,7 +492,7 @@ $query = new Query();
                  ?>
                  <tr>
                    <td><?php echo $repackingdata['id']; ?></td>
-                   <td><?php echo $repackingdata['date']; ?></td>
+                   <td><?php echo date('d-m-Y', strtotime($repackingdata['date'])); ?></td>
                    <td><?php echo $repackingdata['description']; ?></td>
                    <td><?php if($repackingdata['sheet'] != '0'){ echo $repackingdata['sheet']; }; ?></td>
                    <td><?php if($repackingdata['plastic'] != '0'){ echo $repackingdata['plastic']; }; ?></td>
@@ -512,7 +514,6 @@ $query = new Query();
                   <th>Mc</th>
                   <th>Total Mc</th>
                   <th>Kg</th>
-                  <th>Total Kg</th>
                   <th>Balance Kg</th>
                 </tr>
                 <?php
@@ -533,14 +534,13 @@ $query = new Query();
                   $commonditydata = $query->select('item', $item_id, 'item_id');
                   ?>
                 <tr>
-                  <td><?php if($hhkstockdata['indate'] != "0000-00-00"){ echo $hhkstockdata['indate']; }; ?></td>
-                  <td><?php if($hhkstockdata['outdate'] != "0000-00-00"){ echo $hhkstockdata['outdate']; }; ?></td>
+                  <td><?php if($hhkstockdata['indate'] != "0000-00-00"){ echo date('d-m-Y', strtotime($hhkstockdata['indate'])); }; ?></td>
+                  <td><?php if($hhkstockdata['outdate'] != "0000-00-00"){ echo date('d-m-Y', strtotime($hhkstockdata['outdate'])); }; ?></td>
                   <td><?php echo $commonditydata['item_name']; ?></td>
                   <td><?php echo $hhkstockdata['mc']; ?></td>
                   <td><?php echo $hhkstockdata['total_mc']; ?></td>
                   <td><?php echo $hhkstockdata['kg']; ?></td>
                   <td><?php echo $hhkstockdata['total_kg']; ?></td>
-                  <td><?php echo $hhkstockdata['balance']; ?></td>
                 </tr>
                 <?php
                   }
@@ -561,56 +561,66 @@ $query = new Query();
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <form action="msldaterangecharges.php" method="post">
-          <div class="modal-body">
-            <div class="row" style="margin-bottom: 10px !important;">
-              <div class="col">
-                <label style="font-weight: bold;">In Date</label>
-                <input type="date" name="indate" class="form-control inpv2">
+            <div class="modal-body">
+              <div class="row" style="margin-bottom: 10px !important;">
+                <div class="col">
+                  <label style="font-weight: bold;">In Date</label>
+                  <input type="date" name="indate" class="form-control inpv2">
+                </div>
+                <div class="col">
+                  <label style="font-weight: bold;">Out Date</label>
+                  <input type="date" name="outdate" class="form-control inpv2">
+                </div>
               </div>
-              <div class="col">
-                <label style="font-weight: bold;">Out Date</label>
-                <input type="date" name="outdate" class="form-control inpv2">
-              </div>
-            </div>
-            <div class="row" style="margin-bottom: 10px !important;">
-              <div class="col">
-                <label>Fish Name</label>
-                <select class="form-control inpv2" name="item_id">
-                  <?php
-                  $commonditydatas = $query->selectall('item');
-                  foreach ($commonditydatas as $commonditydata) {
-                    ?>
-                    <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+              <div class="row" style="margin-bottom: 10px !important;">
+                <div class="col">
+                  <label>Fish Name</label>
+                  <select class="form-control inpv2" name="item_id">
                     <?php
-                    }
-                   ?>
-                </select>
+                    $commonditydatas = $query->selectall('item');
+                    foreach ($commonditydatas as $commonditydata) {
+                      ?>
+                      <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                      <?php
+                      }
+                     ?>
+                  </select>
+                </div>
+                <div class="col">
+                  <label style="font-weight: bold;">Mc</label>
+                  <input type="number" name="mc" class="form-control inpv2">
+                </div>
               </div>
-              <div class="col">
-                <label style="font-weight: bold;">Mc</label>
-                <input type="number" name="mc" class="form-control inpv2">
+              <div class="row" style="margin-bottom: 10px !important;">
+                <div class="col">
+                  <label style="font-weight: bold;">Kg</label>
+                  <input type="text" name="kg" class="form-control inpv2">
+                </div>
+                <div class="col">
+                  <label style="font-weight: bold;">Cold Store Rate</label>
+                  <input type="text" name="coldstorerate" class="form-control inpv2">
+                </div>
               </div>
-            </div>
-            <div class="row" style="margin-bottom: 10px !important;">
-              <div class="col">
-                <label style="font-weight: bold;">Kg</label>
-                <input type="text" name="kg" class="form-control inpv2">
+              <div class="row">
+                <div class="col">
+                  <label style="font-weight: bold;">Freezing Rate</label>
+                  <input type="text" name="freezingrate" class="form-control inpv2">
+                </div>
+                <div class="col">
+                  <label style="font-weight: bold;">Export Handling Rate</label>
+                  <input type="text" name="exportrate" class="form-control inpv2">
+                </div>
               </div>
-              <div class="col">
-                <label style="font-weight: bold;">Cold Store Rate</label>
-                <input type="text" name="coldstorerate" class="form-control inpv2">
+              <div class="row">
+                <div class="col mt-2">
+                  <label>Loose Mc</label>
+                  <input type="number" name="loose_mc" class="form-control inpv2">
+                </div>
+                <div class="col mt-2">
+                  <label>Loose Kg</label>
+                  <input type="text" name="loose_kg" class="form-control inpv2">
+                </div>
               </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <label style="font-weight: bold;">Freezing Rate</label>
-                <input type="text" name="freezingrate" class="form-control inpv2">
-              </div>
-            <div class="col">
-              <label style="font-weight: bold;">Export Handling Rate</label>
-              <input type="text" name="exportrate" class="form-control inpv2">
-              </div>
-            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
