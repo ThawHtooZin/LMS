@@ -154,6 +154,34 @@
         </div>
       </li>
       <li style=" border: 2px solid black; " class="rounded">
+        <a href="#" class="nav-link text-white report" data-bs-toggle="collapse" data-bs-target="#stock-collapse" aria-expanded="false">
+          <svg class="bi" width="16" height="16"><i class="bi bi-card-list"></i></svg>
+          Stock Control >
+        </a>
+        <div class="collapse" id="stock-collapse">
+          <ul class="btn-toggle-nav list-unstyled fw-normal ms-2">
+            <li class="nav-item  rounded">
+              <a href="form_7.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - Form-7
+              </a>
+            </li>
+            <li class="nav-item  rounded">
+              <a href="form_10.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - Form-10
+              </a>
+            </li>
+            <li class="nav-item  rounded">
+              <a href="packing_stock.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - Packing Stock
+              </a>
+            </li>
+          </ul>
+        </div>
+      </li>
+      <li style=" border: 2px solid black; " class="rounded">
         <a href="#" class="nav-link text-white report" data-bs-toggle="collapse" data-bs-target="#report-collapse" aria-expanded="false">
           <svg class="bi" width="16" height="16"><i class="bi bi-card-list"></i></svg>
           Reports >

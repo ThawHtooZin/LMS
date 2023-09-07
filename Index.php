@@ -41,14 +41,13 @@ $query = new Query();
       }
     }
     ?>
-    <div class="login-box" style="border: 3px solid lightblue;">
-      <div class="login-logo">
-        <a href="../../index2.html"><b>Link Mark</b> Login</a>
-      </div>
+    <div class="login-box" style="box-shadow: 0px 8px 16px 0px gray;">
       <!-- /.login-logo -->
       <div class="card">
         <div class="card-body login-card-body">
-          <p class="login-box-msg">Login to access the the datas</p>
+          <div class="login-logo">
+            <a href="../../index2.html"><b>Link Mark</b> Login</a>
+          </div>
           <?php
           if(!empty($error)){
             echo '

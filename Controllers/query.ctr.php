@@ -343,7 +343,7 @@ Class Query{
     $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, purchase_amount, balance, link_id) VALUES('$supplier_name', '$voucher_no', '$amount', '$total_balance', '$id')");
     $payablestmt->execute();
     $kg = $viss * 1.634;
-    $formstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, size, viss, kg, pcsperf7) VALUES('$date', '$commodity', '$supplier_name', '$size', '$viss', '$kg', '$pcs')");
+    $formstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, size, viss, kg, pcspervr) VALUES('$date', '$commodity', '$supplier_name', '$size', '$viss', '$kg', '$pcs')");
     $formstmt->execute();
     if($stmt){
       return $successmessage = "Purchase Voucher Added Successfully";
@@ -1648,11 +1648,37 @@ Class Query{
 
   // MSL QUERIES
 
-  function updatecountry($country, $updateid){
+  function updatecountry($country, $pcsperf7, $updateid){
     global $pdo;
 
-    $countryupdatestmt = $pdo->prepare("UPDATE form7stock SET country='$country' WHERE id='$updateid'");
+    $countryupdatestmt = $pdo->prepare("UPDATE form7stock SET country='$country', pcsperf7='$pcsperf7' WHERE id='$updateid'");
     $countryupdatestmt->execute();
+  }
+
+  function addform10($date, $item_id, $country, $size, $pcsform10, $mc, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs){
+    global $pdo;
+
+    $kg = $mc * 20;
+    $total_kg = intval($kg) + intval($looseinkg) - intval($looseoutkg);
+    $addform10stmt = $pdo->prepare("INSERT INTO form10stock(date, item_id, country, size, pcsform10, mc, kg, pcs, looseinkg, looseinpcs, looseoutkg, looseoutpcs, total_kg) VALUES('$date', '$item_id', '$country', '$size', '$pcsform10', '$mc', '$kg', '$pcs', '$looseinkg', '$looseinpcs', '$looseoutkg', '$looseoutpcs', '$total_kg')");
+    $addform10stmt->execute();
+  }
+
+  function addpackinglist($date, $customer_id, $country, $invoiceno, $containerno){
+    global $pdo;
+
+    $addpackingliststmt = $pdo->prepare("INSERT INTO packingliststock(date, customer_id, country, invoiceno, containerno) VALUES('$date', '$customer_id', '$country', '$invoiceno', '$containerno')");
+    $addpackingliststmt->execute();
+  }
+
+  function addpackinglistinfo($commondity, $size, $packingkgperbox, $mc, $infoid){
+    global $pdo;
+
+    $totalnetweight = $packingkgperbox * $mc;
+    $totalgrossweight = $totalnetweight + $mc;
+
+    $addpackingliststmt = $pdo->prepare("INSERT INTO packingliststockinfo(commondity_id, size, packingkgperbox, mc, totalnetweight, totalgrossweight, infoid) VALUES('$commondity', '$size', '$packingkgperbox', '$mc', '$totalnetweight', '$totalgrossweight', '$infoid')");
+    $addpackingliststmt->execute();
   }
 
   // MORE SELECTS
