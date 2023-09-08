@@ -50,12 +50,11 @@ $query = new Query();
       </div>
       <div class="col-10">
         <div class="card">
-          <div class="card-header bg-info">
-            <span class=" text-light" id="pltext" style="font-size:20px; font-weight:bold;">Actual Packing List</span>
+          <div class="card-header bg-secondary">
+            <span class=" text-light" id="pltext" style="font-size:20px; font-weight:bold;">Invoice Costing</span>
             <span class=" text-light hide" id="itext" style="font-size:20px; font-weight:bold;">Actual Invoice</span>
-            <button type="button" class="btn btn-danger float-end btn-sm" id="actualinvoice">Actual Invoice</button>
-            <button type="button" class="btn btn-success float-end me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#add" id="addpackingstockbtn">Add Packing Stock</button>
-            <a href="packing_stock.php" class="btn btn-secondary float-end me-2 btn-sm">Back</a>
+            <button type="button" class="btn btn-info text-light float-end btn-sm" id="actualinvoice">Profit Or Lost</button>
+            <a href="packing_stock.php" class="btn btn-danger float-end me-2 btn-sm">Back</a>
           </div>
           <div class="card-body">
             <?php
@@ -65,33 +64,15 @@ $query = new Query();
             $infostmt->execute();
             $infodata = $infostmt->fetch(PDO::FETCH_ASSOC);
              ?>
-             <div class="row">
-               <div class="col-1">
-
-               </div>
-               <div class="col-8">
-                 <?php
-                   $customer_id = $infodata['customer_id'];
-                   $customerdata = $query->select('customers', $customer_id, 'customer_id');
-                   echo $customerdata['customer_name'];
-                  ?>
-               </div>
-               <div class="col-2">
+             <div class="row text-center">
+               <div class="col">
                  Date : <?php echo date('d-m-Y', strtotime($infodata['date']));  ?>
-                 <br>
-                 Invoice No : <?php echo $infodata['invoiceno'];  ?>
-                 <br>
-                 CTNR No : <?php echo $infodata['containerno'];  ?>
-                 <br>
-                 VESSEL NAME :
-                 <br>
-                 VOY NAME :
-                 <br>
-                 FDA :
-
                </div>
-               <div class="col-1">
-
+               <div class="col">
+                 Invoice No : <?php echo $infodata['invoiceno'];  ?>
+               </div>
+               <div class="col">
+                 CTNR No : <?php echo $infodata['containerno'];  ?>
                </div>
              </div>
              <br>
@@ -101,14 +82,22 @@ $query = new Query();
              if (!empty($emptyornot)) {
                ?>
                <table class="table table-striped table-hover table-bordered actualinvoicetable">
-                 <tr>
+                 <tr class="text-center">
                    <th>No</th>
-                   <th>Commondity</th>
+                   <th>Fish Name</th>
                    <th>Size</th>
-                   <th>Packing Kg Per Box</th>
-                   <th>Mc</th>
-                   <th>Total Net Weight</th>
-                   <th>Total Gross Weight</th>
+                   <th>Kg</th>
+                   <th>Price per viss</th>
+                   <th>Price per kg</th>
+                   <th>Yield</th>
+                   <th>Total Price(ks)</th>
+                   <th>USD</th>
+                   <th>Packing Material</th>
+                   <th>Ocean Pacific</th>
+                   <th>Tax</th>
+                   <th>Agent</th>
+                   <th>Transport</th>
+                   <th>Total FOD/USD</th>
                  </tr>
                  <?php
                  $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM packingliststockinfo WHERE infoid='$infoid'");
@@ -129,62 +118,28 @@ $query = new Query();
                      $commonditydata = $query->select('item', $item_id, 'item_id');
                   ?>
                  <tr>
-                   <td><?php echo $packingstockinfodata['id']; ?></td>
-                   <td><?php echo $commonditydata['item_name']; ?></td>
-                   <td><?php echo $packingstockinfodata['size']; ?></td>
-                   <td><?php echo $packingstockinfodata['packingkgperbox']; ?></td>
-                   <td><?php echo $packingstockinfodata['mc']; ?></td>
-                   <td><?php echo $packingstockinfodata['totalnetweight']; ?></td>
-                   <td><?php echo $packingstockinfodata['totalgrossweight']; ?></td>
+                   <td></td>
+                   <td></td>
+                   <td></td>
+                   <td></td>
+                   <td></td>
+                   <td></td>
+                   <td></td>
+                   <td></td>
+                   <td></td>
+                   <td></td>
+                   <td></td>
+                   <td></td>
+                   <td></td>
+                   <td></td>
+                   <td></td>
                  </tr>
                  <?php
                  ?>
                  <?php
                  }
-                 $item_id = $packingstockinfodata['commondity_id'];
-                 $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM packingliststockinfo WHERE infoid='$infoid' AND commondity_id='$item_id'");
-                 $totalmcstmt->execute();
-                 $totalmcdata = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
-                 $totalnetweightstmt = $pdo->prepare("SELECT SUM(totalnetweight) AS totalnetweight FROM packingliststockinfo WHERE infoid='$infoid' AND commondity_id='$item_id'");
-                 $totalnetweightstmt->execute();
-                 $totalnetweightdata = $totalnetweightstmt->fetch(PDO::FETCH_ASSOC);
-                 $totalgrssweightstmt = $pdo->prepare("SELECT SUM(totalgrossweight) AS totalgrossweight FROM packingliststockinfo WHERE infoid='$infoid' AND commondity_id='$item_id'");
-                 $totalgrssweightstmt->execute();
-                 $totalgrssweightdata = $totalgrssweightstmt->fetch(PDO::FETCH_ASSOC);
-                 ?>
-                 <tr>
-                 <td></td>
-                 <td>Sub Total</td>
-                 <td></td>
-                 <td></td>
-                 <td><?php echo $totalmcdata['totalmc']; ?></td>
-                 <td><?php if(!empty($totalnetweightdata['totalnetweight'])){ echo $totalnetweightdata['totalnetweight']; }; ?></td>
-                 <td><?php if(!empty($totalgrssweightdata['totalgrossweight'])){ echo $totalgrssweightdata['totalgrossweight']; }; ?></td>
-                 </tr>
-                 <?php
                }
                   ?>
-                  <?php
-                  $item_id = $packingstockinfodata['commondity_id'];
-                  $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM packingliststockinfo WHERE infoid='$infoid'");
-                  $totalmcstmt->execute();
-                  $totalmcdata = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
-                  $totalnetweightstmt = $pdo->prepare("SELECT SUM(totalnetweight) AS totalnetweight FROM packingliststockinfo WHERE infoid='$infoid'");
-                  $totalnetweightstmt->execute();
-                  $totalnetweightdata = $totalnetweightstmt->fetch(PDO::FETCH_ASSOC);
-                  $totalgrssweightstmt = $pdo->prepare("SELECT SUM(totalgrossweight) AS totalgrossweight FROM packingliststockinfo WHERE infoid='$infoid'");
-                  $totalgrssweightstmt->execute();
-                  $totalgrssweightdata = $totalgrssweightstmt->fetch(PDO::FETCH_ASSOC);
-                   ?>
-                  <tr>
-                    <td></td>
-                    <td style="font-weight:bold !important;">Grand Total</td>
-                    <td></td>
-                    <td></td>
-                    <td style="font-weight:bold !important;"><?php echo $totalmcdata['totalmc']; ?></td>
-                    <td style="font-weight:bold !important;"><?php if(!empty($totalnetweightdata['totalnetweight'])){ echo $totalnetweightdata['totalnetweight']; }; ?></td>
-                    <td style="font-weight:bold !important;"><?php if(!empty($totalgrssweightdata['totalgrossweight'])){ echo $totalgrssweightdata['totalgrossweight']; }; ?></td>
-                  </tr>
                </table>
                <!-- =============================================================== -->
                <table class="table table-striped table-hover table-bordered actualinvoicetable hide">

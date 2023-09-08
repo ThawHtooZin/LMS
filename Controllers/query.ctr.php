@@ -1679,6 +1679,21 @@ Class Query{
 
     $addpackingliststmt = $pdo->prepare("INSERT INTO packingliststockinfo(commondity_id, size, packingkgperbox, mc, totalnetweight, totalgrossweight, infoid) VALUES('$commondity', '$size', '$packingkgperbox', '$mc', '$totalnetweight', '$totalgrossweight', '$infoid')");
     $addpackingliststmt->execute();
+
+    $addinvoicestmt = $pdo->prepare("INSERT INTO actualinvoice(commondity_id, size, packingkgperbox, mc, totalnetweight, infoid) VALUES('$commondity', '$size', '$packingkgperbox', '$mc', '$totalnetweight', '$infoid')");
+    $addinvoicestmt->execute();
+  }
+
+  function updateactualinvoice($usd, $updateid){
+    global $pdo;
+
+    $netweightstmt = $pdo->prepare("SELECT * FROM actualinvoice WHERE id='$updateid'");
+    $netweightstmt->execute();
+    $netweight = $netweightstmt->fetch(PDO::FETCH_ASSOC);
+
+    $total_usd = $usd * intval($netweight['totalnetweight']);
+    $updateusdstmt = $pdo->prepare("UPDATE actualinvoice SET usd='$usd', total_usd='$total_usd' WHERE id='$updateid'");
+    $updateusdstmt->execute();
   }
 
   // MORE SELECTS
