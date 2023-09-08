@@ -1682,6 +1682,9 @@ Class Query{
 
     $addinvoicestmt = $pdo->prepare("INSERT INTO actualinvoice(commondity_id, size, packingkgperbox, mc, totalnetweight, infoid) VALUES('$commondity', '$size', '$packingkgperbox', '$mc', '$totalnetweight', '$infoid')");
     $addinvoicestmt->execute();
+
+    $addinvoicecostingstmt = $pdo->prepare("INSERT INTO invoice_costing(commondity_id, size, kg, infoid) VALUES('$commondity', '$size', '$packingkgperbox', '$infoid')");
+    $addinvoicecostingstmt->execute();
   }
 
   function updateactualinvoice($usd, $updateid){
@@ -1694,6 +1697,51 @@ Class Query{
     $total_usd = $usd * intval($netweight['totalnetweight']);
     $updateusdstmt = $pdo->prepare("UPDATE actualinvoice SET usd='$usd', total_usd='$total_usd' WHERE id='$updateid'");
     $updateusdstmt->execute();
+  }
+
+  function updateinvoicecosting($priceperviss, $yield, $packing_material, $ocean_pacific, $tax, $agent, $transport, $updateid, $dollar){
+    global $pdo;
+
+    $priceperkg = intval($priceperviss) / 1.634;
+    if(str_contains($yield, '-')){
+      $percentage = 100 / (100 - intval($yield));
+    }else{
+      $percentage = 100 / (100 + intval($yield));
+    }
+    $kgstmt = $pdo->prepare("SELECT * FROM invoice_costing WHERE id='$updateid'");
+    $kgstmt->execute();
+    $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
+    $total_price = intval($priceperkg) / $percentage;
+    $usd = intval($total_price) / intval($dollar);
+    $total_usd = $usd + $packing_material + $ocean_pacific + $tax + $agent + $transport;
+    $total_kg_price = $total_usd * intval($kgdata['kg']);
+
+    $updateinvoicecostingstmt = $pdo->prepare("UPDATE invoice_costing SET priceperviss='$priceperviss', priceperkg='$priceperkg', yield='$yield', total_price='$total_price', usd='$usd', packing_material='$packing_material', ocean_pacific='$ocean_pacific', tax='$tax', agent='$agent', transport='$transport', total_usd='$total_usd', total_kg_price='$total_kg_price'
+    WHERE id='$updateid'");
+    $updateinvoicecostingstmt->execute();
+  }
+
+  function updatesellingprice($sellingpriceperkg, $updateid, $commondity_id, $size){
+    global $pdo;
+
+    $stmt = $pdo->prepare("SELECT * FROM invoice_costing WHERE id='$updateid'");
+    $stmt->execute();
+    $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $total_selling_price = $sellingpriceperkg * $data['kg'];
+    $profitorlossperkg = $sellingpriceperkg - $data['total_usd'];
+    $profit_amount = $data['kg'] * $profitorlossperkg;
+
+    $pcsperkgstmt = $pdo->prepare("SELECT * FROM actualinvoice WHERE commondity_id='$commondity_id'");
+    $pcsperkgstmt->execute();
+    $pcsperkgdata = $pcsperkgstmt->fetch(PDO::FETCH_ASSOC);
+    $total_usd = $sellingpriceperkg * $pcsperkgdata['packingkgperbox'];
+
+    $updatesellingpricestmt = $pdo->prepare("UPDATE invoice_costing SET sellingpriceperkg='$sellingpriceperkg', total_selling_price='$total_selling_price', profitorlossperkg='$profitorlossperkg', profit_amount='$profit_amount' WHERE id='$updateid'");
+    $updatesellingpricestmt->execute();
+
+    $updatestockstmt = $pdo->prepare("UPDATE actualinvoice SET usd='$sellingpriceperkg', total_usd='$total_usd' WHERE commondity_id='$commondity_id' AND size='$size'");
+    $updatestockstmt->execute();
   }
 
   // MORE SELECTS

@@ -322,7 +322,7 @@ $query = new Query();
                <div class="modal-dialog" role="document">
                  <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
                    <div class="modal-header bg-info text-light">
-                     <h1 class="modal-title fs-5">Addd Packing Stock</h1>
+                     <h1 class="modal-title fs-5">Add Packing Stock</h1>
                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                    </div>
                    <div class="modal-body">
