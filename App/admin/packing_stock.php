@@ -1,4 +1,4 @@
-<?php
+  <?php
 session_start();
 include '../../Auth/authrize.ctr.php';
 include '../../Resources/resource.boot.php';

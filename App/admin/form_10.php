@@ -36,7 +36,6 @@ $query = new Query();
       $item_id = $_POST['item_id'];
       $country = $_POST['country'];
       $size = $_POST['size'];
-      $pcsform10 = $_POST['pcsperf10'];
       $mc = $_POST['mc'];
       $pcs = $_POST['pcs'];
       $looseinkg = $_POST['loose_in_kg'];
@@ -44,7 +43,7 @@ $query = new Query();
       $looseoutkg = $_POST['loose_out_kg'];
       $looseoutpcs = $_POST['loose_out_pcs'];
 
-      $query->addform10($date, $item_id, $country, $size, $pcsform10, $mc, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs);
+      $query->addform10($date, $item_id, $country, $size, $mc, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs);
     }
 
      ?>
@@ -71,7 +70,7 @@ $query = new Query();
                 <th colspan="2">Loose In</th>
                 <th colspan="2">Loose Out</th>
                 <th>Total</th>
-                <th rowspan="2" style="padding-top:25px;">%</th>
+                <th rowspan="2" style="padding-top:25px;">Percentage</th>
               </tr>
               <tr class="text-center">
                 <th>PCS/Form-10</th>
@@ -85,8 +84,19 @@ $query = new Query();
                 <th>Kg</th>
               </tr>
               <?php
-              $form10datas = $query->selectall('form10stock');
-              foreach ($form10datas as $form10data) {
+              $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM form10stock");
+              $commonditycountstmt->execute();
+              $commonditycountdatas = $commonditycountstmt->fetchColumn();
+              for ($i=0; $i < $commonditycountdatas; $i++) {
+                $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
+                $commonditystmt->execute();
+                $commonditydata = $commonditystmt->fetchall();
+                $commondity_id = $commonditydata[$i]['item_id'];
+
+              $stmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id'");
+              $stmt->execute();
+              $datas = $stmt->fetchall();
+              foreach ($datas as $form10data) {
                 $item_id = $form10data['item_id'];
                 $commonditydata = $query->select('item', $item_id, 'item_id');
                ?>
@@ -108,30 +118,38 @@ $query = new Query();
               </tr>
               <?php
               }
+              $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id'");
+              $totalkgstmt->execute();
+              $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+
+              $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id'");
+              $totalf7kgstmt->execute();
+              $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
+              $totalkgdata['total_kg'];
+              $totalf7kgdata['total_kg'];
+              $result1 = $totalkgdata['total_kg'] - $totalf7kgdata['total_kg'];
+              $result2 = $result1 / $totalf7kgdata['total_kg'];
+              $percentage = $result2 * 100;
+              ?>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><?php echo round($percentage, 2); ?>%</td>
+              </tr>
+              <?php
+              }
                ?>
-              <!-- <div class="modal fade" id="updatemodal<?php // echo $form7data['id']; ?>">
-                <div class="modal-dialog" role="document">
-                  <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
-                    <div class="modal-header bg-warning text-light">
-                      <h1 class="modal-title fs-5">Update Country</h1>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                      <form action="form_7.php" method="post">
-                        <input type="hidden" name="id" value="<?php // echo $form7data['id']; ?>">
-                      <div class="modal-body">
-                        <label>Country</label>
-                        <input type="text" name="country" class="form-control inpv2 mt-1">
-                      </div>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                      <button type="submit" class="btn btn-warning" name="update">Update</button>
-                    </div>
-                  </form>
-                  </div>
-                </div>
-              </div> -->
             </table>
           </div>
         </div>
@@ -147,9 +165,11 @@ $query = new Query();
           <div class="modal-body">
             <form action="form_10.php" method="post">
             <div class="modal-body">
-              <label>Date</label>
-              <input type="date" name="date" class="form-control inpv2 mb-2">
               <div class="row">
+                <div class="col">
+                  <label>Date</label>
+                  <input type="date" name="date" class="form-control inpv2 mb-2">
+                </div>
                 <div class="col">
                   <label>Commondity</label>
                   <select class="form-control inpv2 mb-2" name="item_id">
@@ -167,19 +187,15 @@ $query = new Query();
                     ?>
                   </select>
                 </div>
+              </div>
+              <div class="row">
                 <div class="col">
                   <label>Country</label>
                   <input type="text" name="country" class="form-control inpv2 mb-2">
                 </div>
-              </div>
-              <div class="row">
                 <div class="col">
                   <label>Size</label>
                   <input type="text" name="size" class="form-control inpv2 mb-2">
-                </div>
-                <div class="col">
-                  <label>Pcs Per Form-10</label>
-                  <input type="text" name="pcsperf10" class="form-control inpv2 mb-2">
                 </div>
               </div>
               <div class="row">

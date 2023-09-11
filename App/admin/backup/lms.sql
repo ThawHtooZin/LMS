@@ -31,10 +31,14 @@ CREATE TABLE `actualinvoice` (
   `total_usd` varchar(11) NOT NULL,
   `infoid` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO actualinvoice VALUES("11","HG184","2up","20","10","200","1.5","30","1");
-INSERT INTO actualinvoice VALUES("12","HG184","3up","15","10","150","1.6","32","1");
+INSERT INTO actualinvoice VALUES("11","HG184","2up","20","10","200","0","0","1");
+INSERT INTO actualinvoice VALUES("12","HG184","3up","15","10","150","0","0","1");
+INSERT INTO actualinvoice VALUES("13","HL123","3up","20","10","200","0","0","3");
+INSERT INTO actualinvoice VALUES("14","UT216","2up","20","10","200","","","3");
+INSERT INTO actualinvoice VALUES("15","HL123","2up","21","5","105","2","40","3");
+INSERT INTO actualinvoice VALUES("16","HL123","3up","21","5","105","0","0","3");
 
 
 
@@ -156,11 +160,12 @@ CREATE TABLE `form10stock` (
   `total_kg` varchar(11) NOT NULL,
   `percentage` varchar(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO form10stock VALUES("1","2023-09-08","HG184","Japan","2up","10","3","60","9","3","1","","0","63","");
 INSERT INTO form10stock VALUES("2","2023-09-08","HL123","NY","3up","20","2","40","10","","0","","0","40","");
 INSERT INTO form10stock VALUES("3","2023-09-07","KJ243","NY","4up","79","25","500","3","12.5","4","","0","512","");
+INSERT INTO form10stock VALUES("4","2023-08-16","UT216","NY","2up","10","3","60","3","3","1","","0","63","");
 
 
 
@@ -178,17 +183,18 @@ CREATE TABLE `form7stock` (
   `pcspervr` varchar(15) NOT NULL,
   `pcsperf7` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO form7stock VALUES("1","2023-09-06","KJ243","NS123","NY","3up","209.4","342.1596","89","10");
 INSERT INTO form7stock VALUES("2","2023-09-06","KJ243","NS123","","4up","357.5","584.155","79","20");
-INSERT INTO form7stock VALUES("3","2023-09-06","UT216","NS123","","2up","200","326.8","50","0");
+INSERT INTO form7stock VALUES("3","2023-09-06","UT216","NS123","Japan","2up","200","326.8","50","10");
 INSERT INTO form7stock VALUES("4","2023-09-06","UT216","NS123","","5up","100","163.4","100","0");
 INSERT INTO form7stock VALUES("5","2023-09-06","HL123","NS123","","1up","45","73.53","20","20");
 INSERT INTO form7stock VALUES("6","2023-09-07","OJ247","HE132","","3up","200","326.8","50","0");
 INSERT INTO form7stock VALUES("7","2023-09-07","HG184","JH123","Japan","2up","100","163.4","","10");
 INSERT INTO form7stock VALUES("8","2023-09-09","HL123","JK909","","4up","75","122.55","","0");
 INSERT INTO form7stock VALUES("9","2023-09-09","HL123","JK909","","3up","100","163.4","","0");
+INSERT INTO form7stock VALUES("10","2023-09-08","HL123","NS123","","6up","150","245.1","","0");
 
 
 
@@ -377,10 +383,14 @@ CREATE TABLE `invoice_costing` (
   `total_kg_price` varchar(11) NOT NULL,
   `infoid` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO invoice_costing VALUES("1","HG184","2up","20","1100","673.1946144","4.5","699.92","0.233","0.3","0.04","0.3","0.3","0.2","1.373","1.5","30","0.127","2.54","27.46","1");
 INSERT INTO invoice_costing VALUES("2","HG184","3up","15","1200","734.3941248","-3.5","756.02","0.252","0.3","0.04","0.3","0.3","0.2","1.392","1.6","24","0.208","3.12","20.88","1");
+INSERT INTO invoice_costing VALUES("3","HL123","3up","20","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","3");
+INSERT INTO invoice_costing VALUES("4","UT216","2up","20","","","","","","","","","","","","","","","","","3");
+INSERT INTO invoice_costing VALUES("5","HL123","2up","21","1100","1797.4","4.5","1720","0.573333333","0.3","0.04","0.3","0.3","0.2","1.713333333","2","42","0.286666667","6.020000007","35.98","3");
+INSERT INTO invoice_costing VALUES("6","HL123","3up","21","","","","","","","","","","","","","","","","","3");
 
 
 
@@ -605,10 +615,14 @@ CREATE TABLE `packingliststockinfo` (
   `total_usd` varchar(11) NOT NULL,
   `infoid` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO packingliststockinfo VALUES("18","HG184","2up","20","10","200","210","","","1");
 INSERT INTO packingliststockinfo VALUES("19","HG184","3up","15","10","150","160","","","1");
+INSERT INTO packingliststockinfo VALUES("20","HL123","3up","20","10","200","210","","","3");
+INSERT INTO packingliststockinfo VALUES("21","UT216","2up","20","10","200","210","","","3");
+INSERT INTO packingliststockinfo VALUES("22","HL123","2up","21","5","105","110","","","3");
+INSERT INTO packingliststockinfo VALUES("23","HL123","3up","21","5","105","110","","","3");
 
 
 
@@ -656,7 +670,7 @@ CREATE TABLE `payable` (
   `balance` bigint(25) NOT NULL,
   `link_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=85 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=86 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO payable VALUES("57","DK123","2001","800000","0000-00-00","","0","800000","25");
 INSERT INTO payable VALUES("58","DK123","","0","2023-08-26","AP0001","500000","0","0");
@@ -684,6 +698,7 @@ INSERT INTO payable VALUES("81","HE132","2010","240000","0000-00-00","","0","546
 INSERT INTO payable VALUES("82","JH123","2011","110000","0000-00-00","","0","5576000","43");
 INSERT INTO payable VALUES("83","JK909","2011","75000","0000-00-00","","0","5651000","44");
 INSERT INTO payable VALUES("84","JK909","2012","110000","0000-00-00","","0","5761000","45");
+INSERT INTO payable VALUES("85","NS123","2012","150000","0000-00-00","","0","5911000","46");
 
 
 
@@ -727,7 +742,7 @@ CREATE TABLE `purchase` (
   `price` int(11) NOT NULL,
   `amount` int(11) NOT NULL,
   PRIMARY KEY (`no`)
-) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO purchase VALUES("25","2023-08-26","2001","DK123","frozen","HL123","10","200","0","4000","800000");
 INSERT INTO purchase VALUES("26","2023-08-26","2001","DK123","frozen","HG184","10","100","0","30000","3000000");
@@ -745,6 +760,7 @@ INSERT INTO purchase VALUES("42","2023-09-07","2010","HE132","frozen","OJ247","3
 INSERT INTO purchase VALUES("43","2023-09-07","2011","JH123","frozen","HG184","2up","100","0","1100","110000");
 INSERT INTO purchase VALUES("44","2023-09-09","2011","JK909","frozen","HL123","4up","75","0","1000","75000");
 INSERT INTO purchase VALUES("45","2023-09-09","2012","JK909","frozen","HL123","3up","100","0","1100","110000");
+INSERT INTO purchase VALUES("46","2023-09-08","2012","NS123","frozen","HL123","6up","150","0","1000","150000");
 
 
 

@@ -34,8 +34,11 @@ $query = new Query();
       $transport = $_POST['transport'];
       $dollar = $_POST['dollar'];
       $updateid = $_POST['updateid'];
+      $commondity_id = $_POST['commondity_id'];
+      $size=  $_POST['size'];
 
-      $query->updateinvoicecosting($priceperviss, $yield, $packing_material, $ocean_pacific, $tax, $agent, $transport, $updateid, $dollar);
+
+      $query->updateinvoicecosting($priceperviss, $yield, $packing_material, $ocean_pacific, $tax, $agent, $transport, $updateid, $dollar, $commondity_id, $size);
     }
 
     if(isset($_POST['sellingpriceupdatebtn'])){
@@ -57,9 +60,10 @@ $query = new Query();
         <div class="card">
           <div class="card-header bg-secondary">
             <span class=" text-light" id="pltext" style="font-size:20px; font-weight:bold;">Invoice Costing</span>
-            <span class=" text-light hide" id="itext" style="font-size:20px; font-weight:bold;">Actual Invoice</span>
-            <button type="button" class="btn btn-info text-light float-end btn-sm" id="actualinvoice">Profit Or Lost</button>
-            <a href="packing_stock.php" class="btn btn-danger float-end me-2 btn-sm">Back</a>
+            <span class=" text-light hide" id="itext" style="font-size:20px; font-weight:bold;">Profit Or Loss</span>
+            <button type="button" class="btn btn-info text-light float-end btn-sm " id="invoicecosting">Profit Or Loss</button>
+            <button type="button" class="btn btn-primary text-light float-end btn-sm hide" id="invoicecostingbtn">Invoice Costing</button>
+            <a href="packing_stock.php" class="btn btn-danger float-end me-2 btn-sm" id="back">Back</a>
           </div>
           <div class="card-body">
             <?php
@@ -116,28 +120,35 @@ $query = new Query();
                    $commondity_id = $commonditydata[$i]['commondity_id'];
                    $infoid = $_GET['infoid'];
 
-                   $stmt = $pdo->prepare("SELECT * FROM invoice_costing WHERE commondity_id='$commondity_id' AND infoid='$infoid'");
+                   $stmt = $pdo->prepare("SELECT * FROM invoice_costing WHERE commondity_id='$commondity_id' GROUP BY size ORDER BY id DESC");
                    $stmt->execute();
                    $invoicecostingdatas = $stmt->fetchall();
+
                    foreach ($invoicecostingdatas as $invoicecostingdata) {
                      $item_id = $invoicecostingdata['commondity_id'];
                      $commonditydata = $query->select('item', $item_id, 'item_id');
+                     $size = $invoicecostingdata['size'];
+
+
+                     $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS totalkg FROM invoice_costing WHERE commondity_id='$commondity_id' AND size='$size'");
+                     $totalkgstmt->execute();
+                     $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
                   ?>
                  <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $invoicecostingdata['id']; ?>">
                    <td><?php echo $invoicecostingdata['id']; ?></td>
                    <td><?php echo $commonditydata['item_name']; ?></td>
                    <td><?php echo $invoicecostingdata['size']; ?></td>
-                   <td><?php echo $invoicecostingdata['kg']; ?></td>
-                   <td><?php echo $invoicecostingdata['priceperviss']; ?></td>
+                   <td><?php echo $totalkgdata['totalkg']; ?></td>
+                   <td><?php if($invoicecostingdata['priceperviss'] != 0){ echo $invoicecostingdata['priceperviss'];}; ?></td>
                    <td><?php if(!empty($invoicecostingdata['priceperkg'])){echo round($invoicecostingdata['priceperkg'], 2);} ?></td>
-                   <td><?php echo $invoicecostingdata['yield']; ?></td>
+                   <td><?php if($invoicecostingdata['yield'] != 0){ echo $invoicecostingdata['yield'];}; ?></td>
                    <td><?php if(!empty($invoicecostingdata['total_price'])){echo round($invoicecostingdata['total_price'], 2);} ?></td>
                    <td><?php if(!empty($invoicecostingdata['usd'])){echo round($invoicecostingdata['usd'], 2);} ?></td>
-                   <td><?php echo $invoicecostingdata['packing_material']; ?></td>
-                   <td><?php echo $invoicecostingdata['ocean_pacific']; ?></td>
-                   <td><?php echo $invoicecostingdata['tax']; ?></td>
-                   <td><?php echo $invoicecostingdata['agent']; ?></td>
-                   <td><?php echo $invoicecostingdata['transport']; ?></td>
+                   <td><?php if($invoicecostingdata['packing_material'] != 0){ echo $invoicecostingdata['packing_material'];}; ?></td>
+                   <td><?php if($invoicecostingdata['ocean_pacific'] != 0){ echo $invoicecostingdata['ocean_pacific'];}; ?></td>
+                   <td><?php if($invoicecostingdata['tax'] != 0){ echo $invoicecostingdata['tax'];}; ?></td>
+                   <td><?php if($invoicecostingdata['agent'] != 0){ echo $invoicecostingdata['agent'];}; ?></td>
+                   <td><?php if($invoicecostingdata['transport'] != 0){ echo $invoicecostingdata['transport'];} ?></td>
                    <td><?php if(!empty($invoicecostingdata['total_usd'])){echo round($invoicecostingdata['total_usd'], 2);} ?></td>
                    <td><?php if(!empty($invoicecostingdata['total_kg_price'])){echo round($invoicecostingdata['total_kg_price'], 2);} ?></td>
                  </tr>
@@ -150,6 +161,8 @@ $query = new Query();
                        </div>
                        <form action="" method="post">
                          <input type="hidden" name="updateid" value="<?php echo $invoicecostingdata['id']; ?>">
+                         <input type="hidden" name="commondity_id" value="<?php echo $invoicecostingdata['commondity_id']; ?>">
+                         <input type="hidden" name="size" value="<?php echo $invoicecostingdata['size']; ?>">
                        <div class="modal-body">
                          <div class="row">
                            <div class="col">
@@ -227,7 +240,7 @@ $query = new Query();
                  <td></td>
                  <td></td>
                  <td></td>
-                 <td style="font-weight:bold;"><?php echo $totalkgpricedata['totalkgprice']; ?></td>
+                 <td style="font-weight:bold;"><?php if(round(floatval($totalkgpricedata['totalkgprice']), 2) != 0){ echo round(floatval($totalkgpricedata['totalkgprice']), 2);}; ?></td>
                  </tr>
                  <?php
                }
@@ -236,6 +249,9 @@ $query = new Query();
                <!-- =============================================================== -->
                <table class="table table-striped table-hover table-bordered actualinvoicetable hide">
                  <tr>
+                   <th>Fish Name</th>
+                   <th>Size</th>
+                   <th>Kg</th>
                    <th>Total FOD/USD</th>
                    <th>Selling Price Per Kg</th>
                    <th>Total Kg Price</th>
@@ -254,20 +270,30 @@ $query = new Query();
                    $commondity_id = $commonditydata[$i]['commondity_id'];
                    $infoid = $_GET['infoid'];
 
-                   $stmt = $pdo->prepare("SELECT * FROM invoice_costing WHERE commondity_id='$commondity_id' AND infoid='$infoid'");
+                   $stmt = $pdo->prepare("SELECT * FROM invoice_costing WHERE commondity_id='$commondity_id' AND infoid='$infoid' GROUP BY size ORDER BY id DESC");
                    $stmt->execute();
                    $invoicecostingdatas = $stmt->fetchall();
                    foreach ($invoicecostingdatas as $invoicecostingdata) {
                      $item_id = $invoicecostingdata['commondity_id'];
                      $commonditydata = $query->select('item', $item_id, 'item_id');
+
+                     $size = $invoicecostingdata['size'];
+
+
+                     $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS totalkg FROM invoice_costing WHERE commondity_id='$commondity_id' AND size='$size'");
+                     $totalkgstmt->execute();
+                     $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
                   ?>
                  <tr data-bs-toggle="modal" data-bs-target="#updatemodal2<?php echo $invoicecostingdata['id']; ?>">
-                   <td><?php echo $invoicecostingdata['total_usd']; ?></td>
-                   <td><?php echo $invoicecostingdata['sellingpriceperkg']; ?></td>
+                   <td><?php echo $commonditydata['item_name']; ?></td>
+                   <td><?php echo $invoicecostingdata['size']; ?></td>
+                   <td><?php echo $totalkgdata['totalkg']; ?></td>
+                   <td><?php if(round(floatval($invoicecostingdata['total_usd']), 2) != 0){ echo round(floatval($invoicecostingdata['total_usd']), 2);}; ?></td>
+                   <td><?php if($invoicecostingdata['sellingpriceperkg'] != 0){ echo $invoicecostingdata['sellingpriceperkg'];}; ?></td>
                    <td><?php if(!empty($invoicecostingdata['total_kg_price'])){echo round($invoicecostingdata['total_kg_price'], 2);} ?></td>
-                   <td><?php echo $invoicecostingdata['total_selling_price']; ?></td>
-                   <td><?php echo $invoicecostingdata['profitorlossperkg']; ?></td>
-                   <td><?php echo $invoicecostingdata['profit_amount']; ?></td>
+                   <td><?php if($invoicecostingdata['total_selling_price'] != 0){ echo $invoicecostingdata['total_selling_price'];}; ?></td>
+                   <td><?php if(round(floatval($invoicecostingdata['profitorlossperkg']),2) != 0){echo round(floatval($invoicecostingdata['profitorlossperkg']),2);}; ?></td>
+                   <td><?php if(round(floatval($invoicecostingdata['profit_amount']),2) != 0){ echo round(floatval($invoicecostingdata['profit_amount']),2);}; ?></td>
                  </tr>
                  <?php
                  ?>
@@ -310,12 +336,15 @@ $query = new Query();
                  $totalkgprofitdata = $totalkgprofitstmt->fetch(PDO::FETCH_ASSOC);
                  ?>
                  <tr>
+                 <td></td>
                  <td style="font-weight:bold;">Total</td>
                  <td></td>
-                 <td style="font-weight:bold;"><?php echo $totalkgpricedata['totalkgprice']; ?></td>
-                 <td style="font-weight:bold;"><?php echo $totalkgsellingpricedata['total_selling_price']; ?></td>
                  <td></td>
-                 <td style="font-weight:bold;"><?php echo $totalkgprofitdata['profit_amount']; ?></td>
+                 <td></td>
+                 <td style="font-weight:bold;"><?php if(round(floatval($totalkgpricedata['totalkgprice']), 2) != 0){ echo round(floatval($totalkgpricedata['totalkgprice']), 2);}; ?></td>
+                 <td style="font-weight:bold;"><?php if(round(floatval($totalkgsellingpricedata['total_selling_price']), 2) != 0){ echo round(floatval($totalkgsellingpricedata['total_selling_price']), 2);}; ?></td>
+                 <td></td>
+                 <td style="font-weight:bold;"><?php if(round(floatval($totalkgprofitdata['profit_amount']), 2) != 0){ echo round(floatval($totalkgprofitdata['profit_amount']), 2);}; ?></td>
                  </tr>
                  <?php
                }
@@ -352,11 +381,23 @@ $query = new Query();
     </div>
     <script type="text/javascript">
     $(document).ready(function(){
-      $("#actualinvoice").click(function(){
+      $("#invoicecosting").click(function(){
         $(".actualinvoicetable").toggle();
         $("#addpackingstockbtn").toggle();
         $("#itext").toggle();
         $("#pltext").toggle();
+        $("#back").toggle();
+        $("#invoicecosting").toggle();
+        $("#invoicecostingbtn").toggle();
+      });
+      $("#invoicecostingbtn").click(function(){
+        $(".actualinvoicetable").toggle();
+        $("#addpackingstockbtn").toggle();
+        $("#itext").toggle();
+        $("#pltext").toggle();
+        $("#back").toggle();
+        $("#invoicecostingbtn").toggle();
+        $("#invoicecosting").toggle();
       });
     });
     </script>

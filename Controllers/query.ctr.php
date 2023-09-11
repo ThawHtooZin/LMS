@@ -1655,13 +1655,18 @@ Class Query{
     $countryupdatestmt->execute();
   }
 
-  function addform10($date, $item_id, $country, $size, $pcsform10, $mc, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs){
+  function addform10($date, $item_id, $country, $size, $mc, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs){
     global $pdo;
 
+    $form7stmt = $pdo->prepare("SELECT * FROM form7stock WHERE item_id='$item_id' AND size='$size'");
+    $form7stmt->execute();
+    $form7data = $form7stmt->fetch(PDO::FETCH_ASSOC);
     $kg = $mc * 20;
     $total_kg = intval($kg) + intval($looseinkg) - intval($looseoutkg);
-    $addform10stmt = $pdo->prepare("INSERT INTO form10stock(date, item_id, country, size, pcsform10, mc, kg, pcs, looseinkg, looseinpcs, looseoutkg, looseoutpcs, total_kg) VALUES('$date', '$item_id', '$country', '$size', '$pcsform10', '$mc', '$kg', '$pcs', '$looseinkg', '$looseinpcs', '$looseoutkg', '$looseoutpcs', '$total_kg')");
+    $addform10 = ($mc * $pcs) + floatval($looseinpcs) - floatval($looseoutpcs);
+    $addform10stmt = $pdo->prepare("INSERT INTO form10stock(date, item_id, country, size, pcsform10, mc, kg, pcs, looseinkg, looseinpcs, looseoutkg, looseoutpcs, total_kg) VALUES('$date', '$item_id', '$country', '$size', '$addform10', '$mc', '$kg', '$pcs', '$looseinkg', '$looseinpcs', '$looseoutkg', '$looseoutpcs', '$total_kg')");
     $addform10stmt->execute();
+
   }
 
   function addpackinglist($date, $customer_id, $country, $invoiceno, $containerno){
@@ -1699,26 +1704,40 @@ Class Query{
     $updateusdstmt->execute();
   }
 
-  function updateinvoicecosting($priceperviss, $yield, $packing_material, $ocean_pacific, $tax, $agent, $transport, $updateid, $dollar){
+  function updateinvoicecosting($priceperviss, $yield, $packing_material, $ocean_pacific, $tax, $agent, $transport, $updateid, $dollar, $commondity_id, $size){
     global $pdo;
 
-    $priceperkg = intval($priceperviss) / 1.634;
-    if(str_contains($yield, '-')){
-      $percentage = 100 / (100 - intval($yield));
-    }else{
-      $percentage = 100 / (100 + intval($yield));
-    }
-    $kgstmt = $pdo->prepare("SELECT * FROM invoice_costing WHERE id='$updateid'");
-    $kgstmt->execute();
-    $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
-    $total_price = intval($priceperkg) / $percentage;
-    $usd = intval($total_price) / intval($dollar);
-    $total_usd = $usd + $packing_material + $ocean_pacific + $tax + $agent + $transport;
-    $total_kg_price = $total_usd * intval($kgdata['kg']);
+    if($priceperviss != 0 || $yield != 0 || $packing_material != 0){
+      $priceperkg = intval($priceperviss) * 1.634;
+      if(str_contains($yield, '-')){
+        $percentage = (100 - intval($yield)) / 100;
+      }else{
+         $percentage = (100 + round($yield, 4)) / 100;
+      }
+      $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS totalkg FROM invoice_costing WHERE commondity_id='$commondity_id' AND size='$size'");
+      $totalkgstmt->execute();
+      $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+      $kgstmt = $pdo->prepare("SELECT * FROM invoice_costing WHERE id='$updateid'");
+      $kgstmt->execute();
+      $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
+      $total_price = $priceperkg / $percentage;
+      $usd = intval($total_price) / intval($dollar);
+      $total_usd = $usd + $packing_material + $ocean_pacific + $tax + $agent + $transport;
+      $total_kg_price = $total_usd * $totalkgdata['totalkg'];
 
-    $updateinvoicecostingstmt = $pdo->prepare("UPDATE invoice_costing SET priceperviss='$priceperviss', priceperkg='$priceperkg', yield='$yield', total_price='$total_price', usd='$usd', packing_material='$packing_material', ocean_pacific='$ocean_pacific', tax='$tax', agent='$agent', transport='$transport', total_usd='$total_usd', total_kg_price='$total_kg_price'
-    WHERE id='$updateid'");
-    $updateinvoicecostingstmt->execute();
+      $updateinvoicecostingstmt = $pdo->prepare("UPDATE invoice_costing SET priceperviss='$priceperviss', priceperkg='$priceperkg', yield='$yield', total_price='$total_price', usd='$usd', packing_material='$packing_material', ocean_pacific='$ocean_pacific', tax='$tax', agent='$agent', transport='$transport', total_usd='$total_usd', total_kg_price='$total_kg_price'
+      WHERE id='$updateid'");
+      $updateinvoicecostingstmt->execute();
+    }else{
+      $priceperkg = 0;
+      $total_price = 0;
+      $usd = 0;
+      $total_usd = 0;
+      $total_kg_price = 0;
+      $updateinvoicecostingstmt = $pdo->prepare("UPDATE invoice_costing SET priceperviss='$priceperviss', priceperkg='$priceperkg', yield='$yield', total_price='$total_price', usd='$usd', packing_material='$packing_material', ocean_pacific='$ocean_pacific', tax='$tax', agent='$agent', transport='$transport', total_usd='$total_usd', total_kg_price='$total_kg_price'
+      WHERE id='$updateid'");
+      $updateinvoicecostingstmt->execute();
+    }
   }
 
   function updatesellingprice($sellingpriceperkg, $updateid, $commondity_id, $size){
@@ -1742,6 +1761,13 @@ Class Query{
 
     $updatestockstmt = $pdo->prepare("UPDATE actualinvoice SET usd='$sellingpriceperkg', total_usd='$total_usd' WHERE commondity_id='$commondity_id' AND size='$size'");
     $updatestockstmt->execute();
+  }
+
+  function addbankdetail($company_name,$company_address,$usd,$account_type,$bank_name,$swift_code,$bank_branch_address,$branch_name,$infoid){
+    global $pdo;
+
+    $addbankdetailstmt = $pdo->prepare("INSERT INTO bankdetail(company_name,company_address,usd,account_type,bank_name,swift_code,bank_branch_address,branch_name,infoid) VALUES('$company_name','$company_address','$usd','$account_type','$bank_name','$swift_code','$bank_branch_address','$branch_name','$infoid')");
+    $addbankdetailstmt->execute();
   }
 
   // MORE SELECTS

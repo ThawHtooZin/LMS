@@ -1,16 +1,11 @@
-<div class="d-flex flex-column flex-shrink-0 p-1 text-white bg-secondary" style="width: 112%; height:109%;">
+<div class="d-flex flex-column flex-shrink-0 p-1 text-white bg-secondary" style="width: 112%; height:100%;">
       <div class="text-center bg-light text-dark pt-3 pb-3">
         <b class="fs-4">Link Mark System</b>
         <br>
         <b class="text-warning">Version 1.0.0</b>
       </div>
-    <hr>
-    <p class=" h6 pb-2 text-center">
-      <?php
-      echo $_SESSION['username'];
-      ?>
-    </p>
-    <ul class="nav nav-pills flex-column mb-auto">
+      <hr>
+    <ul class="nav nav-pills flex-column">
       <li class="nav-item  rounded" style=" border: 2px solid black; ">
         <a href="../admin/" class="nav-link text-light" aria-current="page">
           <svg class="bi" width="16" height="16"><i class="bi bi-speedometer2"></i></svg>
@@ -144,12 +139,6 @@
                 - PM Cost
               </a>
             </li>
-            <li class="nav-item rounded">
-              <a href="stockcontrol.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
-                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
-                - Stock Control
-              </a>
-            </li>
           </ul>
         </div>
       </li>
@@ -172,6 +161,16 @@
                 - Form-10
               </a>
             </li>
+          </ul>
+        </div>
+      </li>
+      <li style=" border: 2px solid black; " class="rounded">
+        <a href="#" class="nav-link text-white report" data-bs-toggle="collapse" data-bs-target="#logestic-collapse" aria-expanded="false">
+          <svg class="bi" width="16" height="16"><i class="bi bi-card-list"></i></svg>
+          Logestic >
+        </a>
+        <div class="collapse" id="logestic-collapse">
+          <ul class="btn-toggle-nav list-unstyled fw-normal ms-2">
             <li class="nav-item  rounded">
               <a href="packing_stock.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
