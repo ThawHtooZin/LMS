@@ -21,16 +21,6 @@ $query = new Query();
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
-  <style media="screen">
-    .hide{
-      display:none;
-    }
-    .color{
-      border-radius: 5px;
-      background-color:grey;
-      color:white !important;
-    }
-  </style>
   <body>
     <?php
     if(isset($_POST['add'])){

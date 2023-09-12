@@ -43,6 +43,17 @@ class Bootstrap
     echo '
       <link rel="stylesheet" href="../../Resources\bootstrap-5.3.1-dist\css\bootstrap.min.css">
       <style>
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
+      ::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 5px grey !important;
+        border-radius: 10px !important;
+      }
+      ::-webkit-scrollbar-thumb {
+        background:rgba(0,0,0,0.3) !important;
+        border-radius: 5px !important;
+      }
         .h:hover{
           color:  black !important;
           background:  rgb(254, 254, 51, 0.9);
@@ -69,7 +80,12 @@ class Bootstrap
           font-weight: bold;
         }
         .hide{
-          display: none;
+          display:none;
+        }
+        .color{
+          border-radius: 5px;
+          background-color:grey;
+          color:white !important;
         }
         .table>tbody>tr>*{
           background-color: transparent !important;

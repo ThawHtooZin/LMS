@@ -161,6 +161,12 @@
                 - Form-10
               </a>
             </li>
+            <li class="nav-item  rounded">
+              <a href="hhkmcstock.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - HKK Mc Stock
+              </a>
+            </li>
           </ul>
         </div>
       </li>

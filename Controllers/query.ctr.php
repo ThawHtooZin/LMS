@@ -1651,8 +1651,13 @@ Class Query{
   function updatecountry($country, $pcsperf7, $updateid){
     global $pdo;
 
-    $countryupdatestmt = $pdo->prepare("UPDATE form7stock SET country='$country', pcsperf7='$pcsperf7' WHERE id='$updateid'");
-    $countryupdatestmt->execute();
+    if($country == ""){
+      $countryupdatestmt = $pdo->prepare("UPDATE form7stock SET country= NULL, pcsperf7='$pcsperf7' WHERE id='$updateid'");
+      $countryupdatestmt->execute();
+    }else{
+      $countryupdatestmt = $pdo->prepare("UPDATE form7stock SET country='$country', pcsperf7='$pcsperf7' WHERE id='$updateid'");
+      $countryupdatestmt->execute();
+    }
   }
 
   function addform10($date, $item_id, $country, $size, $mc, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs){
@@ -1770,6 +1775,33 @@ Class Query{
     $addbankdetailstmt->execute();
   }
 
+  function addmcstock($date, $particular, $country, $commondity_id, $size, $kg, $mc){
+    global $pdo;
+
+    $mcstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE kg='$kg' AND size='$size' AND commondity_id='$commondity_id' AND country='$country' ORDER BY id DESC");
+    $mcstmt->execute();
+    $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
+
+    if(!empty($mcdata)){
+      $balance_mc = $mcdata['balance_mc'] + $mc;
+    }else{
+      $balance_mc = $mc;
+    }
+    $addmcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc) VALUES('$date', '$country', '$particular', '$commondity_id', '$size', '$kg', '$mc', '$balance_mc')");
+    $addmcstmt->execute();
+  }
+
+  function transfermcstock($transferdate, $transferparticular, $transfercountry, $transfercommondity_id, $transfersize, $transferkg, $transfermc){
+    global $pdo;
+
+    $mcstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE kg='$transferkg' AND size='$transfersize' AND commondity_id='$transfercommondity_id' AND country='$transfercountry' ORDER BY id DESC");
+    $mcstmt->execute();
+    $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
+
+    $balance_mc = $mcdata['balance_mc'] - $transfermc;
+    $addmcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transfersize', '$transferkg', '$transfermc', '$balance_mc')");
+    $addmcstmt->execute();
+  }
   // MORE SELECTS
 
   function selectsum($table, $id, $selectwhat){
