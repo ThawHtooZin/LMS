@@ -135,10 +135,12 @@ $query = new Query();
                   <?php
                   $date = $form7data['date'];
                   $item_id = $form7data['item_id'];
+                  $country = $form7data['country'];
                 }
-                $totalvissstmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM form7stock WHERE item_id='$item_id'");
+                $totalvissstmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM form7stock WHERE item_id='$item_id' AND country='$country'");
                 $totalvissstmt->execute();
                 $totalvissdata = $totalvissstmt->fetch(PDO::FETCH_ASSOC);
+                print_r($totalvissdata);
                 $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$item_id'");
                 $totalkgstmt->execute();
                 $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
