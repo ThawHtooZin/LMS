@@ -93,7 +93,7 @@ $query = new Query();
               </tr>
               <?php
               $country = $countrydata['country'];
-              $stmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country='$country' GROUP BY size");
+              $stmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country='$country' GROUP BY commondity_id,size");
               $stmt->execute();
               $datas = $stmt->fetchall();
               foreach ($datas as $hhkstockdata) {
@@ -101,13 +101,14 @@ $query = new Query();
                 $commonditydata = $query->select('item', $item_id, 'item_id');
                 $size = $hhkstockdata['size'];
                 $kg = $hhkstockdata['kg'];
+                $commondity_id = $hhkstockdata['commondity_id'];
                 $sizestmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE size='$size' ORDER BY id DESC");
                 $sizestmt->execute();
                 $sizedata = $sizestmt->fetch(PDO::FETCH_ASSOC);
-                $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND particular!='hhk to gfc'");
+                $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular!='hhk to gfc'");
                 $totalmcstmt->execute();
                 $totalmcnotsub = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
-                $totalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND particular='hhk to gfc'");
+                $totalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular='hhk to gfc'");
                 $totalmcsubnumstmt->execute();
                 $totalmcsubnum = $totalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
                 $totalmc = $totalmcnotsub['total_mc'] - $totalmcsubnum['total_mc'];

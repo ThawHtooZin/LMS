@@ -34,8 +34,9 @@ $query = new Query();
             <?php
             if(isset($_POST['deletebutton'])){
               $deleteid = $_POST['deleteid'];
-              $message = $query->deletepurchase('purchase', $deleteid);
-              $message = $query->deletepayable('payable', $deleteid);
+              $query->deletepurchase('purchase', $deleteid);
+              $query->deletepayable('payable', $deleteid);
+              $query->deleteform7('form7stock', $deleteid);
             }
             if(isset($_POST['updatebutton'])){
               $date = $_POST['date'];
@@ -206,7 +207,7 @@ $query = new Query();
                 <td><?php echo $item_name['item_name']; ?></td>
                 <td><?php echo $purchasedata['size']; ?></td>
                 <td><?php echo $purchasedata['viss']; ?></td>
-                <td><?php echo $purchasedata['viss'] * 1.634; ?></td>
+                <td><?php echo floatval($purchasedata['viss']) * 1.634; ?></td>
                 <td><?php echo $purchasedata['pcs']; ?></td>
                 <td><?php echo $purchasedata['price']; ?></td>
                 <td><?php echo $purchasedata['amount']; ?></td>
@@ -216,6 +217,7 @@ $query = new Query();
                 <div class="modal-dialog" role="document">
                   <div class="modal-content" style="width: 750px; !important; margin-top:70px !important;">
                     <form action="" method="post" autocomplete="off">
+                      <input type="hidden" name="deleteid" value="<?php echo $purchasedata['no']; ?>">
                     <div class="modal-header bg-warning text-light">
                       <h5 class="modal-title" id="updatemodallabel">Update An Category</h5>
                       <div class="row">
@@ -225,7 +227,7 @@ $query = new Query();
                               <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
                             </svg>
                           </button>
-                          <button type="submit" name="deletebutton d-inline" class="btn btn-danger">
+                          <button type="submit" name="deletebutton" class="btn btn-danger d-inline">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
                           </button>
                           <button type="button" class="btn btn-primary d-inline" data-bs-toggle="modal">&times;</button>
@@ -421,7 +423,7 @@ $query = new Query();
               </div>
               <div class="col">
                 <label style="font-weight: bold;">Voucher No</label>
-                <input type="number" name="voucher_no" class="form-control inpv2 mb-2">
+                <input type="number" name="voucher_no" class="form-control inpv2 mb-2" value="<?php echo rand(0, 9999); ?>">
               </div>
             </div>
             <div class="row">

@@ -318,7 +318,7 @@ Class Query{
   function addpurchase($table, $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price){
     global $pdo;
     if(!empty($viss) || !empty($price)){
-      $amount = $price * $viss;
+      $amount = floatval($price) * floatval($viss);
     }else{
       $amount = 0;
     }
@@ -342,8 +342,9 @@ Class Query{
     $id = $iddata['no'];
     $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, purchase_amount, balance, link_id) VALUES('$supplier_name', '$voucher_no', '$amount', '$total_balance', '$id')");
     $payablestmt->execute();
-    $kg = $viss * 1.634;
-    $formstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, size, viss, kg, pcspervr) VALUES('$date', '$commodity', '$supplier_name', '$size', '$viss', '$kg', '$pcs')");
+    $kg = floatval($viss) * 1.634;
+    $link_id = $id;
+    $formstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', '$size', '$viss', '$kg', '$pcs', '$link_id')");
     $formstmt->execute();
     if($stmt){
       return $successmessage = "Purchase Voucher Added Successfully";
@@ -355,7 +356,7 @@ Class Query{
 
   function updatepurchase($table, $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price, $no){
     global $pdo;
-    $amount = $price * $viss;
+    $amount = $price * floatval($viss);
     $stmt = $pdo->prepare("UPDATE $table SET date='$date', voucher_no='$voucher_no', tclfrozen='$tclfrozen', supplier_id='$supplier_name', commodity='$commodity', size='$size', viss='$viss', pcs='$pcs', price='$price', amount='$amount' WHERE no='$no'");
     $stmt->execute();
     if($stmt){
@@ -381,9 +382,20 @@ Class Query{
     $stmt = $pdo->prepare("DELETE FROM $table WHERE link_id='$deleteid'");
     $stmt->execute();
     if($stmt){
-      return $successmessage = "Purchase Voucher Deleted Successfully";
+      return $successmessage = "Payable Voucher Deleted Successfully";
     }else{
-      return $errmessage = "Error accors when deleted Purchase Voucher";
+      return $errmessage = "Error accors when deleted Payable Voucher";
+    }
+  }
+
+  function deleteform7($table, $deleteid){
+    global $pdo;
+    $stmt = $pdo->prepare("DELETE FROM $table WHERE id='$deleteid'");
+    $stmt->execute();
+    if($stmt){
+      return $successmessage = "Payable Voucher Deleted Successfully";
+    }else{
+      return $errmessage = "Error accors when deleted Payable Voucher";
     }
   }
 
@@ -1660,15 +1672,14 @@ Class Query{
     }
   }
 
-  function addform10($date, $item_id, $country, $size, $mc, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs){
+  function addform10($date, $item_id, $country, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs){
     global $pdo;
 
     $form7stmt = $pdo->prepare("SELECT * FROM form7stock WHERE item_id='$item_id' AND size='$size'");
     $form7stmt->execute();
     $form7data = $form7stmt->fetch(PDO::FETCH_ASSOC);
-    $kg = $mc * 20;
-    $total_kg = intval($kg) + intval($looseinkg) - intval($looseoutkg);
-    $addform10 = ($mc * $pcs) + floatval($looseinpcs) - floatval($looseoutpcs);
+    $total_kg = (floatval($kg) + floatval($looseinkg)) - floatval($looseoutkg);
+    $addform10 = (intval($pcs) + floatval($looseinpcs)) - floatval($looseoutpcs);
     $addform10stmt = $pdo->prepare("INSERT INTO form10stock(date, item_id, country, size, pcsform10, mc, kg, pcs, looseinkg, looseinpcs, looseoutkg, looseoutpcs, total_kg) VALUES('$date', '$item_id', '$country', '$size', '$addform10', '$mc', '$kg', '$pcs', '$looseinkg', '$looseinpcs', '$looseoutkg', '$looseoutpcs', '$total_kg')");
     $addform10stmt->execute();
 
@@ -1799,8 +1810,8 @@ Class Query{
     $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
 
     $balance_mc = $mcdata['balance_mc'] - $transfermc;
-    $addmcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transfersize', '$transferkg', '$transfermc', '$balance_mc')");
-    $addmcstmt->execute();
+    $transfermcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transfersize', '$transferkg', '$transfermc', '$balance_mc')");
+    $transfermcstmt->execute();
   }
   // MORE SELECTS
 
