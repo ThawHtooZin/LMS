@@ -112,6 +112,7 @@ $query = new Query();
                 <th>Mc</th>
               </tr>
               <?php
+              $id = 0;
                 $hhkmcstockkgstmt = $pdo->prepare("SELECT DISTINCT size FROM hhkmcstock WHERE country='$country'");
                 $hhkmcstockkgstmt->execute();
                 $hhkmcstockkgdatas = $hhkmcstockkgstmt->fetchall();
@@ -138,7 +139,16 @@ $query = new Query();
                   $hhkkgdatas = $hhkkgstmt->fetchall();
 
                   foreach ($hhkkgdatas as $hhkkgdata) {
-                    $kg = $hhkkgdata['kg']
+                    $id++;
+                    $kg = $hhkkgdata['kg'];
+
+                    $fetchallstmt = $pdo->prepare("SELECT balance_mc FROM hhkmcstock WHERE size='$size' AND commondity_id='$item_id' AND kg='$kg' ORDER BY id DESC");
+                    $fetchallstmt->execute();
+                    $fetchalldata = $fetchallstmt->fetch(PDO::FETCH_ASSOC);
+
+                    $fetchallgfcstmt = $pdo->prepare("SELECT balance_mc FROM gfcmcstock WHERE size='$size' AND commondity_id='$item_id' AND kg='$kg' ORDER BY id DESC");
+                    $fetchallgfcstmt->execute();
+                    $fetchallgfcdata = $fetchallgfcstmt->fetch(PDO::FETCH_ASSOC);
                 // $country = $hhkmcstockdata['country'];
                 // $size = $hhkmcstockdata['size'];
                 // $kg = $hhkmcstockdata['kg'];
@@ -147,14 +157,14 @@ $query = new Query();
                 // $gfcmcstockdata = $gfcmcstockstmt->fetch(PDO::FETCH_ASSOC);
                ?>
               <tr <?php //if($hhkmcstockdata['commondity_id'] ){} ?>>
-                <td><?php //echo $hhkmcstockdata['id']; ?></td>
+                <td><?php echo $id; ?></td>
                 <td><?php echo $commonditydata['item_name']; ?></td>
                 <td><?php echo $country; ?></td>
                 <td><?php echo $size; ?></td>
                 <td><?php echo $kg; ?></td>
-                <td><?php //echo $hhkmcstockdata['balance_mc']; ?></td>
-                <td><?php //if(!empty($gfcmcstockdata['balance_mc'])){ echo $gfcmcstockdata['balance_mc'];};  ?></td>
-                <td><?php // if(!empty($gfcmcstockdata['balance_mc'])){echo $hhkmcstockdata['balance_mc'] + $gfcmcstockdata['balance_mc'];}else{echo $hhkmcstockdata['balance_mc'];};  ?></td>
+                <td><?php echo $fetchalldata['balance_mc']; ?></td>
+                <td><?php if(!empty($fetchallgfcdata['balance_mc'])){ echo $fetchallgfcdata['balance_mc'];};  ?></td>
+                <td><?php if(!empty($fetchallgfcdata['balance_mc'])){echo $fetchalldata['balance_mc'] + $fetchallgfcdata['balance_mc'];}else{echo $fetchalldata['balance_mc'];};  ?></td>
               </tr>
               <?php
               }
