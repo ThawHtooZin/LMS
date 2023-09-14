@@ -94,36 +94,6 @@ $query = new Query();
               $hhkmcstockkgstmt = $pdo->prepare("SELECT commondity_id FROM hhkmcstock WHERE country='$country'");
               $hhkmcstockkgstmt->execute();
               $hhkmcstockkgdatas = $hhkmcstockkgstmt->fetchall();
-                  // print_r($hhkmcstockkgdatas);
-                  // echo "<br>";
-                  // foreach ($hhkmcstockkgdatas as $hhkmcstockkgdata) {
-                  //   $commondity_id = $hhkmcstockkgdata['commondity_id'];
-                  //   $hhksizestmt = $pdo->prepare("SELECT size FROM hhkmcstock WHERE commondity_id='$commondity_id'");
-                  //   $hhksizestmt->execute();
-                  //   $hhksizedatas = $hhksizestmt->fetchall();
-                  //   print "<pre>";
-                  //   print_r($hhksizedatas);
-                  //
-                  // }
-                  // $size = $hhkmcstockkgdata['size'];
-            //   foreach ($hhkmcstockkgdatas as $hhkmcstockkgdata) {
-            //     $commondity_id = $hhkmcstockkgdata['commondity_id'];
-            //     $hhkmcstockstmt = $pdo->prepare("SELECT DISTINCT kg FROM hhkmcstock WHERE size='$size'");
-            //     $hhkmcstockstmt->execute();
-            //     $hhkmcstockdatas = $hhkmcstockstmt->fetchall();
-            //     foreach ($hhkmcstockdatas as $hhkmcstockdata) {
-            //       echo $kg = $hhkmcstockdata['kg'];
-            //       $kgstockstmt = $pdo->prepare("SELECT MAX(balance_mc) AS balance_mc FROM hhkmcstock WHERE kg='$kg' AND size='$size' AND commondity_id='$commondity_id'  ORDER BY id DESC");
-            //       $kgstockstmt->execute();
-            //       $kgstockdatas = $kgstockstmt->fetchall();
-            //       foreach ($kgstockdatas as $kgstockdata) {
-            //         echo "<br>balamce_mc";
-            //         print_r($kgstockdata['balance_mc']);
-            //         echo "<br>";
-            //       }
-            //     }
-            //     exit();
-            //   }
              ?>
             <table class="table table-hover table-bordered table-striped hide" id="<?php echo $countrydata['country']; ?>table">
               <tr class="text-center">
@@ -163,7 +133,12 @@ $query = new Query();
                   $hhkcommonditystmt->execute();
                   $hhkcommonditydatas = $hhkcommonditystmt->fetchall();
 
+                  $hhkkgstmt = $pdo->prepare("SELECT DISTINCT kg FROM hhkmcstock WHERE size='$size' AND commondity_id='$item_id'");
+                  $hhkkgstmt->execute();
+                  $hhkkgdatas = $hhkkgstmt->fetchall();
 
+                  foreach ($hhkkgdatas as $hhkkgdata) {
+                    $kg = $hhkkgdata['kg']
                 // $country = $hhkmcstockdata['country'];
                 // $size = $hhkmcstockdata['size'];
                 // $kg = $hhkmcstockdata['kg'];
@@ -174,9 +149,9 @@ $query = new Query();
               <tr <?php //if($hhkmcstockdata['commondity_id'] ){} ?>>
                 <td><?php //echo $hhkmcstockdata['id']; ?></td>
                 <td><?php echo $commonditydata['item_name']; ?></td>
-                <td><?php //echo $hhkmcstockdata['country']; ?></td>
+                <td><?php echo $country; ?></td>
                 <td><?php echo $size; ?></td>
-                <td><?php //echo $hhkmcstockdata['kg']; ?></td>
+                <td><?php echo $kg; ?></td>
                 <td><?php //echo $hhkmcstockdata['balance_mc']; ?></td>
                 <td><?php //if(!empty($gfcmcstockdata['balance_mc'])){ echo $gfcmcstockdata['balance_mc'];};  ?></td>
                 <td><?php // if(!empty($gfcmcstockdata['balance_mc'])){echo $hhkmcstockdata['balance_mc'] + $gfcmcstockdata['balance_mc'];}else{echo $hhkmcstockdata['balance_mc'];};  ?></td>
@@ -184,6 +159,7 @@ $query = new Query();
               <?php
               }
             }
+          }
                ?>
             </table>
             <?php
