@@ -41,10 +41,11 @@ $query = new Query();
       <div class="col-10">
         <div class="card mt-1">
           <form action="" method="post">
-            <div class="card-header bg-warning text-light pt-3"  style="padding:-10px;">
+            <div class="card-header bg-warning text-light pt-2 pb-3">
               <b class="h5">Link Mark Limited (F-7)</b>
               <button type="submit" name="searchbtn" class="btn btn-secondary btn-sm float-end">View</button>
-              <select name="commondity_id" class="form-control inpv2 w-25 d-inline float-end me-2" style="height:30px !important;">
+              <select name="commondity_id" class="form-control inpv2 w-25 d-inline float-end me-2" style="height:34px !important;">
+                <option value="">Select Commondity</option>
                 <?php
                 $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
                 $commonstmt->execute();
@@ -75,11 +76,22 @@ $query = new Query();
                 <th>Pcs per F-7</th>
               </tr>
               <?php
-              if (isset($_POST['searchbtn'])) {
+              if (isset($_POST['searchbtn']) && !empty($_POST['commondity_id'])) {
                 $commondity_id = $_POST['commondity_id'];
-                $stmt = $pdo->prepare("SELECT * FROM form7stock WHERE item_id='$commondity_id'");
-                $stmt->execute();
-                $datas = $stmt->fetchall();
+                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT country) FROM form7stock WHERE item_id='$commondity_id'");
+                $commonditycountstmt->execute();
+                $commonditycountdatas = $commonditycountstmt->fetchColumn();
+                for ($i=0; $i < $commonditycountdatas; $i++) {
+
+                  $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form7stock WHERE item_id='$commondity_id'");
+                  $countrystmt->execute();
+                  $countrydata = $countrystmt->fetchall();
+                  $country = $countrydata[$i]['country'];
+
+                  $stmt = $pdo->prepare("SELECT * FROM form7stock WHERE country='$country' AND item_id='$commondity_id'");
+                  $stmt->execute();
+                  $datas = $stmt->fetchall();
+
                 foreach ($datas as $form7data) {
                   $item_id = $form7data['item_id'];
                   $commonditydata = $query->select('item', $item_id, 'item_id');
@@ -140,18 +152,17 @@ $query = new Query();
                 $totalvissstmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM form7stock WHERE item_id='$item_id' AND country='$country'");
                 $totalvissstmt->execute();
                 $totalvissdata = $totalvissstmt->fetch(PDO::FETCH_ASSOC);
-                print_r($totalvissdata);
-                $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$item_id'");
+                $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$item_id' AND country='$country'");
                 $totalkgstmt->execute();
                 $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
-                $totalpcsstmt = $pdo->prepare("SELECT SUM(pcspervr) AS total_pcs FROM form7stock WHERE item_id='$item_id'");
+                $totalpcsstmt = $pdo->prepare("SELECT SUM(pcspervr) AS total_pcs FROM form7stock WHERE item_id='$item_id' AND country='$country'");
                 $totalpcsstmt->execute();
                 $totalpcsdata = $totalpcsstmt->fetch(PDO::FETCH_ASSOC);
-                $totalpcsf7stmt = $pdo->prepare("SELECT SUM(pcsperf7) AS total_pcsf7 FROM form7stock WHERE item_id='$item_id'");
+                $totalpcsf7stmt = $pdo->prepare("SELECT SUM(pcsperf7) AS total_pcsf7 FROM form7stock WHERE item_id='$item_id' AND country='$country'");
                 $totalpcsf7stmt->execute();
                 $totalpcsf7data = $totalpcsf7stmt->fetch(PDO::FETCH_ASSOC);
                 ?>
-                <tr>
+                <tr style="font-weight: bold !important;">
                   <td></td>
                   <td>Total</td>
                   <td></td>
@@ -163,22 +174,18 @@ $query = new Query();
                   <td><?php if(!empty($totalpcsf7data['total_pcsf7'])){ echo $totalpcsf7data['total_pcsf7']; }; ?></td>
                 </tr>
                 <?php
+              }
               }else{
-                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT country) FROM form7stock");
+                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM form7stock");
                 $commonditycountstmt->execute();
                 $commonditycountdatas = $commonditycountstmt->fetchColumn();
                 for ($i=0; $i < $commonditycountdatas; $i++) {
-                  $commonditystmt = $pdo->prepare("SELECT DISTINCT country FROM form7stock");
+                  $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
                   $commonditystmt->execute();
                   $commonditydata = $commonditystmt->fetchall();
-                  $commondity_id = $commonditydata[$i]['country'];
+                  $commondity_id = $commonditydata[$i]['item_id'];
 
-                  $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form7stock");
-                  $countrystmt->execute();
-                  $countrydata = $countrystmt->fetchall();
-                  $country = $countrydata[$i]['country'];
-
-                  $stmt = $pdo->prepare("SELECT * FROM form7stock WHERE country='$country'");
+                  $stmt = $pdo->prepare("SELECT * FROM form7stock WHERE item_id='$commondity_id'");
                   $stmt->execute();
                   $datas = $stmt->fetchall();
                   foreach ($datas as $form7data) {
@@ -234,34 +241,7 @@ $query = new Query();
                       </div>
                     </div>
                     <?php
-                    $date = $form7data['date'];
-                    $item_id = $form7data['item_id'];
                   }
-                  $totalvissstmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM form7stock WHERE date='$date' AND item_id='$item_id'");
-                  $totalvissstmt->execute();
-                  $totalvissdata = $totalvissstmt->fetch(PDO::FETCH_ASSOC);
-                  $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE date='$date' AND item_id='$item_id'");
-                  $totalkgstmt->execute();
-                  $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
-                  $totalpcsstmt = $pdo->prepare("SELECT SUM(pcspervr) AS total_pcs FROM form7stock WHERE date='$date' AND item_id='$item_id'");
-                  $totalpcsstmt->execute();
-                  $totalpcsdata = $totalpcsstmt->fetch(PDO::FETCH_ASSOC);
-                  $totalpcsf7stmt = $pdo->prepare("SELECT SUM(pcsperf7) AS total_pcsf7 FROM form7stock WHERE date='$date' AND item_id='$item_id'");
-                  $totalpcsf7stmt->execute();
-                  $totalpcsf7data = $totalpcsf7stmt->fetch(PDO::FETCH_ASSOC);
-                  ?>
-                  <tr>
-                    <td></td>
-                    <td>Total</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td><?php echo round($totalvissdata['total_viss'], 3); ?></td>
-                    <td><?php echo round($totalkgdata['total_kg'], 2); ?></td>
-                    <td><?php if(!empty($totalpcsdata['total_pcs'])){ echo $totalpcsdata['total_pcs']; }; ?></td>
-                    <td><?php if(!empty($totalpcsf7data['total_pcsf7'])){ echo $totalpcsf7data['total_pcsf7']; }; ?></td>
-                  </tr>
-                  <?php
                 }
               }
                 ?>

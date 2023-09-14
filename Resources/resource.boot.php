@@ -17,6 +17,7 @@ class Bootstrap
   function javascriptindex()
   {
     echo '
+      <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
       <script src="Resources/bootstrap-5.3.1-dist/js/bootstrap.min.js" charset="utf-8"></script>
       <!-- jQuery -->
       <script src="Resources/plugins/jquery/jquery.min.js"></script>
@@ -97,6 +98,7 @@ class Bootstrap
           width: 84%;
         }
       </style>
+      <script src="../../Resources/sweetalert.js" charset="utf-8"></script>
       <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.css">
     ';

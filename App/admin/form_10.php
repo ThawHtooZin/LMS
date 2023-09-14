@@ -119,15 +119,15 @@ $query = new Query();
               </tr>
               <?php
               }
+
+              $country = $form10data['country'];
+              $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country'");
+              $totalf7kgstmt->execute();
+              $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
+
               $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id'");
               $totalkgstmt->execute();
               $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
-
-              $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id'");
-              $totalf7kgstmt->execute();
-              $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
-              $totalkgdata['total_kg'];
-              $totalf7kgdata['total_kg'];
               $result1 = round($totalkgdata['total_kg'], 2) - round($totalf7kgdata['total_kg'], 2);
               $result2 = $result1 / round($totalf7kgdata['total_kg'], 2);
               $percentage = $result2 * 100;

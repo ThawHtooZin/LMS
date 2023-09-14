@@ -32,14 +32,14 @@ $query = new Query();
         <div class="card mt-1">
           <div class="card-header bg-info">
             <form class="" action="" method="post">
-            <h5 style="font-weight:bold;" class="text-light d-inline">HHK MC STOCK INFO</h5>
+            <h5 style="font-weight:bold;" class="text-light d-inline">GFC MC STOCK INFO</h5>
             <!-- <button type="button" class="btn btn-secondary float-end" data-bs-toggle="modal" data-bs-target="#add">Add Mc Data</button> -->
-            <a href="hhkmcstock.php" type="button" class="btn btn-danger float-end ms-2">Back</a>
+            <a href="gfcmcstock.php" type="button" class="btn btn-danger float-end ms-2">Back</a>
             <?php
             $size = $_GET['sizeinfo'];
             $commondity_id = $_GET['commondity'];
             $country = $_GET['country'];
-            $kgstmt = $pdo->prepare("SELECT DISTINCT kg FROM hhkmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country'");
+            $kgstmt = $pdo->prepare("SELECT DISTINCT kg FROM gfcmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country'");
             $kgstmt->execute();
             $kgdatas = $kgstmt->fetchall();
             ?>
@@ -73,11 +73,11 @@ $query = new Query();
 
               if (isset($_POST['view']) && !empty($_POST['kgsearch'])) {
                 $kgsearch = $_POST['kgsearch'];
-                $sizeinfostmt2 = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country' AND kg='$kgsearch'");
+                $sizeinfostmt2 = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country' AND kg='$kgsearch'");
                 $sizeinfostmt2->execute();
                 $sizeinfodatas = $sizeinfostmt2->fetchall();
               }else{
-                $sizeinfostmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country'");
+                $sizeinfostmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country'");
                 $sizeinfostmt->execute();
                 $sizeinfodatas = $sizeinfostmt->fetchall();
               }
@@ -86,7 +86,7 @@ $query = new Query();
                 $item_id = $sizeinfodata['commondity_id'];
                 $commonditydata = $query->select('item', $item_id, 'item_id');
                ?>
-              <tr style="<?php if(str_contains($sizeinfodata['particular'], 'To') || str_contains($sizeinfodata['particular'], 'to')){echo 'background-color:rgba(255, 0, 0, 0.3) !important;';} ?>">
+               <tr style="<?php if(str_contains($sizeinfodata['particular'], 'Ship')){echo 'background-color:rgba(255, 0, 0, 0.3) !important;';} ?>">
                 <td><?php echo date('d-m-Y', strtotime($sizeinfodata['date'])); ?></td>
                 <td><?php echo $sizeinfodata['particular'];?></td>
                 <td><?php echo $commonditydata['item_name']; ?></td>

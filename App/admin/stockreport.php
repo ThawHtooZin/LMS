@@ -1,0 +1,194 @@
+<?php
+session_start();
+include '../../Auth/authrize.ctr.php';
+include '../../Resources/resource.boot.php';
+include '../../Controllers/query.ctr.php';
+
+$auth = new auth();
+$auth->checkadmin();
+$bootstrap = new Bootstrap();
+$query = new Query();
+?>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Admin | Dashboard</title>
+  </head>
+  <?php
+  $bootstrap->css();
+  ?>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
+  <body>
+    <?php
+    if(isset($_POST['addbtn'])){
+      $date = $_POST['date'];
+      $particular = $_POST['particular'];
+      $commondity_id = $_POST['commondity_id'];
+      $size = $_POST['size'];
+      $kg = $_POST['kg'];
+      $mc = $_POST['mc'];
+      $country = $_POST['country'];
+
+      $query->addmcstock($date, $particular, $country, $commondity_id, $size, $kg, $mc);
+    }
+
+    if(isset($_POST['transferbtn'])){
+      $transferdate = $_POST['transferdate'];
+      $transferparticular = $_POST['transferparticular'];
+      $transfercommondity_id = $_POST['transfercommondity_id'];
+      $transfersize = $_POST['transfersize'];
+      $transferkg = $_POST['transferkg'];
+      $transfermc = $_POST['transfermc'];
+      $transfercountry = $_POST['transfercountry'];
+
+      $transfercheckstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE size='$transfersize' AND country='$transfercountry' AND commondity_id='$transfercommondity_id' ORDER BY id DESC");
+      $transfercheckstmt->execute();
+      $transfercheck = $transfercheckstmt->fetch(PDO::FETCH_ASSOC);
+
+      if($transfercheck['balance_mc'] >= $transfermc){
+        echo $query->transfermcstock($transferdate, $transferparticular, $transfercountry, $transfercommondity_id, $transfersize, $transferkg, $transfermc);
+      }else{
+        echo '<script>swal("Sorry!", "Not Enough Mc!", "warning");</script>';
+      }
+    }
+     ?>
+    <div class="row">
+      <div class="col-2">
+        <?php
+        include 'sidebar.php';
+        ?>
+      </div>
+      <div class="col-10">
+        <div class="card">
+          <div class="card-header bg-primary">
+            <h5 style="font-weight:bold;" class="text-light d-inline">Stock Reports</h5>
+          </div>
+          <div class="card-body">
+            <?php
+             ?>
+            <form action="" method="post" class="text-center">
+              <?php
+              $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form7stock WHERE country IS NOT NULL");
+              $countrystmt->execute();
+              $countrydatas = $countrystmt->fetchall();
+              foreach ($countrydatas as $countrydata) {
+                $btnname = $countrydata['country'] . "btn";
+                if(isset($_POST[$btnname])){
+                  $_SESSION['tabs'] = $countrydata['country'];
+                }
+                ?>
+                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark rounded <?php echo $countrydata['country']; ?>link" style="text-decoration:none; border:none;" name="<?php echo $btnname; ?>"><?php echo $countrydata['country'] ." Stock"; ?></button>
+                <?php
+              }
+              ?>
+            </form>
+            <hr>
+            <?php
+            foreach ($countrydatas as $countrydata) {
+
+              $country = $countrydata['country'];
+
+            //   $hhkmcstockkgstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country='$country' GROUP BY size");
+            //   $hhkmcstockkgstmt->execute();
+            //   $hhkmcstockkgdatas = $hhkmcstockkgstmt->fetchall();
+            //   foreach ($hhkmcstockkgdatas as $hhkmcstockkgdata) {
+            //     print_r($hhkmcstockkgdata['size']);
+            //     $size = $hhkmcstockkgdata['size'];
+            //     $commondity_id = $hhkmcstockkgdata['commondity_id'];
+            //     $hhkmcstockstmt = $pdo->prepare("SELECT DISTINCT kg FROM hhkmcstock WHERE size='$size'");
+            //     $hhkmcstockstmt->execute();
+            //     $hhkmcstockdatas = $hhkmcstockstmt->fetchall();
+            //     foreach ($hhkmcstockdatas as $hhkmcstockdata) {
+            //       echo $kg = $hhkmcstockdata['kg'];
+            //       $kgstockstmt = $pdo->prepare("SELECT MAX(balance_mc) AS balance_mc FROM hhkmcstock WHERE kg='$kg' AND size='$size' AND commondity_id='$commondity_id'  ORDER BY id DESC");
+            //       $kgstockstmt->execute();
+            //       $kgstockdatas = $kgstockstmt->fetchall();
+            //       foreach ($kgstockdatas as $kgstockdata) {
+            //         echo "<br>balamce_mc";
+            //         print_r($kgstockdata['balance_mc']);
+            //         echo "<br>";
+            //       }
+            //     }
+            //     exit();
+            //   }
+             ?>
+            <table class="table table-hover table-bordered table-striped hide" id="<?php echo $countrydata['country']; ?>table">
+              <tr class="text-center">
+                <th rowspan="2" style="padding-top:30px;">No</th>
+                <th rowspan="2" style="padding-top:30px;">Fish Name</th>
+                <th rowspan="2" style="padding-top:30px;">Country</th>
+                <th rowspan="2" style="padding-top:30px;">Size</th>
+                <th rowspan="2" style="padding-top:30px;">Kg</th>
+                <th>HHK</th>
+                <th>GFC</th>
+                <th>Total</th>
+              </tr>
+              <tr class="text-center">
+                <th>Mc</th>
+                <th>Mc</th>
+                <th>Mc</th>
+              </tr>
+              <?php
+                $hhkmcstockkgstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country='$country'");
+                $hhkmcstockkgstmt->execute();
+                $hhkmcstockkgdatas = $hhkmcstockkgstmt->fetchall();
+
+              foreach ($hhkmcstockkgdatas as $hhkmcstockdata) {
+                $item_id = $hhkmcstockdata['commondity_id'];
+                $commonditydata = $query->select('item', $item_id, 'item_id');
+                $country = $hhkmcstockdata['country'];
+                $size = $hhkmcstockdata['size'];
+                $kg = $hhkmcstockdata['kg'];
+                $gfcmcstockstmt = $pdo->prepare("SELECT balance_mc FROM gfcmcstock WHERE country='$country' AND commondity_id='$item_id' AND size='$size' AND kg='$kg' ORDER BY id DESC");
+                $gfcmcstockstmt->execute();
+                $gfcmcstockdata = $gfcmcstockstmt->fetch(PDO::FETCH_ASSOC);
+               ?>
+              <tr <?php if($hhkmcstockdata['commondity_id'] ){} ?>>
+                <td><?php echo $hhkmcstockdata['id']; ?></td>
+                <td><?php echo $commonditydata['item_name']; ?></td>
+                <td><?php echo $hhkmcstockdata['country']; ?></td>
+                <td><?php echo $hhkmcstockdata['size']; ?></td>
+                <td><?php echo $hhkmcstockdata['kg']; ?></td>
+                <td><?php echo $hhkmcstockdata['balance_mc']; ?></td>
+                <td><?php if(!empty($gfcmcstockdata['balance_mc'])){ echo $gfcmcstockdata['balance_mc'];};  ?></td>
+                <td><?php  if(!empty($gfcmcstockdata['balance_mc'])){echo $hhkmcstockdata['balance_mc'] + $gfcmcstockdata['balance_mc'];}else{echo $hhkmcstockdata['balance_mc'];};  ?></td>
+              </tr>
+              <?php
+              }
+               ?>
+            </table>
+            <?php
+            }
+             ?>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+    <?php
+      foreach ($countrydatas as $countrydata) {
+        if($_SESSION['tabs'] == $countrydata['country']){
+          echo "show" . $countrydata['country'] . "();";
+          if($_SESSION['tabs'] == $countrydata['country']){
+          echo ' function show' . $countrydata['country'] .'(){';
+            foreach ($countrydatas as $countrydata) {
+              echo 'document.querySelector("#'.$countrydata['country'].'table").classList.add(\'hide\');';
+              echo 'document.querySelector(".'.$countrydata['country'].'link").classList.remove(\'color\');';
+            }
+            echo 'document.querySelector("#'.$_SESSION['tabs'].'table").classList.remove(\'hide\');';
+            echo 'document.querySelector(".'.$_SESSION['tabs'].'link").classList.add(\'color\');';
+            echo '}';
+          }
+        }
+      }
+     ?>
+    </script>
+    <?php
+    $bootstrap->javascript();
+    ?>
+  </body>
+</html>

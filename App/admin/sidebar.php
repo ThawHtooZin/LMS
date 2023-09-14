@@ -167,6 +167,18 @@
                 - HKK Mc Stock
               </a>
             </li>
+            <li class="nav-item  rounded">
+              <a href="gfcmcstock.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - GFC Mc Stock
+              </a>
+            </li>
+            <li class="nav-item  rounded">
+              <a href="stockreport.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - Stock Report
+              </a>
+            </li>
           </ul>
         </div>
       </li>

@@ -1800,18 +1800,57 @@ Class Query{
     }
     $addmcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc) VALUES('$date', '$country', '$particular', '$commondity_id', '$size', '$kg', '$mc', '$balance_mc')");
     $addmcstmt->execute();
+
+    if(!empty($addmcstmt)){
+      echo '<script>swal("Success!", "Mc Added Successfully!", "success");</script>';
+    }
   }
 
   function transfermcstock($transferdate, $transferparticular, $transfercountry, $transfercommondity_id, $transfersize, $transferkg, $transfermc){
     global $pdo;
 
-    $mcstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE kg='$transferkg' AND size='$transfersize' AND commondity_id='$transfercommondity_id' AND country='$transfercountry' ORDER BY id DESC");
-    $mcstmt->execute();
-    $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
+    $hhkmcstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE kg='$transferkg' AND size='$transfersize' AND commondity_id='$transfercommondity_id' AND country='$transfercountry' ORDER BY id DESC");
+    $hhkmcstmt->execute();
+    $hhkmcdata = $hhkmcstmt->fetch(PDO::FETCH_ASSOC);
 
-    $balance_mc = $mcdata['balance_mc'] - $transfermc;
+    $balance_mc = $hhkmcdata['balance_mc'] - $transfermc;
     $transfermcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transfersize', '$transferkg', '$transfermc', '$balance_mc')");
     $transfermcstmt->execute();
+
+    $gfcmcstmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE kg='$transferkg' AND size='$transfersize' AND commondity_id='$transfercommondity_id' AND country='$transfercountry' ORDER BY id DESC");
+    $gfcmcstmt->execute();
+    $gfcmcdata = $gfcmcstmt->fetch(PDO::FETCH_ASSOC);
+
+    print_r($gfcmcdata);
+    if(!empty($gfcmcdata)){
+      $balance_mc_for_gfc = $gfcmcdata['balance_mc'] + $transfermc;
+      $transfertogfcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transfersize', '$transferkg', '$transfermc', '$balance_mc_for_gfc')");
+      $transfertogfcstmt->execute();
+    }else{
+      $balance_mc_for_gfc = $transfermc;
+      $transfertogfcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transfersize', '$transferkg', '$transfermc', '$balance_mc_for_gfc')");
+      $transfertogfcstmt->execute();
+    }
+
+    if(!empty($transfermcstmt)){
+      echo '<script>swal("Success!", "Transfered Successfully!", "success");</script>';
+    }
+  }
+
+  function exportmcstock($exportdate, $exportparticular, $exportcountry, $exportcommondity_id, $exportsize, $exportkg, $exportmc){
+    global $pdo;
+
+    $gfcmcstmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE kg='$exportkg' AND size='$exportsize' AND commondity_id='$exportcommondity_id' AND country='$exportcountry' ORDER BY id DESC");
+    $gfcmcstmt->execute();
+    $gfcmcdata = $gfcmcstmt->fetch(PDO::FETCH_ASSOC);
+
+    $balance_mc = $gfcmcdata['balance_mc'] - $exportmc;
+    $exportmcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc) VALUES('$exportdate', '$exportcountry', '$exportparticular', '$exportcommondity_id', '$exportsize', '$exportkg', '$exportmc', '$balance_mc')");
+    $exportmcstmt->execute();
+
+    if(!empty($exportmcstmt)){
+      echo '<script>swal("Success!", "Exported Successfully!", "success");</script>';
+    }
   }
   // MORE SELECTS
 
