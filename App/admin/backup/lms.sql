@@ -347,6 +347,34 @@ INSERT INTO gfcfishlabour VALUES("92","2023-09-02","import","300","3","900","567
 
 
 
+DROP TABLE gfcmcstock;
+
+CREATE TABLE `gfcmcstock` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `country` varchar(19) NOT NULL,
+  `particular` varchar(255) NOT NULL,
+  `date` date NOT NULL,
+  `commondity_id` varchar(11) NOT NULL,
+  `size` varchar(11) NOT NULL,
+  `kg` varchar(11) NOT NULL,
+  `mc` int(11) NOT NULL,
+  `balance_mc` bigint(17) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO gfcmcstock VALUES("4","NY","HHK To GFC","2023-09-14","UT216","2up","21","4","4");
+INSERT INTO gfcmcstock VALUES("5","Can","HHK To GFC","2023-09-13","UT216","4up","21","5","5");
+INSERT INTO gfcmcstock VALUES("13","LM","HHK To GFC","2023-09-14","SB263","j","49","2","2");
+INSERT INTO gfcmcstock VALUES("14","LM","HHK To GFC","2023-09-16","SB263","j","49","1","3");
+INSERT INTO gfcmcstock VALUES("15","LM","HHK To GFC","2023-09-18","SB263","j","49","7","10");
+INSERT INTO gfcmcstock VALUES("18","LM","Ship/","2023-09-13","SB263","j","49","5","5");
+INSERT INTO gfcmcstock VALUES("19","LM","Ship/","2023-09-13","SB263","j","49","3","2");
+INSERT INTO gfcmcstock VALUES("20","NY","HHK To GFC","2023-09-15","HG184","4up","22","12","12");
+INSERT INTO gfcmcstock VALUES("21","LM","Ship/","2023-09-20","SB263","j","49","1","1");
+INSERT INTO gfcmcstock VALUES("22","NY","HHK To GFC","2023-09-14","HL123","2up","21","1","1");
+
+
+
 DROP TABLE gfctotal;
 
 CREATE TABLE `gfctotal` (
@@ -383,7 +411,7 @@ CREATE TABLE `hhkmcstock` (
   `mc` int(11) NOT NULL,
   `balance_mc` bigint(17) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=90 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=123 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO hhkmcstock VALUES("71","NY","From From-10","2023-09-12","UT216","2up","21","9","9");
 INSERT INTO hhkmcstock VALUES("72","NY","From From-10","2023-09-12","UT216","2up","22","7","7");
@@ -400,6 +428,16 @@ INSERT INTO hhkmcstock VALUES("86","Can","From From-10","2023-09-12","UT216","4u
 INSERT INTO hhkmcstock VALUES("87","NY","HHK to GFC","2023-09-13","OJ247","5up","21","5","3");
 INSERT INTO hhkmcstock VALUES("88","NY","HHK To GFC","2023-09-13","OJ247","5up","23","6","6");
 INSERT INTO hhkmcstock VALUES("89","NY","HHK To GFC","2023-09-13","OJ247","5up","23","8","-2");
+INSERT INTO hhkmcstock VALUES("93","NY","HHK To GFC","2023-09-14","UT216","2up","21","4","0");
+INSERT INTO hhkmcstock VALUES("94","Can","HHK To GFC","2023-09-13","UT216","4up","21","5","5");
+INSERT INTO hhkmcstock VALUES("114","LM","From From-10","2023-09-13","SB263","j","49","3","3");
+INSERT INTO hhkmcstock VALUES("115","LM","HHK to GFC","2023-09-14","SB263","j","49","2","1");
+INSERT INTO hhkmcstock VALUES("117","LM","HHK To GFC","2023-09-16","SB263","j","49","1","0");
+INSERT INTO hhkmcstock VALUES("118","LM","From From-10","2023-09-18","SB263","j","49","7","7");
+INSERT INTO hhkmcstock VALUES("119","LM","HHK To GFC","2023-09-18","SB263","j","49","7","0");
+INSERT INTO hhkmcstock VALUES("120","NY","From From-10","2023-09-14","UT216","2up","21","200","200");
+INSERT INTO hhkmcstock VALUES("121","NY","HHK To GFC","2023-09-15","HG184","4up","22","12","0");
+INSERT INTO hhkmcstock VALUES("122","NY","HHK To GFC","2023-09-14","HL123","2up","21","1","10");
 
 
 
