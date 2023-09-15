@@ -35,6 +35,7 @@ $query = new Query();
       $date = $_POST['date'];
       $item_id = $_POST['item_id'];
       $country = $_POST['country'];
+      $type = $_POST['type'];
       $size = $_POST['size'];
       $mc = $_POST['mc'];
       $kg = $_POST['kg'];
@@ -44,7 +45,7 @@ $query = new Query();
       $looseoutkg = $_POST['loose_out_kg'];
       $looseoutpcs = $_POST['loose_out_pcs'];
 
-      $query->addform10($date, $item_id, $country, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs);
+      $query->addform10($date, $item_id, $country, $type, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs);
     }
 
      ?>
@@ -56,16 +57,25 @@ $query = new Query();
       </div>
       <div class="col-10">
         <div class="card mt-1">
-          <div class="card-header bg-warning text-secondary"  style="padding:-10px;">
-            <b>Link Mark Limited (F-10)</b>
-            <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#addmodal">Add Form-10 Data</button>
-          </div>
+            <div class="card-header bg-warning text-secondary"  style="padding:-10px;">
+              <form action="" method="post">
+              <b>Link Mark Limited (F-10)</b>
+              <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#addmodal">Add Form-10 Data</button>
+              <button type="submit" name="searchbtn2" class="btn btn-secondary float-end me-2">View</button>
+              <select name="type" class="form-control inpv2 w-25 d-inline float-end me-2">
+                <option value="">Select Type</option>
+                <option value="frozen">Frozen</option>
+                <option value="tcl">TCL</option>
+              </select>
+            </form>
+            </div>
           <div class="card-body">
             <table class="table table-hover table-striped table-bordered">
               <tr class="text-center">
                 <th rowspan="2" style="padding-top:25px;">Date</th>
                 <th rowspan="2" style="padding-top:25px;">Commondity</th>
                 <th rowspan="2" style="padding-top:25px;">Country</th>
+                <th rowspan="2" style="padding-top:25px;">Type</th>
                 <th rowspan="2" style="padding-top:25px;">Size</th>
                 <th colspan="4">Production</th>
                 <th colspan="2">Loose In</th>
@@ -93,10 +103,16 @@ $query = new Query();
                 $commonditystmt->execute();
                 $commonditydata = $commonditystmt->fetchall();
                 $commondity_id = $commonditydata[$i]['item_id'];
-
-              $stmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id'");
-              $stmt->execute();
-              $datas = $stmt->fetchall();
+              if(isset($_POST['searchbtn2']) && !empty($_POST['type'])){
+                $type = $_POST['type'];
+                $stmt = $pdo->prepare("SELECT * FROM form10stock WHERE type='$type'");
+                $stmt->execute();
+                $datas = $stmt->fetchall();
+              }else{
+                $stmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id'");
+                $stmt->execute();
+                $datas = $stmt->fetchall();
+              }
               foreach ($datas as $form10data) {
                 $item_id = $form10data['item_id'];
                 $commonditydata = $query->select('item', $item_id, 'item_id');
@@ -105,6 +121,7 @@ $query = new Query();
                 <td><?php echo $form10data['date']; ?></td>
                 <td><?php echo $commonditydata['item_name']; ?></td>
                 <td><?php echo $form10data['country']; ?></td>
+                <td><?php echo $form10data['type']; ?></td>
                 <td><?php echo $form10data['size']; ?></td>
                 <td><?php echo $form10data['pcsform10']; ?></td>
                 <td><?php echo $form10data['mc']; ?></td>
@@ -118,35 +135,64 @@ $query = new Query();
                 <td><?php echo $form10data['percentage']; ?></td>
               </tr>
               <?php
-              }
-
               $country = $form10data['country'];
-              $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country'");
-              $totalf7kgstmt->execute();
-              $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
+              }
+              if(isset($_POST['searchbtn2']) && !empty($_POST['type'])){
+                $type = $_POST['type'];
+                $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE type='$type' AND country='$country'");
+                $totalf7kgstmt->execute();
+                $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
 
-              $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id'");
-              $totalkgstmt->execute();
-              $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
-              $result1 = round($totalkgdata['total_kg'], 2) - round($totalf7kgdata['total_kg'], 2);
-              $result2 = $result1 / round($totalf7kgdata['total_kg'], 2);
-              $percentage = $result2 * 100;
+                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE type='$type'");
+                $totalkgstmt->execute();
+                $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+                $result1 = round($totalkgdata['total_kg'], 2) - round($totalf7kgdata['total_kg'], 2);
+                $result2 = $result1 / round($totalf7kgdata['total_kg'], 2);
+                $percentage = $result2 * 100;
 
-              $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE item_id='$commondity_id'");
-              $form10pcsstmt->execute();
-              $form10pcsdata = $form10pcsstmt->fetch(PDO::FETCH_ASSOC);
+                $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE type='$type'");
+                $form10pcsstmt->execute();
+                $form10pcsdata = $form10pcsstmt->fetch(PDO::FETCH_ASSOC);
 
-              $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id'");
-              $totalkgstmt->execute();
-              $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE type='$type'");
+                $totalkgstmt->execute();
+                $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
 
-              $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM form10stock WHERE item_id='$commondity_id'");
-              $mcstmt->execute();
-              $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
+                $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM form10stock WHERE type='$type'");
+                $mcstmt->execute();
+                $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
 
-              $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stock WHERE item_id='$commondity_id'");
-              $kgstmt->execute();
-              $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
+                $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stock WHERE type='$type'");
+                $kgstmt->execute();
+                $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
+              }else{
+                $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country'");
+                $totalf7kgstmt->execute();
+                $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id'");
+                $totalkgstmt->execute();
+                $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+                $result1 = round($totalkgdata['total_kg'], 2) - round($totalf7kgdata['total_kg'], 2);
+                $result2 = $result1 / round($totalf7kgdata['total_kg'], 2);
+                $percentage = $result2 * 100;
+
+                $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE item_id='$commondity_id'");
+                $form10pcsstmt->execute();
+                $form10pcsdata = $form10pcsstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id'");
+                $totalkgstmt->execute();
+                $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+
+                $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM form10stock WHERE item_id='$commondity_id'");
+                $mcstmt->execute();
+                $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
+
+                $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stock WHERE item_id='$commondity_id'");
+                $kgstmt->execute();
+                $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
+              }
               ?>
               <tr>
                 <td></td>
@@ -161,8 +207,9 @@ $query = new Query();
                 <td></td>
                 <td></td>
                 <td></td>
+                <td></td>
                 <td style="font-weight:bold;"><?php echo round($totalkgdata['total_kg'], 2); ?></td>
-                <td style="font-weight:bold; <?php if(str_contains(round($percentage, 2), '-')){echo 'color:red;';} ?>"><?php echo round($percentage, 2). "%"; ?></td>
+                <td style="font-weight:bold; <?php if(strpos(round($percentage, 2), '-') !== false){echo 'color:red;';} ?>"><?php echo round($percentage, 2). "%"; ?></td>
               </tr>
               <?php
               }
@@ -182,8 +229,20 @@ $query = new Query();
           <div class="modal-body">
             <form action="form_10.php" method="post">
             <div class="modal-body">
-              <label>Date</label>
-              <input type="date" name="date" class="form-control inpv2 mb-2">
+              <div class="row">
+                <div class="col">
+                  <label>Date</label>
+                  <input type="date" name="date" class="form-control inpv2 mb-2">
+                </div>
+                <div class="col">
+                  <label>Type</label>
+                  <select class="form-control inpv2 mb-2" name="type">
+                    <option>Select Type</option>
+                    <option value="frozen">frozen</option>
+                    <option value="tcl">tcl</option>
+                  </select>
+                </div>
+              </div>
               <div class="row">
                 <div class="col">
                   <label>Commondity</label>

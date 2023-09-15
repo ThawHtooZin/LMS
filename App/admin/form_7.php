@@ -60,6 +60,12 @@ $query = new Query();
                 }
                  ?>
               </select>
+              <button type="submit" name="searchbtn2" class="btn btn-secondary btn-sm float-end me-2">View</button>
+              <select name="type" class="form-control inpv2 w-25 d-inline float-end me-2" style="height:34px !important;">
+                <option value="">Select Type</option>
+                <option value="frozen">Frozen</option>
+                <option value="tcl">TCL</option>
+              </select>
             </div>
           </form>
           <div class="card-body">
@@ -68,6 +74,7 @@ $query = new Query();
                 <th>Date</th>
                 <th>Fish Name</th>
                 <th>Supplier Name</th>
+                <th>Type</th>
                 <th>Country</th>
                 <th>Size</th>
                 <th>Viss</th>
@@ -102,6 +109,7 @@ $query = new Query();
                     <td><?php echo date('d-m-Y', strtotime($form7data['date'])); ?></td>
                     <td><?php echo $commonditydata['item_name']; ?></td>
                     <td><?php echo $supplierdata['supplier_name']; ?></td>
+                    <td><?php echo $form7data['type']; ?></td>
                     <td><?php echo $form7data['country']; ?></td>
                     <td><?php echo $form7data['size']; ?></td>
                     <td><?php echo $form7data['viss']; ?></td>
@@ -168,6 +176,7 @@ $query = new Query();
                   <td></td>
                   <td></td>
                   <td></td>
+                  <td></td>
                   <td><?php echo round($totalvissdata['total_viss'], 3); ?></td>
                   <td><?php echo round($totalkgdata['total_kg'], 2); ?></td>
                   <td><?php if(!empty($totalpcsdata['total_pcs'])){ echo $totalpcsdata['total_pcs']; }; ?></td>
@@ -175,75 +184,177 @@ $query = new Query();
                 </tr>
                 <?php
               }
-              }else{
-                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM form7stock");
-                $commonditycountstmt->execute();
-                $commonditycountdatas = $commonditycountstmt->fetchColumn();
-                for ($i=0; $i < $commonditycountdatas; $i++) {
-                  $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
-                  $commonditystmt->execute();
-                  $commonditydata = $commonditystmt->fetchall();
-                  $commondity_id = $commonditydata[$i]['item_id'];
+            }elseif(isset($_POST['searchbtn2']) && !empty($_POST['type'])){
+              $type = $_POST['type'];
+              $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT country) FROM form7stock WHERE type='$type'");
+              $commonditycountstmt->execute();
+              $commonditycountdatas = $commonditycountstmt->fetchColumn();
+              for ($i=0; $i < $commonditycountdatas; $i++) {
 
-                  $stmt = $pdo->prepare("SELECT * FROM form7stock WHERE item_id='$commondity_id'");
-                  $stmt->execute();
-                  $datas = $stmt->fetchall();
-                  foreach ($datas as $form7data) {
-                    $item_id = $form7data['item_id'];
-                    $commonditydata = $query->select('item', $item_id, 'item_id');
-                    $supplier_id = $form7data['supplier_name'];
-                    $supplierdata = $query->select('supplier', $supplier_id, 'supplier_id');
-                    ?>
-                    <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>">
-                      <td><?php echo date('d-m-Y', strtotime($form7data['date'])); ?></td>
-                      <td><?php echo $commonditydata['item_name']; ?></td>
-                      <td><?php echo $supplierdata['supplier_name']; ?></td>
-                      <td><?php echo $form7data['country']; ?></td>
-                      <td><?php echo $form7data['size']; ?></td>
-                      <td><?php echo $form7data['viss']; ?></td>
-                      <td><?php echo round($form7data['kg'], 2); ?></td>
-                      <td><?php echo $form7data['pcspervr']; ?></td>
-                      <td><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
-                    </tr>
-                    <div class="modal fade" id="updatemodal<?php echo $form7data['id']; ?>">
-                      <div class="modal-dialog" role="document">
-                        <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
-                          <div class="modal-header bg-warning text-light">
-                            <h1 class="modal-title fs-5">Update Data</h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
+                $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form7stock WHERE type='$type'");
+                $countrystmt->execute();
+                $countrydata = $countrystmt->fetchall();
+                $country = $countrydata[$i]['country'];
+
+                $stmt = $pdo->prepare("SELECT * FROM form7stock WHERE country='$country' AND type='$type'");
+                $stmt->execute();
+                $datas = $stmt->fetchall();
+
+              foreach ($datas as $form7data) {
+                $item_id = $form7data['item_id'];
+                $commonditydata = $query->select('item', $item_id, 'item_id');
+                $supplier_id = $form7data['supplier_name'];
+                $supplierdata = $query->select('supplier', $supplier_id, 'supplier_id');
+                ?>
+                <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>">
+                  <td><?php echo date('d-m-Y', strtotime($form7data['date'])); ?></td>
+                  <td><?php echo $commonditydata['item_name']; ?></td>
+                  <td><?php echo $supplierdata['supplier_name']; ?></td>
+                  <td><?php echo $form7data['type']; ?></td>
+                  <td><?php echo $form7data['country']; ?></td>
+                  <td><?php echo $form7data['size']; ?></td>
+                  <td><?php echo $form7data['viss']; ?></td>
+                  <td><?php echo round($form7data['kg'], 2); ?></td>
+                  <td><?php echo $form7data['pcspervr']; ?></td>
+                  <td><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
+                </tr>
+                <div class="modal fade" id="updatemodal<?php echo $form7data['id']; ?>">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                      <div class="modal-header bg-warning text-light">
+                        <h1 class="modal-title fs-5">Update Data</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <form action="form_7.php" method="post">
+                          <input type="hidden" name="id" value="<?php echo $form7data['id']; ?>">
                           <div class="modal-body">
-                            <form action="form_7.php" method="post">
-                              <input type="hidden" name="id" value="<?php echo $form7data['id']; ?>">
-                              <div class="modal-body">
-                                <?php
-                                $idd = $form7data['id'];
-                                $updata = $query->select('form7stock', $idd, 'id');
-                                ?>
-                                <div class="row">
-                                  <div class="col">
-                                    <label>Country</label>
-                                    <input type="text" name="country" class="form-control inpv2 mt-1" value="<?php echo $updata['country']; ?>">
-                                  </div>
-                                  <div class="col">
-                                    <label>Pcs Per F7</label>
-                                    <input type="text" name="pcsperf7" class="form-control inpv2 mt-1" value="<?php echo $updata['pcsperf7']; ?>">
-                                  </div>
+                            <?php
+                            $idd = $form7data['id'];
+                            $updata = $query->select('form7stock', $idd, 'id');
+                            ?>
+                            <div class="row">
+                              <div class="col">
+                                <label>Country</label>
+                                <input type="text" name="country" class="form-control inpv2 mt-1" value="<?php echo $updata['country']; ?>">
+                              </div>
+                              <div class="col">
+                                <label>Pcs Per F7</label>
+                                <input type="text" name="pcsperf7" class="form-control inpv2 mt-1" value="<?php echo $updata['pcsperf7']; ?>">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="submit" class="btn btn-warning" name="update">Update</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <?php
+                $date = $form7data['date'];
+                $item_id = $form7data['item_id'];
+                $country = $form7data['country'];
+              }
+              $totalvissstmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM form7stock WHERE type='$type' AND country='$country'");
+              $totalvissstmt->execute();
+              $totalvissdata = $totalvissstmt->fetch(PDO::FETCH_ASSOC);
+              $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE type='$type' AND country='$country'");
+              $totalkgstmt->execute();
+              $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+              $totalpcsstmt = $pdo->prepare("SELECT SUM(pcspervr) AS total_pcs FROM form7stock WHERE type='$type' AND country='$country'");
+              $totalpcsstmt->execute();
+              $totalpcsdata = $totalpcsstmt->fetch(PDO::FETCH_ASSOC);
+              $totalpcsf7stmt = $pdo->prepare("SELECT SUM(pcsperf7) AS total_pcsf7 FROM form7stock WHERE type='$type' AND country='$country'");
+              $totalpcsf7stmt->execute();
+              $totalpcsf7data = $totalpcsf7stmt->fetch(PDO::FETCH_ASSOC);
+              ?>
+              <tr style="font-weight: bold !important;">
+                <td></td>
+                <td>Total</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><?php echo round($totalvissdata['total_viss'], 3); ?></td>
+                <td><?php echo round($totalkgdata['total_kg'], 2); ?></td>
+                <td><?php if(!empty($totalpcsdata['total_pcs'])){ echo $totalpcsdata['total_pcs']; }; ?></td>
+                <td><?php if(!empty($totalpcsf7data['total_pcsf7'])){ echo $totalpcsf7data['total_pcsf7']; }; ?></td>
+              </tr>
+              <?php
+              }
+            }else{
+              $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM form7stock");
+              $commonditycountstmt->execute();
+              $commonditycountdatas = $commonditycountstmt->fetchColumn();
+              for ($i=0; $i < $commonditycountdatas; $i++) {
+                $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
+                $commonditystmt->execute();
+                $commonditydata = $commonditystmt->fetchall();
+                $commondity_id = $commonditydata[$i]['item_id'];
+
+                $stmt = $pdo->prepare("SELECT * FROM form7stock WHERE item_id='$commondity_id'");
+                $stmt->execute();
+                $datas = $stmt->fetchall();
+                foreach ($datas as $form7data) {
+                  $item_id = $form7data['item_id'];
+                  $commonditydata = $query->select('item', $item_id, 'item_id');
+                  $supplier_id = $form7data['supplier_name'];
+                  $supplierdata = $query->select('supplier', $supplier_id, 'supplier_id');
+                  ?>
+                  <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>">
+                    <td><?php echo date('d-m-Y', strtotime($form7data['date'])); ?></td>
+                    <td><?php echo $commonditydata['item_name']; ?></td>
+                    <td><?php echo $supplierdata['supplier_name']; ?></td>
+                    <td><?php echo $form7data['type']; ?></td>
+                    <td><?php echo $form7data['country']; ?></td>
+                    <td><?php echo $form7data['size']; ?></td>
+                    <td><?php echo $form7data['viss']; ?></td>
+                    <td><?php echo round($form7data['kg'], 2); ?></td>
+                    <td><?php echo $form7data['pcspervr']; ?></td>
+                    <td><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
+                  </tr>
+                  <div class="modal fade" id="updatemodal<?php echo $form7data['id']; ?>">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                        <div class="modal-header bg-warning text-light">
+                          <h1 class="modal-title fs-5">Update Data</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <form action="form_7.php" method="post">
+                            <input type="hidden" name="id" value="<?php echo $form7data['id']; ?>">
+                            <div class="modal-body">
+                              <?php
+                              $idd = $form7data['id'];
+                              $updata = $query->select('form7stock', $idd, 'id');
+                              ?>
+                              <div class="row">
+                                <div class="col">
+                                  <label>Country</label>
+                                  <input type="text" name="country" class="form-control inpv2 mt-1" value="<?php echo $updata['country']; ?>">
+                                </div>
+                                <div class="col">
+                                  <label>Pcs Per F7</label>
+                                  <input type="text" name="pcsperf7" class="form-control inpv2 mt-1" value="<?php echo $updata['pcsperf7']; ?>">
                                 </div>
                               </div>
                             </div>
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                              <button type="submit" class="btn btn-warning" name="update">Update</button>
-                            </div>
-                          </form>
-                        </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-warning" name="update">Update</button>
+                          </div>
+                        </form>
                       </div>
                     </div>
-                    <?php
-                  }
+                  </div>
+                  <?php
                 }
               }
+            }
                 ?>
             </table>
           </div>

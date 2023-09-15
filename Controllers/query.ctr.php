@@ -344,7 +344,7 @@ Class Query{
     $payablestmt->execute();
     $kg = floatval($viss) * 1.634;
     $link_id = $id;
-    $formstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', '$size', '$viss', '$kg', '$pcs', '$link_id')");
+    $formstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', '$$tclfrozen', '$size', '$viss', '$kg', '$pcs', '$link_id')");
     $formstmt->execute();
     if($stmt){
       echo '<script>swal("Success!", "Purchase Voucher Added Successfully", "success");</script>';
@@ -1672,7 +1672,7 @@ Class Query{
     }
   }
 
-  function addform10($date, $item_id, $country, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs){
+  function addform10($date, $item_id, $country, $type, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs){
     global $pdo;
 
     $form7stmt = $pdo->prepare("SELECT * FROM form7stock WHERE item_id='$item_id' AND size='$size'");
@@ -1680,7 +1680,7 @@ Class Query{
     $form7data = $form7stmt->fetch(PDO::FETCH_ASSOC);
     $total_kg = (floatval($kg) + floatval($looseinkg)) - floatval($looseoutkg);
     $addform10 = (intval($pcs) + floatval($looseinpcs)) - floatval($looseoutpcs);
-    $addform10stmt = $pdo->prepare("INSERT INTO form10stock(date, item_id, country, size, pcsform10, mc, kg, pcs, looseinkg, looseinpcs, looseoutkg, looseoutpcs, total_kg) VALUES('$date', '$item_id', '$country', '$size', '$addform10', '$mc', '$kg', '$pcs', '$looseinkg', '$looseinpcs', '$looseoutkg', '$looseoutpcs', '$total_kg')");
+    $addform10stmt = $pdo->prepare("INSERT INTO form10stock(date, item_id, country, type, size, pcsform10, mc, kg, pcs, looseinkg, looseinpcs, looseoutkg, looseoutpcs, total_kg) VALUES('$date', '$item_id', '$country', '$size', '$size', '$addform10', '$mc', '$kg', '$pcs', '$looseinkg', '$looseinpcs', '$looseoutkg', '$looseoutpcs', '$total_kg')");
     $addform10stmt->execute();
 
   }
