@@ -169,6 +169,7 @@ CREATE TABLE `form10stock` (
   `date` date NOT NULL,
   `item_id` varchar(11) NOT NULL,
   `country` varchar(11) NOT NULL,
+  `type` varchar(22) NOT NULL,
   `size` varchar(11) NOT NULL,
   `pcsform10` int(11) NOT NULL,
   `mc` int(11) NOT NULL,
@@ -183,15 +184,15 @@ CREATE TABLE `form10stock` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO form10stock VALUES("20","2023-08-11","KO962","NY","2up","63","8","160","61","4.9","2","","0","164.9","");
-INSERT INTO form10stock VALUES("21","2023-08-11","KO962","NY","3up","41","7","149","42","9.9","3","13.8","4","145.1","");
-INSERT INTO form10stock VALUES("22","2023-08-11","KO962","NY","4up","5","1","24","5","","0","","0","24","");
-INSERT INTO form10stock VALUES("23","2023-08-11","KO962","NY","5up","11","3","69","12","","0","5.9","1","63.1","");
-INSERT INTO form10stock VALUES("24","2023-08-11","KO962","NY","6up","4","1","19","3","12.9","2","6.3","1","25.6","");
-INSERT INTO form10stock VALUES("25","2023-08-11","KO962","NY","7up","1","1","23.5","3","","0","15.3","2","8.2","");
-INSERT INTO form10stock VALUES("30","2023-08-11","KO962","NY","9up","0","0","","0","10","1","10.4","1","-0.4","");
-INSERT INTO form10stock VALUES("31","2023-08-11","KO962","NY","10up","1","1","21","2","","0","10.8","1","10.2","");
-INSERT INTO form10stock VALUES("32","2023-08-11","SB263","LM","j","0","3","49","0","","0","15","0","34","");
+INSERT INTO form10stock VALUES("20","2023-08-11","KO962","NY","frozen","2up","63","8","160","61","4.9","2","","0","164.9","");
+INSERT INTO form10stock VALUES("21","2023-08-11","KO962","NY","frozen","3up","41","7","149","42","9.9","3","13.8","4","145.1","");
+INSERT INTO form10stock VALUES("22","2023-08-11","KO962","NY","frozen","4up","5","1","24","5","","0","","0","24","");
+INSERT INTO form10stock VALUES("23","2023-08-11","KO962","NY","frozen","5up","11","3","69","12","","0","5.9","1","63.1","");
+INSERT INTO form10stock VALUES("24","2023-08-11","KO962","NY","frozen","6up","4","1","19","3","12.9","2","6.3","1","25.6","");
+INSERT INTO form10stock VALUES("25","2023-08-11","KO962","NY","frozen","7up","1","1","23.5","3","","0","15.3","2","8.2","");
+INSERT INTO form10stock VALUES("30","2023-08-11","KO962","NY","frozen","9up","0","0","","0","10","1","10.4","1","-0.4","");
+INSERT INTO form10stock VALUES("31","2023-08-11","KO962","NY","frozen","10up","1","1","21","2","","0","10.8","1","10.2","");
+INSERT INTO form10stock VALUES("32","2023-08-11","SB263","LM","tcl","j","0","3","49","0","","0","15","0","34","");
 
 
 
@@ -201,6 +202,7 @@ CREATE TABLE `form7stock` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `date` date NOT NULL,
   `item_id` varchar(11) NOT NULL,
+  `type` varchar(11) NOT NULL,
   `supplier_name` varchar(255) NOT NULL,
   `country` varchar(155) DEFAULT NULL,
   `size` varchar(11) NOT NULL,
@@ -210,33 +212,34 @@ CREATE TABLE `form7stock` (
   `pcsperf7` int(11) NOT NULL,
   `link_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO form7stock VALUES("1","2023-09-06","KJ243","NS123","NY","3up","209.4","342.1596","89","10","0");
-INSERT INTO form7stock VALUES("2","2023-09-06","KJ243","NS123","","4up","357.5","584.155","79","20","0");
-INSERT INTO form7stock VALUES("3","2023-09-06","UT216","NS123","Japan","2up","200","326.8","50","10","0");
-INSERT INTO form7stock VALUES("4","2023-09-06","UT216","NS123","","5up","100","163.4","100","15","0");
-INSERT INTO form7stock VALUES("5","2023-09-06","HL123","NS123","DAKA","1up","45","73.53","20","20","0");
-INSERT INTO form7stock VALUES("6","2023-09-07","OJ247","HE132","","3up","200","326.8","50","0","0");
-INSERT INTO form7stock VALUES("7","2023-09-07","HG184","JH123","Japan","2up","100","163.4","","13","0");
-INSERT INTO form7stock VALUES("8","2023-09-09","HL123","JK909","Japan","4up","75","122.55","","0","0");
-INSERT INTO form7stock VALUES("9","2023-09-09","HL123","JK909","Can","3up","100","163.4","","0","0");
-INSERT INTO form7stock VALUES("10","2023-09-08","HL123","NS123","","6up","150","245.1","","0","0");
-INSERT INTO form7stock VALUES("11","2023-09-12","UT216","KJ122","","5up","280","457.52","","0","0");
-INSERT INTO form7stock VALUES("12","2023-09-13","MR163","KJ234","","3up","209.4","342.1596","","0","0");
-INSERT INTO form7stock VALUES("13","2023-09-13","MR163","KJ234","","4up","357.5","584.155","","0","0");
-INSERT INTO form7stock VALUES("25","2023-08-10","KO962","AT263","NY","1.5up","","0","","3","62");
-INSERT INTO form7stock VALUES("26","2023-08-10","KO962","AT263","NY","2up","99.8","163.0732","","60","63");
-INSERT INTO form7stock VALUES("27","2023-08-10","KO962","AT263","NY","3up","185.35","302.8619","","41","64");
-INSERT INTO form7stock VALUES("28","2023-08-10","KO962","AT263","NY","4up","","0","","5","65");
-INSERT INTO form7stock VALUES("29","2023-08-10","KO962","AT263","NY","5up","","0","","11","66");
-INSERT INTO form7stock VALUES("30","2023-08-10","KO962","AT263","NY","6up","","0","","4","67");
-INSERT INTO form7stock VALUES("31","2023-08-10","KO962","AT263","NY","7up","","0","","1","68");
-INSERT INTO form7stock VALUES("32","2023-08-10","KO962","AT263","NY","9up","","0","","1","69");
-INSERT INTO form7stock VALUES("33","2023-08-10","KO962","AT263","NY","10up","","0","","0","70");
-INSERT INTO form7stock VALUES("36","2023-08-10","SB263","MK1625","LM","j","19.86","32.45124","","0","73");
-INSERT INTO form7stock VALUES("37","2023-08-10","KO962","NS123","Can","2up","263.2","430.0688","","10","74");
-INSERT INTO form7stock VALUES("38","2023-09-14","MR163","HE132","","4up","285","465.69","","0","75");
+INSERT INTO form7stock VALUES("1","2023-09-06","KJ243","frozen","NS123","NY","3up","209.4","342.1596","89","10","0");
+INSERT INTO form7stock VALUES("2","2023-09-06","KJ243","frozen","NS123","","4up","357.5","584.155","79","20","0");
+INSERT INTO form7stock VALUES("3","2023-09-06","UT216","frozen","NS123","Japan","2up","200","326.8","50","10","0");
+INSERT INTO form7stock VALUES("4","2023-09-06","UT216","frozen","NS123","","5up","100","163.4","100","15","0");
+INSERT INTO form7stock VALUES("5","2023-09-06","HL123","frozen","NS123","DAKA","1up","45","73.53","20","20","0");
+INSERT INTO form7stock VALUES("6","2023-09-07","OJ247","frozen","HE132","","3up","200","326.8","50","0","0");
+INSERT INTO form7stock VALUES("7","2023-09-07","HG184","frozen","JH123","Japan","2up","100","163.4","","13","0");
+INSERT INTO form7stock VALUES("8","2023-09-09","HL123","frozen","JK909","Japan","4up","75","122.55","","0","0");
+INSERT INTO form7stock VALUES("9","2023-09-09","HL123","frozen","JK909","Can","3up","100","163.4","","0","0");
+INSERT INTO form7stock VALUES("10","2023-09-08","HL123","frozen","NS123","","6up","150","245.1","","0","0");
+INSERT INTO form7stock VALUES("11","2023-09-12","UT216","frozen","KJ122","","5up","280","457.52","","0","0");
+INSERT INTO form7stock VALUES("12","2023-09-13","MR163","frozen","KJ234","","3up","209.4","342.1596","","0","0");
+INSERT INTO form7stock VALUES("13","2023-09-13","MR163","frozen","KJ234","LM","4up","357.5","584.155","","0","0");
+INSERT INTO form7stock VALUES("25","2023-08-10","KO962","frozen","AT263","NY","1.5up","","0","","3","62");
+INSERT INTO form7stock VALUES("26","2023-08-10","KO962","frozen","AT263","NY","2up","99.8","163.0732","","60","63");
+INSERT INTO form7stock VALUES("27","2023-08-10","KO962","frozen","AT263","NY","3up","185.35","302.8619","","41","64");
+INSERT INTO form7stock VALUES("28","2023-08-10","KO962","frozen","AT263","NY","4up","","0","","5","65");
+INSERT INTO form7stock VALUES("29","2023-08-10","KO962","frozen","AT263","NY","5up","","0","","11","66");
+INSERT INTO form7stock VALUES("30","2023-08-10","KO962","frozen","AT263","NY","6up","","0","","4","67");
+INSERT INTO form7stock VALUES("31","2023-08-10","KO962","frozen","AT263","NY","7up","","0","","1","68");
+INSERT INTO form7stock VALUES("32","2023-08-10","KO962","frozen","AT263","NY","9up","","0","","1","69");
+INSERT INTO form7stock VALUES("33","2023-08-10","KO962","frozen","AT263","NY","10up","","0","","0","70");
+INSERT INTO form7stock VALUES("36","2023-08-10","SB263","frozen","MK1625","LM","j","19.86","32.45124","","0","73");
+INSERT INTO form7stock VALUES("37","2023-08-10","KO962","frozen","NS123","Can","2up","263.2","430.0688","","10","74");
+INSERT INTO form7stock VALUES("38","2023-09-14","MR163","tcl","HE132","","4up","285","465.69","","0","75");
+INSERT INTO form7stock VALUES("39","2023-09-16","HL123","","NS123","","2up","200","326.8","","0","76");
 
 
 
@@ -765,7 +768,7 @@ CREATE TABLE `payable` (
   `balance` bigint(25) NOT NULL,
   `link_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=115 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=116 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO payable VALUES("57","DK123","2001","800000","0000-00-00","","0","800000","25");
 INSERT INTO payable VALUES("58","DK123","","0","2023-08-26","AP0001","500000","0","0");
@@ -807,6 +810,7 @@ INSERT INTO payable VALUES("109","AT263","7938","0","0000-00-00","","0","6952150
 INSERT INTO payable VALUES("112","MK1625","4232","19860","0000-00-00","","0","6972010","73");
 INSERT INTO payable VALUES("113","NS123","2620","260568","0000-00-00","","0","7232578","74");
 INSERT INTO payable VALUES("114","HE132","3155","313500","0000-00-00","","0","7546078","75");
+INSERT INTO payable VALUES("115","NS123","4354","200000","0000-00-00","","0","7746078","76");
 
 
 
@@ -850,7 +854,7 @@ CREATE TABLE `purchase` (
   `price` int(11) NOT NULL,
   `amount` int(11) NOT NULL,
   PRIMARY KEY (`no`)
-) ENGINE=InnoDB AUTO_INCREMENT=76 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=77 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO purchase VALUES("25","2023-08-26","2001","DK123","frozen","HL123","10","200","0","4000","800000");
 INSERT INTO purchase VALUES("26","2023-08-26","2001","DK123","frozen","HG184","10","100","0","30000","3000000");
@@ -882,6 +886,7 @@ INSERT INTO purchase VALUES("70","2023-08-10","7938","AT263","frozen","KO962","1
 INSERT INTO purchase VALUES("73","2023-08-10","4232","MK1625","frozen","SB263","j","19.86","0","1000","19860");
 INSERT INTO purchase VALUES("74","2023-08-10","2620","NS123","frozen","KO962","2up","263.2","0","990","260568");
 INSERT INTO purchase VALUES("75","2023-09-14","3155","HE132","frozen","MR163","4up","285","0","1100","313500");
+INSERT INTO purchase VALUES("76","2023-09-16","4354","NS123","tcl","HL123","2up","200","0","1000","200000");
 
 
 
