@@ -95,17 +95,25 @@ $query = new Query();
                 <th>Kg</th>
               </tr>
               <?php
-              $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM form10stock");
+              if(isset($_POST['searchbtn2']) && !empty($_POST['type'])){
+                $type = $_POST['type'];
+                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM form10stock WHERE type='$type'");
+              }else{
+                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM form10stock");
+              }
               $commonditycountstmt->execute();
               $commonditycountdatas = $commonditycountstmt->fetchColumn();
               for ($i=0; $i < $commonditycountdatas; $i++) {
-                $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
+                if(isset($_POST['searchbtn2']) && !empty($_POST['type'])){
+                  $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock WHERE type='$type'");
+                }else{
+                  $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
+                }
                 $commonditystmt->execute();
                 $commonditydata = $commonditystmt->fetchall();
                 $commondity_id = $commonditydata[$i]['item_id'];
               if(isset($_POST['searchbtn2']) && !empty($_POST['type'])){
-                $type = $_POST['type'];
-                $stmt = $pdo->prepare("SELECT * FROM form10stock WHERE type='$type'");
+                $stmt = $pdo->prepare("SELECT * FROM form10stock WHERE type='$type' AND item_id='$commondity_id'");
                 $stmt->execute();
                 $datas = $stmt->fetchall();
               }else{
@@ -136,18 +144,23 @@ $query = new Query();
               </tr>
               <?php
               $country = $form10data['country'];
+              $commondity_id = $form10data['item_id'];
               }
               if(isset($_POST['searchbtn2']) && !empty($_POST['type'])){
                 $type = $_POST['type'];
-                $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE type='$type' AND country='$country'");
+                $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE type='$type' AND country='$country' AND item_id='$commondity_id'");
                 $totalf7kgstmt->execute();
                 $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
 
-                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE type='$type'");
+                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE type='$type' AND item_id='$commondity_id'");
                 $totalkgstmt->execute();
                 $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
                 $result1 = round($totalkgdata['total_kg'], 2) - round($totalf7kgdata['total_kg'], 2);
-                $result2 = $result1 / round($totalf7kgdata['total_kg'], 2);
+                if(round($totalf7kgdata['total_kg'], 2) != 0 || $result1 != 0){
+                  $result2 = $result1 / round($totalf7kgdata['total_kg'], 2);
+                }else{
+                  $result2 = round($totalf7kgdata['total_kg'], 2);
+                }
                 $percentage = $result2 * 100;
 
                 $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE type='$type'");

@@ -1680,7 +1680,7 @@ Class Query{
     $form7data = $form7stmt->fetch(PDO::FETCH_ASSOC);
     $total_kg = (floatval($kg) + floatval($looseinkg)) - floatval($looseoutkg);
     $addform10 = (intval($pcs) + floatval($looseinpcs)) - floatval($looseoutpcs);
-    $addform10stmt = $pdo->prepare("INSERT INTO form10stock(date, item_id, country, type, size, pcsform10, mc, kg, pcs, looseinkg, looseinpcs, looseoutkg, looseoutpcs, total_kg) VALUES('$date', '$item_id', '$country', '$size', '$size', '$addform10', '$mc', '$kg', '$pcs', '$looseinkg', '$looseinpcs', '$looseoutkg', '$looseoutpcs', '$total_kg')");
+    $addform10stmt = $pdo->prepare("INSERT INTO form10stock(date, item_id, country, type, size, pcsform10, mc, kg, pcs, looseinkg, looseinpcs, looseoutkg, looseoutpcs, total_kg) VALUES('$date', '$item_id', '$country', '$type', '$size', '$addform10', '$mc', '$kg', '$pcs', '$looseinkg', '$looseinpcs', '$looseoutkg', '$looseoutpcs', '$total_kg')");
     $addform10stmt->execute();
 
   }
