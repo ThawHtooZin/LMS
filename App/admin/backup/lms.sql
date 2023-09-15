@@ -37,7 +37,7 @@ INSERT INTO actualinvoice VALUES("11","HG184","2up","20","10","200","1.6","320",
 INSERT INTO actualinvoice VALUES("12","HG184","3up","15","10","150","1.5","225","1");
 INSERT INTO actualinvoice VALUES("13","HL123","3up","20","10","200","0","0","3");
 INSERT INTO actualinvoice VALUES("14","UT216","2up","20","10","200","","","3");
-INSERT INTO actualinvoice VALUES("15","HL123","2up","21","5","105","2","40","3");
+INSERT INTO actualinvoice VALUES("15","HL123","2up","21","5","105","0","0","3");
 INSERT INTO actualinvoice VALUES("16","HL123","3up","21","5","105","0","0","3");
 
 
@@ -56,9 +56,10 @@ CREATE TABLE `bankdetail` (
   `bank_branch_address` varchar(200) NOT NULL,
   `branch_name` varchar(200) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO bankdetail VALUES("2","1","HMS GLOBAL PTE LTD","111 North Bridge Road, #08-26A Peninsula Plaza, Singapore 179098","2.85","USD Current  Account","United Overseas Bank Ltd (UOB) , Singapore","UOVBSGSG","1 Coleman Street , #01-14 the Adelphi, Singapore 179803","Coleman Branch");
+INSERT INTO bankdetail VALUES("3","3","HMS GLOBAL PTE LTD","111 North Bridge Road, #08-26A Peninsula Plaza, Singapore 179098","2.85","USD Current  Account","United Overseas Bank Ltd (UOB) , Singapore","UOVBSGSG","1 Coleman Street , #01-14 the Adelphi, Singapore 179803","");
 
 
 
@@ -121,11 +122,11 @@ CREATE TABLE `coldstore` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=85 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO coldstore VALUES("79","2023-09-05","2023-09-10","4","50","50","150","150","5","4","3000","3000");
-INSERT INTO coldstore VALUES("81","2023-09-02","2023-09-06","4","100","150","300","450","5","4","6000","9000");
-INSERT INTO coldstore VALUES("82","2023-09-04","2023-09-07","11","50","50","150","150","3","4","1800","1800");
-INSERT INTO coldstore VALUES("83","2023-09-01","2023-09-05","4","50","100","150","300","5","4","3000","4800");
-INSERT INTO coldstore VALUES("84","2023-09-02","2023-09-06","11","100","150","300","450","5","4","6000","7800");
+INSERT INTO coldstore VALUES("79","2023-09-05","2023-09-10","4","50","50","140","140","6","4","3360","3360");
+INSERT INTO coldstore VALUES("81","2023-09-02","2023-09-06","4","100","150","150","290","5","4","3000","6360");
+INSERT INTO coldstore VALUES("82","2023-09-04","2023-09-07","4","50","200","150","440","4","4","2400","8760");
+INSERT INTO coldstore VALUES("83","2023-09-01","2023-09-05","4","50","250","150","590","5","4","3000","11760");
+INSERT INTO coldstore VALUES("84","2023-09-02","2023-09-06","4","100","350","300","890","5","4","6000","17760");
 
 
 
@@ -155,7 +156,7 @@ CREATE TABLE `customers` (
   PRIMARY KEY (`customer_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO customers VALUES("B133","U KoKo","911111111","mandalay");
+INSERT INTO customers VALUES("B133","U KoKo","92341546","mandalay");
 INSERT INTO customers VALUES("M3333","MomboJumbo","344544","NY");
 INSERT INTO customers VALUES("w12121","Mr.LPO","97854234","DAKA");
 
@@ -361,19 +362,11 @@ CREATE TABLE `gfcmcstock` (
   `mc` int(11) NOT NULL,
   `balance_mc` bigint(17) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO gfcmcstock VALUES("4","NY","HHK To GFC","2023-09-14","UT216","2up","21","4","4");
-INSERT INTO gfcmcstock VALUES("5","Can","HHK To GFC","2023-09-13","UT216","4up","21","5","5");
-INSERT INTO gfcmcstock VALUES("13","LM","HHK To GFC","2023-09-14","SB263","j","49","2","2");
-INSERT INTO gfcmcstock VALUES("14","LM","HHK To GFC","2023-09-16","SB263","j","49","1","3");
-INSERT INTO gfcmcstock VALUES("15","LM","HHK To GFC","2023-09-18","SB263","j","49","7","10");
-INSERT INTO gfcmcstock VALUES("18","LM","Ship/","2023-09-13","SB263","j","49","5","5");
-INSERT INTO gfcmcstock VALUES("19","LM","Ship/","2023-09-13","SB263","j","49","3","2");
-INSERT INTO gfcmcstock VALUES("20","NY","HHK To GFC","2023-09-15","HG184","4up","22","12","12");
-INSERT INTO gfcmcstock VALUES("21","LM","Ship/","2023-09-20","SB263","j","49","1","1");
-INSERT INTO gfcmcstock VALUES("22","NY","HHK To GFC","2023-09-14","HL123","2up","21","1","1");
-INSERT INTO gfcmcstock VALUES("23","NY","HHK To GFC","2023-09-14","UT216","2up","21","200","204");
+INSERT INTO gfcmcstock VALUES("25","NY","HHK To GFC","2023-09-16","UT216","2up","21","15","15");
+INSERT INTO gfcmcstock VALUES("26","LM","HHK To GFC","2023-09-16","SB263","j","49","23","23");
+INSERT INTO gfcmcstock VALUES("27","NY","Ship/","2023-09-16","UT216","2up","21","10","5");
 
 
 
@@ -413,40 +406,17 @@ CREATE TABLE `hhkmcstock` (
   `mc` int(11) NOT NULL,
   `balance_mc` bigint(17) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=130 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=141 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO hhkmcstock VALUES("71","NY","From From-10","2023-09-12","UT216","2up","21","9","9");
-INSERT INTO hhkmcstock VALUES("72","NY","From From-10","2023-09-12","UT216","2up","22","7","7");
-INSERT INTO hhkmcstock VALUES("73","NY","HHK To GFC","2023-09-13","UT216","2up","21","5","4");
-INSERT INTO hhkmcstock VALUES("74","NY","From From-10","0000-00-00","UT216","2up","21","9","13");
-INSERT INTO hhkmcstock VALUES("75","NY","From From-10","2023-09-12","UT216","2up","23","8","8");
-INSERT INTO hhkmcstock VALUES("76","NY","HHK To GFC","2023-09-13","UT216","2up","21","9","4");
-INSERT INTO hhkmcstock VALUES("77","NY","From From-10","2023-09-12","HG184","4up","22","12","12");
-INSERT INTO hhkmcstock VALUES("78","NY","From From-10","2023-09-12","HL123","2up","21","11","11");
-INSERT INTO hhkmcstock VALUES("82","NY","From From-10","2023-09-12","OJ247","4up","22","9","9");
-INSERT INTO hhkmcstock VALUES("83","NY","From From-10","2023-09-12","OJ247","5up","23","12","12");
-INSERT INTO hhkmcstock VALUES("85","NY","From From-10","2023-09-12","OJ247","5up","21","8","8");
-INSERT INTO hhkmcstock VALUES("86","Can","From From-10","2023-09-12","UT216","4up","21","10","10");
-INSERT INTO hhkmcstock VALUES("87","NY","HHK to GFC","2023-09-13","OJ247","5up","21","5","3");
-INSERT INTO hhkmcstock VALUES("88","NY","HHK To GFC","2023-09-13","OJ247","5up","23","6","6");
-INSERT INTO hhkmcstock VALUES("89","NY","HHK To GFC","2023-09-13","OJ247","5up","23","8","-2");
-INSERT INTO hhkmcstock VALUES("93","NY","HHK To GFC","2023-09-14","UT216","2up","21","4","0");
-INSERT INTO hhkmcstock VALUES("94","Can","HHK To GFC","2023-09-13","UT216","4up","21","5","5");
-INSERT INTO hhkmcstock VALUES("114","LM","From From-10","2023-09-13","SB263","j","49","3","3");
-INSERT INTO hhkmcstock VALUES("115","LM","HHK to GFC","2023-09-14","SB263","j","49","2","1");
-INSERT INTO hhkmcstock VALUES("117","LM","HHK To GFC","2023-09-16","SB263","j","49","1","0");
-INSERT INTO hhkmcstock VALUES("118","LM","From From-10","2023-09-18","SB263","j","49","7","7");
-INSERT INTO hhkmcstock VALUES("119","LM","HHK To GFC","2023-09-18","SB263","j","49","7","0");
-INSERT INTO hhkmcstock VALUES("120","NY","From From-10","2023-09-14","UT216","2up","21","200","200");
-INSERT INTO hhkmcstock VALUES("121","NY","HHK To GFC","2023-09-15","HG184","4up","22","12","0");
-INSERT INTO hhkmcstock VALUES("122","NY","HHK To GFC","2023-09-14","HL123","2up","21","1","10");
-INSERT INTO hhkmcstock VALUES("123","NY","From From-10","2023-09-14","MR163","3up","22","8","8");
-INSERT INTO hhkmcstock VALUES("124","Can","From From-10","2023-09-14","UT216","4up","21","2","7");
-INSERT INTO hhkmcstock VALUES("125","Can","From From-10","2023-09-14","UT216","4up","22","5","5");
-INSERT INTO hhkmcstock VALUES("126","LM","From From-10","2023-09-14","SB263","j","21","10","10");
-INSERT INTO hhkmcstock VALUES("127","NY","From From-10","2023-09-14","OJ247","5up","23","5","3");
-INSERT INTO hhkmcstock VALUES("128","NY","From From-10","2023-09-14","UT216","3up","23","9","9");
-INSERT INTO hhkmcstock VALUES("129","NY","HHK To GFC","2023-09-14","UT216","2up","21","200","0");
+INSERT INTO hhkmcstock VALUES("132","NY","From From-10","2023-09-15","UT216","2up","22","11","11");
+INSERT INTO hhkmcstock VALUES("133","NY","From From-10","2023-09-15","UT216","2up","21","15","15");
+INSERT INTO hhkmcstock VALUES("134","NY","From From-10","2023-09-15","UT216","3up","22","19","19");
+INSERT INTO hhkmcstock VALUES("135","NY","From From-10","2023-09-15","HL123","4up","23","25","25");
+INSERT INTO hhkmcstock VALUES("136","Can","From From-10","2023-09-15","MR163","5up","22","20","20");
+INSERT INTO hhkmcstock VALUES("137","NY","HHK To GFC","2023-09-16","UT216","2up","21","15","0");
+INSERT INTO hhkmcstock VALUES("138","LM","From From-10","2023-09-16","SB263","j","49","23","23");
+INSERT INTO hhkmcstock VALUES("139","LM","HHK To GFC","2023-09-16","SB263","j","49","23","0");
+INSERT INTO hhkmcstock VALUES("140","Japan","From From-10","2023-09-15","HG184","3up","22","210","210");
 
 
 
@@ -555,11 +525,11 @@ CREATE TABLE `labour` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=85 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO labour VALUES("79","2023-09-05","2023-09-10","4","50","50","150","150","5","750","750");
-INSERT INTO labour VALUES("81","2023-09-02","2023-09-06","4","100","150","300","450","5","1500","2250");
-INSERT INTO labour VALUES("82","2023-09-04","2023-09-07","11","50","50","150","150","5","750","750");
-INSERT INTO labour VALUES("83","2023-09-01","2023-09-05","4","50","200","150","600","5","750","3000");
-INSERT INTO labour VALUES("84","2023-09-02","2023-09-06","11","100","150","300","450","5","1500","2250");
+INSERT INTO labour VALUES("79","2023-09-05","2023-09-10","4","50","50","140","140","5","700","700");
+INSERT INTO labour VALUES("81","2023-09-02","2023-09-06","4","100","150","150","290","5","750","1450");
+INSERT INTO labour VALUES("82","2023-09-04","2023-09-07","4","50","200","150","440","5","750","2200");
+INSERT INTO labour VALUES("83","2023-09-01","2023-09-05","4","50","250","150","590","5","750","2950");
+INSERT INTO labour VALUES("84","2023-09-02","2023-09-06","4","100","350","300","890","5","1500","4450");
 
 
 
@@ -715,12 +685,14 @@ CREATE TABLE `packingliststock` (
   `country` varchar(11) NOT NULL,
   `invoiceno` varchar(11) NOT NULL,
   `containerno` varchar(11) NOT NULL,
+  `vessel_name` varchar(33) NOT NULL,
+  `voyname` varchar(55) NOT NULL,
+  `fda` varchar(56) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO packingliststock VALUES("1","2023-09-01","M3333","NY","975B2","BF747");
-INSERT INTO packingliststock VALUES("3","2023-09-08","B133","NY","975T2","LJ734");
-INSERT INTO packingliststock VALUES("4","2023-09-10","w12121","DAKA","97P31","AJ733");
+INSERT INTO packingliststock VALUES("1","2023-09-01","M3333","NY","975B2","BF747","","","");
+INSERT INTO packingliststock VALUES("3","2023-09-08","B133","NY","975T2","LJ734","","","");
 
 
 
@@ -855,11 +827,11 @@ CREATE TABLE `processing` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=85 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO processing VALUES("79","2023-09-05","2023-09-10","4","50","50","150","150","270","40500","40500");
-INSERT INTO processing VALUES("81","2023-09-02","2023-09-06","4","100","150","300","450","270","81000","121500");
-INSERT INTO processing VALUES("82","2023-09-04","2023-09-07","11","50","50","150","150","470","70500","70500");
-INSERT INTO processing VALUES("83","2023-09-01","2023-09-05","4","50","200","150","600","270","40500","162000");
-INSERT INTO processing VALUES("84","2023-09-02","2023-09-06","11","100","100","300","300","350","105000","105000");
+INSERT INTO processing VALUES("79","2023-09-05","2023-09-10","4","50","50","140","140","270","37800","37800");
+INSERT INTO processing VALUES("81","2023-09-02","2023-09-06","4","100","150","150","290","270","40500","78300");
+INSERT INTO processing VALUES("82","2023-09-04","2023-09-07","4","50","200","150","440","470","70500","148800");
+INSERT INTO processing VALUES("83","2023-09-01","2023-09-05","4","50","250","150","590","270","40500","189300");
+INSERT INTO processing VALUES("84","2023-09-02","2023-09-06","4","100","350","300","890","350","105000","294300");
 
 
 
