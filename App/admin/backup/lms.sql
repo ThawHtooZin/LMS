@@ -209,7 +209,7 @@ CREATE TABLE `form7stock` (
   `pcsperf7` int(11) NOT NULL,
   `link_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO form7stock VALUES("1","2023-09-06","KJ243","NS123","NY","3up","209.4","342.1596","89","10","0");
 INSERT INTO form7stock VALUES("2","2023-09-06","KJ243","NS123","","4up","357.5","584.155","79","20","0");
@@ -235,6 +235,7 @@ INSERT INTO form7stock VALUES("32","2023-08-10","KO962","AT263","NY","9up","","0
 INSERT INTO form7stock VALUES("33","2023-08-10","KO962","AT263","NY","10up","","0","","0","70");
 INSERT INTO form7stock VALUES("36","2023-08-10","SB263","MK1625","LM","j","19.86","32.45124","","0","73");
 INSERT INTO form7stock VALUES("37","2023-08-10","KO962","NS123","Can","2up","263.2","430.0688","","10","74");
+INSERT INTO form7stock VALUES("38","2023-09-14","MR163","HE132","","4up","285","465.69","","0","75");
 
 
 
@@ -360,7 +361,7 @@ CREATE TABLE `gfcmcstock` (
   `mc` int(11) NOT NULL,
   `balance_mc` bigint(17) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO gfcmcstock VALUES("4","NY","HHK To GFC","2023-09-14","UT216","2up","21","4","4");
 INSERT INTO gfcmcstock VALUES("5","Can","HHK To GFC","2023-09-13","UT216","4up","21","5","5");
@@ -372,6 +373,7 @@ INSERT INTO gfcmcstock VALUES("19","LM","Ship/","2023-09-13","SB263","j","49","3
 INSERT INTO gfcmcstock VALUES("20","NY","HHK To GFC","2023-09-15","HG184","4up","22","12","12");
 INSERT INTO gfcmcstock VALUES("21","LM","Ship/","2023-09-20","SB263","j","49","1","1");
 INSERT INTO gfcmcstock VALUES("22","NY","HHK To GFC","2023-09-14","HL123","2up","21","1","1");
+INSERT INTO gfcmcstock VALUES("23","NY","HHK To GFC","2023-09-14","UT216","2up","21","200","204");
 
 
 
@@ -411,7 +413,7 @@ CREATE TABLE `hhkmcstock` (
   `mc` int(11) NOT NULL,
   `balance_mc` bigint(17) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=123 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=130 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO hhkmcstock VALUES("71","NY","From From-10","2023-09-12","UT216","2up","21","9","9");
 INSERT INTO hhkmcstock VALUES("72","NY","From From-10","2023-09-12","UT216","2up","22","7","7");
@@ -438,6 +440,13 @@ INSERT INTO hhkmcstock VALUES("119","LM","HHK To GFC","2023-09-18","SB263","j","
 INSERT INTO hhkmcstock VALUES("120","NY","From From-10","2023-09-14","UT216","2up","21","200","200");
 INSERT INTO hhkmcstock VALUES("121","NY","HHK To GFC","2023-09-15","HG184","4up","22","12","0");
 INSERT INTO hhkmcstock VALUES("122","NY","HHK To GFC","2023-09-14","HL123","2up","21","1","10");
+INSERT INTO hhkmcstock VALUES("123","NY","From From-10","2023-09-14","MR163","3up","22","8","8");
+INSERT INTO hhkmcstock VALUES("124","Can","From From-10","2023-09-14","UT216","4up","21","2","7");
+INSERT INTO hhkmcstock VALUES("125","Can","From From-10","2023-09-14","UT216","4up","22","5","5");
+INSERT INTO hhkmcstock VALUES("126","LM","From From-10","2023-09-14","SB263","j","21","10","10");
+INSERT INTO hhkmcstock VALUES("127","NY","From From-10","2023-09-14","OJ247","5up","23","5","3");
+INSERT INTO hhkmcstock VALUES("128","NY","From From-10","2023-09-14","UT216","3up","23","9","9");
+INSERT INTO hhkmcstock VALUES("129","NY","HHK To GFC","2023-09-14","UT216","2up","21","200","0");
 
 
 
@@ -784,7 +793,7 @@ CREATE TABLE `payable` (
   `balance` bigint(25) NOT NULL,
   `link_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=114 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=115 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO payable VALUES("57","DK123","2001","800000","0000-00-00","","0","800000","25");
 INSERT INTO payable VALUES("58","DK123","","0","2023-08-26","AP0001","500000","0","0");
@@ -825,6 +834,7 @@ INSERT INTO payable VALUES("108","AT263","4078","0","0000-00-00","","0","6952150
 INSERT INTO payable VALUES("109","AT263","7938","0","0000-00-00","","0","6952150","70");
 INSERT INTO payable VALUES("112","MK1625","4232","19860","0000-00-00","","0","6972010","73");
 INSERT INTO payable VALUES("113","NS123","2620","260568","0000-00-00","","0","7232578","74");
+INSERT INTO payable VALUES("114","HE132","3155","313500","0000-00-00","","0","7546078","75");
 
 
 
@@ -868,7 +878,7 @@ CREATE TABLE `purchase` (
   `price` int(11) NOT NULL,
   `amount` int(11) NOT NULL,
   PRIMARY KEY (`no`)
-) ENGINE=InnoDB AUTO_INCREMENT=75 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=76 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO purchase VALUES("25","2023-08-26","2001","DK123","frozen","HL123","10","200","0","4000","800000");
 INSERT INTO purchase VALUES("26","2023-08-26","2001","DK123","frozen","HG184","10","100","0","30000","3000000");
@@ -899,6 +909,7 @@ INSERT INTO purchase VALUES("69","2023-08-10","4078","AT263","frozen","KO962","9
 INSERT INTO purchase VALUES("70","2023-08-10","7938","AT263","frozen","KO962","10up","","0","1000","0");
 INSERT INTO purchase VALUES("73","2023-08-10","4232","MK1625","frozen","SB263","j","19.86","0","1000","19860");
 INSERT INTO purchase VALUES("74","2023-08-10","2620","NS123","frozen","KO962","2up","263.2","0","990","260568");
+INSERT INTO purchase VALUES("75","2023-09-14","3155","HE132","frozen","MR163","4up","285","0","1100","313500");
 
 
 

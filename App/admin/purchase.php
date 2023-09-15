@@ -131,7 +131,7 @@ $query = new Query();
                 }
                 ?>
               </select>
-              <button type="submit" name="total" class="btn btn-primary btn-sm">Total</button>
+              <button type="submit" name="total" class="btn btn-primary btn-sm">Search</button>
               <span>Commodity:</span>
               <select class="form-control d-inline" name="item_id" style="width:15%;">
                 <?php

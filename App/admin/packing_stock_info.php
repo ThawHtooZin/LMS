@@ -94,25 +94,25 @@ $query = new Query();
                <div class="col-1">
 
                </div>
-               <div class="col-8">
+               <div class="col-7">
                  <?php
                    $customer_id = $infodata['customer_id'];
                    $customerdata = $query->select('customers', $customer_id, 'customer_id');
                    echo $customerdata['customer_name'];
                   ?>
                </div>
-               <div class="col-2">
+               <div class="col-3">
                  Date : <?php echo date('d-m-Y', strtotime($infodata['date']));  ?>
                  <br>
                  Invoice No : <?php echo $infodata['invoiceno'];  ?>
                  <br>
                  CTNR No : <?php echo $infodata['containerno'];  ?>
                  <br>
-                 VESSEL NAME :
+                 VESSEL NAME : <?php echo $infodata['vessel_name']; ?>
                  <br>
-                 VOY NAME :
+                 VOY NAME : <?php echo $infodata['voyname']; ?>
                  <br>
-                 FDA :
+                 FDA : <?php echo $infodata['fda']; ?>
 
                </div>
                <div class="col-1">

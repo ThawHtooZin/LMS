@@ -29,8 +29,11 @@ $query = new Query();
       $country = $_POST['country'];
       $invoiceno = $_POST['invoiceno'];
       $containerno = $_POST['containerno'];
+      $vessel_no = $_POST['vessel_no'];
+      $voyname = $_POST['voyname'];
+      $fda = $_POST['fda'];
 
-      $query->addpackinglist($date, $customer_id, $country, $invoiceno, $containerno);
+      $query->addpackinglist($date, $customer_id, $country, $invoiceno, $containerno, $vessel_no, $voyname, $fda);
     }
     ?>
     <div class="row">
@@ -86,7 +89,6 @@ $query = new Query();
                 </div>
                 <div class="modal-body">
                   <form action="packing_stock.php" method="post">
-                  <div class="modal-body">
                     <div class="row">
                       <div class="col">
                         <label>Date</label>
@@ -121,12 +123,25 @@ $query = new Query();
                         <label>Container No</label>
                         <input type="text" name="containerno" class="form-control inpv2 mb-2">
                       </div>
-                      <div class="col mt-4">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success" name="add">Add</button>
+                      <div class="col">
+                        <label>VESSEL Name</label>
+                        <input type="text" name="vessel_no" class="form-control inpv2 mb-2">
                       </div>
                     </div>
-                  </div>
+                    <div class="row">
+                      <div class="col">
+                        <label>VOY Name</label>
+                        <input type="text" name="voyname" class="form-control inpv2 mb-2">
+                      </div>
+                      <div class="col">
+                        <label>FDA</label>
+                        <input type="text" name="fda" class="form-control inpv2 mb-2">
+                      </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-success" name="add">Add</button>
                 </div>
               </form>
               </div>

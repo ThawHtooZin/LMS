@@ -347,9 +347,9 @@ Class Query{
     $formstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', '$size', '$viss', '$kg', '$pcs', '$link_id')");
     $formstmt->execute();
     if($stmt){
-      return $successmessage = "Purchase Voucher Added Successfully";
+      echo '<script>swal("Success!", "Purchase Voucher Added Successfully", "success");</script>';
     }else{
-      return $errmessage = "Error accors when added Purchase Voucher";
+      echo '<script>swal("Error!", "Error accors when added Purchase Voucher", "error");</script>';
     }
 
   }
@@ -821,10 +821,10 @@ Class Query{
     $processingstmt->execute();
     $processing = $processingstmt->fetch(PDO::FETCH_ASSOC);
     if(!empty($processing)){
-      $ptotal_mc = $processingdata['total_mc'] + intval($mc);
-      $ptotal_kg = $processingdata['total_kg'] + intval($kg);
+      $ptotal_mc = $processing['total_mc'] + intval($mc);
+      $ptotal_kg = $processing['total_kg'] + intval($kg);
       $pcharges = intval($processingrate) * intval($kg);
-      $totalprocessingcharges = intval($processingdata['total_charges']) + intval($pcharges);
+      $totalprocessingcharges = intval($processing['total_charges']) + intval($pcharges);
     }else{
       $ptotal_mc = intval($mc);
       $ptotal_kg = intval($kg);
@@ -1685,10 +1685,10 @@ Class Query{
 
   }
 
-  function addpackinglist($date, $customer_id, $country, $invoiceno, $containerno){
+  function addpackinglist($date, $customer_id, $country, $invoiceno, $containerno, $vessel_no, $voyname, $fda){
     global $pdo;
 
-    $addpackingliststmt = $pdo->prepare("INSERT INTO packingliststock(date, customer_id, country, invoiceno, containerno) VALUES('$date', '$customer_id', '$country', '$invoiceno', '$containerno')");
+    $addpackingliststmt = $pdo->prepare("INSERT INTO packingliststock(date, customer_id, country, invoiceno, containerno, vessel_name, voyname, fda) VALUES('$date', '$customer_id', '$country', '$invoiceno', '$containerno', '$vessel_name', '$voyname', '$fda')");
     $addpackingliststmt->execute();
   }
 
@@ -1821,7 +1821,6 @@ Class Query{
     $gfcmcstmt->execute();
     $gfcmcdata = $gfcmcstmt->fetch(PDO::FETCH_ASSOC);
 
-    print_r($gfcmcdata);
     if(!empty($gfcmcdata)){
       $balance_mc_for_gfc = $gfcmcdata['balance_mc'] + $transfermc;
       $transfertogfcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transfersize', '$transferkg', '$transfermc', '$balance_mc_for_gfc')");

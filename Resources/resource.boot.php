@@ -97,6 +97,12 @@ class Bootstrap
         .col-10{
           width: 84%;
         }
+        .modal-content{
+          border-radius: 0 !important;
+        }
+        .modal-header{
+          border-radius: 0 !important;
+        }
       </style>
       <script src="../../Resources/sweetalert.js" charset="utf-8"></script>
       <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">

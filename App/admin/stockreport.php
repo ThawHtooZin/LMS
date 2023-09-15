@@ -63,17 +63,40 @@ $query = new Query();
       </div>
       <div class="col-10">
         <div class="card">
-          <div class="card-header bg-primary">
+          <form class="" action="" method="post">
+          <div class="card-header bg-success">
             <h5 style="font-weight:bold;" class="text-light d-inline">Stock Reports</h5>
-          </div>
-          <div class="card-body">
-            <?php
-             ?>
-            <form action="" method="post" class="text-center">
+
+            <button type="submit" name="commonditybtn" class="btn btn-info text-light btn-sm float-end ms-2">View</button>
+            <select class="form-control w-25 d-inline float-end" style="height:30px; padding-left:10px; padding-top:2px;" name="commondity_id">
+              <option value="">View Each Commondity</option>
               <?php
               $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form7stock WHERE country IS NOT NULL");
               $countrystmt->execute();
               $countrydatas = $countrystmt->fetchall();
+
+              $country = $_SESSION['tabs'];
+              $hhkcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country='$country'");
+              $hhkcommonditystmt->execute();
+              $hhkcommonditydatas = $hhkcommonditystmt->fetchall();
+              foreach ($hhkcommonditydatas as $hhkcommonditydata) {
+                $item_id = $hhkcommonditydata['commondity_id'];
+                $commonditydata = $query->select('item', $item_id, 'item_id');
+                ?>
+                <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                <?php
+              }
+              ?>
+            </select>
+            <?php
+             ?>
+          </div>
+        </form>
+          <div class="card-body">
+          <?php
+             ?>
+            <form action="" method="post" class="text-center">
+              <?php
               foreach ($countrydatas as $countrydata) {
                 $btnname = $countrydata['country'] . "btn";
                 if(isset($_POST[$btnname])){
@@ -120,10 +143,16 @@ $query = new Query();
               foreach ($hhkmcstockkgdatas as $hhkmcstockdata) {
                 $size = $hhkmcstockdata['size'];
 
-                $hhkcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE size='$size' AND country='$country'");
-                $hhkcommonditystmt->execute();
-                $hhkcommonditydatas = $hhkcommonditystmt->fetchall();
-                //print_r($hhkcommonditydatas);
+                if(isset($_POST['commonditybtn']) && !empty($_POST['commondity_id'])){
+                  $commondity_id = $_POST['commondity_id'];
+                  $hhkcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id'");
+                  $hhkcommonditystmt->execute();
+                  $hhkcommonditydatas = $hhkcommonditystmt->fetchall();
+                }else{
+                  $hhkcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE size='$size' AND country='$country'");
+                  $hhkcommonditystmt->execute();
+                  $hhkcommonditydatas = $hhkcommonditystmt->fetchall();
+                }
 
                 foreach ($hhkcommonditydatas as $hhkcommonditydata) {
 
@@ -156,18 +185,46 @@ $query = new Query();
                 // $gfcmcstockstmt->execute();
                 // $gfcmcstockdata = $gfcmcstockstmt->fetch(PDO::FETCH_ASSOC);
                ?>
-              <tr <?php //if($hhkmcstockdata['commondity_id'] ){} ?>>
+              <tr>
                 <td><?php echo $id; ?></td>
                 <td><?php echo $commonditydata['item_name']; ?></td>
                 <td><?php echo $country; ?></td>
                 <td><?php echo $size; ?></td>
                 <td><?php echo $kg; ?></td>
-                <td><?php echo $fetchalldata['balance_mc']; ?></td>
-                <td><?php if(!empty($fetchallgfcdata['balance_mc'])){ echo $fetchallgfcdata['balance_mc'];};  ?></td>
+                <td><?php if($fetchalldata['balance_mc'] != 0){ echo $fetchalldata['balance_mc'];}else{echo "-";}; ?></td>
+                <td><?php if(!empty($fetchallgfcdata['balance_mc'])){ echo $fetchallgfcdata['balance_mc'];}else{echo "-";};  ?></td>
                 <td><?php if(!empty($fetchallgfcdata['balance_mc'])){echo $fetchalldata['balance_mc'] + $fetchallgfcdata['balance_mc'];}else{echo $fetchalldata['balance_mc'];};  ?></td>
               </tr>
               <?php
               }
+              $hhktotalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$item_id' AND particular NOT LIKE '%to%'");
+              $hhktotalmcstmt->execute();
+              $hhktotalmcnotsub = $hhktotalmcstmt->fetch(PDO::FETCH_ASSOC);
+              $hhktotalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$item_id' AND particular LIKE '%to%'");
+              $hhktotalmcsubnumstmt->execute();
+              $hhktotalmcsubnum = $hhktotalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
+              $hhktotalmc = $hhktotalmcnotsub['total_mc'] - $hhktotalmcsubnum['total_mc'];
+
+              $gfctotalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND country='$country' AND commondity_id='$item_id' AND particular LIKE '%to%'");
+              $gfctotalmcstmt->execute();
+              $gfctotalmcnotsub = $gfctotalmcstmt->fetch(PDO::FETCH_ASSOC);
+              $gfctotalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND country='$country' AND commondity_id='$item_id' AND particular NOT LIKE '%to%'");
+              $gfctotalmcsubnumstmt->execute();
+              $gfctotalmcsubnum = $gfctotalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
+              $gfctotalmc = $gfctotalmcnotsub['total_mc'] - $gfctotalmcsubnum['total_mc'];
+              ?>
+              <!-- <tr style="background-color:#c1f5cf;"> -->
+              <tr>
+                <td style="font-weight: bold;"></td>
+                <td style="font-weight: bold;">Total</td>
+                <td style="font-weight: bold;"></td>
+                <td style="font-weight: bold;"></td>
+                <td style="font-weight: bold;"></td>
+                <td style="font-weight: bold;"><?php if($hhktotalmc != 0){echo $hhktotalmc;}else{echo "-";}; ?></td>
+                <td style="font-weight: bold;"><?php if($gfctotalmc != 0){echo $gfctotalmc;}else{echo "-";}; ?></td>
+                <td style="font-weight: bold;"><?php if($gfctotalmc != 0 || $hhktotalmc != 0){echo $hhktotalmc + $gfctotalmc;}else{echo "-";}; ?></td>
+              </tr>
+              <?php
             }
           }
                ?>

@@ -127,18 +127,12 @@
                 - Cold Store Charges
               </a>
             </li>
-            <li class="nav-item  rounded">
+            <!-- <li class="nav-item  rounded">
               <a href="container.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Container
               </a>
-            </li>
-            <li class="nav-item  rounded">
-              <a href="packingmeterial.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
-                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
-                - PM Cost
-              </a>
-            </li>
+            </li> -->
           </ul>
         </div>
       </li>
@@ -192,7 +186,13 @@
             <li class="nav-item  rounded">
               <a href="packing_stock.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
-                - Packing Stock
+                - Shippment Export
+              </a>
+            </li>
+            <li class="nav-item  rounded">
+              <a href="packingmeterial.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - Packing Material
               </a>
             </li>
           </ul>

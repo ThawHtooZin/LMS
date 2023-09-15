@@ -72,13 +72,14 @@ $query = new Query();
     if(isset($_POST['update'])){
       $indate = $_POST['indate'];
       $outdate = $_POST['outdate'];
+      $commondity_id = $_POST['commondity_id'];
       $mc = $_POST['mc'];
       $kg = $_POST['kg'];
       $coldstorerate = $_POST['coldstorerate'];
       $labourrate = $_POST['labourrate'];
       $processingrate = $_POST['processingrate'];
       $updateid = $_POST['updateid'];
-      $query->updatecoldstore($indate, $outdate, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $updateid);
+      $query->updatecoldstore($indate, $outdate, $commondity_id,  $mc, $kg, $coldstorerate, $labourrate, $processingrate, $updateid);
     }
 
      ?>
@@ -155,9 +156,18 @@ $query = new Query();
                   $stmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='$commondity_id'");
                   $stmt->execute();
                   $datas = $stmt->fetchall();
+
                   foreach ($datas as $data) {
                     $item_id = $data['commondity_id'];
                     $commonditydata = $query->select('category', $item_id, 'category_id');
+
+                    $comstmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='$commondity_id' GROUP BY commondity_id");
+                    $comstmt->execute();
+                    $comdatas = $comstmt->fetch(PDO::FETCH_ASSOC);
+                    $item_id = $comdatas['commondity_id'];
+                    $commonstmt = $pdo->prepare("SELECT id FROM coldstore WHERE commondity_id='$item_id'");
+                    $commonstmt->execute();
+                    $commondata = $commonstmt->fetch(PDO::FETCH_ASSOC);
                   ?>
                   <!-- <tr style="<?php //if($commonditydata['category_name'] == "IQF"){echo "background-color: #6ef757 !important;";}elseif($commonditydata['category_name'] == "Block"){echo "background-color: #f5764c !important;";}elseif($commonditydata['category_name'] == "Pujanut"){echo "background-color: lightblue !important;";} ?>"> -->
                   <tr>
@@ -173,7 +183,7 @@ $query = new Query();
                     <td><?php echo $data['rate']; ?></td>
                     <td><?php echo $data['charges']; ?></td>
                     <td><?php echo $data['total_charges']; ?></td>
-                    <td><a href="daterangecharges.php" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#coldstoreupdatemodal<?php echo $data['id']; ?>">
+                    <td><a href="daterangecharges.php" style="<?php if($data['id'] == $commondata['id']){ echo "display:none;"; } ?>" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#coldstoreupdatemodal<?php echo $data['id']; ?>">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
     <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
     <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
@@ -222,24 +232,37 @@ $query = new Query();
                             </div>
                             <div class="row" style="margin-bottom: 10px !important;">
                               <div class="col">
-                                <label style="font-weight: bold;">Cold Store Rate</label>
-                                <input type="text" name="coldstorerate" class="form-control inpv2" value="<?php echo $coldstoredataup['rate'];  ?>">
+                                <label>Commondity</label>
+                                <select class="form-control inpv2" name="commondity_id">
+                                  <?php
+                                  $commonditydatas = $query->selectall('category');
+                                  foreach ($commonditydatas as $commonditydata) {
+                                    ?>
+                                    <option value="<?php echo $commonditydata['category_id']; ?>"><?php echo $commonditydata['category_name']; ?></option>
+                                    <?php
+                                  }
+                                  ?>
+                                </select>
                               </div>
                               <div class="col">
-                                <label style="font-weight: bold;">Labour Rate</label>
-                                <input type="text" name="labourrate" class="form-control inpv2" value="<?php echo $labourdataup['rate'];  ?>">
+                                <label style="font-weight: bold;">Cold Store Rate</label>
+                                <input type="text" name="coldstorerate" class="form-control inpv2" value="<?php echo $coldstoredataup['rate'];  ?>">
                               </div>
                             </div>
                             <div class="row">
                               <div class="col">
-                                <label style="font-weight: bold;">Processing Rate</label>
-                                <input type="text" name="processingrate" class="form-control inpv2" value="<?php echo $processingdataup['rate'];  ?>">
+                                <label style="font-weight: bold;">Labour Rate</label>
+                                <input type="text" name="labourrate" class="form-control inpv2" value="<?php echo $labourdataup['rate'];  ?>">
                               </div>
-                            <div class="col mt-4">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-warning" name="update">Update</button>
-                              </div>
+                            <div class="col">
+                              <label style="font-weight: bold;">Processing Rate</label>
+                              <input type="text" name="processingrate" class="form-control inpv2" value="<?php echo $processingdataup['rate'];  ?>">
                             </div>
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-warning" name="update">Update</button>
                           </div>
                         </form>
                         </div>
@@ -266,7 +289,6 @@ $query = new Query();
                   <th class="text-center">Rate</th>
                   <th class="text-center">Charges</th>
                   <th class="text-center">Total Charges</th>
-                  <th class="text-center">Action</th>
                 </tr>
                 <?php
                 $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM labour");
@@ -297,11 +319,6 @@ $query = new Query();
                   <td><?php echo $labourdata['rate']; ?></td>
                   <td><?php echo $labourdata['charges']; ?></td>
                   <td><?php echo $labourdata['total_charges']; ?></td>
-                  <td><a href="daterangecharges.php" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#coldstoreupdatemodal<?php echo $data['id']; ?>">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-  <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-  <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-</svg></a>
                   <!-- <button type="submit" name="deletebutton" class="btn btn-danger">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
                   </button> -->
@@ -327,7 +344,6 @@ $query = new Query();
                   <th class="text-center">Rate</th>
                   <th class="text-center">Charges</th>
                   <th class="text-center">Total Charges</th>
-                  <th class="text-center">Action</th>
                 </tr>
                 <?php
                 $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM processing");
@@ -358,11 +374,7 @@ $query = new Query();
                   <td><?php echo $processingdata['rate']; ?></td>
                   <td><?php echo $processingdata['charges']; ?></td>
                   <td><?php echo $processingdata['total_charges']; ?></td>
-                  <td><a href="daterangecharges.php" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#coldstoreupdatemodal<?php echo $data['id']; ?>">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-  <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-  <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-</svg></a>
+
                   <!-- <button type="submit" name="deletebutton" class="btn btn-danger">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
                   </button> -->
@@ -757,6 +769,8 @@ $query = new Query();
         echo "showtotal();";
       }elseif($_SESSION['tabs'] == "remainingstock"){
         echo "showstock();";
+      }else{
+        echo "showcoldstore();";
       }
     ?>
     function showtotal(){

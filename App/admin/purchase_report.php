@@ -360,7 +360,7 @@ $query = new Query();
                 <td><?php echo $item_name['item_name']; ?></td>
                 <td><?php echo $purchasedata['size']; ?></td>
                 <td><?php echo $purchasedata['viss']; ?></td>
-                <td><?php echo $purchasedata['viss'] * 1.634; ?></td>
+                <td><?php echo floatval($purchasedata['viss']) * 1.634; ?></td>
                 <td><?php echo $purchasedata['pcs']; ?></td>
                 <td><?php echo $purchasedata['price']; ?></td>
                 <td><?php echo $purchasedata['amount']; ?></td>
@@ -432,7 +432,7 @@ $query = new Query();
                     <td></td>
                     <td></td>
                     <td>Total Kg:</td>
-                    <td><?php echo $total_amount_commodity_search_viss['total_viss'] * 1.634; ?></td>
+                    <td><?php echo floatval($total_amount_commodity_search_viss['total_viss']) * 1.634; ?></td>
                   </tr>
                   <?php
                 }
@@ -544,7 +544,7 @@ $query = new Query();
                             <td></td>
                             <td></td>
                             <td>Total Kg:</td>
-                            <td><?php echo $total_amount_commodity_and_size_search_viss['total_viss'] * 1.634; ?></td>
+                            <td><?php echo floatval($total_amount_commodity_and_size_search_viss['total_viss']) * 1.634; ?></td>
                           </tr>
                           <?php
                         }

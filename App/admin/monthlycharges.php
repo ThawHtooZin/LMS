@@ -96,23 +96,42 @@ $query = new Query();
         include 'sidebar.php';
         ?>
       </div>
+      <?php
+      if(isset($_POST['fishcoldstore'])){
+        $_SESSION['tabs'] = "fishcoldstore";
+      }elseif(isset($_POST['fishlabour'])){
+        $_SESSION['tabs'] = "fishlabour";
+      }elseif(isset($_POST['dryfishcoldstoer'])){
+        $_SESSION['tabs'] = "dryfishcoldstoer";
+      }elseif(isset($_POST['dryfishlabour'])){
+        $_SESSION['tabs'] = "dryfishlabour";
+      }elseif(isset($_POST['repackingout'])){
+        $_SESSION['tabs'] = "repackingout";
+      }elseif(isset($_POST['totalamountbalance'])){
+        $_SESSION['tabs'] = "totalamountbalance";
+      }else{
+        $_SESSION['tabs'] = "fishcoldstore";
+      }
+       ?>
       <div class="col-10">
         <div class="card">
           <div class="card-header bg-info text-light">
             <h4 class="d-inline">Monthly Cold Store Charges</h4>
-            <button type="submit" class="btn btn-success float-end addfishcharges" data-bs-toggle="modal" data-bs-target="#addfishcharges">Add Fish Charges</button>
-            <button type="submit" class="btn btn-success float-end hide adddryfishcharges" data-bs-toggle="modal" data-bs-target="#adddryfishcharges">Add Dry Fish Charges</button>
-            <button type="submit" class="btn btn-success float-end hide addrepackingout" data-bs-toggle="modal" data-bs-target="#addrepackingout">Add Repacking Out</button>
-            <button type="submit" class="btn btn-success float-end hide addtotal" data-bs-toggle="modal" data-bs-target="#addtotal">Add Total Balance</button>
+            <button type="submit" class="btn btn-success float-end addfishcharges" data-bs-toggle="modal" data-bs-target="#addfishcharges" name="fishcoldstorebtn">Add Fish Charges</button>
+            <button type="submit" class="btn btn-success float-end hide adddryfishcharges" data-bs-toggle="modal" data-bs-target="#adddryfishcharges" name="dryfishcoldstorebtn">Add Dry Fish Charges</button>
+            <button type="submit" class="btn btn-success float-end hide addrepackingout" data-bs-toggle="modal" data-bs-target="#addrepackingout" name="repackingbtn">Add Repacking Out</button>
+            <button type="submit" class="btn btn-success float-end hide addtotal" data-bs-toggle="modal" data-bs-target="#addtotal" name="totalbtn">Add Total Balance</button>
           </div>
           <div class="card-body">
             <div class="text-center">
-              <button class="pb-2 pt-2 ps-4 pe-4 text-dark fishcoldstorelink" style="text-decoration:none; border:none;" onclick="showfishcoldstore()">Fish C-S</button>
-              <button class="pb-2 pt-2 ps-4 pe-4 text-dark fishlabourlink" style="text-decoration:none; border:none;" onclick="showfishlabour()">Fish L-B</button>
-              <button class="pb-2 pt-2 ps-4 pe-4 text-dark dryfishcoldstorelink" style="text-decoration:none; border:none;" onclick="showdryfishcoldstore()">Dry Fish C-S</button>
-              <button class="pb-2 pt-2 ps-4 pe-4 text-dark dryfishlabourlink" style="text-decoration:none; border:none;" onclick="showdryfishlabour()">Dry Fish L-B</button>
-              <button class="pb-2 pt-2 ps-4 pe-4 text-dark repackingoutlink" style="text-decoration:none; border:none;" onclick="showrepackingout()">RP Out</button>
-              <button class="pb-2 pt-2 ps-4 pe-4 text-dark totalamountlink" style="text-decoration:none; border:none;" onclick="showtotal()">Total Amount Balance</button>
+              <form class="" action="" method="post">
+                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark fishcoldstorelink" style="text-decoration:none; border:none;" name="fishcoldstore">Fish C-S</button>
+                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark fishlabourlink" style="text-decoration:none; border:none;" name="fishlabour">Fish L-B</button>
+                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark dryfishcoldstorelink" style="text-decoration:none; border:none;" name="dryfishcoldstoer">Dry Fish C-S</button>
+                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark dryfishlabourlink" style="text-decoration:none; border:none;" name="dryfishlabour">Dry Fish L-B</button>
+                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark repackingoutlink" style="text-decoration:none; border:none;" name="repackingout">RP Out</button>
+                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark totalamountlink" style="text-decoration:none; border:none;" name="totalamountbalance">Total Amount Balance</button>
+              </form>
             </div>
             <hr>
             <div class="fishcoldstore hide">
@@ -314,7 +333,23 @@ $query = new Query();
     include 'addmodals.php';
      ?>
     <script type="text/javascript">
-    showfishcoldstore();
+    <?php
+      if($_SESSION['tabs'] == "fishcoldstore"){
+        echo "showfishcoldstore();";
+      }elseif($_SESSION['tabs'] == "fishlabour"){
+        echo "showfishlabour();";
+      }elseif($_SESSION['tabs'] == "dryfishcoldstoer"){
+        echo "showdryfishcoldstore();";
+      }elseif($_SESSION['tabs'] == "dryfishlabour"){
+        echo "showdryfishlabour();";
+      }elseif($_SESSION['tabs'] == "repackingout"){
+        echo "showrepackingout();";
+      }elseif($_SESSION['tabs'] == "totalamountbalance"){
+        echo "showtotal();";
+      }else{
+        echo "showfishcoldstore();";
+      }
+    ?>
     function showfishcoldstore(){
       document.querySelector(".fishcoldstore").classList.remove('hide');
       document.querySelector(".fishcoldstorelink").classList.add('color');
