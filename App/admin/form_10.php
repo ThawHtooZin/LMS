@@ -34,6 +34,7 @@ $query = new Query();
     if(isset($_POST['add'])){
       $date = $_POST['date'];
       $item_id = $_POST['item_id'];
+      $supplier_id = $_POST['supplier_id'];
       $country = $_POST['country'];
       $type = $_POST['type'];
       $size = $_POST['size'];
@@ -45,7 +46,7 @@ $query = new Query();
       $looseoutkg = $_POST['loose_out_kg'];
       $looseoutpcs = $_POST['loose_out_pcs'];
 
-      $query->addform10($date, $item_id, $country, $type, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs);
+      $query->addform10($date, $item_id, $supplier_id, $country, $type, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs);
     }
 
      ?>
@@ -60,12 +61,28 @@ $query = new Query();
             <div class="card-header bg-warning text-secondary"  style="padding:-10px;">
               <form action="" method="post">
               <b>Link Mark Limited (F-10)</b>
-              <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#addmodal">Add Form-10 Data</button>
-              <button type="submit" name="searchbtn2" class="btn btn-secondary float-end me-2">View</button>
-              <select name="type" class="form-control inpv2 w-25 d-inline float-end me-2">
+              <button type="button" class="btn btn-success btn-sm float-end" data-bs-toggle="modal" data-bs-target="#addmodal">Add Form-10 Data</button>
+              <button type="submit" name="searchbtn2" class="btn btn-secondary btn-sm float-end me-2">View</button>
+              <select name="type" class="form-control inpv2 w-25 d-inline float-end me-2" style="height: 32px !important; padding-top: 0.5px !important;">
                 <option value="">Select Type</option>
                 <option value="frozen">Frozen</option>
                 <option value="tcl">TCL</option>
+              </select>
+              <button type="submit" name="searchbtn2" class="btn btn-secondary btn-sm float-end me-2">View</button>
+              <select name="commonditybtn" class="form-control inpv2 w-25 d-inline float-end me-2" style="height: 32px !important; padding-top: 0.5px !important;">
+                <option value="">Select Commondity</option>
+                <?php
+                $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
+                $commonstmt->execute();
+                $commondatas = $commonstmt->fetchall();
+                foreach ($commondatas as $commondata) {
+                  $itemid = $commondata['item_id'];
+                  $item_name = $query->select('item', $itemid, 'item_id');
+                  ?>
+                  <option value="<?php echo $item_name['item_id']; ?>"><?php echo $item_name['item_name']; ?></option>
+                  <?php
+                }
+                 ?>
               </select>
             </form>
             </div>
@@ -74,6 +91,7 @@ $query = new Query();
               <tr class="text-center">
                 <th rowspan="2" style="padding-top:25px;">Date</th>
                 <th rowspan="2" style="padding-top:25px;">Commondity</th>
+                <th rowspan="2" style="padding-top:25px;">Supplier</th>
                 <th rowspan="2" style="padding-top:25px;">Country</th>
                 <th rowspan="2" style="padding-top:25px;">Type</th>
                 <th rowspan="2" style="padding-top:25px;">Size</th>
@@ -124,10 +142,13 @@ $query = new Query();
               foreach ($datas as $form10data) {
                 $item_id = $form10data['item_id'];
                 $commonditydata = $query->select('item', $item_id, 'item_id');
+                $supplierid = $form10data['supplier_id'];
+                $supplier_name = $query->select('supplier', $supplierid, 'supplier_id');
                ?>
               <tr>
-                <td><?php echo $form10data['date']; ?></td>
+                <td><?php echo date('d-m-Y', strtotime($form10data['date'])); ?></td>
                 <td><?php echo $commonditydata['item_name']; ?></td>
+                <td><?php echo $supplier_name['supplier_name']; ?></td>
                 <td><?php echo $form10data['country']; ?></td>
                 <td><?php echo $form10data['type']; ?></td>
                 <td><?php echo $form10data['size']; ?></td>
@@ -152,12 +173,11 @@ $query = new Query();
                 $totalf7kgstmt->execute();
                 $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
 
-                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE type='$type' AND item_id='$commondity_id'");
+                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE type='$type' AND country='$country'");
                 $totalkgstmt->execute();
                 $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
                 $result1 = round($totalkgdata['total_kg'], 2) - round($totalf7kgdata['total_kg'], 2);
                 if(round($totalf7kgdata['total_kg'], 2) != 0 && $result1 != 0){
-                  echo "adfasdasf";
                   $result2 = $result1 / round($totalf7kgdata['total_kg'], 2);
                 }else{
                   $result2 = round($totalf7kgdata['total_kg'], 2);
@@ -213,6 +233,7 @@ $query = new Query();
                 <td style="font-weight:bold;">Total</td>
                 <td></td>
                 <td></td>
+                <td></td>
                 <td style="font-weight:bold;"><?php echo round($form10pcsdata['total_form10_pcs'], 2); ?></td>
                 <td style="font-weight:bold;"><?php echo round($mcdata['total_mc'], 2); ?></td>
                 <td style="font-weight:bold;"><?php echo round($kgdata['kg'], 2); ?></td>
@@ -243,11 +264,9 @@ $query = new Query();
           <div class="modal-body">
             <form action="form_10.php" method="post">
             <div class="modal-body">
+              <label>Date</label>
+              <input type="date" name="date" class="form-control inpv2 mb-2">
               <div class="row">
-                <div class="col">
-                  <label>Date</label>
-                  <input type="date" name="date" class="form-control inpv2 mb-2">
-                </div>
                 <div class="col">
                   <label>Type</label>
                   <select class="form-control inpv2 mb-2" name="type">
@@ -256,6 +275,26 @@ $query = new Query();
                     <option value="tcl">tcl</option>
                   </select>
                 </div>
+                <div class="col">
+                  <label>Supplier Name</label>
+                  <select name="supplier_id" class="form-control inpv2">
+                    <?php
+                    $supplier_id_stmt = $pdo->prepare("SELECT DISTINCT supplier_id FROM purchase");
+                    $supplier_id_stmt->execute();
+                    $supplier_id_datas = $supplier_id_stmt->fetchall();
+
+                    foreach ($supplier_id_datas as $supplier_id_data) {
+                      $supplierid = $supplier_id_data['supplier_id'];
+                      $supplier_name = $query->select('supplier', $supplierid, 'supplier_id');
+                      ?>
+                      <option value="<?php echo $supplier_name['supplier_id']; ?>"><?php echo $supplier_name['supplier_name']; ?></option>
+                      <?php
+                    }
+                     ?>
+                  </select>
+                </div>
+              </div>
+              <div class="row">
               </div>
               <div class="row">
                 <div class="col">

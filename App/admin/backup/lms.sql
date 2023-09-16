@@ -170,6 +170,7 @@ CREATE TABLE `form10stock` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `date` date NOT NULL,
   `item_id` varchar(11) NOT NULL,
+  `supplier_id` varchar(20) NOT NULL,
   `country` varchar(11) NOT NULL,
   `type` varchar(255) NOT NULL,
   `size` varchar(11) NOT NULL,
@@ -184,11 +185,11 @@ CREATE TABLE `form10stock` (
   `total_kg` varchar(11) NOT NULL,
   `percentage` varchar(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO form10stock VALUES("44","2023-09-17","KO962","NY","frozen","3up","3","5","15","3","","0","","0","15","");
-INSERT INTO form10stock VALUES("45","2023-09-16","KO962","Can","frozen","2up","63","8","160","61","4.9","2","","0","164.9","");
-INSERT INTO form10stock VALUES("46","2023-09-16","KO962","Can","frozen","3up","41","7","149","42","9.9","3","13.8","4","145.1","");
+INSERT INTO form10stock VALUES("47","2023-09-16","KO962","DK123","NY","frozen","2up","6","25","75","6","","0","","0","75","");
+INSERT INTO form10stock VALUES("48","2023-09-16","KO962","DK123","Can","frozen","3up","9","20","60","6","9","3","","0","69","");
+INSERT INTO form10stock VALUES("49","2023-09-17","HL123","KJ122","Can","frozen","5up","7","18","541","7","","0","","0","541","");
 
 
 
@@ -208,11 +209,12 @@ CREATE TABLE `form7stock` (
   `pcsperf7` int(11) NOT NULL,
   `link_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO form7stock VALUES("47","2023-09-16","KO962","JK909","NY","frozen","3up","250","408.5","","12","84");
 INSERT INTO form7stock VALUES("48","2023-09-15","KO962","DK123","Can","frozen","2up","99.8","163.0732","","60","85");
 INSERT INTO form7stock VALUES("49","2023-09-15","KO962","DK123","Can","frozen","3up","185.35","302.8619","","41","86");
+INSERT INTO form7stock VALUES("50","2023-09-16","HL123","KJ122","Can","frozen","5up","280","457.52","","0","87");
 
 
 
@@ -721,7 +723,7 @@ CREATE TABLE `payable` (
   `balance` bigint(25) NOT NULL,
   `link_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=126 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=127 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO payable VALUES("57","DK123","2001","800000","0000-00-00","","0","800000","25");
 INSERT INTO payable VALUES("58","DK123","","0","2023-08-26","AP0001","500000","0","0");
@@ -766,6 +768,7 @@ INSERT INTO payable VALUES("114","HE132","3155","313500","0000-00-00","","0","75
 INSERT INTO payable VALUES("123","JK909","6807","250000","0000-00-00","","0","7796078","84");
 INSERT INTO payable VALUES("124","DK123","9972","99800","0000-00-00","","0","7895878","85");
 INSERT INTO payable VALUES("125","DK123","6486","185350","0000-00-00","","0","8081228","86");
+INSERT INTO payable VALUES("126","KJ122","1853","280000","0000-00-00","","0","8361228","87");
 
 
 
@@ -810,7 +813,7 @@ CREATE TABLE `purchase` (
   `price` int(11) NOT NULL,
   `amount` int(11) NOT NULL,
   PRIMARY KEY (`no`)
-) ENGINE=InnoDB AUTO_INCREMENT=87 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=88 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO purchase VALUES("25","2023-08-26","2001","DK123","frozen","HL123","10","200","0","4000","800000");
 INSERT INTO purchase VALUES("26","2023-08-26","2001","DK123","frozen","HG184","10","100","0","30000","3000000");
@@ -833,6 +836,7 @@ INSERT INTO purchase VALUES("47","2023-09-12","3021","KJ122","frozen","UT216","5
 INSERT INTO purchase VALUES("84","2023-09-16","6807","JK909","frozen","KO962","3up","250","0","1000","250000");
 INSERT INTO purchase VALUES("85","2023-09-15","9972","DK123","frozen","KO962","2up","99.8","0","1000","99800");
 INSERT INTO purchase VALUES("86","2023-09-15","6486","DK123","frozen","KO962","3up","185.35","0","1000","185350");
+INSERT INTO purchase VALUES("87","2023-09-16","1853","KJ122","frozen","HL123","5up","280","0","1000","280000");
 
 
 
