@@ -107,6 +107,7 @@ class Bootstrap
       <script src="../../Resources/sweetalert.js" charset="utf-8"></script>
       <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.css">
+      <script src="../../Resources/jquery.resc.js"></script>
     ';
   }
   function javascript()
