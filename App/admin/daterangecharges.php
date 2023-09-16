@@ -32,14 +32,16 @@ $query = new Query();
       $coldstorerate = $_POST['coldstorerate'];
       $labourrate = $_POST['labourrate'];
       $processingrate = $_POST['processingrate'];
-      $query->addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate);
+      $pcharges = $_POST['processingcharges'];
+      $query->addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $pcharges);
     }
 
     if(isset($_POST['updatetotalcharges'])){
       $id = $_POST['id'];
       $repacking_charges = $_POST['repacking_charges'];
       $ice_charges = $_POST['ice_charges'];
-      $query->updatecoldstoretotal($id, $repacking_charges, $ice_charges);
+      $ot_charges = $_POST['ot_charges'];
+      $query->updatecoldstoretotal($id, $repacking_charges, $ice_charges, $ot_charges);
     }
 
     if(isset($_POST['paymentbtn'])){
@@ -396,6 +398,7 @@ $query = new Query();
                   <th class="text-center">Total Processing Charges</th>
                   <th class="text-center">Repacking Charges</th>
                   <th class="text-center">Ice Charges</th>
+                  <th class="text-center">OT Charges</th>
                   <th class="text-center">Total Charges</th>
                   <th class="text-center">Grand Total Charges</th>
                   <th class="text-center">Payment Date</th>
@@ -420,6 +423,7 @@ $query = new Query();
                   <td><?php if($total_charges_data['total_processing_charges'] != "0"){ echo $total_charges_data['total_processing_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['repacking_charges'] != "0"){ echo $total_charges_data['repacking_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['ice_charges'] != "0"){ echo $total_charges_data['ice_charges'];} ; ?></td>
+                  <td><?php if($total_charges_data['ot_charges'] != "0"){ echo $total_charges_data['ot_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['total_charges'] != "0"){ echo $total_charges_data['total_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['grand_total_charges'] != "0"){ echo $total_charges_data['grand_total_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['payment_date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($total_charges_data['payment_date'])); } ; ?></td>
@@ -457,6 +461,8 @@ $query = new Query();
                         </div>
                         <div class="row">
                           <div class="col">
+                            <label>Ot Charges</label>
+                            <input type="number" name="ot_charges" class="form-control inpv2 mb-2" value="<?php if(!empty($updatedata['ot_charges'])){ echo $updatedata['ot_charges']; } ?>">
                           </div>
                           <div class="col mt-4">
                             <button type="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
@@ -582,7 +588,7 @@ $query = new Query();
             <div class="row" style="margin-bottom: 10px !important;">
               <div class="col">
                 <label>Commondity</label>
-                <select class="form-control inpv2" name="commondity_id">
+                <select class="form-control inpv2" name="commondity_id" id="commondity">
                   <?php
                   $commonditydatas = $query->selectall('category');
                   foreach ($commonditydatas as $commonditydata) {
@@ -614,8 +620,14 @@ $query = new Query();
                 <input type="text" name="labourrate" class="form-control inpv2">
               </div>
             <div class="col">
-              <label style="font-weight: bold;">Processing Rate</label>
-              <input type="text" name="processingrate" class="form-control inpv2">
+              <div class="processingratediv">
+                <label style="font-weight: bold;">Processing Rate</label>
+                <input type="text" name="processingrate" class="form-control inpv2">
+              </div>
+              <div class="processingchargesdiv hide">
+                <label style="font-weight: bold;">Processing Charges</label>
+                <input type="number" name="processingcharges" class="form-control inpv2">
+              </div>
               </div>
             </div>
           </div>
@@ -755,6 +767,18 @@ $query = new Query();
       </div>
     </div>
     <!-- Add Modal -->
+    <script type="text/javascript">
+      $("#commondity").change(function(){
+        var commondity = $("#commondity").val();
+        if(commondity == '12'){
+          $(".processingratediv").toggle();
+          $(".processingchargesdiv").toggle();
+        }else{
+          $(".processingratediv").toggle();
+          $(".processingchargesdiv").toggle();
+        }
+      });
+    </script>
     <script type="text/javascript">
     <?php
       if($_SESSION['tabs'] == "coldstore"){

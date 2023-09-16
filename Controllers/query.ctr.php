@@ -431,7 +431,7 @@ Class Query{
 
   // HHK QUERIES
 
-  function addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate){
+  function addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $pcharges){
     global $pdo;
 
     $datastmt = $pdo->prepare("SELECT * FROM coldstore ORDER BY id DESC");
@@ -663,12 +663,12 @@ Class Query{
 
           $ptotal_mc = intval($processingdata['total_mc']) + intval($mc);
           $ptotal_kg = intval($processingdata['total_kg']) + intval($kg);
-          $pcharges = intval($processingrate) * intval($kg);
+          $pcharges = $pcharges;
           $totalprocessingcharges = intval($processingdata['total_charges']) + intval($pcharges);
         }else{
           $ptotal_mc = intval($mc);
           $ptotal_kg = intval($kg);
-          $pcharges = intval($processingrate) * intval($kg);
+          $pcharges = $pcharges;
           $totalprocessingcharges = intval($pcharges);
         }
       }elseif($commondity_id == '13'){
@@ -890,7 +890,7 @@ Class Query{
           }
   }
 
-  function updatecoldstoretotal($id, $repacking_charges, $ice_charges){
+  function updatecoldstoretotal($id, $repacking_charges, $ice_charges, $ot_charges){
     global $pdo;
 
     $totalchargesstmt = $pdo->prepare("SELECT * FROM total_charges WHERE id='$id'");
@@ -902,10 +902,14 @@ Class Query{
     $balancestmt->execute();
     $balancedata= $balancestmt->fetch(PDO::FETCH_ASSOC);
 
-    $total_charges = intval($repacking_charges) + intval($ice_charges) + $totalchargesdata['total_charges'];
-    $grand_total_charges = $balancedata['balance_amount'] + $total_charges;
+    $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($ot_charges) + $totalchargesdata['total_charges'];
+    if(!empty($balancedata['balance_amount'])){
+      $grand_total_charges = $balancedata['balance_amount'] + $total_charges;
+    }else{
+      $grand_total_charges = $total_charges;
+    }
     $balance_amount = $grand_total_charges;
-    $updatestmt = $pdo->prepare("UPDATE total_charges SET repacking_charges='$repacking_charges', ice_charges='$ice_charges', total_charges='$total_charges', grand_total_charges='$grand_total_charges', balance_amount='$balance_amount' WHERE id='$id'");
+    $updatestmt = $pdo->prepare("UPDATE total_charges SET repacking_charges='$repacking_charges', ice_charges='$ice_charges', ot_charges='$ot_charges', total_charges='$total_charges', grand_total_charges='$grand_total_charges', balance_amount='$balance_amount' WHERE id='$id'");
     $updatestmt->execute();
   }
 
