@@ -38,8 +38,8 @@ $query = new Query();
         ?>
       </div>
       <div class="col-10">
-        <div class="card mt-3">
-          <div class="card-header bg-warning text-light"  style="padding:-10px;">
+        <div class="card">
+          <div class="card-header bg-warning text-light">
             <h5>Payable Detail Info</h5>
           </div>
           <div class="card-body">
@@ -122,7 +122,7 @@ $query = new Query();
                 <th>Paid Date</th>
                 <th>Paid Voucher</th>
                 <th>Paid Amount</th>
-                <th>Action</th>
+                <!-- <th>Action</th> -->
               </tr>
               <?php
               foreach ($payabledatas as $payabledata) {
@@ -141,15 +141,15 @@ $query = new Query();
                 <td><?php if($payabledata['paid_date'] != "0000-00-00"){ echo $payabledata['paid_date']; }; ?></td>
                 <td><?php echo $payabledata['paid_voucher']; ?></td>
                 <td><?php if(!empty($payabledata['paid_amount'])){ echo $payabledata['paid_amount'];}; ?></td>
-                <td style="<?php if($payabledata['paid_date'] == "0000-00-00"){ echo "display:none;"; }; ?>">
-                  <input type="hidden" name="updateid" value="<?php echo $payabledata['id']; ?>">
-                  <button type="submit" class="btn btn-warning text-light" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $payabledata['id']; ?>">
+                <!-- <td style="<?php// if($payabledata['paid_date'] == "0000-00-00"){ echo "display:none;"; }; ?>">
+                  <input type="hidden" name="updateid" value="<?php// echo $payabledata['id']; ?>">
+                  <button type="submit" class="btn btn-warning text-light" data-bs-toggle="modal" data-bs-target="#updatemodal<?php //echo $payabledata['id']; ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
   <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
   <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
 </svg>
                   </button>
-              </td>
+              </td> -->
               </tr>
 
               <!-- Data Update Modal -->
@@ -222,20 +222,6 @@ $query = new Query();
                 ?>
 
             </table>
-            <br>
-            <div aria-label="Page navigation example" style="float:right;">
-              <ul class="pagination">
-                <li class="page-item"><a class="page-link" href="?pageno=1">First</a></li>
-                <li class="page-item <?php if($pageno <= 1){echo 'disabled';} ?>">
-                  <a class="page-link" href="<?php if($pageno <= 1){echo '#';} else {echo "?pageno=".($pageno-1);} ?>">Previous</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#"><?php echo $pageno; ?></a></li>
-                <li class="page-item <?php if($pageno >= $total_pages){echo 'disabled';}; ?>">
-                  <a class="page-link" href="<?php if($pageno >= $total_pages){echo '#';}else{echo "?pageno=".($pageno+1);} ?>">Next</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="?pageno=<?php echo $total_pages; ?>">Last</a> </li>
-              </ul>
-            </div>
           </div>
         </div>
       </div>

@@ -38,7 +38,7 @@ $query = new Query();
         ?>
       </div>
       <div class="col-10">
-        <div class="card mt-1">
+        <div class="card">
           <div class="card-header bg-warning text-light"  style="padding:-10px;">
             <b>Manage Supplier</b>
           </div>

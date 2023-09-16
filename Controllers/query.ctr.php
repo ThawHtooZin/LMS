@@ -344,7 +344,7 @@ Class Query{
     $payablestmt->execute();
     $kg = floatval($viss) * 1.634;
     $link_id = $id;
-    $formstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', '$$tclfrozen', '$size', '$viss', '$kg', '$pcs', '$link_id')");
+    $formstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', '$tclfrozen', '$size', '$viss', '$kg', '$pcs', '$link_id')");
     $formstmt->execute();
     if($stmt){
       echo '<script>swal("Success!", "Purchase Voucher Added Successfully", "success");</script>';
@@ -989,7 +989,7 @@ Class Query{
             $totalchargesstmt2->execute();
             $totalchargesdata2 = $totalchargesstmt2->fetch(PDO::FETCH_ASSOC);
 
-            $coldstorecharges = $coldstorerate * $totalchargesdata2['total_kg'];
+            $coldstorecharges = $coldstorerate * $totalchargesdata2['kg'];
             $total_charges = $coldstorecharges + $fishcoldstore['total_charges'];
           }else{
 
@@ -1019,8 +1019,12 @@ Class Query{
         $importrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE date='$date' AND ite='import'");
         $importrowstmt->execute();
         $importrowsdata = $importrowstmt->fetch(PDO::FETCH_ASSOC);
-        $total_charges = $importrowsdata['total_charges'] + $coldstorecharges;
-        $coldstoreupdatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET charges='$coldstorecharges', total_charges='$total_charges' WHERE id='$id'");
+        $nodateimportrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE date!='$date' ORDER BY id DESC");
+        $nodateimportrowstmt->execute();
+        $nodateimportrowsdata = $nodateimportrowstmt->fetch(PDO::FETCH_ASSOC);
+        $coldstorecharges2 = $coldstorerate * $importrowsdata['kg'];
+        $total_charges = $nodateimportrowsdata['total_charges'] + $coldstorecharges2;
+        $coldstoreupdatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET charges='$coldstorecharges2', total_charges='$total_charges' WHERE id='$id'");
         $coldstoreupdatestmt->execute();
       }else{
         $coldstoreupdatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET charges='$coldstorecharges' WHERE id='$id'");

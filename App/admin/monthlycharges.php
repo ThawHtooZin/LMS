@@ -151,6 +151,10 @@ $query = new Query();
                 <?php
                 $fishcoldstoredatas = $query->selectall('gfcfishcoldstore');
                 foreach ($fishcoldstoredatas as $fishcoldstoredata) {
+                  $date = $fishcoldstoredata['date'];
+                  $fishcoldstoremaxstmt = $pdo->prepare("SELECT MAX(charges) AS charges FROM gfcfishcoldstore WHERE date='$date'");
+                  $fishcoldstoremaxstmt->execute();
+                  $fishcoldstoremaxdata = $fishcoldstoremaxstmt->fetch(PDO::FETCH_ASSOC);
                  ?>
                 <tr>
                   <td><?php echo $fishcoldstoredata['id']; ?></td>

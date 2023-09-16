@@ -156,7 +156,8 @@ $query = new Query();
                 $totalkgstmt->execute();
                 $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
                 $result1 = round($totalkgdata['total_kg'], 2) - round($totalf7kgdata['total_kg'], 2);
-                if(round($totalf7kgdata['total_kg'], 2) != 0 || $result1 != 0){
+                if(round($totalf7kgdata['total_kg'], 2) != 0 && $result1 != 0){
+                  echo "adfasdasf";
                   $result2 = $result1 / round($totalf7kgdata['total_kg'], 2);
                 }else{
                   $result2 = round($totalf7kgdata['total_kg'], 2);
