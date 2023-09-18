@@ -31,15 +31,19 @@ CREATE TABLE `actualinvoice` (
   `total_usd` varchar(11) NOT NULL,
   `infoid` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO actualinvoice VALUES("11","HG184","2up","20","10","200","1.6","320","1");
-INSERT INTO actualinvoice VALUES("12","HG184","3up","15","10","150","1.5","225","1");
+INSERT INTO actualinvoice VALUES("12","HG184","3up","15","10","150","1.3","195","1");
 INSERT INTO actualinvoice VALUES("13","HL123","3up","20","10","200","2.00","400","3");
 INSERT INTO actualinvoice VALUES("14","UT216","2up","20","10","200","","","3");
 INSERT INTO actualinvoice VALUES("15","HL123","2up","21","5","105","0","0","3");
 INSERT INTO actualinvoice VALUES("16","HL123","3up","21","5","105","0","0","3");
 INSERT INTO actualinvoice VALUES("17","HL123","3up","4","5","20","","","3");
+INSERT INTO actualinvoice VALUES("23","HL123","4up","21","8","168","","","1");
+INSERT INTO actualinvoice VALUES("25","HL123","4up","22","10","220","","","1");
+INSERT INTO actualinvoice VALUES("26","HL123","5up","22","12","264","","","1");
+INSERT INTO actualinvoice VALUES("27","HL123","5up","23","15","345","","","1");
 
 
 
@@ -416,7 +420,7 @@ CREATE TABLE `invoice_costing` (
   `total_kg_price` varchar(11) NOT NULL,
   `infoid` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO invoice_costing VALUES("1","HG184","2up","20","1100","673.1946144","4.5","699.92","0.233","0.3","0.04","0.3","0.3","0.2","1.373","1.5","30","0.127","2.54","27.46","1");
 INSERT INTO invoice_costing VALUES("2","HG184","3up","15","1200","734.3941248","-3.5","756.02","0.252","0.3","0.04","0.3","0.3","0.2","1.392","1.6","24","0.208","3.12","20.88","1");
@@ -425,6 +429,16 @@ INSERT INTO invoice_costing VALUES("4","UT216","2up","20","","","","","","","","
 INSERT INTO invoice_costing VALUES("5","HL123","2up","21","1100","1797.4","4.5","1720","0.573333333","0.3","0.04","0.3","0.3","0.2","1.713333333","2","42","0.286666667","6.020000007","35.98","3");
 INSERT INTO invoice_costing VALUES("6","HL123","3up","21","","","","","","","","","","","","","","","","","3");
 INSERT INTO invoice_costing VALUES("7","HL123","3up","4","","","","","","","","","","","","","","","","","3");
+INSERT INTO invoice_costing VALUES("8","HL123","5up","21","","","","","","","","","","","","","","","","","1");
+INSERT INTO invoice_costing VALUES("9","HL123","5up","22","","","","","","","","","","","","","","","","","1");
+INSERT INTO invoice_costing VALUES("10","HL123","5up","21","","","","","","","","","","","","","","","","","1");
+INSERT INTO invoice_costing VALUES("11","HL123","3up","21","","","","","","","","","","","","","","","","","1");
+INSERT INTO invoice_costing VALUES("12","HL123","3up","21","","","","","","","","","","","","","","","","","1");
+INSERT INTO invoice_costing VALUES("13","HL123","4up","21","","","","","","","","","","","","","","","","","1");
+INSERT INTO invoice_costing VALUES("14","HL123","4up","22","","","","","","","","","","","","","","","","","1");
+INSERT INTO invoice_costing VALUES("15","HL123","4up","22","","","","","","","","","","","","","","","","","1");
+INSERT INTO invoice_costing VALUES("16","HL123","5up","22","","","","","","","","","","","","","","","","","1");
+INSERT INTO invoice_costing VALUES("17","HL123","5up","23","","","","","","","","","","","","","","","","","1");
 
 
 
@@ -667,7 +681,7 @@ CREATE TABLE `packingliststockinfo` (
   `total_usd` varchar(11) NOT NULL,
   `infoid` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO packingliststockinfo VALUES("18","HG184","2up","20","10","200","210","","","1");
 INSERT INTO packingliststockinfo VALUES("19","HG184","3up","15","10","150","160","","","1");
@@ -676,6 +690,10 @@ INSERT INTO packingliststockinfo VALUES("21","UT216","2up","20","10","200","210"
 INSERT INTO packingliststockinfo VALUES("22","HL123","2up","21","5","105","110","","","3");
 INSERT INTO packingliststockinfo VALUES("23","HL123","3up","21","5","105","110","","","3");
 INSERT INTO packingliststockinfo VALUES("24","HL123","3up","4","5","20","25","","","3");
+INSERT INTO packingliststockinfo VALUES("30","HL123","4up","21","8","168","176","","","1");
+INSERT INTO packingliststockinfo VALUES("32","HL123","4up","22","10","220","230","","","1");
+INSERT INTO packingliststockinfo VALUES("33","HL123","5up","22","12","264","276","","","1");
+INSERT INTO packingliststockinfo VALUES("34","HL123","5up","23","15","345","360","","","1");
 
 
 
@@ -966,4 +984,6 @@ CREATE TABLE `total_charges` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO total_charges VALUES("68","0000-00-00","4","22260","5350","375300","0","0","402910","402910","0000-00-00","0","402910","0");
+
+
+
