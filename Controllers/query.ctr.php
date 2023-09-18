@@ -12,30 +12,10 @@ Class Query{
 
     if(!empty($userdata)){
       if($userdata['password'] == $password){
-        if($userdata['role'] == 1){
-          $_SESSION['role'] = $userdata['role'];
-          $_SESSION['username'] = $username;
-          $_SESSION['logged_in'] = true;
-          header('location:App/admin/');
-        }
-        if($userdata['role'] == 2){
-          $_SESSION['role'] = 2;
-          $_SESSION['username'] = $username;
-          $_SESSION['logged_in'] = true;
-          header('location:App/user/');
-        }
-        if($userdata['role'] == 3){
-          $_SESSION['role'] = 3;
-          $_SESSION['username'] = $username;
-          $_SESSION['logged_in'] = true;
-          header('location:App/sale/');
-        }
-        if($userdata['role'] == 4){
-          $_SESSION['role'] = 4;
-          $_SESSION['username'] = $username;
-          $_SESSION['logged_in'] = true;
-          header('location:App/purchase/');
-        }
+        $_SESSION['role'] = $userdata['role'];
+        $_SESSION['username'] = $username;
+        $_SESSION['logged_in'] = true;
+        header('location:App/admin/');
       }
     }
   }
@@ -140,7 +120,7 @@ Class Query{
   function addrole($role_name){
     global $pdo;
 
-    $addrole = $pdo->prepare("INSERT INTO role(role_name) VALUES('$role_name]')");
+    $addrole = $pdo->prepare("INSERT INTO role(role_name) VALUES('$role_name')");
     $addrole->execute();
   }
 

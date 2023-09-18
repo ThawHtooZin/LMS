@@ -319,7 +319,7 @@ $query = new Query();
                      <td><?php echo $form7data['type']; ?></td>
                      <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php echo $form7data['country']; ?></td>
                      <td data-bs-toggle="modal" data-bs-target="#addsizemodal<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php echo $form7data['size']; ?></td>
-                     <td><?php echo $form7data['viss']; ?></td>
+                     <td data-bs-toggle="modal" data-bs-target="#adjustvissandcountry<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php echo $form7data['viss']; ?></td>
                      <td><?php if(!empty($form7data['kg'])){echo round($form7data['kg'], 2);}; ?></td>
                      <td><?php echo $form7data['pcspervr']; ?></td>
                      <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
@@ -380,6 +380,35 @@ $query = new Query();
                           </div>
                         </form>
                       </div>
+                    </div>
+                  </div>
+                  <div class="modal fade" id="adjustvissandcountry<?php echo $form7data['id']; ?>">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header bg-warning text-light">
+                          <h1 class="modal-title fs-5">Update Country And Viss</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <form action="form_7.php" method="post">
+                            <label>Num Of Record</label>
+                            <input type="number" name="numofrecords" value="0" class="form-control inpv2">
+                            <div class="row">
+                            <div class="col">
+                              <label>Country</label>
+                              <input type="text" name="country" value="" class="form-control inpv2">
+                            </div>
+                            <div class="col">
+                              <label>Viss</label>
+                              <input type="text" name="country" value="" class="form-control inpv2">
+                            </div>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success" name="addsize">Add Size</button>
+                      </div>
+                    </form>
                     </div>
                   </div>
                   <?php
