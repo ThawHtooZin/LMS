@@ -262,7 +262,8 @@ $query = new Query();
                            <td><?php echo $packingstockinfodata['total_usd']; ?></td>
                          </tr>
                          <?php
-                       }else{
+                       }
+                       else{
                          ?>
                          <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $packingstockinfodata['id']; ?>">
                            <td><?php echo $no; ?></td>
