@@ -1,3 +1,7 @@
+<?php
+$permission = $query->select('permission', $_SESSION['role'], 'role_id');
+$permissions = $permission['permission'];
+ ?>
 <div class="d-flex flex-column flex-shrink-0 p-1 text-white" style="width: 112%; height:100%; background-color:gray !important;">
       <div class="text-center bg-light text-dark pt-3 pb-3">
         <b class="fs-4 text-primary">Link Mark System</b>
@@ -12,6 +16,9 @@
           Home
         </a>
       </li>
+      <?php
+      if(str_contains($permissions, 'manage_accounts')== 1 || str_contains($permissions, 'manage_role') == 1){
+      ?>
       <li style=" border-bottom: 2px solid black; " >
         <a href="#" class="nav-link text-white" data-bs-toggle="collapse" data-bs-target="#system-collapse" aria-expanded="false">
           <svg class="bi" width="16" height="16"><i class="bi bi-card-list"></i></svg>
@@ -19,27 +26,51 @@
         </a>
         <div class="collapse" id="system-collapse">
           <ul class="btn-toggle-nav list-unstyled fw-normal ms-2">
-            <li class="nav-item">
-              <a href="manageaccounts.php" class="nav-link h text-light show" aria-current="page" style="font-size:14px !important; font-weight:bold;">
-                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-tags"></i></svg>
-                - Manage Accounts
-              </a>
-            </li>
+            <?php
+            if(str_contains($permissions, 'manage_accounts')){
+              ?>
+              <li class="nav-item">
+                <a href="manageaccounts.php" class="nav-link h text-light show" aria-current="page" style="font-size:14px !important; font-weight:bold;">
+                  <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-tags"></i></svg>
+                  - Manage Accounts
+                </a>
+              </li>
+              <?php
+            }
+             ?>
+             <?php
+             if(str_contains($permissions, 'manage_role')){
+               ?>
             <li class="nav-item">
               <a href="managerole.php" class="nav-link h text-light show" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-tags"></i></svg>
                 - Manage Role
               </a>
             </li>
+            <?php
+            }
+            ?>
+            <?php
+            if($_SESSION['role'] == 1){
+              ?>
             <li class="nav-item">
               <a href="backupandrestore.php" class="nav-link h text-light show" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-tags"></i></svg>
                 - Backup And Restore
               </a>
             </li>
+            <?php
+          }
+           ?>
           </ul>
         </div>
       </li>
+      <?php
+      }
+       ?>
+      <?php
+      if(str_contains($permissions, 'manage_sale') == 1 || str_contains($permissions, 'manage_purchase') == 1 ||str_contains($permissions, 'manage_cashbook') == 1 ||str_contains($permissions, 'manage_accountpayable') == 1 ||str_contains($permissions, 'manage_accountreceivable') == 1){
+      ?>
       <li style=" border-bottom: 2px solid black; " >
         <a href="#" class="nav-link text-white" data-bs-toggle="collapse" data-bs-target="#account-collapse" aria-expanded="false">
           <svg class="bi" width="16" height="16"><i class="bi bi-card-list"></i></svg>
@@ -47,39 +78,53 @@
         </a>
         <div class="collapse" id="account-collapse">
           <ul class="btn-toggle-nav list-unstyled fw-normal">
+
             <li class="nav-item" style="cursor: not-allowed !important;">
               <a href="sales.php" class="nav-link h text-light show disabled"  aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-tags"></i></svg>
                 - Sales
               </a>
             </li>
+
+
             <li class="nav-item">
               <a href="purchase.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Purchase
               </a>
             </li>
+
+
             <li class="nav-item" style="cursor: not-allowed !important;">
               <a href="cashbook.php" class="nav-link  h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Cash Book
               </a>
             </li>
+
+
             <li class="nav-item">
               <a href="accountpayable.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Account Payable
               </a>
             </li>
+
+
             <li class="nav-item" style="cursor: not-allowed !important;">
               <a href="accountreceivable.php" class="nav-link h text-light disabled" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Account Receivable
               </a>
             </li>
+
+
           </ul>
         </div>
       </li>
+      <?php
+    }
+       ?>
       <li style=" border-bottom: 2px solid black; " >
         <a href="#" class="nav-link text-white" data-bs-toggle="collapse" data-bs-target="#config-collapse" aria-expanded="false">
           <svg class="bi" width="16" height="16"><i class="bi bi-card-list"></i></svg>

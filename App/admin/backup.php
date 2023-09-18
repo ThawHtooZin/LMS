@@ -35,4 +35,4 @@ fwrite($handle,$return);
 fclose($handle);
 fwrite($handle2,$return);
 fclose($handle2);
-// echo '<script>alert("successfully backup!"); window.location.href="backupandrestore.php";</script>';
+echo '<script>alert("successfully backup!"); window.location.href="backupandrestore.php";</script>';

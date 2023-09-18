@@ -248,7 +248,6 @@ $query = new Query();
                        $oncestmt = $pdo->prepare("SELECT * FROM actualinvoice WHERE id > '$id' AND commondity_id='$item_id'");
                        $oncestmt->execute();
                        $oncedatas = $oncestmt->fetch(PDO::FETCH_ASSOC);
-                       // print_r($oncedatas);
                        if (!empty($oncedatas)) {
                          ?>
                          <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $packingstockinfodata['id']; ?>">

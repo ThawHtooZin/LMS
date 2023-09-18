@@ -63,13 +63,13 @@ $query = new Query();
               <b>Link Mark Limited (F-10)</b>
               <button type="button" class="btn btn-success btn-sm float-end" data-bs-toggle="modal" data-bs-target="#addmodal">Add Form-10 Data</button>
               <button type="submit" name="searchbtn2" class="btn btn-secondary btn-sm float-end me-2">View</button>
-              <select name="type" class="form-control inpv2 w-25 d-inline float-end me-2" style="height: 32px !important; padding-top: 0.5px !important;">
+              <select name="type" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 17% !important; height: 32px !important; padding-top: 0.5px !important;">
                 <option value="">Select Type</option>
                 <option value="frozen">Frozen</option>
                 <option value="tcl">TCL</option>
               </select>
-              <button type="submit" name="searchbtn2" class="btn btn-secondary btn-sm float-end me-2">View</button>
-              <select name="commonditybtn" class="form-control inpv2 w-25 d-inline float-end me-2" style="height: 32px !important; padding-top: 0.5px !important;">
+              <button type="submit" name="view" class="btn btn-secondary btn-sm float-end me-2">View</button>
+              <select name="commondity" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 17% !important; height: 32px !important; padding-top: 0.5px !important;">
                 <option value="">Select Commondity</option>
                 <?php
                 $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
@@ -80,6 +80,19 @@ $query = new Query();
                   $item_name = $query->select('item', $itemid, 'item_id');
                   ?>
                   <option value="<?php echo $item_name['item_id']; ?>"><?php echo $item_name['item_name']; ?></option>
+                  <?php
+                }
+                 ?>
+              </select>
+              <select name="country" class="form-control inpv2 d-inline float-end me-2" style=" width: 17% !important; height: 32px !important; padding-top: 0.5px !important;">
+                <option value="">Select Country</option>
+                <?php
+                $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock");
+                $countrystmt->execute();
+                $countrydatas = $countrystmt->fetchall();
+                foreach ($countrydatas as $countrydata) {
+                  ?>
+                  <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
                   <?php
                 }
                  ?>
@@ -99,7 +112,7 @@ $query = new Query();
                 <th colspan="2">Loose In</th>
                 <th colspan="2">Loose Out</th>
                 <th>Total</th>
-                <th rowspan="2" style="padding-top:25px;">Percentage</th>
+                <th rowspan="2" style="padding-top:25px;">%</th>
               </tr>
               <tr class="text-center">
                 <th>PCS/Form-10</th>
@@ -113,6 +126,91 @@ $query = new Query();
                 <th>Kg</th>
               </tr>
               <?php
+              if(isset($_POST['view']) && !empty($_POST['commondity']) && !empty($_POST['country'])){
+                $commondity_id = $_POST['commondity'];
+                $country = $_POST['country'];
+                $stmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+                $stmt->execute();
+                $datas = $stmt->fetchall();
+                foreach ($datas as $data) {
+                  $item_id = $data['item_id'];
+                  $commonditydata = $query->select('item', $item_id, 'item_id');
+                  $supplierid = $data['supplier_id'];
+                  $supplier_name = $query->select('supplier', $supplierid, 'supplier_id');
+                ?>
+                <tr>
+                  <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
+                  <td><?php echo $commonditydata['item_name']; ?></td>
+                  <td><?php echo $supplier_name['supplier_name']; ?></td>
+                  <td><?php echo $data['country']; ?></td>
+                  <td><?php echo $data['type']; ?></td>
+                  <td><?php echo $data['size']; ?></td>
+                  <td><?php echo $data['pcsform10']; ?></td>
+                  <td><?php echo $data['mc']; ?></td>
+                  <td><?php echo $data['kg']; ?></td>
+                  <td><?php echo $data['pcs']; ?></td>
+                  <td><?php echo $data['looseinkg']; ?></td>
+                  <td><?php echo $data['looseinpcs']; ?></td>
+                  <td><?php echo $data['looseoutkg']; ?></td>
+                  <td><?php echo $data['looseoutpcs']; ?></td>
+                  <td><?php echo round($data['total_kg'], 2); ?></td>
+                  <td></td>
+                </tr>
+                <?php
+                }
+                $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country'");
+                $totalf7kgstmt->execute();
+                $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+                $totalkgstmt->execute();
+                $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+                $result1 = round($totalkgdata['total_kg'], 2) - round($totalf7kgdata['total_kg'], 2);
+                if(round($totalf7kgdata['total_kg']) == 0){
+                  $percentage = "";
+                }else{
+                  $result2 = $result1 / round($totalf7kgdata['total_kg'], 2);
+                  $percentage = $result2 * 100;
+                }
+
+
+                $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+                $form10pcsstmt->execute();
+                $form10pcsdata = $form10pcsstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+                $totalkgstmt->execute();
+                $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+
+                $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+                $mcstmt->execute();
+                $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
+
+                $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+                $kgstmt->execute();
+                $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
+                ?>
+                <tr>
+                <td></td>
+                <td style="font-weight:bold;">Total</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td style="font-weight:bold;"><?php echo round($form10pcsdata['total_form10_pcs'], 2); ?></td>
+                <td style="font-weight:bold;"><?php echo round($mcdata['total_mc'], 2); ?></td>
+                <td style="font-weight:bold;"><?php echo round($kgdata['kg'], 2); ?></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td style="font-weight:bold;"><?php echo round($totalkgdata['total_kg'], 2); ?></td>
+                <td style="font-weight:bold; <?php if(strpos(round($percentage, 2), '-') !== false){echo 'color:red;';} ?>"><?php echo round($percentage, 2). "%"; ?></td>
+                </tr>
+
+                <?php
+              }else{
               if(isset($_POST['searchbtn2']) && !empty($_POST['type'])){
                 $type = $_POST['type'];
                 $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM form10stock WHERE type='$type'");
@@ -167,87 +265,88 @@ $query = new Query();
               $country = $form10data['country'];
               $commondity_id = $form10data['item_id'];
               }
-              if(isset($_POST['searchbtn2']) && !empty($_POST['type'])){
-                $type = $_POST['type'];
-                $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE type='$type' AND country='$country' AND item_id='$commondity_id'");
-                $totalf7kgstmt->execute();
-                $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
-
-                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE type='$type' AND country='$country'");
-                $totalkgstmt->execute();
-                $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
-                $result1 = round($totalkgdata['total_kg'], 2) - round($totalf7kgdata['total_kg'], 2);
-                if(round($totalf7kgdata['total_kg'], 2) != 0 && $result1 != 0){
-                  $result2 = $result1 / round($totalf7kgdata['total_kg'], 2);
-                }else{
-                  $result2 = round($totalf7kgdata['total_kg'], 2);
-                }
-                $percentage = $result2 * 100;
-
-                $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE type='$type'");
-                $form10pcsstmt->execute();
-                $form10pcsdata = $form10pcsstmt->fetch(PDO::FETCH_ASSOC);
-
-                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE type='$type'");
-                $totalkgstmt->execute();
-                $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
-
-                $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM form10stock WHERE type='$type'");
-                $mcstmt->execute();
-                $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
-
-                $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stock WHERE type='$type'");
-                $kgstmt->execute();
-                $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
-              }else{
-                $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country'");
-                $totalf7kgstmt->execute();
-                $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
-
-                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id'");
-                $totalkgstmt->execute();
-                $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
-                $result1 = round($totalkgdata['total_kg'], 2) - round($totalf7kgdata['total_kg'], 2);
-                $result2 = $result1 / round($totalf7kgdata['total_kg'], 2);
-                $percentage = $result2 * 100;
-
-                $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE item_id='$commondity_id'");
-                $form10pcsstmt->execute();
-                $form10pcsdata = $form10pcsstmt->fetch(PDO::FETCH_ASSOC);
-
-                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id'");
-                $totalkgstmt->execute();
-                $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
-
-                $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM form10stock WHERE item_id='$commondity_id'");
-                $mcstmt->execute();
-                $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
-
-                $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stock WHERE item_id='$commondity_id'");
-                $kgstmt->execute();
-                $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
-              }
+              // if(isset($_POST['searchbtn2']) && !empty($_POST['type'])){
+              //   $type = $_POST['type'];
+              //   $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE type='$type' AND country='$country' AND item_id='$commondity_id'");
+              //   $totalf7kgstmt->execute();
+              //   $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
+              //
+              //   $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE type='$type' AND country='$country'");
+              //   $totalkgstmt->execute();
+              //   $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+              //   $result1 = round($totalkgdata['total_kg'], 2) - round($totalf7kgdata['total_kg'], 2);
+              //   if(round($totalf7kgdata['total_kg'], 2) != 0 && $result1 != 0){
+              //     $result2 = $result1 / round($totalf7kgdata['total_kg'], 2);
+              //   }else{
+              //     $result2 = round($totalf7kgdata['total_kg'], 2);
+              //   }
+              //   $percentage = $result2 * 100;
+              //
+              //   $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE type='$type'");
+              //   $form10pcsstmt->execute();
+              //   $form10pcsdata = $form10pcsstmt->fetch(PDO::FETCH_ASSOC);
+              //
+              //   $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE type='$type'");
+              //   $totalkgstmt->execute();
+              //   $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+              //
+              //   $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM form10stock WHERE type='$type'");
+              //   $mcstmt->execute();
+              //   $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
+              //
+              //   $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stock WHERE type='$type'");
+              //   $kgstmt->execute();
+              //   $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
+              // }else{
+              //   $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country'");
+              //   $totalf7kgstmt->execute();
+              //   $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
+              //
+              //   $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id'");
+              //   $totalkgstmt->execute();
+              //   $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+              //   $result1 = round($totalkgdata['total_kg'], 2) - round($totalf7kgdata['total_kg'], 2);
+              //   $result2 = $result1 / round($totalf7kgdata['total_kg'], 2);
+              //   $percentage = $result2 * 100;
+              //
+              //   $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE item_id='$commondity_id'");
+              //   $form10pcsstmt->execute();
+              //   $form10pcsdata = $form10pcsstmt->fetch(PDO::FETCH_ASSOC);
+              //
+              //   $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id'");
+              //   $totalkgstmt->execute();
+              //   $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+              //
+              //   $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM form10stock WHERE item_id='$commondity_id'");
+              //   $mcstmt->execute();
+              //   $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
+              //
+              //   $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stock WHERE item_id='$commondity_id'");
+              //   $kgstmt->execute();
+              //   $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
+              // }
               ?>
-              <tr>
+              <!-- <tr>
                 <td></td>
                 <td style="font-weight:bold;">Total</td>
                 <td></td>
                 <td></td>
                 <td></td>
-                <td style="font-weight:bold;"><?php echo round($form10pcsdata['total_form10_pcs'], 2); ?></td>
-                <td style="font-weight:bold;"><?php echo round($mcdata['total_mc'], 2); ?></td>
-                <td style="font-weight:bold;"><?php echo round($kgdata['kg'], 2); ?></td>
+                <td></td>
+                <td style="font-weight:bold;"><?php //echo round($form10pcsdata['total_form10_pcs'], 2); ?></td>
+                <td style="font-weight:bold;"><?php //echo round($mcdata['total_mc'], 2); ?></td>
+                <td style="font-weight:bold;"><?php //echo round($kgdata['kg'], 2); ?></td>
                 <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
-                <td></td>
-                <td style="font-weight:bold;"><?php echo round($totalkgdata['total_kg'], 2); ?></td>
-                <td style="font-weight:bold; <?php if(strpos(round($percentage, 2), '-') !== false){echo 'color:red;';} ?>"><?php echo round($percentage, 2). "%"; ?></td>
-              </tr>
+                <td style="font-weight:bold;"><?php //echo round($totalkgdata['total_kg'], 2); ?></td>
+                <td style="font-weight:bold; <?php //if(strpos(round($percentage, 2), '-') !== false){echo 'color:red;';} ?>"><?php echo round($percentage, 2). "%"; ?></td>
+              </tr> -->
               <?php
               }
+            }
                ?>
             </table>
           </div>

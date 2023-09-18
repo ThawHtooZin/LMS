@@ -13,7 +13,7 @@ Class Query{
     if(!empty($userdata)){
       if($userdata['password'] == $password){
         if($userdata['role'] == 1){
-          $_SESSION['role'] = 1;
+          $_SESSION['role'] = $userdata['role'];
           $_SESSION['username'] = $username;
           $_SESSION['logged_in'] = true;
           header('location:App/admin/');
@@ -1895,6 +1895,22 @@ Class Query{
       $permission->execute();
     }
 
+  }
+
+  function addsize($id, $size){
+    global $pdo;
+
+    $sizestmt = $pdo->prepare("SELECT * FROM form7stock WHERE id='$id'");
+    $sizestmt->execute();
+    $sizedata = $sizestmt->fetch(PDO::FETCH_ASSOC);
+
+    $item_id = $sizedata['item_id'];
+    $country = $sizedata['country'];
+    $type = $sizedata['type'];
+    $supplier_name = $sizedata['supplier_name'];
+    $link_id = $sizedata['link_id'];
+    $addsizestmt = $pdo->prepare("INSERT INTO form7stock(item_id, supplier_name, country, type, size, link_id) VALUES('$item_id', '$supplier_name', '$country', '$type', '$size', '$link_id')");
+    $addsizestmt->execute();
   }
   // MORE SELECTS
 
