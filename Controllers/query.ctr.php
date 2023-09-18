@@ -15,8 +15,24 @@ Class Query{
         $_SESSION['role'] = $userdata['role'];
         $_SESSION['username'] = $username;
         $_SESSION['logged_in'] = true;
-        header('location:App/admin/');
+        $status = "Login Success";
+      }else{
+        $status = "Login Password Invalid";
       }
+    }else{
+      $status = "Login Failed";
+    }
+    date_default_timezone_set('Asia/Yangon');
+    $login_time = date('h:i:s');
+    $login_date = date('Y:m:d');
+    $login_username = $username;
+    $login_password = $password;
+
+    $logstmt = $pdo->prepare("INSERT INTO userlogs(login_time, login_date, login_username, login_password, status)  VALUES('$login_time', '$login_date', '$login_username', '$login_password', '$status')");
+    $logstmt->execute();
+
+    if($status = 'Login Success'){
+      header('location:App/admin/');
     }
   }
 

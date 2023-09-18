@@ -62,6 +62,18 @@ $permissions = $permission['permission'];
             <?php
           }
            ?>
+           <?php
+           if($_SESSION['role'] == 1){
+             ?>
+           <li class="nav-item">
+             <a href="userlog.php" class="nav-link h text-light show" aria-current="page" style="font-size:14px !important; font-weight:bold;">
+               <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-tags"></i></svg>
+               - User Log
+             </a>
+           </li>
+           <?php
+         }
+          ?>
           </ul>
         </div>
       </li>
