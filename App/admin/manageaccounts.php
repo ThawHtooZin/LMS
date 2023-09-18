@@ -257,10 +257,14 @@ $query = new Query();
             <label>Role</label>
             <select class="form-control" name="role">
               <option value="">Select Role</option>
-              <option value="1">Admin</option>
-              <option value="2">User</option>
-              <option value="3">Sale Person</option>
-              <option value="4">Purchase Person</option>
+              <?php
+              $roledatas  = $query->selectall('role');
+              foreach ($roledatas as $roledata) {
+              ?>
+              <option value="<?php echo $roledata['role_id']; ?>"><?php echo $roledata['role_name']; ?></option>
+              <?php
+              }
+              ?>
             </select>
           </div>
           <div class="modal-footer">

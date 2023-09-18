@@ -137,6 +137,27 @@ Class Query{
     }
   }
 
+  function addrole($role_name){
+    global $pdo;
+
+    $addrole = $pdo->prepare("INSERT INTO role(role_name) VALUES('$role_name]')");
+    $addrole->execute();
+  }
+
+  function updaterole($role_id, $role_name){
+    global $pdo;
+
+    $updaterole = $pdo->prepare("UPDATE role SET role_name='$role_name' WHERE role_id='$role_id'");
+    $updaterole->execute();
+  }
+
+  function deleterole($delete_role_id){
+    global $pdo;
+
+    $deleterole = $pdo->prepare("DELETE FROM role WHERE role_id='$delete_role_id'");
+    $deleterole->execute();
+  }
+
   function addcashbookdata($table, $date, $serial_no, $ac_name, $particular, $debit, $credit){
     global $pdo;
       $stmt = $pdo->prepare("SELECT balance FROM cashbook ORDER BY id DESC");
@@ -1858,6 +1879,22 @@ Class Query{
     if(!empty($exportmcstmt)){
       echo '<script>swal("Success!", "Exported Successfully!", "success");</script>';
     }
+  }
+
+  function permission($permission, $role_id){
+    global $pdo;
+
+    $permissioncheckstmt = $pdo->prepare("SELECT * FROM permission WHERE role_id='$role_id'");
+    $permissioncheckstmt->execute();
+    $permissioncheckdata = $permissioncheckstmt->fetchall();
+    if(!empty($permissioncheckdata)){
+      $permission = $pdo->prepare("UPDATE permission SET permission='$permission' WHERE role_id='$role_id'");
+      $permission->execute();
+    }else{
+      $permission = $pdo->prepare("INSERT INTO permission(role_id, permission) VALUES('$role_id', '$permission')");
+      $permission->execute();
+    }
+
   }
   // MORE SELECTS
 
