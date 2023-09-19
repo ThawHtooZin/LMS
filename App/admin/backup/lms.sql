@@ -7,9 +7,10 @@ CREATE TABLE `accounts` (
   `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `role` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO accounts VALUES("18","admin","admin","admin@gmail.com","1");
+INSERT INTO accounts VALUES("20","Stock Control Person","scp","scp@gmail.com","2");
 
 
 
@@ -182,7 +183,7 @@ CREATE TABLE `form10stock` (
   `total_kg` varchar(11) NOT NULL,
   `percentage` varchar(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO form10stock VALUES("52","2023-09-19","MR163","AT268","NY","frozen","3up","89","14","327","84","23.1","6","4.1","1","346","");
 INSERT INTO form10stock VALUES("53","2023-09-19","MR163","AT268","NY","frozen","4up","79","16","379","80","18.8","4","22.9","5","374.9","");
@@ -201,6 +202,7 @@ INSERT INTO form10stock VALUES("65","2023-09-11","KO962","AT263","NY","frozen","
 INSERT INTO form10stock VALUES("66","2023-09-11","KO962","AT263","NY","frozen","7up","1","1","23.5","3","","0","15.3","2","8.2","");
 INSERT INTO form10stock VALUES("67","2023-09-11","KO962","AT263","NY","frozen","9up","0","0","0","0","10","1","10.4","1","-0.4","");
 INSERT INTO form10stock VALUES("68","2023-09-11","KO962","AT263","NY","frozen","10up","1","1","21","2","","0","10.8","1","10.2","");
+INSERT INTO form10stock VALUES("69","2023-09-19","SB263","MK1625","DAKA","tcl","2up","89","14","327","84","23.1","6","4.1","1","346","");
 
 
 
@@ -220,7 +222,7 @@ CREATE TABLE `form7stock` (
   `pcsperf7` int(11) NOT NULL,
   `link_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=82 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=105 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO form7stock VALUES("51","2023-09-16","MR163","AT268","NY","frozen","3up","209.4","342.1596","","89","88");
 INSERT INTO form7stock VALUES("52","2023-09-16","MR163","AT268","NY","frozen","4up","357.5","584.155","","79","89");
@@ -237,8 +239,11 @@ INSERT INTO form7stock VALUES("74","0000-00-00","KO962","AT263","NY","frozen","5
 INSERT INTO form7stock VALUES("75","0000-00-00","KO962","AT263","NY","frozen","6up","","","","4","91");
 INSERT INTO form7stock VALUES("76","0000-00-00","KO962","AT263","NY","frozen","7up","","","","1","91");
 INSERT INTO form7stock VALUES("79","0000-00-00","KO962","AT263","NY","frozen","9up","","","","1","91");
-INSERT INTO form7stock VALUES("80","0000-00-00","KO962","AT263","NY","frozen","10up","","","","0","91");
-INSERT INTO form7stock VALUES("81","0000-00-00","KO962","AT263","NY","frozen","1.5up","","","","3","91");
+INSERT INTO form7stock VALUES("95","0000-00-00","MR163","AT268","NY","frozen","10up","","","","0","88");
+INSERT INTO form7stock VALUES("99","2023-09-19","HL123","NS123","Can","frozen","2up","100","163.4","","10","0");
+INSERT INTO form7stock VALUES("102","0000-00-00","HL123","NS123","Can","frozen","3up","","","","0","0");
+INSERT INTO form7stock VALUES("103","2023-09-19","SB263","MK1625","DAKA","tcl","2up","209.4","342.1596","","89","93");
+INSERT INTO form7stock VALUES("104","2023-09-19","HL123","DG214","DAKA","tcl","3up","100","163.4","","0","0");
 
 
 
@@ -373,7 +378,7 @@ CREATE TABLE `hhkmcstock` (
   `mc` int(11) NOT NULL,
   `balance_mc` bigint(17) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=149 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=150 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO hhkmcstock VALUES("143","NY","From From-10","2023-09-17","KO962","2up","21","5","5");
 INSERT INTO hhkmcstock VALUES("144","NY","From From-10","2023-09-17","KO962","2up","22","3","3");
@@ -381,6 +386,7 @@ INSERT INTO hhkmcstock VALUES("145","NY","From From-10","2023-09-17","KO962","3u
 INSERT INTO hhkmcstock VALUES("146","NY","From From-10","2023-09-17","KO962","3up","22","200","200");
 INSERT INTO hhkmcstock VALUES("147","NY","HHK To GFC","2023-09-20","KO962","3up","21","5","5");
 INSERT INTO hhkmcstock VALUES("148","NY","HHK To GFC","2023-09-20","KO962","2up","22","2","1");
+INSERT INTO hhkmcstock VALUES("149","Can","From From-10","2023-09-19","MR163","2up","150","5","5");
 
 
 
@@ -752,7 +758,7 @@ CREATE TABLE `payable` (
   `balance` bigint(25) NOT NULL,
   `link_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=131 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=133 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO payable VALUES("57","DK123","2001","800000","0000-00-00","","0","800000","25");
 INSERT INTO payable VALUES("58","DK123","","0","2023-08-26","AP0001","500000","0","0");
@@ -802,6 +808,8 @@ INSERT INTO payable VALUES("127","AT268","1012","209400","0000-00-00","","0","85
 INSERT INTO payable VALUES("128","AT268","6526","357500","0000-00-00","","0","8928128","89");
 INSERT INTO payable VALUES("129","AT263","6890","99800","0000-00-00","","0","9027928","90");
 INSERT INTO payable VALUES("130","AT263","9493","185350","0000-00-00","","0","9213278","91");
+INSERT INTO payable VALUES("131","DK123","52","150000","0000-00-00","","0","9363278","92");
+INSERT INTO payable VALUES("132","MK1625","422","209400","0000-00-00","","0","9572678","93");
 
 
 
@@ -812,9 +820,10 @@ CREATE TABLE `permission` (
   `role_id` int(11) NOT NULL,
   `permission` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO permission VALUES("1","1","manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_accountreceivable,manage_customers,manage_supplier,manage_category,manage_item,manage_unit,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_packingmaterial,sale_report,purchase_report");
+INSERT INTO permission VALUES("2","2",",manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport");
 
 
 
@@ -861,7 +870,7 @@ CREATE TABLE `purchase` (
   `price` int(11) NOT NULL,
   `amount` int(11) NOT NULL,
   PRIMARY KEY (`no`)
-) ENGINE=InnoDB AUTO_INCREMENT=92 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=94 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO purchase VALUES("25","2023-08-26","2001","DK123","frozen","HL123","10","200","0","4000","800000");
 INSERT INTO purchase VALUES("26","2023-08-26","2001","DK123","frozen","HG184","10","100","0","30000","3000000");
@@ -889,6 +898,8 @@ INSERT INTO purchase VALUES("88","2023-09-16","1012","AT268","frozen","MR163","3
 INSERT INTO purchase VALUES("89","2023-09-16","6526","AT268","frozen","MR163","4up","357.5","0","1000","357500");
 INSERT INTO purchase VALUES("90","2023-09-10","6890","AT263","frozen","KO962","2up","99.8","0","1000","99800");
 INSERT INTO purchase VALUES("91","2023-09-10","9493","AT263","frozen","KO962","3up","185.35","0","1000","185350");
+INSERT INTO purchase VALUES("92","2023-09-11","52","DK123","frozen","BJ123","3up","150","0","1000","150000");
+INSERT INTO purchase VALUES("93","2023-09-19","422","MK1625","tcl","SB263","2up","209.4","0","1000","209400");
 
 
 
@@ -934,9 +945,10 @@ CREATE TABLE `role` (
   `role_id` int(11) NOT NULL AUTO_INCREMENT,
   `role_name` varchar(255) NOT NULL,
   PRIMARY KEY (`role_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO role VALUES("1","Admin");
+INSERT INTO role VALUES("2","Stock");
 
 
 
@@ -1010,6 +1022,34 @@ INSERT INTO supplier VALUES("AT268","Aung Htike","0953245678","Yangon");
 
 
 
+DROP TABLE tclmcstock;
+
+CREATE TABLE `tclmcstock` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `date` date NOT NULL,
+  `item_id` varchar(9) NOT NULL,
+  `size` varchar(9) NOT NULL,
+  `pcs` int(9) NOT NULL,
+  `kg` float NOT NULL,
+  `opening_mc` int(11) NOT NULL,
+  `form10mc` int(11) NOT NULL,
+  `transfer_to_where` varchar(11) NOT NULL,
+  `transfer_mc` int(11) NOT NULL,
+  `loading_no` int(11) NOT NULL,
+  `loading_mc` int(11) NOT NULL,
+  `grandtotal_mc` bigint(77) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO tclmcstock VALUES("2","2023-09-19","SB263","2up","89","327","0","14","HHK","14","0","0","0");
+INSERT INTO tclmcstock VALUES("4","2023-09-19","SB263","3up","89","327","0","15","","0","31","15","0");
+INSERT INTO tclmcstock VALUES("5","2023-09-19","SB263","2up","90","372","0","20","","0","22","20","0");
+INSERT INTO tclmcstock VALUES("6","2023-09-19","SB263","4up","84","150","0","15","","0","23","15","0");
+INSERT INTO tclmcstock VALUES("7","2023-09-20","SB263","5up","89","327","0","15","","0","35","15","0");
+INSERT INTO tclmcstock VALUES("8","2023-09-20","SB263","9up","100","400","0","50","HHK","25","36","25","0");
+
+
+
 DROP TABLE total_charges;
 
 CREATE TABLE `total_charges` (
@@ -1033,6 +1073,29 @@ CREATE TABLE `total_charges` (
 
 INSERT INTO total_charges VALUES("71","0000-00-00","12","600","450","300000","0","0","0","301050","301050","0000-00-00","0","301050","0");
 INSERT INTO total_charges VALUES("72","0000-00-00","12","1350","900","600000","0","0","0","602250","903300","0000-00-00","0","903300","0");
+
+
+
+DROP TABLE userlogs;
+
+CREATE TABLE `userlogs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `login_time` time(6) NOT NULL,
+  `login_date` date NOT NULL,
+  `login_username` varchar(125) NOT NULL,
+  `login_password` varchar(125) NOT NULL,
+  `status` varchar(55) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO userlogs VALUES("1","10:26:18.000000","2023-09-18","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("2","10:31:25.000000","2023-09-18","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("3","09:34:51.000000","2023-09-19","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("4","05:49:07.000000","2023-09-19","admin","","Logout");
+INSERT INTO userlogs VALUES("5","10:19:14.000000","2023-09-19","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("6","05:49:31.000000","2023-09-19","admin","","Logout");
+INSERT INTO userlogs VALUES("7","10:19:36.000000","2023-09-19","asdf","yyyy","Login Failed");
+INSERT INTO userlogs VALUES("8","10:19:39.000000","2023-09-19","admin","admin","Login Success");
 
 
 

@@ -322,6 +322,18 @@ $permissions = $permission['permission'];
             }
             ?>
             <?php
+            if(str_contains($permissions, ',')){
+              ?>
+            <li class="nav-item">
+              <a href="tclmcstock.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - TCL Mc Stock
+              </a>
+            </li>
+            <?php
+            }
+            ?>
+            <?php
             if(str_contains($permissions, 'manage_stockreport')){
               ?>
             <li class="nav-item">

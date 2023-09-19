@@ -405,17 +405,6 @@ Class Query{
     }
   }
 
-  function deleteform7($table, $deleteid){
-    global $pdo;
-    $stmt = $pdo->prepare("DELETE FROM $table WHERE id='$deleteid'");
-    $stmt->execute();
-    if($stmt){
-      return $successmessage = "Payable Voucher Deleted Successfully";
-    }else{
-      return $errmessage = "Error accors when deleted Payable Voucher";
-    }
-  }
-
   function addpayable($table, $supplier_id, $paid_date, $paid_voucher, $paid_amount){
     global $pdo;
     $stmt = $pdo->prepare("INSERT INTO $table(supplier_id ,paid_date, paid_voucher, paid_amount) VALUES('$supplier_id', '$paid_date', '$paid_voucher', '$paid_amount')");
@@ -1908,6 +1897,56 @@ Class Query{
     $addsizestmt = $pdo->prepare("INSERT INTO form7stock(item_id, supplier_name, country, type, size, link_id) VALUES('$item_id', '$supplier_name', '$country', '$type', '$size', '$link_id')");
     $addsizestmt->execute();
   }
+
+  function addform7($date, $commondity_id, $supplier_name, $type, $size, $viss){
+    global $pdo;
+
+    $kg = $viss * 1.634;
+
+    $addstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, type, size, viss, kg) VALUES('$date', '$commondity_id', '$supplier_name', '$type', '$size', '$viss', '$kg')");
+    $addstmt->execute();
+  }
+
+  function deleteform7($deleteid){
+    global $pdo;
+
+    $stmt = $pdo->prepare("DELETE FROM form7stock WHERE id='$deleteid'");
+    $stmt->execute();
+  }
+
+  function addtclmcstock($date, $item_id, $size, $pcs, $kg, $form10_mc){
+    global $pdo;
+
+    $addtclmcstmt = $pdo->prepare("INSERT INTO tclmcstock(date, item_id, size, pcs, kg, form10mc, grandtotal_mc) VALUES('$date', '$item_id', '$size', '$pcs', '$kg', '$form10_mc', '$form10_mc')");
+    $addtclmcstmt->execute();
+  }
+
+  function transfermcstocktcl($transfer_to, $transfer_mc, $id){
+    global $pdo;
+
+    $transfercheckstmt = $pdo->prepare("SELECT * FROM tclmcstock WHERE id='$id'");
+    $transfercheckstmt->execute();
+    $transfercheck = $transfercheckstmt->fetch(PDO::FETCH_ASSOC);
+
+    $grandtotal_mc = $transfercheck['grandtotal_mc'] - $transfer_mc;
+    $transferstmt = $pdo->prepare("UPDATE tclmcstock SET transfer_to_where='$transfer_to', transfer_mc='$transfer_mc', grandtotal_mc='$grandtotal_mc' WHERE id='$id'");
+    $transferstmt->execute();
+    return '<script>swal("Success!", "Successfully Transfered!", "success");</script>';
+  }
+
+  function loadmcstocktcl($loading_no, $loading_mc, $id){
+    global $pdo;
+
+    $loadcheckstmt = $pdo->prepare("SELECT * FROM tclmcstock WHERE id='$id'");
+    $loadcheckstmt->execute();
+    $loadcheck = $loadcheckstmt->fetch(PDO::FETCH_ASSOC);
+
+    $grandtotal_mc = $loadcheck['grandtotal_mc'] - $loading_mc;
+    $loadstmt = $pdo->prepare("UPDATE tclmcstock SET loading_no='$loading_no', loading_mc='$loading_mc', grandtotal_mc='$grandtotal_mc' WHERE id='$id'");
+    $loadstmt->execute();
+    return '<script>swal("Success!", "Successfully Loaded!", "success");</script>';
+  }
+
   // MORE SELECTS
 
   function selectsum($table, $id, $selectwhat){
