@@ -2,12 +2,12 @@
 session_start();
 include '../../Auth/authrize.ctr.php';
 include '../../Resources/resource.boot.php';
-// include '../../Controllers/query.ctr.php';
+include '../../Controllers/query.ctr.php';
 
 $auth = new auth();
 $auth->checkadmin();
 $bootstrap = new Bootstrap();
-// $query = new Query();
+$query = new Query();
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">

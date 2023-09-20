@@ -12,31 +12,27 @@ Class Query{
 
     if(!empty($userdata)){
       if($userdata['password'] == $password){
-        if($userdata['role'] == 1){
-          $_SESSION['role'] = 1;
-          $_SESSION['username'] = $username;
-          $_SESSION['logged_in'] = true;
-          header('location:App/admin/');
-        }
-        if($userdata['role'] == 2){
-          $_SESSION['role'] = 2;
-          $_SESSION['username'] = $username;
-          $_SESSION['logged_in'] = true;
-          header('location:App/user/');
-        }
-        if($userdata['role'] == 3){
-          $_SESSION['role'] = 3;
-          $_SESSION['username'] = $username;
-          $_SESSION['logged_in'] = true;
-          header('location:App/sale/');
-        }
-        if($userdata['role'] == 4){
-          $_SESSION['role'] = 4;
-          $_SESSION['username'] = $username;
-          $_SESSION['logged_in'] = true;
-          header('location:App/purchase/');
-        }
+        $_SESSION['role'] = $userdata['role'];
+        $_SESSION['username'] = $username;
+        $_SESSION['logged_in'] = true;
+        $status = "Login Success";
+      }else{
+        $status = "Login Password Invalid";
       }
+    }else{
+      $status = "Login Failed";
+    }
+    date_default_timezone_set('Asia/Yangon');
+    $login_time = date('h:i:s');
+    $login_date = date('Y:m:d');
+    $login_username = $username;
+    $login_password = $password;
+
+    $logstmt = $pdo->prepare("INSERT INTO userlogs(login_time, login_date, login_username, login_password, status)  VALUES('$login_time', '$login_date', '$login_username', '$login_password', '$status')");
+    $logstmt->execute();
+
+    if($status = 'Login Success'){
+      header('location:App/admin/');
     }
   }
 
@@ -140,7 +136,7 @@ Class Query{
   function addrole($role_name){
     global $pdo;
 
-    $addrole = $pdo->prepare("INSERT INTO role(role_name) VALUES('$role_name]')");
+    $addrole = $pdo->prepare("INSERT INTO role(role_name) VALUES('$role_name')");
     $addrole->execute();
   }
 
@@ -401,17 +397,6 @@ Class Query{
   function deletepayable($table, $deleteid){
     global $pdo;
     $stmt = $pdo->prepare("DELETE FROM $table WHERE link_id='$deleteid'");
-    $stmt->execute();
-    if($stmt){
-      return $successmessage = "Payable Voucher Deleted Successfully";
-    }else{
-      return $errmessage = "Error accors when deleted Payable Voucher";
-    }
-  }
-
-  function deleteform7($table, $deleteid){
-    global $pdo;
-    $stmt = $pdo->prepare("DELETE FROM $table WHERE id='$deleteid'");
     $stmt->execute();
     if($stmt){
       return $successmessage = "Payable Voucher Deleted Successfully";
@@ -1896,6 +1881,72 @@ Class Query{
     }
 
   }
+
+  function addsize($id, $size){
+    global $pdo;
+
+    $sizestmt = $pdo->prepare("SELECT * FROM form7stock WHERE id='$id'");
+    $sizestmt->execute();
+    $sizedata = $sizestmt->fetch(PDO::FETCH_ASSOC);
+
+    $item_id = $sizedata['item_id'];
+    $country = $sizedata['country'];
+    $type = $sizedata['type'];
+    $supplier_name = $sizedata['supplier_name'];
+    $link_id = $sizedata['link_id'];
+    $addsizestmt = $pdo->prepare("INSERT INTO form7stock(item_id, supplier_name, country, type, size, link_id) VALUES('$item_id', '$supplier_name', '$country', '$type', '$size', '$link_id')");
+    $addsizestmt->execute();
+  }
+
+  function addform7($date, $commondity_id, $supplier_name, $type, $size, $viss){
+    global $pdo;
+
+    $kg = $viss * 1.634;
+
+    $addstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, type, size, viss, kg) VALUES('$date', '$commondity_id', '$supplier_name', '$type', '$size', '$viss', '$kg')");
+    $addstmt->execute();
+  }
+
+  function deleteform7($deleteid){
+    global $pdo;
+
+    $stmt = $pdo->prepare("DELETE FROM form7stock WHERE id='$deleteid'");
+    $stmt->execute();
+  }
+
+  function addtclmcstock($date, $item_id, $size, $pcs, $kg, $form10_mc){
+    global $pdo;
+
+    $addtclmcstmt = $pdo->prepare("INSERT INTO tclmcstock(date, item_id, size, pcs, kg, form10mc, grandtotal_mc) VALUES('$date', '$item_id', '$size', '$pcs', '$kg', '$form10_mc', '$form10_mc')");
+    $addtclmcstmt->execute();
+  }
+
+  function transfermcstocktcl($transfer_to, $transfer_mc, $id){
+    global $pdo;
+
+    $transfercheckstmt = $pdo->prepare("SELECT * FROM tclmcstock WHERE id='$id'");
+    $transfercheckstmt->execute();
+    $transfercheck = $transfercheckstmt->fetch(PDO::FETCH_ASSOC);
+
+    $grandtotal_mc = $transfercheck['grandtotal_mc'] - $transfer_mc;
+    $transferstmt = $pdo->prepare("UPDATE tclmcstock SET transfer_to_where='$transfer_to', transfer_mc='$transfer_mc', grandtotal_mc='$grandtotal_mc' WHERE id='$id'");
+    $transferstmt->execute();
+    return '<script>swal("Success!", "Successfully Transfered!", "success");</script>';
+  }
+
+  function loadmcstocktcl($loading_no, $loading_mc, $id){
+    global $pdo;
+
+    $loadcheckstmt = $pdo->prepare("SELECT * FROM tclmcstock WHERE id='$id'");
+    $loadcheckstmt->execute();
+    $loadcheck = $loadcheckstmt->fetch(PDO::FETCH_ASSOC);
+
+    $grandtotal_mc = $loadcheck['grandtotal_mc'] - $loading_mc;
+    $loadstmt = $pdo->prepare("UPDATE tclmcstock SET loading_no='$loading_no', loading_mc='$loading_mc', grandtotal_mc='$grandtotal_mc' WHERE id='$id'");
+    $loadstmt->execute();
+    return '<script>swal("Success!", "Successfully Loaded!", "success");</script>';
+  }
+
   // MORE SELECTS
 
   function selectsum($table, $id, $selectwhat){

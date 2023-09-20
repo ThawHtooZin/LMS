@@ -120,9 +120,7 @@ $query = new Query();
             $permissionstmt->execute();
             $permissiondata = $permissionstmt->fetch(PDO::FETCH_ASSOC);
             if(!empty($permissiondata)){
-              echo $permissionshow = $permissiondata['permission'];
-              if(!empty(strpos($permissionshow, 'manage_accounts'))){echo "checked";}else{echo "aaa";};
-              if(!empty(strpos($permissionshow, 'manage_unit'))){echo "checked";};
+              $permissionshow = $permissiondata['permission'];
             }
             ?>
             <table class="table table-bordered">
@@ -135,69 +133,69 @@ $query = new Query();
                 </tr>
                 <tr>
                   <td>Manage Accounts</td>
-                  <td><input type="checkbox" name="manage_accounts" <?php if(!empty($permission)){if(!empty(strpos($permissionshow, 'manage_accounts'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="manage_accounts" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_accounts') == 1){echo "checked";}} ?>></td>
                   <td>Manage Unit</td>
-                  <td><input type="checkbox" name="manage_unit" <?php if(!empty($permission)){if(!empty(strpos($permissionshow, 'manage_unit'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="manage_unit" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_unit') == 1){echo "checked";}} ?>></td>
                 </tr>
                 <tr>
                   <td>Manage Role</td>
-                  <td><input type="checkbox" name="manage_role" <?php if(!empty($permission)){if(!empty(strpos($permissionshow, 'manage_role'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="manage_role" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_role') == 1){echo "checked";}} ?>></td>
                   <td>Manage Cold Store Charges</td>
-                  <td><input type="checkbox" name="manage_coldstorecharges" <?php if(!empty($permission)){if(!empty(strpos($permissionshow, 'manage_coldstorecharges'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="manage_coldstorecharges" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_coldstorecharges') == 1){echo "checked";}} ?>></td>
                 </tr>
                 <tr>
                   <td>Manage Sale</td>
-                  <td><input type="checkbox" name="manage_sale" <?php if(!empty($permission)){if(!empty(strpos($permissionshow, 'manage_sale'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="manage_sale" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_sale') == 1){echo "checked";}} ?>></td>
                   <td>Manage Form7</td>
-                  <td><input type="checkbox" name="manage_form7" <?php if(!empty($permission)){if(!empty(strpos($permissionshow, 'manage_form7'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="manage_form7" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_form7') == 1){echo "checked";}} ?>></td>
                 </tr>
                 <tr>
                   <td>Manage Purchase</td>
-                  <td><input type="checkbox" name="manage_purchase" <?php if(!empty($permission)){if(!empty(strpos($permissionshow, 'manage_purchase'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="manage_purchase" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_purchase') == 1){echo "checked";}} ?>></td>
                   <td>Manage Form10</td>
-                  <td><input type="checkbox" name="manage_form10" <?php if(!empty($permission)){if(!empty(strpos($permissionshow, 'manage_form10'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="manage_form10" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_form10') == 1){echo "checked";}} ?>></td>
                 </tr>
                 <tr>
                   <td>Manage Cash Book</td>
-                  <td><input type="checkbox" name="manage_cashbook" <?php if(!empty($permission)){if(!empty(strpos($permissionshow, 'manage_cashbook'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="manage_cashbook" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_cashbook') == 1){echo "checked";}} ?>></td>
                   <td>Manage HHK Mc Stock</td>
-                  <td><input type="checkbox" name="manage_hhkmcstock" <?php if(!empty($permission)){if(!empty(strpos($permissionshow, 'manage_hhkmcstock'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="manage_hhkmcstock" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_hhkmcstock') == 1){echo "checked";}} ?>></td>
                 </tr>
                 <tr>
                   <td>Manage Account Payable</td>
-                  <td><input type="checkbox" name="manage_accountpayable" <?php if(!empty($permission)){if(!empty(strpos($permissionshow, 'manage_accountpayable'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="manage_accountpayable" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_accountpayable') == 1){echo "checked";}} ?>></td>
                   <td>Manage GFC Mc Stock</td>
-                  <td><input type="checkbox" name="manage_gfcmcstock" <?php if(!empty($permission)){if(!empty(strpos($permissionshow, 'manage_gfcmcstock'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="manage_gfcmcstock" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_gfcmcstock') == 1){echo "checked";}} ?>></td>
                 </tr>
                 <tr>
                   <td>Manage Account Receivable</td>
-                  <td><input type="checkbox" name="manage_accountreceivable" <?php if(!empty($permission)){if(!empty(strpos($permissionshow, 'manage_accountreceivable'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="manage_accountreceivable" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_accountreceivable') == 1){echo "checked";}} ?>></td>
                   <td>Manage Stock Report</td>
-                  <td><input type="checkbox" name="manage_stockreport" <?php if(!empty($permission)){if(!empty(strpos($permissionshow, 'manage_stockreport'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="manage_stockreport" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_stockreport') == 1){echo "checked";}} ?>></td>
                 </tr>
                 <tr>
                   <td>Manage Customers</td>
-                  <td><input type="checkbox" name="manage_customers" <?php if(!empty($permission)){if(!empty(strpos($permissionshow, 'manage_customers'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="manage_customers" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_customers') == 1){echo "checked";}} ?>></td>
                   <td>Manage Shippment Export</td>
-                  <td><input type="checkbox" name="manage_shippmentexport" <?php if(!empty($permission)){if(!empty(strpos($permissionshow, 'manage_shippmentexport'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="manage_shippmentexport" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_shippmentexport') == 1){echo "checked";}} ?>></td>
                 </tr>
                 <tr>
                   <td>Manage Supplier</td>
-                  <td><input type="checkbox" name="manage_supplier" <?php if(!empty($permission)){if(!empty(strpos($permissionshow, 'manage_supplier'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="manage_supplier" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_supplier') == 1){echo "checked";}} ?>></td>
                   <td>Manage Packing Material</td>
-                  <td><input type="checkbox" name="manage_packingmaterial" <?php if(!empty($permission)){if(!empty(strpos($permissionshow, 'manage_packingmaterial'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="manage_packingmaterial" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_packingmaterial') == 1){echo "checked";}} ?>></td>
                 </tr>
                 <tr>
                   <td>Manage Category</td>
-                  <td><input type="checkbox" name="manage_category" <?php if(!empty($permission)){if(!empty(strpos($permissionshow, 'manage_category'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="manage_category" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_category') == 1){echo "checked";}} ?>></td>
                   <td>Sale Report</td>
-                  <td><input type="checkbox" name="sale_report" <?php if(!empty($permission)){if(!empty(strpos($permissionshow, 'sale_report'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="sale_report" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'sale_report') == 1){echo "checked";}} ?>></td>
                 </tr>
                 <tr>
                   <td>Manage Item</td>
-                  <td><input type="checkbox" name="manage_item" <?php if(!empty($permission)){if(!empty(strpos($permissionshow, 'manage_item'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="manage_item" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_item') == 1){echo "checked";}} ?>></td>
                   <td>Purchase Report</td>
-                  <td><input type="checkbox" name="purchase_report" <?php if(!empty($permission)){if(empty(strpos($permissionshow, 'purchase_report'))){echo "checked";}} ?>></td>
+                  <td><input type="checkbox" name="purchase_report" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'purchase_report') == 1){echo "checked";}} ?>></td>
                 </tr>
                 <tr>
                   <td></td>

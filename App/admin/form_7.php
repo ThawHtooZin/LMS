@@ -31,6 +31,28 @@ $query = new Query();
 
       $query->updatecountry($country, $pcsperf7, $updateid);
     }
+
+    if(isset($_POST['addsize'])){
+      $id = $_POST['id'];
+      $size = $_POST['size'];
+      $query->addsize($id ,$size);
+    }
+
+    if(isset($_POST['addform7'])){
+      $date = $_POST['date'];
+      $commondity_id = $_POST['item_id'];
+      $supplier_name = $_POST['supplier_id'];
+      $type = $_POST['type'];
+      $size = $_POST['size'];
+      $viss = $_POST['viss'];
+
+      $query->addform7($date, $commondity_id, $supplier_name, $type, $size, $viss);
+    }
+
+    if(isset($_POST['deleteform7'])){
+      $deleteid = $_POST['deleteid'];
+      $query->deleteform7($deleteid);
+    }
      ?>
     <div class="row">
       <div class="col-2">
@@ -41,8 +63,9 @@ $query = new Query();
       <div class="col-10">
         <div class="card mt-1">
           <form action="" method="post">
-            <div class="card-header bg-warning text-light pt-2 pb-3">
+            <div class="card-header bg-info text-light pt-2 pb-3">
               <b class="h5">Link Mark Limited (F-7)</b>
+              <button type="button" class="btn btn-success btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#addmodal">Add Data</button>
               <button type="submit" name="searchbtn" class="btn btn-secondary btn-sm float-end">View</button>
               <select name="commondity_id" class="form-control inpv2 w-25 d-inline float-end me-2" style="height:34px !important;">
                 <option value="">Select Commondity</option>
@@ -81,6 +104,7 @@ $query = new Query();
                 <th>Kg</th>
                 <th>Pcs per Vr</th>
                 <th>Pcs per F-7</th>
+                <th>Action</th>
               </tr>
               <?php
               if (isset($_POST['searchbtn']) && !empty($_POST['commondity_id'])) {
@@ -106,16 +130,24 @@ $query = new Query();
                   $supplierdata = $query->select('supplier', $supplier_id, 'supplier_id');
                   ?>
                   <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>">
-                    <td><?php echo date('d-m-Y', strtotime($form7data['date'])); ?></td>
+                    <td><?php if($form7data['date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($form7data['date']));}; ?></td>
                     <td><?php echo $commonditydata['item_name']; ?></td>
                     <td><?php echo $supplierdata['supplier_name']; ?></td>
                     <td><?php echo $form7data['type']; ?></td>
                     <td><?php echo $form7data['country']; ?></td>
                     <td><?php echo $form7data['size']; ?></td>
                     <td><?php echo $form7data['viss']; ?></td>
-                    <td><?php echo round($form7data['kg'], 2); ?></td>
+                    <td><?php if(!empty($form7data['kg'])){echo round($form7data['kg'], 2);}; ?></td>
                     <td><?php echo $form7data['pcspervr']; ?></td>
                     <td><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
+                    <td>
+                      <form action="form_7.php" method="post">
+                        <input type="hidden" name="deleteid" value="<?php echo $form7data['id']; ?>">
+                        <button type="submit" name="deleteform7" class="btn btn-danger btn-sm">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
+                        </button>
+                      </form>
+                    </td>
                   </tr>
                   <div class="modal fade" id="updatemodal<?php echo $form7data['id']; ?>">
                     <div class="modal-dialog" role="document">
@@ -181,6 +213,7 @@ $query = new Query();
                   <td><?php echo round($totalkgdata['total_kg'], 2); ?></td>
                   <td><?php if(!empty($totalpcsdata['total_pcs'])){ echo $totalpcsdata['total_pcs']; }; ?></td>
                   <td><?php if(!empty($totalpcsf7data['total_pcsf7'])){ echo $totalpcsf7data['total_pcsf7']; }; ?></td>
+                  <td></td>
                 </tr>
                 <?php
               }
@@ -207,16 +240,24 @@ $query = new Query();
                 $supplierdata = $query->select('supplier', $supplier_id, 'supplier_id');
                 ?>
                 <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>">
-                  <td><?php echo date('d-m-Y', strtotime($form7data['date'])); ?></td>
+                  <td><?php if($form7data['date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($form7data['date']));}; ?></td>
                   <td><?php echo $commonditydata['item_name']; ?></td>
                   <td><?php echo $supplierdata['supplier_name']; ?></td>
                   <td><?php echo $form7data['type']; ?></td>
                   <td><?php echo $form7data['country']; ?></td>
                   <td><?php echo $form7data['size']; ?></td>
                   <td><?php echo $form7data['viss']; ?></td>
-                  <td><?php echo round($form7data['kg'], 2); ?></td>
+                  <td><?php if(!empty($form7data['kg'])){echo round($form7data['kg'], 2);}; ?></td>
                   <td><?php echo $form7data['pcspervr']; ?></td>
                   <td><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
+                  <td>
+                    <form action="form_7.php" method="post">
+                      <input type="hidden" name="deleteid" value="<?php echo $form7data['id']; ?>">
+                      <button type="submit" name="deleteform7" class="btn btn-danger btn-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
+                      </button>
+                    </form>
+                  </td>
                 </tr>
                 <div class="modal fade" id="updatemodal<?php echo $form7data['id']; ?>">
                   <div class="modal-dialog" role="document">
@@ -258,31 +299,31 @@ $query = new Query();
                 $item_id = $form7data['item_id'];
                 $country = $form7data['country'];
               }
-              $totalvissstmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM form7stock WHERE type='$type' AND country='$country'");
-              $totalvissstmt->execute();
-              $totalvissdata = $totalvissstmt->fetch(PDO::FETCH_ASSOC);
-              $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE type='$type' AND country='$country'");
-              $totalkgstmt->execute();
-              $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
-              $totalpcsstmt = $pdo->prepare("SELECT SUM(pcspervr) AS total_pcs FROM form7stock WHERE type='$type' AND country='$country'");
-              $totalpcsstmt->execute();
-              $totalpcsdata = $totalpcsstmt->fetch(PDO::FETCH_ASSOC);
-              $totalpcsf7stmt = $pdo->prepare("SELECT SUM(pcsperf7) AS total_pcsf7 FROM form7stock WHERE type='$type' AND country='$country'");
-              $totalpcsf7stmt->execute();
-              $totalpcsf7data = $totalpcsf7stmt->fetch(PDO::FETCH_ASSOC);
+              // $totalvissstmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM form7stock WHERE type='$type' AND country='$country'");
+              // $totalvissstmt->execute();
+              // $totalvissdata = $totalvissstmt->fetch(PDO::FETCH_ASSOC);
+              // $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE type='$type' AND country='$country'");
+              // $totalkgstmt->execute();
+              // $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+              // $totalpcsstmt = $pdo->prepare("SELECT SUM(pcspervr) AS total_pcs FROM form7stock WHERE type='$type' AND country='$country'");
+              // $totalpcsstmt->execute();
+              // $totalpcsdata = $totalpcsstmt->fetch(PDO::FETCH_ASSOC);
+              // $totalpcsf7stmt = $pdo->prepare("SELECT SUM(pcsperf7) AS total_pcsf7 FROM form7stock WHERE type='$type' AND country='$country'");
+              // $totalpcsf7stmt->execute();
+              // $totalpcsf7data = $totalpcsf7stmt->fetch(PDO::FETCH_ASSOC);
               ?>
-              <tr style="font-weight: bold !important;">
+              <!-- <tr style="font-weight: bold !important;">
                 <td></td>
                 <td>Total</td>
                 <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
-                <td><?php echo round($totalvissdata['total_viss'], 3); ?></td>
-                <td><?php echo round($totalkgdata['total_kg'], 2); ?></td>
-                <td><?php if(!empty($totalpcsdata['total_pcs'])){ echo $totalpcsdata['total_pcs']; }; ?></td>
-                <td><?php if(!empty($totalpcsf7data['total_pcsf7'])){ echo $totalpcsf7data['total_pcsf7']; }; ?></td>
-              </tr>
+                <td><?php //echo round($totalvissdata['total_viss'], 3); ?></td>
+                <td><?php //echo round($totalkgdata['total_kg'], 2); ?></td>
+                <td><?php //if(!empty($totalpcsdata['total_pcs'])){ echo $totalpcsdata['total_pcs']; }; ?></td>
+                <td><?php //if(!empty($totalpcsf7data['total_pcsf7'])){ echo $totalpcsf7data['total_pcsf7']; }; ?></td>
+              </tr> -->
               <?php
               }
             }else{
@@ -300,22 +341,32 @@ $query = new Query();
                 $datas = $stmt->fetchall();
                 foreach ($datas as $form7data) {
                   $item_id = $form7data['item_id'];
+                  $country = $form7data['country'];
                   $commonditydata = $query->select('item', $item_id, 'item_id');
                   $supplier_id = $form7data['supplier_name'];
                   $supplierdata = $query->select('supplier', $supplier_id, 'supplier_id');
-                  ?>
-                  <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>">
-                    <td><?php echo date('d-m-Y', strtotime($form7data['date'])); ?></td>
-                    <td><?php echo $commonditydata['item_name']; ?></td>
-                    <td><?php echo $supplierdata['supplier_name']; ?></td>
-                    <td><?php echo $form7data['type']; ?></td>
-                    <td><?php echo $form7data['country']; ?></td>
-                    <td><?php echo $form7data['size']; ?></td>
-                    <td><?php echo $form7data['viss']; ?></td>
-                    <td><?php echo round($form7data['kg'], 2); ?></td>
-                    <td><?php echo $form7data['pcspervr']; ?></td>
-                    <td><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
-                  </tr>
+
+                    ?>
+                   <tr>
+                     <td><?php if($form7data['date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($form7data['date']));}; ?></td>
+                     <td><?php echo $commonditydata['item_name']; ?></td>
+                     <td><?php echo $supplierdata['supplier_name']; ?></td>
+                     <td><?php echo $form7data['type']; ?></td>
+                     <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php echo $form7data['country']; ?></td>
+                     <td data-bs-toggle="modal" data-bs-target="#addsizemodal<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php echo $form7data['size']; ?></td>
+                     <td data-bs-toggle="modal" data-bs-target="#adjustvissandcountry<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php echo $form7data['viss']; ?></td>
+                     <td><?php if(!empty($form7data['kg'])){echo round($form7data['kg'], 2);}; ?></td>
+                     <td><?php echo $form7data['pcspervr']; ?></td>
+                     <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
+                     <td>
+                       <form action="form_7.php" method="post">
+                         <input type="hidden" name="deleteid" value="<?php echo $form7data['id']; ?>">
+                         <button type="submit" name="deleteform7" class="btn btn-danger btn-sm">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
+                         </button>
+                       </form>
+                     </td>
+                   </tr>
                   <div class="modal fade" id="updatemodal<?php echo $form7data['id']; ?>">
                     <div class="modal-dialog" role="document">
                       <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
@@ -351,13 +402,108 @@ $query = new Query();
                       </div>
                     </div>
                   </div>
+                  <div class="modal fade" id="addsizemodal<?php echo $form7data['id']; ?>">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header bg-warning text-light">
+                          <h1 class="modal-title fs-5">Add Size</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <form action="form_7.php" method="post">
+                            <input type="hidden" name="id" value="<?php echo $form7data['id']; ?>">
+                            <div class="modal-body">
+                              <label>Size</label>
+                              <input type="text" name="size" class="form-control inpv2 mt-2">
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-success" name="addsize">Add Size</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
                   <?php
                 }
+                }
               }
-            }
+
                 ?>
             </table>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="addmodal">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content"  style="width: 650px; !important; margin-top:70px !important;">
+          <div class="modal-header bg-secondary text-light">
+            <h1 class="modal-title fs-5">Add New Data</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
+          <div class="modal-body">
+            <form action="form_7.php" method="post">
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col">
+                    <label>Date</label>
+                    <input type="date" name="date" class="form-control inpv2 mb-2">
+                  </div>
+                  <div class="col">
+                    <label>Fish Name</label>
+                    <select class="form-control inpv2 mb-2" name="item_id">
+                      <?php
+                      $itemdatas = $query->selectall('item');
+                      foreach ($itemdatas as $itemdata) {
+                        ?>
+                        <option value="<?php echo $itemdata['item_id']; ?>"><?php echo $itemdata['item_name']; ?></option>
+                        <?php
+                      }
+                      ?>
+                    </select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col">
+                    <label>Supplier Name</label>
+                    <select class="form-control inpv2 mb-2" name="supplier_id">
+                      <?php
+                      $supplierdatas = $query->selectall('supplier');
+                      foreach ($supplierdatas as $supplierdata) {
+                        ?>
+                        <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplierdata['supplier_name']; ?></option>
+                        <?php
+                      }
+                      ?>
+                    </select>
+                  </div>
+                  <div class="col">
+                    <label>Type</label>
+                    <select class="form-control inpv2 mb-2" name="type">
+                      <option value="">Select Type</option>
+                      <option value="frozen">Frozen</option>
+                      <option value="tcl">TCl</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col">
+                    <label>Size</label>
+                    <input type="text" name="size" class="form-control inpv2 mb-2">
+                  </div>
+                  <div class="col">
+                    <label>Viss</label>
+                    <input type="text" name="viss" Class="form-control inpv2 mb-2">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-success" name="addform7">Add</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

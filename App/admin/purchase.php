@@ -155,7 +155,7 @@ $query = new Query();
             }else{
               $pageno = 1;
             }
-            $numOfrecs = 8;
+            $numOfrecs = 10;
             $offset = ($pageno -1) * $numOfrecs;
             ?>
             <table class="mt-1 table table-bordered table-striped rounded table-hover">
@@ -321,7 +321,7 @@ $query = new Query();
               };
               ?>
               <?php
-              if (isset($_POST['total'])) {
+              if (isset($_POST['total']) ) {
                 $supplier_id = $_POST['supplier_id'];
                 $total_amount = $query->selectsum('purchase', $supplier_id, 'supplier_id');
                 ?>
@@ -365,7 +365,7 @@ $query = new Query();
               }
               ?>
               <?php
-              if(!$_POST){
+              if(!$_POST && !empty($_GET['pageno']) && $_GET['pageno'] == $total_pages){
                 $total_amount = $query->selectallsum('purchase', 'amount', 'total_amount');
                 ?>
                 <tr>
@@ -382,11 +382,10 @@ $query = new Query();
                   <td><?php echo $total_amount['total_amount'];  ?></td>
                   <td></td>
                 </tr>
+                <?php
+              }
+              ?>
             </table>
-            <?php
-            }
-            ?>
-            <br>
             <div aria-label="Page navigation example" style="float:right;">
               <ul class="pagination">
                 <li class="page-item"><a class="page-link" href="?pageno=1">First</a></li>
