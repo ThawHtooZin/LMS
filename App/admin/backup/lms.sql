@@ -1091,10 +1091,29 @@ CREATE TABLE `truckactualinvoice` (
   `total_usd` float NOT NULL,
   `invoice_no` varchar(15) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO truckactualinvoice VALUES("9","MR163","2up","12","36","20","720","0","0","SH473");
-INSERT INTO truckactualinvoice VALUES("10","KO962","4up","12","19","10","190","0","0","SH473");
+INSERT INTO truckactualinvoice VALUES("11","MR163","2up","10","18","20","360","2","720","SH473");
+INSERT INTO truckactualinvoice VALUES("12","KO962","4up","10","18","15","270","0","0","SH473");
+
+
+
+DROP TABLE truckdeclare;
+
+CREATE TABLE `truckdeclare` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `item_id` varchar(24) NOT NULL,
+  `size` varchar(24) NOT NULL,
+  `pcsperbox` bigint(20) NOT NULL,
+  `kgperbox` float NOT NULL,
+  `mc` bigint(20) NOT NULL,
+  `netweight` float NOT NULL,
+  `invoice_no` varchar(15) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO truckdeclare VALUES("1","MR163","2up","10","20","20","400","SH473");
+INSERT INTO truckdeclare VALUES("2","KO962","4up","10","40","15","600","SH473");
 
 
 
@@ -1111,10 +1130,10 @@ CREATE TABLE `truckfoambox` (
   `foambox_no` varchar(255) NOT NULL,
   `invoice_no` varchar(15) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO truckfoambox VALUES("3","MR163","2up","12","36","20","720","","SH473");
-INSERT INTO truckfoambox VALUES("4","KO962","4up","12","19","10","190","","SH473");
+INSERT INTO truckfoambox VALUES("5","MR163","2up","10","18","20","360","","SH473");
+INSERT INTO truckfoambox VALUES("6","KO962","4up","10","18","15","270","","SH473");
 
 
 
@@ -1145,10 +1164,10 @@ CREATE TABLE `truckpackingliststockinfo` (
   `totalgrossweight` float NOT NULL,
   `invoice_no` varchar(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO truckpackingliststockinfo VALUES("10","MR163","2up","12","36","20","720","1200","SH473");
-INSERT INTO truckpackingliststockinfo VALUES("11","KO962","4up","12","19","10","190","600","SH473");
+INSERT INTO truckpackingliststockinfo VALUES("12","MR163","2up","10","18","20","360","1200","SH473");
+INSERT INTO truckpackingliststockinfo VALUES("13","KO962","4up","10","18","15","270","900","SH473");
 
 
 

@@ -1968,6 +1968,9 @@ Class Query{
 
     $addfoambox = $pdo->prepare("INSERT INTO truckfoambox(item_id, size, pcsperbox, kgperbox, mc, netweight, invoice_no) VALUES('$commondity', '$size', '$pcsperbox', '$kgperbox', '$mc', '$totalnetweight', '$invoice_no')");
     $addfoambox->execute();
+
+    $adddeclare = $pdo->prepare("INSERT INTO truckdeclare(item_id, size, pcsperbox, mc, invoice_no) VALUES('$commondity', '$size', '$pcsperbox', '$mc', '$invoice_no')");
+    $adddeclare->execute();
   }
 
   function updatetruckactualinvoice($usd, $updateid){
@@ -1980,6 +1983,26 @@ Class Query{
     $total_usd = $usd * intval($netweight['netweight']);
     $updateusdstmt = $pdo->prepare("UPDATE truckactualinvoice SET usd='$usd', total_usd='$total_usd' WHERE id='$updateid'");
     $updateusdstmt->execute();
+  }
+
+  function updatefoambox($foamboxid, $foambox){
+    global $pdo;
+
+    $updatefoamstmt = $pdo->prepare("UPDATE truckfoambox SET foambox_no='$foambox' WHERE id='$foamboxid'");
+    $updatefoamstmt->execute();
+  }
+
+  function updatekgperbox($kgperbox, $kgperboxid){
+    global $pdo;
+
+    $mcstmt = $pdo->prepare("SELECT * FROM truckdeclare WHERE id='$kgperboxid'");
+    $mcstmt->execute();
+    $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
+
+    $netweight = $mcdata['mc'] * $kgperbox;
+
+    $updatepcsperboxstmt = $pdo->prepare("UPDATE truckdeclare SET kgperbox='$kgperbox', netweight='$netweight' WHERE id='$kgperboxid'");
+    $updatepcsperboxstmt->execute();
   }
 
   // MORE SELECTS
