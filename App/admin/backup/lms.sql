@@ -378,7 +378,7 @@ CREATE TABLE `hhkmcstock` (
   `mc` int(11) NOT NULL,
   `balance_mc` bigint(17) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=150 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=151 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO hhkmcstock VALUES("143","NY","From From-10","2023-09-17","KO962","2up","21","5","5");
 INSERT INTO hhkmcstock VALUES("144","NY","From From-10","2023-09-17","KO962","2up","22","3","3");
@@ -387,6 +387,7 @@ INSERT INTO hhkmcstock VALUES("146","NY","From From-10","2023-09-17","KO962","3u
 INSERT INTO hhkmcstock VALUES("147","NY","HHK To GFC","2023-09-20","KO962","3up","21","5","5");
 INSERT INTO hhkmcstock VALUES("148","NY","HHK To GFC","2023-09-20","KO962","2up","22","2","1");
 INSERT INTO hhkmcstock VALUES("149","Can","From From-10","2023-09-19","MR163","2up","150","5","5");
+INSERT INTO hhkmcstock VALUES("150","DAKA","From TCL","2023-09-20","SB263","2up","327","14","14");
 
 
 
@@ -681,7 +682,7 @@ CREATE TABLE `packingliststock` (
   `voyname` varchar(55) NOT NULL,
   `fda` varchar(56) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO packingliststock VALUES("1","2023-09-01","M3333","NY","975B2","BF747","","","");
 INSERT INTO packingliststock VALUES("3","2023-09-08","B133","NY","975T2","LJ734","","","");
@@ -822,7 +823,7 @@ CREATE TABLE `permission` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO permission VALUES("1","1","manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_accountreceivable,manage_customers,manage_supplier,manage_category,manage_item,manage_unit,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_packingmaterial,sale_report,purchase_report");
+INSERT INTO permission VALUES("1","1","manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_accountreceivable,manage_customers,manage_supplier,manage_category,manage_item,manage_unit,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,sale_report,purchase_report");
 INSERT INTO permission VALUES("2","2",",manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport");
 
 
@@ -1076,6 +1077,81 @@ INSERT INTO total_charges VALUES("72","0000-00-00","12","1350","900","600000","0
 
 
 
+DROP TABLE truckactualinvoice;
+
+CREATE TABLE `truckactualinvoice` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `item_id` varchar(24) NOT NULL,
+  `size` varchar(24) NOT NULL,
+  `pcsperbox` bigint(20) NOT NULL,
+  `kgperbox` float NOT NULL,
+  `mc` bigint(20) NOT NULL,
+  `netweight` float NOT NULL,
+  `usd` float NOT NULL,
+  `total_usd` float NOT NULL,
+  `invoice_no` varchar(15) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO truckactualinvoice VALUES("9","MR163","2up","12","36","20","720","0","0","SH473");
+INSERT INTO truckactualinvoice VALUES("10","KO962","4up","12","19","10","190","0","0","SH473");
+
+
+
+DROP TABLE truckfoambox;
+
+CREATE TABLE `truckfoambox` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `item_id` varchar(24) NOT NULL,
+  `size` varchar(24) NOT NULL,
+  `pcsperbox` bigint(20) NOT NULL,
+  `kgperbox` float NOT NULL,
+  `mc` bigint(20) NOT NULL,
+  `netweight` float NOT NULL,
+  `foambox_no` varchar(255) NOT NULL,
+  `invoice_no` varchar(15) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO truckfoambox VALUES("3","MR163","2up","12","36","20","720","","SH473");
+INSERT INTO truckfoambox VALUES("4","KO962","4up","12","19","10","190","","SH473");
+
+
+
+DROP TABLE truckpackingliststock;
+
+CREATE TABLE `truckpackingliststock` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `date` date NOT NULL,
+  `invoice_no` varchar(11) NOT NULL,
+  `truck_no` varchar(16) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO truckpackingliststock VALUES("5","2023-09-01","SH473","31");
+
+
+
+DROP TABLE truckpackingliststockinfo;
+
+CREATE TABLE `truckpackingliststockinfo` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `item_id` varchar(11) NOT NULL,
+  `size` varchar(11) NOT NULL,
+  `pcsperbox` int(11) NOT NULL,
+  `kgperbox` float NOT NULL,
+  `mc` int(11) NOT NULL,
+  `netweight` float NOT NULL,
+  `totalgrossweight` float NOT NULL,
+  `invoice_no` varchar(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO truckpackingliststockinfo VALUES("10","MR163","2up","12","36","20","720","1200","SH473");
+INSERT INTO truckpackingliststockinfo VALUES("11","KO962","4up","12","19","10","190","600","SH473");
+
+
+
 DROP TABLE userlogs;
 
 CREATE TABLE `userlogs` (
@@ -1086,7 +1162,7 @@ CREATE TABLE `userlogs` (
   `login_password` varchar(125) NOT NULL,
   `status` varchar(55) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO userlogs VALUES("1","10:26:18.000000","2023-09-18","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("2","10:31:25.000000","2023-09-18","admin","admin","Login Success");
@@ -1096,6 +1172,7 @@ INSERT INTO userlogs VALUES("5","10:19:14.000000","2023-09-19","admin","admin","
 INSERT INTO userlogs VALUES("6","05:49:31.000000","2023-09-19","admin","","Logout");
 INSERT INTO userlogs VALUES("7","10:19:36.000000","2023-09-19","asdf","yyyy","Login Failed");
 INSERT INTO userlogs VALUES("8","10:19:39.000000","2023-09-19","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("9","10:10:48.000000","2023-09-20","admin","admin","Login Success");
 
 
 

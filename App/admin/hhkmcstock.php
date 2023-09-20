@@ -73,7 +73,7 @@ $query = new Query();
              ?>
             <form action="" method="post" class="text-center">
               <?php
-              $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE type!='tcl' AND country IS NOT NULL");
+              $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
               $countrystmt->execute();
               $countrydatas = $countrystmt->fetchall();
               foreach ($countrydatas as $countrydata) {
@@ -158,7 +158,7 @@ $query = new Query();
                 <label>Commondity</label>
                 <select class="form-control inpv2 mb-2" name="commondity_id">
                   <?php
-                  $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock WHERE type!='tcl'");
+                  $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
                   $form7commonditystmt->execute();
                   $form7commonditydatas = $form7commonditystmt->fetchall();
                   foreach ($form7commonditydatas as $form7commonditydata) {
@@ -182,7 +182,7 @@ $query = new Query();
                 <select class="form-control inpv2 mb-2" name="country">
 
                   <?php
-                  $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE type!='tcl' AND country IS NOT NULL");
+                  $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
                   $countrystmt->execute();
                   $countrydatas = $countrystmt->fetchall();
                   foreach ($countrydatas as $countrydata) {
@@ -233,7 +233,7 @@ $query = new Query();
                 <label>Commondity</label>
                 <select class="form-control inpv2 mb-2" name="transfercommondity_id">
                   <?php
-                  $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock WHERE type!='tcl'");
+                  $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
                   $form7commonditystmt->execute();
                   $form7commonditydatas = $form7commonditystmt->fetchall();
                   foreach ($form7commonditydatas as $form7commonditydata) {
@@ -257,7 +257,7 @@ $query = new Query();
                 <select class="form-control inpv2 mb-2" name="transfercountry">
 
                   <?php
-                  $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE type!='tcl' AND country IS NOT NULL");
+                  $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
                   $countrystmt->execute();
                   $countrydatas = $countrystmt->fetchall();
                   foreach ($countrydatas as $countrydata) {

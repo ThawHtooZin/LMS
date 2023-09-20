@@ -1947,6 +1947,41 @@ Class Query{
     return '<script>swal("Success!", "Successfully Loaded!", "success");</script>';
   }
 
+  function addtruckpackinglist($date, $invoice_no, $truck_no){
+    global $pdo;
+
+    $addpackingliststmt = $pdo->prepare("INSERT INTO truckpackingliststock(date, invoice_no, truck_no) VALUES('$date', '$invoice_no', '$truck_no')");
+    $addpackingliststmt->execute();
+  }
+
+  function addtruckpackinglistinfo($commondity, $size, $pcsperbox, $kgperbox, $mc, $invoice_no){
+    global $pdo;
+
+    $totalnetweight = $kgperbox * $mc;
+    $totalgrossweight = $mc * 60;
+
+    $addtruckpackingliststmt = $pdo->prepare("INSERT INTO truckpackingliststockinfo(item_id, size, pcsperbox, kgperbox, mc, netweight, totalgrossweight, invoice_no) VALUES('$commondity', '$size', '$pcsperbox', '$kgperbox', '$mc', '$totalnetweight', '$totalgrossweight', '$invoice_no')");
+    $addtruckpackingliststmt->execute();
+
+    $addinvoicestmt = $pdo->prepare("INSERT INTO truckactualinvoice(item_id, size, pcsperbox, kgperbox, mc, netweight, invoice_no) VALUES('$commondity', '$size', '$pcsperbox', '$kgperbox', '$mc', '$totalnetweight', '$invoice_no')");
+    $addinvoicestmt->execute();
+
+    $addfoambox = $pdo->prepare("INSERT INTO truckfoambox(item_id, size, pcsperbox, kgperbox, mc, netweight, invoice_no) VALUES('$commondity', '$size', '$pcsperbox', '$kgperbox', '$mc', '$totalnetweight', '$invoice_no')");
+    $addfoambox->execute();
+  }
+
+  function updatetruckactualinvoice($usd, $updateid){
+    global $pdo;
+
+    $netweightstmt = $pdo->prepare("SELECT * FROM truckactualinvoice WHERE id='$updateid'");
+    $netweightstmt->execute();
+    $netweight = $netweightstmt->fetch(PDO::FETCH_ASSOC);
+
+    $total_usd = $usd * intval($netweight['netweight']);
+    $updateusdstmt = $pdo->prepare("UPDATE truckactualinvoice SET usd='$usd', total_usd='$total_usd' WHERE id='$updateid'");
+    $updateusdstmt->execute();
+  }
+
   // MORE SELECTS
 
   function selectsum($table, $id, $selectwhat){
