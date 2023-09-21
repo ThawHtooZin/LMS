@@ -756,7 +756,24 @@ $query = new Query();
       }
        ?>
        <?php
-       if($_SESSION['tabs'] == 'actualinvoice'){
+       if($_SESSION['tabs'] == ''){
+         echo '
+         $("#declare").show();
+         $("#foambox").show();
+         $(".declaretable").hide();
+         $(".foamboxtable").hide();
+         $("#actualinvoice").show();
+         $("#actualinvoiceback").hide();
+         $(".actualinvoicetable").hide();
+         $("#addpackingstockbtn").show();
+         $(".packingstocktable").show();
+         $("#dtext").hide();
+         $("#fbtext").hide();
+         $("#itext").hide();
+         $("#pltext").show();
+         $("#back").show();
+         ';
+       }elseif($_SESSION['tabs'] == 'actualinvoice'){
          echo '
          $("#declare").hide();
          $("#foambox").hide();

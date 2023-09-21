@@ -1971,6 +1971,9 @@ Class Query{
 
     $adddeclare = $pdo->prepare("INSERT INTO truckdeclare(item_id, size, pcsperbox, mc, invoice_no) VALUES('$commondity', '$size', '$pcsperbox', '$mc', '$invoice_no')");
     $adddeclare->execute();
+
+    $adddeclare = $pdo->prepare("INSERT INTO trucktotalcosting(item_id, size, invoice_no) VALUES('$commondity', '$size', '$invoice_no')");
+    $adddeclare->execute();
   }
 
   function updatetruckactualinvoice($usd, $updateid){
@@ -2003,6 +2006,56 @@ Class Query{
 
     $updatepcsperboxstmt = $pdo->prepare("UPDATE truckdeclare SET kgperbox='$kgperbox', netweight='$netweight' WHERE id='$kgperboxid'");
     $updatepcsperboxstmt->execute();
+  }
+
+  function addmaterial($date, $remark, $ice_amount, $ice_per_price, $tape_amount, $tape_per_price, $foambox_amount, $foambox_per_price,$plastic_amount, $plastic_per_price, $miscellous, $form10kg, $invoice_no){
+    global $pdo;
+
+    $ice = $ice_amount * $ice_per_price;
+    $tape = $tape_amount * $tape_per_price;
+    $foam_box = $foambox_amount * $foambox_per_price;
+    $plastic = $plastic_amount * $plastic_per_price;
+    $total_charges = $ice + $tape + $foam_box + $plastic + $miscellous;
+
+    $iceperkg = $ice / $form10kg;
+    $tapeperkg = $tape / $form10kg;
+    $foam_boxperkg = $foam_box / $form10kg;
+    $plasticperkg = $plastic / $form10kg;
+    $miscellousperkg = $miscellous / $form10kg;
+    $costperkg = $iceperkg + $tapeperkg + $foam_boxperkg + $plasticperkg + $miscellousperkg;
+
+    $addmaterialstmt = $pdo->prepare("INSERT INTO truckpackingmaterial(date, remark,	ice, miscellous,	tape,	foam_box,	plastic,	total_charges, form10kg, costperkg, invoice_no) VALUES('$date', '$remark', '$ice', '$miscellous', '$tape', '$foam_box', '$plastic', '$total_charges', '$form10kg', '$costperkg', '$invoice_no')");
+    $addmaterialstmt->execute();
+  }
+
+  function updatetotalcosting($total_kg, $priceperviss, $percentage, $packing_charges, $ygntomt, $mttotechnck, $labour_charges, $id, $invoice_no){
+    global $pdo;
+    $priceperkg = floatval($priceperviss) / 1.634;
+
+    $updatetotalcostingstmt = $pdo->prepare("UPDATE trucktotalcosting SET total_kg='$total_kg', priceperviss='$priceperviss', priceperkg='$priceperkg', percentage='$percentage', packing_charges='$packing_charges', labour_charges='$labour_charges' WHERE id='$id'");
+    $updatetotalcostingstmt->execute();
+    // ------------------------
+    $totalcostingstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM trucktotalcosting WHERE invoice_no='$invoice_no'");
+    $totalcostingstmt->execute();
+    $totalcosting = $totalcostingstmt->fetch(PDO::FETCH_ASSOC);
+    $commonditystmt = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE id='$id'");
+    $commonditystmt->execute();
+    $commondity = $commonditystmt->fetch(PDO::FETCH_ASSOC);
+    $ygntomt = $ygntomt / $totalcosting['total_kg'];
+    $mttotechnck = $mttotechnck / $totalcosting['total_kg'];
+    $packingandtransport = $packing_charges + $ygntomt + $mttotechnck + $labour_charges;
+    if($commondity['item_id'] == 'HL123'){
+      $packingandtransportsubtracted = $packingandtransport / 10;
+      $total = $packingandtransport + $packingandtransportsubtracted;
+    }else{
+      $packingandtransportsubtracted = $packingandtransport / 10;
+      $total = $packingandtransport - $packingandtransportsubtracted;
+    }
+
+    $grand_total = $percentage + $total;
+
+    $updatestmt = $pdo->prepare("UPDATE trucktotalcosting SET ygntomt_charges='$ygntomt', mttotechnck_charges='$mttotechnck', packingandtransport='$packingandtransport', total='$total', grand_total='$grand_total' WHERE id='$id'");
+    $updatestmt->execute();
   }
 
   // MORE SELECTS
