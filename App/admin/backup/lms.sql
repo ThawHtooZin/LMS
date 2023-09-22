@@ -1130,7 +1130,7 @@ CREATE TABLE `truckfoambox` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO truckfoambox VALUES("8","MR163","4up","12","40","30","1200","","SH473");
+INSERT INTO truckfoambox VALUES("8","MR163","4up","12","40","30","1200","0","SH473");
 
 
 
@@ -1219,7 +1219,7 @@ CREATE TABLE `trucktotalcosting` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO trucktotalcosting VALUES("1","0000-00-00","MR163","4up","8364","35000","21419.8","22082.3","272","395","313","100","1080","971.593","23053.9","0","0","0","0","0","0","0","SH473");
+INSERT INTO trucktotalcosting VALUES("1","0000-00-00","MR163","4up","8364","1100","673.195","22082.3","272","395","750","100","1516","1364.78","23447.1","3022","7.75879","8","0.24121","64894.5","66912","2017.48","SH473");
 
 
 
@@ -1233,7 +1233,7 @@ CREATE TABLE `userlogs` (
   `login_password` varchar(125) NOT NULL,
   `status` varchar(55) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO userlogs VALUES("1","10:26:18.000000","2023-09-18","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("2","10:31:25.000000","2023-09-18","admin","admin","Login Success");
@@ -1250,6 +1250,11 @@ INSERT INTO userlogs VALUES("12","11:20:31.000000","2023-09-21","admin","admin",
 INSERT INTO userlogs VALUES("13","11:21:06.000000","2023-09-21","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("14","11:27:45.000000","2023-09-21","ADMIN","ADMIN","Login Password Invalid");
 INSERT INTO userlogs VALUES("15","11:27:53.000000","2023-09-21","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("16","10:47:33.000000","2023-09-22","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("17","10:51:57.000000","2023-09-22","sdamin","admin","Login Failed");
+INSERT INTO userlogs VALUES("18","10:52:01.000000","2023-09-22","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("19","10:52:45.000000","2023-09-22","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("20","10:55:31.000000","2023-09-22","admin","admin","Login Success");
 
 
 

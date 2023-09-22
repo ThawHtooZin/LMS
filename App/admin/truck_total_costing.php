@@ -32,9 +32,10 @@ $query = new Query();
       $ygntomt = $_POST['ygntomt'];
       $mttotechnck = $_POST['mttotechnck'];
       $labour_charges = $_POST['labour_charges'];
+      $dollar_rate = $_POST['dollar_rate'];
       $id = $_POST['id'];
       $invoice_no = $_GET['invoice_no'];
-      $query->updatetotalcosting($total_kg, $priceperviss, $percentage, $packing_charges, $ygntomt, $mttotechnck, $labour_charges, $id, $invoice_no);
+      $query->updatetotalcosting($total_kg, $priceperviss, $percentage, $packing_charges, $ygntomt, $mttotechnck, $labour_charges, $dollar_rate, $id, $invoice_no);
     }
 
     if(isset($_POST['sellingpriceupdatebtn'])){
@@ -44,6 +45,14 @@ $query = new Query();
       $size = $_POST['size'];
 
       $query->updatesellingprice($sellingpriceperkg, $updateid, $commondity_id, $size);
+    }
+
+    if(isset($_POST['updatesellingrate'])){
+      $selling_rate = $_POST['selling_rate'];
+      $id = $_POST['id'];
+      $invoice_no = $_GET['invoice_no'];
+
+      $query->updateselingrate($selling_rate, $id, $invoice_no);
     }
      ?>
     <div class="row">
@@ -56,9 +65,10 @@ $query = new Query();
       <div class="col-10">
         <div class="card">
           <div class="card-header bg-secondary">
-            <span class=" text-light" id="ictext" style="font-size:20px; font-weight:bold;">Total Costing</span>
+            <span class=" text-light" id="tctext" style="font-size:20px; font-weight:bold;">Total Costing</span>
             <span class=" text-light hide" id="ptext" style="font-size:20px; font-weight:bold;">Profit</span>
-            <button type="button" class="btn btn-info text-light float-end btn-sm " id="invoicecosting">Profit</button>
+            <button type="button" class="btn btn-info text-light float-end btn-sm " id="profitbtn">Profit</button>
+            <button type="button" class="btn btn-info text-light float-end btn-sm hide" id="totalcostingbtn">Total Costing</button>
             <a href="truck_packing_stock.php" class="btn btn-danger float-end me-2 btn-sm" id="back">Back</a>
           </div>
           <div class="card-body">
@@ -81,7 +91,7 @@ $query = new Query();
             <div class="total_charges">
               <table class="table table-striped table-hover table-bordered text-center">
                 <tr>
-                  <th rowspan="2" style="padding-top:40px;">Date</th>
+                  <!-- <th rowspan="2" style="padding-top:40px;">Date</th> -->
                   <th rowspan="2" style="padding-top:40px;">Commondity</th>
                   <th rowspan="2" style="padding-top:40px;">Size</th>
                   <th>Export</th>
@@ -108,7 +118,7 @@ $query = new Query();
                   $commonditydata = $query->select('item', $item_id, 'item_id');
                   ?>
                   <tr data-bs-toggle='modal' data-bs-target="#updatetotalcosting<?php echo $data['id']; ?>">
-                    <td><?php echo date('d-m-Y', strtotime($invoice_nodata['date']));  ?></td>
+                    <!-- <td><?php// echo date('d-m-Y', strtotime($invoice_nodata['date']));  ?></td> -->
                     <td><?php echo $commonditydata['item_name']; ?></td>
                     <td><?php echo $data['size']; ?></td>
                     <td><?php echo $data['total_kg']; ?></td>
@@ -168,11 +178,15 @@ $query = new Query();
                                 <label>Labour Charges</label>
                                 <input type="number" name="labour_charges" class="form-control inpv2 mb-2">
                               </div>
-                              <div class="col mt-4">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-success" name="updatetotalcosting">Update</button>
+                              <div class="col">
+                                <label>Dollar Rate</label>
+                                <input type="number" name="dollar_rate" class="form-control inpv2 mb-2">
                               </div>
                             </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-success" name="updatetotalcosting">Update</button>
                           </div>
                         </form>
                       </div>
@@ -183,14 +197,60 @@ $query = new Query();
                  ?>
               </table>
             </div>
-            <div class="profit">
+            <div class="profit hide">
               <table class="table table-striped table-hover table-bordered">
                 <tr>
-
+                  <th>Grand Total</th>
+                  <th>Dollar Rate</th>
+                  <th>Costing USD</th>
+                  <th>Selling Rate</th>
+                  <th>Profit Per Kg</th>
+                  <th>Original Cost</th>
+                  <th>Sellling Amount</th>
+                  <th>Total Profit</th>
                 </tr>
-                <tr>
-
-                </tr>
+                <?php
+                $stmt = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE invoice_no='$invoice_no'");
+                $stmt->execute();
+                $datas = $stmt->fetchall();
+                foreach ($datas as $data) {
+                  $item_id = $data['item_id'];
+                  $commonditydata = $query->select('item', $item_id, 'item_id');
+                  ?>
+                  <tr data-bs-toggle='modal' data-bs-target="#updateprofit<?php echo $data['id']; ?>">
+                    <td><?php echo $data['grand_total']; ?></td>
+                    <td><?php echo $data['rate']; ?></td>
+                    <td><?php echo round($data['costing_usd'], 2); ?></td>
+                    <td><?php echo $data['selling_rate']; ?></td>
+                    <td><?php echo $data['profitperkg']; ?></td>
+                    <td><?php echo $data['original_cost']; ?></td>
+                    <td><?php echo $data['selling_amount']; ?></td>
+                    <td><?php echo $data['profit']; ?></td>
+                  </tr>
+                  <div class="modal fade" id="updateprofit<?php echo $data['id']; ?>">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                        <div class="modal-header bg-info text-light">
+                          <h1 class="modal-title fs-5">Add Selling Rate</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form action="" method="post">
+                          <input type="hidden" name="id" value="<?php echo $data['id']; ?>">
+                          <div class="modal-body">
+                            <label>Selling Rate</label>
+                            <input type="text" name="selling_rate" class="form-control inpv2 mb-2">
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-success" name="updatesellingrate">Update</button>
+                          </div>
+                      </div>
+                    </form>
+                    </div>
+                  </div>
+                  <?php
+                }
+                 ?>
               </table>
             </div>
           </div>
@@ -199,11 +259,19 @@ $query = new Query();
     </div>
     <script type="text/javascript">
     $(document).ready(function(){
-      $("#total_charges").click(function(){
-
+      $("#profitbtn").click(function(){
+        $("#back").toggle();
+        $(".profit").toggle();
+        $(".total_charges").toggle();
+        $("#profitbtn").toggle();
+        $("#totalcostingbtn").toggle();
       });
-      $("#invoicecostingbtn").click(function(){
-
+      $("#totalcostingbtn").click(function(){
+        $("#back").toggle();
+        $(".total_charges").toggle();
+        $(".profit").toggle();
+        $("#profitbtn").toggle();
+        $("#totalcostingbtn").toggle();
       });
     });
     </script>

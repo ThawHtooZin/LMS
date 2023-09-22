@@ -2028,7 +2028,7 @@ Class Query{
     $addmaterialstmt->execute();
   }
 
-  function updatetotalcosting($total_kg, $priceperviss, $percentage, $packing_charges, $ygntomt, $mttotechnck, $labour_charges, $id, $invoice_no){
+  function updatetotalcosting($total_kg, $priceperviss, $percentage, $packing_charges, $ygntomt, $mttotechnck, $labour_charges, $dollar_rate, $id, $invoice_no){
     global $pdo;
     $priceperkg = floatval($priceperviss) / 1.634;
 
@@ -2037,6 +2037,7 @@ Class Query{
     // ------------------------
     $totalcostingstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM trucktotalcosting WHERE invoice_no='$invoice_no'");
     $totalcostingstmt->execute();
+
     $totalcosting = $totalcostingstmt->fetch(PDO::FETCH_ASSOC);
     $commonditystmt = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE id='$id'");
     $commonditystmt->execute();
@@ -2054,7 +2055,25 @@ Class Query{
 
     $grand_total = $percentage + $total;
 
-    $updatestmt = $pdo->prepare("UPDATE trucktotalcosting SET ygntomt_charges='$ygntomt', mttotechnck_charges='$mttotechnck', packingandtransport='$packingandtransport', total='$total', grand_total='$grand_total' WHERE id='$id'");
+    $costing_usd = $grand_total / $dollar_rate;
+    $updatestmt = $pdo->prepare("UPDATE trucktotalcosting SET ygntomt_charges='$ygntomt', mttotechnck_charges='$mttotechnck', packingandtransport='$packingandtransport', total='$total', grand_total='$grand_total', rate='$dollar_rate',costing_usd='$costing_usd' WHERE id='$id'");
+    $updatestmt->execute();
+  }
+
+  function updateselingrate($selling_rate, $id, $invoice_no){
+    global $pdo;
+
+    $stmt = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE id='$id'");
+    $stmt->execute();
+    $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $total_kg = $data['total_kg'];
+    $profitperkg = $selling_rate - $data['costing_usd'];
+    $original_cost = $data['total_kg'] * $data['costing_usd'];
+    $selling_amount = $data['total_kg'] * $selling_rate;
+    $profit = $selling_amount - $original_cost;
+
+    $updatestmt = $pdo->prepare("UPDATE trucktotalcosting SET selling_rate='$selling_rate', profitperkg='$profitperkg', original_cost='$original_cost', selling_amount='$selling_amount', profit='$profit' WHERE id='$id'");
     $updatestmt->execute();
   }
 

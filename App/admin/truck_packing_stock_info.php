@@ -756,7 +756,7 @@ $query = new Query();
       }
        ?>
        <?php
-       if($_SESSION['tabs'] == ''){
+       if(empty($_SESSION['tabs'])){
          echo '
          $("#declare").show();
          $("#foambox").show();
