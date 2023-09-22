@@ -1091,9 +1091,11 @@ CREATE TABLE `truckactualinvoice` (
   `total_usd` float NOT NULL,
   `invoice_no` varchar(15) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO truckactualinvoice VALUES("14","MR163","4up","12","40","30","1200","0","0","SH473");
+INSERT INTO truckactualinvoice VALUES("22","MR163","2up","18","49","22","1078","0","0","SH473");
+INSERT INTO truckactualinvoice VALUES("23","MR163","2up","19","44","23","1012","0","0","SH473");
+INSERT INTO truckactualinvoice VALUES("24","KO962","3up","17","37","24","888","0","0","SH473");
 
 
 
@@ -1109,9 +1111,11 @@ CREATE TABLE `truckdeclare` (
   `netweight` float NOT NULL,
   `invoice_no` varchar(15) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO truckdeclare VALUES("4","MR163","4up","12","0","30","0","SH473");
+INSERT INTO truckdeclare VALUES("12","MR163","2up","18","0","22","0","SH473");
+INSERT INTO truckdeclare VALUES("13","MR163","2up","19","0","23","0","SH473");
+INSERT INTO truckdeclare VALUES("14","KO962","3up","17","0","24","0","SH473");
 
 
 
@@ -1125,12 +1129,14 @@ CREATE TABLE `truckfoambox` (
   `kgperbox` float NOT NULL,
   `mc` bigint(20) NOT NULL,
   `netweight` float NOT NULL,
-  `foambox_no` varchar(255) NOT NULL,
-  `invoice_no` varchar(15) NOT NULL,
+  `foambox_no` varchar(255) DEFAULT NULL,
+  `invoice_no` varchar(15) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO truckfoambox VALUES("8","MR163","4up","12","40","30","1200","0","SH473");
+INSERT INTO truckfoambox VALUES("16","MR163","2up","18","49","22","1078","1,2,3,4,5","SH473");
+INSERT INTO truckfoambox VALUES("17","MR163","2up","19","44","23","1012","6,7,8,9,10","SH473");
+INSERT INTO truckfoambox VALUES("18","KO962","3up","17","37","24","888","11,12,13","SH473");
 
 
 
@@ -1162,9 +1168,11 @@ CREATE TABLE `truckpackingliststockinfo` (
   `totalgrossweight` float NOT NULL,
   `invoice_no` varchar(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO truckpackingliststockinfo VALUES("15","MR163","4up","12","40","30","1200","1800","SH473");
+INSERT INTO truckpackingliststockinfo VALUES("23","MR163","2up","18","49","22","1078","1320","SH473");
+INSERT INTO truckpackingliststockinfo VALUES("24","MR163","2up","19","44","23","1012","1380","SH473");
+INSERT INTO truckpackingliststockinfo VALUES("25","KO962","3up","17","37","24","888","1440","SH473");
 
 
 
@@ -1217,9 +1225,11 @@ CREATE TABLE `trucktotalcosting` (
   `profit` float NOT NULL,
   `invoice_no` varchar(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO trucktotalcosting VALUES("1","0000-00-00","MR163","4up","8364","1100","673.195","22082.3","272","395","750","100","1516","1364.78","23447.1","3022","7.75879","8","0.24121","64894.5","66912","2017.48","SH473");
+INSERT INTO trucktotalcosting VALUES("9","0000-00-00","MR163","2up","49","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
+INSERT INTO trucktotalcosting VALUES("10","0000-00-00","MR163","2up","44","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
+INSERT INTO trucktotalcosting VALUES("11","0000-00-00","KO962","3up","37","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
 
 
 

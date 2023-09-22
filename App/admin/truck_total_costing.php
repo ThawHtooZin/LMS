@@ -25,7 +25,6 @@ $query = new Query();
   <body>
     <?php
     if(isset($_POST['updatetotalcosting'])){
-      $total_kg = $_POST['total_kg'];
       $priceperviss = $_POST['priceperviss'];
       $percentage = $_POST['percentage'];
       $packing_charges = $_POST['packing_charges'];
@@ -33,9 +32,10 @@ $query = new Query();
       $mttotechnck = $_POST['mttotechnck'];
       $labour_charges = $_POST['labour_charges'];
       $dollar_rate = $_POST['dollar_rate'];
+      $cal_percentage = $_POST['cal_percentage'];
       $id = $_POST['id'];
       $invoice_no = $_GET['invoice_no'];
-      $query->updatetotalcosting($total_kg, $priceperviss, $percentage, $packing_charges, $ygntomt, $mttotechnck, $labour_charges, $dollar_rate, $id, $invoice_no);
+      $query->updatetotalcosting($priceperviss, $percentage, $packing_charges, $ygntomt, $mttotechnck, $labour_charges, $dollar_rate, $cal_percentage, $id, $invoice_no);
     }
 
     if(isset($_POST['sellingpriceupdatebtn'])){
@@ -62,15 +62,30 @@ $query = new Query();
         ?>
       </div>
 
+      <?php
+
+       ?>
       <div class="col-10">
         <div class="card">
-          <div class="card-header bg-secondary">
-            <span class=" text-light" id="tctext" style="font-size:20px; font-weight:bold;">Total Costing</span>
-            <span class=" text-light hide" id="ptext" style="font-size:20px; font-weight:bold;">Profit</span>
-            <button type="button" class="btn btn-info text-light float-end btn-sm " id="profitbtn">Profit</button>
-            <button type="button" class="btn btn-info text-light float-end btn-sm hide" id="totalcostingbtn">Total Costing</button>
-            <a href="truck_packing_stock.php" class="btn btn-danger float-end me-2 btn-sm" id="back">Back</a>
-          </div>
+          <?php
+
+          if(isset($_POST['profitbtn'])){
+            $_SESSION['tabs'] = 'profit';
+          }
+
+          if(isset($_POST['totalcostingbtn'])){
+            $_SESSION['tabs'] = 'totalcosting';
+          }
+           ?>
+          <form action="" method="post">
+            <div class="card-header bg-secondary">
+              <span class=" text-light" id="tctext" style="font-size:20px; font-weight:bold;">Total Costing</span>
+              <span class=" text-light hide" id="ptext" style="font-size:20px; font-weight:bold;">Profit</span>
+              <button type="button" class="btn btn-info text-light float-end btn-sm " id="profitbtn" name="profitbtn">Profit</button>
+              <button type="button" class="btn btn-info text-light float-end btn-sm hide" id="totalcostingbtn" name="totalcostingbtn">Total Costing</button>
+              <a href="truck_packing_stock.php" class="btn btn-danger float-end me-2 btn-sm" id="back">Back</a>
+            </div>
+          </form>
           <div class="card-body">
             <?php
             $invoice_no = $_GET['invoice_no'];
@@ -110,28 +125,32 @@ $query = new Query();
                   <th>Total Kg</th>
                 </tr>
                 <?php
-                $stmt = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE invoice_no='$invoice_no'");
+                $stmt = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE invoice_no='$invoice_no' GROUP BY size ORDER BY id");
                 $stmt->execute();
                 $datas = $stmt->fetchall();
                 foreach ($datas as $data) {
                   $item_id = $data['item_id'];
                   $commonditydata = $query->select('item', $item_id, 'item_id');
+                  $size = $data['size'];
+                  $ttlkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM trucktotalcosting WHERE size='$size'");
+                  $ttlkgstmt->execute();
+                  $ttlkgdata = $ttlkgstmt->fetch(PDO::FETCH_ASSOC);
                   ?>
                   <tr data-bs-toggle='modal' data-bs-target="#updatetotalcosting<?php echo $data['id']; ?>">
                     <!-- <td><?php// echo date('d-m-Y', strtotime($invoice_nodata['date']));  ?></td> -->
                     <td><?php echo $commonditydata['item_name']; ?></td>
                     <td><?php echo $data['size']; ?></td>
-                    <td><?php echo $data['total_kg']; ?></td>
-                    <td><?php echo $data['priceperviss']; ?></td>
-                    <td><?php echo $data['priceperkg']; ?></td>
-                    <td><?php echo $data['percentage']; ?></td>
-                    <td><?php echo $data['packing_charges']; ?></td>
-                    <td><?php echo $data['ygntomt_charges']; ?></td>
-                    <td><?php echo $data['mttotechnck_charges']; ?></td>
-                    <td><?php echo $data['labour_charges']; ?></td>
-                    <td><?php echo $data['packingandtransport']; ?></td>
-                    <td><?php echo $data['total']; ?></td>
-                    <td><?php echo $data['grand_total']; ?></td>
+                    <td><?php if($ttlkgdata['total_kg'] != 0){echo $ttlkgdata['total_kg'];}else{ echo "-";} ?></td>
+                    <td><?php if($data['priceperviss'] != 0){echo $data['priceperviss'];}else{ echo "-";} ?></td>
+                    <td><?php if($data['priceperkg'] != 0){echo $data['priceperkg'];}else{ echo "-";} ?></td>
+                    <td><?php if($data['percentage'] != 0){echo $data['percentage'];}else{ echo "-";} ?></td>
+                    <td><?php if($data['packing_charges'] != 0){echo $data['packing_charges'];}else{ echo "-";} ?></td>
+                    <td><?php if($data['ygntomt_charges'] != 0){echo $data['ygntomt_charges'];}else{ echo "-";} ?></td>
+                    <td><?php if($data['mttotechnck_charges'] != 0){echo $data['mttotechnck_charges'];}else{ echo "-";} ?></td>
+                    <td><?php if($data['labour_charges'] != 0){echo $data['labour_charges'];}else{ echo "-";} ?></td>
+                    <td><?php if($data['packingandtransport'] != 0){echo $data['packingandtransport'];}else{ echo "-";} ?></td>
+                    <td><?php if($data['total'] != 0){echo $data['total'];} ?></td>
+                    <td><?php if($data['grand_total'] != 0){echo $data['grand_total'];}else{ echo "-";} ?></td>
                   </tr>
                   <div class="modal fade" id="updatetotalcosting<?php echo $data['id']; ?>">
                     <div class="modal-dialog" role="document">
@@ -145,42 +164,42 @@ $query = new Query();
                           <div class="modal-body">
                             <div class="row">
                               <div class="col">
-                                <label>Total Kg</label>
-                                <input type="text" name="total_kg" class="form-control inpv2 mb-2">
-                              </div>
-                              <div class="col">
                                 <label>Price Per Viss</label>
                                 <input type="text" name="priceperviss" class="form-control inpv2 mb-2">
                               </div>
-                            </div>
-                            <div class="row">
                               <div class="col">
                                 <label>Percentage</label>
                                 <input type="text" name="percentage" class="form-control inpv2 mb-2">
                               </div>
+                            </div>
+                            <div class="row">
                               <div class="col">
                                 <label>Packing Charges</label>
                                 <input type="number" name="packing_charges" class="form-control inpv2 mb-2">
                               </div>
-                            </div>
-                            <div class="row">
                               <div class="col">
                                 <label>YGN To Mt Charges</label>
                                 <input type="number" name="ygntomt" class="form-control inpv2 mb-2">
                               </div>
+                            </div>
+                            <div class="row">
                               <div class="col">
                                 <label>Mt To Technck</label>
                                 <input type="number" name="mttotechnck" class="form-control inpv2 mb-2">
                               </div>
-                            </div>
-                            <div class="row">
                               <div class="col">
                                 <label>Labour Charges</label>
                                 <input type="number" name="labour_charges" class="form-control inpv2 mb-2">
                               </div>
+                            </div>
+                            <div class="row">
                               <div class="col">
                                 <label>Dollar Rate</label>
                                 <input type="number" name="dollar_rate" class="form-control inpv2 mb-2">
+                              </div>
+                              <div class="col">
+                                <label>Calculation Percentage</label>
+                                <input type="number" name="cal_percentage" class="form-control inpv2 mb-2">
                               </div>
                             </div>
                           </div>
@@ -210,7 +229,7 @@ $query = new Query();
                   <th>Total Profit</th>
                 </tr>
                 <?php
-                $stmt = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE invoice_no='$invoice_no'");
+                $stmt = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE invoice_no='$invoice_no' GROUP BY size ORDER BY id");
                 $stmt->execute();
                 $datas = $stmt->fetchall();
                 foreach ($datas as $data) {
@@ -218,14 +237,14 @@ $query = new Query();
                   $commonditydata = $query->select('item', $item_id, 'item_id');
                   ?>
                   <tr data-bs-toggle='modal' data-bs-target="#updateprofit<?php echo $data['id']; ?>">
-                    <td><?php echo $data['grand_total']; ?></td>
-                    <td><?php echo $data['rate']; ?></td>
-                    <td><?php echo round($data['costing_usd'], 2); ?></td>
-                    <td><?php echo $data['selling_rate']; ?></td>
-                    <td><?php echo $data['profitperkg']; ?></td>
-                    <td><?php echo $data['original_cost']; ?></td>
-                    <td><?php echo $data['selling_amount']; ?></td>
-                    <td><?php echo $data['profit']; ?></td>
+                    <td><?php if($data['grand_total'] != 0){ echo $data['grand_total']; }else{ echo '-';} ?></td>
+                    <td><?php if($data['rate'] != 0){ echo $data['rate']; }else{ echo '-';} ?></td>
+                    <td><?php if(round($data['costing_usd'], 2) != 0){ echo round($data['costing_usd'], 2); }else{ echo '-';} ?></td>
+                    <td><?php if($data['selling_rate'] != 0){ echo $data['selling_rate']; }else{ echo '-';} ?></td>
+                    <td><?php if($data['profitperkg'] != 0){ echo $data['profitperkg']; }else{ echo '-';} ?></td>
+                    <td><?php if($data['original_cost'] != 0){ echo $data['original_cost']; }else{ echo '-';} ?></td>
+                    <td><?php if($data['selling_amount'] != 0){ echo $data['selling_amount']; }else{ echo '-';} ?></td>
+                    <td><?php if($data['profit'] != 0){ echo $data['profit']; }else{ echo '-';} ?></td>
                   </tr>
                   <div class="modal fade" id="updateprofit<?php echo $data['id']; ?>">
                     <div class="modal-dialog" role="document">
@@ -258,6 +277,7 @@ $query = new Query();
       </div>
     </div>
     <script type="text/javascript">
+
     $(document).ready(function(){
       $("#profitbtn").click(function(){
         $("#back").toggle();
@@ -274,6 +294,7 @@ $query = new Query();
         $("#totalcostingbtn").toggle();
       });
     });
+
     </script>
     <?php
     $bootstrap->javascript();

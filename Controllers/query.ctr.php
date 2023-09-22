@@ -1972,7 +1972,7 @@ Class Query{
     $adddeclare = $pdo->prepare("INSERT INTO truckdeclare(item_id, size, pcsperbox, mc, invoice_no) VALUES('$commondity', '$size', '$pcsperbox', '$mc', '$invoice_no')");
     $adddeclare->execute();
 
-    $adddeclare = $pdo->prepare("INSERT INTO trucktotalcosting(item_id, size, invoice_no) VALUES('$commondity', '$size', '$invoice_no')");
+    $adddeclare = $pdo->prepare("INSERT INTO trucktotalcosting(item_id, size, total_kg, invoice_no) VALUES('$commondity', '$size', '$kgperbox', '$invoice_no')");
     $adddeclare->execute();
   }
 
@@ -1988,12 +1988,53 @@ Class Query{
     $updateusdstmt->execute();
   }
 
-  function updatefoambox($foamboxid, $foambox){
+  function updatefoambox($foamboxid, $foambox, $invoice_no){
     global $pdo;
+      $checkstmt = $pdo->prepare("SELECT * FROM truckfoambox WHERE invoice_no='$invoice_no' AND foambox_no IS NOT NULL");
+      $checkstmt->execute();
+      $checkdata = $checkstmt->fetchall();
 
-    $updatefoamstmt = $pdo->prepare("UPDATE truckfoambox SET foambox_no='$foambox' WHERE id='$foamboxid'");
-    $updatefoamstmt->execute();
-  }
+      $countstmt = $pdo->prepare("SELECT COUNT(*) FROM truckfoambox WHERE invoice_no='$invoice_no' AND foambox_no IS NOT NULL");
+      $countstmt->execute();
+      $countdata = $countstmt->fetchColumn();
+      $count = 0;
+      foreach ($checkdata as $foamdata) {
+        $count++;
+        $thefoamboxs = "";
+        if($countdata == $count){
+          $thefoamboxs .= $foamdata['foambox_no'];
+        }else{
+          $thefoamboxs .= $foamdata['foambox_no'] . ",";
+        }
+        $thefoamboxs .= "," .$thefoamboxs;
+        $condition = "";
+        $thefoamboxsexplode = explode(',', $thefoamboxs);
+        foreach ($thefoamboxsexplode as $thenums) {
+          $explodeddatas = explode(",", $foambox);
+          foreach ($explodeddatas as $explodeddata) {
+            if($explodeddata == $thenums){
+              $condition .= "error";
+            }else{
+              $condition .= "success";
+            }
+          }
+        }
+      }
+
+      // $foamboxs = $checkdata['foambox_no'];
+      // $foamboxexploded = explode("-", $foamboxs);
+      // $foamboxno = count($foamboxexploded);
+      // for ($i=0; $i < $foambox_no; $i++) {
+      //   // code...
+      // }
+      // echo $condition;
+    if(!str_contains($condition, 'error')){
+      $updatefoamstmt = $pdo->prepare("UPDATE truckfoambox SET foambox_no='$foambox' WHERE id='$foamboxid'");
+      $updatefoamstmt->execute();
+    }else{
+      echo "<script>swal('Warning!', 'Duplicate Foam Number', 'warning');</script>";
+    }
+    }
 
   function updatekgperbox($kgperbox, $kgperboxid){
     global $pdo;
@@ -2028,11 +2069,11 @@ Class Query{
     $addmaterialstmt->execute();
   }
 
-  function updatetotalcosting($total_kg, $priceperviss, $percentage, $packing_charges, $ygntomt, $mttotechnck, $labour_charges, $dollar_rate, $id, $invoice_no){
+  function updatetotalcosting($priceperviss, $percentage, $packing_charges, $ygntomt, $mttotechnck, $labour_charges, $dollar_rate, $cal_percentage,  $id, $invoice_no){
     global $pdo;
     $priceperkg = floatval($priceperviss) / 1.634;
 
-    $updatetotalcostingstmt = $pdo->prepare("UPDATE trucktotalcosting SET total_kg='$total_kg', priceperviss='$priceperviss', priceperkg='$priceperkg', percentage='$percentage', packing_charges='$packing_charges', labour_charges='$labour_charges' WHERE id='$id'");
+    $updatetotalcostingstmt = $pdo->prepare("UPDATE trucktotalcosting SET priceperviss='$priceperviss', priceperkg='$priceperkg', percentage='$percentage', packing_charges='$packing_charges', labour_charges='$labour_charges' WHERE id='$id'");
     $updatetotalcostingstmt->execute();
     // ------------------------
     $totalcostingstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM trucktotalcosting WHERE invoice_no='$invoice_no'");
@@ -2045,14 +2086,15 @@ Class Query{
     $ygntomt = $ygntomt / $totalcosting['total_kg'];
     $mttotechnck = $mttotechnck / $totalcosting['total_kg'];
     $packingandtransport = $packing_charges + $ygntomt + $mttotechnck + $labour_charges;
-    if($commondity['item_id'] == 'HL123'){
-      $packingandtransportsubtracted = $packingandtransport / 10;
-      $total = $packingandtransport + $packingandtransportsubtracted;
-    }else{
-      $packingandtransportsubtracted = $packingandtransport / 10;
+    if(str_contains($cal_percentage, '-')){
+      $cal_percentage = explode("-", $cal_percentage);
+      $cal_percentage = $cal_percentage[1];
+      $packingandtransportsubtracted = $packingandtransport / intval($cal_percentage);
       $total = $packingandtransport - $packingandtransportsubtracted;
+    }else{
+      $packingandtransportsubtracted = $packingandtransport / $cal_percentage;
+      $total = $packingandtransport + $packingandtransportsubtracted;
     }
-
     $grand_total = $percentage + $total;
 
     $costing_usd = $grand_total / $dollar_rate;

@@ -43,8 +43,8 @@ $query = new Query();
     if(isset($_POST['addfoamboxbtn'])){
       $foamboxid = $_POST['foamboxid'];
       $foambox = $_POST['foambox_no'];
-
-      $query->updatefoambox($foamboxid, $foambox);
+      $invoice_no = $_GET['invoice_no'];
+      $query->updatefoambox($foamboxid, $foambox, $invoice_no);
     }
 
     if(isset($_POST['addkgperbox'])){
