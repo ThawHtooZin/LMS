@@ -130,6 +130,7 @@ $query = new Query();
                   $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no'");
                   $commonditycountstmt->execute();
                   $commonditycountdatas = $commonditycountstmt->fetchColumn();
+                  $no = 1;
                   for ($i=0; $i < $commonditycountdatas; $i++) {
                     $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no'");
                     $commonditystmt->execute();
@@ -137,17 +138,25 @@ $query = new Query();
                     $item_id = $commonditydata[$i]['item_id'];
                     $invoice_no = $_GET['invoice_no'];
 
-                    $stmt = $pdo->prepare("SELECT * FROM truckpackingliststockinfo WHERE item_id='$item_id' AND invoice_no='$invoice_no'");
+                    $stmt = $pdo->prepare("SELECT * FROM truckpackingliststockinfo WHERE item_id='$item_id' AND invoice_no='$invoice_no' ORDER BY size");
                     $stmt->execute();
                     $datas = $stmt->fetchall();
                     foreach ($datas as $packingstockinfodata) {
                       $item_id = $packingstockinfodata['item_id'];
                       $commonditydata = $query->select('item', $item_id, 'item_id');
+                      $lastid = $packingstockinfodata['id'];
+                      $size = $packingstockinfodata['size'];
+                      $checklast = $pdo->prepare("SELECT * FROM truckpackingliststockinfo WHERE id < $lastid AND item_id='$item_id' AND size='$size'");
+                      $checklast->execute();
+                      $checklastavaliable = $checklast->fetch(PDO::FETCH_ASSOC);
+                      $lastcommondity = $pdo->prepare("SELECT * FROM truckpackingliststockinfo WHERE id < $lastid AND item_id='$item_id'");
+                      $lastcommondity->execute();
+                      $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
                    ?>
                   <tr>
-                    <td><?php echo $packingstockinfodata['id']; ?></td>
-                    <td><?php echo $commonditydata['item_name']; ?></td>
-                    <td><?php echo $packingstockinfodata['size']; ?></td>
+                    <td><?php if(empty($lastcommondity)){ echo $no;}; ?></td>
+                    <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
+                    <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['size'];} ?></td>
                     <td><?php echo $packingstockinfodata['kgperbox']; ?></td>
                     <td><?php echo $packingstockinfodata['mc']; ?></td>
                     <td><?php echo $packingstockinfodata['netweight']; ?></td>
@@ -157,6 +166,7 @@ $query = new Query();
                   ?>
                   <?php
                   }
+                  $no++;
                   $item_id = $packingstockinfodata['item_id'];
                   $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' AND item_id='$item_id'");
                   $totalmcstmt->execute();
@@ -257,7 +267,7 @@ $query = new Query();
                      $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM truckactualinvoice WHERE invoice_no='$invoice_no'");
                      $commonditycountstmt->execute();
                      $commonditycountdatas = $commonditycountstmt->fetchColumn();
-                     $no = 1;
+                     $no1 = 1;
                      for ($i=0; $i < $commonditycountdatas; $i++) {
                        $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM truckactualinvoice WHERE invoice_no='$invoice_no'");
                        $commonditystmt->execute();
@@ -265,47 +275,32 @@ $query = new Query();
                        $item_id = $commonditydata[$i]['item_id'];
                        $invoice_no = $_GET['invoice_no'];
 
-                       $stmt = $pdo->prepare("SELECT * FROM truckactualinvoice WHERE item_id='$item_id' AND invoice_no='$invoice_no' ORDER BY id DESC");
+                       $stmt = $pdo->prepare("SELECT * FROM truckactualinvoice WHERE item_id='$item_id' AND invoice_no='$invoice_no' ORDER BY size");
                        $stmt->execute();
                        $datas = $stmt->fetchall();
 
                        foreach ($datas as $packingstockinfodata) {
                          $item_id = $packingstockinfodata['item_id'];
                          $commonditydata = $query->select('item', $item_id, 'item_id');
-
-                         $id = $packingstockinfodata['id'];
-                         $oncestmt = $pdo->prepare("SELECT * FROM truckactualinvoice WHERE id > '$id' AND item_id='$item_id'");
-                         $oncestmt->execute();
-                         $oncedatas = $oncestmt->fetch(PDO::FETCH_ASSOC);
-                         if (!empty($oncedatas)) {
+                         $lastid = $packingstockinfodata['id'];
+                         $size = $packingstockinfodata['size'];
+                         $checklast = $pdo->prepare("SELECT * FROM truckactualinvoice WHERE id < $lastid AND item_id='$item_id' AND size='$size'");
+                         $checklast->execute();
+                         $checklastavaliable = $checklast->fetch(PDO::FETCH_ASSOC);
+                         $lastcommondity = $pdo->prepare("SELECT * FROM truckactualinvoice WHERE id < $lastid AND item_id='$item_id'");
+                         $lastcommondity->execute();
+                         $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
                            ?>
                            <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $packingstockinfodata['id']; ?>">
-                             <td><?php echo $no; ?></td>
-                             <td><?php if($packingstockinfodata['item_id'] != $oncedatas['item_id']){ echo $commonditydata['item_name'];}; ?></td>
-                             <td><?php if($packingstockinfodata['size'] != $oncedatas['size']){ echo $packingstockinfodata['size'];}; ?></td>
+                             <td><?php if(empty($lastcommondity)){ echo $no1;}; ?></td>
+                             <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
+                             <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['size'];} ?></td>
                              <td><?php echo $packingstockinfodata['kgperbox']; ?></td>
                              <td><?php echo $packingstockinfodata['mc']; ?></td>
                              <td><?php echo $packingstockinfodata['netweight']; ?></td>
                              <td><?php echo $packingstockinfodata['usd']; ?></td>
                              <td><?php echo $packingstockinfodata['total_usd']; ?></td>
                            </tr>
-                           <?php
-                         }
-                         else{
-                           ?>
-                           <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $packingstockinfodata['id']; ?>">
-                             <td><?php echo $no; ?></td>
-                             <td><?php echo $commonditydata['item_name']; ?></td>
-                             <td><?php echo $packingstockinfodata['size']; ?></td>
-                             <td><?php echo $packingstockinfodata['kgperbox']; ?></td>
-                             <td><?php echo $packingstockinfodata['mc']; ?></td>
-                             <td><?php echo $packingstockinfodata['netweight']; ?></td>
-                             <td><?php echo $packingstockinfodata['usd']; ?></td>
-                             <td><?php echo $packingstockinfodata['total_usd']; ?></td>
-                           </tr>
-                           <?php
-                         }
-                         ?>
                          <?php
                          ?>
                          <div class="modal fade" id="updatemodal<?php echo $packingstockinfodata['id']; ?>">
@@ -332,8 +327,8 @@ $query = new Query();
                            </div>
                          </div>
                          <?php
-                         $no++;
                        }
+                       $no1++;
                        $item_id = $packingstockinfodata['item_id'];
                        $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' AND item_id='$item_id'");
                        $totalmcstmt->execute();
@@ -432,6 +427,7 @@ $query = new Query();
                  $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM truckfoambox WHERE invoice_no='$invoice_no'");
                  $commonditycountstmt->execute();
                  $commonditycountdatas = $commonditycountstmt->fetchColumn();
+                 $no2 = 1;
                  for ($i=0; $i < $commonditycountdatas; $i++) {
                    $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM truckfoambox WHERE invoice_no='$invoice_no'");
                    $commonditystmt->execute();
@@ -439,17 +435,25 @@ $query = new Query();
                    $item_id = $commonditydata[$i]['item_id'];
                    $invoice_no = $_GET['invoice_no'];
 
-                   $stmt = $pdo->prepare("SELECT * FROM truckfoambox WHERE item_id='$item_id' AND invoice_no='$invoice_no'");
+                   $stmt = $pdo->prepare("SELECT * FROM truckfoambox WHERE item_id='$item_id' AND invoice_no='$invoice_no' ORDER BY size");
                    $stmt->execute();
                    $datas = $stmt->fetchall();
                    foreach ($datas as $packingstockinfodata) {
                      $item_id = $packingstockinfodata['item_id'];
                      $commonditydata = $query->select('item', $item_id, 'item_id');
+                     $lastid = $packingstockinfodata['id'];
+                     $size = $packingstockinfodata['size'];
+                     $checklast = $pdo->prepare("SELECT * FROM truckfoambox WHERE id < $lastid AND item_id='$item_id' AND size='$size'");
+                     $checklast->execute();
+                     $checklastavaliable = $checklast->fetch(PDO::FETCH_ASSOC);
+                     $lastcommondity = $pdo->prepare("SELECT * FROM truckfoambox WHERE id < $lastid AND item_id='$item_id'");
+                     $lastcommondity->execute();
+                     $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
                   ?>
                  <tr>
-                   <td><?php echo $packingstockinfodata['id']; ?></td>
-                   <td><?php echo $commonditydata['item_name']; ?></td>
-                   <td><?php echo $packingstockinfodata['size']; ?></td>
+                   <td><?php if(empty($lastcommondity)){ echo $no2;}; ?></td>
+                   <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
+                   <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['size'];} ?></td>
                    <td><?php echo $packingstockinfodata['pcsperbox']; ?></td>
                    <td><?php echo $packingstockinfodata['kgperbox']; ?></td>
                    <td><?php echo $packingstockinfodata['mc']; ?></td>
@@ -484,6 +488,7 @@ $query = new Query();
                  </div>
                  <?php
                  }
+                 $no2++;
                  $item_id = $packingstockinfodata['item_id'];
                  $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' AND item_id='$item_id'");
                  $totalmcstmt->execute();
@@ -576,6 +581,7 @@ $query = new Query();
                  $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM truckdeclare WHERE invoice_no='$invoice_no'");
                  $commonditycountstmt->execute();
                  $commonditycountdatas = $commonditycountstmt->fetchColumn();
+                 $no3 = 1;
                  for ($i=0; $i < $commonditycountdatas; $i++) {
                    $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM truckdeclare WHERE invoice_no='$invoice_no'");
                    $commonditystmt->execute();
@@ -583,21 +589,29 @@ $query = new Query();
                    $item_id = $commonditydata[$i]['item_id'];
                    $invoice_no = $_GET['invoice_no'];
 
-                   $stmt = $pdo->prepare("SELECT * FROM truckdeclare WHERE item_id='$item_id' AND invoice_no='$invoice_no'");
+                   $stmt = $pdo->prepare("SELECT * FROM truckdeclare WHERE item_id='$item_id' AND invoice_no='$invoice_no' ORDER BY size");
                    $stmt->execute();
                    $datas = $stmt->fetchall();
                    foreach ($datas as $packingstockinfodata) {
                      $item_id = $packingstockinfodata['item_id'];
                      $commonditydata = $query->select('item', $item_id, 'item_id');
+                     $lastid = $packingstockinfodata['id'];
+                     $size = $packingstockinfodata['size'];
+                     $checklast = $pdo->prepare("SELECT * FROM truckdeclare WHERE id < $lastid AND item_id='$item_id' AND size='$size'");
+                     $checklast->execute();
+                     $checklastavaliable = $checklast->fetch(PDO::FETCH_ASSOC);
+                     $lastcommondity = $pdo->prepare("SELECT * FROM truckdeclare WHERE id < $lastid AND item_id='$item_id'");
+                     $lastcommondity->execute();
+                     $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
                   ?>
                  <tr data-bs-toggle="modal" data-bs-target="#updatekgperbox<?php echo $packingstockinfodata['id']; ?>">
-                   <td><?php echo $packingstockinfodata['id']; ?></td>
-                   <td><?php echo $commonditydata['item_name']; ?></td>
-                   <td><?php echo $packingstockinfodata['size']; ?></td>
+                   <td><?php if(empty($lastcommondity)){ echo $no3;}; ?></td>
+                   <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
+                   <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['size'];} ?></td>
                    <td><?php echo $packingstockinfodata['pcsperbox']; ?></td>
-                   <td><?php echo $packingstockinfodata['kgperbox']; ?></td>
+                   <td><?php if($packingstockinfodata['kgperbox'] != 0){ echo $packingstockinfodata['kgperbox'];}else{ echo "-"; }; ?></td>
                    <td><?php echo $packingstockinfodata['mc']; ?></td>
-                   <td><?php echo $packingstockinfodata['netweight']; ?></td>
+                   <td><?php if($packingstockinfodata['netweight'] != 0){ echo $packingstockinfodata['netweight'];}else{ echo "-"; }; ?></td>
                  </tr>
                  <?php
                  // print_r( explode(",", $packingstockinfodata['foambox_no']));
@@ -627,6 +641,7 @@ $query = new Query();
                  </div>
                  <?php
                  }
+                 $no3++;
                  $item_id = $packingstockinfodata['item_id'];
                  $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' AND item_id='$item_id'");
                  $totalmcstmt->execute();

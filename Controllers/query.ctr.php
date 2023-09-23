@@ -982,7 +982,7 @@ Class Query{
         $fishcoldstorestmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore ORDER BY id DESC");
         $fishcoldstorestmt->execute();
         $fishcoldstore2 = $fishcoldstorestmt->fetch(PDO::FETCH_ASSOC);
-        $total_kg_damage = $fishcoldstore2['total_kg'] - $damagekg;
+        $total_kg_damage = floatval($fishcoldstore2['total_kg']) - floatval($damagekg);
         $coldstorestmt = $pdo->prepare("INSERT INTO gfcfishcoldstore(date, ite, total_mc, kg, total_kg, rate) VALUES('$date', '$ite', '$total_mc', '$damagekg', '$total_kg_damage', '$coldstorerate')");
         $coldstorestmt->execute();
       }
@@ -1025,15 +1025,29 @@ Class Query{
       $lastrowsdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
       $id = $lastrowsdata['id'];
 
+      $rowcount = $pdo->prepare("SELECT COUNT(*) FROM gfcfishcoldstore WHERE date='$date'");
+      $rowcount->execute();
+      $rowcount = $rowcount->fetchColumn();
       if($ite == 'import'){
         $importrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE date='$date' AND ite='import'");
         $importrowstmt->execute();
         $importrowsdata = $importrowstmt->fetch(PDO::FETCH_ASSOC);
-        $nodateimportrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE date!='$date' ORDER BY id DESC");
-        $nodateimportrowstmt->execute();
-        $nodateimportrowsdata = $nodateimportrowstmt->fetch(PDO::FETCH_ASSOC);
+        $lasttottalstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE total_charges!=0 AND id < $id ORDER BY id DESC");
+        $lasttottalstmt->execute();
+        $lasttotalcharges = $lasttottalstmt->fetch(PDO::FETCH_ASSOC);
         $coldstorecharges2 = $coldstorerate * $importrowsdata['kg'];
-        $total_charges = $nodateimportrowsdata['total_charges'] + $coldstorecharges2;
+        $total_charges = $lasttotalcharges['total_charges'] + $coldstorecharges2;
+        $coldstoreupdatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET charges='$coldstorecharges2', total_charges='$total_charges' WHERE id='$id'");
+        $coldstoreupdatestmt->execute();
+      }elseif($rowcount == 1){
+        $importrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE date='$date'");
+        $importrowstmt->execute();
+        $importrowsdata = $importrowstmt->fetch(PDO::FETCH_ASSOC);
+        $lasttottalstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE total_charges!=0 AND id < $id ORDER BY id DESC");
+        $lasttottalstmt->execute();
+        $lasttotalcharges = $lasttottalstmt->fetch(PDO::FETCH_ASSOC);
+        $coldstorecharges2 = $coldstorerate * $importrowsdata['kg'];
+        $total_charges = $lasttotalcharges['total_charges'] + $coldstorecharges2;
         $coldstoreupdatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET charges='$coldstorecharges2', total_charges='$total_charges' WHERE id='$id'");
         $coldstoreupdatestmt->execute();
       }else{

@@ -155,6 +155,11 @@ $query = new Query();
                   $fishcoldstoremaxstmt = $pdo->prepare("SELECT MAX(charges) AS charges FROM gfcfishcoldstore WHERE date='$date'");
                   $fishcoldstoremaxstmt->execute();
                   $fishcoldstoremaxdata = $fishcoldstoremaxstmt->fetch(PDO::FETCH_ASSOC);
+
+                  $exportstmt = $pdo->prepare("SELECT COUNT(*) FROM gfcfishcoldstore WHERE date='$date'");
+                  $exportstmt->execute();
+                  $exportcount = $exportstmt->fetchColumn();
+
                  ?>
                 <tr>
                   <td><?php echo $fishcoldstoredata['id']; ?></td>
@@ -165,7 +170,7 @@ $query = new Query();
                   <td><?php echo $fishcoldstoredata['kg']; ?></td>
                   <td><?php echo $fishcoldstoredata['total_kg']; ?></td>
                   <td><?php echo $fishcoldstoredata['rate']; ?></td>
-                  <td><?php if ($fishcoldstoredata['charges'] == '0'){echo "";}else{ echo $fishcoldstoredata['charges'];}; ?></td>
+                  <td><?php if ($exportcount > 1){if($fishcoldstoredata['ite'] == 'import'){ echo $fishcoldstoredata['charges']; };}else{ echo $fishcoldstoredata['charges'];}; ?></td>
                   <td><?php if ($fishcoldstoredata['total_charges'] == '0'){echo "";}else{ echo $fishcoldstoredata['total_charges'];}; ?></td>
                 </tr>
                 <?php
