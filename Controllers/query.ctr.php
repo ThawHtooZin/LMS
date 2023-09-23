@@ -1998,27 +1998,22 @@ Class Query{
       $countstmt->execute();
       $countdata = $countstmt->fetchColumn();
       $count = 0;
+      $thefoamboxs = "";
       foreach ($checkdata as $foamdata) {
         $count++;
-        $thefoamboxs = "";
         if($countdata == $count){
           $thefoamboxs .= $foamdata['foambox_no'];
         }else{
           $thefoamboxs .= $foamdata['foambox_no'] . ",";
         }
-        $thefoamboxs .= "," .$thefoamboxs;
-        $condition = "";
-        $thefoamboxsexplode = explode(',', $thefoamboxs);
-        foreach ($thefoamboxsexplode as $thenums) {
-          $explodeddatas = explode(",", $foambox);
-          foreach ($explodeddatas as $explodeddata) {
-            if($explodeddata == $thenums){
-              $condition .= "error";
-            }else{
-              $condition .= "success";
-            }
-          }
-        }
+      }
+      $thefoamboxs = explode(',', $thefoamboxs);
+      $foamboxs = explode(',', $foambox);
+      $dup = array_intersect($thefoamboxs, $foamboxs);
+      if(!empty($dup)){
+        $condition = "error";
+      }else{
+        $condition = "success";
       }
 
       // $foamboxs = $checkdata['foambox_no'];
@@ -2028,7 +2023,7 @@ Class Query{
       //   // code...
       // }
       // echo $condition;
-    if(!str_contains($condition, 'error')){
+    if($condition != 'error'){
       $updatefoamstmt = $pdo->prepare("UPDATE truckfoambox SET foambox_no='$foambox' WHERE id='$foamboxid'");
       $updatefoamstmt->execute();
     }else{

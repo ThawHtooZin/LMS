@@ -73,6 +73,8 @@ $query = new Query();
               $_SESSION['tabs'] = 'foambox';
             }elseif(isset($_POST['declarebtn'])){
               $_SESSION['tabs'] = 'declare';
+            }elseif(empty($_SESSION['tabs']) || $_SESSION['tabs'] == ''){
+              $_SESSION['tabs'] = 'default';
             }
              ?>
                 <span class=" text-light" id="fbtext" style="font-size:20px; font-weight:bold;">Foam Box</span>
@@ -189,6 +191,9 @@ $query = new Query();
                    $totalgrssweightstmt = $pdo->prepare("SELECT SUM(totalgrossweight) AS totalgrossweight FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no'");
                    $totalgrssweightstmt->execute();
                    $totalgrssweightdata = $totalgrssweightstmt->fetch(PDO::FETCH_ASSOC);
+                   $foamboxstmt = $pdo->prepare("SELECT SUM(total_foambox_no) AS total_foambox_no FROM truckfoambox WHERE invoice_no='$invoice_no'");
+                   $foamboxstmt->execute();
+                   $foamboxdata = $foamboxstmt->fetch(PDO::FETCH_ASSOC);
                     ?>
                    <tr>
                      <td></td>
@@ -200,7 +205,7 @@ $query = new Query();
                      <td style="font-weight:bold !important;"><?php if(!empty($totalgrssweightdata['totalgrossweight'])){ echo $totalgrssweightdata['totalgrossweight']; }; ?></td>
                    </tr>
                 </table>
-                <h5 style="text-transform:uppercase;">Total Foam Box - </h5>
+                <h5 style="text-transform:uppercase;">Total Foam Box - <?php if(!empty($foamboxdata['total_foambox_no'])){ echo $foamboxdata['total_foambox_no'] . " Box"; }; ?></h5>
                 <h5 style="text-transform:uppercase;">Total Net Weight - <?php if(!empty($netweightdata['netweight'])){ echo $netweightdata['netweight'] . " KGS"; }; ?></h5>
                 <h5 style="text-transform:uppercase;">Total Gross Weight - <?php if(!empty($totalgrssweightdata['totalgrossweight'])){ echo $totalgrssweightdata['totalgrossweight'] . " KGS"; }; ?></h5>
               </div>
@@ -367,6 +372,9 @@ $query = new Query();
                      $totalusdstmt = $pdo->prepare("SELECT SUM(total_usd) AS total_usd FROM truckactualinvoice WHERE invoice_no='$invoice_no'");
                      $totalusdstmt->execute();
                      $totalusddata = $totalusdstmt->fetch(PDO::FETCH_ASSOC);
+                     $foamboxstmt = $pdo->prepare("SELECT SUM(total_foambox_no) AS total_foambox_no FROM truckfoambox WHERE invoice_no='$invoice_no'");
+                     $foamboxstmt->execute();
+                     $foamboxdata = $foamboxstmt->fetch(PDO::FETCH_ASSOC);
                      ?>
                      <tr style="font-weight:bold !important;">
                        <td></td>
@@ -379,7 +387,7 @@ $query = new Query();
                        <td><?php echo $totalusddata['total_usd']; ?></td>
                      </tr>
                    </table>
-                   <h5 style="text-transform:uppercase;">Total Foam Box - </h5>
+                   <h5 style="text-transform:uppercase;">Total Foam Box - <?php if(!empty($foamboxdata['total_foambox_no'])){ echo $foamboxdata['total_foambox_no'] . " Box"; }; ?></h5>
                    <h5 style="text-transform:uppercase;">Total Net Weight - <?php if(!empty($netweightdata['total_netweight'])){ echo $netweightdata['total_netweight'] . " KGS"; }; ?></h5>
                    <h5 style="text-transform:uppercase;">Total Value USD - <?php if(!empty($totalusddata['total_usd'])){ echo $totalusddata['total_usd'] . " USD"; }; ?></h5>
                    <br><br>
@@ -511,6 +519,9 @@ $query = new Query();
                   $totalkgperboxstmt = $pdo->prepare("SELECT SUM(kgperbox) AS total_kgperbox FROM truckfoambox WHERE invoice_no='$invoice_no'");
                   $totalkgperboxstmt->execute();
                   $totalkgperboxdata = $totalkgperboxstmt->fetch(PDO::FETCH_ASSOC);
+                  $foamboxstmt = $pdo->prepare("SELECT SUM(total_foambox_no) AS total_foambox_no FROM truckfoambox WHERE invoice_no='$invoice_no'");
+                  $foamboxstmt->execute();
+                  $foamboxdata = $foamboxstmt->fetch(PDO::FETCH_ASSOC);
                    ?>
                   <tr style="font-weight:bold !important;">
                     <td></td>
@@ -523,7 +534,7 @@ $query = new Query();
                     <td></td>
                   </tr>
                </table>
-               <h5 style="text-transform:uppercase;">Total Foam Box - </h5>
+               <h5 style="text-transform:uppercase;">Total Foam Box - <?php if(!empty($foamboxdata['total_foambox_no'])){ echo $foamboxdata['total_foambox_no'] . " Box"; }; ?></h5>
                <h5 style="text-transform:uppercase;">Total Net Weight - <?php if(!empty($netweightdata['netweight'])){ echo $netweightdata['netweight'] . " KGS"; }; ?></h5>
              </div>
              <?php
@@ -650,6 +661,9 @@ $query = new Query();
                   $totalkgperboxstmt = $pdo->prepare("SELECT SUM(kgperbox) AS total_kgperbox FROM truckdeclare WHERE invoice_no='$invoice_no'");
                   $totalkgperboxstmt->execute();
                   $totalkgperboxdata = $totalkgperboxstmt->fetch(PDO::FETCH_ASSOC);
+                  $foamboxstmt = $pdo->prepare("SELECT SUM(total_foambox_no) AS total_foambox_no FROM truckfoambox WHERE invoice_no='$invoice_no'");
+                  $foamboxstmt->execute();
+                  $foamboxdata = $foamboxstmt->fetch(PDO::FETCH_ASSOC);
                    ?>
                   <tr style="font-weight:bold !important;">
                     <td></td>
@@ -661,7 +675,7 @@ $query = new Query();
                     <td><?php if(!empty($netweightdata['netweight'])){ echo $netweightdata['netweight']; }; ?></td>
                   </tr>
                </table>
-               <h5 style="text-transform:uppercase;">Total Foam Box - </h5>
+               <h5 style="text-transform:uppercase;">Total Foam Box - <?php if(!empty($foamboxdata['total_foambox_no'])){ echo $foamboxdata['total_foambox_no'] . " Box"; }; ?></h5>
                <h5 style="text-transform:uppercase;">Total Net Weight - <?php if(!empty($netweightdata['netweight'])){ echo $netweightdata['netweight'] . " KGS"; }; ?></h5>
              </div>
              <?php
@@ -756,7 +770,7 @@ $query = new Query();
       }
        ?>
        <?php
-       if(empty($_SESSION['tabs'])){
+       if(empty($_SESSION['tabs']) || $_SESSION['tabs'] == 'default'){
          echo '
          $("#declare").show();
          $("#foambox").show();

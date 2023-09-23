@@ -81,8 +81,8 @@ $query = new Query();
             <div class="card-header bg-secondary">
               <span class=" text-light" id="tctext" style="font-size:20px; font-weight:bold;">Total Costing</span>
               <span class=" text-light hide" id="ptext" style="font-size:20px; font-weight:bold;">Profit</span>
-              <button type="button" class="btn btn-info text-light float-end btn-sm " id="profitbtn" name="profitbtn">Profit</button>
-              <button type="button" class="btn btn-info text-light float-end btn-sm hide" id="totalcostingbtn" name="totalcostingbtn">Total Costing</button>
+              <button type="submit" class="btn btn-info text-light float-end btn-sm " id="profitbtn" name="profitbtn">Profit</button>
+              <button type="submit" class="btn btn-info text-light float-end btn-sm hide" id="totalcostingbtn" name="totalcostingbtn">Total Costing</button>
               <a href="truck_packing_stock.php" class="btn btn-danger float-end me-2 btn-sm" id="back">Back</a>
             </div>
           </form>
@@ -278,22 +278,29 @@ $query = new Query();
     </div>
     <script type="text/javascript">
 
-    $(document).ready(function(){
-      $("#profitbtn").click(function(){
-        $("#back").toggle();
-        $(".profit").toggle();
-        $(".total_charges").toggle();
-        $("#profitbtn").toggle();
-        $("#totalcostingbtn").toggle();
-      });
-      $("#totalcostingbtn").click(function(){
-        $("#back").toggle();
-        $(".total_charges").toggle();
-        $(".profit").toggle();
-        $("#profitbtn").toggle();
-        $("#totalcostingbtn").toggle();
-      });
-    });
+        $(document).ready(function(){
+          <?php
+          if(empty($_SESSION['tabs'])){
+            echo 'profit();';
+          }elseif($_SESSION['tabs'] == 'profit'){
+            echo 'profit();';
+          }
+           ?>
+          function profit(){
+              $("#back").toggle();
+              $(".profit").toggle();
+              $(".total_charges").toggle();
+              $("#profitbtn").toggle();
+              $("#totalcostingbtn").toggle();
+            };
+          function totalcosting(){
+            $("#back").toggle();
+            $(".total_charges").toggle();
+            $(".profit").toggle();
+            $("#profitbtn").toggle();
+            $("#totalcostingbtn").toggle();
+          };
+        });
 
     </script>
     <?php
