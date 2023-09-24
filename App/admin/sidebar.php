@@ -372,6 +372,18 @@ $permissions = $permission['permission'];
             }
             ?>
             <?php
+            if(str_contains($permissions, 'manage_truckexport')){
+              ?>
+            <li class="nav-item">
+              <a href="truck_packing_stock.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - Truck Export
+              </a>
+            </li>
+            <?php
+            }
+            ?>
+            <?php
             if(str_contains($permissions, 'manage_packingmaterial')){
               ?>
             <li class="nav-item">

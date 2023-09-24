@@ -982,7 +982,7 @@ Class Query{
         $fishcoldstorestmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore ORDER BY id DESC");
         $fishcoldstorestmt->execute();
         $fishcoldstore2 = $fishcoldstorestmt->fetch(PDO::FETCH_ASSOC);
-        $total_kg_damage = $fishcoldstore2['total_kg'] - $damagekg;
+        $total_kg_damage = floatval($fishcoldstore2['total_kg']) - floatval($damagekg);
         $coldstorestmt = $pdo->prepare("INSERT INTO gfcfishcoldstore(date, ite, total_mc, kg, total_kg, rate) VALUES('$date', '$ite', '$total_mc', '$damagekg', '$total_kg_damage', '$coldstorerate')");
         $coldstorestmt->execute();
       }
@@ -1025,15 +1025,29 @@ Class Query{
       $lastrowsdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
       $id = $lastrowsdata['id'];
 
+      $rowcount = $pdo->prepare("SELECT COUNT(*) FROM gfcfishcoldstore WHERE date='$date'");
+      $rowcount->execute();
+      $rowcount = $rowcount->fetchColumn();
       if($ite == 'import'){
         $importrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE date='$date' AND ite='import'");
         $importrowstmt->execute();
         $importrowsdata = $importrowstmt->fetch(PDO::FETCH_ASSOC);
-        $nodateimportrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE date!='$date' ORDER BY id DESC");
-        $nodateimportrowstmt->execute();
-        $nodateimportrowsdata = $nodateimportrowstmt->fetch(PDO::FETCH_ASSOC);
+        $lasttottalstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE total_charges!=0 AND id < $id ORDER BY id DESC");
+        $lasttottalstmt->execute();
+        $lasttotalcharges = $lasttottalstmt->fetch(PDO::FETCH_ASSOC);
         $coldstorecharges2 = $coldstorerate * $importrowsdata['kg'];
-        $total_charges = $nodateimportrowsdata['total_charges'] + $coldstorecharges2;
+        $total_charges = $lasttotalcharges['total_charges'] + $coldstorecharges2;
+        $coldstoreupdatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET charges='$coldstorecharges2', total_charges='$total_charges' WHERE id='$id'");
+        $coldstoreupdatestmt->execute();
+      }elseif($rowcount == 1){
+        $importrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE date='$date'");
+        $importrowstmt->execute();
+        $importrowsdata = $importrowstmt->fetch(PDO::FETCH_ASSOC);
+        $lasttottalstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE total_charges!=0 AND id < $id ORDER BY id DESC");
+        $lasttottalstmt->execute();
+        $lasttotalcharges = $lasttottalstmt->fetch(PDO::FETCH_ASSOC);
+        $coldstorecharges2 = $coldstorerate * $importrowsdata['kg'];
+        $total_charges = $lasttotalcharges['total_charges'] + $coldstorecharges2;
         $coldstoreupdatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET charges='$coldstorecharges2', total_charges='$total_charges' WHERE id='$id'");
         $coldstoreupdatestmt->execute();
       }else{
@@ -1945,6 +1959,173 @@ Class Query{
     $loadstmt = $pdo->prepare("UPDATE tclmcstock SET loading_no='$loading_no', loading_mc='$loading_mc', grandtotal_mc='$grandtotal_mc' WHERE id='$id'");
     $loadstmt->execute();
     return '<script>swal("Success!", "Successfully Loaded!", "success");</script>';
+  }
+
+  function addtruckpackinglist($date, $invoice_no, $truck_no){
+    global $pdo;
+
+    $addpackingliststmt = $pdo->prepare("INSERT INTO truckpackingliststock(date, invoice_no, truck_no) VALUES('$date', '$invoice_no', '$truck_no')");
+    $addpackingliststmt->execute();
+  }
+
+  function addtruckpackinglistinfo($commondity, $size, $pcsperbox, $kgperbox, $mc, $invoice_no){
+    global $pdo;
+
+    $totalnetweight = $kgperbox * $mc;
+    $totalgrossweight = $mc * 60;
+
+    $addtruckpackingliststmt = $pdo->prepare("INSERT INTO truckpackingliststockinfo(item_id, size, pcsperbox, kgperbox, mc, netweight, totalgrossweight, invoice_no) VALUES('$commondity', '$size', '$pcsperbox', '$kgperbox', '$mc', '$totalnetweight', '$totalgrossweight', '$invoice_no')");
+    $addtruckpackingliststmt->execute();
+
+    $addinvoicestmt = $pdo->prepare("INSERT INTO truckactualinvoice(item_id, size, pcsperbox, kgperbox, mc, netweight, invoice_no) VALUES('$commondity', '$size', '$pcsperbox', '$kgperbox', '$mc', '$totalnetweight', '$invoice_no')");
+    $addinvoicestmt->execute();
+
+    $addfoambox = $pdo->prepare("INSERT INTO truckfoambox(item_id, size, pcsperbox, kgperbox, mc, netweight, invoice_no) VALUES('$commondity', '$size', '$pcsperbox', '$kgperbox', '$mc', '$totalnetweight', '$invoice_no')");
+    $addfoambox->execute();
+
+    $adddeclare = $pdo->prepare("INSERT INTO truckdeclare(item_id, size, pcsperbox, mc, invoice_no) VALUES('$commondity', '$size', '$pcsperbox', '$mc', '$invoice_no')");
+    $adddeclare->execute();
+
+    $adddeclare = $pdo->prepare("INSERT INTO trucktotalcosting(item_id, size, total_kg, invoice_no) VALUES('$commondity', '$size', '$kgperbox', '$invoice_no')");
+    $adddeclare->execute();
+  }
+
+  function updatetruckactualinvoice($usd, $updateid){
+    global $pdo;
+
+    $netweightstmt = $pdo->prepare("SELECT * FROM truckactualinvoice WHERE id='$updateid'");
+    $netweightstmt->execute();
+    $netweight = $netweightstmt->fetch(PDO::FETCH_ASSOC);
+
+    $total_usd = $usd * intval($netweight['netweight']);
+    $updateusdstmt = $pdo->prepare("UPDATE truckactualinvoice SET usd='$usd', total_usd='$total_usd' WHERE id='$updateid'");
+    $updateusdstmt->execute();
+  }
+
+  function updatefoambox($foamboxid, $foambox, $invoice_no){
+    global $pdo;
+      $checkstmt = $pdo->prepare("SELECT * FROM truckfoambox WHERE invoice_no='$invoice_no' AND foambox_no IS NOT NULL");
+      $checkstmt->execute();
+      $checkdata = $checkstmt->fetchall();
+
+      $countstmt = $pdo->prepare("SELECT COUNT(*) FROM truckfoambox WHERE invoice_no='$invoice_no' AND foambox_no IS NOT NULL");
+      $countstmt->execute();
+      $countdata = $countstmt->fetchColumn();
+      $count = 0;
+      $thefoamboxs = "";
+      foreach ($checkdata as $foamdata) {
+        $count++;
+        if($countdata == $count){
+          $thefoamboxs .= $foamdata['foambox_no'];
+        }else{
+          $thefoamboxs .= $foamdata['foambox_no'] . ",";
+        }
+      }
+      $thefoamboxs = explode(',', $thefoamboxs);
+      $foamboxs = explode(',', $foambox);
+      $dup = array_intersect($thefoamboxs, $foamboxs);
+      if(!empty($dup)){
+        $condition = "error";
+      }else{
+        $condition = "success";
+      }
+
+      // $foamboxs = $checkdata['foambox_no'];
+      // $foamboxexploded = explode("-", $foamboxs);
+      // $foamboxno = count($foamboxexploded);
+      // for ($i=0; $i < $foambox_no; $i++) {
+      //   // code...
+      // }
+      // echo $condition;
+    if($condition != 'error'){
+      $updatefoamstmt = $pdo->prepare("UPDATE truckfoambox SET foambox_no='$foambox' WHERE id='$foamboxid'");
+      $updatefoamstmt->execute();
+    }else{
+      echo "<script>swal('Warning!', 'Duplicate Foam Number', 'warning');</script>";
+    }
+    }
+
+  function updatekgperbox($kgperbox, $kgperboxid){
+    global $pdo;
+
+    $mcstmt = $pdo->prepare("SELECT * FROM truckdeclare WHERE id='$kgperboxid'");
+    $mcstmt->execute();
+    $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
+
+    $netweight = $mcdata['mc'] * $kgperbox;
+
+    $updatepcsperboxstmt = $pdo->prepare("UPDATE truckdeclare SET kgperbox='$kgperbox', netweight='$netweight' WHERE id='$kgperboxid'");
+    $updatepcsperboxstmt->execute();
+  }
+
+  function addmaterial($date, $remark, $ice_amount, $ice_per_price, $tape_amount, $tape_per_price, $foambox_amount, $foambox_per_price,$plastic_amount, $plastic_per_price, $miscellous, $form10kg, $invoice_no){
+    global $pdo;
+
+    $ice = $ice_amount * $ice_per_price;
+    $tape = $tape_amount * $tape_per_price;
+    $foam_box = $foambox_amount * $foambox_per_price;
+    $plastic = $plastic_amount * $plastic_per_price;
+    $total_charges = $ice + $tape + $foam_box + $plastic + $miscellous;
+
+    $iceperkg = $ice / $form10kg;
+    $tapeperkg = $tape / $form10kg;
+    $foam_boxperkg = $foam_box / $form10kg;
+    $plasticperkg = $plastic / $form10kg;
+    $miscellousperkg = $miscellous / $form10kg;
+    $costperkg = $iceperkg + $tapeperkg + $foam_boxperkg + $plasticperkg + $miscellousperkg;
+
+    $addmaterialstmt = $pdo->prepare("INSERT INTO truckpackingmaterial(date, remark,	ice, miscellous,	tape,	foam_box,	plastic,	total_charges, form10kg, costperkg, invoice_no) VALUES('$date', '$remark', '$ice', '$miscellous', '$tape', '$foam_box', '$plastic', '$total_charges', '$form10kg', '$costperkg', '$invoice_no')");
+    $addmaterialstmt->execute();
+  }
+
+  function updatetotalcosting($priceperviss, $percentage, $packing_charges, $ygntomt, $mttotechnck, $labour_charges, $dollar_rate, $cal_percentage,  $id, $invoice_no){
+    global $pdo;
+    $priceperkg = floatval($priceperviss) / 1.634;
+
+    $updatetotalcostingstmt = $pdo->prepare("UPDATE trucktotalcosting SET priceperviss='$priceperviss', priceperkg='$priceperkg', percentage='$percentage', packing_charges='$packing_charges', labour_charges='$labour_charges' WHERE id='$id'");
+    $updatetotalcostingstmt->execute();
+    // ------------------------
+    $totalcostingstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM trucktotalcosting WHERE invoice_no='$invoice_no'");
+    $totalcostingstmt->execute();
+
+    $totalcosting = $totalcostingstmt->fetch(PDO::FETCH_ASSOC);
+    $commonditystmt = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE id='$id'");
+    $commonditystmt->execute();
+    $commondity = $commonditystmt->fetch(PDO::FETCH_ASSOC);
+    $ygntomt = $ygntomt / $totalcosting['total_kg'];
+    $mttotechnck = $mttotechnck / $totalcosting['total_kg'];
+    $packingandtransport = $packing_charges + $ygntomt + $mttotechnck + $labour_charges;
+    if(str_contains($cal_percentage, '-')){
+      $cal_percentage = explode("-", $cal_percentage);
+      $cal_percentage = $cal_percentage[1];
+      $packingandtransportsubtracted = $packingandtransport / intval($cal_percentage);
+      $total = $packingandtransport - $packingandtransportsubtracted;
+    }else{
+      $packingandtransportsubtracted = $packingandtransport / $cal_percentage;
+      $total = $packingandtransport + $packingandtransportsubtracted;
+    }
+    $grand_total = $percentage + $total;
+
+    $costing_usd = $grand_total / $dollar_rate;
+    $updatestmt = $pdo->prepare("UPDATE trucktotalcosting SET ygntomt_charges='$ygntomt', mttotechnck_charges='$mttotechnck', packingandtransport='$packingandtransport', total='$total', grand_total='$grand_total', rate='$dollar_rate',costing_usd='$costing_usd' WHERE id='$id'");
+    $updatestmt->execute();
+  }
+
+  function updateselingrate($selling_rate, $id, $invoice_no){
+    global $pdo;
+
+    $stmt = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE id='$id'");
+    $stmt->execute();
+    $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $total_kg = $data['total_kg'];
+    $profitperkg = $selling_rate - $data['costing_usd'];
+    $original_cost = $data['total_kg'] * $data['costing_usd'];
+    $selling_amount = $data['total_kg'] * $selling_rate;
+    $profit = $selling_amount - $original_cost;
+
+    $updatestmt = $pdo->prepare("UPDATE trucktotalcosting SET selling_rate='$selling_rate', profitperkg='$profitperkg', original_cost='$original_cost', selling_amount='$selling_amount', profit='$profit' WHERE id='$id'");
+    $updatestmt->execute();
   }
 
   // MORE SELECTS
