@@ -259,8 +259,18 @@ CREATE TABLE `gfcdryfishcoldstore` (
   `charges` bigint(15) NOT NULL,
   `total_charges` bigint(15) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4;
 
+INSERT INTO gfcdryfishcoldstore VALUES("38","2023-09-01","balance","","0","","0","0");
+INSERT INTO gfcdryfishcoldstore VALUES("40","2023-09-01","import","300","300","1.6","480","480");
+INSERT INTO gfcdryfishcoldstore VALUES("41","2023-09-01","export","150","150","1.6","0","0");
+INSERT INTO gfcdryfishcoldstore VALUES("42","2023-09-01","takeout","40","110","1.6","0","0");
+INSERT INTO gfcdryfishcoldstore VALUES("43","2023-09-01","takeout","10","100","1.6","0","0");
+INSERT INTO gfcdryfishcoldstore VALUES("45","2023-09-02","import","300","400","1.6","640","1120");
+INSERT INTO gfcdryfishcoldstore VALUES("46","2023-09-03","export","100","300","1.6","640","1760");
+INSERT INTO gfcdryfishcoldstore VALUES("49","2023-09-04","takeout","130","170","1.6","0","0");
+INSERT INTO gfcdryfishcoldstore VALUES("50","2023-09-04","takeout","20","150","1.6","480","2240");
+INSERT INTO gfcdryfishcoldstore VALUES("51","2023-09-05","export","100","50","1.6","240","2480");
 
 
 
@@ -275,8 +285,15 @@ CREATE TABLE `gfcdryfishlabour` (
   `charges` bigint(15) NOT NULL,
   `total_charges` bigint(15) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4;
 
+INSERT INTO gfcdryfishlabour VALUES("28","2023-09-01","import","300","4","1200","1200");
+INSERT INTO gfcdryfishlabour VALUES("29","2023-09-01","export","150","4","600","1800");
+INSERT INTO gfcdryfishlabour VALUES("30","2023-09-01","takeout","40","4","160","1960");
+INSERT INTO gfcdryfishlabour VALUES("32","2023-09-02","import","300","4","1200","3160");
+INSERT INTO gfcdryfishlabour VALUES("33","2023-09-03","export","100","3","300","3460");
+INSERT INTO gfcdryfishlabour VALUES("35","2023-09-04","takeout","130","4","520","3980");
+INSERT INTO gfcdryfishlabour VALUES("36","2023-09-05","export","100","4","400","4380");
 
 
 
@@ -294,17 +311,18 @@ CREATE TABLE `gfcfishcoldstore` (
   `charges` bigint(13) NOT NULL,
   `total_charges` bigint(14) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=202 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=392 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO gfcfishcoldstore VALUES("185","2023-09-01","balance","0","0","","0","","0","0");
-INSERT INTO gfcfishcoldstore VALUES("186","2023-09-02","import","100","100","300","300","1.5","450","450");
-INSERT INTO gfcfishcoldstore VALUES("187","2023-09-02","export","50","50","150","150","1.5","450","0");
-INSERT INTO gfcfishcoldstore VALUES("188","2023-09-03","import","150","200","450","600","1.5","675","1125");
-INSERT INTO gfcfishcoldstore VALUES("190","2023-09-03","takeout","20","180","60","540","1.5","0","0");
-INSERT INTO gfcfishcoldstore VALUES("191","2023-09-03","takeout","0","180","3","537","1.5","900","0");
-INSERT INTO gfcfishcoldstore VALUES("192","2023-09-04","import","40","220","120","657","1.5","180","1305");
-INSERT INTO gfcfishcoldstore VALUES("200","2023-09-05","export","200","20","600","57","1.5","900","2205");
-INSERT INTO gfcfishcoldstore VALUES("201","2023-09-06","import","100","120","300","357","1.5","450","2655");
+INSERT INTO gfcfishcoldstore VALUES("382","2023-09-01","balance","0","0","","0","","0","0");
+INSERT INTO gfcfishcoldstore VALUES("383","2023-09-01","import","100","100","300","300","1.5","450","450");
+INSERT INTO gfcfishcoldstore VALUES("384","2023-09-02","export","50","50","150","150","1.5","450","900");
+INSERT INTO gfcfishcoldstore VALUES("385","2023-09-03","import","200","250","600","750","1.5","1125","2025");
+INSERT INTO gfcfishcoldstore VALUES("386","2023-09-03","takeout","100","150","250","500","1.5","0","0");
+INSERT INTO gfcfishcoldstore VALUES("387","2023-09-03","takeout","0","150","50","450","1.5","0","0");
+INSERT INTO gfcfishcoldstore VALUES("388","2023-09-04","export","50","100","150","300","1.5","675","2700");
+INSERT INTO gfcfishcoldstore VALUES("389","2023-09-05","takeout","50","50","150","150","1.5","450","3150");
+INSERT INTO gfcfishcoldstore VALUES("390","2023-09-06","import","100","150","300","450","1.5","675","3825");
+INSERT INTO gfcfishcoldstore VALUES("391","2023-09-06","export","50","100","150","300","1.5","0","0");
 
 
 
@@ -319,40 +337,16 @@ CREATE TABLE `gfcfishlabour` (
   `charges` bigint(15) NOT NULL,
   `total_charges` bigint(15) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=151 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=291 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO gfcfishlabour VALUES("119","2023-09-02","import","300","3","900","900");
-INSERT INTO gfcfishlabour VALUES("120","2023-09-02","export","150","3","450","1350");
-INSERT INTO gfcfishlabour VALUES("121","2023-09-02","takeout","90","3","270","1620");
-INSERT INTO gfcfishlabour VALUES("122","2023-09-03","import","300","3","900","2520");
-INSERT INTO gfcfishlabour VALUES("123","2023-09-03","import","300","3","900","3420");
-INSERT INTO gfcfishlabour VALUES("124","2023-09-04","export","300","3","900","4320");
-INSERT INTO gfcfishlabour VALUES("125","2023-09-03","import","450","3","1350","5670");
-INSERT INTO gfcfishlabour VALUES("126","2023-09-03","export","300","3","900","6570");
-INSERT INTO gfcfishlabour VALUES("127","2023-09-03","takeout","150","3","450","7020");
-INSERT INTO gfcfishlabour VALUES("128","2023-09-03","import","300","3","900","7920");
-INSERT INTO gfcfishlabour VALUES("129","2023-09-03","export","300","3","900","8820");
-INSERT INTO gfcfishlabour VALUES("130","2023-09-03","import","550","3","1650","10470");
-INSERT INTO gfcfishlabour VALUES("131","2023-09-03","export","150","3","450","10920");
-INSERT INTO gfcfishlabour VALUES("132","2023-09-03","import","300","3","900","11820");
-INSERT INTO gfcfishlabour VALUES("133","2023-09-04","import","300","3","900","12720");
-INSERT INTO gfcfishlabour VALUES("134","2023-09-03","export","57","3","171","12891");
-INSERT INTO gfcfishlabour VALUES("135","2023-09-03","import","390","3","1170","14061");
-INSERT INTO gfcfishlabour VALUES("136","2023-09-04","export","300","3","900","14961");
-INSERT INTO gfcfishlabour VALUES("137","2023-09-02","import","300","3","900","15861");
-INSERT INTO gfcfishlabour VALUES("138","2023-09-02","export","150","3","450","16311");
-INSERT INTO gfcfishlabour VALUES("139","2023-09-03","import","450","3","1350","17661");
-INSERT INTO gfcfishlabour VALUES("140","2023-09-03","takeout","60","3","180","17841");
-INSERT INTO gfcfishlabour VALUES("141","2023-09-04","import","120","3","360","18201");
-INSERT INTO gfcfishlabour VALUES("142","2023-09-05","export","60","3","180","18381");
-INSERT INTO gfcfishlabour VALUES("143","2023-09-23","export","300","3","900","19281");
-INSERT INTO gfcfishlabour VALUES("144","2023-09-23","export","300","3","900","20181");
-INSERT INTO gfcfishlabour VALUES("145","2023-09-23","export","300","3","900","21081");
-INSERT INTO gfcfishlabour VALUES("146","2023-09-05","export","600","3","1800","22881");
-INSERT INTO gfcfishlabour VALUES("147","2023-09-05","export","600","3","1800","24681");
-INSERT INTO gfcfishlabour VALUES("148","2023-09-05","export","600","3","1800","26481");
-INSERT INTO gfcfishlabour VALUES("149","2023-09-05","export","600","3","1800","28281");
-INSERT INTO gfcfishlabour VALUES("150","2023-09-06","import","300","3","900","29181");
+INSERT INTO gfcfishlabour VALUES("283","2023-09-01","import","300","3","900","900");
+INSERT INTO gfcfishlabour VALUES("284","2023-09-02","export","150","3","450","1350");
+INSERT INTO gfcfishlabour VALUES("285","2023-09-03","import","600","3","1800","3150");
+INSERT INTO gfcfishlabour VALUES("286","2023-09-03","takeout","250","3","750","3900");
+INSERT INTO gfcfishlabour VALUES("287","2023-09-04","export","150","3","450","4350");
+INSERT INTO gfcfishlabour VALUES("288","2023-09-05","takeout","150","3","450","4800");
+INSERT INTO gfcfishlabour VALUES("289","2023-09-06","import","300","3","900","5700");
+INSERT INTO gfcfishlabour VALUES("290","2023-09-06","export","150","3","450","6150");
 
 
 
@@ -1124,7 +1118,7 @@ CREATE TABLE `truckactualinvoice` (
   `total_usd` float NOT NULL,
   `invoice_no` varchar(15) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO truckactualinvoice VALUES("28","MR163","2up","12","49","15","735","0","0","SH473");
 INSERT INTO truckactualinvoice VALUES("29","MR163","3up","10","44","15","660","0","0","SH473");
@@ -1134,6 +1128,10 @@ INSERT INTO truckactualinvoice VALUES("33","MR163","3up","23","47","25","1175","
 INSERT INTO truckactualinvoice VALUES("34","MR163","2up","16","47","22","1034","0","0","SH473");
 INSERT INTO truckactualinvoice VALUES("35","MR163","5up","22","46","27","1242","0","0","SH473");
 INSERT INTO truckactualinvoice VALUES("36","KO962","2up","12","47","23","1081","0","0","SH473");
+INSERT INTO truckactualinvoice VALUES("39","MR163","2up","29","49","39","1911","0","0","GW573");
+INSERT INTO truckactualinvoice VALUES("40","MR163","3up","21","48","40","1920","0","0","GW573");
+INSERT INTO truckactualinvoice VALUES("41","MR163","2up","24","47","32","1504","0","0","GW573");
+INSERT INTO truckactualinvoice VALUES("42","KO962","2up","22","47","30","1410","0","0","GW573");
 
 
 
@@ -1149,7 +1147,7 @@ CREATE TABLE `truckdeclare` (
   `netweight` float NOT NULL,
   `invoice_no` varchar(15) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO truckdeclare VALUES("18","MR163","2up","12","0","15","0","SH473");
 INSERT INTO truckdeclare VALUES("19","MR163","3up","10","0","15","0","SH473");
@@ -1159,6 +1157,10 @@ INSERT INTO truckdeclare VALUES("23","MR163","3up","23","0","25","0","SH473");
 INSERT INTO truckdeclare VALUES("24","MR163","2up","16","0","22","0","SH473");
 INSERT INTO truckdeclare VALUES("25","MR163","5up","22","0","27","0","SH473");
 INSERT INTO truckdeclare VALUES("26","KO962","2up","12","0","23","0","SH473");
+INSERT INTO truckdeclare VALUES("29","MR163","2up","29","0","39","0","GW573");
+INSERT INTO truckdeclare VALUES("30","MR163","3up","21","0","40","0","GW573");
+INSERT INTO truckdeclare VALUES("31","MR163","2up","24","0","32","0","GW573");
+INSERT INTO truckdeclare VALUES("32","KO962","2up","22","0","30","0","GW573");
 
 
 
@@ -1176,7 +1178,7 @@ CREATE TABLE `truckfoambox` (
   `total_foambox_no` varchar(255) NOT NULL,
   `invoice_no` varchar(15) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO truckfoambox VALUES("22","MR163","2up","12","49","15","735","","","SH473");
 INSERT INTO truckfoambox VALUES("23","MR163","3up","10","44","15","660","","","SH473");
@@ -1186,6 +1188,10 @@ INSERT INTO truckfoambox VALUES("27","MR163","3up","23","47","25","1175","","","
 INSERT INTO truckfoambox VALUES("28","MR163","2up","16","47","22","1034","","","SH473");
 INSERT INTO truckfoambox VALUES("29","MR163","5up","22","46","27","1242","","","SH473");
 INSERT INTO truckfoambox VALUES("30","KO962","2up","12","47","23","1081","","","SH473");
+INSERT INTO truckfoambox VALUES("33","MR163","2up","29","49","39","1911","","","GW573");
+INSERT INTO truckfoambox VALUES("34","MR163","3up","21","48","40","1920","","","GW573");
+INSERT INTO truckfoambox VALUES("35","MR163","2up","24","47","32","1504","","","GW573");
+INSERT INTO truckfoambox VALUES("36","KO962","2up","22","47","30","1410","","","GW573");
 
 
 
@@ -1217,7 +1223,7 @@ CREATE TABLE `truckpackingliststockinfo` (
   `totalgrossweight` float NOT NULL,
   `invoice_no` varchar(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO truckpackingliststockinfo VALUES("29","MR163","2up","12","49","15","735","900","SH473");
 INSERT INTO truckpackingliststockinfo VALUES("30","MR163","3up","10","44","15","660","900","SH473");
@@ -1227,6 +1233,10 @@ INSERT INTO truckpackingliststockinfo VALUES("34","MR163","3up","23","47","25","
 INSERT INTO truckpackingliststockinfo VALUES("35","MR163","2up","16","47","22","1034","1320","SH473");
 INSERT INTO truckpackingliststockinfo VALUES("36","MR163","5up","22","46","27","1242","1620","SH473");
 INSERT INTO truckpackingliststockinfo VALUES("37","KO962","2up","12","47","23","1081","1380","SH473");
+INSERT INTO truckpackingliststockinfo VALUES("40","MR163","2up","29","49","39","1911","2340","GW573");
+INSERT INTO truckpackingliststockinfo VALUES("41","MR163","3up","21","48","40","1920","2400","GW573");
+INSERT INTO truckpackingliststockinfo VALUES("42","MR163","2up","24","47","32","1504","1920","GW573");
+INSERT INTO truckpackingliststockinfo VALUES("43","KO962","2up","22","47","30","1410","1800","GW573");
 
 
 
@@ -1247,8 +1257,9 @@ CREATE TABLE `truckpackingmaterial` (
   `costperkg` float NOT NULL,
   `invoice_no` varchar(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4;
 
+INSERT INTO truckpackingmaterial VALUES("15","2023-09-01","Hilsa Marical","495000","30000","273500","1925000","327750","3051250","0","8441","361.48","SH473");
 
 
 
@@ -1279,16 +1290,20 @@ CREATE TABLE `trucktotalcosting` (
   `profit` float NOT NULL,
   `invoice_no` varchar(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO trucktotalcosting VALUES("15","0000-00-00","MR163","2up","49","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
-INSERT INTO trucktotalcosting VALUES("16","0000-00-00","MR163","3up","44","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
+INSERT INTO trucktotalcosting VALUES("16","0000-00-00","MR163","3up","44","1100","673.195","686.933","362","8992","7133","100","16587","0","0","0","0","0","0","0","0","0","SH473");
 INSERT INTO trucktotalcosting VALUES("17","0000-00-00","MR163","2up","46","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
 INSERT INTO trucktotalcosting VALUES("18","0000-00-00","MR163","3up","41","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
 INSERT INTO trucktotalcosting VALUES("20","0000-00-00","MR163","3up","47","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
 INSERT INTO trucktotalcosting VALUES("21","0000-00-00","MR163","2up","47","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
 INSERT INTO trucktotalcosting VALUES("22","0000-00-00","MR163","5up","46","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
 INSERT INTO trucktotalcosting VALUES("23","0000-00-00","KO962","2up","47","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
+INSERT INTO trucktotalcosting VALUES("26","0000-00-00","MR163","2up","49","1100","673.195","686.933","362","395","313","100","1170","0","0","0","0","0","0","0","0","0","GW573");
+INSERT INTO trucktotalcosting VALUES("27","0000-00-00","MR163","3up","48","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","GW573");
+INSERT INTO trucktotalcosting VALUES("28","0000-00-00","MR163","2up","47","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","GW573");
+INSERT INTO trucktotalcosting VALUES("29","0000-00-00","KO962","2up","47","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","GW573");
 
 
 
@@ -1302,7 +1317,7 @@ CREATE TABLE `userlogs` (
   `login_password` varchar(125) NOT NULL,
   `status` varchar(55) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO userlogs VALUES("1","10:26:18.000000","2023-09-18","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("2","10:31:25.000000","2023-09-18","admin","admin","Login Success");
@@ -1325,6 +1340,8 @@ INSERT INTO userlogs VALUES("18","10:52:01.000000","2023-09-22","admin","admin",
 INSERT INTO userlogs VALUES("19","10:52:45.000000","2023-09-22","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("20","10:55:31.000000","2023-09-22","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("21","09:24:47.000000","2023-09-23","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("22","10:33:14.000000","2023-09-25","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("23","10:04:05.000000","2023-09-26","admin","admin","Login Success");
 
 
 

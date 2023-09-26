@@ -255,8 +255,8 @@ $query = new Query();
                   <td><?php echo $dryfishcoldstoredata['kg']; ?></td>
                   <td><?php echo $dryfishcoldstoredata['total_kg']; ?></td>
                   <td><?php echo $dryfishcoldstoredata['rate']; ?></td>
-                  <td><?php echo $dryfishcoldstoredata['charges']; ?></td>
-                  <td><?php echo $dryfishcoldstoredata['total_charges']; ?></td>
+                  <td><?php if($dryfishcoldstoredata['charges'] != 0){ echo $dryfishcoldstoredata['charges']; } ?></td>
+                  <td><?php if($dryfishcoldstoredata['total_charges'] != 0){ echo $dryfishcoldstoredata['total_charges']; } ?></td>
                 </tr>
                 <?php
                 }
