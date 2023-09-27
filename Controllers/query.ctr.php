@@ -2287,6 +2287,65 @@ Class Query{
     $stmt->execute();
   }
 
+  function addactype($actype){
+    global $pdo;
+
+    $stmt = $pdo->prepare("INSERT INTO actype(actype) VALUES('$actype')");
+    $stmt->execute();
+    if($stmt){
+      echo "<script>swal('Success', 'Added A/C Type' , 'success')</script>";
+    }
+  }
+
+  function updateactype($actype, $id){
+    global $pdo;
+
+    $stmt = $pdo->prepare("UPDATE actype SET actype='$actype' WHERE acid = '$id'");
+    $stmt->execute();
+    if($stmt){
+      echo "<script>swal('Success', 'Updated A/C Type' , 'success')</script>";
+    }
+  }
+
+  function deleteactype($id){
+    global $pdo;
+
+    $stmt = $pdo->prepare("DELETE FROM actype WHERE acid = '$id'");
+    $stmt->execute();
+    if($stmt){
+      echo "<script>swal('Success', 'Deleted A/C Type' , 'success')</script>";
+    }
+  }
+
+  function addacname($code_no, $actype, $acname){
+    global $pdo;
+
+    $stmt = $pdo->prepare("INSERT INTO acname(code_no, ac_type, ac_name) VALUES('$code_no', '$actype', '$acname')");
+    $stmt->execute();
+    if($stmt){
+      echo "<script>swal('Success', 'Added A/C Type' , 'success')</script>";
+    }
+  }
+
+  function updateacname($code_no, $actype, $acname, $id){
+    global $pdo;
+
+    $stmt = $pdo->prepare("UPDATE acname SET code_no='$code_no', ac_type='$actype', ac_name='$acname' WHERE id = '$id'");
+    $stmt->execute();
+    if($stmt){
+      echo "<script>swal('Success', 'Updated A/C Type' , 'success')</script>";
+    }
+  }
+
+  function deleteacname($id){
+    global $pdo;
+
+    $stmt = $pdo->prepare("DELETE FROM acname WHERE id = '$id'");
+    $stmt->execute();
+    if($stmt){
+      echo "<script>swal('Success', 'Deleted A/C Type' , 'success')</script>";
+    }
+  }
   // MORE SELECTS
 
   function selectsum($table, $id, $selectwhat){
