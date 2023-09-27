@@ -14,6 +14,20 @@ INSERT INTO accounts VALUES("20","Stock Control Person","scp","scp@gmail.com","2
 
 
 
+DROP TABLE acname;
+
+CREATE TABLE `acname` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `code_no` varchar(255) NOT NULL,
+  `ac_type` int(11) NOT NULL,
+  `ac_name` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO acname VALUES("2","500/0001","4","Cost of Goods Sold");
+
+
+
 DROP TABLE actualinvoice;
 
 CREATE TABLE `actualinvoice` (
@@ -36,6 +50,19 @@ INSERT INTO actualinvoice VALUES("14","UT216","2up","20","10","200","","","3");
 INSERT INTO actualinvoice VALUES("15","HL123","2up","21","5","105","0","0","3");
 INSERT INTO actualinvoice VALUES("16","HL123","3up","21","5","105","0","0","3");
 INSERT INTO actualinvoice VALUES("17","HL123","3up","4","5","20","","","3");
+
+
+
+DROP TABLE actype;
+
+CREATE TABLE `actype` (
+  `acid` int(11) NOT NULL AUTO_INCREMENT,
+  `ac_type` varchar(255) NOT NULL,
+  PRIMARY KEY (`acid`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO actype VALUES("4","Revenue");
+INSERT INTO actype VALUES("5","Expences");
 
 
 
@@ -850,7 +877,7 @@ CREATE TABLE `permission` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO permission VALUES("1","1","manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_accountreceivable,manage_customers,manage_supplier,manage_category,manage_item,manage_unit,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,sale_report,purchase_report");
+INSERT INTO permission VALUES("1","1","manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_accountreceivable,manage_customers,manage_supplier,manage_category,manage_item,manage_actype,manage_acname,manage_unit,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,sale_report,purchase_report");
 INSERT INTO permission VALUES("2","2",",manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport");
 
 
@@ -1180,7 +1207,7 @@ CREATE TABLE `truckfoambox` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO truckfoambox VALUES("22","MR163","2up","12","49","15","735","","","SH473");
+INSERT INTO truckfoambox VALUES("22","MR163","2up","12","49","15","735","1,2,3,4,5","5","SH473");
 INSERT INTO truckfoambox VALUES("23","MR163","3up","10","44","15","660","","","SH473");
 INSERT INTO truckfoambox VALUES("24","MR163","2up","13","46","17","782","","","SH473");
 INSERT INTO truckfoambox VALUES("25","MR163","3up","6","41","30","1230","","","SH473");
@@ -1317,7 +1344,7 @@ CREATE TABLE `userlogs` (
   `login_password` varchar(125) NOT NULL,
   `status` varchar(55) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO userlogs VALUES("1","10:26:18.000000","2023-09-18","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("2","10:31:25.000000","2023-09-18","admin","admin","Login Success");
@@ -1342,6 +1369,7 @@ INSERT INTO userlogs VALUES("20","10:55:31.000000","2023-09-22","admin","admin",
 INSERT INTO userlogs VALUES("21","09:24:47.000000","2023-09-23","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("22","10:33:14.000000","2023-09-25","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("23","10:04:05.000000","2023-09-26","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("24","10:31:52.000000","2023-09-27","admin","admin","Login Success");
 
 
 
