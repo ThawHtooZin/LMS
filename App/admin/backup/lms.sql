@@ -22,9 +22,11 @@ CREATE TABLE `acname` (
   `ac_type` int(11) NOT NULL,
   `ac_name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO acname VALUES("2","500/0001","4","Cost of Goods Sold");
+INSERT INTO acname VALUES("5","500/0002","9","Petrol");
+INSERT INTO acname VALUES("6","500/0001","10","Cost of Goods Sold");
+INSERT INTO acname VALUES("7","500/0003","11","Cash Book");
 
 
 
@@ -59,10 +61,11 @@ CREATE TABLE `actype` (
   `acid` int(11) NOT NULL AUTO_INCREMENT,
   `ac_type` varchar(255) NOT NULL,
   PRIMARY KEY (`acid`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO actype VALUES("4","Revenue");
-INSERT INTO actype VALUES("5","Expences");
+INSERT INTO actype VALUES("9","expanse");
+INSERT INTO actype VALUES("10","Revenue");
+INSERT INTO actype VALUES("11","Current Asset");
 
 
 
@@ -170,6 +173,23 @@ CREATE TABLE `container` (
 INSERT INTO container VALUES("2","1","USA","2023-09-30");
 INSERT INTO container VALUES("3","2","Canada","2023-09-30");
 INSERT INTO container VALUES("4","3","Bangladish","2023-09-30");
+
+
+
+DROP TABLE currency;
+
+CREATE TABLE `currency` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `dollar_rate` double NOT NULL,
+  `debitorcredit` varchar(255) NOT NULL,
+  `mmk_amount` bigint(25) NOT NULL,
+  `usd_amount` bigint(25) NOT NULL,
+  `voucher_no` varchar(36) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO currency VALUES("21","3000","credit","30000","10","AS262");
+INSERT INTO currency VALUES("22","3000","debit","300000","100","AS264");
 
 
 
@@ -877,7 +897,7 @@ CREATE TABLE `permission` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO permission VALUES("1","1","manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_accountreceivable,manage_customers,manage_supplier,manage_category,manage_item,manage_actype,manage_acname,manage_unit,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,sale_report,purchase_report");
+INSERT INTO permission VALUES("1","1","manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_accountreceivable,manage_transaction,manage_customers,manage_supplier,manage_category,manage_item,manage_actype,manage_acname,manage_unit,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,sale_report,purchase_report");
 INSERT INTO permission VALUES("2","2",",manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport");
 
 
@@ -1131,6 +1151,24 @@ INSERT INTO total_charges VALUES("72","0000-00-00","12","1350","900","600000","0
 
 
 
+DROP TABLE transaction;
+
+CREATE TABLE `transaction` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `date` date NOT NULL,
+  `voucher_no` varchar(44) NOT NULL,
+  `ac_code` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  `debit` double NOT NULL,
+  `credit` double NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO transaction VALUES("26","2023-09-27","AS264","Petrol","Patrol","50000","0");
+INSERT INTO transaction VALUES("27","2023-09-27","AS264","Cash Book","Petrol Expense","0","50000");
+
+
+
 DROP TABLE truckactualinvoice;
 
 CREATE TABLE `truckactualinvoice` (
@@ -1344,7 +1382,7 @@ CREATE TABLE `userlogs` (
   `login_password` varchar(125) NOT NULL,
   `status` varchar(55) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO userlogs VALUES("1","10:26:18.000000","2023-09-18","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("2","10:31:25.000000","2023-09-18","admin","admin","Login Success");
@@ -1370,6 +1408,7 @@ INSERT INTO userlogs VALUES("21","09:24:47.000000","2023-09-23","admin","admin",
 INSERT INTO userlogs VALUES("22","10:33:14.000000","2023-09-25","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("23","10:04:05.000000","2023-09-26","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("24","10:31:52.000000","2023-09-27","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("25","06:07:40.000000","2023-09-27","admin","admin","Login Success");
 
 
 
