@@ -56,7 +56,7 @@ $query = new Query();
       <div class="col-10">
         <div class="card">
           <div class="card-header bg-info text-light">
-            <b>Manage A/C Name</b>
+            <b style="font-size:18px;">Manage A/C Name</b>
 
             <button type="button" class="btn btn-secondary btn-sm float-end text-light" data-bs-toggle="modal" data-bs-target="#addmodal">Add A/C Name</button>
           </div>
@@ -163,7 +163,7 @@ $query = new Query();
                             <?php
                               $actypedatas = $query->selectall('actype');
                              foreach ($actypedatas as $actypedata): ?>
-                             <option value="<?php echo $actypedata['acid']; ?>"><?php echo $actypedata['actype']; ?></option>
+                             <option value="<?php echo $actypedata['acid']; ?>"><?php echo $actypedata['ac_type']; ?></option>
                             <?php endforeach; ?>
                           </select>
                         </div>

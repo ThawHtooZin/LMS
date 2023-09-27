@@ -123,6 +123,12 @@ class Bootstrap
     $(function() {
       $(".chzn-select").chosen();
     });
+
+    // (function(e){
+    //   let h3 = document.getElementsByTagName("h3");
+    //   let stm = e.target.dataset.num;
+    //   console.log(stm);
+    // })();
     </script>
     ';
   }

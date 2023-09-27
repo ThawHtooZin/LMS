@@ -2290,7 +2290,7 @@ Class Query{
   function addactype($actype){
     global $pdo;
 
-    $stmt = $pdo->prepare("INSERT INTO actype(actype) VALUES('$actype')");
+    $stmt = $pdo->prepare("INSERT INTO actype(ac_type) VALUES('$actype')");
     $stmt->execute();
     if($stmt){
       echo "<script>swal('Success', 'Added A/C Type' , 'success')</script>";
@@ -2300,7 +2300,7 @@ Class Query{
   function updateactype($actype, $id){
     global $pdo;
 
-    $stmt = $pdo->prepare("UPDATE actype SET actype='$actype' WHERE acid = '$id'");
+    $stmt = $pdo->prepare("UPDATE actype SET ac_type='$actype' WHERE acid = '$id'");
     $stmt->execute();
     if($stmt){
       echo "<script>swal('Success', 'Updated A/C Type' , 'success')</script>";
@@ -2345,6 +2345,49 @@ Class Query{
     if($stmt){
       echo "<script>swal('Success', 'Deleted A/C Type' , 'success')</script>";
     }
+  }
+
+  function savetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit){
+    global $pdo;
+
+    if($currency == 'usd'){
+      $mmkdebit = intval($rate) * intval($debit);
+      $mmkcredit = intval($rate) * intval($credit);
+    }else{
+      $mmkdebit = $debit;
+      $mmkcredit = $credit;
+    }
+
+    $transactionstmt = $pdo->prepare("INSERT INTO transaction(date, voucher_no, ac_code, description, debit, credit) VALUES('$date', '$voucher_no', '$ac_code', '$description', '$mmkdebit', '$mmkcredit')");
+    $transactionstmt->execute();
+
+    if(!empty($debit)){
+      $debitorcredit = 'debit';
+      if($currency == 'usd'){
+        $mmk_amount = intval($rate) * intval($debit);
+        $usd_amount = $debit;
+      }elseif($currency == 'mmk'){
+        $mmk_amount = $debit;
+        $usd_amount = intval($debit) / intval($rate);
+      }
+    }elseif(!empty($credit)){
+      $debitorcredit = 'credit';
+      if($currency == 'usd'){
+        $mmk_amount = intval($rate) * intval($credit);
+        $usd_amount = $credit;
+      }elseif($currency == 'mmk'){
+        $mmk_amount = $credit;
+        $usd_amount = intval($credit) / intval($rate);
+      }
+    }
+
+
+
+    $currencystmt = $pdo->prepare("INSERT INTO currency(dollar_rate, debitorcredit, mmk_amount, usd_amount, voucher_no) VALUES('$rate', '$debitorcredit', '$mmk_amount', '$usd_amount', '$voucher_no')");
+    $currencystmt->execute();
+
+    $_SESSION['date'] = "";
+    $_SESSION['voucher_no'] = "";
   }
   // MORE SELECTS
 

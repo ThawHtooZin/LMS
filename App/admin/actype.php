@@ -40,7 +40,7 @@ $query = new Query();
       $id = $_POST['id'];
 
       $stmt = $query->deleteactype($id);
-      
+
     }
      ?>
     <div class="row">
@@ -52,7 +52,7 @@ $query = new Query();
       <div class="col-10">
         <div class="card">
           <div class="card-header bg-info text-light">
-            <b>Manage A/C Type</b>
+            <b style="font-size:18px;">Manage A/C Type</b>
 
             <button type="button" class="btn btn-secondary btn-sm float-end text-light" data-bs-toggle="modal" data-bs-target="#addmodal">Add A/C Type</button>
           </div>
@@ -68,7 +68,7 @@ $query = new Query();
               ?>
               <tr data-bs-toggle='modal' data-bs-target="#updatemodal<?php echo $data['acid']; ?>">
                 <td><?php echo $data['acid']; ?></td>
-                <td><?php echo $data['actype']; ?></td>
+                <td><?php echo $data['ac_type']; ?></td>
               </tr>
               <div class="modal fade" id="updatemodal<?php echo $data['acid'];  ?>" tabindex="-1" role="dialog"  style="margin-left:auto !important; margin-right: auto !important;">
                 <div class="modal-dialog" role="document">
@@ -98,7 +98,7 @@ $query = new Query();
                         ?>
                         <input type="hidden" name="updateid" value="<?php echo $data['acid']; ?>">
                         <label>A/C Type</label>
-                        <input type="text" name="actype" class="form-control inpv2 mb-2" value="<?php echo $updatedata['actype']; ?>">
+                        <input type="text" name="actype" class="form-control inpv2 mb-2" value="<?php echo $updatedata['ac_type']; ?>">
                       </div>
                     </form>
                   </div>

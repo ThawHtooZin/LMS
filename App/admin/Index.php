@@ -33,7 +33,7 @@ $query = new Query();
         <div class="container text-center w-50" style="margin-top:50px; margin-left:auto; margin-right:auto;">
           <img src="../../Images/Personal-computer.jpg" alt="" width="50%">
           <br><br><br>
-          <h3>LINK MARK SYSTEM</h3>
+          <h3 data-num="1">LINK MARK SYSTEM</h3>
         </div>
       </div>
     </div>
