@@ -150,6 +150,18 @@ $permissions = $permission['permission'];
             <?php
             }
             ?>
+            <?php
+            if(str_contains($permissions, 'manage_transaction')){
+              ?>
+            <li class="nav-item">
+              <a href="transaction.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - Transaction
+              </a>
+            </li>
+            <?php
+            }
+            ?>
           </ul>
         </div>
       </li>
@@ -210,6 +222,30 @@ $permissions = $permission['permission'];
               <a href="item.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Items
+              </a>
+            </li>
+            <?php
+            }
+            ?>
+            <?php
+            if(str_contains($permissions, 'actype')){
+              ?>
+            <li class="nav-item">
+              <a href="actype.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - A/C Type
+              </a>
+            </li>
+            <?php
+            }
+            ?>
+            <?php
+            if(str_contains($permissions, 'acname')){
+              ?>
+            <li class="nav-item">
+              <a href="acname.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - A/C Name
               </a>
             </li>
             <?php

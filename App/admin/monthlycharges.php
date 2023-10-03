@@ -109,8 +109,6 @@ $query = new Query();
         $_SESSION['tabs'] = "repackingout";
       }elseif(isset($_POST['totalamountbalance'])){
         $_SESSION['tabs'] = "totalamountbalance";
-      }else{
-        $_SESSION['tabs'] = "fishcoldstore";
       }
        ?>
       <div class="col-10">
@@ -160,6 +158,11 @@ $query = new Query();
                   $exportstmt->execute();
                   $exportcount = $exportstmt->fetchColumn();
 
+                  $istakeoutstmt =$pdo->prepare("SELECT COUNT(*) FROM gfcfishcoldstore WHERE date='$date' AND ite='takeout' AND ite='import' OR ite='export'");
+                  $istakeoutstmt->execute();
+                  $istakeout = $istakeoutstmt->fetchColumn();
+
+                  // print_r($istakeout);
                  ?>
                 <tr>
                   <td><?php echo $fishcoldstoredata['id']; ?></td>
@@ -170,8 +173,30 @@ $query = new Query();
                   <td><?php echo $fishcoldstoredata['kg']; ?></td>
                   <td><?php echo $fishcoldstoredata['total_kg']; ?></td>
                   <td><?php echo $fishcoldstoredata['rate']; ?></td>
-                  <td><?php if ($exportcount > 1){if($fishcoldstoredata['ite'] == 'import'){ echo $fishcoldstoredata['charges']; };}else{ echo $fishcoldstoredata['charges'];}; ?></td>
-                  <td><?php if ($fishcoldstoredata['total_charges'] == '0'){echo "";}else{ echo $fishcoldstoredata['total_charges'];}; ?></td>
+                  <!-- <td><?php// if($fishcoldstoredata['charges'] != 0){
+                     //if($exportcount != 1){
+                         //if($fishcoldstoredata['ite'] == 'import'){
+                           //echo $fishcoldstoredata['charges'];
+                         //}elseif($istakeout == 1 || $istakeout == 2){
+                           //echo $fishcoldstoredata['charges'];
+                         //}
+                       //}else{
+                         //echo $fishcoldstoredata['charges'];
+                       //}
+                      //} ?></td>
+                  <td><?php //if($fishcoldstoredata['total_charges'] != 0){
+                     //if($exportcount != 1){
+                         //if($fishcoldstoredata['ite'] == 'import'){
+                           //echo $fishcoldstoredata['total_charges'];
+                         //}elseif($istakeout == 1 && $istakeout == 2){
+                           //echo $fishcoldstoredata['total_charges'];
+                         //}
+                       //}else{
+                         //echo $fishcoldstoredata['total_charges'];
+                       //}
+                      // } ?></td>-->
+                      <td><?php  if($fishcoldstoredata['charges'] != 0){echo $fishcoldstoredata['charges'];} ?></td>
+                      <td><?php  if($fishcoldstoredata['total_charges'] != 0){echo $fishcoldstoredata['total_charges'];} ?></td>
                 </tr>
                 <?php
                 }
@@ -230,8 +255,8 @@ $query = new Query();
                   <td><?php echo $dryfishcoldstoredata['kg']; ?></td>
                   <td><?php echo $dryfishcoldstoredata['total_kg']; ?></td>
                   <td><?php echo $dryfishcoldstoredata['rate']; ?></td>
-                  <td><?php echo $dryfishcoldstoredata['charges']; ?></td>
-                  <td><?php echo $dryfishcoldstoredata['total_charges']; ?></td>
+                  <td><?php if($dryfishcoldstoredata['charges'] != 0){ echo $dryfishcoldstoredata['charges']; } ?></td>
+                  <td><?php if($dryfishcoldstoredata['total_charges'] != 0){ echo $dryfishcoldstoredata['total_charges']; } ?></td>
                 </tr>
                 <?php
                 }

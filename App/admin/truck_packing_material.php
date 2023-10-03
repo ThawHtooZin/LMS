@@ -28,18 +28,14 @@ $query = new Query();
       $date = $_POST['date'];
       $remark = $_POST['remark'];
       $ice_amount = $_POST['ice_amount'];
-      $ice_per_price = $_POST['ice_per_price'];
       $tape_amount = $_POST['tape_amount'];
-      $tape_per_price = $_POST['tape_per_price'];
       $foambox_amount = $_POST['foambox_amount'];
-      $foambox_per_price = $_POST['foambox_per_price'];
       $plastic_amount = $_POST['plastic_amount'];
-      $plastic_per_price = $_POST['plastic_per_price'];
       $miscellous = $_POST['miscellous'];
       $form10kg = $_POST['form10kg'];
       $invoice_no = $_GET['invoice_no'];
 
-      $query->addmaterial($date, $remark, $ice_amount, $ice_per_price, $tape_amount, $tape_per_price, $foambox_amount, $foambox_per_price,$plastic_amount, $plastic_per_price, $miscellous, $form10kg, $invoice_no);
+      $query->addmaterial($date, $remark, $ice_amount, $tape_amount, $foambox_amount, $plastic_amount, $miscellous, $form10kg, $invoice_no);
     }
 
      ?>
@@ -111,8 +107,8 @@ $query = new Query();
                 <td><?php echo $data['remark']; ?></td>
               </tr>
               <tr style="font-weight:bold;">
-                <td>Cost Per Kg</td>
                 <td></td>
+                <td>Cost Per Kg</td>
                 <td><?php echo round($data['ice'] / $data['form10kg'], 2); ?></td>
                 <td><?php echo round($data['miscellous'] / $data['form10kg'], 2); ?></td>
                 <td><?php echo round($data['tape'] / $data['form10kg'], 2); ?></td>
@@ -166,42 +162,22 @@ $query = new Query();
               </div>
               <div class="row">
                 <div class="col">
-                  <label>Ice Amount</label>
+                  <label>Ice Charges</label>
                   <input type="number" name="ice_amount" class="form-control inpv2 mb-2">
                 </div>
                 <div class="col">
-                  <label>Ice Per Price</label>
-                  <input type="number" name="ice_per_price" class="form-control inpv2 mb-2">
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <label>Tape Amout</label>
+                  <label>Tape Charges</label>
                   <input type="number" name="tape_amount" class="form-control inpv2 mb-2">
                 </div>
-                <div class="col">
-                  <label>Tape Per Price</label>
-                  <input type="number" name="tape_per_price" class="form-control inpv2 mb-2">
-                </div>
               </div>
               <div class="row">
                 <div class="col">
-                  <label>Foam Box Amount</label>
+                  <label>Foam Box Charges</label>
                   <input type="number" name="foambox_amount" class="form-control inpv2 mb-2">
                 </div>
                 <div class="col">
-                  <label>Foam Box Per Price</label>
-                  <input type="number" name="foambox_per_price" class="form-control inpv2 mb-2">
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <label>Plastic Amount</label>
+                  <label>Plastic Charges</label>
                   <input type="number" name="plastic_amount" class="form-control inpv2 mb-2">
-                </div>
-                <div class="col">
-                  <label>Plastic Per Price</label>
-                  <input type="number" name="plastic_per_price" class="form-control inpv2 mb-2">
                 </div>
               </div>
               <div class="row">
