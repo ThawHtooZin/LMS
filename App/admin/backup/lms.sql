@@ -22,11 +22,12 @@ CREATE TABLE `acname` (
   `ac_type` int(11) NOT NULL,
   `ac_name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO acname VALUES("5","500/0002","9","Petrol");
 INSERT INTO acname VALUES("6","500/0001","10","Cost of Goods Sold");
 INSERT INTO acname VALUES("7","500/0003","11","Cash Book");
+INSERT INTO acname VALUES("8","500/0004","11","Receivable");
 
 
 
@@ -186,10 +187,10 @@ CREATE TABLE `currency` (
   `usd_amount` bigint(25) NOT NULL,
   `voucher_no` varchar(36) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=123 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO currency VALUES("21","3000","credit","30000","10","AS262");
-INSERT INTO currency VALUES("22","3000","debit","300000","100","AS264");
+INSERT INTO currency VALUES("121","0","debit","50000","0","AS261");
+INSERT INTO currency VALUES("122","0","credit","50000","0","AS261");
 
 
 
@@ -1161,11 +1162,12 @@ CREATE TABLE `transaction` (
   `description` text NOT NULL,
   `debit` double NOT NULL,
   `credit` double NOT NULL,
+  `currency` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=128 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO transaction VALUES("26","2023-09-27","AS264","Petrol","Patrol","50000","0");
-INSERT INTO transaction VALUES("27","2023-09-27","AS264","Cash Book","Petrol Expense","0","50000");
+INSERT INTO transaction VALUES("126","2023-09-28","AS261","500/0001","dxhfdtghdhfd","50000","0","mmk");
+INSERT INTO transaction VALUES("127","2023-09-28","AS261","500/0004","fjgfjgfjgfj","0","50000","mmk");
 
 
 
@@ -1382,7 +1384,7 @@ CREATE TABLE `userlogs` (
   `login_password` varchar(125) NOT NULL,
   `status` varchar(55) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO userlogs VALUES("1","10:26:18.000000","2023-09-18","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("2","10:31:25.000000","2023-09-18","admin","admin","Login Success");
@@ -1409,6 +1411,8 @@ INSERT INTO userlogs VALUES("22","10:33:14.000000","2023-09-25","admin","admin",
 INSERT INTO userlogs VALUES("23","10:04:05.000000","2023-09-26","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("24","10:31:52.000000","2023-09-27","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("25","06:07:40.000000","2023-09-27","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("26","10:05:20.000000","2023-09-28","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("27","03:53:51.000000","2023-10-03","admin","admin","Login Success");
 
 
 

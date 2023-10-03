@@ -2353,12 +2353,12 @@ Class Query{
     if($currency == 'usd'){
       $mmkdebit = intval($rate) * intval($debit);
       $mmkcredit = intval($rate) * intval($credit);
-    }else{
+    }elseif($currency == 'mmk'){
       $mmkdebit = $debit;
       $mmkcredit = $credit;
     }
 
-    $transactionstmt = $pdo->prepare("INSERT INTO transaction(date, voucher_no, ac_code, description, debit, credit) VALUES('$date', '$voucher_no', '$ac_code', '$description', '$mmkdebit', '$mmkcredit')");
+    $transactionstmt = $pdo->prepare("INSERT INTO transaction(date, voucher_no, ac_code, description, debit, credit, currency) VALUES('$date', '$voucher_no', '$ac_code', '$description', '$mmkdebit', '$mmkcredit', '$currency')");
     $transactionstmt->execute();
 
     if(!empty($debit)){
@@ -2368,7 +2368,7 @@ Class Query{
         $usd_amount = $debit;
       }elseif($currency == 'mmk'){
         $mmk_amount = $debit;
-        $usd_amount = intval($debit) / intval($rate);
+        $usd_amount = 0;
       }
     }elseif(!empty($credit)){
       $debitorcredit = 'credit';
@@ -2377,7 +2377,7 @@ Class Query{
         $usd_amount = $credit;
       }elseif($currency == 'mmk'){
         $mmk_amount = $credit;
-        $usd_amount = intval($credit) / intval($rate);
+        $usd_amount = 0;
       }
     }
 
@@ -2386,8 +2386,78 @@ Class Query{
     $currencystmt = $pdo->prepare("INSERT INTO currency(dollar_rate, debitorcredit, mmk_amount, usd_amount, voucher_no) VALUES('$rate', '$debitorcredit', '$mmk_amount', '$usd_amount', '$voucher_no')");
     $currencystmt->execute();
 
-    $_SESSION['date'] = "";
-    $_SESSION['voucher_no'] = "";
+    $_SESSION['adddate'] = "";
+    $_SESSION['addvoucher_no'] = "";
+    $_SESSION['addac_code'] = "";
+  }
+
+  function deletetransaction($id, $voucher_no){
+    global $pdo;
+
+    $selectstmt = $pdo->prepare("SELECT * FROM transaction WHERE id='$id'");
+    $selectstmt->execute();
+    $selectdata = $selectstmt->fetch(PDO::FETCH_ASSOC);
+
+    $stmt = $pdo->prepare("DELETE FROM transaction WHERE id='$id'");
+    $stmt->execute();
+
+    if($selectdata['debit'] != 0){
+      $debitorcredit = 'debit';
+      $debitcurrency = $pdo->prepare("DELETE FROM currency WHERE debitorcredit='$debitorcredit' AND voucher_no='$voucher_no'");
+      $debitcurrency->execute();
+    }elseif($selectdata['credit'] != 0){
+      $debitorcredit = 'credit';
+      $creditcurrency = $pdo->prepare("DELETE FROM currency WHERE debitorcredit='$debitorcredit' AND voucher_no='$voucher_no'");
+      $creditcurrency->execute();
+    }
+
+    if($stmt){
+      echo "<script>swal('Success', 'Deleted Transaction Successfully' , 'success')</script>";
+    }
+  }
+
+  function updatetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $id){
+    global $pdo;
+
+    if($currency == 'usd'){
+      $mmkdebit = intval($rate) * intval($debit);
+      $mmkcredit = intval($rate) * intval($credit);
+    }elseif($currency == 'mmk'){
+      $mmkdebit = $debit;
+      $mmkcredit = $credit;
+    }
+
+    $transactionstmt = $pdo->prepare("UPDATE transaction SET date='$date', voucher_no='$voucher_no', ac_code='$ac_code', description='$description', debit='$mmkdebit', credit='$mmkcredit', currency='$currency' WHERE id='$id'");
+    $transactionstmt->execute();
+
+    if(!empty($debit)){
+      $debitorcredit = 'debit';
+      if($currency == 'usd'){
+        $mmk_amount = intval($rate) * intval($debit);
+        $usd_amount = $debit;
+      }elseif($currency == 'mmk'){
+        $mmk_amount = $debit;
+        $usd_amount = 0;
+      }
+    }elseif(!empty($credit)){
+      $debitorcredit = 'credit';
+      if($currency == 'usd'){
+        $mmk_amount = intval($rate) * intval($credit);
+        $usd_amount = $credit;
+      }elseif($currency == 'mmk'){
+        $mmk_amount = $credit;
+        $usd_amount = 0;
+      }
+    }
+
+
+    $currencystmt = $pdo->prepare("UPDATE currency SET dollar_rate='$rate', debitorcredit='$debitorcredit', mmk_amount='$mmk_amount', usd_amount='$usd_amount', voucher_no='$voucher_no' WHERE voucher_no='$voucher_no' AND debitorcredit='$debitorcredit'");
+    $currencystmt->execute();
+
+    $_SESSION['adddate'] = "";
+    $_SESSION['addvoucher_no'] = "";
+    $_SESSION['addac_code'] = "";
+
   }
   // MORE SELECTS
 
