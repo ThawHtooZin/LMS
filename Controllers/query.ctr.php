@@ -2347,7 +2347,7 @@ Class Query{
     }
   }
 
-  function savetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit){
+  function savetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $sr_no, $container_no){
     global $pdo;
 
     if($currency == 'usd'){
@@ -2358,7 +2358,7 @@ Class Query{
       $mmkcredit = $credit;
     }
 
-    $transactionstmt = $pdo->prepare("INSERT INTO transaction(date, voucher_no, ac_code, description, debit, credit, currency) VALUES('$date', '$voucher_no', '$ac_code', '$description', '$mmkdebit', '$mmkcredit', '$currency')");
+    $transactionstmt = $pdo->prepare("INSERT INTO transaction(date, voucher_no, ac_code, description, debit, credit, currency, sr_no, container_no) VALUES('$date', '$voucher_no', '$ac_code', '$description', '$mmkdebit', '$mmkcredit', '$currency', '$sr_no', '$container_no')");
     $transactionstmt->execute();
 
     if(!empty($debit)){
@@ -2381,14 +2381,9 @@ Class Query{
       }
     }
 
-
-
     $currencystmt = $pdo->prepare("INSERT INTO currency(dollar_rate, debitorcredit, mmk_amount, usd_amount, voucher_no) VALUES('$rate', '$debitorcredit', '$mmk_amount', '$usd_amount', '$voucher_no')");
     $currencystmt->execute();
 
-    $_SESSION['adddate'] = "";
-    $_SESSION['addvoucher_no'] = "";
-    $_SESSION['addac_code'] = "";
   }
 
   function deletetransaction($id, $voucher_no){
@@ -2413,6 +2408,11 @@ Class Query{
 
     if($stmt){
       echo "<script>swal('Success', 'Deleted Transaction Successfully' , 'success')</script>";
+      $_SESSION['adddate'] = "";
+      $_SESSION['addvoucher_no'] = "";
+      $_SESSION['addac_code'] = "";
+      $_SESSION['ac_name'] = "";
+      $_SESSION['description'] = "";
     }
   }
 
@@ -2454,11 +2454,131 @@ Class Query{
     $currencystmt = $pdo->prepare("UPDATE currency SET dollar_rate='$rate', debitorcredit='$debitorcredit', mmk_amount='$mmk_amount', usd_amount='$usd_amount', voucher_no='$voucher_no' WHERE voucher_no='$voucher_no' AND debitorcredit='$debitorcredit'");
     $currencystmt->execute();
 
-    $_SESSION['adddate'] = "";
-    $_SESSION['addvoucher_no'] = "";
-    $_SESSION['addac_code'] = "";
-
   }
+
+  function accepttransaction($date){
+    global $pdo;
+    $accpeterror = "";
+    $transactionstmt = $pdo->prepare("SELECT * FROM transaction WHERE date='$date'");
+    $transactionstmt->execute();
+    $transactiondatas = $transactionstmt->fetchall();
+    foreach ($transactiondatas as $transactiondata) {
+      if($transactiondata['ac_code'] == '500/0004'){
+        $ac_name = $transactiondata['ac_code'];
+        $stmt = $pdo->prepare("SELECT * FROM transaction WHERE date='$date' AND ac_code='$ac_name'");
+        $stmt->execute();
+        $receivabledatas = $stmt->fetchall();
+        foreach ($receivabledatas as $receivabledata) {
+          $voucher_no = $receivabledata['voucher_no'];
+
+          if($receivabledata['debit'] != 0){
+            $debitorcredit = 'debit';
+            $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' WHERE debitorcredit='$debitorcredit'");
+            $currencystmt->execute();
+            $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
+            $receivestmt = $pdo->prepare("SELECT * FROM receivable ORDER BY id DESC");
+            $receivestmt->execute();
+            $receivedata = $receivestmt->fetch(PDO::FETCH_ASSOC);
+            $invoice_amount = $currencydata['usd_amount'];
+            $balance = $currencydata['usd_amount'] + $receivedata['balance'];
+          }elseif($receivabledata['credit'] != 0){
+            $debitorcredit = 'credit';
+            $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='$debitorcredit'");
+            $currencystmt->execute();
+            $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
+            $receivestmt = $pdo->prepare("SELECT * FROM receivable ORDER BY id DESC");
+            $receivestmt->execute();
+            $receivedata = $receivestmt->fetch(PDO::FETCH_ASSOC);
+            if (!empty($receivedata['balance'])) {
+              $invoice_amount = $currencydata['usd_amount'];
+              $balance = $currencydata['usd_amount'] + $receivedata['balance'];
+            }else{
+              $invoice_amount = $currencydata['usd_amount'];
+              $balance = $currencydata['usd_amount'];
+            }
+          }
+
+          $sr_no = $receivabledata['sr_no'];
+          $container_no = $receivabledata['container_no'];
+          $receivestmt = $pdo->prepare("SELECT * FROM receivable WHERE date='$date'");
+          $receivestmt->execute();
+          $receivedata = $receivestmt->fetchall();
+          if(empty($receivedata)){
+            $receivestmt = $pdo->prepare("INSERT INTO receivable(date, sr_no, container_no, invoice_amount, balance) VALUES('$date', '$sr_no', '$container_no', '$invoice_amount', '$balance')");
+            $receivestmt->execute();
+          }else{
+            $accpeterror = true;
+          }
+        }
+
+      }
+      $ac_code = $transactiondata['ac_code'];
+      $narration = $transactiondata['description'];
+      $voucher_no = $transactiondata['voucher_no'];
+      $debit = $transactiondata['debit'];
+      $credit = $transactiondata['credit'];
+      if(!empty($debit)){
+        $glstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE voucherno='$voucher_no' AND date='$date' AND credit_ac_code!=''");
+        $glstmt->execute();
+        $gldata = $glstmt->fetchall();
+        if(empty($gldata)){
+          $debitglstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, debit_ac_code, debit, credit_ac_code, credit, narration) VALUES('$date', '$voucher_no', '$ac_code', '$debit', '$ac_code', '$credit', '$narration')");
+          $debitglstmt->execute();
+        }else{
+          $accpeterror = true;
+        }
+      }
+    }
+
+    if($accpeterror === true){
+      echo "<script>swal('Warning', 'Already Accepted Before', 'warning');</script>";
+    }else{
+      echo "<script>swal('Success', 'Accepted Successfully', 'success');</script>";
+    }
+  }
+
+  function addpaymentofreceivable($id, $paid_date, $payment_no, $particular, $paid_amount)
+  {
+    global $pdo;
+
+    $receivestmt = $pdo->prepare("SELECT * FROM receivable WHERE id='$id'");
+    $receivestmt->execute();
+    $receivedata = $receivestmt->fetch(PDO::FETCH_ASSOC);
+
+    $stmt = $pdo->prepare("SELECT balance FROM receivable WHERE id < '$id' ORDER BY id DESC");
+    $stmt->execute();
+    $data = $stmt->fetch(PDO::FETCH_ASSOC);
+    $balance = ($data['balance'] + $receivedata['invoice_amount']) - $paid_amount;
+
+    $paymentstmt = $pdo->prepare("UPDATE receivable SET paid_date='$paid_date', payment_no='$payment_no', particulars='$particular', paid_amount='$paid_amount', balance='$balance' WHERE id='$id'");
+    $paymentstmt->execute();
+
+    $updatecountstmt = $pdo->prepare("SELECT COUNT(id) FROM receivable WHERE id > '$id'");
+    $updatecountstmt->execute();
+    $loopcount = $updatecountstmt->fetchColumn();
+    $upid = $id;
+    if(!empty($loopcount)){
+      for ($i=0; $i < $loopcount; $i++) {
+        $upid++;
+        $upstmt = $pdo->prepare("SELECT * FROM receivable WHERE id='$upid'");
+        $upstmt->execute();
+        $updata = $upstmt->fetch(PDO::FETCH_ASSOC);
+        if(empty($updata['balance'])){
+          $balance = $updata['invoice_amount'] + $balance;
+        }else{
+          $balance = ($updata['invoice_amount'] + $balance) - $updata['paid_amount'];
+        }
+        $updatedownstmt = $pdo->prepare("UPDATE receivable SET balance='$balance' WHERE id='$upid'");
+        $updatedownstmt->execute();
+      }
+    }
+  }
+
+function addbalance($balance){
+  global $pdo;
+  $balancestmt = $pdo->prepare("INSERT INTO receivable(balance) VALUES('$balance')");
+  $balancestmt->execute();
+}
   // MORE SELECTS
 
   function selectsum($table, $id, $selectwhat){

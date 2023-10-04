@@ -81,7 +81,7 @@ $permissions = $permission['permission'];
       }
        ?>
       <?php
-      if(str_contains($permissions, 'manage_sale') == 1 || str_contains($permissions, 'manage_purchase') == 1 ||str_contains($permissions, 'manage_cashbook') == 1 ||str_contains($permissions, 'manage_accountpayable') == 1 ||str_contains($permissions, 'manage_accountreceivable') == 1){
+      if(str_contains($permissions, 'manage_sale') == 1 || str_contains($permissions, 'manage_purchase') == 1 ||str_contains($permissions, 'manage_cashbook') == 1 ||str_contains($permissions, 'manage_accountpayable') == 1 ||str_contains($permissions, 'manage_accountreceivable') == 1 ||str_contains($permissions, 'manage_general_ledger') == 1){
       ?>
       <li style=" border-bottom: 2px solid black; " >
         <a href="#" class="nav-link text-white" data-bs-toggle="collapse" data-bs-target="#account-collapse" aria-expanded="false">
@@ -141,8 +141,8 @@ $permissions = $permission['permission'];
             <?php
             if(str_contains($permissions, 'manage_accountreceivable')){
               ?>
-            <li class="nav-item" style="cursor: not-allowed !important;">
-              <a href="accountreceivable.php" class="nav-link h text-light disabled" aria-current="page" style="font-size:14px !important; font-weight:bold;">
+            <li class="nav-item">
+              <a href="accountreceivable.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Account Receivable
               </a>
@@ -157,6 +157,18 @@ $permissions = $permission['permission'];
               <a href="transaction.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Transaction
+              </a>
+            </li>
+            <?php
+            }
+            ?>
+            <?php
+            if(str_contains($permissions, 'manage_general_ledger')){
+              ?>
+            <li class="nav-item">
+              <a href="general_ledger.php" class="nav-link h text-light" aria-current="page" style="font-size:14px !important; font-weight:bold;">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - General Ledger
               </a>
             </li>
             <?php

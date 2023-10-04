@@ -37,6 +37,7 @@ $query = new Query();
         echo "<script>swal('Error', 'A/C Name Doesn\'t Exist', 'warning');</script>";
       }else{
         $ac_name = $datas['ac_name'];
+        $_SESSION['ac_name'] = $ac_name;
       }
     }
     if(isset($_POST['save'])){
@@ -50,11 +51,25 @@ $query = new Query();
       }else{
         $rate = "";
       }
-      $debit = $_POST['adddebit'];
-      $credit = $_POST['addcredit'];
-
-      $query->savetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit);
-
+      if(!empty($_POST['adddebit'])){
+        $debit = $_POST['adddebit'];
+      }else{
+        $debit = 0;
+      }
+      if(!empty($_POST['addcredit'])){
+        $credit = $_POST['addcredit'];
+      }else{
+        $credit = 0;
+      }
+      if($ac_code == '500/0004'){
+        $sr_no = $_POST['sr_no'];
+        $container_no = $_POST['container_no'];
+      }else{
+        $sr_no = '';
+        $container_no = '';
+      }
+      $_SESSION['description'] = $_POST['adddescription'];
+      $query->savetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $sr_no, $container_no);
     }
     if (isset($_POST['update'])) {
       $id = $_POST['id'];
@@ -68,8 +83,16 @@ $query = new Query();
       }else{
         $rate = "";
       }
-      $debit = $_POST['debit'];
-      $credit = $_POST['credit'];
+      if(!empty($_POST['debit'])){
+        $debit = $_POST['debit'];
+      }else{
+        $debit = 0;
+      }
+      if(!empty($_POST['credit'])){
+        $credit = $_POST['credit'];
+      }else{
+        $credit = 0;
+      }
 
       $query->updatetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $id);
     }
@@ -91,7 +114,9 @@ $query = new Query();
       if($totaldebitdata['total'] != $totalcreditdata['total']){
         echo "<script>swal('Dosen\'t Match', 'Debit Credit Dosen\'t Match, Please Check again', 'warning');</script>";
       }else{
-        echo "<script>swal('Match', 'Debit Credit Match.', 'success');</script>";
+        $date = date('Y-m-d');
+        $query->accepttransaction($date);
+        // echo "<script>swal('Success', 'Accepted Successfully.', 'success');</script>";
       }
     }
      ?>
@@ -130,34 +155,51 @@ $query = new Query();
                 </div>
                 <div class="col">
                   <label>A/C Name</label>
-                  <input type="text" name="addac_name" disabled class="form-control inpv2 mb-1" value="<?php if($ac_name != ''){echo $ac_name;} ?>" style="padding-top: 2px; padding-bottom: 2px;">
+                  <input type="text" name="addac_name" disabled class="form-control inpv2 mb-1" value="<?php if(!empty($_SESSION['ac_name'])){echo $_SESSION['ac_name']; } ?>" style="padding-top: 2px; padding-bottom: 2px;">
                 </div>
             </div>
             <button type="submit" style="display:none;"></button>
             <div class="row">
-              <div class="col-6">
-                <label>Description</label>
-                <textarea name="adddescription" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"></textarea>
-              </div>
+              <?php
+              if($_SESSION['ac_name'] == 'Receivable'){
+                ?>
+                <div class="col-4">
+                  <label>Description</label>
+                  <textarea name="adddescription" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(!empty($_SESSION['description'])){echo $_SESSION['description']; } ?></textarea>
+                </div>
+                <div class="col-2">
+                  <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="sr_no" placeholder="Sr No.">
+                  <input type="text" class="form-control inpv2 mb-2" style="padding-top: 2px; padding-bottom: 2px;" name="container_no" placeholder="Container No.">
+                </div>
+                <?php
+              }else{
+                ?>
+                <div class="col-6">
+                  <label>Description</label>
+                  <textarea name="adddescription" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(!empty($_SESSION['description'])){echo $_SESSION['description']; } ?></textarea>
+                </div>
+                <?php
+              }
+               ?>
               <div class="col-3">
                 <label>Currency</label>
                 <select class="form-control inpv2" name="addcurrency" onchange="addcheckrate();" id="addselectcurrecy" style="padding-top: 2px; padding-bottom: 2px;">
-                  <option value="usd">USD</option>
                   <option value="mmk">MMK</option>
+                  <option value="usd">USD</option>
                 </select>
-                  <input type="text" name="adddebit" class="form-control inpv2" placeholder="Debit" style="padding-top: 2px; padding-bottom: 2px; width: 45%; display:inline; margin-top:15px;">
-                  <input type="text" name="addcredit" class="form-control inpv2" placeholder="Credit" style="padding-top: 2px; padding-bottom: 2px; width: 45%; display:inline; margin-top:15px; margin-left:20px;">
+                  <input type="text" name="adddebit" id="adddebitinp" class="form-control inpv2" placeholder="Debit" style="padding-top: 2px; padding-bottom: 2px; width: 45%; display:inline; margin-top:15px;">
+                  <input type="text" name="addcredit" id="addcreditinp" class="form-control inpv2" placeholder="Credit" style="padding-top: 2px; padding-bottom: 2px; width: 45%; display:inline; margin-top:15px; margin-left:20px;">
               </div>
               <div class="col-3">
                 <label>Rate</label>
-                <input type="number" name="addrate" class="form-control inpv2" id="addrate" style="padding-top: 2px; padding-bottom: 2px;">
+                <input type="number" name="addrate" class="form-control inpv2" disabled id="addrate" style="padding-top: 2px; padding-bottom: 2px;">
                 <button type="submit" class="btn btn-success mt-3 btn-sm" style="width: 100%;" name="save">Save</button>
               </div>
               </div>
             </form>
             </div>
             <!-- TABLEEEEEEEEEEEEEEEEEEEE -->
-            <table class="table table-hover table-bordered table-striped">
+            <table class="table table-hover table-striped">
               <tr>
                 <th>No</th>
                 <th>Date</th>
@@ -184,6 +226,7 @@ $query = new Query();
                 $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='$dorc'");
                 $currencystmt->execute();
                 $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
+
                 ?>
                   <tr data-bs-toggle="collapse" data-bs-target="#updatecollapse<?php echo $data['id'];  ?>" id="collapsebtn">
                     <button type="button" class="btn btn-primary btn-sm float-end hide" data-bs-toggle="collapse" data-bs-target="#adddiv">Add</button>
@@ -239,8 +282,8 @@ $query = new Query();
                             <option value="usd" <?php if($updata['currency'] == 'usd'){ echo 'selected'; } ?>>USD</option>
                             <option value="mmk" <?php if($updata['currency'] == 'mmk'){ echo 'selected'; } ?>>MMK</option>
                           </select>
-                          <input type="text" name="debit" class="form-control inpv2 mt-3" value="<?php if(!empty($updata['debit'])){if($updata['currency'] == 'usd'){ echo $currencydata['usd_amount']; }else{echo $currencydata['mmk_amount'];};} ?>" placeholder="Debit" style="padding-top: 2px; padding-bottom: 2px; width:45%; display:inline;">
-                          <input type="text" name="credit" class="form-control inpv2 mt-3" placeholder="Credit" value="<?php if(!empty($updata['credit'])){if($updata['currency'] == 'usd'){ echo $currencydata['usd_amount']; }else{echo $currencydata['mmk_amount'];};} ?>" style="padding-top: 2px; padding-bottom: 2px; width:45%; margin-left:20px; display:inline;">
+                          <input type="text" id="debitinp<?php echo $id; ?>" name="debit" class="form-control inpv2 mt-3" value="<?php if(!empty($updata['debit'])){if($updata['currency'] != 'usd'){ echo $updata['debit']; }else{echo $currencydata['usd_amount'];};} ?>" placeholder="Debit" style="padding-top: 2px; padding-bottom: 2px; width:45%; display:inline;">
+                          <input type="text" id="creditinp<?php echo $id; ?>" name="credit" class="form-control inpv2 mt-3" placeholder="Credit" value="<?php if(!empty($updata['credit'])){if($updata['currency'] != 'usd'){ echo $updata['credit']; }else{echo $currencydata['usd_amount'];};} ?>" style="padding-top: 2px; padding-bottom: 2px; width:45%; margin-left:20px; display:inline;">
                         </div>
                         <div class="col-3">
                           <label>Rate</label>
@@ -254,6 +297,30 @@ $query = new Query();
                   </form>
                   </div>
                   <script type="text/javascript">
+                  $('#debitinp<?php echo $id; ?>').on('keyup', function(){
+                    if($('#debitinp<?php echo $id; ?>').val() == ''){
+                      document.getElementById('creditinp<?php echo $id; ?>').disabled = false;
+                    }else{
+                      document.getElementById('creditinp<?php echo $id; ?>').disabled = true;
+                    }
+                  });
+                  $('#creditinp<?php echo $id; ?>').on('keyup', function(){
+                    if($('#creditinp<?php echo $id; ?>').val() == ''){
+                      document.getElementById('debitinp<?php echo $id; ?>').disabled = false;
+                    }else{
+                      document.getElementById('debitinp<?php echo $id; ?>').disabled = true;
+                    }
+                  });
+                  if($('#debitinp<?php echo $id; ?>').val() == ''){
+                    document.getElementById('creditinp<?php echo $id; ?>').disabled = false;
+                  }else{
+                    document.getElementById('creditinp<?php echo $id; ?>').disabled = true;
+                  }
+                  if($('#creditinp<?php echo $id; ?>').val() == ''){
+                    document.getElementById('debitinp<?php echo $id; ?>').disabled = false;
+                  }else{
+                    document.getElementById('debitinp<?php echo $id; ?>').disabled = true;
+                  }
                   function check<?php echo $data['id']; ?>rate(){
                     let rateinp = document.getElementById('rate<?php echo $data['id']; ?>');
                     let selectcurrecy = document.getElementById('selectcurrecy<?php echo $data['id']; ?>');
@@ -288,6 +355,22 @@ $query = new Query();
       </div>
     </div>
     <script type="text/javascript">
+    $(document).ready(function(){
+      $('#adddebitinp').on('keyup', function(){
+        if($('#adddebitinp').val() == ''){
+          document.getElementById('addcreditinp').disabled = false;
+        }else{
+          document.getElementById('addcreditinp').disabled = true;
+        }
+      });
+      $('#addcreditinp').on('keyup', function(){
+        if($('#addcreditinp').val() == ''){
+          document.getElementById('adddebitinp').disabled = false;
+        }else{
+          document.getElementById('adddebitinp').disabled = true;
+        }
+      });
+    });
       function addcheckrate(){
         let addrateinp = document.getElementById('addrate');
         let addselectcurrecy = document.getElementById('addselectcurrecy');

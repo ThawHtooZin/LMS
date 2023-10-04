@@ -187,10 +187,10 @@ CREATE TABLE `currency` (
   `usd_amount` bigint(25) NOT NULL,
   `voucher_no` varchar(36) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=123 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=161 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO currency VALUES("121","0","debit","50000","0","AS261");
-INSERT INTO currency VALUES("122","0","credit","50000","0","AS261");
+INSERT INTO currency VALUES("158","3000","debit","300000","100","AS261");
+INSERT INTO currency VALUES("160","3000","credit","300000","100","AS261");
 
 
 
@@ -292,6 +292,24 @@ INSERT INTO form7stock VALUES("99","2023-09-19","HL123","NS123","Can","frozen","
 INSERT INTO form7stock VALUES("102","0000-00-00","HL123","NS123","Can","frozen","3up","","","","0","0");
 INSERT INTO form7stock VALUES("103","2023-09-19","SB263","MK1625","DAKA","tcl","2up","209.4","342.1596","","89","93");
 INSERT INTO form7stock VALUES("104","2023-09-19","HL123","DG214","DAKA","tcl","3up","100","163.4","","0","0");
+
+
+
+DROP TABLE general_ledger;
+
+CREATE TABLE `general_ledger` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `date` date NOT NULL,
+  `voucherno` varchar(25) NOT NULL,
+  `debit_ac_code` varchar(25) NOT NULL,
+  `debit` int(11) NOT NULL,
+  `credit_ac_code` varchar(25) NOT NULL,
+  `credit` int(11) NOT NULL,
+  `narration` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO general_ledger VALUES("24","2023-10-04","AS261","500/0001","300000","500/0001","0","Sold TCL BY HEHEH");
 
 
 
@@ -898,7 +916,7 @@ CREATE TABLE `permission` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO permission VALUES("1","1","manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_accountreceivable,manage_transaction,manage_customers,manage_supplier,manage_category,manage_item,manage_actype,manage_acname,manage_unit,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,sale_report,purchase_report");
+INSERT INTO permission VALUES("1","1","manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_accountreceivable,manage_transactionmanage_general_ledger,manage_customers,manage_supplier,manage_category,manage_item,manage_actype,manage_acname,manage_unit,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,sale_report,purchase_report");
 INSERT INTO permission VALUES("2","2",",manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport");
 
 
@@ -976,6 +994,26 @@ INSERT INTO purchase VALUES("90","2023-09-10","6890","AT263","frozen","KO962","2
 INSERT INTO purchase VALUES("91","2023-09-10","9493","AT263","frozen","KO962","3up","185.35","0","1000","185350");
 INSERT INTO purchase VALUES("92","2023-09-11","52","DK123","frozen","BJ123","3up","150","0","1000","150000");
 INSERT INTO purchase VALUES("93","2023-09-19","422","MK1625","tcl","SB263","2up","209.4","0","1000","209400");
+
+
+
+DROP TABLE receivable;
+
+CREATE TABLE `receivable` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `date` date NOT NULL,
+  `sr_no` varchar(25) NOT NULL,
+  `container_no` varchar(25) NOT NULL,
+  `invoice_amount` varchar(25) NOT NULL,
+  `paid_date` date NOT NULL,
+  `payment_no` varchar(25) NOT NULL,
+  `particulars` varchar(255) NOT NULL,
+  `paid_amount` int(11) NOT NULL,
+  `balance` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO receivable VALUES("44","2023-10-04","SAF-15/2023","TEMU-9312350","100","0000-00-00","","","0","100");
 
 
 
@@ -1163,11 +1201,13 @@ CREATE TABLE `transaction` (
   `debit` double NOT NULL,
   `credit` double NOT NULL,
   `currency` varchar(20) NOT NULL,
+  `sr_no` varchar(25) NOT NULL,
+  `container_no` varchar(25) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=128 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=166 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO transaction VALUES("126","2023-09-28","AS261","500/0001","dxhfdtghdhfd","50000","0","mmk");
-INSERT INTO transaction VALUES("127","2023-09-28","AS261","500/0004","fjgfjgfjgfj","0","50000","mmk");
+INSERT INTO transaction VALUES("163","2023-10-04","AS261","500/0001","Sold TCL BY HEHEH","300000","0","usd","","");
+INSERT INTO transaction VALUES("165","2023-10-04","AS261","500/0004","Sold By Heeh","0","300000","usd","SAF-15/2023","TEMU-9312350");
 
 
 
@@ -1384,7 +1424,7 @@ CREATE TABLE `userlogs` (
   `login_password` varchar(125) NOT NULL,
   `status` varchar(55) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO userlogs VALUES("1","10:26:18.000000","2023-09-18","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("2","10:31:25.000000","2023-09-18","admin","admin","Login Success");
@@ -1413,6 +1453,9 @@ INSERT INTO userlogs VALUES("24","10:31:52.000000","2023-09-27","admin","admin",
 INSERT INTO userlogs VALUES("25","06:07:40.000000","2023-09-27","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("26","10:05:20.000000","2023-09-28","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("27","03:53:51.000000","2023-10-03","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("28","04:16:27.000000","2023-10-03","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("29","06:03:09.000000","2023-10-03","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("30","11:02:48.000000","2023-10-04","admin","admin","Login Success");
 
 
 
