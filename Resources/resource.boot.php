@@ -42,8 +42,26 @@ class Bootstrap
   function css()
   {
     echo '
-      <link rel="stylesheet" href="../../Resources\bootstrap-5.3.1-dist\css\bootstrap.min.css">
+    <script type="text/javascript">
+    setInterval(function() {
+    var currentTime = new Date ( );
+    var currentHours = currentTime.getHours ( );
+    var currentMinutes = currentTime.getMinutes ( );
+    var currentSeconds = currentTime.getSeconds ( );
+    currentMinutes = ( currentMinutes < 10 ? "0" : "" ) + currentMinutes;
+    currentSeconds = ( currentSeconds < 10 ? "0" : "" ) + currentSeconds;
+    var timeOfDay = ( currentHours < 12 ) ? "AM" : "PM";
+    currentHours = ( currentHours > 12 ) ? currentHours - 12 : currentHours;
+    currentHours = ( currentHours == 0 ) ? 12 : currentHours;
+    var currentTimeString = currentHours + ":" + currentMinutes + ":" + currentSeconds + " " + timeOfDay;
+    document.getElementById("timer").innerHTML = currentTimeString;
+    }, 100);
+    </script>
+      <link rel="stylesheet" href="../../Resources\bootstrap-5.3.1-dist\css\bootstrap.css">
       <style>
+      row{
+        padding: 0px !important;
+      }
       #content > .card > .card-header > #menu{
         display:inline !important;
       }
@@ -70,20 +88,10 @@ class Bootstrap
         color:white;
       }
       #sidebar {
-        background-color: #333;
-        color: white;
-        height: 100%;
         transition: all 0.5s ease;
       }
       #content{
         transition: all 0.5s ease;
-      }
-      .fullcontent{
-        width: 100% !important;
-        padding-left: 25px !important;
-      }
-      .sidebarhide{
-        margin-left:-220px !important;
       }
       ::-webkit-scrollbar {
         width: 10px;
@@ -96,9 +104,22 @@ class Bootstrap
         background:rgba(0,0,0,0.3) !important;
         border-radius: 5px !important;
       }
+      .arrow {
+        float:right;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        display: inline;
+        margin-top:8px;
+        padding: 1.8px;
+      }
+      .arrdown{
+        transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+      }
         .h:hover{
-          color:  black !important;
-          background:  rgb(254, 254, 51, 0.9);
+          color:  white !important;
+          boder-radius: 1px !important;
+          background:  rgb(22, 172, 170);
           // #ffff33
         }
         .row{
@@ -132,17 +153,31 @@ class Bootstrap
         .table>tbody>tr>*{
           background-color: transparent !important;
         }
-        .col-2{
-          width: 16%;
-        }
-        .col-10{
-          width: 84%;
-        }
         .modal-content{
           border-radius: 0 !important;
         }
         .modal-header{
           border-radius: 0 !important;
+        }
+        .col-2{
+          position:absolute;
+          height: 100%;
+          width: 20% !important;
+        }
+        .col-10{
+          left: 261px;
+          position:absolute;
+          width: 80.9% !important;
+        }
+        .col-12{
+          left: 50px;
+          position:absolute;
+          width: 96.35% !important;
+        }
+        .col-0{
+          position:absolute;
+          height: 100%;
+          width: 4.5% !important;
         }
       </style>
       <script src="../../Resources/sweetalert.js" charset="utf-8"></script>
@@ -176,10 +211,34 @@ class Bootstrap
     ';
     ?>
     <script type="text/javascript">
+    var myVariable = false;
+    function toggleVariable() {
+      myVariable = !myVariable;
+      return myVariable;
+    }
     $('#menu').on('click', function(){
-      $("#sidebar").toggleClass("sidebarhide");
-      $("#content").toggleClass("col-10 col-12");
-      $('#content').toggleClass("fullcontent");
+      var newValue = toggleVariable();
+      if(newValue === false){
+        setTimeout(function(){
+          $("#navtitle").animate({
+            opacity: "show",
+            padding: "show"
+          }, "normal");
+          $("span#navname").animate({
+            opacity: "show",
+            padding: "show"
+          }, "normal");
+          $('.arrow').show("slow");
+        }, 500);
+        $('#sidebar').toggleClass('col-2 col-0');
+      }else{
+        $('#sidebar').toggleClass('col-2 col-0', 1000);
+        $("#navtitle").hide();
+        $("span#navname").hide();
+        $('.arrow').hide();
+      }
+      $('#content').toggleClass('col-10 col-12');
+
     })
     $('.table').removeClass('table-bordered');
     </script>
