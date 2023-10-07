@@ -26,7 +26,7 @@ $query = new Query();
         ?>
       </div>
       <div class="col-10" id="content">
-        <div class="card mt-3">
+        <div class="card">
           <div class="card-header bg-warning text-light"  style="padding:-10px;">
             <button type="button" class="btn btn-default btn-sm" id="menu">
               <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">

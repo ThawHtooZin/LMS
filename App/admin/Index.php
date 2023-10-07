@@ -23,7 +23,7 @@ $query = new Query();
   <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
   <body>
     <div class="row">
-      <div class="col-2" id="sidebar">>
+      <div class="col-2" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>

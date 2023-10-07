@@ -64,15 +64,15 @@ $query = new Query();
         <div class="card mt-1">
           <form action="" method="post">
             <div class="card-header bg-info text-light pt-2 pb-3">
-              <button type="button" class="btn btn-default btn-sm" id="menu">
+              <button type="button" class="btn btn-default btn-sm" id="menu"  style="display:inline !important; color:white !important;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
                   <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
                 </svg>
               </button>
               <b class="h5">Link Mark Limited (F-7)</b>
-              <button type="button" class="btn btn-success btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#addmodal">Add Data</button>
-              <button type="submit" name="searchbtn" class="btn btn-secondary btn-sm float-end">View</button>
-              <select name="commondity_id" class="form-control inpv2 w-25 d-inline float-end me-2" style="height:34px !important;">
+              <button type="button" class="btn btn-success btn-sm float-end ms-2 mt-2" data-bs-toggle="modal" data-bs-target="#addmodal">Add Data</button>
+              <button type="submit" name="searchbtn" class="btn btn-secondary btn-sm float-end mt-2">View</button>
+              <select name="commondity_id" class="form-control inpv2 w-25 d-inline float-end me-2 mt-2" style="height:30px !important; padding:0px 5px;">
                 <option value="">Select Commondity</option>
                 <?php
                 $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
@@ -88,8 +88,8 @@ $query = new Query();
                 }
                  ?>
               </select>
-              <button type="submit" name="searchbtn2" class="btn btn-secondary btn-sm float-end me-2">View</button>
-              <select name="type" class="form-control inpv2 w-25 d-inline float-end me-2" style="height:34px !important;">
+              <button type="submit" name="searchbtn2" class="btn btn-secondary btn-sm float-end me-2 mt-2">View</button>
+              <select name="type" class="form-control inpv2 w-25 d-inline float-end me-2 mt-2" style="height:30px !important; padding:0px 5px;">
                 <option value="">Select Type</option>
                 <option value="frozen">Frozen</option>
                 <option value="tcl">TCL</option>

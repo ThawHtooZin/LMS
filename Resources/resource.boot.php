@@ -44,6 +44,47 @@ class Bootstrap
     echo '
       <link rel="stylesheet" href="../../Resources\bootstrap-5.3.1-dist\css\bootstrap.min.css">
       <style>
+      #content > .card > .card-header > #menu{
+        display:inline !important;
+      }
+      #content > .card > .card-header > h4{
+        display:inline !important;
+      }
+      #content > .card > .card-header > h5{
+        display:inline !important;
+      }
+      #content > .card > .card-header > p{
+        display:inline !important;
+      }
+      #content > .card > .card-header > b{
+        display:inline !important;
+      }
+
+      #content > .card > .card-header > button{
+        color:white;
+      }
+      #content > .card > .card-header > form > button{
+        color:white;
+      }
+      #content > .card > form > .card-header> button{
+        color:white;
+      }
+      #sidebar {
+        background-color: #333;
+        color: white;
+        height: 100%;
+        transition: all 0.5s ease;
+      }
+      #content{
+        transition: all 0.5s ease;
+      }
+      .fullcontent{
+        width: 100% !important;
+        padding-left: 25px !important;
+      }
+      .sidebarhide{
+        margin-left:-220px !important;
+      }
       ::-webkit-scrollbar {
         width: 10px;
       }
@@ -124,13 +165,25 @@ class Bootstrap
       $(".chzn-select").chosen();
     });
 
+
     // (function(e){
     //   let h3 = document.getElementsByTagName("h3");
     //   let stm = e.target.dataset.num;
     //   console.log(stm);
     // })();
     </script>
+
     ';
+    ?>
+    <script type="text/javascript">
+    $('#menu').on('click', function(){
+      $("#sidebar").toggleClass("sidebarhide");
+      $("#content").toggleClass("col-10 col-12");
+      $('#content').toggleClass("fullcontent");
+    })
+    $('.table').removeClass('table-bordered');
+    </script>
+    <?php
   }
 
 }

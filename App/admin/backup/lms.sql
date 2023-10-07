@@ -7,10 +7,11 @@ CREATE TABLE `accounts` (
   `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `role` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO accounts VALUES("18","admin","admin","admin@gmail.com","1");
 INSERT INTO accounts VALUES("20","Stock Control Person","scp","scp@gmail.com","2");
+INSERT INTO accounts VALUES("21","Myat Thu","myatthu","mt@gmail.com","3");
 
 
 
@@ -22,12 +23,13 @@ CREATE TABLE `acname` (
   `ac_type` int(11) NOT NULL,
   `ac_name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO acname VALUES("5","500/0002","9","Petrol");
 INSERT INTO acname VALUES("6","500/0001","10","Cost of Goods Sold");
-INSERT INTO acname VALUES("7","500/0003","11","Cash Book");
+INSERT INTO acname VALUES("7","500/0003","13","Main Cash");
 INSERT INTO acname VALUES("8","500/0004","11","Receivable");
+INSERT INTO acname VALUES("9","500/0005","10","Sale");
 
 
 
@@ -62,11 +64,12 @@ CREATE TABLE `actype` (
   `acid` int(11) NOT NULL AUTO_INCREMENT,
   `ac_type` varchar(255) NOT NULL,
   PRIMARY KEY (`acid`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO actype VALUES("9","expanse");
 INSERT INTO actype VALUES("10","Revenue");
 INSERT INTO actype VALUES("11","Current Asset");
+INSERT INTO actype VALUES("13","Cash Book");
 
 
 
@@ -187,13 +190,15 @@ CREATE TABLE `currency` (
   `usd_amount` bigint(25) NOT NULL,
   `voucher_no` varchar(36) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=180 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=182 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO currency VALUES("160","0","credit","100000","0","AS261");
 INSERT INTO currency VALUES("163","0","debit","50000","0","AS263");
 INSERT INTO currency VALUES("164","0","credit","50000","0","AS263");
 INSERT INTO currency VALUES("168","3000","credit","300000","100","AS264");
 INSERT INTO currency VALUES("173","0","credit","50000","0","AS264");
+INSERT INTO currency VALUES("180","3000","debit","600000","200","AS266");
+INSERT INTO currency VALUES("181","3000","credit","600000","200","AS266");
 
 
 
@@ -310,11 +315,11 @@ CREATE TABLE `general_ledger` (
   `credit` int(11) NOT NULL,
   `narration` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO general_ledger VALUES("58","2023-10-05","AS263","500/0002","50000","500/0003","50000","car expanse");
 INSERT INTO general_ledger VALUES("59","2023-10-05","AS264","500/0001","300000","500/0004","300000","sold fish");
-INSERT INTO general_ledger VALUES("62","2023-10-06","AS265","500/0002","50000","500/0003","50000","car expanse");
+INSERT INTO general_ledger VALUES("67","2023-10-07","AS266","500/0004","600000","500/0005","600000","Hello ,I\'m Baymax");
 
 
 
@@ -919,10 +924,11 @@ CREATE TABLE `permission` (
   `role_id` int(11) NOT NULL,
   `permission` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO permission VALUES("1","1","manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_accountreceivable,manage_transactionmanage_general_ledger,manage_customers,manage_supplier,manage_category,manage_item,manage_actype,manage_acname,manage_unit,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,sale_report,purchase_report");
 INSERT INTO permission VALUES("2","2",",manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport");
+INSERT INTO permission VALUES("3","3","manage_accounts,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_accountreceivablemanage_general_ledger,manage_customers");
 
 
 
@@ -1016,9 +1022,10 @@ CREATE TABLE `receivable` (
   `paid_amount` int(11) NOT NULL,
   `balance` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO receivable VALUES("53","2023-10-05","SAF-15/2023","TEMU-9312350","100","2023-10-07","HC22I0R6CA","USA send to HMS GLOBAL PTE ","50","50");
+INSERT INTO receivable VALUES("60","0000-00-00","","","","0000-00-00","","","0","0");
+INSERT INTO receivable VALUES("64","2023-10-07","SAF-15/2023","TEMU-9312350","200","0000-00-00","","","0","200");
 
 
 
@@ -1064,10 +1071,11 @@ CREATE TABLE `role` (
   `role_id` int(11) NOT NULL AUTO_INCREMENT,
   `role_name` varchar(255) NOT NULL,
   PRIMARY KEY (`role_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO role VALUES("1","Admin");
 INSERT INTO role VALUES("2","Stock");
+INSERT INTO role VALUES("3","Purchase");
 
 
 
@@ -1209,7 +1217,7 @@ CREATE TABLE `transaction` (
   `sr_no` varchar(25) NOT NULL,
   `container_no` varchar(25) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=185 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=187 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO transaction VALUES("168","2023-10-05","AS263","500/0002","car expanse","50000","0","mmk","","");
 INSERT INTO transaction VALUES("169","2023-10-05","AS263","500/0003","car expanse","0","50000","mmk","","");
@@ -1217,6 +1225,8 @@ INSERT INTO transaction VALUES("172","2023-10-05","AS264","500/0001","sold fish"
 INSERT INTO transaction VALUES("173","2023-10-05","AS264","500/0004","sold fish","0","300000","usd","SAF-15/2023","TEMU-9312350");
 INSERT INTO transaction VALUES("177","2023-10-06","AS265","500/0002","car expanse","50000","0","mmk","","");
 INSERT INTO transaction VALUES("178","2023-10-06","AS265","500/0003","car expanse","0","50000","mmk","","");
+INSERT INTO transaction VALUES("185","2023-10-07","AS266","500/0004","Hello ,I\'m Baymax","600000","0","usd","SAF-15/2023","TEMU-9312350");
+INSERT INTO transaction VALUES("186","2023-10-07","AS266","500/0005","Hello ,I\'m Baymax","0","600000","usd","","");
 
 
 
@@ -1433,7 +1443,7 @@ CREATE TABLE `userlogs` (
   `login_password` varchar(125) NOT NULL,
   `status` varchar(55) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO userlogs VALUES("1","10:26:18.000000","2023-09-18","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("2","10:31:25.000000","2023-09-18","admin","admin","Login Success");
@@ -1468,6 +1478,15 @@ INSERT INTO userlogs VALUES("30","11:02:48.000000","2023-10-04","admin","admin",
 INSERT INTO userlogs VALUES("31","02:09:44.000000","2023-10-05","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("32","10:11:56.000000","2023-10-05","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("33","09:34:52.000000","2023-10-06","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("34","06:24:13.000000","2023-10-06","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("35","11:08:11.000000","2023-10-07","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("36","11:54:45.000000","2023-10-07","Myat Thu","mt","Login Failed");
+INSERT INTO userlogs VALUES("37","11:54:53.000000","2023-10-07","Myat Thu","myatthu","Login Failed");
+INSERT INTO userlogs VALUES("38","11:55:02.000000","2023-10-07","Myat Thu","myatthu","Login Failed");
+INSERT INTO userlogs VALUES("39","11:55:08.000000","2023-10-07","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("40","11:56:23.000000","2023-10-07","Myat Thu","myatthu","Login Success");
+INSERT INTO userlogs VALUES("41","11:56:37.000000","2023-10-07","Myat Thu","myatthu","Login Success");
+INSERT INTO userlogs VALUES("42","11:58:28.000000","2023-10-07","admin","admin","Login Success");
 
 
 

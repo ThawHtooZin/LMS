@@ -64,7 +64,7 @@ $query = new Query();
                 $creditacname = $creditacnamestmt->fetch(PDO::FETCH_ASSOC);
                  ?>
                 <tr>
-                  <td><?php echo $gldata['date']; ?></td>
+                  <td><?php echo date('d/m/Y', strtotime($gldata['date'])); ?></td>
                   <td><?php echo $gldata['voucherno']; ?></td>
                   <td><?php echo $debitacname['ac_name']; ?></td>
                   <td><?php echo $gldata['debit']; ?></td>

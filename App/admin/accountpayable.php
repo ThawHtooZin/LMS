@@ -130,8 +130,8 @@ $query = new Query();
                 <!-- <th>Action</th> -->
               </tr>
               <?php
+              // $idd = 0;
               foreach ($payabledatas as $payabledata) {
-
                 $supplier = $query->select('payable', $payabledata['supplier_id'] , 'supplier_id');
                 $supplier_name = $query->select('supplier', $supplier['supplier_id'], 'supplier_id');
                 $linkstmt = $pdo->prepare("SELECT link_id FROM payable WHERE ");
@@ -139,7 +139,7 @@ $query = new Query();
               ?>
               <tr>
 
-                <td><?php echo $payabledata['id']; ?></td>
+                <!-- <td><?php //echo $idd; ?></td> -->
                 <td><?php if(!empty($payabledata['purchase_voucher_no'])){ echo $supplier_name['supplier_name']; }; ?></td>
                 <td><?php echo $payabledata['purchase_voucher_no']; ?></td>
                 <td><?php if(!empty($payabledata['purchase_amount'])){ echo $payabledata['purchase_amount'];}; ?></td>
