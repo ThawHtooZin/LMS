@@ -42,6 +42,7 @@ class Bootstrap
   function css()
   {
     echo '
+    <link rel="stylesheet" href="../../Resources\bootstrap-5.3.1-dist\css\bootstrap.min.css">
     <script type="text/javascript">
     setInterval(function() {
     var currentTime = new Date ( );
@@ -57,8 +58,10 @@ class Bootstrap
     document.getElementById("timer").innerHTML = currentTimeString;
     }, 100);
     </script>
-      <link rel="stylesheet" href="../../Resources\bootstrap-5.3.1-dist\css\bootstrap.css">
       <style>
+      *{
+        font-size: 13px;
+      }
       row{
         padding: 0px !important;
       }
@@ -159,25 +162,25 @@ class Bootstrap
         .modal-header{
           border-radius: 0 !important;
         }
-        .col-2{
+        .sidebarcol{
           position:absolute;
           height: 100%;
-          width: 20% !important;
+          width: 16% !important;
         }
-        .col-10{
-          left: 261px;
+        .contentcol{
+          left: 197px;
           position:absolute;
-          width: 80.9% !important;
+          width: 85.5% !important;
         }
-        .col-12{
-          left: 50px;
+        .contentfullcol{
+          left: 44px;
           position:absolute;
-          width: 96.35% !important;
+          width: 96% !important;
         }
-        .col-0{
+        .sidebarnocol{
           position:absolute;
           height: 100%;
-          width: 4.5% !important;
+          width: 4.8% !important;
         }
       </style>
       <script src="../../Resources/sweetalert.js" charset="utf-8"></script>
@@ -230,16 +233,20 @@ class Bootstrap
           }, "normal");
           $('.arrow').show("slow");
         }, 500);
-        $('#sidebar').toggleClass('col-2 col-0');
+        $('#sidebar').toggleClass('sidebarcol sidebarnocol');
+        $('#thenavbar').slideToggle(800);
+        // $('#sidebarlink').removeAttr('disabled');
       }else{
-        $('#sidebar').toggleClass('col-2 col-0', 1000);
+        // $('#sidebarlink').attr('disabled', true);
+        $('#sidebar').toggleClass('sidebarcol sidebarnocol', 1000);
         $("#navtitle").hide();
+        $('#menu').css('height', 82, '%');
         $("span#navname").hide();
         $('.arrow').hide();
+        $('#thenavbar').slideToggle(500);
       }
-      $('#content').toggleClass('col-10 col-12');
-
-    })
+      $('#content').toggleClass('contentcol contentfullcol');
+    });
     $('.table').removeClass('table-bordered');
     </script>
     <?php

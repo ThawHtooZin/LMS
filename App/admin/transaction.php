@@ -188,20 +188,17 @@ $query = new Query();
     }
      ?>
     <div class="row">
-      <div class="col-2" id="sidebar">
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
       </div>
-      <div class="col-10" id="content">
+      <div class="contentcol" id="content">
+        <?php require 'navbar.php'; ?>
             <div class="card">
             <div class="card-header bg-info">
               <form action="" method="post">
-              <button type="button" class="btn btn-default btn-sm" id="menu">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
-                  <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
-                </svg>
-              </button>
+
               <h5 class="text-light d-inline">Add Transaction</h5>
               <button type="submit" id="acceptbtn" class="hide btn btn-primary btn-sm ms-2 float-end" name="accept">Accept</button>
               <button type="button" id="finishbtn" class="btn btn-success btn-sm ms-2 float-end">Finished</button>
@@ -239,7 +236,7 @@ $query = new Query();
                  <label>Description</label>
                  <textarea name="adddescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(!empty($_SESSION['description'])){echo $_SESSION['description']; } ?></textarea>
               </div>
-               <div id="receive2" class="hide col-2">
+               <div id="receive2" class="hide" style="width: 16.66666667%">
                  <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="addsr_no" placeholder="Sr No.">
                  <input type="text" class="form-control inpv2 mb-2" style="padding-top: 2px; padding-bottom: 2px;" name="addcontainer_no" placeholder="Container No.">
                </div>

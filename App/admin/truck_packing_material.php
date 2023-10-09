@@ -40,19 +40,16 @@ $query = new Query();
 
      ?>
     <div class="row">
-      <div class="col-2" id="sidebar">
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
       </div>
-      <div class="col-10" id="content">
+      <div class="contentcol" id="content">
+        <?php require 'navbar.php'; ?>
         <div class="card">
           <div class="card-header bg-success">
-            <button type="button" class="btn btn-default btn-sm" id="menu">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
-              </svg>
-            </button>
+
             <b class="text-light">Truck Packing Material Charges</b>
             <a href="truck_packing_stock.php" class="btn btn-danger btn-sm ms-2 float-end">Back</a>
             <button type="button" name="button" data-bs-toggle="modal" data-bs-target="#addmodal" class="btn btn-info btn-sm float-end text-light">Add</button>

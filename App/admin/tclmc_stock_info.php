@@ -55,20 +55,18 @@ $query = new Query();
     }
      ?>
     <div class="row">
-      <div class="col-2" id="sidebar">
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
       </div>
-      <div class="col-10" id="content">
+      <div class="contentcol" id="content">
+        <?php require 'navbar.php'; ?>
         <div class="card mt-1">
           <div class="card-header bg-info">
             <form class="" action="" method="post">
-              <button type="button" class="btn btn-default btn-sm" id="menu">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
-                  <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
-                </svg>
-              </button>
+
+
             <h5 style="font-weight:bold;" class="text-light d-inline">TCL MC STOCK INFO</h5>
             <button type="button" class="btn btn-danger btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#transfer">Transfer Mc</button>
             <button type="button" class="btn btn-warning btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#export">Export Mc</button>

@@ -23,12 +23,12 @@ $query = new Query();
   <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
   <body>
     <div class="row">
-      <div class="col-2" id="sidebar">
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
       </div>
-      <div class="col-10" id="content">
+      <div class="contentcol" id="content">
         <?php require 'navbar.php'; ?>
         <h1 class="p-3 pt-4 text-center text-primary" style="font-family: 'Caprasimo', cursive;font-family: 'Cormorant Garamond', serif;font-family: 'Teko', sans-serif; font-size: 65px; text-shadow:-7px 7px 10px gray;"> <span style="font-size:70px;">LINK MARK </span> <br> COMPANY LIMITED</h1>
         <div class="container text-center w-50" style="margin-top:50px; margin-left:auto; margin-right:auto;">

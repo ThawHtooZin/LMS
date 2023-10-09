@@ -55,22 +55,21 @@ $query = new Query();
     }
      ?>
     <div class="row">
-      <div class="col-2" id="sidebar">
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
       </div>
-      <div class="col-10" id="content">
+      <div class="contentcol" id="content">
+        <?php require 'navbar.php'; ?>
         <div class="card">
           <form  action="" method="post">
-            <button type="button" class="btn btn-default btn-sm" id="menu">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
-              </svg>
-            </button>
+
           <div class="card-header bg-info">
             <?php
-            if(isset($_POST['actualinvoicebtn'])){
+            if(empty($_SESSION['tabs']) || $_SESSION['tabs'] != 'actualinvoice' || $_SESSION['tabs'] != 'actualpackinglist' || $_SESSION['tabs'] != 'foambox' || $_SESSION['tabs'] != 'declare'){
+              $_SESSION['tabs'] = 'default';
+            }elseif(isset($_POST['actualinvoicebtn'])){
               $_SESSION['tabs'] = 'actualinvoice';
             }elseif(isset($_POST['actualinvoiceback'])){
               $_SESSION['tabs'] = 'actualpackinglist';
@@ -78,8 +77,6 @@ $query = new Query();
               $_SESSION['tabs'] = 'foambox';
             }elseif(isset($_POST['declarebtn'])){
               $_SESSION['tabs'] = 'declare';
-            }elseif(empty($_SESSION['tabs']) || $_SESSION['tabs'] == ''){
-              $_SESSION['tabs'] = 'default';
             }
              ?>
                 <span class=" text-light" id="fbtext" style="font-size:20px; font-weight:bold;">Foam Box</span>
