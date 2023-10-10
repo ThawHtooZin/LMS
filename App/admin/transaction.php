@@ -18,6 +18,12 @@ $query = new Query();
   <?php
   $bootstrap->css();
   ?>
+  <style media="screen">
+    #ac_nameinput{
+      padding-top: 2px !important;
+      padding-bottom: 2px !important;
+    }
+  </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
@@ -35,21 +41,30 @@ $query = new Query();
     $(document).ready(function(){
       $('#addac_code').on('keyup', function(){
         var ac_codepost = $('#addac_code').val();
-        ac_code = ac_codepost.split('/');
+        ac_code = ac_codepost.split('-');
         firstpart = ac_code[0];
         lastpart = ac_code[1];
         $('#addac_name').load('ac_name.php', {
           FirstPart : firstpart,
           LastPart: JSON.stringify(lastpart)
         });
-        if(ac_codepost == '500/0004'){
-          $('#receive').toggle();
-          $('#receive2').toggle();
-          $('#normal').toggle();
+        if(ac_codepost == 'CA-001' || ac_codepost == 'ca-001'){
+          $('#normal').hide();
+          $('#receive').show();
+          $('#receive2').show();
         }else{
           $('#receive').hide();
           $('#receive2').hide();
           $('#normal').show();
+          if(ac_codepost == 'CA-002' || ac_codepost == 'ca-002'){
+            $('#bankchargesdesc').show();
+            $('#bankcharges').show();
+            $('#normal').hide();
+          }else{
+            $('#bankchargesdesc').hide();
+            $('#bankcharges').hide();
+            $('#normal').show();
+          }
         }
       });
       $('#finishbtn').on('click', function(){
@@ -225,7 +240,7 @@ $query = new Query();
                 </div>
                 <div class="col">
                   <label>A/C Name</label>
-                  <div id='addac_name'>
+                  <div id='addac_name' style="padding-top:2px; padding-bottom:2px;">
                     <input type="text" name="addac_name" disabled class="form-control inpv2 mb-1" value="<?php if(!empty($_SESSION['ac_name'])){echo $_SESSION['ac_name']; } ?>" style="padding-top: 2px; padding-bottom: 2px;">
                   </div>
                 </div>
@@ -243,6 +258,13 @@ $query = new Query();
                <div id="normal" class="col-6">
                  <label>Description</label>
                  <textarea name="adddescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(!empty($_SESSION['description'])){echo $_SESSION['description']; } ?></textarea>
+               </div>
+               <div id="bankchargesdesc" class="hide col-4">
+                 <label>Description</label>
+                 <textarea name="adddescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(!empty($_SESSION['description'])){echo $_SESSION['description']; } ?></textarea>
+               </div>
+               <div id="bankcharges" class="hide" style="width: 16.66666667%">
+                 <input type="number" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="addsr_no" placeholder="Bank Charges">
                </div>
               <div class="col-3">
                 <label>Currency</label>

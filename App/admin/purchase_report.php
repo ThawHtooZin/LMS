@@ -207,7 +207,9 @@ $query = new Query();
                   <div class="col-4">
                     <select class="form-control inpv2 mb-2 chzn-select" name="voucher_no" data-placeholder="Select Voucher">
                       <?php
-                      $voucherdatas = $query->selectdesc('purchase');
+                      $voucherdatas = $query->selectall('purchase');
+                      print_r($voucherdatas);
+                      echo "Asdfasdfasdf";
                       foreach ($voucherdatas as $voucherdata) {
                         ?>
                         <option value="<?php echo $voucherdata['voucher_no']; ?>"><?php echo $voucherdata['voucher_no']; ?></option>
@@ -408,6 +410,9 @@ $query = new Query();
                     <td>Total Amount:</td>
                     <td><?php echo $total_amount_commodity_search['total_amount']; ?></td>
                   </tr>
+                  <?php
+                  if (!empty($total_amount_commodity_and_size_search_viss)) {
+                    ?>
                   <tr>
                     <td></td>
                     <td></td>
@@ -436,6 +441,9 @@ $query = new Query();
                     <td>Total Kg:</td>
                     <td><?php echo floatval($total_amount_commodity_search_viss['total_viss']) * 1.634; ?></td>
                   </tr>
+                  <?php
+                }
+                   ?>
                   <?php
                 }
                   ?>

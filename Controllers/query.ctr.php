@@ -2521,48 +2521,28 @@ Class Query{
 
       }
 
+      // $voucher_no = $transactiondata['voucher_no'];
+      // $glstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE voucherno='$voucher_no'");
+      // $glstmt->execute();
+      // $gldata = $glstmt->fetchall();
+      //
+      // $glcreditstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE voucherno='$voucher_no'");
+      // $glcreditstmt->execute();
+      // $glcreditdata = $glcreditstmt->fetchall();
+
+      $ac_code = $transactiondata['ac_code'];
       $voucher_no = $transactiondata['voucher_no'];
-      $glstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE voucherno='$voucher_no'");
-      $glstmt->execute();
-      $gldata = $glstmt->fetchall();
-
-      $glcreditstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE voucherno='$voucher_no' AND credit=''");
-      $glcreditstmt->execute();
-      $glcreditdata = $glcreditstmt->fetchall();
-      if(empty($gldata)){
-        if(!empty($transactiondata['debit'])){
-          $debit_ac_code = $transactiondata['ac_code'];
-          $debit = $transactiondata['debit'];
-          $date = $transactiondata['date'];
-          $debitglstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, debit_ac_code, debit) VALUES('$date', '$voucher_no', '$debit_ac_code', '$debit')");
-          $debitglstmt->execute();
-        }
-        $accepterror = false;
-      }elseif(!empty($glcreditdata)){
-        $voucher_no = $transactiondata['voucher_no'];
-        $creditglstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE voucherno='$voucher_no' AND credit=''");
-        $creditglstmt->execute();
-        $creditgldata = $creditglstmt->fetch(PDO::FETCH_ASSOC);
-        if(empty($creditgldata['credit'])){
-          if(!empty($transactiondata['credit'])){
-            $credit_ac_code = $transactiondata['ac_code'];
-            $credit = $transactiondata['credit'];
-            $description = $transactiondata['description'];
-            $creditstmt = $pdo->prepare("UPDATE general_ledger SET credit_ac_code='$credit_ac_code', credit='$credit', narration=:description WHERE voucherno='$voucher_no'");
-            $creditstmt->execute([
-              ':description' => $description
-            ]);
-          }
-        }else{
-          echo "Asdfasdf";
-          $accepterror = true;
-        }
+      $description = $transactiondata['description'];
+      if (empty($transactiondata['debit'])) {
+        $debit = 0;
+        $credit = $transactiondata['credit'];
+      }else{
+        $debit = $transactiondata['debit'];
+        $credit = 0;
       }
-    }
-
-    if($accepterror !== false){
-      echo "<script>swal('Warning', 'Already Accepted Before', 'warning');</script>";
-    }else{
+      $balance = 0;
+      $generalledgerstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, balance, narration) VALUES('$date','$voucher_no','$ac_code', '$debit', '$credit', '$balance', '$description')");
+      $generalledgerstmt->execute();
       echo "<script>swal('Success', 'Accepted Successfully', 'success');</script>";
     }
   }
@@ -2608,11 +2588,24 @@ Class Query{
     }
   }
 
-function addbalance($balance){
-  global $pdo;
-  $balancestmt = $pdo->prepare("INSERT INTO receivable(balance) VALUES('$balance')");
-  $balancestmt->execute();
-}
+  function addbalance($balance){
+    global $pdo;
+    $balancestmt = $pdo->prepare("INSERT INTO receivable(balance) VALUES('$balance')");
+    $balancestmt->execute();
+  }
+
+  function searchgeneralledger($date_from, $date_to, $ac_code){
+    global $pdo;
+    if(!empty($ac_code) && !empty($date_from) && !empty($date_to)){
+      $searchstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE `date` BETWEEN '$date_from' AND '$date_to' AND ac_code='$ac_code'");
+      $searchstmt->execute();
+      return $searchdata = $searchstmt->fetchall();
+    }elseif(!empty($ac_code) && empty($date_from) && empty($date_to)){
+      return $this->search('general_ledger', 'ac_code', $ac_code);
+    }else{
+      return $this->selectdbw('general_ledger', $date_from, $date_to);
+    }
+  }
   // MORE SELECTS
 
   function selectsum($table, $id, $selectwhat){
@@ -2718,6 +2711,20 @@ function addbalance($balance){
     $stmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM $table WHERE commodity='$item_id' AND size='$size'");
     $stmt->execute();
     return $stmt->fetch(PDO::FETCH_ASSOC);
+  }
+
+  function selectdis($table, $diswhat){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT DISTINCT $diswhat FROM $table");
+    $stmt->execute();
+    return $stmt->fetchall();
+  }
+
+  function selectgroupby($table, $groupbywhat){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM $table GROUP BY $groupbywhat");
+    $stmt->execute();
+    return $stmt->fetchall();
   }
 }
 

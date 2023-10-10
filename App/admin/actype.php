@@ -65,10 +65,12 @@ $query = new Query();
               </tr>
               <?php
               $datas = $query->selectall('actype');
+              $idd = 0;
               foreach ($datas as $data) {
+                $idd++;
               ?>
               <tr data-bs-toggle='modal' data-bs-target="#updatemodal<?php echo $data['acid']; ?>">
-                <td><?php echo $data['acid']; ?></td>
+                <td><?php echo $idd; ?></td>
                 <td><?php echo $data['ac_type']; ?></td>
               </tr>
               <div class="modal fade" id="updatemodal<?php echo $data['acid'];  ?>" tabindex="-1" role="dialog"  style="margin-left:auto !important; margin-right: auto !important;">

@@ -23,13 +23,29 @@ CREATE TABLE `acname` (
   `ac_type` int(11) NOT NULL,
   `ac_name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO acname VALUES("5","500/0002","9","Petrol");
-INSERT INTO acname VALUES("6","500/0001","10","Cost of Goods Sold");
-INSERT INTO acname VALUES("7","500/0003","13","Main Cash");
-INSERT INTO acname VALUES("8","500/0004","11","Receivable");
-INSERT INTO acname VALUES("9","500/0005","10","Sale");
+INSERT INTO acname VALUES("10","FA-001","13","Car");
+INSERT INTO acname VALUES("11","FA-002","13","Building");
+INSERT INTO acname VALUES("12","FA-003","13","Furniture");
+INSERT INTO acname VALUES("13","CA-001","11","Account Receivable ");
+INSERT INTO acname VALUES("14","CA-002","11","Main Cash");
+INSERT INTO acname VALUES("15","CA-003","11","AYA Bank");
+INSERT INTO acname VALUES("16","CA-004","11","KBZ Bank");
+INSERT INTO acname VALUES("17","CA-005","11","CB Bank");
+INSERT INTO acname VALUES("18","CA-006","11","YOMA Bank");
+INSERT INTO acname VALUES("19","C-001","14","Share");
+INSERT INTO acname VALUES("20","C-002","14","Retain Earning");
+INSERT INTO acname VALUES("21","CL-001","16","Account Payable");
+INSERT INTO acname VALUES("22","R-001","10","Cash Sale");
+INSERT INTO acname VALUES("23","R-002","10","Credit Sale");
+INSERT INTO acname VALUES("24","OI-001","18","Rental Income");
+INSERT INTO acname VALUES("25","OI-002","18","Bank Interest");
+INSERT INTO acname VALUES("26","ADM-001","9","Administration");
+INSERT INTO acname VALUES("27","EP-002","9","Selling and Distribution");
+INSERT INTO acname VALUES("28","EP-003","9","Advertising and Marketting");
+INSERT INTO acname VALUES("29","EP-004","9","Operating");
+INSERT INTO acname VALUES("30","EP-005","9","Petrol");
 
 
 
@@ -64,12 +80,17 @@ CREATE TABLE `actype` (
   `acid` int(11) NOT NULL AUTO_INCREMENT,
   `ac_type` varchar(255) NOT NULL,
   PRIMARY KEY (`acid`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO actype VALUES("9","expanse");
-INSERT INTO actype VALUES("10","Revenue");
+INSERT INTO actype VALUES("10","Sale");
 INSERT INTO actype VALUES("11","Current Asset");
-INSERT INTO actype VALUES("13","Cash Book");
+INSERT INTO actype VALUES("13","Fixed Asset");
+INSERT INTO actype VALUES("14","Capital");
+INSERT INTO actype VALUES("15","Long Term Liability");
+INSERT INTO actype VALUES("16","Current Liability");
+INSERT INTO actype VALUES("17","Cost Of Good Sold");
+INSERT INTO actype VALUES("18","Other Income");
 
 
 
@@ -190,15 +211,23 @@ CREATE TABLE `currency` (
   `usd_amount` bigint(25) NOT NULL,
   `voucher_no` varchar(36) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=182 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=190 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO currency VALUES("160","0","credit","100000","0","AS261");
+INSERT INTO currency VALUES("160","0","credit","25000","0","AS261");
 INSERT INTO currency VALUES("163","0","debit","50000","0","AS263");
 INSERT INTO currency VALUES("164","0","credit","50000","0","AS263");
 INSERT INTO currency VALUES("168","3000","credit","300000","100","AS264");
 INSERT INTO currency VALUES("173","0","credit","50000","0","AS264");
 INSERT INTO currency VALUES("180","3000","debit","600000","200","AS266");
 INSERT INTO currency VALUES("181","3000","credit","600000","200","AS266");
+INSERT INTO currency VALUES("182","0","debit","30000","0","BS0001");
+INSERT INTO currency VALUES("183","0","credit","30000","0","BS0001");
+INSERT INTO currency VALUES("184","3000","debit","150000000","50000","BS0002");
+INSERT INTO currency VALUES("185","3000","credit","150000000","50000","BS0002");
+INSERT INTO currency VALUES("186","0","debit","25000","0","AS261");
+INSERT INTO currency VALUES("187","0","credit","25000","0","AS261");
+INSERT INTO currency VALUES("188","3000","debit","15000000","5000","AS262");
+INSERT INTO currency VALUES("189","3000","credit","15000000","5000","AS262");
 
 
 
@@ -241,24 +270,6 @@ CREATE TABLE `form10stock` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO form10stock VALUES("52","2023-09-19","MR163","AT268","NY","frozen","3up","89","14","327","84","23.1","6","4.1","1","346","");
-INSERT INTO form10stock VALUES("53","2023-09-19","MR163","AT268","NY","frozen","4up","79","16","379","80","18.8","4","22.9","5","374.9","");
-INSERT INTO form10stock VALUES("54","2023-09-19","MR163","AT268","NY","frozen","5up","20","5","114","20","","0","","0","114","");
-INSERT INTO form10stock VALUES("55","2023-09-19","MR163","AT268","NY","frozen","6up","1","1","19","3","","0","13.2","2","5.8","");
-INSERT INTO form10stock VALUES("56","2023-09-19","MR163","AT268","NY","frozen","7up","1","0","","0","7.7","1","","0","7.7","");
-INSERT INTO form10stock VALUES("57","2023-09-19","MR163","AT268","NY","frozen","8up","7","2","54","6","8.8","1","","0","62.8","");
-INSERT INTO form10stock VALUES("58","2023-09-19","MR163","AT268","NY","frozen","10up","2","1","21","2","","0","","0","21","");
-INSERT INTO form10stock VALUES("59","2023-09-19","MR163","AT268","NY","frozen","12up","4","2","49","4","","0","","0","49","");
-INSERT INTO form10stock VALUES("60","2023-09-19","MR163","DK123","Can","frozen","5up","6","9","230","6","","0","","0","230","");
-INSERT INTO form10stock VALUES("61","2023-09-11","KO962","AT268","NY","frozen","2up","63","8","160","61","4.9","2","","0","164.9","");
-INSERT INTO form10stock VALUES("62","2023-09-11","KO962","AT263","NY","frozen","3up","41","7","149","42","9.9","3","13.8","4","145.1","");
-INSERT INTO form10stock VALUES("63","2023-09-11","KO962","AT263","NY","frozen","4up","5","1","24","5","","0","","0","24","");
-INSERT INTO form10stock VALUES("64","2023-09-11","KO962","AT263","NY","frozen","5up","11","3","69","12","","0","5.9","1","63.1","");
-INSERT INTO form10stock VALUES("65","2023-09-11","KO962","AT263","NY","frozen","6up","4","1","19","3","12.9","2","6.3","1","25.6","");
-INSERT INTO form10stock VALUES("66","2023-09-11","KO962","AT263","NY","frozen","7up","1","1","23.5","3","","0","15.3","2","8.2","");
-INSERT INTO form10stock VALUES("67","2023-09-11","KO962","AT263","NY","frozen","9up","0","0","0","0","10","1","10.4","1","-0.4","");
-INSERT INTO form10stock VALUES("68","2023-09-11","KO962","AT263","NY","frozen","10up","1","1","21","2","","0","10.8","1","10.2","");
-INSERT INTO form10stock VALUES("69","2023-09-19","SB263","MK1625","DAKA","tcl","2up","89","14","327","84","23.1","6","4.1","1","346","");
 
 
 
@@ -278,28 +289,9 @@ CREATE TABLE `form7stock` (
   `pcsperf7` int(11) NOT NULL,
   `link_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=105 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=106 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO form7stock VALUES("51","2023-09-16","MR163","AT268","NY","frozen","3up","209.4","342.1596","","89","88");
-INSERT INTO form7stock VALUES("52","2023-09-16","MR163","AT268","NY","frozen","4up","357.5","584.155","","79","89");
-INSERT INTO form7stock VALUES("65","0000-00-00","MR163","AT268","NY","frozen","5up","","","","20","89");
-INSERT INTO form7stock VALUES("66","0000-00-00","MR163","AT268","NY","frozen","6up","","","","1","89");
-INSERT INTO form7stock VALUES("67","0000-00-00","MR163","AT268","NY","frozen","7up","","","","1","89");
-INSERT INTO form7stock VALUES("68","0000-00-00","MR163","AT268","NY","frozen","8up","","","","7","89");
-INSERT INTO form7stock VALUES("69","0000-00-00","MR163","AT268","NY","frozen","10up","","","","2","89");
-INSERT INTO form7stock VALUES("70","0000-00-00","MR163","AT268","NY","frozen","12up","","","","4","89");
-INSERT INTO form7stock VALUES("71","2023-09-10","KO962","AT263","NY","frozen","2up","99.8","163.0732","","60","90");
-INSERT INTO form7stock VALUES("72","2023-09-10","KO962","AT263","NY","frozen","3up","185.35","302.8619","","41","91");
-INSERT INTO form7stock VALUES("73","0000-00-00","KO962","AT263","NY","frozen","4up","","","","5","91");
-INSERT INTO form7stock VALUES("74","0000-00-00","KO962","AT263","NY","frozen","5up","","","","11","91");
-INSERT INTO form7stock VALUES("75","0000-00-00","KO962","AT263","NY","frozen","6up","","","","4","91");
-INSERT INTO form7stock VALUES("76","0000-00-00","KO962","AT263","NY","frozen","7up","","","","1","91");
-INSERT INTO form7stock VALUES("79","0000-00-00","KO962","AT263","NY","frozen","9up","","","","1","91");
-INSERT INTO form7stock VALUES("95","0000-00-00","MR163","AT268","NY","frozen","10up","","","","0","88");
-INSERT INTO form7stock VALUES("99","2023-09-19","HL123","NS123","Can","frozen","2up","100","163.4","","10","0");
-INSERT INTO form7stock VALUES("102","0000-00-00","HL123","NS123","Can","frozen","3up","","","","0","0");
-INSERT INTO form7stock VALUES("103","2023-09-19","SB263","MK1625","DAKA","tcl","2up","209.4","342.1596","","89","93");
-INSERT INTO form7stock VALUES("104","2023-09-19","HL123","DG214","DAKA","tcl","3up","100","163.4","","0","0");
+INSERT INTO form7stock VALUES("105","2023-10-10","KO962","KJ122","","frozen","3up","230","375.82","","0","94");
 
 
 
@@ -309,17 +301,18 @@ CREATE TABLE `general_ledger` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `date` date NOT NULL,
   `voucherno` varchar(25) NOT NULL,
-  `debit_ac_code` varchar(25) NOT NULL,
+  `ac_code` varchar(25) NOT NULL,
   `debit` int(11) NOT NULL,
-  `credit_ac_code` varchar(25) NOT NULL,
   `credit` int(11) NOT NULL,
+  `balance` int(11) NOT NULL,
   `narration` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO general_ledger VALUES("58","2023-10-05","AS263","500/0002","50000","500/0003","50000","car expanse");
-INSERT INTO general_ledger VALUES("59","2023-10-05","AS264","500/0001","300000","500/0004","300000","sold fish");
-INSERT INTO general_ledger VALUES("67","2023-10-07","AS266","500/0004","600000","500/0005","600000","Hello ,I\'m Baymax");
+INSERT INTO general_ledger VALUES("74","2023-10-10","AS261","ep-005","25000","0","0","car expense");
+INSERT INTO general_ledger VALUES("75","2023-10-10","AS261","ca-002","0","25000","0","car expense");
+INSERT INTO general_ledger VALUES("76","2023-10-10","AS262","r-002","15000000","0","0","car expense");
+INSERT INTO general_ledger VALUES("77","2023-10-10","AS262","ca-001","0","15000000","0","car expense");
 
 
 
@@ -862,58 +855,9 @@ CREATE TABLE `payable` (
   `balance` bigint(25) NOT NULL,
   `link_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=133 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=134 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO payable VALUES("57","DK123","2001","800000","0000-00-00","","0","800000","25");
-INSERT INTO payable VALUES("58","DK123","","0","2023-08-26","AP0001","500000","0","0");
-INSERT INTO payable VALUES("59","DK123","2001","3000000","0000-00-00","","0","3000000","26");
-INSERT INTO payable VALUES("60","DK123","","0","2023-08-26","AP0002","200000","0","0");
-INSERT INTO payable VALUES("62","DK123","2001","600000","0000-00-00","","0","2100000","28");
-INSERT INTO payable VALUES("64","DK123","","0","2023-08-26","AP0003","2400000","0","0");
-INSERT INTO payable VALUES("65","DK123","","0","2023-08-26","AP0004","100000","0","0");
-INSERT INTO payable VALUES("66","NS123","2002","200000","0000-00-00","","0","200000","29");
-INSERT INTO payable VALUES("67","NS123","2002","900000","0000-00-00","","0","1100000","30");
-INSERT INTO payable VALUES("68","NS123","","0","2023-08-26","AP0006","100000","0","0");
-INSERT INTO payable VALUES("69","KJ122","2008","250000","0000-00-00","","0","250000","31");
-INSERT INTO payable VALUES("70","KJ122","","0","2023-09-02","AP007","100000","0","0");
-INSERT INTO payable VALUES("71","DK123","1009","250000","0000-00-00","","0","250000","32");
-INSERT INTO payable VALUES("72","DK123","2009","1047000","0000-00-00","","0","1297000","33");
-INSERT INTO payable VALUES("73","DK123","","0","0000-00-00","","0","1297000","34");
-INSERT INTO payable VALUES("74","DG214","2009","1047000","0000-00-00","","0","2344000","35");
-INSERT INTO payable VALUES("75","NS123","2009","1047000","0000-00-00","","0","3391000","36");
-INSERT INTO payable VALUES("76","NS123","2009","1047000","0000-00-00","","0","4438000","37");
-INSERT INTO payable VALUES("77","NS123","2009","143000","0000-00-00","","0","4581000","38");
-INSERT INTO payable VALUES("78","NS123","2009","100000","0000-00-00","","0","4681000","39");
-INSERT INTO payable VALUES("79","NS123","2009","500000","0000-00-00","","0","5181000","40");
-INSERT INTO payable VALUES("80","NS123","2009","45000","0000-00-00","","0","5226000","41");
-INSERT INTO payable VALUES("81","HE132","2010","240000","0000-00-00","","0","5466000","42");
-INSERT INTO payable VALUES("82","JH123","2011","110000","0000-00-00","","0","5576000","43");
-INSERT INTO payable VALUES("83","JK909","2011","75000","0000-00-00","","0","5651000","44");
-INSERT INTO payable VALUES("84","JK909","2012","110000","0000-00-00","","0","5761000","45");
-INSERT INTO payable VALUES("85","NS123","2012","150000","0000-00-00","","0","5911000","46");
-INSERT INTO payable VALUES("86","KJ122","3021","756000","0000-00-00","","0","6667000","47");
-INSERT INTO payable VALUES("101","AT263","2890","0","0000-00-00","","0","6667000","62");
-INSERT INTO payable VALUES("102","AT263","2570","99800","0000-00-00","","0","6766800","63");
-INSERT INTO payable VALUES("103","AT263","4563","185350","0000-00-00","","0","6952150","64");
-INSERT INTO payable VALUES("104","AT263","3186","0","0000-00-00","","0","6952150","65");
-INSERT INTO payable VALUES("105","AT263","7352","0","0000-00-00","","0","6952150","66");
-INSERT INTO payable VALUES("106","AT263","6166","0","0000-00-00","","0","6952150","67");
-INSERT INTO payable VALUES("107","AT263","6329","0","0000-00-00","","0","6952150","68");
-INSERT INTO payable VALUES("108","AT263","4078","0","0000-00-00","","0","6952150","69");
-INSERT INTO payable VALUES("109","AT263","7938","0","0000-00-00","","0","6952150","70");
-INSERT INTO payable VALUES("112","MK1625","4232","19860","0000-00-00","","0","6972010","73");
-INSERT INTO payable VALUES("113","NS123","2620","260568","0000-00-00","","0","7232578","74");
-INSERT INTO payable VALUES("114","HE132","3155","313500","0000-00-00","","0","7546078","75");
-INSERT INTO payable VALUES("123","JK909","6807","250000","0000-00-00","","0","7796078","84");
-INSERT INTO payable VALUES("124","DK123","9972","99800","0000-00-00","","0","7895878","85");
-INSERT INTO payable VALUES("125","DK123","6486","185350","0000-00-00","","0","8081228","86");
-INSERT INTO payable VALUES("126","KJ122","1853","280000","0000-00-00","","0","8361228","87");
-INSERT INTO payable VALUES("127","AT268","1012","209400","0000-00-00","","0","8570628","88");
-INSERT INTO payable VALUES("128","AT268","6526","357500","0000-00-00","","0","8928128","89");
-INSERT INTO payable VALUES("129","AT263","6890","99800","0000-00-00","","0","9027928","90");
-INSERT INTO payable VALUES("130","AT263","9493","185350","0000-00-00","","0","9213278","91");
-INSERT INTO payable VALUES("131","DK123","52","150000","0000-00-00","","0","9363278","92");
-INSERT INTO payable VALUES("132","MK1625","422","209400","0000-00-00","","0","9572678","93");
+INSERT INTO payable VALUES("133","KJ122","1438","230000","0000-00-00","","0","9802678","94");
 
 
 
@@ -975,36 +919,12 @@ CREATE TABLE `purchase` (
   `price` int(11) NOT NULL,
   `amount` int(11) NOT NULL,
   PRIMARY KEY (`no`)
-) ENGINE=InnoDB AUTO_INCREMENT=94 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=95 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO purchase VALUES("25","2023-08-26","2001","DK123","frozen","HL123","10","200","0","4000","800000");
-INSERT INTO purchase VALUES("26","2023-08-26","2001","DK123","frozen","HG184","10","100","0","30000","3000000");
-INSERT INTO purchase VALUES("28","2023-08-26","2001","DK123","frozen","HG184","10","200","0","5000","1000000");
-INSERT INTO purchase VALUES("29","2023-08-26","2002","NS123","frozen","BJ123","10","100","0","2000","200000");
-INSERT INTO purchase VALUES("30","2023-08-26","2002","NS123","frozen","BJ123","10","100","0","9000","900000");
-INSERT INTO purchase VALUES("31","2023-09-27","2008","KJ122","frozen","UT216","10","50","5","5000","250000");
-INSERT INTO purchase VALUES("32","2023-09-06","1009","DK123","frozen","BJ123","1up","50","0","5000","250000");
-INSERT INTO purchase VALUES("37","2023-09-06","2009","NS123","frozen","KJ243","3up","209.4","89","5000","1047000");
-INSERT INTO purchase VALUES("38","2023-09-06","2009","NS123","frozen","KJ243","4up","357.5","79","400","143000");
-INSERT INTO purchase VALUES("39","2023-09-06","2009","NS123","frozen","UT216","2up","200","50","500","100000");
-INSERT INTO purchase VALUES("40","2023-09-06","2009","NS123","frozen","UT216","5up","100","100","5000","500000");
-INSERT INTO purchase VALUES("41","2023-09-06","2009","NS123","frozen","HL123","1up","45","20","1000","45000");
-INSERT INTO purchase VALUES("42","2023-09-07","2010","HE132","frozen","OJ247","3up","200","50","1200","240000");
-INSERT INTO purchase VALUES("43","2023-09-07","2011","JH123","frozen","HG184","2up","100","0","1100","110000");
-INSERT INTO purchase VALUES("44","2023-09-09","2011","JK909","frozen","HL123","4up","75","0","1000","75000");
-INSERT INTO purchase VALUES("45","2023-09-09","2012","JK909","frozen","HL123","3up","100","0","1100","110000");
-INSERT INTO purchase VALUES("46","2023-09-08","2012","NS123","frozen","HL123","6up","150","0","1100","165000");
-INSERT INTO purchase VALUES("47","2023-09-12","3021","KJ122","frozen","UT216","5up","280","0","2700","756000");
-INSERT INTO purchase VALUES("84","2023-09-16","6807","JK909","frozen","KO962","3up","250","0","1000","250000");
-INSERT INTO purchase VALUES("85","2023-09-15","9972","DK123","frozen","KO962","2up","99.8","0","1000","99800");
-INSERT INTO purchase VALUES("86","2023-09-15","6486","DK123","frozen","KO962","3up","185.35","0","1000","185350");
-INSERT INTO purchase VALUES("87","2023-09-16","1853","KJ122","frozen","HL123","5up","280","0","1000","280000");
-INSERT INTO purchase VALUES("88","2023-09-16","1012","AT268","frozen","MR163","3up","209.4","0","1000","209400");
-INSERT INTO purchase VALUES("89","2023-09-16","6526","AT268","frozen","MR163","4up","357.5","0","1000","357500");
-INSERT INTO purchase VALUES("90","2023-09-10","6890","AT263","frozen","KO962","2up","99.8","0","1000","99800");
 INSERT INTO purchase VALUES("91","2023-09-10","9493","AT263","frozen","KO962","3up","185.35","0","1000","185350");
-INSERT INTO purchase VALUES("92","2023-09-11","52","DK123","frozen","BJ123","3up","150","0","1000","150000");
+INSERT INTO purchase VALUES("92","2023-09-11","52","AT268","frozen","BJ123","3up","150","0","1000","150000");
 INSERT INTO purchase VALUES("93","2023-09-19","422","MK1625","tcl","SB263","2up","209.4","0","1000","209400");
+INSERT INTO purchase VALUES("94","2023-10-10","1438","KJ122","frozen","KO962","3up","230","0","1000","230000");
 
 
 
@@ -1022,10 +942,8 @@ CREATE TABLE `receivable` (
   `paid_amount` int(11) NOT NULL,
   `balance` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO receivable VALUES("60","0000-00-00","","","","0000-00-00","","","0","0");
-INSERT INTO receivable VALUES("64","2023-10-07","SAF-15/2023","TEMU-9312350","200","0000-00-00","","","0","200");
 
 
 
@@ -1088,64 +1006,12 @@ CREATE TABLE `supplier` (
   `supplier_address` varchar(255) COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO supplier VALUES("DK123","Naung Naung","09123123","Mandalay");
-INSERT INTO supplier VALUES("NS123","Tun Naing","0923423423","Yangon");
-INSERT INTO supplier VALUES("DG214","Thaung Htun","09234234","Mandalay");
-INSERT INTO supplier VALUES("KJ122","Soe Naing","09342124","Nay Pyi Daw");
-INSERT INTO supplier VALUES("OP123","Pho Zaw","092342342","Ayar Wa Di");
-INSERT INTO supplier VALUES("HE132","Bar Bulay","09123123","India");
-INSERT INTO supplier VALUES("KJ126","Soe Thain","091324124","Na Kya Pa Noung");
-INSERT INTO supplier VALUES("JK909","Phyo Lay","09976476","Nay Pyi Daw");
-INSERT INTO supplier VALUES("KJ234","Ko Myo","0938757878","Ka Chin");
-INSERT INTO supplier VALUES("KH122","Soe Myint","09234234","Mandalay");
-INSERT INTO supplier VALUES("JH123","Thar Hla","0924234345","Thi Li Lin Kar");
-INSERT INTO supplier VALUES("DK123","Naung Naung","09123123","Mandalay");
-INSERT INTO supplier VALUES("NS123","Tun Naing","0923423423","Yangon");
-INSERT INTO supplier VALUES("DG214","Thaung Htun","09234234","Mandalay");
-INSERT INTO supplier VALUES("KJ122","Soe Naing","09342124","Nay Pyi Daw");
-INSERT INTO supplier VALUES("OP123","Pho Zaw","092342342","Ayar Wa Di");
-INSERT INTO supplier VALUES("HE132","Bar Bulay","09123123","India");
-INSERT INTO supplier VALUES("KJ126","Soe Thain","091324124","Na Kya Pa Noung");
-INSERT INTO supplier VALUES("JK909","Phyo Lay","09976476","Nay Pyi Daw");
-INSERT INTO supplier VALUES("KJ234","Ko Myo","0938757878","Ka Chin");
-INSERT INTO supplier VALUES("KH122","Soe Myint","09234234","Mandalay");
-INSERT INTO supplier VALUES("JH123","Thar Hla","0924234345","Thi Li Lin Kar");
-INSERT INTO supplier VALUES("DK123","Naung Naung","09123123","Mandalay");
-INSERT INTO supplier VALUES("NS123","Tun Naing","0923423423","Yangon");
-INSERT INTO supplier VALUES("DG214","Thaung Htun","09234234","Mandalay");
-INSERT INTO supplier VALUES("KJ122","Soe Naing","09342124","Nay Pyi Daw");
-INSERT INTO supplier VALUES("OP123","Pho Zaw","092342342","Ayar Wa Di");
-INSERT INTO supplier VALUES("HE132","Bar Bulay","09123123","India");
-INSERT INTO supplier VALUES("KJ126","Soe Thain","091324124","Na Kya Pa Noung");
-INSERT INTO supplier VALUES("JK909","Phyo Lay","09976476","Nay Pyi Daw");
-INSERT INTO supplier VALUES("KJ234","Ko Myo","0938757878","Ka Chin");
-INSERT INTO supplier VALUES("KH122","Soe Myint","09234234","Mandalay");
-INSERT INTO supplier VALUES("JH123","Thar Hla","0924234345","Thi Li Lin Kar");
-INSERT INTO supplier VALUES("DK123","Naung Naung","09123123","Mandalay");
-INSERT INTO supplier VALUES("NS123","Tun Naing","0923423423","Yangon");
-INSERT INTO supplier VALUES("DG214","Thaung Htun","09234234","Mandalay");
-INSERT INTO supplier VALUES("KJ122","Soe Naing","09342124","Nay Pyi Daw");
-INSERT INTO supplier VALUES("OP123","Pho Zaw","092342342","Ayar Wa Di");
-INSERT INTO supplier VALUES("HE132","Bar Bulay","09123123","India");
-INSERT INTO supplier VALUES("KJ126","Soe Thain","091324124","Na Kya Pa Noung");
-INSERT INTO supplier VALUES("JK909","Phyo Lay","09976476","Nay Pyi Daw");
-INSERT INTO supplier VALUES("KJ234","Ko Myo","0938757878","Ka Chin");
-INSERT INTO supplier VALUES("KH122","Soe Myint","09234234","Mandalay");
-INSERT INTO supplier VALUES("JH123","Thar Hla","0924234345","Thi Li Lin Kar");
-INSERT INTO supplier VALUES("DK123","Naung Naung","09123123","Mandalay");
-INSERT INTO supplier VALUES("NS123","Tun Naing","0923423423","Yangon");
-INSERT INTO supplier VALUES("DG214","Thaung Htun","09234234","Mandalay");
-INSERT INTO supplier VALUES("KJ122","Soe Naing","09342124","Nay Pyi Daw");
-INSERT INTO supplier VALUES("OP123","Pho Zaw","092342342","Ayar Wa Di");
-INSERT INTO supplier VALUES("HE132","Bar Bulay","09123123","India");
-INSERT INTO supplier VALUES("KJ126","Soe Thain","091324124","Na Kya Pa Noung");
-INSERT INTO supplier VALUES("JK909","Phyo Lay","09976476","Nay Pyi Daw");
-INSERT INTO supplier VALUES("KJ234","Ko Myo","0938757878","Ka Chin");
-INSERT INTO supplier VALUES("KH122","Soe Myint","09234234","Mandalay");
-INSERT INTO supplier VALUES("JH123","Thar Hla","0924234345","Thi Li Lin Kar");
 INSERT INTO supplier VALUES("AT263","A Thay Lay","09523423234","Yangon");
 INSERT INTO supplier VALUES("MK1625","Market","","Kyi Myin Taing");
 INSERT INTO supplier VALUES("AT268","Aung Htike","0953245678","Yangon");
+INSERT INTO supplier VALUES("DK123","Naung Naung","09345235235","yangon");
+INSERT INTO supplier VALUES("NS123","Tun Naing","09128787987","Mandalay");
+INSERT INTO supplier VALUES("KJ122","Soe Naing","09987856461","Yangon");
 
 
 
@@ -1217,16 +1083,12 @@ CREATE TABLE `transaction` (
   `sr_no` varchar(25) NOT NULL,
   `container_no` varchar(25) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=187 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=195 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO transaction VALUES("168","2023-10-05","AS263","500/0002","car expanse","50000","0","mmk","","");
-INSERT INTO transaction VALUES("169","2023-10-05","AS263","500/0003","car expanse","0","50000","mmk","","");
-INSERT INTO transaction VALUES("172","2023-10-05","AS264","500/0001","sold fish","300000","0","usd","","");
-INSERT INTO transaction VALUES("173","2023-10-05","AS264","500/0004","sold fish","0","300000","usd","SAF-15/2023","TEMU-9312350");
-INSERT INTO transaction VALUES("177","2023-10-06","AS265","500/0002","car expanse","50000","0","mmk","","");
-INSERT INTO transaction VALUES("178","2023-10-06","AS265","500/0003","car expanse","0","50000","mmk","","");
-INSERT INTO transaction VALUES("185","2023-10-07","AS266","500/0004","Hello ,I\'m Baymax","600000","0","usd","SAF-15/2023","TEMU-9312350");
-INSERT INTO transaction VALUES("186","2023-10-07","AS266","500/0005","Hello ,I\'m Baymax","0","600000","usd","","");
+INSERT INTO transaction VALUES("191","2023-10-10","AS261","ep-005","car expense","25000","0","mmk","","");
+INSERT INTO transaction VALUES("192","2023-10-10","AS261","ca-002","car expense","0","25000","mmk","","");
+INSERT INTO transaction VALUES("193","2023-10-10","AS262","r-002","car expense","15000000","0","usd","","");
+INSERT INTO transaction VALUES("194","2023-10-10","AS262","ca-001","car expense","0","15000000","usd","","");
 
 
 
@@ -1443,7 +1305,7 @@ CREATE TABLE `userlogs` (
   `login_password` varchar(125) NOT NULL,
   `status` varchar(55) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO userlogs VALUES("1","10:26:18.000000","2023-09-18","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("2","10:31:25.000000","2023-09-18","admin","admin","Login Success");
@@ -1487,6 +1349,12 @@ INSERT INTO userlogs VALUES("39","11:55:08.000000","2023-10-07","admin","admin",
 INSERT INTO userlogs VALUES("40","11:56:23.000000","2023-10-07","Myat Thu","myatthu","Login Success");
 INSERT INTO userlogs VALUES("41","11:56:37.000000","2023-10-07","Myat Thu","myatthu","Login Success");
 INSERT INTO userlogs VALUES("42","11:58:28.000000","2023-10-07","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("43","11:31:45.000000","2023-10-09","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("44","03:35:06.000000","2023-10-09","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("45","03:50:17.000000","2023-10-09","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("46","06:27:31.000000","2023-10-09","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("47","06:32:04.000000","2023-10-09","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("48","10:52:06.000000","2023-10-10","admin","admin","Login Success");
 
 
 

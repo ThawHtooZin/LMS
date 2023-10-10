@@ -160,7 +160,7 @@ $query = new Query();
                         </div>
                         <div class="col">
                           <label>A/C Type</label>
-                          <select class="form-control inpv2 mb-s" name="ac_type">
+                          <select class="form-control inpv2 mb-s" name="ac_type" id="chzn-select">
                             <?php
                               $actypedatas = $query->selectall('actype');
                              foreach ($actypedatas as $actypedata): ?>
