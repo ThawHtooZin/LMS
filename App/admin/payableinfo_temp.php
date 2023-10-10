@@ -32,14 +32,16 @@ $query = new Query();
     }
      ?>
     <div class="row">
-      <div class="col-2">
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
       </div>
-      <div class="col-10">
+      <div class="contentcol" id="content">
+        <?php require 'navbar.php'; ?>
         <div class="card mt-3">
           <div class="card-header bg-warning text-light"  style="padding:-10px;">
+
             <h5>Payable Detail Info</h5>
           </div>
           <div class="card-body">

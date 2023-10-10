@@ -55,17 +55,21 @@ $query = new Query();
     }
      ?>
     <div class="row">
-      <div class="col-2">
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
       </div>
-      <div class="col-10">
+      <div class="contentcol" id="content">
+        <?php require 'navbar.php'; ?>
         <div class="card">
           <form  action="" method="post">
+
           <div class="card-header bg-info">
             <?php
-            if(isset($_POST['actualinvoicebtn'])){
+            if(empty($_SESSION['tabs']) || $_SESSION['tabs'] != 'actualinvoice' || $_SESSION['tabs'] != 'actualpackinglist' || $_SESSION['tabs'] != 'foambox' || $_SESSION['tabs'] != 'declare'){
+              $_SESSION['tabs'] = 'default';
+            }elseif(isset($_POST['actualinvoicebtn'])){
               $_SESSION['tabs'] = 'actualinvoice';
             }elseif(isset($_POST['actualinvoiceback'])){
               $_SESSION['tabs'] = 'actualpackinglist';
@@ -73,8 +77,6 @@ $query = new Query();
               $_SESSION['tabs'] = 'foambox';
             }elseif(isset($_POST['declarebtn'])){
               $_SESSION['tabs'] = 'declare';
-            }elseif(empty($_SESSION['tabs']) || $_SESSION['tabs'] == ''){
-              $_SESSION['tabs'] = 'default';
             }
              ?>
                 <span class=" text-light" id="fbtext" style="font-size:20px; font-weight:bold;">Foam Box</span>

@@ -23,13 +23,14 @@ $query = new Query();
   <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
   <body>
     <div class="row">
-      <div class="col-2">
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
       </div>
-      <div class="col-10" style="margin-top: 200px;">
-        <div class="row">
+      <div class="contentcol">
+        <?php require 'navbar.php'; ?>
+        <div class="row" style="padding-top: 200px;">
           <div class="col text-center">
             <a href="choosedaterange.php" class="btn btn-default border border-3" style="padding: 100px !important;">Date Range Cold Store Charge</a>
           </div>

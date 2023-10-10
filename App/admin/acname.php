@@ -48,12 +48,13 @@ $query = new Query();
     }
      ?>
     <div class="row">
-      <div class="col-2">
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
       </div>
-      <div class="col-10">
+      <div class="contentcol" id="content">
+        <?php require 'navbar.php'; ?>
         <div class="card">
           <div class="card-header bg-info text-light">
             <b style="font-size:18px;">Manage A/C Name</b>
@@ -159,7 +160,7 @@ $query = new Query();
                         </div>
                         <div class="col">
                           <label>A/C Type</label>
-                          <select class="form-control inpv2 mb-s" name="ac_type">
+                          <select class="form-control inpv2 mb-s" name="ac_type" id="chzn-select">
                             <?php
                               $actypedatas = $query->selectall('actype');
                              foreach ($actypedatas as $actypedata): ?>

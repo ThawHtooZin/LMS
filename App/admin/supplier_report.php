@@ -23,14 +23,16 @@ $query = new Query();
   <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
   <body>
     <div class="row">
-      <div class="col-2">
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
       </div>
-      <div class="col-10">
+      <div class="contentcol" id="content">
+        <?php require 'navbar.php'; ?>
         <div class="card mt-3">
           <div class="card-header bg-warning text-light"  style="padding:-10px;">
+
             <h5 class="d-inline">Supplier Report</h5> <a href="supplier.php" class="btn btn-secondary float-end">Back</a>
           </div>
           <div class="card-body">

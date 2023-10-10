@@ -44,12 +44,13 @@ $query = new Query();
     }
      ?>
     <div class="row">
-      <div class="col-2">
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
       </div>
-      <div class="col-10">
+      <div class="contentcol" id="content">
+        <?php require 'navbar.php'; ?>
         <div class="card">
           <div class="card-header bg-info text-light">
             <b style="font-size:18px;">Manage A/C Type</b>
@@ -64,10 +65,12 @@ $query = new Query();
               </tr>
               <?php
               $datas = $query->selectall('actype');
+              $idd = 0;
               foreach ($datas as $data) {
+                $idd++;
               ?>
               <tr data-bs-toggle='modal' data-bs-target="#updatemodal<?php echo $data['acid']; ?>">
-                <td><?php echo $data['acid']; ?></td>
+                <td><?php echo $idd; ?></td>
                 <td><?php echo $data['ac_type']; ?></td>
               </tr>
               <div class="modal fade" id="updatemodal<?php echo $data['acid'];  ?>" tabindex="-1" role="dialog"  style="margin-left:auto !important; margin-right: auto !important;">

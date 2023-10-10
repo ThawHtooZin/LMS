@@ -51,14 +51,16 @@ $query = new Query();
     }
      ?>
     <div class="row">
-      <div class="col-2">
+      <div class="sidebarcol" id="sidebar">>
         <?php
         include 'sidebar.php';
         ?>
       </div>
-      <div class="col-10">
+      <div class="contentcol" id="content">
+        <?php require 'navbar.php'; ?>
         <div class="card">
           <div class="card-header bg-secondary">
+
             <span class=" text-light" id="pltext" style="font-size:20px; font-weight:bold;">Invoice Costing</span>
             <span class=" text-light hide" id="itext" style="font-size:20px; font-weight:bold;">Profit Or Loss</span>
             <button type="button" class="btn btn-info text-light float-end btn-sm " id="invoicecosting">Profit Or Loss</button>

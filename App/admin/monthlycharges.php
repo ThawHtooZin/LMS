@@ -91,7 +91,7 @@ $query = new Query();
 
      ?>
     <div class="row">
-      <div class="col-2">
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
@@ -111,9 +111,11 @@ $query = new Query();
         $_SESSION['tabs'] = "totalamountbalance";
       }
        ?>
-      <div class="col-10">
+      <div class="contentcol" id="content">
+        <?php require 'navbar.php'; ?>
         <div class="card">
           <div class="card-header bg-info text-light">
+
             <h4 class="d-inline">Monthly Cold Store Charges</h4>
             <button type="submit" class="btn btn-success float-end addfishcharges" data-bs-toggle="modal" data-bs-target="#addfishcharges" name="fishcoldstorebtn">Add Fish Charges</button>
             <button type="submit" class="btn btn-success float-end hide adddryfishcharges" data-bs-toggle="modal" data-bs-target="#adddryfishcharges" name="dryfishcoldstorebtn">Add Dry Fish Charges</button>

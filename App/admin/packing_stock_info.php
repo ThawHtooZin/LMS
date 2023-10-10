@@ -58,14 +58,17 @@ $query = new Query();
     }
      ?>
     <div class="row">
-      <div class="col-2">
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
       </div>
-      <div class="col-10">
+      <div class="contentcol" id="content">
+        <?php require 'navbar.php'; ?>
         <div class="card">
           <form  action="" method="post">
+
+
           <div class="card-header bg-info">
             <?php
             if(isset($_POST['actualinvoicebtn'])){

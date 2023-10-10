@@ -38,14 +38,16 @@ $query = new Query();
       }
     ?>
     <div class="row">
-      <div class="col-2">
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
       </div>
-      <div class="col-10">
+      <div class="contentcol" id="content">
+        <?php require 'navbar.php'; ?>
         <div class="card">
           <div class="card-header bg-primary">
+
             <b class="text-light">Manage Role</b>
             <button type="button" class="btn btn-success float-end btn-sm" data-bs-toggle="modal" data-bs-target="#addrolemodal">Add Role</button>
           </div>

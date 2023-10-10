@@ -40,14 +40,16 @@ $query = new Query();
 
      ?>
     <div class="row">
-      <div class="col-2">
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
       </div>
-      <div class="col-10">
+      <div class="contentcol" id="content">
+        <?php require 'navbar.php'; ?>
         <div class="card">
           <div class="card-header bg-success">
+
             <b class="text-light">Truck Packing Material Charges</b>
             <a href="truck_packing_stock.php" class="btn btn-danger btn-sm ms-2 float-end">Back</a>
             <button type="button" name="button" data-bs-toggle="modal" data-bs-target="#addmodal" class="btn btn-info btn-sm float-end text-light">Add</button>

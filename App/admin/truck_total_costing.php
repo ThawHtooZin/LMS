@@ -63,19 +63,17 @@ $query = new Query();
     }
      ?>
     <div class="row">
-      <div class="col-2">
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
       </div>
-
-      <?php
-
-       ?>
-      <div class="col-10">
+      <div class="contentcol" id="content">
+        <?php require 'navbar.php'; ?>
         <div class="card">
           <form action="" method="post">
             <div class="card-header bg-secondary">
+
               <span class=" text-light" id="tctext" style="font-size:20px; font-weight:bold;">Total Costing</span>
               <a href="#profit" class="btn btn-info text-light float-end btn-sm">Profit</a>
               <button type="submit" class="btn btn-info text-light float-end btn-sm hide" id="totalcostingbtn" name="totalcostingbtn">Total Costing</button>

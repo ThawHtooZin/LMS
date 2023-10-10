@@ -51,16 +51,18 @@ $query = new Query();
 
      ?>
     <div class="row">
-      <div class="col-2">
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
       </div>
-      <div class="col-10">
+      <div class="contentcol" id="content">
+        <?php require 'navbar.php'; ?>
         <div class="card mt-1">
             <div class="card-header bg-warning text-secondary"  style="padding:-10px;">
               <form action="" method="post">
-              <b>Link Mark Limited (F-10)</b>
+
+                <b>Link Mark Limited (F-10)</b>
               <button type="button" class="btn btn-success btn-sm float-end" data-bs-toggle="modal" data-bs-target="#addmodal">Add Form-10 Data</button>
               <button type="submit" name="searchbtn2" class="btn btn-secondary btn-sm float-end me-2">View</button>
               <select name="type" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 17% !important; height: 32px !important; padding-top: 0.5px !important;">

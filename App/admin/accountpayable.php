@@ -32,12 +32,13 @@ $query = new Query();
     }
      ?>
     <div class="row">
-      <div class="col-2">
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
       </div>
-      <div class="col-10">
+      <div class="contentcol" id="content">
+        <?php require 'navbar.php'; ?>
         <div class="card">
           <div class="card-header bg-warning text-light">
             <h5>Payable Detail Info</h5>
@@ -125,8 +126,8 @@ $query = new Query();
                 <!-- <th>Action</th> -->
               </tr>
               <?php
+              // $idd = 0;
               foreach ($payabledatas as $payabledata) {
-
                 $supplier = $query->select('payable', $payabledata['supplier_id'] , 'supplier_id');
                 $supplier_name = $query->select('supplier', $supplier['supplier_id'], 'supplier_id');
                 $linkstmt = $pdo->prepare("SELECT link_id FROM payable WHERE ");
@@ -134,7 +135,7 @@ $query = new Query();
               ?>
               <tr>
 
-                <td><?php echo $payabledata['id']; ?></td>
+                <!-- <td><?php //echo $idd; ?></td> -->
                 <td><?php if(!empty($payabledata['purchase_voucher_no'])){ echo $supplier_name['supplier_name']; }; ?></td>
                 <td><?php echo $payabledata['purchase_voucher_no']; ?></td>
                 <td><?php if(!empty($payabledata['purchase_amount'])){ echo $payabledata['purchase_amount'];}; ?></td>

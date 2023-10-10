@@ -20,12 +20,13 @@ $query = new Query();
   ?>
   <body>
     <div class="row">
-      <div class="col-2">
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
       </div>
-      <div class="col-10">
+      <div class="contentcol" id="content">
+        <?php require 'navbar.php'; ?>
         <div class="card">
           <div class="card-header bg-warning text-light"  style="padding:-10px;">
             <h5>Manage Category</h5>

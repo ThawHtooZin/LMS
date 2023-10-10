@@ -94,14 +94,16 @@ $query = new Query();
 
      ?>
     <div class="row">
-      <div class="col-2">
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
       </div>
-      <div class="col-10" style="">
+      <div class="contentcol" style="">
+        <?php require 'navbar.php'; ?>
         <div class="card">
           <div class="card-header bg-info text-light">
+
             <h4 class="d-inline">MSL Date Range Cold Store Charges</h4>
             <button type="submit" class="btn btn-success float-end addnewstock" data-bs-toggle="modal" data-bs-target="#newstock">Add New Stock</button>
             <button type="submit" class="btn btn-success float-end addnewcharges" data-bs-toggle="modal" data-bs-target="#newcharges">Add New Charges</button>

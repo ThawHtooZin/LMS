@@ -42,8 +42,60 @@ class Bootstrap
   function css()
   {
     echo '
-      <link rel="stylesheet" href="../../Resources\bootstrap-5.3.1-dist\css\bootstrap.min.css">
+    <link rel="stylesheet" href="../../Resources\bootstrap-5.3.1-dist\css\bootstrap.min.css">
+    <script type="text/javascript">
+    setInterval(function() {
+    var currentTime = new Date ( );
+    var currentHours = currentTime.getHours ( );
+    var currentMinutes = currentTime.getMinutes ( );
+    var currentSeconds = currentTime.getSeconds ( );
+    currentMinutes = ( currentMinutes < 10 ? "0" : "" ) + currentMinutes;
+    currentSeconds = ( currentSeconds < 10 ? "0" : "" ) + currentSeconds;
+    var timeOfDay = ( currentHours < 12 ) ? "AM" : "PM";
+    currentHours = ( currentHours > 12 ) ? currentHours - 12 : currentHours;
+    currentHours = ( currentHours == 0 ) ? 12 : currentHours;
+    var currentTimeString = currentHours + ":" + currentMinutes + ":" + currentSeconds + " " + timeOfDay;
+    document.getElementById("timer").innerHTML = currentTimeString;
+    }, 100);
+    </script>
       <style>
+      *{
+        font-size: 13px;
+      }
+      row{
+        padding: 0px !important;
+      }
+      #content > .card > .card-header > #menu{
+        display:inline !important;
+      }
+      #content > .card > .card-header > h4{
+        display:inline !important;
+      }
+      #content > .card > .card-header > h5{
+        display:inline !important;
+      }
+      #content > .card > .card-header > p{
+        display:inline !important;
+      }
+      #content > .card > .card-header > b{
+        display:inline !important;
+      }
+
+      #content > .card > .card-header > button{
+        color:white;
+      }
+      #content > .card > .card-header > form > button{
+        color:white;
+      }
+      #content > .card > form > .card-header> button{
+        color:white;
+      }
+      #sidebar {
+        transition: all 0.5s ease;
+      }
+      #content{
+        transition: all 0.5s ease;
+      }
       ::-webkit-scrollbar {
         width: 10px;
       }
@@ -55,9 +107,22 @@ class Bootstrap
         background:rgba(0,0,0,0.3) !important;
         border-radius: 5px !important;
       }
+      .arrow {
+        float:right;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        display: inline;
+        margin-top:8px;
+        padding: 1.8px;
+      }
+      .arrdown{
+        transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+      }
         .h:hover{
-          color:  black !important;
-          background:  rgb(254, 254, 51, 0.9);
+          color:  white !important;
+          boder-radius: 1px !important;
+          background:  rgb(22, 172, 170);
           // #ffff33
         }
         .row{
@@ -91,17 +156,31 @@ class Bootstrap
         .table>tbody>tr>*{
           background-color: transparent !important;
         }
-        .col-2{
-          width: 16%;
-        }
-        .col-10{
-          width: 84%;
-        }
         .modal-content{
           border-radius: 0 !important;
         }
         .modal-header{
           border-radius: 0 !important;
+        }
+        .sidebarcol{
+          position:absolute;
+          height: 100%;
+          width: 16% !important;
+        }
+        .contentcol{
+          left: 197px;
+          position:absolute;
+          width: 85.5% !important;
+        }
+        .contentfullcol{
+          left: 44px;
+          position:absolute;
+          width: 96% !important;
+        }
+        .sidebarnocol{
+          position:absolute;
+          height: 100%;
+          width: 4.8% !important;
         }
       </style>
       <script src="../../Resources/sweetalert.js" charset="utf-8"></script>
@@ -124,13 +203,53 @@ class Bootstrap
       $(".chzn-select").chosen();
     });
 
+
     // (function(e){
     //   let h3 = document.getElementsByTagName("h3");
     //   let stm = e.target.dataset.num;
     //   console.log(stm);
     // })();
     </script>
+
     ';
+    ?>
+    <script type="text/javascript">
+    var myVariable = false;
+    function toggleVariable() {
+      myVariable = !myVariable;
+      return myVariable;
+    }
+    $('#menu').on('click', function(){
+      var newValue = toggleVariable();
+      if(newValue === false){
+        setTimeout(function(){
+          $("#navtitle").animate({
+            opacity: "show",
+            padding: "show"
+          }, "normal");
+          $("span#navname").animate({
+            opacity: "show",
+            padding: "show"
+          }, "normal");
+          $('.arrow').show("slow");
+        }, 500);
+        $('#sidebar').toggleClass('sidebarcol sidebarnocol');
+        $('#thenavbar').slideToggle(800);
+        // $('#sidebarlink').removeAttr('disabled');
+      }else{
+        // $('#sidebarlink').attr('disabled', true);
+        $('#sidebar').toggleClass('sidebarcol sidebarnocol', 1000);
+        $("#navtitle").hide();
+        $('#menu').css('height', 82, '%');
+        $("span#navname").hide();
+        $('.arrow').hide();
+        $('#thenavbar').slideToggle(500);
+      }
+      $('#content').toggleClass('contentcol contentfullcol');
+    });
+    $('.table').removeClass('table-bordered');
+    </script>
+    <?php
   }
 
 }

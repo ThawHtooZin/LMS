@@ -56,14 +56,16 @@ $query = new Query();
     }
      ?>
     <div class="row">
-      <div class="col-2">
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
       </div>
-      <div class="col-10">
+      <div class="contentcol" id="content">
+        <?php require 'navbar.php'; ?>
         <div class="card mt-1">
           <div class="card-header bg-info">
+
             <h5 style="font-weight:bold;" class="text-light d-inline">GFC MC STOCK</h5>
             <button type="button" class="btn btn-danger float-end ms-2" data-bs-toggle="modal" data-bs-target="#export">Export Mc</button>
           </div>
