@@ -130,7 +130,7 @@ class Bootstrap
           margin-left: -12px !important;
         }
         th{
-          background-color: #D9D9D9 !important;
+          background-color: black !important;
         }
         tr.info>*{
            background-color:lightblue !important;
@@ -138,7 +138,7 @@ class Bootstrap
         .inpv2{
           border: 1px solid gray !important;
         }
-        .table-hover>tbody>tr:hover>*{
+        .table>tbody>tr:hover>*{
           background-color: rgb(0,0,0,0.1) !important;
           color:black;
         }
@@ -214,6 +214,31 @@ class Bootstrap
     ';
     ?>
     <script type="text/javascript">
+    <?php
+    $_SESSION['isSidebarOpen'] = true;
+    ?>
+    var isSidebarOpen = <?php echo isset($_SESSION['isSidebarOpen']) && $_SESSION['isSidebarOpen'] ? 'true' : 'false'; ?>;
+    if (isSidebarOpen) {
+      $('#sidebar').toggleClass('sidebarcol sidebarnocol', 1000);
+      $("#navtitle").hide();
+      $('#menu').css('height', 82, '%');
+      $("span#navname").hide();
+      $('.arrow').hide();
+      $('#thenavbar').slideToggle(500);
+      $('#content').toggleClass('contentcol contentfullcol');
+    } else {
+      $("#navtitle").animate({
+        opacity: "show",
+        padding: "show"
+      }, "normal");
+      $("span#navname").animate({
+        opacity: "show",
+        padding: "show"
+      }, "normal");
+      $('.arrow').show("slow");
+      $('#sidebar').toggleClass('sidebarcol sidebarnocol');
+      $('#thenavbar').slideToggle(800);
+    }
     var myVariable = false;
     function toggleVariable() {
       myVariable = !myVariable;
@@ -221,7 +246,7 @@ class Bootstrap
     }
     $('#menu').on('click', function(){
       var newValue = toggleVariable();
-      if(newValue === false){
+      if(newValue === true){
         setTimeout(function(){
           $("#navtitle").animate({
             opacity: "show",
@@ -236,6 +261,7 @@ class Bootstrap
         $('#sidebar').toggleClass('sidebarcol sidebarnocol');
         $('#thenavbar').slideToggle(800);
         // $('#sidebarlink').removeAttr('disabled');
+        var isSidebarOpen = '<?php echo $_SESSION['isSidebarOpen'] = false; ?>';
       }else{
         // $('#sidebarlink').attr('disabled', true);
         $('#sidebar').toggleClass('sidebarcol sidebarnocol', 1000);
@@ -248,6 +274,7 @@ class Bootstrap
       $('#content').toggleClass('contentcol contentfullcol');
     });
     $('.table').removeClass('table-bordered');
+    $('th').css('background-color', 'black');
     </script>
     <?php
   }

@@ -2534,16 +2534,26 @@ Class Query{
       $voucher_no = $transactiondata['voucher_no'];
       $description = $transactiondata['description'];
       if (empty($transactiondata['debit'])) {
+        $acceptcheckstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$ac_code' AND credit=''");
+        $acceptcheckstmt->execute();
+        $acceptcheck =$acceptcheckstmt->fetchall();
         $debit = 0;
         $credit = $transactiondata['credit'];
       }else{
+        $acceptcheckstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$ac_code' AND debit=''");
+        $acceptcheckstmt->execute();
+        $acceptcheck =$acceptcheckstmt->fetchall();
         $debit = $transactiondata['debit'];
         $credit = 0;
       }
       $balance = 0;
-      $generalledgerstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, balance, narration) VALUES('$date','$voucher_no','$ac_code', '$debit', '$credit', '$balance', '$description')");
-      $generalledgerstmt->execute();
-      echo "<script>swal('Success', 'Accepted Successfully', 'success');</script>";
+      if(!empty($acceptcheck)){
+        echo "<script>swal('Warning', 'Already Accepted', 'warning');</script>";
+      }else{
+        $generalledgerstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, balance, narration) VALUES('$date','$voucher_no','$ac_code', '$debit', '$credit', '$balance', '$description')");
+        $generalledgerstmt->execute();
+        echo "<script>swal('Success', 'Accepted Successfully', 'success');</script>";
+      }
     }
   }
 
@@ -2600,8 +2610,32 @@ Class Query{
       $searchstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE `date` BETWEEN '$date_from' AND '$date_to' AND ac_code='$ac_code'");
       $searchstmt->execute();
       return $searchdata = $searchstmt->fetchall();
-    }elseif(!empty($ac_code) && empty($date_from) && empty($date_to)){
+    }
+    if(!empty($ac_code) && empty($date_from) && empty($date_to)){
       return $this->search('general_ledger', 'ac_code', $ac_code);
+    }
+
+    // DATE RANGE STUFF
+    if(!empty($date_from) && !empty($date_to)){
+      $searchstmt = $pdo->prepare("SELECT * FROM general_ledger  WHERE `date` BETWEEN '$date_from' AND '$date_to'");
+      $searchstmt->execute();
+      return $searchdata = $searchstmt->fetchall();
+    }elseif(!empty($date_from) || !empty($date_to)){
+      if(!empty($date_from)){
+        $searchstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE `date`='$date_from'");
+      }else{
+        $searchstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE `date`='$date_to' ");
+      }
+      $searchstmt->execute();
+      return $searchdata = $searchstmt->fetchall();
+    }elseif(!empty($date_from) || !empty($date_to) && !empty($ac_code)){
+      if(!empty($date_from) && !empty($ac_code)){
+        $searchstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE `date`='$date_from' AND ac_code='$ac_code'");
+      }elseif(!empty($date_to) && !empty($ac_code)){
+        $searchstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE `date`='$date_to' AND ac_code='$ac_code'");
+      }
+      $searchstmt->execute();
+      return $searchdata = $searchstmt->fetchall();
     }else{
       return $this->selectdbw('general_ledger', $date_from, $date_to);
     }

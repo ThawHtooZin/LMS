@@ -53,11 +53,61 @@ $query = new Query();
                 $date_to = $_POST['date_to'];
                 $ac_code = $_POST['ac_code'];
 
-                $gldatas = $query->searchgeneralledger($date_from, $date_to, $ac_code);
+                if(!empty($date_from) && !empty($date_to) && empty($ac_code)){
+                  $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date` BETWEEN '$date_from' AND '$date_to'");
+                  $acnamecountstmt->execute();
+                  $acnamecount = $acnamecountstmt->fetchColumn();
+
+                }else{
+                  $acnamecount = 1;
+                  $acnamedontloop = true;
+                }
+                for ($i=0; $i < $acnamecount; $i++) {
+                  if($acnamedontloop != 1){
+                    $accodestmt = $pdo->prepare("SELECT DISTINCT ac_code FROM general_ledger");
+                    $accodestmt->execute();
+                    $accodedata = $accodestmt->fetchall();
+                    $accode = $accodedata[$i]['ac_code'];
+                    $gldatas = $query->searchgeneralledger($date_from, $date_to, $accode);
+                  }else {
+                    $gldatas = $query->searchgeneralledger($date_from, $date_to, $ac_code);
+                  }
+                  foreach($gldatas as $gldata) : ?>
+                    <?php
+                    $ac_code = $gldata['ac_code'];
+                    $acname = $query->select('acname', $ac_code, 'code_no');
+                     ?>
+                    <tr>
+                      <td><?php echo date('d/m/Y', strtotime($gldata['date'])); ?></td>
+                      <td><?php echo $gldata['voucherno']; ?></td>
+                      <td><?php echo $acname['ac_name']; ?></td>
+                      <td><?php echo $gldata['narration']; ?></td>
+                      <td><?php echo $gldata['debit']; ?></td>
+                      <td><?php echo $gldata['credit']; ?></td>
+                      <td><?php echo $gldata['balance']; ?></td>
+                    </tr>
+                  <?php endforeach;}
               }else{
-                $gldatas = $query->selectall('general_ledger');
-              }
+                $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger");
+                $acnamecountstmt->execute();
+                $acnamecount = $acnamecountstmt->fetchColumn();
+                for ($i=0; $i < $acnamecount; $i++) {
+                  $accodestmt = $pdo->prepare("SELECT DISTINCT ac_code FROM general_ledger");
+                  $accodestmt->execute();
+                  $accodedata = $accodestmt->fetchall();
+                  $accode = $accodedata[$i]['ac_code'];
+                $gldatas = $query->search('general_ledger', 'ac_code', $accode);
+                $acname = $query->select('acname', $accode, 'code_no');
                ?>
+               <!-- <tr>
+                 <td></td>
+                 <td></td>
+                 <td><?php echo $acname['ac_name']; ?></td>
+                 <td></td>
+                 <td></td>
+                 <td></td>
+                 <td></td>
+               </tr> -->
               <?php foreach($gldatas as $gldata) : ?>
                 <?php
                 $ac_code = $gldata['ac_code'];
@@ -73,6 +123,7 @@ $query = new Query();
                   <td><?php echo $gldata['balance']; ?></td>
                 </tr>
               <?php endforeach; ?>
+              <?php } } ?>
             </table>
           </div>
         </div>
@@ -122,6 +173,7 @@ $query = new Query();
     $bootstrap->javascript();
     ?>
     <script type="text/javascript">
+    let loadnumber = 1;
     $(document).ready(function(){
       $('#ac_code').on('keyup', function(){
         var ac_codepost = $('#ac_code').val();
@@ -138,8 +190,10 @@ $query = new Query();
       })
     });
     $(window).on('load', function(){
+      <?php if($_SERVER['REQUEST_METHOD'] != 'POST') : ?>
       $('#reportsmodal').modal('show');
       $('#table').hide();
+      <?php endif; ?>
     });
     </script>
   </body>
