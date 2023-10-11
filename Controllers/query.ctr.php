@@ -2471,56 +2471,6 @@ Class Query{
     $transactionstmt->execute();
     $transactiondatas = $transactionstmt->fetchall();
     foreach ($transactiondatas as $transactiondata) {
-      if($transactiondata['ac_code'] == '500/0004'){
-        $ac_name = $transactiondata['ac_code'];
-        $stmt = $pdo->prepare("SELECT * FROM transaction WHERE date='$date' AND ac_code='$ac_name'");
-        $stmt->execute();
-        $receivabledatas = $stmt->fetchall();
-        foreach ($receivabledatas as $receivabledata) {
-          $voucher_no = $receivabledata['voucher_no'];
-
-          if($receivabledata['debit'] != 0){
-            $debitorcredit = 'debit';
-            $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='$debitorcredit'");
-            $currencystmt->execute();
-            $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
-            $receivestmt = $pdo->prepare("SELECT * FROM receivable ORDER BY id DESC");
-            $receivestmt->execute();
-            $receivedata = $receivestmt->fetch(PDO::FETCH_ASSOC);
-            $invoice_amount = $currencydata['usd_amount'];
-            $balance = $currencydata['usd_amount'] + $receivedata['balance'];
-          }elseif($receivabledata['credit'] != 0){
-            $debitorcredit = 'credit';
-            $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='$debitorcredit'");
-            $currencystmt->execute();
-            $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
-            $receivestmt = $pdo->prepare("SELECT * FROM receivable ORDER BY id DESC");
-            $receivestmt->execute();
-            $receivedata = $receivestmt->fetch(PDO::FETCH_ASSOC);
-            if (!empty($receivedata['balance'])) {
-              $invoice_amount = $currencydata['usd_amount'];
-              $balance = $currencydata['usd_amount'] + $receivedata['balance'];
-            }else{
-              $invoice_amount = $currencydata['usd_amount'];
-              $balance = $currencydata['usd_amount'];
-            }
-          }
-
-          $sr_no = $receivabledata['sr_no'];
-          $container_no = $receivabledata['container_no'];
-          $receivestmt = $pdo->prepare("SELECT * FROM receivable WHERE date='$date'");
-          $receivestmt->execute();
-          $receivedata = $receivestmt->fetchall();
-          if(empty($receivedata)){
-            $receivestmt = $pdo->prepare("INSERT INTO receivable(date, sr_no, container_no, invoice_amount, balance) VALUES('$date', '$sr_no', '$container_no', '$invoice_amount', '$balance')");
-            $receivestmt->execute();
-          }else{
-            $accepterror = true;
-          }
-        }
-
-      }
-
       // $voucher_no = $transactiondata['voucher_no'];
       // $glstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE voucherno='$voucher_no'");
       // $glstmt->execute();
@@ -2534,26 +2484,58 @@ Class Query{
       $voucher_no = $transactiondata['voucher_no'];
       $description = $transactiondata['description'];
       if (empty($transactiondata['debit'])) {
-        $acceptcheckstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$ac_code' AND credit=''");
-        $acceptcheckstmt->execute();
-        $acceptcheck =$acceptcheckstmt->fetchall();
         $debit = 0;
         $credit = $transactiondata['credit'];
       }else{
-        $acceptcheckstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$ac_code' AND debit=''");
-        $acceptcheckstmt->execute();
-        $acceptcheck =$acceptcheckstmt->fetchall();
         $debit = $transactiondata['debit'];
         $credit = 0;
       }
       $balance = 0;
-      if(!empty($acceptcheck)){
-        echo "<script>swal('Warning', 'Already Accepted', 'warning');</script>";
-      }else{
-        $generalledgerstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, balance, narration) VALUES('$date','$voucher_no','$ac_code', '$debit', '$credit', '$balance', '$description')");
-        $generalledgerstmt->execute();
-        echo "<script>swal('Success', 'Accepted Successfully', 'success');</script>";
-      }
+      $generalledgerstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, balance, narration) VALUES('$date','$voucher_no','$ac_code', '$debit', '$credit', '$balance', '$description')");
+      $generalledgerstmt->execute();
+      echo "<script>swal('Success', 'Accepted Successfully', 'success');</script>";
+    }
+    $stmt = $pdo->prepare("SELECT * FROM transaction WHERE date='$date' AND ac_code='ca-001'");
+    $stmt->execute();
+    $receivabledatas = $stmt->fetchall();
+    foreach ($receivabledatas as $receivabledata) {
+      $voucher_no = $receivabledata['voucher_no'];
+      if($receivabledata['debit'] != 0){
+        $debitorcredit = 'debit';
+        $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='$debitorcredit'");
+        $currencystmt->execute();
+        $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
+        $receivestmt = $pdo->prepare("SELECT * FROM receivable ORDER BY id DESC");
+        $receivestmt->execute();
+        $receivedata = $receivestmt->fetch(PDO::FETCH_ASSOC);
+        $invoice_amount = $currencydata['usd_amount'];
+        if (!empty($receivedata)) {
+          $balance = $currencydata['usd_amount'] + $receivedata['balance'];
+        }else{
+          $balance = $currencydata['usd_amount'];
+        }
+      }elseif($receivabledata['credit'] != 0){
+        $debitorcredit = 'credit';
+        $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='$debitorcredit'");
+        $currencystmt->execute();
+        $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
+        $receivestmt = $pdo->prepare("SELECT * FROM receivable ORDER BY id DESC");
+        $receivestmt->execute();
+        $receivedata = $receivestmt->fetch(PDO::FETCH_ASSOC);
+        if (!empty($receivedata['balance'])) {
+          $invoice_amount = $currencydata['usd_amount'];
+          $balance = $currencydata['usd_amount'] + $receivedata['balance'];
+        }else{
+          $invoice_amount = $currencydata['usd_amount'];
+          $balance = $currencydata['usd_amount'];
+        }
+
+      $sr_no = $receivabledata['sr_no'];
+      $container_no = $receivabledata['container_no'];
+      $receivestmt = $pdo->prepare("INSERT INTO receivable(date, sr_no, container_no, invoice_amount, balance) VALUES('$date', '$sr_no', '$container_no', '$invoice_amount', '$balance')");
+      $receivestmt->execute();
+    }
+
     }
   }
 

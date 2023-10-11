@@ -211,11 +211,9 @@ CREATE TABLE `currency` (
   `usd_amount` bigint(25) NOT NULL,
   `voucher_no` varchar(36) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=190 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=212 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO currency VALUES("160","0","credit","25000","0","AS261");
-INSERT INTO currency VALUES("163","0","debit","50000","0","AS263");
-INSERT INTO currency VALUES("164","0","credit","50000","0","AS263");
+INSERT INTO currency VALUES("163","3000","debit","300000","100","AS263");
 INSERT INTO currency VALUES("168","3000","credit","300000","100","AS264");
 INSERT INTO currency VALUES("173","0","credit","50000","0","AS264");
 INSERT INTO currency VALUES("180","3000","debit","600000","200","AS266");
@@ -224,10 +222,22 @@ INSERT INTO currency VALUES("182","0","debit","30000","0","BS0001");
 INSERT INTO currency VALUES("183","0","credit","30000","0","BS0001");
 INSERT INTO currency VALUES("184","3000","debit","150000000","50000","BS0002");
 INSERT INTO currency VALUES("185","3000","credit","150000000","50000","BS0002");
-INSERT INTO currency VALUES("186","0","debit","25000","0","AS261");
-INSERT INTO currency VALUES("187","0","credit","25000","0","AS261");
-INSERT INTO currency VALUES("188","3000","debit","15000000","5000","AS262");
-INSERT INTO currency VALUES("189","3000","credit","15000000","5000","AS262");
+INSERT INTO currency VALUES("188","3000","debit","300000","100","AS262");
+INSERT INTO currency VALUES("189","3000","credit","150000","50","AS262");
+INSERT INTO currency VALUES("190","0","debit","100000","0","AS23");
+INSERT INTO currency VALUES("191","0","credit","100000","0","AS23");
+INSERT INTO currency VALUES("194","3000","debit","300000","100","AS262");
+INSERT INTO currency VALUES("195","3000","credit","150000","50","AS262");
+INSERT INTO currency VALUES("198","3000","debit","300000","100","AS261");
+INSERT INTO currency VALUES("199","3000","credit","300000","100","AS261");
+INSERT INTO currency VALUES("200","3000","debit","300000","100","AS261");
+INSERT INTO currency VALUES("201","3000","credit","300000","100","AS261");
+INSERT INTO currency VALUES("202","3000","debit","300000","100","AS262");
+INSERT INTO currency VALUES("203","3000","debit","300000","100","AS262");
+INSERT INTO currency VALUES("204","3000","debit","300000","100","AS262");
+INSERT INTO currency VALUES("205","3000","credit","300000","100","AS262");
+INSERT INTO currency VALUES("206","3000","debit","300000","100","AS262");
+INSERT INTO currency VALUES("211","3000","credit","300000","100","AS263");
 
 
 
@@ -307,12 +317,12 @@ CREATE TABLE `general_ledger` (
   `balance` int(11) NOT NULL,
   `narration` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=214 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO general_ledger VALUES("74","2023-10-10","AS261","ep-005","25000","0","0","car expense");
-INSERT INTO general_ledger VALUES("75","2023-10-10","AS261","ca-002","0","25000","0","car expense");
-INSERT INTO general_ledger VALUES("76","2023-10-10","AS262","r-002","15000000","0","0","car expense");
-INSERT INTO general_ledger VALUES("77","2023-10-10","AS262","ca-001","0","15000000","0","car expense");
+INSERT INTO general_ledger VALUES("210","2023-10-11","AS262","ca-001","300000","0","0","hello");
+INSERT INTO general_ledger VALUES("211","2023-10-11","AS262","r-002","0","300000","0","hello");
+INSERT INTO general_ledger VALUES("212","2023-10-11","AS263","ca-002","300000","0","0","hello");
+INSERT INTO general_ledger VALUES("213","2023-10-11","AS263","ca-001","0","300000","0","");
 
 
 
@@ -942,8 +952,9 @@ CREATE TABLE `receivable` (
   `paid_amount` int(11) NOT NULL,
   `balance` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=128 DEFAULT CHARSET=utf8mb4;
 
+INSERT INTO receivable VALUES("127","2023-10-11","SGRWFGR","US-23523","100","0000-00-00","","","0","100");
 
 
 
@@ -1083,12 +1094,12 @@ CREATE TABLE `transaction` (
   `sr_no` varchar(25) NOT NULL,
   `container_no` varchar(25) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=195 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=217 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO transaction VALUES("191","2023-10-10","AS261","ep-005","car expense","25000","0","mmk","","");
-INSERT INTO transaction VALUES("192","2023-10-10","AS261","ca-002","car expense","0","25000","mmk","","");
-INSERT INTO transaction VALUES("193","2023-10-10","AS262","r-002","car expense","15000000","0","usd","","");
-INSERT INTO transaction VALUES("194","2023-10-10","AS262","ca-001","car expense","0","15000000","usd","","");
+INSERT INTO transaction VALUES("209","2023-10-11","AS262","ca-001","hello","300000","0","usd","SAF-15/2023","US-23523");
+INSERT INTO transaction VALUES("210","2023-10-11","AS262","r-002","hello","0","300000","usd","","");
+INSERT INTO transaction VALUES("211","2023-10-11","AS263","ca-002","hello","300000","0","usd","","");
+INSERT INTO transaction VALUES("216","2023-10-11","AS263","ca-001","","0","300000","usd","SGRWFGR","US-23523");
 
 
 
@@ -1305,7 +1316,7 @@ CREATE TABLE `userlogs` (
   `login_password` varchar(125) NOT NULL,
   `status` varchar(55) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO userlogs VALUES("1","10:26:18.000000","2023-09-18","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("2","10:31:25.000000","2023-09-18","admin","admin","Login Success");
@@ -1356,6 +1367,8 @@ INSERT INTO userlogs VALUES("46","06:27:31.000000","2023-10-09","admin","admin",
 INSERT INTO userlogs VALUES("47","06:32:04.000000","2023-10-09","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("48","10:52:06.000000","2023-10-10","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("49","06:36:10.000000","2023-10-10","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("50","09:04:38.000000","2023-10-11","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("51","11:58:11.000000","2023-10-11","admin","admin","Login Success");
 
 
 
