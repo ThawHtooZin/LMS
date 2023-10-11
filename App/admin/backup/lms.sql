@@ -1305,7 +1305,7 @@ CREATE TABLE `userlogs` (
   `login_password` varchar(125) NOT NULL,
   `status` varchar(55) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO userlogs VALUES("1","10:26:18.000000","2023-09-18","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("2","10:31:25.000000","2023-09-18","admin","admin","Login Success");
@@ -1355,6 +1355,7 @@ INSERT INTO userlogs VALUES("45","03:50:17.000000","2023-10-09","admin","admin",
 INSERT INTO userlogs VALUES("46","06:27:31.000000","2023-10-09","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("47","06:32:04.000000","2023-10-09","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("48","10:52:06.000000","2023-10-10","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("49","06:36:10.000000","2023-10-10","admin","admin","Login Success");
 
 
 
