@@ -184,9 +184,17 @@ class Bootstrap
         }
       </style>
       <script src="../../Resources/sweetalert.js" charset="utf-8"></script>
-      <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.css">
+      <link rel="stylesheet" href="../../Resources/chosenselect/jquery-ui.css">
+      <link rel="stylesheet" href="../../Resources/chosenselect/chosen.css">
       <script src="../../Resources/jquery.resc.js"></script>
+      <script src="../../Resources/chosenselect/jquery-1.9.3.js"></script>
+      <script src="../../Resources/chosenselect/jquery-ui.js"></script>
+      <script src="../../Resources/chosenselect/chosen.jquery.js"></script>
+      <script>
+      $(function() {
+        $(".chzn-select").chosen();
+      });
+      </script>
     ';
   }
   function javascript()
@@ -194,16 +202,8 @@ class Bootstrap
     echo '
 
     <script src="../../Resources\bootstrap-5.3.1-dist\js\bootstrap.bundle.min.js" charset="utf-8"></script>
-    <script src="http://code.jquery.com/jquery-1.8.3.js"></script>
-    <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.js"></script>
 
     <script type="text/javascript">
-    $(function() {
-      $(".chzn-select").chosen();
-    });
-
-
     // (function(e){
     //   let h3 = document.getElementsByTagName("h3");
     //   let stm = e.target.dataset.num;
@@ -214,31 +214,6 @@ class Bootstrap
     ';
     ?>
     <script type="text/javascript">
-    <?php
-    $_SESSION['isSidebarOpen'] = true;
-    ?>
-    var isSidebarOpen = <?php echo isset($_SESSION['isSidebarOpen']) && $_SESSION['isSidebarOpen'] ? 'true' : 'false'; ?>;
-    if (isSidebarOpen) {
-      $('#sidebar').toggleClass('sidebarcol sidebarnocol', 1000);
-      $("#navtitle").hide();
-      $('#menu').css('height', 82, '%');
-      $("span#navname").hide();
-      $('.arrow').hide();
-      $('#thenavbar').slideToggle(500);
-      $('#content').toggleClass('contentcol contentfullcol');
-    } else {
-      $("#navtitle").animate({
-        opacity: "show",
-        padding: "show"
-      }, "normal");
-      $("span#navname").animate({
-        opacity: "show",
-        padding: "show"
-      }, "normal");
-      $('.arrow').show("slow");
-      $('#sidebar').toggleClass('sidebarcol sidebarnocol');
-      $('#thenavbar').slideToggle(800);
-    }
     var myVariable = false;
     function toggleVariable() {
       myVariable = !myVariable;
@@ -246,7 +221,7 @@ class Bootstrap
     }
     $('#menu').on('click', function(){
       var newValue = toggleVariable();
-      if(newValue === true){
+      if(newValue === false){
         setTimeout(function(){
           $("#navtitle").animate({
             opacity: "show",
@@ -261,7 +236,6 @@ class Bootstrap
         $('#sidebar').toggleClass('sidebarcol sidebarnocol');
         $('#thenavbar').slideToggle(800);
         // $('#sidebarlink').removeAttr('disabled');
-        var isSidebarOpen = '<?php echo $_SESSION['isSidebarOpen'] = false; ?>';
       }else{
         // $('#sidebarlink').attr('disabled', true);
         $('#sidebar').toggleClass('sidebarcol sidebarnocol', 1000);

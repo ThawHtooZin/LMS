@@ -84,13 +84,13 @@ CREATE TABLE `actype` (
 
 INSERT INTO actype VALUES("9","expanse");
 INSERT INTO actype VALUES("10","Sale");
-INSERT INTO actype VALUES("11","Current Asset");
-INSERT INTO actype VALUES("13","Fixed Asset");
+INSERT INTO actype VALUES("11","Current_Asset");
+INSERT INTO actype VALUES("13","Fixed_Asset");
 INSERT INTO actype VALUES("14","Capital");
-INSERT INTO actype VALUES("15","Long Term Liability");
-INSERT INTO actype VALUES("16","Current Liability");
-INSERT INTO actype VALUES("17","Cost Of Good Sold");
-INSERT INTO actype VALUES("18","Other Income");
+INSERT INTO actype VALUES("15","Long_Term_Liability");
+INSERT INTO actype VALUES("16","Current_Liability");
+INSERT INTO actype VALUES("17","Cost_Of_Good_Sold");
+INSERT INTO actype VALUES("18","Other_Income");
 
 
 
@@ -211,11 +211,8 @@ CREATE TABLE `currency` (
   `usd_amount` bigint(25) NOT NULL,
   `voucher_no` varchar(36) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=190 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=221 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO currency VALUES("160","0","credit","25000","0","AS261");
-INSERT INTO currency VALUES("163","0","debit","50000","0","AS263");
-INSERT INTO currency VALUES("164","0","credit","50000","0","AS263");
 INSERT INTO currency VALUES("168","3000","credit","300000","100","AS264");
 INSERT INTO currency VALUES("173","0","credit","50000","0","AS264");
 INSERT INTO currency VALUES("180","3000","debit","600000","200","AS266");
@@ -224,10 +221,27 @@ INSERT INTO currency VALUES("182","0","debit","30000","0","BS0001");
 INSERT INTO currency VALUES("183","0","credit","30000","0","BS0001");
 INSERT INTO currency VALUES("184","3000","debit","150000000","50000","BS0002");
 INSERT INTO currency VALUES("185","3000","credit","150000000","50000","BS0002");
-INSERT INTO currency VALUES("186","0","debit","25000","0","AS261");
-INSERT INTO currency VALUES("187","0","credit","25000","0","AS261");
-INSERT INTO currency VALUES("188","3000","debit","15000000","5000","AS262");
-INSERT INTO currency VALUES("189","3000","credit","15000000","5000","AS262");
+INSERT INTO currency VALUES("188","3000","debit","300000","100","AS262");
+INSERT INTO currency VALUES("189","3000","credit","150000","50","AS262");
+INSERT INTO currency VALUES("190","0","debit","100000","0","AS23");
+INSERT INTO currency VALUES("191","0","credit","100000","0","AS23");
+INSERT INTO currency VALUES("194","3000","debit","300000","100","AS262");
+INSERT INTO currency VALUES("195","3000","credit","150000","50","AS262");
+INSERT INTO currency VALUES("198","3000","debit","300000","100","AS261");
+INSERT INTO currency VALUES("199","3000","credit","300000","100","AS261");
+INSERT INTO currency VALUES("200","3000","debit","300000","100","AS261");
+INSERT INTO currency VALUES("201","3000","credit","300000","100","AS261");
+INSERT INTO currency VALUES("202","3000","debit","300000","100","AS262");
+INSERT INTO currency VALUES("203","3000","debit","300000","100","AS262");
+INSERT INTO currency VALUES("204","3000","debit","300000","100","AS262");
+INSERT INTO currency VALUES("205","3000","credit","300000","100","AS262");
+INSERT INTO currency VALUES("206","3000","debit","300000","100","AS262");
+INSERT INTO currency VALUES("212","0","debit","50000","0","AS261");
+INSERT INTO currency VALUES("213","0","credit","50000","0","AS261");
+INSERT INTO currency VALUES("214","3000","debit","300000","100","AS262");
+INSERT INTO currency VALUES("215","3000","credit","300000","100","AS262");
+INSERT INTO currency VALUES("219","3000","debit","300000","100","AS263");
+INSERT INTO currency VALUES("220","3000","credit","300000","100","AS263");
 
 
 
@@ -306,13 +320,19 @@ CREATE TABLE `general_ledger` (
   `credit` int(11) NOT NULL,
   `balance` int(11) NOT NULL,
   `narration` text NOT NULL,
+  `sr_no` varchar(25) NOT NULL,
+  `container_no` varchar(25) NOT NULL,
+  `bank_charges` float NOT NULL,
+  `acid` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=242 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO general_ledger VALUES("74","2023-10-10","AS261","ep-005","25000","0","0","car expense");
-INSERT INTO general_ledger VALUES("75","2023-10-10","AS261","ca-002","0","25000","0","car expense");
-INSERT INTO general_ledger VALUES("76","2023-10-10","AS262","r-002","15000000","0","0","car expense");
-INSERT INTO general_ledger VALUES("77","2023-10-10","AS262","ca-001","0","15000000","0","car expense");
+INSERT INTO general_ledger VALUES("236","2023-10-12","AS261","ep-005","50000","0","0","","","","0","9");
+INSERT INTO general_ledger VALUES("237","2023-10-12","AS261","ca-002","0","50000","0","hubhhhjggshffdghjgfjgf","","","0","11");
+INSERT INTO general_ledger VALUES("238","2023-10-12","AS262","ca-001","300000","0","0","hubhhhjggshffdghjgfjgf","SGRWFGR","US-23523","0","11");
+INSERT INTO general_ledger VALUES("239","2023-10-12","AS262","r-002","0","300000","0","hubhhhjggshffdghjgfjgf","","","0","10");
+INSERT INTO general_ledger VALUES("240","2023-10-12","AS263","ca-002","300000","0","0","asdfasdfasdf","","","50","11");
+INSERT INTO general_ledger VALUES("241","2023-10-12","AS263","ca-001","0","300000","0","asdfasdfasdf","SGRWFGR","US-23523","0","11");
 
 
 
@@ -870,7 +890,7 @@ CREATE TABLE `permission` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO permission VALUES("1","1","manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_accountreceivable,manage_transactionmanage_general_ledger,manage_customers,manage_supplier,manage_category,manage_item,manage_actype,manage_acname,manage_unit,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,sale_report,purchase_report");
+INSERT INTO permission VALUES("1","1","manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_accountreceivable,manage_transactionmanage_general_ledgermanage_ledger_record,manage_customers,manage_supplier,manage_category,manage_item,manage_actype,manage_acname,manage_unit,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,sale_report,purchase_report");
 INSERT INTO permission VALUES("2","2",",manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport");
 INSERT INTO permission VALUES("3","3","manage_accounts,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_accountreceivablemanage_general_ledger,manage_customers");
 
@@ -942,8 +962,13 @@ CREATE TABLE `receivable` (
   `paid_amount` int(11) NOT NULL,
   `balance` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=133 DEFAULT CHARSET=utf8mb4;
 
+INSERT INTO receivable VALUES("128","2023-10-12","SGRWFGR","US-23523","100","0000-00-00","","","0","100");
+INSERT INTO receivable VALUES("129","2023-10-12","SGRWFGR","US-23523","100","0000-00-00","","","0","200");
+INSERT INTO receivable VALUES("130","2023-10-12","SGRWFGR","US-23523","100","0000-00-00","","","0","300");
+INSERT INTO receivable VALUES("131","2023-10-12","SGRWFGR","US-23523","100","0000-00-00","","","0","400");
+INSERT INTO receivable VALUES("132","2023-10-12","SGRWFGR","US-23523","100","0000-00-00","","","0","500");
 
 
 
@@ -1082,13 +1107,16 @@ CREATE TABLE `transaction` (
   `currency` varchar(20) NOT NULL,
   `sr_no` varchar(25) NOT NULL,
   `container_no` varchar(25) NOT NULL,
+  `bank_charges` float NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=195 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=226 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO transaction VALUES("191","2023-10-10","AS261","ep-005","car expense","25000","0","mmk","","");
-INSERT INTO transaction VALUES("192","2023-10-10","AS261","ca-002","car expense","0","25000","mmk","","");
-INSERT INTO transaction VALUES("193","2023-10-10","AS262","r-002","car expense","15000000","0","usd","","");
-INSERT INTO transaction VALUES("194","2023-10-10","AS262","ca-001","car expense","0","15000000","usd","","");
+INSERT INTO transaction VALUES("217","2023-10-12","AS261","ep-005","","50000","0","mmk","","","0");
+INSERT INTO transaction VALUES("218","2023-10-12","AS261","ca-002","hubhhhjggshffdghjgfjgf","0","50000","mmk","","","0");
+INSERT INTO transaction VALUES("219","2023-10-12","AS262","ca-001","hubhhhjggshffdghjgfjgf","300000","0","usd","SGRWFGR","US-23523","0");
+INSERT INTO transaction VALUES("220","2023-10-12","AS262","r-002","hubhhhjggshffdghjgfjgf","0","300000","usd","","","0");
+INSERT INTO transaction VALUES("224","2023-10-12","AS263","ca-002","asdfasdfasdf","300000","0","usd","","","50");
+INSERT INTO transaction VALUES("225","2023-10-12","AS263","ca-001","asdfasdfasdf","0","300000","usd","SGRWFGR","US-23523","0");
 
 
 
@@ -1305,7 +1333,7 @@ CREATE TABLE `userlogs` (
   `login_password` varchar(125) NOT NULL,
   `status` varchar(55) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO userlogs VALUES("1","10:26:18.000000","2023-09-18","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("2","10:31:25.000000","2023-09-18","admin","admin","Login Success");
@@ -1356,6 +1384,9 @@ INSERT INTO userlogs VALUES("46","06:27:31.000000","2023-10-09","admin","admin",
 INSERT INTO userlogs VALUES("47","06:32:04.000000","2023-10-09","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("48","10:52:06.000000","2023-10-10","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("49","06:36:10.000000","2023-10-10","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("50","09:04:38.000000","2023-10-11","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("51","11:58:11.000000","2023-10-11","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("52","09:33:13.000000","2023-10-12","admin","admin","Login Success");
 
 
 
