@@ -94,28 +94,13 @@ $query = new Query();
   <body>
     <?php
     $ac_name = '';
-    // if($_POST && !isset($_POST['save']) && !isset($_POST['accept']) && !isset($_POST['update']) && !isset($_POST['delete'])){
-    //   $_SESSION['adddate'] = $_POST['adddate'];
-    //   $_SESSION['addvoucher_no'] = $_POST['addvoucher_no'];
-    //   $_SESSION['addac_code'] = $_POST['addac_code'];
-    //
-    //   $ac_code = $_POST['addac_code'];
-    //   $stmt = $pdo->prepare("SELECT * FROM acname WHERE code_no='$ac_code'");
-    //   $stmt->execute();
-    //   $datas = $stmt->fetch(PDO::FETCH_ASSOC);
-    //   if(empty($datas['ac_name'])){
-    //     echo "<script>swal('Error', 'A/C Name Doesn\'t Exist', 'warning');</script>";
-    //   }else{
-    //     $ac_name = $datas['ac_name'];
-    //     $_SESSION['ac_name'] = $ac_name;
-    //   }
-    // }
     if(isset($_POST['save'])){
       $date = $_POST['adddate'];
       $voucher_no = $_POST['addvoucher_no'];
       $ac_code = $_POST['addac_code'];
       $description = $_POST['adddescription'];
       $currency = $_POST['addcurrency'];
+      $bank_charges = $_POST['bank_charges'];
       if(!empty($_POST['addrate'])){
         $rate = $_POST['addrate'];
       }else{
@@ -131,7 +116,7 @@ $query = new Query();
       }else{
         $credit = 0;
       }
-      if($ac_code == 'ca-001'){
+      if(!empty($_POST['addsr_no']) && !empty($_POST['addcontainer_no'])){
         $sr_no = $_POST['addsr_no'];
         $container_no = $_POST['addcontainer_no'];
       }else{
@@ -143,8 +128,8 @@ $query = new Query();
       $_SESSION['addvoucher_no'] = $_POST['addvoucher_no'];
       $_SESSION['addac_code'] = $_POST['addac_code'];
       $_SESSION['ac_name'] = $ac_name;
-
-      $query->savetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $sr_no, $container_no);
+      
+      $query->savetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $sr_no, $container_no, $bank_charges);
     }
     if (isset($_POST['update'])) {
       $id = $_POST['id'];
@@ -264,7 +249,7 @@ $query = new Query();
                  <textarea name="adddescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(!empty($_SESSION['description'])){echo $_SESSION['description']; } ?></textarea>
                </div>
                <div id="bankcharges" class="hide" style="width: 16.66666667%">
-                 <input type="number" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="" placeholder="Bank Charges">
+                 <input type="number" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="bank_charges" placeholder="Bank Charges">
                </div>
               <div class="col-3">
                 <label>Currency</label>
@@ -399,7 +384,7 @@ $query = new Query();
                             <textarea name="adddescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(!empty($_SESSION['description'])){echo $_SESSION['description']; } ?></textarea>
                           </div>
                           <div id="bankcharges<?php echo $data['id']; ?>" class="hide" style="width: 16.66666667%">
-                            <input type="number" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="addsr_no" placeholder="Bank Charges">
+                            <input type="number" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="bank_charges" placeholder="Bank Charges">
                           </div>
                         <div class="col-3">
                           <label>Currency</label>

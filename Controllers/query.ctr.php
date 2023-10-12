@@ -2347,7 +2347,7 @@ Class Query{
     }
   }
 
-  function savetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $sr_no, $container_no){
+  function savetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $sr_no, $container_no, $bank_charges){
     global $pdo;
 
     if($currency == 'usd'){
@@ -2357,8 +2357,7 @@ Class Query{
       $mmkdebit = $debit;
       $mmkcredit = $credit;
     }
-
-    $transactionstmt = $pdo->prepare("INSERT INTO transaction(date, voucher_no, ac_code, description, debit, credit, currency, sr_no, container_no) VALUES('$date', '$voucher_no', '$ac_code', :description, '$mmkdebit', '$mmkcredit', '$currency', '$sr_no', '$container_no')");
+    $transactionstmt = $pdo->prepare("INSERT INTO transaction(date, voucher_no, ac_code, description, debit, credit, currency, sr_no, container_no,bank_charges) VALUES('$date', '$voucher_no', '$ac_code', :description, '$mmkdebit', '$mmkcredit', '$currency', '$sr_no', '$container_no', '$bank_charges')");
     $transactionstmt->execute(
       [
         ':description' => $description,
@@ -2384,6 +2383,7 @@ Class Query{
         $usd_amount = 0;
       }
     }
+
 
     $currencystmt = $pdo->prepare("INSERT INTO currency(dollar_rate, debitorcredit, mmk_amount, usd_amount, voucher_no) VALUES('$rate', '$debitorcredit', '$mmk_amount', '$usd_amount', '$voucher_no')");
     $currencystmt->execute();
@@ -2471,15 +2471,6 @@ Class Query{
     $transactionstmt->execute();
     $transactiondatas = $transactionstmt->fetchall();
     foreach ($transactiondatas as $transactiondata) {
-      // $voucher_no = $transactiondata['voucher_no'];
-      // $glstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE voucherno='$voucher_no'");
-      // $glstmt->execute();
-      // $gldata = $glstmt->fetchall();
-      //
-      // $glcreditstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE voucherno='$voucher_no'");
-      // $glcreditstmt->execute();
-      // $glcreditdata = $glcreditstmt->fetchall();
-
       $ac_code = $transactiondata['ac_code'];
       $voucher_no = $transactiondata['voucher_no'];
       $description = $transactiondata['description'];
@@ -2491,7 +2482,15 @@ Class Query{
         $credit = 0;
       }
       $balance = 0;
-      $generalledgerstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, balance, narration) VALUES('$date','$voucher_no','$ac_code', '$debit', '$credit', '$balance', '$description')");
+      $sr_no = $transactiondata['sr_no'];
+      $container_no = $transactiondata['container_no'];
+      $bank_charges = $transactiondata['bank_charges'];
+      $actypestmt = $pdo->prepare("SELECT * FROM acname WHERE code_no='$ac_code'");
+      $actypestmt->execute();
+      $acid = $actypestmt->fetch(PDO::FETCH_ASSOC);
+      $acid = $acid['ac_type'];
+
+      $generalledgerstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, balance, narration,sr_no, container_no, bank_charges, acid) VALUES('$date','$voucher_no','$ac_code', '$debit', '$credit', '$balance', '$description', '$sr_no', '$container_no', '$bank_charges', '$acid')");
       $generalledgerstmt->execute();
       echo "<script>swal('Success', 'Accepted Successfully', 'success');</script>";
     }
