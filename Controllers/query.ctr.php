@@ -2420,7 +2420,7 @@ Class Query{
     }
   }
 
-  function updatetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $id, $sr_no, $container_no){
+  function updatetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $id, $sr_no, $container_no, $bank_charges){
     global $pdo;
 
     if($currency == 'usd'){
@@ -2431,7 +2431,7 @@ Class Query{
       $mmkcredit = $credit;
     }
 
-    $transactionstmt = $pdo->prepare("UPDATE transaction SET date='$date', voucher_no='$voucher_no', ac_code='$ac_code', description=:description, debit='$mmkdebit', credit='$mmkcredit', currency='$currency', sr_no='$sr_no', container_no='$container_no' WHERE id='$id'");
+    $transactionstmt = $pdo->prepare("UPDATE transaction SET date='$date', voucher_no='$voucher_no', ac_code='$ac_code', description=:description, debit='$mmkdebit', credit='$mmkcredit', currency='$currency', sr_no='$sr_no', container_no='$container_no', bank_charges='$bank_charges' WHERE id='$id'");
     $transactionstmt->execute(
       [
         ':description' => $description
@@ -2477,11 +2477,21 @@ Class Query{
       if (empty($transactiondata['debit'])) {
         $debit = 0;
         $credit = $transactiondata['credit'];
+        // $balance = $credit;
       }else{
-        $debit = $transactiondata['debit'];
-        $credit = 0;
+
+        if($transactiondata['bank_charges'] != 0){
+          $bankchargesstmt = $pdo->prepare("SELECT bank_charges FROM transaction WHERE ac_code='ca-002' ORDER BY id DESC");
+          $bankchargesstmt->execute();
+          $bankchargesdata = $bankchargesstmt->fetch(PDO::FETCH_ASSOC);
+          $debit = $transactiondata['debit'] - $transactiondata['bank_charges'];
+          $credit = 0;
+        }else{
+          $debit = $transactiondata['debit'];
+          $credit = 0;
+        }
+        // $balance = $debit;
       }
-      $balance = 0;
       $sr_no = $transactiondata['sr_no'];
       $container_no = $transactiondata['container_no'];
       $bank_charges = $transactiondata['bank_charges'];
@@ -2490,6 +2500,18 @@ Class Query{
       $acid = $actypestmt->fetch(PDO::FETCH_ASSOC);
       $acid = $acid['ac_type'];
 
+      $balancestmt = $pdo->prepare("SELECT * FROM general_ledger ORDER BY id DESC");
+      $balancestmt->execute();
+      $balancedata = $balancestmt->fetch(PDO::FETCH_ASSOC);
+      if (!empty($balancedata['balance'])) {
+        $balance = ($balancedata['balance'] + $debit) - $credit;
+      }else{
+        if($debit != 0){
+          $balance = $debit;
+        }else{
+          $balance = 0 - $credit;
+        }
+      }
       $generalledgerstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, balance, narration,sr_no, container_no, bank_charges, acid) VALUES('$date','$voucher_no','$ac_code', '$debit', '$credit', '$balance', '$description', '$sr_no', '$container_no', '$bank_charges', '$acid')");
       $generalledgerstmt->execute();
       echo "<script>swal('Success', 'Accepted Successfully', 'success');</script>";
@@ -2621,6 +2643,46 @@ Class Query{
       return $this->selectdbw('general_ledger', $date_from, $date_to);
     }
   }
+
+  function selectledgerrecord($date_from, $date_to, $ac_code, $acid){
+    global $pdo;
+    if($ac_code != '' && !empty($date_from) && !empty($date_to)){
+      $searchstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE `date` BETWEEN '$date_from' AND '$date_to' AND ac_code='$ac_code' AND `acid`='$acid'");
+      $searchstmt->execute();
+      return $searchdata = $searchstmt->fetchall();
+    }
+    if(!empty($date_from) && !empty($date_to) && $ac_code == ''){
+      $searchstmt = $pdo->prepare("SELECT * FROM general_ledger  WHERE `date` BETWEEN '$date_from' AND '$date_to' AND `acid`='$acid'");
+      $searchstmt->execute();
+      return $searchdata = $searchstmt->fetchall();
+    }
+    //DATE RANGE STUFF
+    if(!empty($date_from) || !empty($date_to) && $ac_code != ''){
+      if(!empty($date_from) && !empty($ac_code)){
+        $searchstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE `date`='$date_from' AND ac_code='$ac_code' AND `acid`='$acid'");
+      }elseif(!empty($date_to) && $ac_code != ''){
+        $searchstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE `date`='$date_to' AND ac_code='$ac_code' AND `acid`='$acid'");
+      }
+      $searchstmt->execute();
+      return $searchdata = $searchstmt->fetchall();
+    }
+    if(!empty($date_from) || !empty($date_to)){
+      if(!empty($date_from)){
+        $searchstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE `date`='$date_from' AND `acid`='$acid'");
+      }else{
+        $searchstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE `date`='$date_to' AND `acid`='$acid' ");
+      }
+      $searchstmt->execute();
+      return $searchdata = $searchstmt->fetchall();
+    }
+    if($ac_code != '' && empty($date_from) && empty($date_to)){
+      return $this->search('general_ledger', 'ac_code', $ac_code);
+    }else{
+      return $this->selectdbw('general_ledger', $date_from, $date_to);
+      $searchstmt->execute();
+      return $searchdata = $searchstmt->fetchall();
+    }
+   }
   // MORE SELECTS
 
   function selectsum($table, $id, $selectwhat){
