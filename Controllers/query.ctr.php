@@ -2086,7 +2086,6 @@ Class Query{
 
   function deleteform7($table, $idtodelete){
     global $pdo;
-    
     $stmt = $pdo->prepare("DELETE FROM $table WHERE link_id='$idtodelete'");
     $stmt->execute();
   }
@@ -2536,6 +2535,8 @@ Class Query{
       $generalledgerstmt->execute();
       echo "<script>swal('Success', 'Accepted Successfully', 'success');</script>";
     }
+
+    // Receivable
     $stmt = $pdo->prepare("SELECT * FROM transaction WHERE date='$date' AND ac_code='ca-001'");
     $stmt->execute();
     $receivabledatas = $stmt->fetchall();
@@ -2577,6 +2578,28 @@ Class Query{
       $receivestmt->execute();
     }
 
+    }
+
+    // Payable
+    $stmt = $pdo->prepare("SELECT * FROM transaction WHERE date='$date' AND ac_code LIKE '4000%'");
+    $stmt->execute();
+    $payabledatas = $stmt->fetchall();
+    foreach ($payabledatas as $payabledata) {
+      $supplier_id = $payabledata['ac_name'];
+      $voucher_no = $payabledata['voucher_no'];
+      $paid_amount = $payabledata['debit'];
+
+      $payabledatastmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' ORDER BY id DESC");
+      $payabledatastmt->execute();
+      $payabledata = $payabledatastmt->fetch(PDO::FETCH_ASSOC);
+      if(!empty($payabledata)){
+        $balance = $payabledata['balance'] - $debit;
+        $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, paid_date, paid_voucher, paid_amount, balance) VALUES('$supplier_id', '$date', '$voucher_no', '$debit', '$balance')");
+      }else{
+        $balance = 0;
+        $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, paid_date, paid_voucher, paid_amount, balance) VALUES('$supplier_id', '$date', '$voucher_no', '$debit', '$balance')");
+      }
+      $payablestmt->execute();
     }
   }
 

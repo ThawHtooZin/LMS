@@ -41,7 +41,11 @@ $query = new Query();
     $(document).ready(function(){
       $('#addac_code').on('keyup', function(){
         var ac_codepost = $('#addac_code').val();
-        ac_code = ac_codepost.split('-');
+        if(){
+          ac_code = ac_codepost.split('/');
+        }else{
+          
+        }
         firstpart = ac_code[0];
         lastpart = ac_code[1];
         $('#addac_name').load('ac_name.php', {
