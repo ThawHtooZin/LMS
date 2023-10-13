@@ -81,10 +81,13 @@ $query = new Query();
               <span>Supplier Name:</span>
               <select class="form-control d-inline" name="supplier_id" style="width:15%;">
                 <?php
-                $supplierdatas = $query->search('acname', 'ac_type', 19);
+                $supplierdatastmt->prepare("SELECT DISTINCT supplier_id FROM payable");
+                $supplierdatastmt->execute();
+                $supplierdatas = $supplierdatastmt->execute();
                 foreach ($supplierdatas as $supplierdata) {
+                  $supplier_name = $query->select('acname', $payabledata['supplier_id'], 'code_no');
                   ?>
-                  <option value="<?php echo $supplierdata['code_no']; ?>"><?php echo $supplierdata['ac_name']; ?></option>
+                  <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplier_name['ac_name']; ?></option>
                   <?php
                 }
                 ?>
@@ -95,7 +98,7 @@ $query = new Query();
             </button>
             <?php
               if(isset($_POST['search'])){
-                echo $supplier_id = $_POST['supplier_id'];
+                $supplier_id = $_POST['supplier_id'];
                 $payabledatas = $query->search('payable', 'supplier_id', $supplier_id);
               }elseif(!empty($_GET['pageno'])){
                 $stmt = $pdo->prepare("SELECT * FROM payable ORDER BY id");
@@ -119,6 +122,7 @@ $query = new Query();
                 <th>Paid Date</th>
                 <th>Paid Voucher</th>
                 <th>Paid Amount</th>
+                <th>Balance</th>
                 <!-- <th>Action</th> -->
               </tr>
               <?php
@@ -137,6 +141,7 @@ $query = new Query();
                 <td><?php if($payabledata['paid_date'] != "0000-00-00"){ echo $payabledata['paid_date']; }; ?></td>
                 <td><?php echo $payabledata['paid_voucher']; ?></td>
                 <td><?php if(!empty($payabledata['paid_amount'])){ echo $payabledata['paid_amount'];}; ?></td>
+                <td><?php if(!empty($payabledata['balance'])){ echo $payabledata['balance'];}; ?></td>
                 <!-- <td style="<?php// if($payabledata['paid_date'] == "0000-00-00"){ echo "display:none;"; }; ?>">
                   <input type="hidden" name="updateid" value="<?php// echo $payabledata['id']; ?>">
                   <button type="submit" class="btn btn-warning text-light" data-bs-toggle="modal" data-bs-target="#updatemodal<?php //echo $payabledata['id']; ?>">

@@ -10,7 +10,11 @@ if(!empty($_POST['LastPart'])){
   $lastPart = "";
 }
 
-$ac_code = $firstPart . '/' . $lastPart;
+if($_POST['Type'] == 'slash'){
+  $ac_code = $firstPart . '/' . $lastPart;
+}elseif($_POST['Type'] == 'dash'){
+  $ac_code = $firstPart . '-' . $lastPart;
+}
 $data = $query->select('acname', $ac_code, 'code_no');
 
 if(!empty($data['ac_name']))

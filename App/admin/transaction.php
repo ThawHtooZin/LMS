@@ -41,16 +41,20 @@ $query = new Query();
     $(document).ready(function(){
       $('#addac_code').on('keyup', function(){
         var ac_codepost = $('#addac_code').val();
-        if(){
+        var type = "";
+        if(ac_codepost.includes('/')){
           ac_code = ac_codepost.split('/');
+          type = "slash";
         }else{
-          
+          ac_code = ac_codepost.split('-');
+          type = "dash";
         }
         firstpart = ac_code[0];
         lastpart = ac_code[1];
         $('#addac_name').load('ac_name.php', {
           FirstPart : firstpart,
-          LastPart: JSON.stringify(lastpart)
+          LastPart: JSON.stringify(lastpart),
+          Type: type
         });
         if(ac_codepost == 'CA-001' || ac_codepost == 'ca-001'){
           $('#normal').hide();
