@@ -58,6 +58,22 @@ Class Query{
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
+  function selectcontain($table, $column, $containwhat)
+  {
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM $table WHERE $column LIKE '$containwhat%'");
+    $stmt->execute();
+    return $stmt->fetchall();
+  }
+
+  function selectoncecontain($table, $column, $containwhat)
+  {
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM $table WHERE $column LIKE '$containwhat%'");
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+  }
+
   function search($table, $search_row, $serach_id){
     global $pdo;
     $stmt = $pdo->prepare("SELECT * FROM $table WHERE $search_row='$serach_id'");
@@ -347,7 +363,11 @@ Class Query{
     $balstmt = $pdo->prepare("SELECT balance FROM payable ORDER BY id DESC");
     $balstmt->execute();
     $baldata = $balstmt->fetch(PDO::FETCH_ASSOC);
-    $balance = $baldata['balance'];
+    if(!empty($baldata['balance'])){
+      $balance = $baldata['balance'];
+    }else{
+      $balance = 0;
+    }
     if($balance != 1){
        $total_balance = $balance + $amount;
     }else{
@@ -2064,10 +2084,10 @@ Class Query{
     $addstmt->execute();
   }
 
-  function deleteform7($deleteid){
+  function deleteform7($table, $idtodelete){
     global $pdo;
-
-    $stmt = $pdo->prepare("DELETE FROM form7stock WHERE id='$deleteid'");
+    
+    $stmt = $pdo->prepare("DELETE FROM $table WHERE link_id='$idtodelete'");
     $stmt->execute();
   }
 

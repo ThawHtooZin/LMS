@@ -380,13 +380,13 @@ $query = new Query();
                   <label>Supplier Name</label>
                   <select name="supplier_id" class="form-control inpv2">
                     <?php
-                    $supplier_id_stmt = $pdo->prepare("SELECT DISTINCT supplier_id FROM purchase");
+                    $supplier_id_stmt = $pdo->prepare("SELECT DISTINCT supplier_name FROM form7stock");
                     $supplier_id_stmt->execute();
                     $supplier_id_datas = $supplier_id_stmt->fetchall();
 
                     foreach ($supplier_id_datas as $supplier_id_data) {
-                      $supplierid = $supplier_id_data['supplier_id'];
-                      $supplier_name = $query->select('acname', $supplierid, 'code_no');
+                      $supplierid = $supplier_id_data['supplier_name'];
+                      $supplier_name = $query->selectoncecontain('acname', 'code_no', $supplierid);
                       ?>
                       <option value="<?php echo $supplier_name['code_no']; ?>"><?php echo $supplier_name['ac_name']; ?></option>
                       <?php

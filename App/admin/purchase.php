@@ -125,10 +125,10 @@ $query = new Query();
               <span>Supplier Name:</span>
               <select class="chzn-select" name="supplier_id" style="width:15%;" data-placeholder="Supplier Name">
                 <?php
-                $supplierdatas = $query->search('acname', 'ac_type', 19);
+                $supplierdatas = $query->selectcontain('acname', 'code_no', 4000);
                 foreach ($supplierdatas as $supplierdata) {
                   ?>
-                  <option value="<?php echo $supplierdata['code_no']; ?>"><?php echo $supplierdata['ac_name']; ?></option>
+                  <option value="<?php echo $supplierdata['code_no']; ?>"><?php echo $supplierdata['ac_name']; ?> - <?php echo $supplierdata['code_no']; ?></option>
                   <?php
                 }
                 ?>
@@ -261,9 +261,9 @@ $query = new Query();
                           </div>
                           <div class="col">
                             <label style="font-weight: bold;">Supplier Name</label>
-                            <select class="form-control inpv2 mb-2 chzn-select" name="supplier_name" data-placeholder="Supplier Name">
+                            <select class="form-control inpv2 mb-2" name="supplier_name" data-placeholder="Supplier Name">
                               <?php
-                              $supplierdatas = $query->search('acname', 'ac_type', 19);
+                              $supplierdatas = $query->selectcontain('acname', 'code_no', 4000);
                               foreach ($supplierdatas as $supplierdata) {
                                 ?>
                                 <option value="<?php echo $supplierdata['code_no']; ?>"  <?php if($updatedata['supplier_id'] == $supplierdata['code_no']){ echo 'selected'; } ?>><?php echo $supplierdata['ac_name']; ?></option>
@@ -435,7 +435,17 @@ $query = new Query();
                 </select>
               </div>
               <div class="col">
-                
+                <label>Supplier Name</label>
+                <select class="form-control inpv2 mb-2" name="supplier_name">
+                  <?php
+                  $supplierdatas = $query->selectcontain('acname', 'code_no', 4000);
+                  foreach ($supplierdatas as $supplierdata) {
+                    ?>
+                    <option value="<?php echo $supplierdata['code_no']; ?>"><?php echo $supplierdata['ac_name']; ?></option>
+                    <?php
+                  }
+                  ?>
+                </select>
               </div>
             </div>
             <div class="row">
