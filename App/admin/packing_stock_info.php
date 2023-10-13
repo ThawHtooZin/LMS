@@ -100,8 +100,8 @@ $query = new Query();
                <div class="col-7">
                  <?php
                    $customer_id = $infodata['customer_id'];
-                   $customerdata = $query->select('customers', $customer_id, 'customer_id');
-                   echo $customerdata['customer_name'];
+                   $customerdata = $query->select('acname', $customer_id, 'code_no');
+                   echo $customerdata['ac_name'];
                   ?>
                </div>
                <div class="col-3">

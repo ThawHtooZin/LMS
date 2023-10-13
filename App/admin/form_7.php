@@ -128,12 +128,13 @@ $query = new Query();
                   $item_id = $form7data['item_id'];
                   $commonditydata = $query->select('item', $item_id, 'item_id');
                   $supplier_id = $form7data['supplier_name'];
-                  $supplierdata = $query->select('supplier', $supplier_id, 'supplier_id');
+                  $supplierdata = $query->select('acname', $supplier_id, 'code_no');
+
                   ?>
                   <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>">
                     <td><?php if($form7data['date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($form7data['date']));}; ?></td>
                     <td><?php echo $commonditydata['item_name']; ?></td>
-                    <td><?php echo $supplierdata['supplier_name']; ?></td>
+                    <td><?php echo $supplierdata['ac_name']; ?></td>
                     <td><?php echo $form7data['type']; ?></td>
                     <td><?php echo $form7data['country']; ?></td>
                     <td><?php echo $form7data['size']; ?></td>
@@ -238,12 +239,12 @@ $query = new Query();
                 $item_id = $form7data['item_id'];
                 $commonditydata = $query->select('item', $item_id, 'item_id');
                 $supplier_id = $form7data['supplier_name'];
-                $supplierdata = $query->select('supplier', $supplier_id, 'supplier_id');
+                $supplierdata = $query->select('acname', $supplier_id, 'code_no');
                 ?>
                 <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>">
                   <td><?php if($form7data['date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($form7data['date']));}; ?></td>
                   <td><?php echo $commonditydata['item_name']; ?></td>
-                  <td><?php echo $supplierdata['supplier_name']; ?></td>
+                  <td><?php echo $supplierdata['ac_name']; ?></td>
                   <td><?php echo $form7data['type']; ?></td>
                   <td><?php echo $form7data['country']; ?></td>
                   <td><?php echo $form7data['size']; ?></td>
@@ -345,13 +346,13 @@ $query = new Query();
                   $country = $form7data['country'];
                   $commonditydata = $query->select('item', $item_id, 'item_id');
                   $supplier_id = $form7data['supplier_name'];
-                  $supplierdata = $query->select('supplier', $supplier_id, 'supplier_id');
+                  $supplierdata = $query->select('acname', $supplier_id, 'code_no');
 
                     ?>
                    <tr>
                      <td><?php if($form7data['date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($form7data['date']));}; ?></td>
                      <td><?php echo $commonditydata['item_name']; ?></td>
-                     <td><?php echo $supplierdata['supplier_name']; ?></td>
+                     <td><?php echo $supplierdata['ac_name']; ?></td>
                      <td><?php echo $form7data['type']; ?></td>
                      <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php echo $form7data['country']; ?></td>
                      <td data-bs-toggle="modal" data-bs-target="#addsizemodal<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php echo $form7data['size']; ?></td>
@@ -470,10 +471,10 @@ $query = new Query();
                     <label>Supplier Name</label>
                     <select class="form-control inpv2 mb-2" name="supplier_id">
                       <?php
-                      $supplierdatas = $query->selectall('supplier');
+                      $supplierdatas = $query->search('acname', 'ac_type', 19);
                       foreach ($supplierdatas as $supplierdata) {
                         ?>
-                        <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplierdata['supplier_name']; ?></option>
+                        <option value="<?php echo $supplierdata['code_no']; ?>"><?php echo $supplierdata['ac_name']; ?></option>
                         <?php
                       }
                       ?>

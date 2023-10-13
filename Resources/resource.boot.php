@@ -59,6 +59,14 @@ class Bootstrap
     }, 100);
     </script>
       <style>
+      /* Example CSS class to reset styles for the "card" element */
+      .card-reset {
+          /* Reset or modify styles as needed */
+          /* For example: */
+          padding: 0; /* Reset padding */
+          margin: 0; /* Reset margin */
+          /* Other style adjustments */
+      }
       *{
         font-size: 13px;
       }

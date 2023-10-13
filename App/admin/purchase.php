@@ -123,12 +123,12 @@ $query = new Query();
             <a href="purchase_report.php" class="btn btn-primary btn-sm">Report</a>
             <form  action="purchase.php" method="post" class="d-inline">
               <span>Supplier Name:</span>
-              <select class="form-control d-inline" name="supplier_id" style="width:15%;">
+              <select class="chzn-select" name="supplier_id" style="width:15%;" data-placeholder="Supplier Name">
                 <?php
-                $supplierdatas = $query->selectall('supplier');
+                $supplierdatas = $query->search('acname', 'ac_type', 19);
                 foreach ($supplierdatas as $supplierdata) {
                   ?>
-                  <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplierdata['supplier_name']; ?></option>
+                  <option value="<?php echo $supplierdata['code_no']; ?>"><?php echo $supplierdata['ac_name']; ?></option>
                   <?php
                 }
                 ?>
@@ -192,8 +192,7 @@ $query = new Query();
                 $purchasedatas = $stmt->fetchAll();
               }
               foreach ($purchasedatas as $purchasedata) {
-                $supplierid = $purchasedata['supplier_id'];
-                $supplier_name = $query->select('supplier', $supplierid, 'supplier_id');
+                $supplier_name = $query->select('acname', $purchasedata['supplier_id'], 'code_no');
                 $itemid = $purchasedata['commodity'];
                 $item_name = $query->select('item', $itemid, 'item_id');
               ?>
@@ -204,7 +203,7 @@ $query = new Query();
                 <td><?php echo date('d-m-Y', strtotime($purchasedata['date'])); ?></td>
                 <td><?php echo $purchasedata['voucher_no']; ?></td>
                 <td><?php echo $purchasedata['tclfrozen']; ?></td>
-                <td><?php echo $supplier_name['supplier_name']; ?></td>
+                <td><?php echo $supplier_name['ac_name']; ?></td>
                 <td><?php echo $item_name['item_name']; ?></td>
                 <td><?php echo $purchasedata['size']; ?></td>
                 <td><?php echo $purchasedata['viss']; ?></td>
@@ -262,12 +261,12 @@ $query = new Query();
                           </div>
                           <div class="col">
                             <label style="font-weight: bold;">Supplier Name</label>
-                            <select class="form-control inpv2 mb-2" name="supplier_name">
+                            <select class="form-control inpv2 mb-2 chzn-select" name="supplier_name" data-placeholder="Supplier Name">
                               <?php
-                              $supplierdatas = $query->selectall('supplier');
+                              $supplierdatas = $query->search('acname', 'ac_type', 19);
                               foreach ($supplierdatas as $supplierdata) {
                                 ?>
-                                <option value="<?php echo $supplierdata['supplier_id']; ?>"  <?php if($updatedata['supplier_id'] == $supplierdata['supplier_id']){ echo 'selected'; } ?>><?php echo $supplierdata['supplier_name']; ?></option>
+                                <option value="<?php echo $supplierdata['code_no']; ?>"  <?php if($updatedata['supplier_id'] == $supplierdata['code_no']){ echo 'selected'; } ?>><?php echo $supplierdata['ac_name']; ?></option>
                                 <?php
                               }
                               ?>
@@ -436,17 +435,7 @@ $query = new Query();
                 </select>
               </div>
               <div class="col">
-                <label style="font-weight: bold;">Supplier Name</label>
-                <select class="form-control inpv2 mb-2" name="supplier_name">
-                  <?php
-                  $supplierdatas = $query->selectall('supplier');
-                  foreach ($supplierdatas as $supplierdata) {
-                    ?>
-                    <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplierdata['supplier_name']; ?></option>
-                    <?php
-                  }
-                  ?>
-                </select>
+                
               </div>
             </div>
             <div class="row">
@@ -494,7 +483,12 @@ $query = new Query();
     </div>
   </div>
   <!-- Add Modal -->
-
+  <script type="text/javascript">
+  $('#addmodal').on('shown.bs.modal', function () {
+  // Initialize Chosen for the select element
+  $('.chzn-select').chosen();
+});
+  </script>
   <?php
   $bootstrap->javascript();
   ?>

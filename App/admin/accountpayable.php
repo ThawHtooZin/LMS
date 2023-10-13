@@ -25,10 +25,10 @@ $query = new Query();
         $search_id = $_POST['search_id'];
         $customerdatas = $query->search('customers', 'customer_id', $search_id);
       }else {
-        $customerdatas = $query->selectall('customers');
+        $supplierdatas = $query->search('acname', 'ac_type', 19);
       }
     }else {
-      $customerdatas = $query->selectall('customers');
+      $supplierdatas = $query->search('acname', 'ac_type', 19);
     }
      ?>
     <div class="row">
@@ -45,10 +45,6 @@ $query = new Query();
           </div>
           <div class="card-body">
             <?php
-            if(isset($_POST['deletebutton'])){
-              $deleteid = $_POST['deleteid'];
-              $message = $query->deletecustomer('customers', $deleteid);
-            }
             if(isset($_POST['updatebutton'])){
               $paid_date = $_POST['paid_date'];
               $paid_voucher = $_POST['paid_voucher'];
@@ -81,14 +77,14 @@ $query = new Query();
             $numOfrecs = 2;
             $offset = ($pageno -1) * $numOfrecs;
             ?>
-            <form  action="accountpayable.php" method="post" class="d-inline">
+            <form  method="post" class="d-inline">
               <span>Supplier Name:</span>
               <select class="form-control d-inline" name="supplier_id" style="width:15%;">
                 <?php
-                $supplierdatas = $query->selectall('supplier');
+                $supplierdatas = $query->search('acname', 'ac_type', 19);
                 foreach ($supplierdatas as $supplierdata) {
                   ?>
-                  <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplierdata['supplier_name']; ?></option>
+                  <option value="<?php echo $supplierdata['code_no']; ?>"><?php echo $supplierdata['ac_name']; ?></option>
                   <?php
                 }
                 ?>
@@ -99,7 +95,7 @@ $query = new Query();
             </button>
             <?php
               if(isset($_POST['search'])){
-                $supplier_id = $_POST['supplier_id'];
+                echo $supplier_id = $_POST['supplier_id'];
                 $payabledatas = $query->search('payable', 'supplier_id', $supplier_id);
               }elseif(!empty($_GET['pageno'])){
                 $stmt = $pdo->prepare("SELECT * FROM payable ORDER BY id");
@@ -116,7 +112,7 @@ $query = new Query();
             ?>
             <table class="mt-5 table table-bordered table-striped rounded">
               <tr>
-                <th>#</th>
+                <!-- <th>#</th> -->
                 <th>Supplier</th>
                 <th>Purchase <br> Voucher No</th>
                 <th>Purchase <br> Amount</th>
@@ -128,15 +124,14 @@ $query = new Query();
               <?php
               // $idd = 0;
               foreach ($payabledatas as $payabledata) {
-                $supplier = $query->select('payable', $payabledata['supplier_id'] , 'supplier_id');
-                $supplier_name = $query->select('supplier', $supplier['supplier_id'], 'supplier_id');
+                $supplier_name = $query->select('acname', $payabledata['supplier_id'], 'code_no');
                 $linkstmt = $pdo->prepare("SELECT link_id FROM payable WHERE ");
                 $link_id = $linkstmt->fetch(PDO::FETCH_ASSOC);
               ?>
               <tr>
 
                 <!-- <td><?php //echo $idd; ?></td> -->
-                <td><?php if(!empty($payabledata['purchase_voucher_no'])){ echo $supplier_name['supplier_name']; }; ?></td>
+                <td><?php if(!empty($payabledata['purchase_voucher_no'])){ echo $supplier_name['ac_name']; }; ?></td>
                 <td><?php echo $payabledata['purchase_voucher_no']; ?></td>
                 <td><?php if(!empty($payabledata['purchase_amount'])){ echo $payabledata['purchase_amount'];}; ?></td>
                 <td><?php if($payabledata['paid_date'] != "0000-00-00"){ echo $payabledata['paid_date']; }; ?></td>

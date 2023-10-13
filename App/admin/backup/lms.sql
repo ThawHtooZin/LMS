@@ -1059,12 +1059,12 @@ CREATE TABLE `tclmcstock` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO tclmcstock VALUES("2","2023-09-19","SB263","2up","89","327","0","14","HHK","14","0","0","0");
-INSERT INTO tclmcstock VALUES("4","2023-09-19","SB263","3up","89","327","0","15","","0","31","15","0");
-INSERT INTO tclmcstock VALUES("5","2023-09-19","SB263","2up","90","372","0","20","","0","22","20","0");
-INSERT INTO tclmcstock VALUES("6","2023-09-19","SB263","4up","84","150","0","15","","0","23","15","0");
-INSERT INTO tclmcstock VALUES("7","2023-09-20","SB263","5up","89","327","0","15","","0","35","15","0");
-INSERT INTO tclmcstock VALUES("8","2023-09-20","SB263","9up","100","400","0","50","HHK","25","36","25","0");
+-- INSERT INTO tclmcstock VALUES("2","2023-09-19","SB263","2up","89","327","0","14","HHK","14","0","0","0");
+-- INSERT INTO tclmcstock VALUES("4","2023-09-19","SB263","3up","89","327","0","15","","0","31","15","0");
+-- INSERT INTO tclmcstock VALUES("5","2023-09-19","SB263","2up","90","372","0","20","","0","22","20","0");
+-- INSERT INTO tclmcstock VALUES("6","2023-09-19","SB263","4up","84","150","0","15","","0","23","15","0");
+-- INSERT INTO tclmcstock VALUES("7","2023-09-20","SB263","5up","89","327","0","15","","0","35","15","0");
+-- INSERT INTO tclmcstock VALUES("8","2023-09-20","SB263","9up","100","400","0","50","HHK","25","36","25","0");
 
 
 
@@ -1111,12 +1111,12 @@ CREATE TABLE `transaction` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=226 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO transaction VALUES("217","2023-10-12","AS261","ep-005","","50000","0","mmk","","","0");
-INSERT INTO transaction VALUES("218","2023-10-12","AS261","ca-002","hubhhhjggshffdghjgfjgf","0","50000","mmk","","","0");
-INSERT INTO transaction VALUES("219","2023-10-12","AS262","ca-001","hubhhhjggshffdghjgfjgf","300000","0","usd","SGRWFGR","US-23523","0");
-INSERT INTO transaction VALUES("220","2023-10-12","AS262","r-002","hubhhhjggshffdghjgfjgf","0","300000","usd","","","0");
-INSERT INTO transaction VALUES("224","2023-10-12","AS263","ca-002","asdfasdfasdf","300000","0","usd","","","50");
-INSERT INTO transaction VALUES("225","2023-10-12","AS263","ca-001","asdfasdfasdf","0","300000","usd","SGRWFGR","US-23523","0");
+-- INSERT INTO transaction VALUES("217","2023-10-12","AS261","ep-005","","50000","0","mmk","","","0");
+-- INSERT INTO transaction VALUES("218","2023-10-12","AS261","ca-002","hubhhhjggshffdghjgfjgf","0","50000","mmk","","","0");
+-- INSERT INTO transaction VALUES("219","2023-10-12","AS262","ca-001","hubhhhjggshffdghjgfjgf","300000","0","usd","SGRWFGR","US-23523","0");
+-- INSERT INTO transaction VALUES("220","2023-10-12","AS262","r-002","hubhhhjggshffdghjgfjgf","0","300000","usd","","","0");
+-- INSERT INTO transaction VALUES("224","2023-10-12","AS263","ca-002","asdfasdfasdf","300000","0","usd","","","50");
+-- INSERT INTO transaction VALUES("225","2023-10-12","AS263","ca-001","asdfasdfasdf","0","300000","usd","SGRWFGR","US-23523","0");
 
 
 
@@ -1136,18 +1136,18 @@ CREATE TABLE `truckactualinvoice` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO truckactualinvoice VALUES("28","MR163","2up","12","49","15","735","0","0","SH473");
-INSERT INTO truckactualinvoice VALUES("29","MR163","3up","10","44","15","660","0","0","SH473");
-INSERT INTO truckactualinvoice VALUES("30","MR163","2up","13","46","17","782","0","0","SH473");
-INSERT INTO truckactualinvoice VALUES("31","MR163","3up","6","41","30","1230","0","0","SH473");
-INSERT INTO truckactualinvoice VALUES("33","MR163","3up","23","47","25","1175","0","0","SH473");
-INSERT INTO truckactualinvoice VALUES("34","MR163","2up","16","47","22","1034","0","0","SH473");
-INSERT INTO truckactualinvoice VALUES("35","MR163","5up","22","46","27","1242","0","0","SH473");
-INSERT INTO truckactualinvoice VALUES("36","KO962","2up","12","47","23","1081","0","0","SH473");
-INSERT INTO truckactualinvoice VALUES("39","MR163","2up","29","49","39","1911","0","0","GW573");
-INSERT INTO truckactualinvoice VALUES("40","MR163","3up","21","48","40","1920","0","0","GW573");
-INSERT INTO truckactualinvoice VALUES("41","MR163","2up","24","47","32","1504","0","0","GW573");
-INSERT INTO truckactualinvoice VALUES("42","KO962","2up","22","47","30","1410","0","0","GW573");
+-- INSERT INTO truckactualinvoice VALUES("28","MR163","2up","12","49","15","735","0","0","SH473");
+-- INSERT INTO truckactualinvoice VALUES("29","MR163","3up","10","44","15","660","0","0","SH473");
+-- INSERT INTO truckactualinvoice VALUES("30","MR163","2up","13","46","17","782","0","0","SH473");
+-- INSERT INTO truckactualinvoice VALUES("31","MR163","3up","6","41","30","1230","0","0","SH473");
+-- INSERT INTO truckactualinvoice VALUES("33","MR163","3up","23","47","25","1175","0","0","SH473");
+-- INSERT INTO truckactualinvoice VALUES("34","MR163","2up","16","47","22","1034","0","0","SH473");
+-- INSERT INTO truckactualinvoice VALUES("35","MR163","5up","22","46","27","1242","0","0","SH473");
+-- INSERT INTO truckactualinvoice VALUES("36","KO962","2up","12","47","23","1081","0","0","SH473");
+-- INSERT INTO truckactualinvoice VALUES("39","MR163","2up","29","49","39","1911","0","0","GW573");
+-- INSERT INTO truckactualinvoice VALUES("40","MR163","3up","21","48","40","1920","0","0","GW573");
+-- INSERT INTO truckactualinvoice VALUES("41","MR163","2up","24","47","32","1504","0","0","GW573");
+-- INSERT INTO truckactualinvoice VALUES("42","KO962","2up","22","47","30","1410","0","0","GW573");
 
 
 
@@ -1165,18 +1165,18 @@ CREATE TABLE `truckdeclare` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO truckdeclare VALUES("18","MR163","2up","12","0","15","0","SH473");
-INSERT INTO truckdeclare VALUES("19","MR163","3up","10","0","15","0","SH473");
-INSERT INTO truckdeclare VALUES("20","MR163","2up","13","0","17","0","SH473");
-INSERT INTO truckdeclare VALUES("21","MR163","3up","6","0","30","0","SH473");
-INSERT INTO truckdeclare VALUES("23","MR163","3up","23","0","25","0","SH473");
-INSERT INTO truckdeclare VALUES("24","MR163","2up","16","0","22","0","SH473");
-INSERT INTO truckdeclare VALUES("25","MR163","5up","22","0","27","0","SH473");
-INSERT INTO truckdeclare VALUES("26","KO962","2up","12","0","23","0","SH473");
-INSERT INTO truckdeclare VALUES("29","MR163","2up","29","0","39","0","GW573");
-INSERT INTO truckdeclare VALUES("30","MR163","3up","21","0","40","0","GW573");
-INSERT INTO truckdeclare VALUES("31","MR163","2up","24","0","32","0","GW573");
-INSERT INTO truckdeclare VALUES("32","KO962","2up","22","0","30","0","GW573");
+-- INSERT INTO truckdeclare VALUES("18","MR163","2up","12","0","15","0","SH473");
+-- INSERT INTO truckdeclare VALUES("19","MR163","3up","10","0","15","0","SH473");
+-- INSERT INTO truckdeclare VALUES("20","MR163","2up","13","0","17","0","SH473");
+-- INSERT INTO truckdeclare VALUES("21","MR163","3up","6","0","30","0","SH473");
+-- INSERT INTO truckdeclare VALUES("23","MR163","3up","23","0","25","0","SH473");
+-- INSERT INTO truckdeclare VALUES("24","MR163","2up","16","0","22","0","SH473");
+-- INSERT INTO truckdeclare VALUES("25","MR163","5up","22","0","27","0","SH473");
+-- INSERT INTO truckdeclare VALUES("26","KO962","2up","12","0","23","0","SH473");
+-- INSERT INTO truckdeclare VALUES("29","MR163","2up","29","0","39","0","GW573");
+-- INSERT INTO truckdeclare VALUES("30","MR163","3up","21","0","40","0","GW573");
+-- INSERT INTO truckdeclare VALUES("31","MR163","2up","24","0","32","0","GW573");
+-- INSERT INTO truckdeclare VALUES("32","KO962","2up","22","0","30","0","GW573");
 
 
 
@@ -1196,18 +1196,18 @@ CREATE TABLE `truckfoambox` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO truckfoambox VALUES("22","MR163","2up","12","49","15","735","1,2,3,4,5","5","SH473");
-INSERT INTO truckfoambox VALUES("23","MR163","3up","10","44","15","660","","","SH473");
-INSERT INTO truckfoambox VALUES("24","MR163","2up","13","46","17","782","","","SH473");
-INSERT INTO truckfoambox VALUES("25","MR163","3up","6","41","30","1230","","","SH473");
-INSERT INTO truckfoambox VALUES("27","MR163","3up","23","47","25","1175","","","SH473");
-INSERT INTO truckfoambox VALUES("28","MR163","2up","16","47","22","1034","","","SH473");
-INSERT INTO truckfoambox VALUES("29","MR163","5up","22","46","27","1242","","","SH473");
-INSERT INTO truckfoambox VALUES("30","KO962","2up","12","47","23","1081","","","SH473");
-INSERT INTO truckfoambox VALUES("33","MR163","2up","29","49","39","1911","","","GW573");
-INSERT INTO truckfoambox VALUES("34","MR163","3up","21","48","40","1920","","","GW573");
-INSERT INTO truckfoambox VALUES("35","MR163","2up","24","47","32","1504","","","GW573");
-INSERT INTO truckfoambox VALUES("36","KO962","2up","22","47","30","1410","","","GW573");
+-- INSERT INTO truckfoambox VALUES("22","MR163","2up","12","49","15","735","1,2,3,4,5","5","SH473");
+-- INSERT INTO truckfoambox VALUES("23","MR163","3up","10","44","15","660","","","SH473");
+-- INSERT INTO truckfoambox VALUES("24","MR163","2up","13","46","17","782","","","SH473");
+-- INSERT INTO truckfoambox VALUES("25","MR163","3up","6","41","30","1230","","","SH473");
+-- INSERT INTO truckfoambox VALUES("27","MR163","3up","23","47","25","1175","","","SH473");
+-- INSERT INTO truckfoambox VALUES("28","MR163","2up","16","47","22","1034","","","SH473");
+-- INSERT INTO truckfoambox VALUES("29","MR163","5up","22","46","27","1242","","","SH473");
+-- INSERT INTO truckfoambox VALUES("30","KO962","2up","12","47","23","1081","","","SH473");
+-- INSERT INTO truckfoambox VALUES("33","MR163","2up","29","49","39","1911","","","GW573");
+-- INSERT INTO truckfoambox VALUES("34","MR163","3up","21","48","40","1920","","","GW573");
+-- INSERT INTO truckfoambox VALUES("35","MR163","2up","24","47","32","1504","","","GW573");
+-- INSERT INTO truckfoambox VALUES("36","KO962","2up","22","47","30","1410","","","GW573");
 
 
 
@@ -1241,18 +1241,18 @@ CREATE TABLE `truckpackingliststockinfo` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO truckpackingliststockinfo VALUES("29","MR163","2up","12","49","15","735","900","SH473");
-INSERT INTO truckpackingliststockinfo VALUES("30","MR163","3up","10","44","15","660","900","SH473");
-INSERT INTO truckpackingliststockinfo VALUES("31","MR163","2up","13","46","17","782","1020","SH473");
-INSERT INTO truckpackingliststockinfo VALUES("32","MR163","3up","6","41","30","1230","1800","SH473");
-INSERT INTO truckpackingliststockinfo VALUES("34","MR163","3up","23","47","25","1175","1500","SH473");
-INSERT INTO truckpackingliststockinfo VALUES("35","MR163","2up","16","47","22","1034","1320","SH473");
-INSERT INTO truckpackingliststockinfo VALUES("36","MR163","5up","22","46","27","1242","1620","SH473");
-INSERT INTO truckpackingliststockinfo VALUES("37","KO962","2up","12","47","23","1081","1380","SH473");
-INSERT INTO truckpackingliststockinfo VALUES("40","MR163","2up","29","49","39","1911","2340","GW573");
-INSERT INTO truckpackingliststockinfo VALUES("41","MR163","3up","21","48","40","1920","2400","GW573");
-INSERT INTO truckpackingliststockinfo VALUES("42","MR163","2up","24","47","32","1504","1920","GW573");
-INSERT INTO truckpackingliststockinfo VALUES("43","KO962","2up","22","47","30","1410","1800","GW573");
+-- INSERT INTO truckpackingliststockinfo VALUES("29","MR163","2up","12","49","15","735","900","SH473");
+-- INSERT INTO truckpackingliststockinfo VALUES("30","MR163","3up","10","44","15","660","900","SH473");
+-- INSERT INTO truckpackingliststockinfo VALUES("31","MR163","2up","13","46","17","782","1020","SH473");
+-- INSERT INTO truckpackingliststockinfo VALUES("32","MR163","3up","6","41","30","1230","1800","SH473");
+-- INSERT INTO truckpackingliststockinfo VALUES("34","MR163","3up","23","47","25","1175","1500","SH473");
+-- INSERT INTO truckpackingliststockinfo VALUES("35","MR163","2up","16","47","22","1034","1320","SH473");
+-- INSERT INTO truckpackingliststockinfo VALUES("36","MR163","5up","22","46","27","1242","1620","SH473");
+-- INSERT INTO truckpackingliststockinfo VALUES("37","KO962","2up","12","47","23","1081","1380","SH473");
+-- INSERT INTO truckpackingliststockinfo VALUES("40","MR163","2up","29","49","39","1911","2340","GW573");
+-- INSERT INTO truckpackingliststockinfo VALUES("41","MR163","3up","21","48","40","1920","2400","GW573");
+-- INSERT INTO truckpackingliststockinfo VALUES("42","MR163","2up","24","47","32","1504","1920","GW573");
+-- INSERT INTO truckpackingliststockinfo VALUES("43","KO962","2up","22","47","30","1410","1800","GW573");
 
 
 
@@ -1308,18 +1308,18 @@ CREATE TABLE `trucktotalcosting` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO trucktotalcosting VALUES("15","0000-00-00","MR163","2up","49","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
-INSERT INTO trucktotalcosting VALUES("16","0000-00-00","MR163","3up","44","1100","673.195","686.933","362","8992","7133","100","16587","0","0","0","0","0","0","0","0","0","SH473");
-INSERT INTO trucktotalcosting VALUES("17","0000-00-00","MR163","2up","46","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
-INSERT INTO trucktotalcosting VALUES("18","0000-00-00","MR163","3up","41","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
-INSERT INTO trucktotalcosting VALUES("20","0000-00-00","MR163","3up","47","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
-INSERT INTO trucktotalcosting VALUES("21","0000-00-00","MR163","2up","47","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
-INSERT INTO trucktotalcosting VALUES("22","0000-00-00","MR163","5up","46","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
-INSERT INTO trucktotalcosting VALUES("23","0000-00-00","KO962","2up","47","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
-INSERT INTO trucktotalcosting VALUES("26","0000-00-00","MR163","2up","49","1100","673.195","686.933","362","395","313","100","1170","0","0","0","0","0","0","0","0","0","GW573");
-INSERT INTO trucktotalcosting VALUES("27","0000-00-00","MR163","3up","48","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","GW573");
-INSERT INTO trucktotalcosting VALUES("28","0000-00-00","MR163","2up","47","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","GW573");
-INSERT INTO trucktotalcosting VALUES("29","0000-00-00","KO962","2up","47","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","GW573");
+-- INSERT INTO trucktotalcosting VALUES("15","0000-00-00","MR163","2up","49","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
+-- INSERT INTO trucktotalcosting VALUES("16","0000-00-00","MR163","3up","44","1100","673.195","686.933","362","8992","7133","100","16587","0","0","0","0","0","0","0","0","0","SH473");
+-- INSERT INTO trucktotalcosting VALUES("17","0000-00-00","MR163","2up","46","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
+-- INSERT INTO trucktotalcosting VALUES("18","0000-00-00","MR163","3up","41","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
+-- INSERT INTO trucktotalcosting VALUES("20","0000-00-00","MR163","3up","47","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
+-- INSERT INTO trucktotalcosting VALUES("21","0000-00-00","MR163","2up","47","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
+-- INSERT INTO trucktotalcosting VALUES("22","0000-00-00","MR163","5up","46","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
+-- INSERT INTO trucktotalcosting VALUES("23","0000-00-00","KO962","2up","47","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","SH473");
+-- INSERT INTO trucktotalcosting VALUES("26","0000-00-00","MR163","2up","49","1100","673.195","686.933","362","395","313","100","1170","0","0","0","0","0","0","0","0","0","GW573");
+-- INSERT INTO trucktotalcosting VALUES("27","0000-00-00","MR163","3up","48","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","GW573");
+-- INSERT INTO trucktotalcosting VALUES("28","0000-00-00","MR163","2up","47","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","GW573");
+-- INSERT INTO trucktotalcosting VALUES("29","0000-00-00","KO962","2up","47","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","GW573");
 
 
 
@@ -1336,57 +1336,3 @@ CREATE TABLE `userlogs` (
 ) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO userlogs VALUES("1","10:26:18.000000","2023-09-18","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("2","10:31:25.000000","2023-09-18","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("3","09:34:51.000000","2023-09-19","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("4","05:49:07.000000","2023-09-19","admin","","Logout");
-INSERT INTO userlogs VALUES("5","10:19:14.000000","2023-09-19","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("6","05:49:31.000000","2023-09-19","admin","","Logout");
-INSERT INTO userlogs VALUES("7","10:19:36.000000","2023-09-19","asdf","yyyy","Login Failed");
-INSERT INTO userlogs VALUES("8","10:19:39.000000","2023-09-19","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("9","10:10:48.000000","2023-09-20","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("10","11:03:45.000000","2023-09-21","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("11","11:03:47.000000","2023-09-21","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("12","11:20:31.000000","2023-09-21","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("13","11:21:06.000000","2023-09-21","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("14","11:27:45.000000","2023-09-21","ADMIN","ADMIN","Login Password Invalid");
-INSERT INTO userlogs VALUES("15","11:27:53.000000","2023-09-21","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("16","10:47:33.000000","2023-09-22","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("17","10:51:57.000000","2023-09-22","sdamin","admin","Login Failed");
-INSERT INTO userlogs VALUES("18","10:52:01.000000","2023-09-22","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("19","10:52:45.000000","2023-09-22","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("20","10:55:31.000000","2023-09-22","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("21","09:24:47.000000","2023-09-23","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("22","10:33:14.000000","2023-09-25","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("23","10:04:05.000000","2023-09-26","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("24","10:31:52.000000","2023-09-27","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("25","06:07:40.000000","2023-09-27","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("26","10:05:20.000000","2023-09-28","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("27","03:53:51.000000","2023-10-03","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("28","04:16:27.000000","2023-10-03","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("29","06:03:09.000000","2023-10-03","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("30","11:02:48.000000","2023-10-04","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("31","02:09:44.000000","2023-10-05","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("32","10:11:56.000000","2023-10-05","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("33","09:34:52.000000","2023-10-06","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("34","06:24:13.000000","2023-10-06","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("35","11:08:11.000000","2023-10-07","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("36","11:54:45.000000","2023-10-07","Myat Thu","mt","Login Failed");
-INSERT INTO userlogs VALUES("37","11:54:53.000000","2023-10-07","Myat Thu","myatthu","Login Failed");
-INSERT INTO userlogs VALUES("38","11:55:02.000000","2023-10-07","Myat Thu","myatthu","Login Failed");
-INSERT INTO userlogs VALUES("39","11:55:08.000000","2023-10-07","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("40","11:56:23.000000","2023-10-07","Myat Thu","myatthu","Login Success");
-INSERT INTO userlogs VALUES("41","11:56:37.000000","2023-10-07","Myat Thu","myatthu","Login Success");
-INSERT INTO userlogs VALUES("42","11:58:28.000000","2023-10-07","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("43","11:31:45.000000","2023-10-09","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("44","03:35:06.000000","2023-10-09","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("45","03:50:17.000000","2023-10-09","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("46","06:27:31.000000","2023-10-09","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("47","06:32:04.000000","2023-10-09","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("48","10:52:06.000000","2023-10-10","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("49","06:36:10.000000","2023-10-10","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("50","09:04:38.000000","2023-10-11","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("51","11:58:11.000000","2023-10-11","admin","admin","Login Success");
-INSERT INTO userlogs VALUES("52","09:33:13.000000","2023-10-12","admin","admin","Login Success");
-
-
-

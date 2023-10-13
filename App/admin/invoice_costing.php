@@ -51,7 +51,7 @@ $query = new Query();
     }
      ?>
     <div class="row">
-      <div class="sidebarcol" id="sidebar">>
+      <div class="sidebarcol" id="sidebar">
         <?php
         include 'sidebar.php';
         ?>
