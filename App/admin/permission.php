@@ -109,6 +109,9 @@ $query = new Query();
       if(!empty($_POST['purchase_report'])){
         $permission .= ",purchase_report";
       }
+      if(!empty($_POST['payable_report'])){
+        $permission .= ",payable_report";
+      }
 
       $permission;
       $role_id = $_GET['role_id'];
@@ -236,8 +239,8 @@ $query = new Query();
                   <td><input type="checkbox" name="sale_report" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'sale_report') == 1){echo "checked";}} ?>></td>
                 </tr>
                 <tr>
-                  <td></td>
-                  <td></td>
+                  <td>Payable Report</td>
+                  <td><input type="checkbox" name="payable_report" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'payable_report') == 1){echo "checked";}} ?>></td>
                   <td></td>
                   <td><button type="submit" name="save" class="btn btn-success">Save</button></td>
                 </tr>

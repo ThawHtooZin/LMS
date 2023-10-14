@@ -360,7 +360,7 @@ Class Query{
     $iddata = $idstmt->fetch(PDO::FETCH_ASSOC);
     $stmt = $pdo->prepare("INSERT INTO $table(date, voucher_no, tclfrozen, supplier_id, commodity, size, viss, pcs, price, amount) VALUES('$date', '$voucher_no', '$tclfrozen', '$supplier_name', '$commodity', '$size', '$viss', '$pcs', '$price', '$amount')");
     $stmt->execute();
-    $balstmt = $pdo->prepare("SELECT balance FROM payable ORDER BY id DESC");
+    $balstmt = $pdo->prepare("SELECT balance FROM payable WHERE supplier_id = '$supplier_name' ORDER BY id DESC");
     $balstmt->execute();
     $baldata = $balstmt->fetch(PDO::FETCH_ASSOC);
     if(!empty($baldata['balance'])){
@@ -377,7 +377,7 @@ Class Query{
     $idstmt->execute();
     $iddata = $idstmt->fetch(PDO::FETCH_ASSOC);
     $id = $iddata['no'];
-    $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, purchase_amount, balance, link_id) VALUES('$supplier_name', '$voucher_no', '$amount', '$total_balance', '$id')");
+    $payablestmt = $pdo->prepare("INSERT INTO payable(date, supplier_id, purchase_voucher_no, purchase_amount, balance, link_id) VALUES('$date', '$supplier_name', '$voucher_no', '$amount', '$total_balance', '$id')");
     $payablestmt->execute();
     $kg = floatval($viss) * 1.634;
     $link_id = $id;
@@ -2588,23 +2588,23 @@ Class Query{
       $supplier_id = $payabledata['ac_code'];
       $voucher_no = $payabledata['voucher_no'];
       $paid_amount = $payabledata['debit'];
+      $description = $payabledata['description'];
 
       $payabledatastmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' ORDER BY id DESC");
       $payabledatastmt->execute();
       $payablesearchdata = $payabledatastmt->fetch(PDO::FETCH_ASSOC);
       if(!empty($payablesearchdata)){
         if($payablesearchdata['paid_amount'] == '0'){
-          $balance = $payablesearchdata['balance'] - $debit;
+          $balance = $payablesearchdata['balance'] - $paid_amount;
           $rowid = $payablesearchdata['id'];
-          $paid_amount = $payabledata['debit'];
-          $payablestmt = $pdo->prepare("UPDATE payable SET supplier_id='$supplier_id', paid_date='$date', paid_voucher='$voucher_no', paid_amount='$paid_amount', balance='$balance' WHERE id='$rowid'");
+          $payablestmt = $pdo->prepare("UPDATE payable SET supplier_id='$supplier_id', paid_date='$date', paid_voucher='$voucher_no', remark='$description', paid_amount='$paid_amount', balance='$balance' WHERE id='$rowid'");
         }else{
-          $balance = $payablesearchdata['balance'] - $debit;
-          $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, paid_date, paid_voucher, paid_amount, balance) VALUES('$supplier_id', '$date', '$voucher_no', '$debit', '$balance')");
+          $balance = $payablesearchdata['balance'] - $paid_amount;
+          $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '$date', '$voucher_no', '$description', '$paid_amount', '$balance')");
         }
       }else{
         $balance = 0;
-        $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, paid_date, paid_voucher, paid_amount, balance) VALUES('$supplier_id', '$date', '$voucher_no', '$debit', '$balance')");
+        $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '$date', '$voucher_no', '$description', '$paid_amount', '$balance')");
       }
       $payablestmt->execute();
     }

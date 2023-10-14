@@ -125,10 +125,13 @@ $query = new Query();
               <span>Supplier Name:</span>
               <select class="chzn-select" name="supplier_id" style="width:15%;" data-placeholder="Supplier Name">
                 <?php
-                $supplierdatas = $query->selectcontain('acname', 'code_no', 4000);
+                $supplierdatastmt = $pdo->prepare("SELECT DISTINCT supplier_id FROM purchase");
+                $supplierdatastmt->execute();
+                $supplierdatas = $supplierdatastmt->fetchall();
                 foreach ($supplierdatas as $supplierdata) {
+                  $supplier_name = $query->select('acname', $supplierdata['supplier_id'], 'code_no');
                   ?>
-                  <option value="<?php echo $supplierdata['code_no']; ?>"><?php echo $supplierdata['ac_name']; ?> - <?php echo $supplierdata['code_no']; ?></option>
+                  <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplier_name['ac_name']; ?> - <?php echo $supplierdata['supplier_id']; ?></option>
                   <?php
                 }
                 ?>

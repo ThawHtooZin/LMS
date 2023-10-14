@@ -20,16 +20,6 @@ $query = new Query();
   ?>
   <body>
     <?php
-    if(isset($_POST['searchcustomer'])){
-      if(!empty($_POST['search_id'])){
-        $search_id = $_POST['search_id'];
-        $customerdatas = $query->search('customers', 'customer_id', $search_id);
-      }else {
-        $supplierdatas = $query->search('acname', 'ac_type', 19);
-      }
-    }else {
-      $supplierdatas = $query->search('acname', 'ac_type', 19);
-    }
      ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
@@ -40,8 +30,26 @@ $query = new Query();
       <div class="contentcol" id="content">
         <?php require 'navbar.php'; ?>
         <div class="card">
-          <div class="card-header bg-warning text-light">
+          <div class="card-header bg-info text-light">
             <h5>Payable Detail Info</h5>
+            <form class="float-end" action="" method="post">
+
+              <select class="chzn-select" name="supplier_id" style="width:100%;" data-placeholder="Supplier name">
+                <option value=""></option>
+                <?php
+                $supplierdatastmt = $pdo->prepare("SELECT DISTINCT supplier_id FROM payable");
+                $supplierdatastmt->execute();
+                $supplierdatas = $supplierdatastmt->fetchall();
+                foreach ($supplierdatas as $supplierdata) {
+                  $supplier_name = $query->select('acname', $supplierdata['supplier_id'], 'code_no');
+                  ?>
+                  <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplier_name['ac_name']; ?> - <?php echo $supplierdata['supplier_id']; ?></option>
+                  <?php
+                }
+                ?>
+              </select>
+              <button type="submit" name="search" class="btn btn-primary btn-sm">Search</button>
+            </form>
           </div>
           <div class="card-body">
             <?php
@@ -77,25 +85,6 @@ $query = new Query();
             $numOfrecs = 2;
             $offset = ($pageno -1) * $numOfrecs;
             ?>
-            <form  method="post" class="d-inline">
-              <span>Supplier Name:</span>
-              <select class="form-control d-inline" name="supplier_id" style="width:15%;">
-                <?php
-                $supplierdatastmt->prepare("SELECT DISTINCT supplier_id FROM payable");
-                $supplierdatastmt->execute();
-                $supplierdatas = $supplierdatastmt->execute();
-                foreach ($supplierdatas as $supplierdata) {
-                  $supplier_name = $query->select('acname', $payabledata['supplier_id'], 'code_no');
-                  ?>
-                  <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplier_name['ac_name']; ?></option>
-                  <?php
-                }
-                ?>
-              </select>
-              <button type="submit" name="search" class="btn btn-primary btn-sm">Search</button>
-            <button type="button" class="btn btn-success float-end d-inline" data-bs-toggle="modal" data-bs-target="#addmodal">
-              Add Pay Amount
-            </button>
             <?php
               if(isset($_POST['search'])){
                 $supplier_id = $_POST['supplier_id'];
@@ -113,14 +102,15 @@ $query = new Query();
                 $payabledatas = $query->selectall('payable');
               }
             ?>
-            <table class="mt-5 table table-bordered table-striped rounded">
+            <table class="mt-1 table table-bordered table-striped rounded">
               <tr>
                 <!-- <th>#</th> -->
-                <th>Supplier</th>
+                <th>Supplier Name</th>
                 <th>Purchase <br> Voucher No</th>
                 <th>Purchase <br> Amount</th>
                 <th>Paid Date</th>
                 <th>Paid Voucher</th>
+                <th>Remark</th>
                 <th>Paid Amount</th>
                 <th>Balance</th>
                 <!-- <th>Action</th> -->
@@ -140,6 +130,7 @@ $query = new Query();
                 <td><?php if(!empty($payabledata['purchase_amount'])){ echo $payabledata['purchase_amount'];}; ?></td>
                 <td><?php if($payabledata['paid_date'] != "0000-00-00"){ echo $payabledata['paid_date']; }; ?></td>
                 <td><?php echo $payabledata['paid_voucher']; ?></td>
+                <td><?php echo $payabledata['remark']; ?></td>
                 <td><?php if(!empty($payabledata['paid_amount'])){ echo $payabledata['paid_amount'];}; ?></td>
                 <td><?php if(!empty($payabledata['balance'])){ echo $payabledata['balance'];}; ?></td>
                 <!-- <td style="<?php// if($payabledata['paid_date'] == "0000-00-00"){ echo "display:none;"; }; ?>">
@@ -197,26 +188,18 @@ $query = new Query();
                   $total_purchase_amount = $query->selectallsumpayable('payable', 'purchase_amount', 'total_purchase_amount', $supplier_id);
 
                   $total_paid_amount = $query->selectallsumpayable('payable', 'paid_amount', 'total_paid_amount', $supplier_id);
+
+
                   ?>
-                  <tr>
+                  <tr style="font-weight: bold;">
+                    <td>Total:</td>
                     <td></td>
-                    <td></td>
-                    <td>Total Purchase Amount</td>
                     <td><?php echo $total_purchase_amount['total_purchase_amount'] ?></td>
                     <td></td>
-                    <td>Total Paid Amount</td>
+                    <td></td>
+                    <td></td>
                     <td><?php echo $total_paid_amount['total_paid_amount'] ?></td>
-                    <td></td>
-                  </tr>
-                  <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>Balance</td>
                     <td><?php echo $total_purchase_amount['total_purchase_amount'] - $total_paid_amount['total_paid_amount']; ?></td>
-                    <td></td>
                   </tr>
                   <?php
                 }
@@ -229,7 +212,7 @@ $query = new Query();
     </div>
 
   <!-- Data Add Modal -->
-  <div class="modal fade" id="addmodal" tabindex="-1" role="dialog" aria-hidden="true">
+  <!-- <div class="modal fade" id="addmodal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header bg-secondary text-light">
@@ -239,7 +222,7 @@ $query = new Query();
           </button>
         </div>
         <form action="accountpayable.php" method="post" autocomplete="off">
-          <input type="hidden" name="supplier_id" value="<?php echo $supplier_id; ?>">
+          <input type="hidden" name="supplier_id" value="<?php //echo $supplier_id; ?>">
           <div class="modal-body">
             <label>Paid Date</label>
             <input type="date" name="paid_date" class="form-control">
@@ -255,7 +238,7 @@ $query = new Query();
         </form>
       </div>
     </div>
-  </div>
+  </div> -->
   <!-- Add Modal -->
 
   <?php

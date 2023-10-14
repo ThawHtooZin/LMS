@@ -58,7 +58,20 @@ $query = new Query();
         <div class="card">
           <div class="card-header bg-info text-light">
             <b style="font-size:18px;">Manage A/C Name</b>
+            <select class="chzn-select" name="supplier_id" style="width:15%;" data-placeholder="Supplier Name">
+              <?php
+              $actypestmt = $pdo->prepare("SELECT DISTINCT ac_type FROM acname");
+              $actypestmt->execute();
+              $actypes = $actypestmt->fetchall();
 
+              foreach ($actypes as $actype) {
+                $ac_name = $query->select('actype', $actype['ac_type'], 'acid');
+                ?>
+                <option value="<?php echo $ac_name['acid']; ?>"><?php echo $ac_name['ac_type']; ?></option>
+                <?php
+              }
+              ?>
+            </select>
             <button type="button" class="btn btn-secondary btn-sm float-end text-light" data-bs-toggle="modal" data-bs-target="#addmodal">Add A/C Name</button>
           </div>
           <div class="card-body">
