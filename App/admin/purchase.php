@@ -125,8 +125,10 @@ $query = new Query();
               <span>Supplier Name:</span>
               <select class="chzn-select" name="supplier_id" style="width:15%;" data-placeholder="Supplier Name">
                 <?php
-                $supplierdatas = $query->selectall('supplier');
+                $supplierdatastmt = $pdo->prepare("SELECT * FROM purchase GROUP BY supplier_id");
+                $supplierdatastmt->execute();
                 $supplierdatas = $supplierdatastmt->fetchall();
+                print_r($supplierdatas);
                 foreach ($supplierdatas as $supplierdata) {
                   $supplier_name = $query->select('acname', $supplierdata['supplier_id'], 'code_no');
                   ?>
@@ -496,7 +498,7 @@ $query = new Query();
     </div>
   </div>
   <!-- Add Modal -->
-  
+
   <?php
   $bootstrap->javascript();
   ?>

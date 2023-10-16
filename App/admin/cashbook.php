@@ -208,7 +208,7 @@ $query = new Query();
                 ?>
               <tr>
                 <td><?php echo $cashdata['id']; ?></td>
-                <td><?php echo $cashdata['date']; ?></td>
+                <td><?php echo date('d-m-Y', strtotime($cashdata['date'])); ?></td>
                 <td><?php echo $cashdata['serial_no']; ?></td>
                 <td><?php echo $acname; ?></td>
                 <td><?php echo $cashdata['particular']; ?></td>

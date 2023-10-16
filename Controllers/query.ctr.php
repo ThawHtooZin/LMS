@@ -2768,6 +2768,41 @@ Class Query{
       return $searchdata = $searchstmt->fetchall();
     }
    }
+
+   function payablereport(){
+    global $pdo;
+
+    $payablesuppliers = $this->selectdis('payable', 'supplier_id');
+    foreach ($payablesuppliers as $payablesupplier) {
+      $date = date('Y-m-d');
+      $supplier_id = $payablesupplier['supplier_id'];
+      $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id'");
+      $payablestmt->execute();
+      $payabledata = $payablestmt->fetch(PDO::FETCH_ASSOC);
+
+      $idofrow = $payabledata['id'];
+      $openingamountstmt = $pdo->prepare("SELECT balance FROM payable WHERE supplier_id='$supplier_id' AND id < '$idofrow' AND report_date!='0000-00-00' ORDER BY id DESC");
+      $openingamountstmt->execute();
+      $openingamount = $openingamountstmt->fetch(PDO::FETCH_ASSOC);
+
+      $purchaseamtstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS purchase_amount FROM payable WHERE supplier_id='$supplier_id'");
+      $purchaseamtstmt->execute();
+      $purchaseamt = $purchaseamtstmt->fetch(PDO::FETCH_ASSOC);
+
+      $paidamtstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE supplier_id='$supplier_id'");
+      $paidamtstmt->execute();
+      $paidamt = $paidamtstmt->fetch(PDO::FETCH_ASSOC);
+      if (!empty($openingamount['balance'])) {
+        $openingamt = $openingamount['balance'];
+      }else{
+        $openingamt = 0;
+      }
+      $closing_balance =  ($openingamt + $purchaseamt['purchase_amount']) - $paidamt['paid_amount'];
+      $payableid = $payabledata['id'];
+      $payablereportstmt = $pdo->prepare("UPDATE payable SET closing_balance='$closing_balance',  report_date='$date' WHERE id='$payableid'");
+      $payablereportstmt->execute();
+    }
+   }
   // MORE SELECTS
 
   function selectsum($table, $id, $selectwhat){

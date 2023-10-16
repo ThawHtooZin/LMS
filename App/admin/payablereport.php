@@ -22,6 +22,11 @@ $query = new Query();
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
   <body>
+    <?php
+    if(isset($_POST['print'])){
+      $query->payablereport();
+    }
+     ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
         <?php
@@ -33,7 +38,9 @@ $query = new Query();
         <div class="card">
           <div class="card-header bg-info text-light">
             <h5>Payable Reports</h5>
-            <button type="button" class="btn btn-success float-end btn-sm d-inline" onclick="window.open('print/payablereportprint.php');">Print</button>
+            <form action="" method="post" class="d-inline">
+              <button type="submit" name="print" class="btn btn-success float-end btn-sm d-inline" onclick="window.open('print/payablereportprint.php');">Print</button>
+            </form>
           </div>
           <div class="card-body">
             <b>Payable for Supplier</b>
@@ -56,22 +63,21 @@ $query = new Query();
               $payablesuppliers = $query->selectdis('payable', 'supplier_id');
               $id = 0;
               foreach ($payablesuppliers as $payablesupplier) :
-                $date = date('Y-m-d');
                 $supplier_id = $payablesupplier['supplier_id'];
                 $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id'");
                 $payablestmt->execute();
                 $payabledata = $payablestmt->fetch(PDO::FETCH_ASSOC);
 
                 $idofrow = $payabledata['id'];
-                $openingamountstmt = $pdo->prepare("SELECT balance FROM payable WHERE supplier_id='$supplier_id' AND date='$date' AND id < '$idofrow' AND report_date!='0000-00-00' ORDER BY id DESC");
+                $openingamountstmt = $pdo->prepare("SELECT balance FROM payable WHERE supplier_id='$supplier_id' AND id < '$idofrow' AND report_date!='0000-00-00' ORDER BY id DESC");
                 $openingamountstmt->execute();
                 $openingamount = $openingamountstmt->fetch(PDO::FETCH_ASSOC);
 
-                $purchaseamtstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND date='$date'");
+                $purchaseamtstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS purchase_amount FROM payable WHERE supplier_id='$supplier_id'");
                 $purchaseamtstmt->execute();
                 $purchaseamt = $purchaseamtstmt->fetch(PDO::FETCH_ASSOC);
 
-                $paidamtstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE supplier_id='$supplier_id' AND date='$date'");
+                $paidamtstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE supplier_id='$supplier_id'");
                 $paidamtstmt->execute();
                 $paidamt = $paidamtstmt->fetch(PDO::FETCH_ASSOC);
 
