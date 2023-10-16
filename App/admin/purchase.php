@@ -130,9 +130,9 @@ $query = new Query();
                 $supplierdatas = $supplierdatastmt->fetchall();
                 print_r($supplierdatas);
                 foreach ($supplierdatas as $supplierdata) {
-                  $supplier_name = $query->select('acname', $supplierdata['supplier_id'], 'code_no');
+                  $supplier_name = $query->select('supplier', $supplierdata['supplier_id'], 'supplier_id');
                   ?>
-                  <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplierdata['supplier_name']; ?></option>
+                  <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplier_name['supplier_name']; ?></option>
                   <?php
                 }
                 ?>

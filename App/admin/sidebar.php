@@ -88,7 +88,7 @@ $permissions = $permission['permission'];
       }
        ?>
       <?php
-      if(str_contains($permissions, 'manage_sale') == 1 || str_contains($permissions, 'manage_purchase') == 1 ||str_contains($permissions, 'manage_cashbook') == 1 ||str_contains($permissions, 'manage_accountpayable') == 1 ||str_contains($permissions, 'manage_accountreceivable') == 1 ||str_contains($permissions, 'manage_general_ledger') == 1 ||str_contains($permissions, 'manage_ledger_record') == 1 ){
+      if(str_contains($permissions, 'manage_sale') == 1 || str_contains($permissions, 'manage_purchase') == 1 ||str_contains($permissions, 'manage_cashbook') == 1 ||str_contains($permissions, 'manage_accountpayable') == 1 ||str_contains($permissions, 'manage_accountreceivable') == 1 ||str_contains($permissions, 'manage_general_ledger') == 1 ||str_contains($permissions, 'manage_ledger_record') == 1 ||str_contains($permissions, 'manage_acpayable') == 1 ){
       ?>
       <li  class=" p-1" style=" font-weight:bold; border-bottom: 1px solid rgb(255,255,255,0.2); " >
         <a href="#" class="nav-link text-white" data-bs-toggle="collapse" data-bs-target="#account-collapse" aria-expanded="false" id="sidebarlink">
@@ -131,6 +131,18 @@ $permissions = $permission['permission'];
               <a href="cashbook.php" class="nav-link  h text-light"  style="font-size:14px !important; ">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Cash Book
+              </a>
+            </li>
+            <?php
+            }
+            ?>
+            <?php
+            if(str_contains($permissions, 'manage_acpayable')){
+              ?>
+            <li class="nav-item">
+              <a href="acpayable.php" class="nav-link h text-light"  style="font-size:14px !important; ">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - A/C Payable
               </a>
             </li>
             <?php
