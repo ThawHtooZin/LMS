@@ -2608,6 +2608,41 @@ Class Query{
       }
       $payablestmt->execute();
     }
+
+    // Cash Book
+    $stmt = $pdo->prepare("SELECT * FROM transaction WHERE date='$date' AND ac_code LIKE '3600%'");
+    $stmt->execute();
+    $cashbookdatas = $stmt->fetchall();
+    foreach ($cashbookdatas as $cashbookdata) {
+      $debit = $cashbookdata['debit'];
+      $credit = $cashbookdata['credit'];
+      $description = $cashbookdata['description'];
+      $selectacname = $this->select('transaction', $cashbookdata['voucher_no'], 'voucher_no');
+      $ac_code = $selectacname['ac_code'];
+
+      if(str_contains($ac_code, '4000')){
+        $ac_code = 'Supplier';
+      }elseif(str_contains($ac_code, '9100')){
+        $ac_code = $selectacname['ac_code'];
+      }
+
+      $payabledatastmt = $pdo->prepare("SELECT balance FROM cashbook ORDER BY id DESC");
+      $payabledatastmt->execute();
+      $cashbooksearchdata = $payabledatastmt->fetch(PDO::FETCH_ASSOC);
+      if(!empty($cashbooksearchdata['balance'])){
+          $balance = $cashbooksearchdata['balance'];
+      }else{
+        $balance = 0;
+      }
+      $balance = ($balance + $debit) - $credit;
+      $cashbookstmt = $pdo->prepare("INSERT INTO cashbook(date, ac_name, particular, debit, credit, balance) VALUES('$date', '$ac_code', :description, '$debit', '$credit', '$balance')");
+      $cashbookstmt->execute([
+        ':description' => $description
+      ]);
+    }
+
+
+
   }
 
   function addpaymentofreceivable($id, $paid_date, $payment_no, $particular, $paid_amount)

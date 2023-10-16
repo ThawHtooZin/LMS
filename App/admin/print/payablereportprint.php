@@ -24,7 +24,7 @@ $query = new Query();
     <b><u>Payable for Supplier</u></b>
 
     <b class="float-end">Date : <?= date('d-m-Y'); ?></b>
-    <table class="mt-3 table table-bordered table-striped rounded">
+    <table class="mt-3 table table-bordered rounded">
       <tr>
         <th>No</th>
         <th>Supplier Name</th>

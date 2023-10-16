@@ -33,7 +33,7 @@ $query = new Query();
         <div class="card">
           <div class="card-header bg-info text-light">
             <h5>Payable Reports</h5>
-            <button type="button" class="btn btn-success float-end btn-sm" onclick="window.open('print/payablereportprint.php');">Print</button>
+            <button type="button" class="btn btn-success float-end btn-sm d-inline" onclick="window.open('print/payablereportprint.php');">Print</button>
           </div>
           <div class="card-body">
             <b>Payable for Supplier</b>
@@ -56,28 +56,32 @@ $query = new Query();
               $payablesuppliers = $query->selectdis('payable', 'supplier_id');
               $id = 0;
               foreach ($payablesuppliers as $payablesupplier) :
+                $date = date('Y-m-d');
                 $supplier_id = $payablesupplier['supplier_id'];
                 $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id'");
                 $payablestmt->execute();
                 $payabledata = $payablestmt->fetch(PDO::FETCH_ASSOC);
 
-                $openingamountstmt = $pdo->prepare("SELECT SUM(balance) AS balance FROM payable WHERE supplier_id='$supplier_id' AND report_date!='0000-00-00' ORDER BY id DESC");
+                $idofrow = $payabledata['id'];
+                $openingamountstmt = $pdo->prepare("SELECT balance FROM payable WHERE supplier_id='$supplier_id' AND date='$date' AND id < '$idofrow' AND report_date!='0000-00-00' ORDER BY id DESC");
                 $openingamountstmt->execute();
                 $openingamount = $openingamountstmt->fetch(PDO::FETCH_ASSOC);
 
-                $purchaseamtstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS purchase_amount FROM payable WHERE supplier_id='$supplier_id'");
+                $purchaseamtstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND date='$date'");
                 $purchaseamtstmt->execute();
                 $purchaseamt = $purchaseamtstmt->fetch(PDO::FETCH_ASSOC);
 
-                $paidamtstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE supplier_id='$supplier_id'");
+                $paidamtstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE supplier_id='$supplier_id' AND date='$date'");
                 $paidamtstmt->execute();
                 $paidamt = $paidamtstmt->fetch(PDO::FETCH_ASSOC);
 
-                $balancestmt = $pdo->prepare("SELECT SUM(balance) AS balance FROM payable WHERE supplier_id='$supplier_id'");
-                $balancestmt->execute();
-                $balanceamt = $balancestmt->fetch(PDO::FETCH_ASSOC);
-
                 $id++;
+                if (!empty($openingamount['balance'])) {
+                  $openingamt = $openingamount['balance'];
+                }else{
+                  $openingamt = 0;
+                }
+                $balance =  ($openingamt + $purchaseamt['purchase_amount']) - $paidamt['paid_amount'];
 
                 $supplier_id = $payablesupplier['supplier_id'];
                 $supplierdata = $query->select('acname', $supplier_id, 'code_no');
@@ -86,10 +90,10 @@ $query = new Query();
               <tr style="<?php if($balance['balance'] == 0){ echo "display:none;";} ?>">
                 <td><?= $id; ?></td>
                 <td><?= $supplierdata['ac_name']; ?></td>
-                <td <?php if(empty($openingamount['balance'])){ echo "data-bs-toggle='modal' data-bs-target='#addbalancemodal'";} ?>><?= $openingamount['balance']; ?></td>
+                <td <?php if(empty($openingamount['balance'])){ echo "data-bs-toggle='modal' data-bs-target='#addbalancemodal'";} ?>><?php if(!empty($openingamount['balance'])){ echo $openingamount['balance']; } ?></td>
                 <td><?= $purchaseamt['purchase_amount']; ?></td>
                 <td><?= $paidamt['paid_amount']; ?></td>
-                <td><?= $balanceamt['balance']; ?></td>
+                <td><?= $balance; ?></td>
               </tr>
               <?php
               endforeach;
@@ -99,7 +103,8 @@ $query = new Query();
         </div>
       </div>
     </div>
-    <!--  -->
+    <!-- Opening Amount Modal -->
+
     <?php
     $bootstrap->javascript();
     ?>
