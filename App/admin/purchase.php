@@ -125,13 +125,12 @@ $query = new Query();
               <span>Supplier Name:</span>
               <select class="chzn-select" name="supplier_id" style="width:15%;" data-placeholder="Supplier Name">
                 <?php
-                $supplierdatastmt = $pdo->prepare("SELECT DISTINCT supplier_id FROM purchase");
-                $supplierdatastmt->execute();
+                $supplierdatas = $query->selectall('supplier');
                 $supplierdatas = $supplierdatastmt->fetchall();
                 foreach ($supplierdatas as $supplierdata) {
                   $supplier_name = $query->select('acname', $supplierdata['supplier_id'], 'code_no');
                   ?>
-                  <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplier_name['ac_name']; ?> - <?php echo $supplierdata['supplier_id']; ?></option>
+                  <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplierdata['supplier_name']; ?></option>
                   <?php
                 }
                 ?>
@@ -195,7 +194,8 @@ $query = new Query();
                 $purchasedatas = $stmt->fetchAll();
               }
               foreach ($purchasedatas as $purchasedata) {
-                $supplier_name = $query->select('acname', $purchasedata['supplier_id'], 'code_no');
+                $supplierid = $purchasedata['supplier_id'];
+                $supplier_name = $query->select('supplier', $supplierid, 'supplier_id');
                 $itemid = $purchasedata['commodity'];
                 $item_name = $query->select('item', $itemid, 'item_id');
               ?>
@@ -206,7 +206,7 @@ $query = new Query();
                 <td><?php echo date('d-m-Y', strtotime($purchasedata['date'])); ?></td>
                 <td><?php echo $purchasedata['voucher_no']; ?></td>
                 <td><?php echo $purchasedata['tclfrozen']; ?></td>
-                <td><?php echo $supplier_name['ac_name']; ?></td>
+                <td><?php echo $supplier_name['supplier_name']; ?></td>
                 <td><?php echo $item_name['item_name']; ?></td>
                 <td><?php echo $purchasedata['size']; ?></td>
                 <td><?php echo $purchasedata['viss']; ?></td>
@@ -264,12 +264,12 @@ $query = new Query();
                           </div>
                           <div class="col">
                             <label style="font-weight: bold;">Supplier Name</label>
-                            <select class="form-control inpv2 mb-2" name="supplier_name" data-placeholder="Supplier Name">
+                            <select class="form-control inpv2 mb-2" name="supplier_name">
                               <?php
-                              $supplierdatas = $query->selectcontain('acname', 'code_no', 4000);
+                              $supplierdatas = $query->selectall('supplier');
                               foreach ($supplierdatas as $supplierdata) {
                                 ?>
-                                <option value="<?php echo $supplierdata['code_no']; ?>"  <?php if($updatedata['supplier_id'] == $supplierdata['code_no']){ echo 'selected'; } ?>><?php echo $supplierdata['ac_name']; ?></option>
+                                <option value="<?php echo $supplierdata['supplier_id']; ?>"  <?php if($updatedata['supplier_id'] == $supplierdata['supplier_id']){ echo 'selected'; } ?>><?php echo $supplierdata['supplier_name']; ?></option>
                                 <?php
                               }
                               ?>
@@ -438,13 +438,13 @@ $query = new Query();
                 </select>
               </div>
               <div class="col">
-                <label>Supplier Name</label>
+                <label style="font-weight: bold;">Supplier Name</label>
                 <select class="form-control inpv2 mb-2" name="supplier_name">
                   <?php
-                  $supplierdatas = $query->selectcontain('acname', 'code_no', 4000);
+                  $supplierdatas = $query->selectall('supplier');
                   foreach ($supplierdatas as $supplierdata) {
                     ?>
-                    <option value="<?php echo $supplierdata['code_no']; ?>"><?php echo $supplierdata['ac_name']; ?></option>
+                    <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplierdata['supplier_name']; ?></option>
                     <?php
                   }
                   ?>
@@ -496,12 +496,7 @@ $query = new Query();
     </div>
   </div>
   <!-- Add Modal -->
-  <script type="text/javascript">
-  $('#addmodal').on('shown.bs.modal', function () {
-  // Initialize Chosen for the select element
-  $('.chzn-select').chosen();
-});
-  </script>
+  
   <?php
   $bootstrap->javascript();
   ?>
