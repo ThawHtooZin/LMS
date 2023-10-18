@@ -64,11 +64,11 @@ $query = new Query();
                 $packingdatas = $query->selectall("packingliststock");
                 foreach ($packingdatas  as $packingdata) {
                   $customer_id = $packingdata['customer_id'];
-                  $customerdata = $query->select('customers', $customer_id, 'customer_id');
+                  $customerdata = $query->select('acname', $customer_id, 'code_no');
                   ?>
                   <tr>
                   <td><?php echo date('d-m-Y', strtotime($packingdata['date'])); ?></td>
-                  <td><?php echo $customerdata['customer_name']; ?></td>
+                  <td><?php echo $customerdata['ac_name']; ?></td>
                   <td><?php echo $packingdata['country']; ?></td>
                   <td><?php echo $packingdata['invoiceno']; ?></td>
                   <td><?php echo $packingdata['containerno']; ?></td>
@@ -99,13 +99,13 @@ $query = new Query();
                       <div class="col">
                         <label>Customer Name</label>
                         <select class="form-control inpv2 mb-2" name="customer_id">
-                            <?php
-                           $customerdatas = $query->selectall('customers');
-                           foreach ($customerdatas as $customerdata) {
-                            ?>
-                           <option value="<?php echo $customerdata['customer_id']; ?>"><?php echo $customerdata['customer_name']; ?></option>
+                          <?php
+                           $customerdatas = $query->search('acname', 'ac_type', 20);
+                           foreach ($customerdatas as $customerdatas) {
+                           ?>
+                           <option value="<?php echo $customerdatas['code_no']; ?>"><?php echo $customerdatas['ac_name']; ?></option>
                            <?php
-                           }
+                            }
                            ?>
                         </select>
                       </div>

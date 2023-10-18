@@ -2,7 +2,7 @@
 
 include '../../Controllers/database.db.php';
 
-$stmt = $pdo->prepare("SELECT * FROM cashbook");
+
 $stmt->execute();
 $cashdatas = $stmt->fetchAll();
 

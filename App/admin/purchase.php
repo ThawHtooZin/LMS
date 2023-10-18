@@ -132,7 +132,7 @@ $query = new Query();
                 foreach ($supplierdatas as $supplierdata) {
                   $supplier_name = $query->select('supplier', $supplierdata['supplier_id'], 'supplier_id');
                   ?>
-                  <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplier_name['supplier_name']; ?></option>
+                  <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplier_name['supplier_name']; ?> - <?= $supplierdata['supplier_id']; ?></option>
                   <?php
                 }
                 ?>
@@ -341,8 +341,8 @@ $query = new Query();
                   <td></td>
                   <td></td>
                   <td>Total Amount:</td>
-                  <td><?php echo $total_amount['total_amount'];  ?></td>
                   <td></td>
+                  <td><?php echo $total_amount['total_amount'];  ?></td>
                 </tr>
                 <?php
               }

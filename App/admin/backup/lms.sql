@@ -7,11 +7,12 @@ CREATE TABLE `accounts` (
   `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `role` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO accounts VALUES("18","admin","admin","admin@gmail.com","1");
 INSERT INTO accounts VALUES("20","Stock Control Person","scp","scp@gmail.com","2");
 INSERT INTO accounts VALUES("21","Myat Thu","myatthu","mt@gmail.com","3");
+INSERT INTO accounts VALUES("22","account","account","account@gmail.com","4");
 
 
 
@@ -23,12 +24,12 @@ CREATE TABLE `acname` (
   `ac_type` int(11) NOT NULL,
   `ac_name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=71 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO acname VALUES("10","FA-001","13","Car");
 INSERT INTO acname VALUES("11","FA-002","13","Building");
 INSERT INTO acname VALUES("12","FA-003","13","Furniture");
-INSERT INTO acname VALUES("13","CA-001","11","Account Receivable ");
+INSERT INTO acname VALUES("13","3300/000","11","Account Receivable ");
 INSERT INTO acname VALUES("14","3600/001","11","Main Cash ( Ks )");
 INSERT INTO acname VALUES("15","CA-003","11","AYA Bank");
 INSERT INTO acname VALUES("16","CA-004","11","KBZ Bank");
@@ -46,16 +47,26 @@ INSERT INTO acname VALUES("27","EP-002","9","Selling and Distribution");
 INSERT INTO acname VALUES("28","EP-003","9","Advertising and Marketting");
 INSERT INTO acname VALUES("29","EP-004","9","Operating");
 INSERT INTO acname VALUES("30","9100/003","9","Diesel & Petrol");
-INSERT INTO acname VALUES("31","4000/A01","16","A Thay Lay");
-INSERT INTO acname VALUES("32","4000/B01","16","Bar Bu Lay");
-INSERT INTO acname VALUES("33","4000/K01","16","Kyaw Zay Ya");
-INSERT INTO acname VALUES("34","4000/K02","16","Kyi Lwin");
-INSERT INTO acname VALUES("35","4000/K03","16","ka Yin Lay");
-INSERT INTO acname VALUES("36","300/M01","20","MomboJumbo");
+INSERT INTO acname VALUES("36","3300/M01","21","MomboJumbo");
 INSERT INTO acname VALUES("37","3600/002","11","Main Cash ( usd )");
 INSERT INTO acname VALUES("38","9100/001","9","Staff Salary");
 INSERT INTO acname VALUES("39","9100/002","9","Transportation");
 INSERT INTO acname VALUES("40","9100/004","9","Food & Refreshment");
+INSERT INTO acname VALUES("41","1200/000","16","Purchase");
+INSERT INTO acname VALUES("54","4000/A01","16","A Thay Lay");
+INSERT INTO acname VALUES("55","4000/B01","16","Bar Bu Lay");
+INSERT INTO acname VALUES("56","4000/P01","16","Poe Zaw");
+INSERT INTO acname VALUES("57","4000/P02","16","Phyo Lay");
+INSERT INTO acname VALUES("58","4000/S01","16","Soe Naing");
+INSERT INTO acname VALUES("59","4000/S02","16","Soe Thain");
+INSERT INTO acname VALUES("60","4000/S03","16","Soe Myint");
+INSERT INTO acname VALUES("61","4000/T01","16","Tun Naing");
+INSERT INTO acname VALUES("62","4000/T02","16","Thaung Htun");
+INSERT INTO acname VALUES("63","4000/T03","16","Thar Hla");
+INSERT INTO acname VALUES("64","4000/K01","16","Ko Myo ");
+INSERT INTO acname VALUES("65","4000/K02","16","Kyi Sin");
+INSERT INTO acname VALUES("66","3300/001","11","USA");
+INSERT INTO acname VALUES("67","3300/002","11","Canada");
 
 
 
@@ -90,7 +101,7 @@ CREATE TABLE `actype` (
   `acid` int(11) NOT NULL AUTO_INCREMENT,
   `ac_type` varchar(255) NOT NULL,
   PRIMARY KEY (`acid`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO actype VALUES("9","Expanse");
 INSERT INTO actype VALUES("10","Sale");
@@ -101,8 +112,7 @@ INSERT INTO actype VALUES("15","Long_Term_Liability");
 INSERT INTO actype VALUES("16","Current_Liability");
 INSERT INTO actype VALUES("17","Cost_Of_Good_Sold");
 INSERT INTO actype VALUES("18","Other_Income");
-INSERT INTO actype VALUES("19","Suppliers");
-INSERT INTO actype VALUES("20","customers");
+INSERT INTO actype VALUES("21","Customer");
 
 
 
@@ -132,24 +142,17 @@ DROP TABLE cashbook;
 CREATE TABLE `cashbook` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `date` date NOT NULL,
-  `serial_no` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
+  `sr_no` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
   `ac_name` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
   `particular` text COLLATE utf8_unicode_ci NOT NULL,
   `debit` bigint(20) DEFAULT NULL,
   `credit` bigint(20) DEFAULT NULL,
   `balance` bigint(25) NOT NULL,
+  `voucher_no` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=121 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO cashbook VALUES("6","2023-08-24","Mr.Myat","Supplier","Paid to Supplier BoBo vno EG123","0","1000000","-1000000");
-INSERT INTO cashbook VALUES("8","2023-08-24","Mrs.Phyo","Receive","Received from USA","10000000","0","9000000");
-INSERT INTO cashbook VALUES("9","2023-08-24","Mr.Jphn","Supplier","Paid to Supplier Mg Mg vno SS123","0","40000000","-31000000");
-INSERT INTO cashbook VALUES("10","2023-08-23","Mrs.Que","receive","received from Canada","40000000","0","9000000");
-INSERT INTO cashbook VALUES("11","2023-08-24","Mr.Jumbo","Supplier","Paid to Supplier JoJo vno SB140","0","5000000","4000000");
-INSERT INTO cashbook VALUES("14","2023-09-01","Mr.JohnDoe","Buyer","Buy Product","1000000","0","5000000");
-INSERT INTO cashbook VALUES("15","2023-09-01","Mr.Broke","Buyer","Buy Product
-","100000","0","5100000");
-INSERT INTO cashbook VALUES("16","2023-09-02","Mr.Haven","Buyer","Buy Product","900000","0","6000000");
+INSERT INTO cashbook VALUES("120","2023-10-18","","3600/001","Spend Stuff","0","40000","-40000","AS265");
 
 
 
@@ -223,40 +226,10 @@ CREATE TABLE `currency` (
   `usd_amount` bigint(25) NOT NULL,
   `voucher_no` varchar(36) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=228 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=295 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO currency VALUES("168","3000","credit","300000","100","AS264");
-INSERT INTO currency VALUES("173","0","credit","50000","0","AS264");
-INSERT INTO currency VALUES("180","3000","debit","600000","200","AS266");
-INSERT INTO currency VALUES("181","3000","credit","600000","200","AS266");
-INSERT INTO currency VALUES("182","0","debit","30000","0","BS0001");
-INSERT INTO currency VALUES("183","0","credit","30000","0","BS0001");
-INSERT INTO currency VALUES("184","3000","debit","150000000","50000","BS0002");
-INSERT INTO currency VALUES("185","3000","credit","150000000","50000","BS0002");
-INSERT INTO currency VALUES("188","3000","debit","300000","100","AS262");
-INSERT INTO currency VALUES("189","3000","credit","150000","50","AS262");
-INSERT INTO currency VALUES("190","0","debit","100000","0","AS23");
-INSERT INTO currency VALUES("191","0","credit","100000","0","AS23");
-INSERT INTO currency VALUES("194","3000","debit","300000","100","AS262");
-INSERT INTO currency VALUES("195","3000","credit","150000","50","AS262");
-INSERT INTO currency VALUES("198","3000","debit","300000","100","AS261");
-INSERT INTO currency VALUES("199","3000","credit","300000","100","AS261");
-INSERT INTO currency VALUES("200","3000","debit","300000","100","AS261");
-INSERT INTO currency VALUES("201","3000","credit","300000","100","AS261");
-INSERT INTO currency VALUES("202","3000","debit","300000","100","AS262");
-INSERT INTO currency VALUES("203","3000","debit","300000","100","AS262");
-INSERT INTO currency VALUES("204","3000","debit","300000","100","AS262");
-INSERT INTO currency VALUES("205","3000","credit","300000","100","AS262");
-INSERT INTO currency VALUES("206","3000","debit","300000","100","AS262");
-INSERT INTO currency VALUES("212","0","debit","50000","0","AS261");
-INSERT INTO currency VALUES("213","0","credit","50000","0","AS261");
-INSERT INTO currency VALUES("214","3000","debit","300000","100","AS262");
-INSERT INTO currency VALUES("215","3000","credit","300000","100","AS262");
-INSERT INTO currency VALUES("219","3000","debit","300000","100","AS263");
-INSERT INTO currency VALUES("220","3000","credit","300000","100","AS263");
-INSERT INTO currency VALUES("221","0","debit","200000","0","");
-INSERT INTO currency VALUES("226","0","debit","100000","0","AS2570");
-INSERT INTO currency VALUES("227","0","credit","100000","0","AS2570");
+INSERT INTO currency VALUES("293","0","debit","40000","0","AS265");
+INSERT INTO currency VALUES("294","0","credit","40000","0","AS265");
 
 
 
@@ -270,9 +243,8 @@ CREATE TABLE `customers` (
   PRIMARY KEY (`customer_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO customers VALUES("B133","U KoKo","92341546","mandalay");
-INSERT INTO customers VALUES("M3333","MomboJumbo","344544","NY");
-INSERT INTO customers VALUES("w12121","Mr.LPO","97854234","DAKA");
+INSERT INTO customers VALUES("3300/001","USA","0","NY");
+INSERT INTO customers VALUES("3300/002","Canada","0","");
 
 
 
@@ -318,13 +290,10 @@ CREATE TABLE `form7stock` (
   `pcsperf7` int(11) NOT NULL,
   `link_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=145 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=159 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO form7stock VALUES("140","2023-10-14","BJ123","4000/A01","","frozen","2up","100","163.4","","0","129");
-INSERT INTO form7stock VALUES("141","2023-10-14","BJ123","4000/B01","","","5up","200","326.8","","0","130");
-INSERT INTO form7stock VALUES("142","2023-10-14","BJ123","4000/K01","","frozen","5up","150","245.1","","0","131");
-INSERT INTO form7stock VALUES("143","2023-10-14","BJ123","4000/K02","","frozen","2up","100","163.4","","0","132");
-INSERT INTO form7stock VALUES("144","2023-10-14","BJ123","4000/K03","","","1up","120","196.08","","0","133");
+INSERT INTO form7stock VALUES("157","2023-10-18","BJ123","4000/B01","","frozen","2up","315","514.71","","0","148");
+INSERT INTO form7stock VALUES("158","2023-10-18","HL123","4000/K02","","frozen","5UP","218","356.212","","0","149");
 
 
 
@@ -344,78 +313,15 @@ CREATE TABLE `general_ledger` (
   `bank_charges` float NOT NULL,
   `acid` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=308 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=636 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO general_ledger VALUES("236","2023-10-12","AS261","ep-005","50000","0","0","","","","0","9");
-INSERT INTO general_ledger VALUES("237","2023-10-12","AS261","ca-002","0","50000","0","hubhhhjggshffdghjgfjgf","","","0","11");
-INSERT INTO general_ledger VALUES("238","2023-10-12","AS262","ca-001","300000","0","0","hubhhhjggshffdghjgfjgf","SGRWFGR","US-23523","0","11");
-INSERT INTO general_ledger VALUES("239","2023-10-12","AS262","r-002","0","300000","0","hubhhhjggshffdghjgfjgf","","","0","10");
-INSERT INTO general_ledger VALUES("240","2023-10-12","AS263","ca-002","300000","0","0","asdfasdfasdf","","","50","11");
-INSERT INTO general_ledger VALUES("241","2023-10-12","AS263","ca-001","0","300000","0","asdfasdfasdf","SGRWFGR","US-23523","0","11");
-INSERT INTO general_ledger VALUES("244","2023-10-13","AS2569","4000/A01","200000","0","200000","","","","0","16");
-INSERT INTO general_ledger VALUES("245","2023-10-13","AS2569","CA-002","0","200000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("246","2023-10-13","AS2569","4000/A01","200000","0","200000","","","","0","16");
-INSERT INTO general_ledger VALUES("247","2023-10-13","AS2569","CA-002","0","200000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("248","2023-10-13","AS2569","4000/A01","200000","0","200000","","","","0","16");
-INSERT INTO general_ledger VALUES("249","2023-10-13","AS2569","CA-002","0","200000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("250","2023-10-13","AS2569","4000/A01","200000","0","200000","","","","0","16");
-INSERT INTO general_ledger VALUES("251","2023-10-13","AS2569","CA-002","0","200000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("252","2023-10-13","AS2569","4000/A01","200000","0","200000","","","","0","16");
-INSERT INTO general_ledger VALUES("253","2023-10-13","AS2569","CA-002","0","200000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("254","2023-10-13","AS2569","4000/A01","200000","0","200000","","","","0","16");
-INSERT INTO general_ledger VALUES("255","2023-10-13","AS2569","CA-002","0","200000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("256","2023-10-13","AS2569","4000/A01","200000","0","200000","","","","0","16");
-INSERT INTO general_ledger VALUES("257","2023-10-13","AS2569","CA-002","0","200000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("258","2023-10-13","AS2569","4000/A01","200000","0","200000","","","","0","16");
-INSERT INTO general_ledger VALUES("259","2023-10-13","AS2569","CA-002","0","200000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("260","2023-10-13","AS2569","4000/A01","200000","0","200000","","","","0","16");
-INSERT INTO general_ledger VALUES("261","2023-10-13","AS2569","CA-002","0","200000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("262","2023-10-13","AS2569","4000/A01","200000","0","200000","","","","0","16");
-INSERT INTO general_ledger VALUES("263","2023-10-13","AS2569","CA-002","0","200000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("264","2023-10-13","AS2569","4000/A01","200000","0","200000","","","","0","16");
-INSERT INTO general_ledger VALUES("265","2023-10-13","AS2569","CA-002","0","200000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("266","2023-10-13","AS2569","4000/A01","200000","0","200000","","","","0","16");
-INSERT INTO general_ledger VALUES("267","2023-10-13","AS2569","CA-002","0","200000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("268","2023-10-13","AS2569","4000/A01","200000","0","200000","","","","0","16");
-INSERT INTO general_ledger VALUES("269","2023-10-13","AS2569","CA-002","0","200000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("270","2023-10-13","AS2569","4000/A01","200000","0","200000","","","","0","16");
-INSERT INTO general_ledger VALUES("271","2023-10-13","AS2569","CA-002","0","200000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("272","2023-10-13","AS2569","4000/A01","200000","0","200000","","","","0","16");
-INSERT INTO general_ledger VALUES("273","2023-10-13","AS2569","CA-002","0","200000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("274","2023-10-13","AS2569","4000/A01","200000","0","200000","","","","0","16");
-INSERT INTO general_ledger VALUES("275","2023-10-13","AS2569","CA-002","0","200000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("276","2023-10-13","AS2569","4000/A01","200000","0","200000","","","","0","16");
-INSERT INTO general_ledger VALUES("277","2023-10-13","AS2569","CA-002","0","200000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("278","2023-10-13","AS2569","4000/A01","200000","0","200000","","","","0","16");
-INSERT INTO general_ledger VALUES("279","2023-10-13","AS2569","CA-002","0","200000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("280","2023-10-13","AS2569","4000/A01","200000","0","200000","","","","0","16");
-INSERT INTO general_ledger VALUES("281","2023-10-13","AS2569","CA-002","0","200000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("282","2023-10-13","AS2569","4000/A01","100000","0","100000","","","","0","16");
-INSERT INTO general_ledger VALUES("283","2023-10-13","AS2569","ca-002","0","100000","0","k jkh hj khjk hjk hj hjk h","","","0","11");
-INSERT INTO general_ledger VALUES("284","2023-10-13","AS2569","4000/A01","200000","0","200000","","","","0","16");
-INSERT INTO general_ledger VALUES("285","2023-10-13","AS2569","CA-002","0","200000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("286","2023-10-13","AS2569","4000/A01","100000","0","100000","","","","0","16");
-INSERT INTO general_ledger VALUES("287","2023-10-13","AS2569","ca-002","0","100000","0","k jkh hj khjk hjk hj hjk h","","","0","11");
-INSERT INTO general_ledger VALUES("288","2023-10-13","AS2569","4000/A01","200000","0","200000","","","","0","16");
-INSERT INTO general_ledger VALUES("289","2023-10-13","AS2569","CA-002","0","200000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("290","2023-10-13","AS2569","4000/A01","100000","0","100000","","","","0","16");
-INSERT INTO general_ledger VALUES("291","2023-10-13","AS2569","CA-002","0","100000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("292","2023-10-13","AS2569","4000/A01","50000","0","50000","","","","0","16");
-INSERT INTO general_ledger VALUES("293","2023-10-13","AS2569","CA-002","0","50000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("294","2023-10-13","AS2569","4000/A01","50000","0","50000","","","","0","16");
-INSERT INTO general_ledger VALUES("295","2023-10-13","AS2569","CA-002","0","50000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("296","2023-10-13","AS2569","4000/A01","50000","0","50000","","","","0","16");
-INSERT INTO general_ledger VALUES("297","2023-10-13","AS2569","CA-002","0","50000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("298","2023-10-13","AS2569","4000/A01","50000","0","50000","","","","0","16");
-INSERT INTO general_ledger VALUES("299","2023-10-13","AS2569","CA-002","0","50000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("300","2023-10-13","AS2569","4000/A01","50000","0","50000","","","","0","16");
-INSERT INTO general_ledger VALUES("301","2023-10-13","AS2569","CA-002","0","50000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("302","2023-10-13","AS2569","4000/A01","50000","0","50000","PAYABLEEEEEEEEE","","","0","16");
-INSERT INTO general_ledger VALUES("303","2023-10-13","AS2569","CA-002","0","50000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("304","2023-10-13","AS2569","4000/A01","50000","0","50000","PAYABLEEEEEEEEE","","","0","16");
-INSERT INTO general_ledger VALUES("305","2023-10-13","AS2569","CA-002","0","50000","0","asdfasdfasdf","","","0","11");
-INSERT INTO general_ledger VALUES("306","2023-10-14","AS2570","4000/k01","100000","0","100000","k jkh hj khjk hjk hj hjk h","","","0","16");
-INSERT INTO general_ledger VALUES("307","2023-10-14","AS2570","3600/001","0","100000","0","poj lihiohlkh jh j","","","0","11");
+INSERT INTO general_ledger VALUES("626","2023-10-18","AS261","4000/B01","50500","0","50500","paid to burbulay Hehe thank you","","","0","16");
+INSERT INTO general_ledger VALUES("627","2023-10-18","AS261","3600/001","0","50500","0","paid to burbulay Hehe thank you","","","0","11");
+INSERT INTO general_ledger VALUES("628","2023-10-18","AS262","3300/001","750000","0","750000","HehEH USA","SGRWFGR","US-23523","0","11");
+INSERT INTO general_ledger VALUES("629","2023-10-18","AS262","1200/000","0","750000","0","Hehehhe USA","","","0","16");
+INSERT INTO general_ledger VALUES("630","2023-10-18","AS263","3600/002","629990","0","629990","Money Received from USA (190 * 3150)","","","10","11");
+INSERT INTO general_ledger VALUES("634","2023-10-18","AS265","9100/003","40000","0","669990","Spend on useless stuff","","","0","9");
+INSERT INTO general_ledger VALUES("635","2023-10-18","AS265","3600/001","0","40000","629990","Spend Stuff","","","0","11");
 
 
 
@@ -962,13 +868,10 @@ CREATE TABLE `payable` (
   `closing_balance` int(11) NOT NULL,
   `report_date` date NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=182 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=234 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO payable VALUES("177","2023-10-14","4000/A01","8921","100000","0000-00-00","","","0","100000","129","0","0000-00-00");
-INSERT INTO payable VALUES("178","2023-10-14","4000/B01","9403","420000","0000-00-00","","","0","420000","130","0","0000-00-00");
-INSERT INTO payable VALUES("179","2023-10-14","4000/K01","8421","322500","0000-00-00","","","0","322500","131","0","0000-00-00");
-INSERT INTO payable VALUES("180","2023-10-14","4000/K02","9035","120000","0000-00-00","","","0","120000","132","0","0000-00-00");
-INSERT INTO payable VALUES("181","2023-10-14","4000/K03","2919","144000","0000-00-00","","","0","144000","133","0","0000-00-00");
+INSERT INTO payable VALUES("232","2023-10-18","4000/B01","3811","850500","2023-10-18","AS261","paid to burbulay Hehe thank you","50500","800000","148","0","0000-00-00");
+INSERT INTO payable VALUES("233","2023-10-18","4000/K02","8032","937400","0000-00-00","","","0","937400","149","0","0000-00-00");
 
 
 
@@ -979,11 +882,13 @@ CREATE TABLE `permission` (
   `role_id` int(11) NOT NULL,
   `permission` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO permission VALUES("1","1","manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_accountreceivable,manage_transactionmanage_general_ledgermanage_ledger_record,manage_customers,manage_supplier,manage_category,manage_item,manage_acname,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,purchase_report,payable_report");
+INSERT INTO permission VALUES("1","1","manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_acpayable,manage_accountreceivable,manage_transactionmanage_general_ledger,manage_customers,manage_supplier,manage_category,manage_item,manage_actype,manage_acname,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,purchase_report,payable_report");
 INSERT INTO permission VALUES("2","2",",manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport");
 INSERT INTO permission VALUES("3","3","manage_accounts,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_accountreceivablemanage_general_ledger,manage_customers");
+INSERT INTO permission VALUES("4","4",",manage_purchase,manage_cashbook,manage_accountpayable,manage_accountreceivable,manage_transactionmanage_general_ledger,manage_actype,manage_acname,purchase_report,payable_report");
+INSERT INTO permission VALUES("5","5",",manage_customers,manage_supplier,manage_category,manage_item,manage_unit,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial");
 
 
 
@@ -1030,13 +935,10 @@ CREATE TABLE `purchase` (
   `price` int(11) NOT NULL,
   `amount` int(11) NOT NULL,
   PRIMARY KEY (`no`)
-) ENGINE=InnoDB AUTO_INCREMENT=134 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=150 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO purchase VALUES("129","2023-10-14","8921","4000/A01","frozen","BJ123","2up","100","0","1000","100000");
-INSERT INTO purchase VALUES("130","2023-10-14","9403","4000/B01","","BJ123","5up","200","0","2100","420000");
-INSERT INTO purchase VALUES("131","2023-10-14","8421","4000/K01","frozen","BJ123","5up","150","0","2150","322500");
-INSERT INTO purchase VALUES("132","2023-10-14","9035","4000/K02","frozen","BJ123","2up","100","0","1200","120000");
-INSERT INTO purchase VALUES("133","2023-10-14","2919","4000/K03","","BJ123","1up","120","0","1200","144000");
+INSERT INTO purchase VALUES("148","2023-10-18","3811","4000/B01","frozen","BJ123","2up","315","0","2700","850500");
+INSERT INTO purchase VALUES("149","2023-10-18","8032","4000/K02","frozen","HL123","5UP","218","0","4300","937400");
 
 
 
@@ -1045,6 +947,7 @@ DROP TABLE receivable;
 CREATE TABLE `receivable` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `date` date NOT NULL,
+  `ac_code` varchar(25) NOT NULL,
   `sr_no` varchar(25) NOT NULL,
   `container_no` varchar(25) NOT NULL,
   `invoice_amount` varchar(25) NOT NULL,
@@ -1052,15 +955,12 @@ CREATE TABLE `receivable` (
   `payment_no` varchar(25) NOT NULL,
   `particulars` varchar(255) NOT NULL,
   `paid_amount` int(11) NOT NULL,
-  `balance` int(11) NOT NULL,
+  `balance` bigint(25) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=133 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=222 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO receivable VALUES("128","2023-10-12","SGRWFGR","US-23523","100","0000-00-00","","","0","100");
-INSERT INTO receivable VALUES("129","2023-10-12","SGRWFGR","US-23523","100","0000-00-00","","","0","200");
-INSERT INTO receivable VALUES("130","2023-10-12","SGRWFGR","US-23523","100","0000-00-00","","","0","300");
-INSERT INTO receivable VALUES("131","2023-10-12","SGRWFGR","US-23523","100","0000-00-00","","","0","400");
-INSERT INTO receivable VALUES("132","2023-10-12","SGRWFGR","US-23523","100","0000-00-00","","","0","500");
+INSERT INTO receivable VALUES("219","2023-10-18","3300/001","SGRWFGR","US-23523","250","0000-00-00","","","0","250");
+INSERT INTO receivable VALUES("220","0000-00-00","3300/001","","","","2023-10-18","AS263","Money Received From USA (190 *3150)","200","50");
 
 
 
@@ -1106,29 +1006,38 @@ CREATE TABLE `role` (
   `role_id` int(11) NOT NULL AUTO_INCREMENT,
   `role_name` varchar(255) NOT NULL,
   PRIMARY KEY (`role_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO role VALUES("1","Admin");
 INSERT INTO role VALUES("2","Stock");
 INSERT INTO role VALUES("3","Purchase");
+INSERT INTO role VALUES("4","Accountant");
+INSERT INTO role VALUES("5","Factory");
 
 
 
 DROP TABLE supplier;
 
 CREATE TABLE `supplier` (
-  `supplier_id` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
   `supplier_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `supplier_phone` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `supplier_address` varchar(255) COLLATE utf8_unicode_ci NOT NULL
+  `supplier_address` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `supplier_id` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`supplier_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO supplier VALUES("AT263","A Thay Lay","09523423234","Yangon");
-INSERT INTO supplier VALUES("MK1625","Market","","Kyi Myin Taing");
-INSERT INTO supplier VALUES("AT268","Aung Htike","0953245678","Yangon");
-INSERT INTO supplier VALUES("DK123","Naung Naung","09345235235","yangon");
-INSERT INTO supplier VALUES("NS123","Tun Naing","09128787987","Mandalay");
-INSERT INTO supplier VALUES("KJ122","Soe Naing","09987856461","Yangon");
+INSERT INTO supplier VALUES("A Thay Lay","09252534534","Yangon","4000/A01");
+INSERT INTO supplier VALUES("Bar Bu Lay","09234523452","Mandalay","4000/B01");
+INSERT INTO supplier VALUES("Ko Myo ","098345243465","Min Galar Done","4000/K01");
+INSERT INTO supplier VALUES("Kyi Sin","092346555343","Nay Pyi Daw","4000/K02");
+INSERT INTO supplier VALUES("Poe Zaw","09452335235235","Inn Lay","4000/P01");
+INSERT INTO supplier VALUES("Phyo Lay","09235323545","Pago","4000/P02");
+INSERT INTO supplier VALUES("Soe Naing","09345245135","Bagan","4000/S01");
+INSERT INTO supplier VALUES("Soe Thain","0952342345","Nay Pyi Daw","4000/S02");
+INSERT INTO supplier VALUES("Soe Myint","09346464345","Sakaing","4000/S03");
+INSERT INTO supplier VALUES("Tun Naing","09345234","Taung Gyi","4000/T01");
+INSERT INTO supplier VALUES("Thaung Htun","095462341","Tagone","4000/T02");
+INSERT INTO supplier VALUES("Thar Hla","0945425346","Pyi Gyi Nar","4000/T03");
 
 
 
@@ -1195,12 +1104,10 @@ CREATE TABLE `transaction` (
   `container_no` varchar(25) NOT NULL,
   `bank_charges` float NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=233 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=300 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO transaction VALUES("227","2023-10-13","AS2569","4000/A01","PAYABLEEEEEEEEE","50000","0","mmk","","","0");
-INSERT INTO transaction VALUES("228","2023-10-13","AS2569","3600/001","asdfasdfasdf","0","50000","mmk","","","0");
-INSERT INTO transaction VALUES("231","2023-10-14","AS2570","4000/k01","k jkh hj khjk hjk hj hjk h","100000","0","mmk","","","0");
-INSERT INTO transaction VALUES("232","2023-10-14","AS2570","3600/001","poj lihiohlkh jh j","0","100000","mmk","","","0");
+INSERT INTO transaction VALUES("298","2023-10-18","AS265","9100/003","Spend on useless stuff","40000","0","mmk","","","0");
+INSERT INTO transaction VALUES("299","2023-10-18","AS265","3600/001","Spend Stuff","0","40000","mmk","","","0");
 
 
 
@@ -1357,10 +1264,20 @@ CREATE TABLE `userlogs` (
   `login_password` varchar(125) NOT NULL,
   `status` varchar(55) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=54 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO userlogs VALUES("1","10:26:18.000000","2023-09-18","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("53","10:53:04.000000","2023-10-12","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("54","02:03:41.000000","2023-10-14","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("55","10:35:13.000000","2023-10-16","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("56","11:55:57.000000","2023-10-16","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("57","11:56:44.000000","2023-10-16","account","account","Login Success");
+INSERT INTO userlogs VALUES("58","11:57:17.000000","2023-10-16","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("59","11:58:19.000000","2023-10-16","account","account","Login Success");
+INSERT INTO userlogs VALUES("60","01:22:11.000000","2023-10-16","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("61","09:39:58.000000","2023-10-17","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("62","09:47:46.000000","2023-10-18","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("63","10:55:18.000000","2023-10-18","admin","admin","Login Success");
 
 
 

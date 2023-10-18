@@ -56,7 +56,7 @@ $query = new Query();
           LastPart: JSON.stringify(lastpart),
           Type: type
         });
-        if(ac_codepost == 'CA-001' || ac_codepost == 'ca-001'){
+        if(ac_codepost.includes('3300')){
           $('#normal').hide();
           $('#receive').show();
           $('#receive2').show();
@@ -64,7 +64,7 @@ $query = new Query();
           $('#receive').hide();
           $('#receive2').hide();
           $('#normal').show();
-          if(ac_codepost == '3600/001' || ac_codepost == '3600/002'){
+          if(ac_codepost.includes('3600')){
             $('#bankchargesdesc').show();
             $('#bankcharges').show();
             $('#normal').hide();
@@ -106,7 +106,22 @@ $query = new Query();
       $date = $_POST['adddate'];
       $voucher_no = $_POST['addvoucher_no'];
       $ac_code = $_POST['addac_code'];
-      $description = $_POST['adddescription'];
+      if(str_contains($ac_code, '3600')){
+        $description = $_POST['adddescriptionbank'];
+        $_SESSION['description'] = '';
+        $_SESSION['descriptionrec'] = '';
+        $_SESSION['descriptionbank'] = $_POST['adddescriptionbank'];
+      }elseif(str_contains($ac_code, '3300')){
+        $description = $_POST['adddescriptionrec'];
+        $_SESSION['description'] = '';
+        $_SESSION['descriptionbank'] = '';
+        $_SESSION['descriptionrec'] = $_POST['adddescriptionrec'];
+      }else{
+        $description = $_POST['adddescription'];
+        $_SESSION['descriptionrec'] = '';
+        $_SESSION['descriptionbank'] = '';
+        $_SESSION['description'] = $_POST['adddescription'];
+      }
       $currency = $_POST['addcurrency'];
       $bank_charges = $_POST['bank_charges'];
       if(!empty($_POST['addrate'])){
@@ -131,7 +146,6 @@ $query = new Query();
         $sr_no = '';
         $container_no = '';
       }
-      $_SESSION['description'] = $_POST['adddescription'];
       $_SESSION['adddate'] = $_POST['adddate'];
       $_SESSION['addvoucher_no'] = $_POST['addvoucher_no'];
       $_SESSION['addac_code'] = $_POST['addac_code'];
@@ -239,11 +253,11 @@ $query = new Query();
                   </div>
                 </div>
             </div>
-            <button type="submit" style="display:none;"></button>
+            <!-- <button type="submit" style="display:none;"></button> -->
             <div class="row">
               <div id="receive" class="hide col-4">
                  <label>Description</label>
-                 <textarea name="adddescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(!empty($_SESSION['description'])){echo $_SESSION['description']; } ?></textarea>
+                 <textarea name="adddescriptionrec" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(!empty($_SESSION['descriptionrec'])){echo $_SESSION['descriptionrec']; } ?></textarea>
               </div>
                <div id="receive2" class="hide" style="width: 16.66666667%">
                  <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="addsr_no" placeholder="Sr No.">
@@ -255,7 +269,7 @@ $query = new Query();
                </div>
                <div id="bankchargesdesc" class="hide col-4">
                  <label>Description</label>
-                 <textarea name="adddescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(!empty($_SESSION['description'])){echo $_SESSION['description']; } ?></textarea>
+                 <textarea name="adddescriptionbank" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(!empty($_SESSION['descriptionbank'])){echo $_SESSION['descriptionbank']; } ?></textarea>
                </div>
                <div id="bankcharges" class="hide" style="width: 16.66666667%">
                  <input type="number" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="bank_charges" placeholder="Bank Charges">
@@ -353,15 +367,15 @@ $query = new Query();
                           </div>
                       </div>
                       <div class="row">
-                        <div id="upreceive<?php echo $data['id']; ?>" class="<?php if($updata['ac_code'] != '3600/001' && $updata['ac_code'] != 'ca-001'){ echo "hide";} ?> col-4">
+                        <div id="upreceive<?php echo $data['id']; ?>" class="<?php if(!str_contains($updata['ac_code'], 3600) && !str_contains($updata['ac_code'], 3300)){ echo "hide";} ?> col-4">
                            <label>Description</label>
                            <textarea name="description" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php echo $updata['description']; ?></textarea>
                         </div>
-                         <div id="upreceive2<?php echo $data['id']; ?>" class="<?php if($updata['ac_code'] != 'ca-001'){ echo "hide";} ?> col-2">
+                         <div id="upreceive2<?php echo $data['id']; ?>" class="<?php if(!str_contains($updata['ac_code'], 3300)){ echo "hide";} ?> col-2">
                            <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="sr_no" placeholder="Sr No." value="<?php echo $updata['sr_no']; ?>">
                            <input type="text" class="form-control inpv2 mb-2" style="padding-top: 2px; padding-bottom: 2px;" name="container_no" placeholder="Container No." value="<?php echo $updata['container_no']; ?>">
                          </div>
-                         <div id="upnormal<?php echo $data['id']; ?>" class="<?php if($updata['ac_code'] == 'ca-001' || $updata['ac_code'] == "3600/001"){ echo "hide";} ?> col-6">
+                         <div id="upnormal<?php echo $data['id']; ?>" class="<?php if(str_contains($updata['ac_code'], 3300) || str_contains($updata['ac_code'], 3600)){ echo "hide";} ?> col-6">
                            <label>Description</label>
                            <textarea name="description" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php echo $updata['description']; ?></textarea>
                          </div>
@@ -369,7 +383,7 @@ $query = new Query();
                             <label>Description</label>
                             <textarea name="adddescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(!empty($_SESSION['description'])){echo $_SESSION['description']; } ?></textarea>
                           </div>
-                          <div id="bankcharges<?php echo $data['id']; ?>" class="<?php if($updata['ac_code'] != '3600/001'){ echo "hide";} ?>" style="width: 16.66666667%">
+                          <div id="bankcharges<?php echo $data['id']; ?>" class="<?php if(!str_contains($updata['ac_code'], 3600)){ echo "hide";} ?>" style="width: 16.66666667%">
                             <input type="number" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="bank_charges" placeholder="Bank Charges" value="<?php if($updata['bank_charges'] != "0"){ echo $updata['bank_charges'];} ?>">
                           </div>
                         <div class="col-3">
@@ -410,7 +424,7 @@ $query = new Query();
                         LastPart: JSON.stringify(uplastpart),
                         Type: type
                       });
-                      if(upac_codepost == 'ca-001' || upac_codepost == 'CA-001'){
+                      if(upac_codepost.includes('3300')){
                         $('#upreceive<?php echo $data['id']; ?>').toggle();
                         $('#upreceive2<?php echo $data['id']; ?>').toggle();
                         $('#upnormal<?php echo $data['id']; ?>').toggle();
@@ -418,7 +432,7 @@ $query = new Query();
                         $('#upreceive<?php echo $data['id']; ?>').hide();
                         $('#upreceive2<?php echo $data['id']; ?>').hide();
                         $('#upnormal<?php echo $data['id']; ?>').show();
-                        if(upac_codepost == '3600/001' || upac_codepost == '3600/002'){
+                        if(upac_codepost.str_contains('3600')){
                           $('#bankchargesdesc<?php echo $data['id']; ?>').show();
                           $('#bankcharges<?php echo $data['id']; ?>').show();
                           $('#upnormal<?php echo $data['id']; ?>').hide();

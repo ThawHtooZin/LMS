@@ -28,18 +28,55 @@ $query = new Query();
       <div class="contentcol" id="content">
         <?php require 'navbar.php'; ?>
         <div class="card">
-          <div class="card-header bg-warning text-light"  style="padding:-10px;">
-            <h5 class="d-inline">Manage Cash Book</h5>
+          <div class="card-header bg-info text-light"  style="padding:-10px;">
+            <?php
+            if(isset($_POST['usdbtn'])){
+              $_SESSION['cashbookcurrency'] = 'usd';
+            }
+            if(isset($_POST['ksbtn'])){
+              $_SESSION['cashbookcurrency'] = 'ks';
+            }
+            if(empty($_SESSION['cashbookcurrency'])){
+              $_SESSION['cashbookcurrency'] = 'ks';
+            }
+            ?>
+            <?php
+            if (empty($_SESSION['cashbookcurrency']) || $_SESSION['cashbookcurrency'] == 'ks') {
+              ?>
+              <h5 class="d-inline">Manage Cash Book (MMK)</h5>
+              <?php
+            }else{
+              ?>
+              <h5 class="d-inline">Manage Cash Book (USD)</h5>
+              <?php
+            }
+             ?>
             <div class="float-end">
+              <form action="" method="post">
+                <?php
+                $cashnames = $query->selectdis("cashbook", 'ac_name');
+                foreach ($cashnames as $cashname) {
+                  if($cashname['ac_name'] == '3600/002'){
+                    $btnid = "usd";
+                  }elseif($cashname['ac_name'] == '3600/001'){
+                    $btnid = 'ks';
+                  }
+                  $acnamedata = $query->select('acname', $cashname['ac_name'], 'code_no');
+                  $acname = $acnamedata['ac_name'];
+                  ?>
+                  <button type="submit" class="btn btn-light btn-sm" name="<?= $btnid; ?>btn" id="<?= $btnid; ?>btn"><i><?= $acname; ?></i></button>
+                  <?php
+                }
+                ?>
               <?php
                 if($_POST){
                   if (!empty($_POST['startdate']) || !empty($_POST['enddate'])) {
                     ?>
-                    <a href="#" class="btn btn-primary float-end" onclick="window.open('print/cashbookprint.php?startdate=<?php echo $_POST['startdate']; ?>&enddate=<?php echo $_POST['enddate']; ?>')">Print</a>
+                    <a href="#" class="btn btn-light ms-2 btn-sm float-end" onclick="window.open('print/cashbookprint.php?startdate=<?php echo $_POST['startdate']; ?>&enddate=<?php echo $_POST['enddate']; ?>')"><i>Print</i></a>
                     <?php
                   }elseif(!empty($_POST['monthlysearch'])){
                     ?>
-                    <a href="#" class="btn btn-primary float-end" onclick="window.open('print/cashbookprint.php?monthly=<?php echo $_POST['monthlysearch']; ?>')">Print</a>
+                    <a href="#" class="btn btn-light ms-2 btn-sm float-end" onclick="window.open('print/cashbookprint.php?monthly=<?php echo $_POST['monthlysearch']; ?>')"><i>Print</i></a>
                     <?php
                   }
                 }else{
@@ -48,6 +85,7 @@ $query = new Query();
                 }
                ?>
             </div>
+          </form>
           </div>
           <div class="card-body">
             <?php
@@ -149,21 +187,12 @@ $query = new Query();
               </div>
             </div>
             <br>
-            <?php
-            if (!empty($_GET['pageno'])) {
-              $pageno = $_GET['pageno'];
-            }else{
-              $pageno = 1;
-            }
-            $numOfrecs = 8;
-            $offset = ($pageno -1) * $numOfrecs;
-            ?>
             <!-- <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
               Add New Cash Data
             </button> -->
-            <table class="mt-2 table table-bordered table-striped rounded">
+            <table class="table table-bordered table-striped rounded">
               <tr>
-                <th>#</th>
+                <th>No.</th>
                 <th>Date</th>
                 <th>Sr.No</th>
                 <th>A/C Name</th>
@@ -177,46 +206,87 @@ $query = new Query();
               if(isset($_POST['dbwsearch'])){
                 $startdate = $_POST['startdate'];
                 $enddate = $_POST['enddate'];
-                $cashdatas = $query->selectdbw('cashbook', $startdate, $enddate);
+                // $cashdatas = $query->selectdbw('cashbook', $startdate, $enddate);
+                if (empty($_SESSION['cashbookcurrency']) || $_SESSION['cashbookcurrency'] == 'ks') {
+                  $cashstmt = $pdo->prepare("SELECT * FROM cashbook WHERE `date` BETWEEN '$startdate' AND '$enddate' AND ac_name='3600/001'");
+                }else{
+                  $cashstmt = $pdo->prepare("SELECT * FROM cashbook WHERE `date` BETWEEN '$startdate' AND '$enddate' AND ac_name='3600/002'");
+                }
+
+                $cashstmt->execute();
+                $cashdatas = $cashstmt->fetchall();
               }elseif(isset($_POST['monthsearchbtn'])){
                 $month = $_POST['monthlysearch'];
                 $year = date('Y');
                 $search = $year . "-" . $month;
-                $stmt = $pdo->prepare("SELECT * FROM CASHBOOK WHERE date LIKE '%$search%'");
+                if (empty($_SESSION['cashbookcurrency']) || $_SESSION['cashbookcurrency'] == 'ks') {
+                  $stmt = $pdo->prepare("SELECT * FROM cashbook WHERE date LIKE '%$search%' AND ac_name='3600/001'");
+                }else{
+                  $stmt = $pdo->prepare("SELECT * FROM cashbook WHERE date LIKE '%$search%' AND ac_name='3600/002'");
+                }
                 $stmt->execute();
                 $cashdatas = $stmt->fetchall();
               }else{
-                $stmt = $pdo->prepare("SELECT * FROM cashbook ORDER BY id");
-                $stmt->execute();
-                $rawResult = $stmt->fetchAll();
-                $total_pages = ceil(count($rawResult) / $numOfrecs);
+                if (empty($_SESSION['cashbookcurrency']) || $_SESSION['cashbookcurrency'] == 'ks') {
+                  $stmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/001'");
+                }else{
+                  $stmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/002'");
+                }
 
-                $stmt = $pdo->prepare("SELECT * FROM cashbook ORDER BY id LIMIT $offset,$numOfrecs ");
                 $stmt->execute();
                 $cashdatas = $stmt->fetchAll();
               }
               ?>
               <?php
+              $idd = 1;
               foreach ($cashdatas as $cashdata) {
-                $acname = $cashdata['ac_name'];
-                if($acname == 'Supplier'){
+                $voucher_no = $cashdata['voucher_no'];
+                $ac_code = $cashdata['ac_name'];
+                $acselectstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$voucher_no' AND ac_code!='$ac_code'");
+                $acselectstmt->execute();
+                $acselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
+                $accode = $acselect['ac_code'];
+                if(str_contains($accode, '4000/')){
                   $acname = 'Supplier';
-                }else{
-                  $acnamedata = $query->select('acname', $acname, 'code_no');
+                }else {
+                  $acnamedata = $query->select('acname', $accode, 'code_no');
                   $acname = $acnamedata['ac_name'];
                 }
+                if (empty($_SESSION['cashbookcurrency']) || $_SESSION['cashbookcurrency'] == 'ks') {
+                  $debit = $cashdata['debit'];
+                  $credit = $cashdata['credit'];
+                  $balance = $cashdata['balance'];
+                }else{
+                  if($acselect['debit'] != 0){
+                    $debitorcredit = 'debit';
+                  }else{
+                    $debitorcredit = 'credit';
+                  }
+                  $acselectstmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='$debitorcredit'");
+                  $acselectstmt->execute();
+                  $rateselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
+
+                  if($cashdata['debit'] != 0){
+                    $debit = $cashdata['debit'] / $rateselect['dollar_rate'];
+                  }else{
+                    $credit = $cashdata['credit'] / $rateselect['dollar_rate'];
+                  }
+
+                  $balance = $cashdata['balance'] / $rateselect['dollar_rate'];
+                }
+
                 ?>
               <tr>
-                <td><?php echo $cashdata['id']; ?></td>
+                <td><?php echo $idd; ?></td>
                 <td><?php echo date('d-m-Y', strtotime($cashdata['date'])); ?></td>
-                <td><?php echo $cashdata['serial_no']; ?></td>
+                <td><?php echo $cashdata['sr_no']; ?></td>
                 <td><?php echo $acname; ?></td>
                 <td><?php echo $cashdata['particular']; ?></td>
-                <td><?php if($cashdata['debit'] == 0){echo "";}else{echo $cashdata['debit'];}; ?></td>
-                <td><?php if($cashdata['credit'] == 0){echo "";}else{echo $cashdata['credit'];}; ?></td>
-                <td><?php echo $cashdata['balance']; ?></td>
-                <td>
-                  <input type="hidden" name="updateid" value="<?php echo $cashdata['id']; ?>">
+                <td><?php if($cashdata['debit'] == 0){echo "";}else{echo round($debit, 2);}; ?></td>
+                <td><?php if($cashdata['credit'] == 0){echo "";}else{echo round($credit, 2);}; ?></td>
+                <td><?php echo round($balance, 2); ?></td>
+                <!-- <td> -->
+                  <!-- <input type="hidden" name="updateid" value="<?php// echo $cashdata['id']; ?>"> -->
                   <!-- <button type="submit" class="btn btn-warning text-light" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $cashdata['id']; ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
   <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
@@ -224,12 +294,12 @@ $query = new Query();
 </svg>
                   </button>
                 <form action="cashbook.php" method="post" style="display: inline !important;">
-                  <input type="hidden" name="deleteid" value="<?php echo $cashdata['id']; ?>">
+                  <input type="hidden" name="deleteid" value="<?php// echo $cashdata['id']; ?>">
                   <button type="submit" name="deletebutton" class="btn btn-danger">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
                   </button> -->
-                </form>
-              </td>
+                <!-- </form> -->
+              <!-- </td> -->
               </tr>
               <!-- Data Update Modal -->
               <div class="modal fade" id="updatemodal<?php echo $cashdata['id']; ?>" tabindex="-1" role="dialog" aria-hidden="true">
@@ -259,24 +329,12 @@ $query = new Query();
               </div>
               <!-- Update Modal -->
               <?php
+              $idd++;
               }
               ?>
             </table>
             <br>
-            <div aria-label="Page navigation example" style="float:right;">
-              <ul class="pagination">
-                <li class="page-item"><a class="page-link" href="?pageno=1">First</a></li>
-                <li class="page-item <?php if($pageno <= 1){echo 'disabled';} ?>">
-                  <a class="page-link" href="<?php if($pageno <= 1){echo '#';} else {echo "?pageno=".($pageno-1);} ?>">Previous</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#"><?php echo $pageno; ?></a></li>
-                <li class="page-item <?php if($pageno >= $total_pages){echo 'disabled';}; ?>">
-                  <a class="page-link" href="<?php if($pageno >= $total_pages){echo '#';}else{echo "?pageno=".($pageno+1);} ?>">Next</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="?pageno=<?php echo $total_pages; ?>">Last</a> </li>
-              </ul>
-            </div>
-            <a href="cashbookexport.php?forment=excel" class="btn btn-success">Export to Excel</a>
+            <!-- <a href="cashbookexport.php?forment=excel" class="btn btn-success">Export to Excel</a> -->
           </div>
         </div>
       </div>
@@ -335,11 +393,30 @@ $query = new Query();
   </div>
   <!-- Add Modal -->
 
-    <script type="text/javascript">
-      function inoroutchange(){
-
+  <script type="text/javascript">
+    $(document).ready(function(){
+      <?php
+      if(!empty($_SESSION['cashbookcurrency'])){
+        if($_SESSION['cashbookcurrency'] == 'usd'){
+          ?>
+          $('#usdbtn').hide();
+          $('#ksbtn').show();
+          <?php
+        }else{
+          ?>
+          $('#usdbtn').show();
+          $('#ksbtn').hide();
+          <?php
+        }
+      }else{
+        ?>
+        $('#usdbtn').hide();
+        $('#ksbtn').show();
+        <?php
       }
-    </script>
+       ?>
+    });
+  </script>
     <?php
     $bootstrap->javascript();
     ?>

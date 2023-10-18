@@ -51,13 +51,12 @@ $query = new Query();
               $message = $query->deletesupplier('supplier', $deleteid);
             }
             if(isset($_POST['updatebutton'])){
-              $supplier_id = $_POST['supplier_id'];
               $supplier_name = $_POST['supplier_name'];
               $supplier_phone = $_POST['supplier_phone'];
               $supplier_address = $_POST['supplier_address'];
               $updateid = $_POST['updateid'];
 
-              $message = $query->updatesupplier('supplier', $supplier_id, $supplier_name, $supplier_phone, $supplier_address, $updateid);
+              $message = $query->updatesupplier('supplier', $supplier_name, $supplier_phone, $supplier_address, $updateid);
             }
             if(isset($_POST['addbutton'])){
               $supplier_id = $_POST['supplier_id'];
@@ -117,7 +116,7 @@ $query = new Query();
             }else{
               $pageno = 1;
             }
-            $numOfrecs = 7;
+            $numOfrecs = 10;
             $offset = ($pageno -1) * $numOfrecs;
             ?>
             <form action="supplier.php" method="post" class=" d-inline">
@@ -139,7 +138,7 @@ $query = new Query();
             </button>
             <table class="mt-1 table table-bordered table-striped rounded">
               <tr>
-                <th>Supplier ID</th>
+                <th>Supplier A/C Code</th>
                 <th>Supplier Name</th>
                 <th>Supplier Phone</th>
                 <th>Supplier Address</th>
@@ -201,7 +200,7 @@ $query = new Query();
                         ?>
                         <input type="hidden" name="updateid" value="<?php echo $supplierdata['supplier_id']; ?>">
                         <label>Supplier ID</label>
-                        <input type="text" name="supplier_id" class="form-control" placeholder="Supplier ID" value="<?php echo $supplierdata['supplier_id']; ?>">
+                        <input type="text" name="supplier_id" disabled class="form-control" placeholder="Supplier ID" value="<?php echo $supplierdata['supplier_id']; ?>">
                         <label>Supplier Name</label>
                           <input type="text" name="supplier_name" class="form-control" placeholder="Supplier Name" value="<?php echo $supplierdata['supplier_name']; ?>">
                         <label>Supplier Phone</label>

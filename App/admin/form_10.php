@@ -138,12 +138,12 @@ $query = new Query();
                   $item_id = $data['item_id'];
                   $commonditydata = $query->select('item', $item_id, 'item_id');
                   $supplierid = $data['supplier_id'];
-                  $supplier_name = $query->select('supplier', $supplierid, 'supplier_id');
+                  $supplier_name = $query->select('acname', $supplierid, 'code_no');
                 ?>
                 <tr>
                   <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
                   <td><?php echo $commonditydata['item_name']; ?></td>
-                  <td><?php echo $supplier_name['supplier_name']; ?></td>
+                   <td><?php echo $supplier_name['ac_name']; ?></td>
                   <td><?php echo $data['country']; ?></td>
                   <td><?php echo $data['type']; ?></td>
                   <td><?php echo $data['size']; ?></td>
@@ -243,12 +243,12 @@ $query = new Query();
                 $item_id = $form10data['item_id'];
                 $commonditydata = $query->select('item', $item_id, 'item_id');
                 $supplierid = $form10data['supplier_id'];
-                $supplier_name = $query->select('supplier', $supplierid, 'supplier_id');
+                $supplier_name = $query->select('acname', $supplierid, 'code_no');
                ?>
               <tr>
                 <td><?php echo date('d-m-Y', strtotime($form10data['date'])); ?></td>
                 <td><?php echo $commonditydata['item_name']; ?></td>
-                <td><?php echo $supplier_name['supplier_name']; ?></td>
+                <td><?php echo $supplier_name['ac_name']; ?></td>
                 <td><?php echo $form10data['country']; ?></td>
                 <td><?php echo $form10data['type']; ?></td>
                 <td><?php echo $form10data['size']; ?></td>
@@ -386,9 +386,9 @@ $query = new Query();
 
                     foreach ($supplier_id_datas as $supplier_id_data) {
                       $supplierid = $supplier_id_data['supplier_name'];
-                      $supplier_name = $query->select('supplier', $supplierid, 'supplier_id');
+                      $supplier_name = $query->select('acname', $supplierid, 'code_no');
                       ?>
-                      <option value="<?php echo $supplier_name['supplier_id']; ?>"><?php echo $supplier_name['supplier_name']; ?></option>
+                      <option value="<?php echo $supplier_name['code_no']; ?>"><?php echo $supplier_name['ac_name']; ?></option>
                       <?php
                     }
                      ?>

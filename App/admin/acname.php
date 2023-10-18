@@ -87,7 +87,7 @@ $query = new Query();
               foreach ($datas as $data) {
                 $actype = $query->select('actype', $data['ac_type'], 'acid');
               ?>
-              <tr data-bs-toggle='modal' data-bs-target="#updatemodal<?php echo $data['id']; ?>">
+              <tr <?php if(!str_contains($data['code_no'], '4000/')){echo "data-bs-toggle='modal'";} ?> data-bs-target="#updatemodal<?php echo $data['id']; ?>">
                 <td><?php echo $data['id']; ?></td>
                 <td><?php echo $data['code_no']; ?></td>
                 <td><?php echo $actype['ac_type']; ?></td>

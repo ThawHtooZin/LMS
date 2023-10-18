@@ -89,28 +89,19 @@ $query = new Query();
               if(isset($_POST['search'])){
                 $supplier_id = $_POST['supplier_id'];
                 $payabledatas = $query->search('payable', 'supplier_id', $supplier_id);
-              }elseif(!empty($_GET['pageno'])){
-                $stmt = $pdo->prepare("SELECT * FROM payable ORDER BY id");
-                $stmt->execute();
-                $rawResult = $stmt->fetchAll();
-                $total_pages = ceil(count($rawResult) / $numOfrecs);
-
-                $stmt = $pdo->prepare("SELECT * FROM payable ORDER BY id LIMIT $offset,$numOfrecs ");
-                $stmt->execute();
-                $customerdatas = $stmt->fetchAll();
               }else{
                 $payabledatas = $query->selectall('payable');
               }
             ?>
             <table class="mt-1 table table-bordered table-striped rounded">
-              <tr>
-                <!-- <th>#</th> -->
+              <tr class="text-center">
+                <th>Date</th>
                 <th>Supplier Name</th>
                 <th>Purchase <br> Voucher No</th>
                 <th>Purchase <br> Amount</th>
                 <th>Paid Date</th>
                 <th>Paid Voucher</th>
-                <th>Remark</th>
+                <th>Particular</th>
                 <th>Paid Amount</th>
                 <th>Balance</th>
                 <!-- <th>Action</th> -->
@@ -124,11 +115,11 @@ $query = new Query();
               ?>
               <tr>
 
-                <!-- <td><?php //echo $idd; ?></td> -->
+                <td><?php if($payabledata['date'] != '0000-00-00'){echo date('d-m-Y', strtotime($payabledata['date'])); }; ?></td>
                 <td><?php if(!empty($payabledata['purchase_voucher_no'])){ echo $supplier_name['ac_name']; }; ?></td>
                 <td><?php echo $payabledata['purchase_voucher_no']; ?></td>
                 <td><?php if(!empty($payabledata['purchase_amount'])){ echo $payabledata['purchase_amount'];}; ?></td>
-                <td><?php if($payabledata['paid_date'] != "0000-00-00"){ echo $payabledata['paid_date']; }; ?></td>
+                <td><?php if($payabledata['paid_date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($payabledata['paid_date'])); }; ?></td>
                 <td><?php echo $payabledata['paid_voucher']; ?></td>
                 <td><?php echo $payabledata['remark']; ?></td>
                 <td><?php if(!empty($payabledata['paid_amount'])){ echo $payabledata['paid_amount'];}; ?></td>
@@ -194,11 +185,12 @@ $query = new Query();
                   <tr style="font-weight: bold;">
                     <td>Total:</td>
                     <td></td>
+                    <td></td>
                     <td><?php echo $total_purchase_amount['total_purchase_amount'] ?></td>
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td><?php echo $total_paid_amount['total_paid_amount'] ?></td>
+                    <td><?php if($total_paid_amount['total_paid_amount'] != 0){ echo $total_paid_amount['total_paid_amount'];} ?></td>
                     <td><?php echo $total_purchase_amount['total_purchase_amount'] - $total_paid_amount['total_paid_amount']; ?></td>
                   </tr>
                   <?php

@@ -46,12 +46,31 @@ if(isset($_POST['addbalance'])){
         <div class="card">
           <div class="card-header bg-warning text-light">
             <h5 class="d-inline">Account Receivable</h5>
-            <button type="button" class="btn btn-primary btn-sm float-end" data-bs-toggle="modal" data-bs-target="#addbalance">Add Balance</button>
+            <form class="float-end" action="" method="post">
+
+              <select class="chzn-select" name="ac_codeinp" style="width:100%;" data-placeholder="Supplier name">
+                <option value=""></option>
+                <?php
+                $acdatastmt = $pdo->prepare("SELECT DISTINCT ac_code FROM receivable");
+                $acdatastmt->execute();
+                $acdatas = $acdatastmt->fetchall();
+                foreach ($acdatas as $acdata) {
+                  $supplier_name = $query->select('acname', $acdata['ac_code'], 'code_no');
+                  ?>
+                  <option value="<?php echo $acdata['ac_code']; ?>"><?php echo $supplier_name['ac_name']; ?> - <?php echo $acdata['ac_code']; ?></option>
+                  <?php
+                }
+                ?>
+              </select>
+              <button type="button" class="btn btn-primary btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#addbalance">Add Balance</button>
+              <button type="submit" name="search" class="btn btn-primary btn-sm">Search</button>
+            </form>
           </div>
           <div class="card-body">
             <table class="table table-hover table-striped table-bordered">
               <tr>
                 <th>Date</th>
+                <th>A/C Name</th>
                 <th>Sr No.</th>
                 <th>Contianer No</th>
                 <th>Invoice Amount($)</th>
@@ -62,21 +81,29 @@ if(isset($_POST['addbalance'])){
                 <th>Balance($)</th>
               </tr>
               <?php
-              $receivabledatas = $query->selectall('receivable');
+              if(isset($_POST['search'])){
+                $ac_codeinp = $_POST['ac_codeinp'];
+                $receivabledatas = $query->search('receivable', 'ac_code', $ac_codeinp);
+              }else{
+                $receivabledatas = $query->selectall('receivable');
+              }
               foreach($receivabledatas as $receivabledata) :
+                $ac_name = $query->select('acname', $receivabledata['ac_code'], 'code_no');
               ?>
-              <tr <?php if($receivabledata['sr_no']){ ?>data-bs-toggle="modal" data-bs-target="#paymentmodal<?php echo $receivabledata['id']; ?>"<?php } ?>>
+              <!-- <tr <?php// if($receivabledata['sr_no']){ ?>data-bs-toggle="modal" data-bs-target="#paymentmodal<?php// echo $receivabledata['id']; ?>"<?php //} ?>> -->
+              <tr>
                 <td><?php if($receivabledata['date'] != '0000-00-00'){ echo date('d-m-Y', strtotime($receivabledata['date'])); }; ?></td>
+                <td><?php if(!empty($receivabledata['invoice_amount'])){ if(!empty($ac_name['ac_name'])){ echo $ac_name['ac_name'];} } ?></td>
                 <td><?php echo $receivabledata['sr_no']; ?></td>
                 <td><?php echo $receivabledata['container_no']; ?></td>
                 <td><?php echo $receivabledata['invoice_amount']; ?></td>
-                <td><?php if($receivabledata['paid_date'] != '0000-00-00'){ echo $receivabledata['paid_date'];} ?></td>
+                <td><?php if($receivabledata['paid_date'] != '0000-00-00'){ echo date('d-m-Y', strtotime($receivabledata['paid_date'])); } ?></td>
                 <td><?php echo $receivabledata['payment_no']; ?></td>
                 <td><?php echo $receivabledata['particulars']; ?></td>
                 <td><?php if($receivabledata['paid_amount'] != 0){ echo $receivabledata['paid_amount'];} ?></td>
                 <td><?php echo $receivabledata['balance']; ?></td>
               </tr>
-              <div class="modal fade" id="paymentmodal<?php echo $receivabledata['id']; ?>">
+              <!-- <div class="modal fade" id="paymentmodal<?php echo $receivabledata['id']; ?>">
                 <div class="modal-dialog">
                   <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
                     <div class="modal-header bg-secondary text-light">
@@ -114,10 +141,36 @@ if(isset($_POST['addbalance'])){
                   </form>
                   </div>
                 </div>
-              </div>
+              </div> -->
               <?php
+              $ac_code = $receivabledata['ac_code'];
               endforeach;
                ?>
+
+               <?php
+                 if(isset($_POST['search'])){
+                   $total_invoice_amount = $query->selectallsumreceivable('receivable', 'invoice_amount', 'total_invoice_amount', $ac_code);
+
+                   $total_paid_amount = $query->selectallsumreceivable('receivable', 'paid_amount', 'total_paid_amount', $ac_code);
+
+
+                   ?>
+                   <tr style="font-weight: bold;">
+                     <td>Total:</td>
+                     <td></td>
+                     <td></td>
+                     <td></td>
+                     <td><?php echo $total_invoice_amount['total_invoice_amount'] ?></td>
+                     <td></td>
+                     <td></td>
+                     <td></td>
+                     <td><?php if($total_paid_amount['total_paid_amount'] != 0){ echo $total_paid_amount['total_paid_amount'];} ?></td>
+                     <td><?php echo $total_invoice_amount['total_invoice_amount'] - $total_paid_amount['total_paid_amount']; ?></td>
+                   </tr>
+                   <?php
+                 }
+                 ?>
+
             </table>
           </div>
         </div>

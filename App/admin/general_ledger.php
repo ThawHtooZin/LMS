@@ -45,7 +45,7 @@ $query = new Query();
                 <th>Description</th>
                 <th>Debit</th>
                 <th>Cerdit</th>
-                <th>Balance</th>
+                <?php if(isset($_POST['searchgeneralledger'])){ echo ''; }else{ echo '<th>Balance</th>'; } ?>
               </tr>
               <?php
               if (isset($_POST['searchgeneralledger'])) {
@@ -76,6 +76,14 @@ $query = new Query();
                     <?php
                     $ac_code = $gldata['ac_code'];
                     $acname = $query->select('acname', $ac_code, 'code_no');
+                    $debitstmt = $pdo->prepare("SELECT SUM(debit) AS total_debit FROM general_ledger WHERE ac_code='$ac_code'");
+                    $debitstmt->execute();
+                    $totaldebit = $debitstmt->fetch(PDO::FETCH_ASSOC);
+                    $creditstmt = $pdo->prepare("SELECT SUM(credit) AS total_credit FROM general_ledger WHERE ac_code='$ac_code'");
+                    $creditstmt->execute();
+                    $totalcredit = $creditstmt->fetch(PDO::FETCH_ASSOC);
+
+                    $balance = $totaldebit['total_debit'] - $totalcredit['total_credit'];
                      ?>
                     <tr>
                       <td><?php echo date('d/m/Y', strtotime($gldata['date'])); ?></td>
@@ -84,9 +92,28 @@ $query = new Query();
                       <td><?php echo $gldata['narration']; ?></td>
                       <td><?php echo $gldata['debit']; ?></td>
                       <td><?php echo $gldata['credit']; ?></td>
-                      <td><?php echo $gldata['balance']; ?></td>
+                      <!-- <td><?php echo $gldata['balance']; ?></td> -->
                     </tr>
-                  <?php endforeach;}
+                  <?php endforeach;
+                  ?>
+                  <tr style="font-weight:bold;">
+                    <td>Total:</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><?= $totaldebit['total_debit']; ?></td>
+                    <td><?= $totalcredit['total_credit']; ?></td>
+                  </tr>
+                  <tr style="font-weight:bold;">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><?php echo $balance; ?></td>
+                  </tr>
+                  <?php
+                  }
               }else{
                 $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger");
                 $acnamecountstmt->execute();
@@ -161,7 +188,7 @@ $query = new Query();
               </div>
               <div class="modal-footer">
                 <button type="button" name="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
-                <button type="submit" name="searchgeneralledger" class="btn btn-success">Serach</button>
+                <button type="submit" name="searchgeneralledger" class="btn btn-success">Search</button>
               </div>
             </form>
             </div>
@@ -177,12 +204,20 @@ $query = new Query();
     $(document).ready(function(){
       $('#ac_code').on('keyup', function(){
         var ac_codepost = $('#ac_code').val();
-        ac_code = ac_codepost.split('-');
+        var type = "";
+        if(ac_codepost.includes('/')){
+          ac_code = ac_codepost.split('/');
+          type = "slash";
+        }else{
+          ac_code = ac_codepost.split('-');
+          type = "dash";
+        }
         firstpart = ac_code[0];
         lastpart = ac_code[1];
         $('#ac_name').load('ac_name.php', {
           FirstPart : firstpart,
-          LastPart: JSON.stringify(lastpart)
+          LastPart: JSON.stringify(lastpart),
+          Type: type
         });
       });
       $('#reportsmodal').on('hidden.bs.modal', function(){

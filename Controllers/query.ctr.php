@@ -286,6 +286,8 @@ Class Query{
     global $pdo;
     $stmt = $pdo->prepare("INSERT INTO $table(customer_id, customer_name, customer_phone, customer_address) VALUES('$customer_id', '$customer_name', '$customer_phone', '$customer_address');");
     $stmt->execute();
+    $acstmt = $pdo->prepare("INSERT INTO acname(code_no, ac_type, ac_name) VALUES('$customer_id', '11', '$customer_name');");
+    $acstmt->execute();
     if($stmt){
       return $successmessage = "Customer Added Successfully";
     }else{
@@ -293,10 +295,12 @@ Class Query{
     }
   }
 
-  function updatecustomer($table, $customer_id, $customer_name, $customer_phone, $customer_address, $updateid){
+  function updatecustomer($table, $customer_name, $customer_phone, $customer_address, $updateid){
     global $pdo;
-    $stmt = $pdo->prepare("UPDATE $table SET customer_id='$customer_id', customer_name='$customer_name', customer_phone='$customer_phone', customer_address='$customer_address' WHERE customer_id='$updateid'");
+    $stmt = $pdo->prepare("UPDATE $table SET customer_name='$customer_name', customer_phone='$customer_phone', customer_address='$customer_address' WHERE customer_id='$updateid'");
     $stmt->execute();
+    $acstmt = $pdo->prepare("UPDATE acname SET ac_name='$customer_name' WHERE code_no='$updateid'");
+    $acstmt->execute();
     if($stmt){
       return $successmessage = "Item Update Successfully";
     }else{
@@ -319,6 +323,8 @@ Class Query{
     global $pdo;
     $stmt = $pdo->prepare("INSERT INTO $table(supplier_id, supplier_name, supplier_phone, supplier_address) VALUES('$supplier_id', '$supplier_name', '$supplier_phone', '$supplier_address');");
     $stmt->execute();
+    $acstmt = $pdo->prepare("INSERT INTO acname(code_no, ac_type, ac_name) VALUES('$supplier_id', '16', '$supplier_name');");
+    $acstmt->execute();
     if($stmt){
       return $successmessage = "Supplier Added Successfully";
     }else{
@@ -326,10 +332,12 @@ Class Query{
     }
   }
 
-  function updatesupplier($table, $supplier_id, $supplier_name, $supplier_phone, $supplier_address, $updateid){
+  function updatesupplier($table, $supplier_name, $supplier_phone, $supplier_address, $updateid){
     global $pdo;
-    $stmt = $pdo->prepare("UPDATE $table SET supplier_id='$supplier_id', supplier_name='$supplier_name', supplier_phone='$supplier_phone', supplier_address='$supplier_address' WHERE supplier_id='$updateid'");
+    $stmt = $pdo->prepare("UPDATE $table SET supplier_name='$supplier_name', supplier_phone='$supplier_phone', supplier_address='$supplier_address' WHERE supplier_id='$updateid'");
     $stmt->execute();
+    $acstmt = $pdo->prepare("UPDATE acname SET ac_name='$supplier_name' WHERE code_no='$updateid'");
+    $acstmt->execute();
     if($stmt){
       return $successmessage = "Supplier Update Successfully";
     }else{
@@ -360,7 +368,7 @@ Class Query{
     $iddata = $idstmt->fetch(PDO::FETCH_ASSOC);
     $stmt = $pdo->prepare("INSERT INTO $table(date, voucher_no, tclfrozen, supplier_id, commodity, size, viss, pcs, price, amount) VALUES('$date', '$voucher_no', '$tclfrozen', '$supplier_name', '$commodity', '$size', '$viss', '$pcs', '$price', '$amount')");
     $stmt->execute();
-    $balstmt = $pdo->prepare("SELECT balance FROM accountpayable WHERE supplier_id = '$supplier_name' ORDER BY id DESC");
+    $balstmt = $pdo->prepare("SELECT balance FROM payable WHERE supplier_id = '$supplier_name' ORDER BY id DESC");
     $balstmt->execute();
     $baldata = $balstmt->fetch(PDO::FETCH_ASSOC);
     if(!empty($baldata['balance'])){
@@ -377,7 +385,7 @@ Class Query{
     $idstmt->execute();
     $iddata = $idstmt->fetch(PDO::FETCH_ASSOC);
     $id = $iddata['no'];
-    $payablestmt = $pdo->prepare("INSERT INTO accountpayable( supplier_id, purchase_voucher_no, purchase_amount, balance, link_id) VALUES( '$supplier_name', '$voucher_no', '$amount', '$total_balance', '$id')");
+    $payablestmt = $pdo->prepare("INSERT INTO payable(date, supplier_id, purchase_voucher_no, purchase_amount, balance, link_id) VALUES('$date', '$supplier_name', '$voucher_no', '$amount', '$total_balance', '$id')");
     $payablestmt->execute();
     $kg = floatval($viss) * 1.634;
     $link_id = $id;
@@ -2389,7 +2397,7 @@ Class Query{
     );
 
     if(!empty($debit)){
-      echo $debitorcredit = 'debit';
+      $debitorcredit = 'debit';
 
       if($currency == 'usd'){
         $mmk_amount = intval($rate) * intval($debit);
@@ -2506,7 +2514,7 @@ Class Query{
       }else{
 
         if($transactiondata['bank_charges'] != 0){
-          $bankchargesstmt = $pdo->prepare("SELECT bank_charges FROM transaction WHERE ac_code='3000%'");
+          $bankchargesstmt = $pdo->prepare("SELECT bank_charges FROM transaction WHERE ac_code='3300%'");
           $bankchargesstmt->execute();
           $bankchargesdata = $bankchargesstmt->fetch(PDO::FETCH_ASSOC);
           $debit = $transactiondata['debit'] - $transactiondata['bank_charges'];
@@ -2543,11 +2551,13 @@ Class Query{
     }
 
     // Receivable
-    $stmt = $pdo->prepare("SELECT * FROM transaction WHERE date='$date' AND ac_code LIKE '3000%'");
+    $stmt = $pdo->prepare("SELECT * FROM transaction WHERE date='$date' AND ac_code LIKE '3300%'");
     $stmt->execute();
     $receivabledatas = $stmt->fetchall();
     foreach ($receivabledatas as $receivabledata) {
+      $ac_code = $receivabledata['ac_code'];
       $voucher_no = $receivabledata['voucher_no'];
+      $description = $receivabledata['description'];
       if($receivabledata['debit'] != 0){
         $debitorcredit = 'debit';
         $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='$debitorcredit'");
@@ -2557,33 +2567,29 @@ Class Query{
         $receivestmt->execute();
         $receivedata = $receivestmt->fetch(PDO::FETCH_ASSOC);
         $invoice_amount = $currencydata['usd_amount'];
-        if (!empty($receivedata)) {
-          $balance = $currencydata['usd_amount'] + $receivedata['balance'];
-        }else{
-          $balance = $currencydata['usd_amount'];
-        }
+        $sr_no = $receivabledata['sr_no'];
+        $container_no = $receivabledata['container_no'];
+        $balance = $currencydata['usd_amount'];
+        $receivestmt = $pdo->prepare("INSERT INTO receivable(date, ac_code, sr_no, container_no, invoice_amount, balance) VALUES('$date', '$ac_code', '$sr_no', '$container_no', '$invoice_amount', '$balance')");
+        $receivestmt->execute();
       }elseif($receivabledata['credit'] != 0){
         $debitorcredit = 'credit';
         $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='$debitorcredit'");
         $currencystmt->execute();
         $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
-        $receivestmt = $pdo->prepare("SELECT * FROM receivable ORDER BY id DESC");
+        $receivestmt = $pdo->prepare("SELECT * FROM receivable WHERE ac_code='$ac_code' ORDER BY id DESC");
         $receivestmt->execute();
         $receivedata = $receivestmt->fetch(PDO::FETCH_ASSOC);
+        $paid_amount = $currencydata['usd_amount'];
+        $invoice_amount = $receivedata['invoice_amount'];
         if (!empty($receivedata['balance'])) {
-          $invoice_amount = $currencydata['usd_amount'];
-          $balance = $currencydata['usd_amount'] + $receivedata['balance'];
+          $balance = intval($receivedata['balance']) - intval($paid_amount);
         }else{
-          $invoice_amount = $currencydata['usd_amount'];
-          $balance = $currencydata['usd_amount'];
+          $balance = intval($receivedata['balance'] + $invoice_amount) - intval($paid_amount);
         }
-
-      $sr_no = $receivabledata['sr_no'];
-      $container_no = $receivabledata['container_no'];
-      $receivestmt = $pdo->prepare("INSERT INTO receivable(date, sr_no, container_no, paid_amount, balance) VALUES('$date', '$sr_no', '$container_no', '$invoice_amount', '$balance')");
-      $receivestmt->execute();
-    }
-
+        $receivestmt = $pdo->prepare("INSERT INTO receivable(ac_code, paid_date, payment_no, particulars, paid_amount, balance) VALUES('$ac_code', '$date', '$voucher_no', '$description', '$paid_amount', '$balance')");
+        $receivestmt->execute();
+      }
     }
 
     // Payable
@@ -2642,27 +2648,49 @@ Class Query{
     $stmt->execute();
     $cashbookdatas = $stmt->fetchall();
     foreach ($cashbookdatas as $cashbookdata) {
+      $ac_name = $cashbookdata['ac_code'];
+      $sr_no = $cashbookdata['sr_no'];
       $voucher_no = $cashbookdata['voucher_no'];
+      $id = $cashbookdata['id'];
       $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no'");
       $currencystmt->execute();
       $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
       if(!empty($cashbookdata['bank_charges'])){
-        $debit = $cashbookdata['debit'] - ($currencydata['dollar_rate'] * $cashbookdata['bank_charges']);
+        $predebit = $currencydata['dollar_rate'] * $cashbookdata['bank_charges'];
+        $debit = $cashbookdata['debit'] - $predebit;
       }else{
         $debit = $cashbookdata['debit'];
       }
       $credit = $cashbookdata['credit'];
       $description = $cashbookdata['description'];
-      $selectacname = $this->select('transaction', $cashbookdata['voucher_no'], 'voucher_no');
-      $ac_code = $selectacname['ac_code'];
+      // $selectacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no='$voucher_no' AND id!='$id'");
+      // $selectacnamestmt->execute();
+      // $selectacname = $selectacnamestmt->fetch(PDO::FETCH_ASSOC);
+      // $ac_code = $selectacname['ac_code'];
+      //
+      //
+      // if(str_contains($ac_code, '4000')){
+      //   $ac_code = 'Supplier';
+      //    echo "sup";
+      // }
+      // if(str_contains($ac_code, '3300')){
+      //    echo "cus";
+      //   $ac_code = $selectacname['ac_code'];
+      // }
+      // if(str_contains($ac_code, '9100')){
+      //    echo "expanse";
+      //   $ac_code = $selectacname['ac_code'];
+      // }
+      //
+      // $selectacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE id='$id'");
+      // $selectacnamestmt->execute();
+      // $selectacname = $selectacnamestmt->fetch(PDO::FETCH_ASSOC);
 
-      if(str_contains($ac_code, '4000')){
-        $ac_code = 'Supplier';
-      }elseif(str_contains($ac_code, '9100')){
-        $ac_code = $selectacname['ac_code'];
+      if($cashbookdata['ac_code'] == '3600/001'){
+        $payabledatastmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='3600/001' ORDER BY id DESC");
+      }else{
+        $payabledatastmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='3600/002' ORDER BY id DESC");
       }
-
-      $payabledatastmt = $pdo->prepare("SELECT balance FROM cashbook ORDER BY id DESC");
       $payabledatastmt->execute();
       $cashbooksearchdata = $payabledatastmt->fetch(PDO::FETCH_ASSOC);
       if(!empty($cashbooksearchdata['balance'])){
@@ -2671,7 +2699,7 @@ Class Query{
         $balance = 0;
       }
       $balance = ($balance + $debit) - $credit;
-      $cashbookstmt = $pdo->prepare("INSERT INTO cashbook(date, ac_name, particular, debit, credit, balance) VALUES('$date', '$ac_code', :description, '$debit', '$credit', '$balance')");
+      $cashbookstmt = $pdo->prepare("INSERT INTO cashbook(date, ac_name, particular, debit, credit, balance, voucher_no) VALUES('$date', '$ac_name', :description, '$debit', '$credit', '$balance', '$voucher_no')");
       $cashbookstmt->execute([
         ':description' => $description
       ]);
@@ -2865,6 +2893,12 @@ Class Query{
   function selectallsumpayable($table, $row, $selectas, $supplier_id){
     global $pdo;
     $stmt = $pdo->prepare("SELECT SUM($row) AS $selectas FROM $table WHERE supplier_id='$supplier_id'");
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+  }
+  function selectallsumreceivable($table, $row, $selectas, $supplier_id){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT SUM($row) AS $selectas FROM $table WHERE ac_code='$supplier_id'");
     $stmt->execute();
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
