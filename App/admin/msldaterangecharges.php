@@ -159,6 +159,7 @@ $query = new Query();
                   $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM mslcoldstore");
                   $commonditycountstmt->execute();
                   $commonditycountdatas = $commonditycountstmt->fetchColumn();
+                  $idd = 0;
                   for ($i=0; $i < $commonditycountdatas; $i++) {
                     $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM mslcoldstore");
                     $commonditystmt->execute();
@@ -169,12 +170,13 @@ $query = new Query();
                   $stmt->execute();
                   $datas = $stmt->fetchall();
                   foreach ($datas as $data) {
+                    $idd++;
                     $item_id = $data['item_id'];
                     $commonditydata = $query->select('item', $item_id, 'item_id');
                   ?>
                   <!-- <tr style="<?php //if($commonditydata['category_name'] == "IQF"){echo "background-color: #6ef757 !important;";}elseif($commonditydata['category_name'] == "Block"){echo "background-color: #f5764c !important;";}elseif($commonditydata['category_name'] == "Pujanut"){echo "background-color: lightblue !important;";} ?>"> -->
                   <tr>
-                    <td><?php echo $data['id']; ?></td>
+                    <td><?php echo $idd; ?></td>
                     <td><?php echo date("d-m-Y", strtotime($data['indate'])); ?></td>
                     <td><?php if($data['outdate'] != '0000-00-00'){ echo date("d-m-Y", strtotime($data['outdate']));}else{echo "Loose";}; ?></td>
                     <td><?php echo $commonditydata['item_name']; ?></td>
@@ -285,6 +287,7 @@ $query = new Query();
                 $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM mslfreezing");
                 $commonditycountstmt->execute();
                 $commonditycountdatas = $commonditycountstmt->fetchColumn();
+                $idd = 0;
                 for ($i=0; $i < $commonditycountdatas; $i++) {
                   $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM mslfreezing");
                   $commonditystmt->execute();
@@ -295,11 +298,12 @@ $query = new Query();
                 $labourstmt->execute();
                 $labourdatas = $labourstmt->fetchall();
                 foreach ($labourdatas as $labourdata) {
+                  $idd++;
                   $item_id = $labourdata['item_id'];
                   $commonditydata = $query->select('item', $item_id, 'item_id');
                 ?>
                 <tr>
-                  <td><?php echo $labourdata['id']; ?></td>
+                  <td><?php echo $idd; ?></td>
                   <td><?php echo date('d-m-Y', strtotime($labourdata['indate'])); ?></td>
                   <td><?php echo date('d-m-Y', strtotime($labourdata['outdate'])); ?></td>
                   <td><?php echo $commonditydata['item_name']; ?></td>
@@ -346,6 +350,7 @@ $query = new Query();
                 $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM mslexportcharges");
                 $commonditycountstmt->execute();
                 $commonditycountdatas = $commonditycountstmt->fetchColumn();
+                $idd = 0;
                 for ($i=0; $i < $commonditycountdatas; $i++) {
                   $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM mslexportcharges");
                   $commonditystmt->execute();
@@ -356,11 +361,12 @@ $query = new Query();
                 $processingstmt->execute();
                 $processingdatas = $processingstmt->fetchall();
                 foreach ($processingdatas as $processingdata) {
+                  $idd++;
                   $item_id = $processingdata['item_id'];
                   $commonditydata = $query->select('item', $item_id, 'item_id');
                 ?>
                 <tr>
-                  <td><?php echo $processingdata['id']; ?></td>
+                  <td><?php echo $idd; ?></td>
                   <td><?php echo date('d-m-Y', strtotime($processingdata['indate'])); ?></td>
                   <td><?php echo date('d-m-Y', strtotime($processingdata['outdate'])); ?></td>
                   <td><?php echo $commonditydata['item_name']; ?></td>
@@ -408,13 +414,14 @@ $query = new Query();
                 $totalstmt = $pdo->prepare("SELECT * FROM msl_total_charges");
                 $totalstmt->execute();
                 $totaldatas = $totalstmt->fetchall();
-                $no = 1;
+                $idd = 0;
                 foreach ($totaldatas as $total_charges_data) {
+                  $idd++;
                   $item_id = $total_charges_data['item_id'];
                   $commonditydata = $query->select('item', $item_id, 'item_id');
                 ?>
                 <tr data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>">
-                  <td><?php echo $no; ?></td>
+                  <td><?php echo $idd; ?></td>
                   <td><?php if(!empty($commonditydata['item_name'])){ echo $commonditydata['item_name'];} ; ?></td>
                   <td><?php if($total_charges_data['total_coldstore_charges'] != "0"){ echo $total_charges_data['total_coldstore_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['total_freezing_charges'] != "0"){ echo $total_charges_data['total_freezing_charges'];} ; ?></td>
@@ -471,7 +478,6 @@ $query = new Query();
                 </div>
                 <!-- Add Modal -->
                 <?php
-                $no++;
                 }
                  ?>
               </table>
@@ -490,10 +496,12 @@ $query = new Query();
                 </tr>
                 <?php
                 $repackingdatas = $query->selectall('mslrepacking');
+                $idd = 0;
                 foreach ($repackingdatas as $repackingdata) {
+                  $idd++;
                  ?>
                  <tr>
-                   <td><?php echo $repackingdata['id']; ?></td>
+                   <td><?php echo $idd; ?></td>
                    <td><?php echo date('d-m-Y', strtotime($repackingdata['date'])); ?></td>
                    <td><?php echo $repackingdata['description']; ?></td>
                    <td><?php if($repackingdata['sheet'] != '0'){ echo $repackingdata['sheet']; }; ?></td>

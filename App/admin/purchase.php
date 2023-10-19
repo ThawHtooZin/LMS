@@ -165,7 +165,7 @@ $query = new Query();
             ?>
             <table class="mt-1 table table-bordered table-striped rounded table-hover">
               <tr>
-                <th>#</th>
+                <th>No.</th>
                 <th>Date</th>
                 <th>Voucher No</th>
                 <th>Type</th>
@@ -195,7 +195,9 @@ $query = new Query();
                 $stmt->execute();
                 $purchasedatas = $stmt->fetchAll();
               }
+              $idd = 0;
               foreach ($purchasedatas as $purchasedata) {
+                $idd++;
                 $supplierid = $purchasedata['supplier_id'];
                 $supplier_name = $query->select('supplier', $supplierid, 'supplier_id');
                 $itemid = $purchasedata['commodity'];
@@ -204,7 +206,7 @@ $query = new Query();
               <input type="hidden" name="updateid" value="<?php echo $purchasedata['no']; ?>">
 
               <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $purchasedata['no'];  ?>" style="cursor: pointer !important;">
-                <td><?php echo $purchasedata['no']; ?></td>
+                <td><?php echo $idd; ?></td>
                 <td><?php echo date('d-m-Y', strtotime($purchasedata['date'])); ?></td>
                 <td><?php echo $purchasedata['voucher_no']; ?></td>
                 <td><?php echo $purchasedata['tclfrozen']; ?></td>

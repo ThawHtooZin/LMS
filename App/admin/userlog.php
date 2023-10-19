@@ -47,10 +47,12 @@ $query = new Query();
               </tr>
               <?php
               $userlogdatas = $query->selectall('userlogs');
+              $idd = 0;
               foreach ($userlogdatas as $userlogdata) {
+                $idd++;
               ?>
               <tr>
-                <td><?php echo $userlogdata['id']; ?></td>
+                <td><?php echo $idd; ?></td>
                 <td><?php echo date('h:m:s', strtotime($userlogdata['login_time'])); ?></td>
                 <td><?php echo date("d:m:Y", strtotime($userlogdata['login_date'])); ?></td>
                 <td><?php echo $userlogdata['login_username']; ?></td>

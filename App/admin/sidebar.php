@@ -472,7 +472,7 @@ $permissions = $permission['permission'];
             if(str_contains($permissions, 'manage_packingmaterial')){
               ?>
             <li class="nav-item">
-              <a href="packingmeterial.php" class="nav-link h text-light"  style="font-size:14px !important; ">
+              <a href="packingmaterial.php" class="nav-link h text-light"  style="font-size:14px !important; ">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Packing Material
               </a>

@@ -108,7 +108,7 @@ $query = new Query();
             }else{
               $pageno = 1;
             }
-            $numOfrecs = 2;
+            $numOfrecs = 8;
             $offset = ($pageno -1) * $numOfrecs;
             ?>
             <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
@@ -116,7 +116,7 @@ $query = new Query();
             </button>
             <table class="mt-5 table table-bordered table-striped rounded">
               <tr>
-                <th>#</th>
+                <th>Account No</th>
                 <th>Username</th>
                 <th>Password</th>
                 <th>Email</th>
@@ -135,29 +135,17 @@ $query = new Query();
               $accountdatas = $stmt->fetchAll();
               ?>
               <?php
+              $idd = 0;
               foreach ($accountdatas as $accountdata) {
-                $role = $accountdata['role'];
-                switch ($role) {
-                  case 1:
-                    $rolename = "Admin";
-                    break;
-                  case 2:
-                    $rolename = "User";
-                    break;
-                  case 3:
-                    $rolename = "Sale Person";
-                    break;
-                  case 4:
-                    $rolename = "Purchase Person";
-                    break;
-                }
+                $accountname = $query->select('role', $accountdata['role'], 'role_id');
+                $idd++;
               ?>
               <tr>
-                <td><?php echo $accountdata['id']; ?></td>
+                <td><?php echo $idd; ?></td>
                 <td><?php echo $accountdata['username']; ?></td>
                 <td><?php echo $accountdata['password']; ?></td>
                 <td><?php echo $accountdata['email']; ?></td>
-                <td><?php echo $rolename; ?></td>
+                <td><?php echo $accountname['role_name']; ?></td>
                 <td>
                   <input type="hidden" name="updateid" value="<?php echo $accountdata['id']; ?>">
                   <button type="submit" class="btn btn-warning text-light" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $accountdata['id']; ?>">
@@ -200,10 +188,14 @@ $query = new Query();
                         <label>Role</label>
                         <select class="form-control" name="role">
                           <option value="">Select Role</option>
-                          <option value="1" <?php if($updatedata['role'] == 1){ echo "selected";} ?>>Admin</option>
-                          <option value="2" <?php if($updatedata['role'] == 2){ echo "selected";} ?>>User</option>
-                          <option value="3" <?php if($updatedata['role'] == 3){ echo "selected";} ?>>Sale Person</option>
-                          <option value="4" <?php if($updatedata['role'] == 4){ echo "selected";} ?>>Purchase Person</option>
+                          <?php
+                          $roledatas  = $query->selectall('role');
+                          foreach ($roledatas as $roledata) {
+                          ?>
+                          <option value="<?php echo $roledata['role_id']; ?>"><?php echo $roledata['role_name']; ?></option>
+                          <?php
+                          }
+                          ?>
                         </select>
                       </div>
                       <div class="modal-footer">

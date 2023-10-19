@@ -150,7 +150,9 @@ $query = new Query();
                 </tr>
                 <?php
                 $fishcoldstoredatas = $query->selectall('gfcfishcoldstore');
+                $idd = 0;
                 foreach ($fishcoldstoredatas as $fishcoldstoredata) {
+                  $idd++;
                   $date = $fishcoldstoredata['date'];
                   $fishcoldstoremaxstmt = $pdo->prepare("SELECT MAX(charges) AS charges FROM gfcfishcoldstore WHERE date='$date'");
                   $fishcoldstoremaxstmt->execute();
@@ -167,7 +169,7 @@ $query = new Query();
                   // print_r($istakeout);
                  ?>
                 <tr>
-                  <td><?php echo $fishcoldstoredata['id']; ?></td>
+                  <td><?php echo $idd; ?></td>
                   <td><?php echo date('d-m-Y', strtotime($fishcoldstoredata['date'])); ?></td>
                   <td><?php echo $fishcoldstoredata['ite']; ?></td>
                   <td><?php if($fishcoldstoredata['mc'] == '0'){ echo "";}else{ echo $fishcoldstoredata['mc']; }; ?></td>
@@ -218,10 +220,12 @@ $query = new Query();
                 </tr>
                 <?php
                 $fishlabourdatas = $query->selectall("gfcfishlabour");
+                $idd = 0;
                 foreach ($fishlabourdatas as $fishlabourdata) {
+                  $idd++;
                  ?>
                 <tr>
-                  <td><?php echo $fishlabourdata['id']; ?></td>
+                  <td><?php echo $idd; ?></td>
                   <td><?php echo date('d-m-Y', strtotime($fishlabourdata['date'])); ?></td>
                   <td><?php echo $fishlabourdata['ite']; ?></td>
                   <td><?php echo $fishlabourdata['kg']; ?></td>
@@ -248,10 +252,12 @@ $query = new Query();
                 </tr>
                 <?php
                 $dryfishcoldstoredatas = $query->selectall("gfcdryfishcoldstore");
+                $idd = 0;
                 foreach ($dryfishcoldstoredatas as $dryfishcoldstoredata) {
+                  $idd++;
                  ?>
                 <tr>
-                  <td><?php echo $dryfishcoldstoredata['id']; ?></td>
+                  <td><?php echo $idd; ?></td>
                   <td><?php echo date('d-m-Y', strtotime($dryfishcoldstoredata['date'])); ?></td>
                   <td><?php echo $dryfishcoldstoredata['ite']; ?></td>
                   <td><?php echo $dryfishcoldstoredata['kg']; ?></td>
@@ -278,10 +284,12 @@ $query = new Query();
                 </tr>
                 <?php
                 $dryfishlabourdatas = $query->selectall("gfcdryfishlabour");
+                $idd = 0;
                 foreach ($dryfishlabourdatas as $dryfishlabourdata) {
+                  $idd++;
                  ?>
                 <tr>
-                  <td><?php echo $dryfishlabourdata['id']; ?></td>
+                  <td><?php echo $idd; ?></td>
                   <td><?php echo date('d-m-Y', strtotime($dryfishlabourdata['date'])); ?></td>
                   <td><?php echo $dryfishlabourdata['ite']; ?></td>
                   <td><?php echo $dryfishlabourdata['kg']; ?></td>
@@ -306,10 +314,12 @@ $query = new Query();
                 </tr>
                 <?php
                 $repackingoutdatas = $query->selectall('repackingout');
+                $idd = 0;
                 foreach ($repackingoutdatas as $repackingoutdata) {
+                  $idd++;
                  ?>
                 <tr>
-                  <td><?php echo $repackingoutdata['id']; ?></td>
+                  <td><?php echo $idd; ?></td>
                   <td><?php echo date('d-m-Y', strtotime($repackingoutdata['date'])); ?></td>
                   <td><?php echo $repackingoutdata['outkg']; ?></td>
                   <td><?php echo $repackingoutdata['rate']; ?></td>
@@ -339,10 +349,12 @@ $query = new Query();
                 </tr>
                 <?php
                 $totaldatas = $query->selectall('gfctotal');
+                $idd = 0;
                 foreach ($totaldatas as $totaldata) {
+                  $idd++;
                   ?>
                   <tr data-bs-toggle="modal" data-bs-target="#addpayment<?php echo $totaldata['id']; ?>">
-                    <td style="font-size:13px;"><?php if($totaldata['date'] != '0000-00-00'){echo $totaldata['id'];} ?></td>
+                    <td style="font-size:13px;"><?php if($totaldata['date'] != '0000-00-00'){echo $idd;} ?></td>
                     <td style="font-size:13px;"><?php if($totaldata['date'] != '0000-00-00'){echo date('d-m-Y', strtotime($totaldata['date']));} ?></td>
                     <td style="font-size:13px;"><?php if($totaldata['totalfishcoldstorecharges'] != '0'){echo $totaldata['totalfishcoldstorecharges'];} ?></td>
                     <td style="font-size:13px;"><?php if($totaldata['totalfishlabourcharges'] != '0'){echo $totaldata['totalfishlabourcharges'];} ?></td>

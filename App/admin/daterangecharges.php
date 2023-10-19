@@ -150,6 +150,7 @@ $query = new Query();
                   $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM coldstore");
                   $commonditycountstmt->execute();
                   $commonditycountdatas = $commonditycountstmt->fetchColumn();
+                  $idd = 0;
                   for ($i=0; $i < $commonditycountdatas; $i++) {
                     $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM coldstore");
                     $commonditystmt->execute();
@@ -159,8 +160,8 @@ $query = new Query();
                   $stmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='$commondity_id'");
                   $stmt->execute();
                   $datas = $stmt->fetchall();
-
                   foreach ($datas as $data) {
+                    $idd++;
                     $item_id = $data['commondity_id'];
                     $commonditydata = $query->select('category', $item_id, 'category_id');
 
@@ -174,7 +175,7 @@ $query = new Query();
                   ?>
                   <!-- <tr style="<?php //if($commonditydata['category_name'] == "IQF"){echo "background-color: #6ef757 !important;";}elseif($commonditydata['category_name'] == "Block"){echo "background-color: #f5764c !important;";}elseif($commonditydata['category_name'] == "Pujanut"){echo "background-color: lightblue !important;";} ?>"> -->
                   <tr>
-                    <td><?php echo $data['id']; ?></td>
+                    <td><?php echo $idd; ?></td>
                     <td><?php echo date('d-m-Y', strtotime($data['indate'])); ?></td>
                     <td><?php echo date('d-m-Y', strtotime($data['outdate'])); ?></td>
                     <td><?php echo $commonditydata['category_name']; ?></td>
@@ -297,6 +298,7 @@ $query = new Query();
                 $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM labour");
                 $commonditycountstmt->execute();
                 $commonditycountdatas = $commonditycountstmt->fetchColumn();
+                $idd = 0;
                 for ($i=0; $i < $commonditycountdatas; $i++) {
                   $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM labour");
                   $commonditystmt->execute();
@@ -307,11 +309,12 @@ $query = new Query();
                 $labourstmt->execute();
                 $labourdatas = $labourstmt->fetchall();
                 foreach ($labourdatas as $labourdata) {
+                  $idd++;
                   $item_id = $labourdata['commondity_id'];
                   $commonditydata = $query->select('category', $item_id, 'category_id');
                 ?>
                 <tr>
-                  <td><?php echo $labourdata['id']; ?></td>
+                  <td><?php echo $idd; ?></td>
                   <td><?php echo date('d-m-Y', strtotime($labourdata['indate']));  ?></td>
                   <td><?php echo date('d-m-Y', strtotime($labourdata['outdate'])); ?></td>
                   <td><?php echo $commonditydata['category_name']; ?></td>
@@ -352,6 +355,7 @@ $query = new Query();
                 $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM processing");
                 $commonditycountstmt->execute();
                 $commonditycountdatas = $commonditycountstmt->fetchColumn();
+                $idd = 0;
                 for ($i=0; $i < $commonditycountdatas; $i++) {
                   $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM processing");
                   $commonditystmt->execute();
@@ -362,11 +366,12 @@ $query = new Query();
                 $processingstmt->execute();
                 $processingdatas = $processingstmt->fetchall();
                 foreach ($processingdatas as $processingdata) {
+                  $idd++;
                   $item_id = $processingdata['commondity_id'];
                   $commonditydata = $query->select('category', $item_id, 'category_id');
                 ?>
                 <tr>
-                  <td><?php echo $processingdata['id']; ?></td>
+                  <td><?php echo $idd; ?></td>
                   <td><?php echo date('d-m-Y', strtotime($processingdata['indate']));  ?></td>
                   <td><?php echo date('d-m-Y', strtotime($processingdata['outdate'])); ?></td>
                   <td><?php echo $commonditydata['category_name']; ?></td>
@@ -411,13 +416,14 @@ $query = new Query();
                 $totalstmt = $pdo->prepare("SELECT * FROM total_charges");
                 $totalstmt->execute();
                 $totaldatas = $totalstmt->fetchall();
-                $no = 1;
+                $idd = 0;
                 foreach ($totaldatas as $total_charges_data) {
+                  $idd++;
                   $item_id = $total_charges_data['commondity_id'];
                   $commonditydata = $query->select('category', $item_id, 'category_id');
                 ?>
                 <tr data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>">
-                  <td><?php echo $no; ?></td>
+                  <td><?php echo $idd; ?></td>
                   <td><?php if(!empty($commonditydata['category_name'])){ echo $commonditydata['category_name'];} ; ?></td>
                   <td><?php if($total_charges_data['total_coldstore_charges'] != "0"){ echo $total_charges_data['total_coldstore_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['total_labour_charges'] != "0"){ echo $total_charges_data['total_labour_charges'];} ; ?></td>
@@ -477,7 +483,6 @@ $query = new Query();
                 </div>
                 <!-- Add Modal -->
                 <?php
-                $no++;
                 }
                  ?>
               </table>
@@ -499,10 +504,12 @@ $query = new Query();
                 </tr>
                 <?php
                 $repackingdatas = $query->selectall('repacking');
+                $idd = 0;
                 foreach ($repackingdatas as $repackingdata) {
+                  $idd++;
                  ?>
                  <tr>
-                   <td><?php echo $repackingdata['id']; ?></td>
+                   <td><?php echo $idd; ?></td>
                    <td><?php echo date('d-m-Y', strtotime($repackingdata['date'])); ?></td>
                    <td><?php echo $repackingdata['in_mc']; ?></td>
                    <td><?php echo $repackingdata['in_kg']; ?></td>
@@ -534,6 +541,7 @@ $query = new Query();
                 $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM hhkstock");
                 $commonditycountstmt->execute();
                 $commonditycountdatas = $commonditycountstmt->fetchColumn();
+                $idd = 0;
                 for ($i=0; $i < $commonditycountdatas; $i++) {
                   $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkstock");
                   $commonditystmt->execute();
@@ -544,6 +552,7 @@ $query = new Query();
                 $hhkstockstmt->execute();
                 $hhkstockdatas = $hhkstockstmt->fetchall();
                 foreach ($hhkstockdatas as $hhkstockdata) {
+                  $idd++;
                   $item_id = $hhkstockdata['commondity_id'];
                   $commonditydata = $query->select('category', $item_id, 'category_id');
                   ?>
