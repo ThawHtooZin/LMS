@@ -18,6 +18,28 @@ $query = new Query();
   <?php
   $bootstrap->css();
   ?>
+  <script type="text/javascript">
+    $(document).ready(()=>{
+      $('#addac_code').on('keyup', function(){
+        var ac_codepost = $('#addac_code').val();
+        var type = "";
+        if(ac_codepost.includes('/')){
+          ac_code = ac_codepost.split('/');
+          type = "slash";
+        }else{
+          ac_code = ac_codepost.split('-');
+          type = "dash";
+        }
+        firstpart = ac_code[0];
+        lastpart = ac_code[1];
+        $('#addac_name').load('ac_name.php', {
+          FirstPart : firstpart,
+          LastPart: JSON.stringify(lastpart),
+          Type: type
+        });
+      });
+    });
+  </script>
   <body>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
@@ -44,7 +66,7 @@ $query = new Query();
               $date = $_POST['date'];
               $voucher_no = $_POST['voucher_no'];
               $tclfrozen = $_POST['tclfrozen'];
-              $supplier_name = $_POST['supplier_name'];
+              $supplier_name = $_POST['upsupplier_code_no'];
               $commodity = $_POST['commodity'];
               $size = $_POST['size'];
               $viss = $_POST['viss'];
@@ -58,7 +80,7 @@ $query = new Query();
               $date = $_POST['date'];
               $voucher_no = $_POST['voucher_no'];
               $tclfrozen = $_POST['tclfrozen'];
-              $supplier_name = $_POST['supplier_name'];
+              $supplier_name = $_POST['supplier_code_no'];
               $commodity = $_POST['commodity'];
               $size = $_POST['size'];
               $viss = $_POST['viss'];
@@ -245,6 +267,8 @@ $query = new Query();
                         <?php
                          $id = $purchasedata['no'];
                          $updatedata = $query->select('purchase', $id, 'no');
+                         $datas = $query->select('acname', $updatedata['supplier_id'], 'code_no');
+                         $ac_name = $datas['ac_name'];
                         ?>
                         <input type="hidden" name="updateid" value="<?php echo $purchasedata['no']; ?>">
                         <div class="row">
@@ -266,18 +290,18 @@ $query = new Query();
                               <option value="frozen" <?php if($updatedata['tclfrozen'] == 'frozen'){ echo 'selected'; } ?>>Frozen</option>
                             </select>
                           </div>
-                          <div class="col">
-                            <label style="font-weight: bold;">Supplier Name</label>
-                            <select class="form-control inpv2 mb-2" name="supplier_name">
-                              <?php
-                              $supplierdatas = $query->selectall('supplier');
-                              foreach ($supplierdatas as $supplierdata) {
-                                ?>
-                                <option value="<?php echo $supplierdata['supplier_id']; ?>"  <?php if($updatedata['supplier_id'] == $supplierdata['supplier_id']){ echo 'selected'; } ?>><?php echo $supplierdata['supplier_name']; ?></option>
-                                <?php
-                              }
-                              ?>
-                            </select>
+                          <div class="col-6">
+                            <label style="font-weight: bold;">Supplier A/C Code</label>
+                            <div class="row">
+                              <div class="col-6">
+                                <input type="text" name="ac_code" id="upac_code<?php echo $data['id']; ?>" class="form-control inpv2 mb-1" value="<?php echo $updatedata['supplier_id']; ?>" style="padding-top: 2px; padding-bottom: 2px;">
+                              </div>
+                              <div class="col-6">
+                                <div id='ac_name'>
+                                  <input type="text" name="ac_name" disabled class="form-control inpv2 mb-1" value="<?php if($ac_name != ''){echo $ac_name;} ?>" style="padding-top: 2px; padding-bottom: 2px;">
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                         <div class="row">
@@ -324,6 +348,26 @@ $query = new Query();
                 </div>
               </div>
               <!-- Update Modal -->
+              <script type="text/javascript">
+                $('#upac_code<?php echo $data['id']; ?>').on('keyup', function(){
+                  var upac_codepost = $('#upac_code<?php echo $data['id']; ?>').val();
+                  var type = "";
+                  if(upac_codepost.includes('/')){
+                    upac_code = upac_codepost.split('/');
+                    type = "slash";
+                  }else{
+                    upac_code = upac_codepost.split('-');
+                    type = "dash";
+                  }
+                  upfirstpart = upac_code[0];
+                  uplastpart = upac_code[1];
+                  $('#upac_name<?php echo $data['id']; ?>').load('ac_name.php', {
+                    FirstPart : upfirstpart,
+                    LastPart: JSON.stringify(uplastpart),
+                    Type: type
+                  });
+                });
+              </script>
               <?php
               };
               ?>
@@ -441,18 +485,18 @@ $query = new Query();
                   <option value="frozen">Frozen</option>
                 </select>
               </div>
-              <div class="col">
-                <label style="font-weight: bold;">Supplier Name</label>
-                <select class="form-control inpv2 mb-2" name="supplier_name">
-                  <?php
-                  $supplierdatas = $query->selectall('supplier');
-                  foreach ($supplierdatas as $supplierdata) {
-                    ?>
-                    <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplierdata['supplier_name']; ?></option>
-                    <?php
-                  }
-                  ?>
-                </select>
+              <div class="col-6">
+                <label style="font-weight: bold;">Supplier A/C Code</label>
+                <div class="row">
+                  <div class="col-6">
+                    <input type="text" id="addac_code" name="supplier_code_no" class="form-control inpv2 mb-1" style="padding-top: 2px; padding-bottom: 2px;">
+                    </div>
+                  <div class="col-6">
+                    <div id='addac_name'>
+                      <input type="text" name="addac_name" disabled class="form-control inpv2 mb-1" style="padding-top: 2px; padding-bottom: 2px;">
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="row">

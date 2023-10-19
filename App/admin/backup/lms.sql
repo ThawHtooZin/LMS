@@ -7,12 +7,12 @@ CREATE TABLE `accounts` (
   `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `role` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO accounts VALUES("18","admin","admin","admin@gmail.com","1");
 INSERT INTO accounts VALUES("20","Stock Control Person","scp","scp@gmail.com","2");
 INSERT INTO accounts VALUES("21","Myat Thu","myatthu","mt@gmail.com","3");
-INSERT INTO accounts VALUES("22","account","account","account@gmail.com","4");
+INSERT INTO accounts VALUES("22","account","account","account@gmail.com","3");
 
 
 
@@ -461,9 +461,6 @@ CREATE TABLE `gfcmcstock` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO gfcmcstock VALUES("29","NY","HHK To GFC","2023-09-20","KO962","3up","21","5","5");
-INSERT INTO gfcmcstock VALUES("30","NY","HHK To GFC","2023-09-20","KO962","2up","22","2","2");
-INSERT INTO gfcmcstock VALUES("31","NY","Ship/78","2023-09-20","KO962","3up","21","5","0");
 
 
 
@@ -503,14 +500,6 @@ CREATE TABLE `hhkmcstock` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=151 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO hhkmcstock VALUES("143","NY","From From-10","2023-09-17","KO962","2up","21","5","5");
-INSERT INTO hhkmcstock VALUES("144","NY","From From-10","2023-09-17","KO962","2up","22","3","3");
-INSERT INTO hhkmcstock VALUES("145","NY","From From-10","2023-09-17","KO962","3up","21","10","10");
-INSERT INTO hhkmcstock VALUES("146","NY","From From-10","2023-09-17","KO962","3up","22","200","200");
-INSERT INTO hhkmcstock VALUES("147","NY","HHK To GFC","2023-09-20","KO962","3up","21","5","5");
-INSERT INTO hhkmcstock VALUES("148","NY","HHK To GFC","2023-09-20","KO962","2up","22","2","1");
-INSERT INTO hhkmcstock VALUES("149","Can","From From-10","2023-09-19","MR163","2up","150","5","5");
-INSERT INTO hhkmcstock VALUES("150","DAKA","From TCL","2023-09-20","SB263","2up","327","14","14");
 
 
 
@@ -807,8 +796,6 @@ CREATE TABLE `packingliststock` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO packingliststock VALUES("1","2023-09-01","300/M01","NY","975B2","BF747","","","");
-INSERT INTO packingliststock VALUES("3","2023-09-08","300/M01","NY","975T2","LJ734","","","");
 
 
 
@@ -828,13 +815,6 @@ CREATE TABLE `packingliststockinfo` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO packingliststockinfo VALUES("18","HG184","2up","20","10","200","210","","","1");
-INSERT INTO packingliststockinfo VALUES("19","HG184","3up","15","10","150","160","","","1");
-INSERT INTO packingliststockinfo VALUES("20","HL123","3up","20","10","200","210","","","3");
-INSERT INTO packingliststockinfo VALUES("21","UT216","2up","20","10","200","210","","","3");
-INSERT INTO packingliststockinfo VALUES("22","HL123","2up","21","5","105","110","","","3");
-INSERT INTO packingliststockinfo VALUES("23","HL123","3up","21","5","105","110","","","3");
-INSERT INTO packingliststockinfo VALUES("24","HL123","3up","4","5","20","25","","","3");
 
 
 
@@ -1289,7 +1269,7 @@ CREATE TABLE `userlogs` (
   `login_password` varchar(125) NOT NULL,
   `status` varchar(55) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=72 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO userlogs VALUES("1","10:26:18.000000","2023-09-18","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("53","10:53:04.000000","2023-10-12","admin","admin","Login Success");
@@ -1305,6 +1285,12 @@ INSERT INTO userlogs VALUES("62","09:47:46.000000","2023-10-18","admin","admin",
 INSERT INTO userlogs VALUES("63","10:55:18.000000","2023-10-18","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("64","08:15:03.000000","2023-10-18","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("65","09:09:10.000000","2023-10-19","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("66","06:04:49.000000","2023-10-19","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("67","06:33:13.000000","2023-10-19","MG MG ","mgmg","Login Success");
+INSERT INTO userlogs VALUES("68","06:34:43.000000","2023-10-19","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("69","06:35:21.000000","2023-10-19","MG MG ","mgmg","Login Failed");
+INSERT INTO userlogs VALUES("70","06:35:30.000000","2023-10-19","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("71","09:05:12.000000","2023-10-19","admin","admin","Login Success");
 
 
 
