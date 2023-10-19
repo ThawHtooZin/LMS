@@ -2533,7 +2533,7 @@ Class Query{
       $acid = $actypestmt->fetch(PDO::FETCH_ASSOC);
       $acid = $acid['ac_type'];
 
-      $balancestmt = $pdo->prepare("SELECT * FROM general_ledger ORDER BY id DESC");
+      $balancestmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$ac_code' ORDER BY id DESC");
       $balancestmt->execute();
       $balancedata = $balancestmt->fetch(PDO::FETCH_ASSOC);
       if (!empty($balancedata['balance'])) {

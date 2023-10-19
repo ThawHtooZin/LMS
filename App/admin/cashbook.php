@@ -194,7 +194,7 @@ $query = new Query();
               <tr>
                 <th>No.</th>
                 <th>Date</th>
-                <th>Sr.No</th>
+                <th>Voucher No</th>
                 <th>A/C Name</th>
                 <th>Particular</th>
                 <th>Debit</th>
@@ -279,7 +279,7 @@ $query = new Query();
               <tr>
                 <td><?php echo $idd; ?></td>
                 <td><?php echo date('d-m-Y', strtotime($cashdata['date'])); ?></td>
-                <td><?php echo $cashdata['sr_no']; ?></td>
+                <td><?php echo $cashdata['voucher_no']; ?></td>
                 <td><?php echo $acname; ?></td>
                 <td><?php echo $cashdata['particular']; ?></td>
                 <td><?php if($cashdata['debit'] == 0){echo "";}else{echo round($debit, 2);}; ?></td>
@@ -334,7 +334,28 @@ $query = new Query();
               ?>
             </table>
             <br>
-            <!-- <a href="cashbookexport.php?forment=excel" class="btn btn-success">Export to Excel</a> -->
+            <?php
+            if(isset($_POST['dbwsearch'])){
+              $startdate = $_POST['startdate'];
+              $enddate = $_POST['enddate'];
+              ?>
+              <a href="cashbookexport.php?forment=excel&filter=dbwsearch&startdate=<?= $startdate; ?>&enddate=<?= $enddate; ?>" class="btn btn-success">Export to Excel</a>
+              <?php
+            }
+            if(isset($_POST['monthlysearch'])){
+              $month = $_POST['monthlysearch'];
+              $year = date('Y');
+              $searchmonth = $year . "-" . $month;
+              ?>
+              <a href="cashbookexport.php?forment=excel&filter=monthlysearch&month=<?= $searchmonth; ?>" class="btn btn-success">Export to Excel</a>
+              <?php
+            }
+            if(!isset($_POST['dbwsearch']) && !isset($_POST['monthlysearch'])){
+              ?>
+              <a href="cashbookexport.php?forment=excel&filter=normal" class="btn btn-success">Export to Excel</a>
+              <?php
+            }
+             ?>
           </div>
         </div>
       </div>
@@ -358,8 +379,8 @@ $query = new Query();
                 <input type="date" name="date" class="form-control inpv2" placeholder="Date">
               </div>
               <div class="col">
-                <label style="font-weight:bold;">Sr.No</label>
-                <input type="text" name="serial_no" class="form-control inpv2" placeholder="Sr.No">
+                <label style="font-weight:bold;">Voucher No</label>
+                <input type="text" name="serial_no" class="form-control inpv2" placeholder="Voucher No">
               </div>
             </div>
             <div class="row">

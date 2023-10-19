@@ -150,9 +150,12 @@ CREATE TABLE `cashbook` (
   `balance` bigint(25) NOT NULL,
   `voucher_no` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=121 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=135 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO cashbook VALUES("120","2023-10-18","","3600/001","Spend Stuff","0","40000","-40000","AS265");
+INSERT INTO cashbook VALUES("131","2023-10-19","","3600/001","useless stuff","0","20000","-20000","00005");
+INSERT INTO cashbook VALUES("132","2023-10-19","","3600/001","Paid to a Kyi Sin","0","37400","-57400","00006");
+INSERT INTO cashbook VALUES("133","2023-10-19","","3600/002","Money Received From USA","120000","0","120000","00007");
+INSERT INTO cashbook VALUES("134","2023-10-19","","3600/001","Food Stuff hehe","0","50000","-107400","00009");
 
 
 
@@ -226,10 +229,22 @@ CREATE TABLE `currency` (
   `usd_amount` bigint(25) NOT NULL,
   `voucher_no` varchar(36) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=295 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=311 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO currency VALUES("293","0","debit","40000","0","AS265");
-INSERT INTO currency VALUES("294","0","credit","40000","0","AS265");
+INSERT INTO currency VALUES("296","0","","0","0","00001");
+INSERT INTO currency VALUES("297","0","","0","0","00001");
+INSERT INTO currency VALUES("299","3000","debit","300000","100","00002");
+INSERT INTO currency VALUES("300","3000","credit","300000","100","00002");
+INSERT INTO currency VALUES("301","0","debit","20000","0","00005");
+INSERT INTO currency VALUES("302","0","credit","20000","0","00005");
+INSERT INTO currency VALUES("303","0","debit","37400","0","00006");
+INSERT INTO currency VALUES("304","0","credit","37400","0","00006");
+INSERT INTO currency VALUES("305","3000","debit","150000","50","00007");
+INSERT INTO currency VALUES("306","3000","credit","150000","50","00007");
+INSERT INTO currency VALUES("307","3000","debit","450000","150","00008");
+INSERT INTO currency VALUES("308","3000","credit","450000","150","00008");
+INSERT INTO currency VALUES("309","0","debit","50000","0","00009");
+INSERT INTO currency VALUES("310","0","credit","50000","0","00009");
 
 
 
@@ -313,15 +328,18 @@ CREATE TABLE `general_ledger` (
   `bank_charges` float NOT NULL,
   `acid` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=636 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=668 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO general_ledger VALUES("626","2023-10-18","AS261","4000/B01","50500","0","50500","paid to burbulay Hehe thank you","","","0","16");
-INSERT INTO general_ledger VALUES("627","2023-10-18","AS261","3600/001","0","50500","0","paid to burbulay Hehe thank you","","","0","11");
-INSERT INTO general_ledger VALUES("628","2023-10-18","AS262","3300/001","750000","0","750000","HehEH USA","SGRWFGR","US-23523","0","11");
-INSERT INTO general_ledger VALUES("629","2023-10-18","AS262","1200/000","0","750000","0","Hehehhe USA","","","0","16");
-INSERT INTO general_ledger VALUES("630","2023-10-18","AS263","3600/002","629990","0","629990","Money Received from USA (190 * 3150)","","","10","11");
-INSERT INTO general_ledger VALUES("634","2023-10-18","AS265","9100/003","40000","0","669990","Spend on useless stuff","","","0","9");
-INSERT INTO general_ledger VALUES("635","2023-10-18","AS265","3600/001","0","40000","629990","Spend Stuff","","","0","11");
+INSERT INTO general_ledger VALUES("658","2023-10-19","00005","9100/003","20000","0","20000","Useless Stuff bought by stupid driver","","","0","9");
+INSERT INTO general_ledger VALUES("659","2023-10-19","00005","3600/001","0","20000","-20000","useless stuff","","","0","11");
+INSERT INTO general_ledger VALUES("660","2023-10-19","00006","4000/k02","37400","0","37400","Paid to Kyi Sin 37400","","","0","16");
+INSERT INTO general_ledger VALUES("661","2023-10-19","00006","3600/001","0","37400","-57400","Paid to a Kyi Sin","","","0","11");
+INSERT INTO general_ledger VALUES("662","2023-10-19","00007","3600/002","149990","0","149990","Money Received From USA","","","10","11");
+INSERT INTO general_ledger VALUES("663","2023-10-19","00007","3300/001","0","150000","-150000","MONEY RECEIVED FORM USA ","SGRWFGR","US-23523","0","11");
+INSERT INTO general_ledger VALUES("664","2023-10-19","00008","3300/002","450000","0","450000","SELL STUFF FOR Canada","SGRWFGR","US-23523","0","11");
+INSERT INTO general_ledger VALUES("665","2023-10-19","00008","1200/000","0","450000","-450000","asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf","","","0","16");
+INSERT INTO general_ledger VALUES("666","2023-10-19","00009","9100/004","50000","0","50000","REFRESHHH SIKEEEE","","","0","9");
+INSERT INTO general_ledger VALUES("667","2023-10-19","00009","3600/001","0","50000","-107400","Food Stuff hehe","","","0","11");
 
 
 
@@ -868,10 +886,9 @@ CREATE TABLE `payable` (
   `closing_balance` int(11) NOT NULL,
   `report_date` date NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=234 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=236 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO payable VALUES("232","2023-10-18","4000/B01","3811","850500","2023-10-18","AS261","paid to burbulay Hehe thank you","50500","800000","148","0","0000-00-00");
-INSERT INTO payable VALUES("233","2023-10-18","4000/K02","8032","937400","0000-00-00","","","0","937400","149","0","0000-00-00");
+INSERT INTO payable VALUES("235","0000-00-00","4000/k02","","0","2023-10-19","00006","Paid to Kyi Sin 37400","37400","0","0","0","0000-00-00");
 
 
 
@@ -957,10 +974,10 @@ CREATE TABLE `receivable` (
   `paid_amount` int(11) NOT NULL,
   `balance` bigint(25) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=222 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=227 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO receivable VALUES("219","2023-10-18","3300/001","SGRWFGR","US-23523","250","0000-00-00","","","0","250");
-INSERT INTO receivable VALUES("220","0000-00-00","3300/001","","","","2023-10-18","AS263","Money Received From USA (190 *3150)","200","50");
+INSERT INTO receivable VALUES("225","0000-00-00","3300/001","","","","2023-10-19","00007","MONEY RECEIVED FORM USA ","50","-50");
+INSERT INTO receivable VALUES("226","2023-10-19","3300/002","SGRWFGR","US-23523","150","0000-00-00","","","0","150");
 
 
 
@@ -1104,10 +1121,18 @@ CREATE TABLE `transaction` (
   `container_no` varchar(25) NOT NULL,
   `bank_charges` float NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=300 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=316 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO transaction VALUES("298","2023-10-18","AS265","9100/003","Spend on useless stuff","40000","0","mmk","","","0");
-INSERT INTO transaction VALUES("299","2023-10-18","AS265","3600/001","Spend Stuff","0","40000","mmk","","","0");
+INSERT INTO transaction VALUES("306","2023-10-19","00005","9100/003","Useless Stuff bought by stupid driver","20000","0","mmk","","","0");
+INSERT INTO transaction VALUES("307","2023-10-19","00005","3600/001","useless stuff","0","20000","mmk","","","0");
+INSERT INTO transaction VALUES("308","2023-10-19","00006","4000/k02","Paid to Kyi Sin 37400","37400","0","mmk","","","0");
+INSERT INTO transaction VALUES("309","2023-10-19","00006","3600/001","Paid to a Kyi Sin","0","37400","mmk","","","0");
+INSERT INTO transaction VALUES("310","2023-10-19","00007","3600/002","Money Received From USA","150000","0","usd","","","10");
+INSERT INTO transaction VALUES("311","2023-10-19","00007","3300/001","MONEY RECEIVED FORM USA ","0","150000","usd","SGRWFGR","US-23523","0");
+INSERT INTO transaction VALUES("312","2023-10-19","00008","3300/002","SELL STUFF FOR Canada","450000","0","usd","SGRWFGR","US-23523","0");
+INSERT INTO transaction VALUES("313","2023-10-19","00008","1200/000","asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf","0","450000","usd","","","0");
+INSERT INTO transaction VALUES("314","2023-10-19","00009","9100/004","REFRESHHH SIKEEEE","50000","0","mmk","","","0");
+INSERT INTO transaction VALUES("315","2023-10-19","00009","3600/001","Food Stuff hehe","0","50000","mmk","","","0");
 
 
 
@@ -1264,7 +1289,7 @@ CREATE TABLE `userlogs` (
   `login_password` varchar(125) NOT NULL,
   `status` varchar(55) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO userlogs VALUES("1","10:26:18.000000","2023-09-18","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("53","10:53:04.000000","2023-10-12","admin","admin","Login Success");
@@ -1278,6 +1303,8 @@ INSERT INTO userlogs VALUES("60","01:22:11.000000","2023-10-16","admin","admin",
 INSERT INTO userlogs VALUES("61","09:39:58.000000","2023-10-17","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("62","09:47:46.000000","2023-10-18","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("63","10:55:18.000000","2023-10-18","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("64","08:15:03.000000","2023-10-18","admin","admin","Login Success");
+INSERT INTO userlogs VALUES("65","09:09:10.000000","2023-10-19","admin","admin","Login Success");
 
 
 

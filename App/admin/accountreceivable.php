@@ -75,7 +75,7 @@ if(isset($_POST['addbalance'])){
                 <th>Contianer No</th>
                 <th>Invoice Amount($)</th>
                 <th>Paid Date</th>
-                <th>Payment No</th>
+                <th>Voucher No</th>
                 <th>Particulars</th>
                 <th>Paid Amount($)</th>
                 <th>Balance($)</th>
