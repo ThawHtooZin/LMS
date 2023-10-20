@@ -64,8 +64,8 @@ $query = new Query();
       if(!empty($_POST['manage_supplier'])){
         $permission .= ",manage_supplier";
       }
-      if(!empty($_POST['manage_category'])){
-        $permission .= ",manage_category";
+      if(!empty($_POST['manage_coldstoreitem'])){
+        $permission .= ",manage_coldstoreitem";
       }
       if(!empty($_POST['manage_item'])){
         $permission .= ",manage_item";
@@ -230,8 +230,8 @@ $query = new Query();
                   <td><input type="checkbox" name="manage_truckexport" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_truckexport') == 1){echo "checked";}} ?>></td>
                 </tr>
                 <tr>
-                  <td>Manage Category</td>
-                  <td><input type="checkbox" name="manage_category" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_category') == 1){echo "checked";}} ?>></td>
+                  <td>Manage Coldstore Item</td>
+                  <td><input type="checkbox" name="manage_coldstoreitem" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_coldstoreitem') == 1){echo "checked";}} ?>></td>
                   <td>Manage Packing Material</td>
                   <td><input type="checkbox" name="manage_packingmaterial" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_packingmaterial') == 1){echo "checked";}} ?>></td>
                 </tr>

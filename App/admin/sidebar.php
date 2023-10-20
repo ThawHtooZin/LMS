@@ -217,7 +217,7 @@ $permissions = $permission['permission'];
        ?>
 
       <?php
-      if(str_contains($permissions, 'manage_customer') == 1 || str_contains($permissions, 'manage_supplier') == 1 ||str_contains($permissions, 'manage_category') == 1 ||str_contains($permissions, 'manage_item') == 1 ||str_contains($permissions, 'manage_unit') == 1 ||str_contains($permissions, 'actype') == 1 ||str_contains($permissions, 'acname') == 1){
+      if(str_contains($permissions, 'manage_customer') == 1 || str_contains($permissions, 'manage_supplier') == 1 ||str_contains($permissions, 'manage_coldstoreitem') == 1 ||str_contains($permissions, 'manage_item') == 1 ||str_contains($permissions, 'manage_unit') == 1 ||str_contains($permissions, 'actype') == 1 ||str_contains($permissions, 'acname') == 1){
       ?>
       <li class=" p-1" style=" font-weight:bold; border-bottom: 1px solid rgb(255,255,255,0.2); " >
         <a href="#" class="nav-link text-white" id="sidebarlink" data-bs-toggle="collapse" data-bs-target="#config-collapse" aria-expanded="false">
@@ -253,12 +253,12 @@ $permissions = $permission['permission'];
             }
             ?>
             <?php
-            if(str_contains($permissions, 'manage_category')){
+            if(str_contains($permissions, 'manage_coldstoreitem')){
               ?>
             <li class="nav-item">
               <a href="category.php" class="nav-link h text-light show"  style="font-size:14px !important; ">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-tags"></i></svg>
-                - Category
+                - Coldstore Item
               </a>
             </li>
             <?php
@@ -270,7 +270,7 @@ $permissions = $permission['permission'];
             <li class="nav-item">
               <a href="item.php" class="nav-link h text-light"  style="font-size:14px !important; ">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
-                - Items
+                - Stock Items
               </a>
             </li>
             <?php

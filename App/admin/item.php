@@ -29,8 +29,10 @@ $query = new Query();
         <?php require 'navbar.php'; ?>
         <div class="card">
           <div class="card-header bg-warning text-light"  style="padding:-10px;">
-
-            <h5>Manage Item</h5>
+            <h5>Manage Stock Item</h5>
+            <button type="button" class="btn btn-success btn-sm float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
+              Add Item
+            </button>
           </div>
           <div class="card-body">
             <?php
@@ -40,18 +42,16 @@ $query = new Query();
             }
             if(isset($_POST['updatebutton'])){
               $item_name = $_POST['item_name'];
-              $category_id = $_POST['category_id'];
               $item_code = $_POST['item_code'];
               $item_id = $_POST['item_id'];
 
-              $message = $query->updateitem('item', $category_id, $item_name, $item_code, $item_id);
+              $message = $query->updateitem('item', $item_name, $item_code, $item_id);
             }
             if(isset($_POST['addbutton'])){
-              $category_id = $_POST['category_id'];
               $item_code = $_POST['item_id'];
               $item_name = $_POST['item_name'];
 
-              $message = $query->additem('item', $category_id, $item_code,  $item_name);
+              $message = $query->additem('item', $item_code,  $item_name);
             }
             ?>
             <?php
@@ -98,10 +98,6 @@ $query = new Query();
             }
             ?>
 
-            <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
-              Add Item
-            </button>
-
             <?php
 
             if (!empty($_GET['pageno'])) {
@@ -112,9 +108,9 @@ $query = new Query();
             $numOfrecs = 10;
             $offset = ($pageno -1) * $numOfrecs;
             ?>
-            <table class="mt-5 table table-bordered table-striped rounded">
+            <table class="mt-3 table table-bordered table-striped rounded">
               <tr>
-                <th>Category Name</th>
+                <!-- <th>Category Name</th> -->
                 <th>Item Code</th>
                 <th>Item Name</th>
                 <th>Action</th>
@@ -132,12 +128,12 @@ $query = new Query();
               ?>
               <?php
               foreach ($itemdatas as $itemdata) {
-                $category_id = $itemdata['category_id'];
-                $category_name = $query->select('category', $category_id, 'category_id');
+                // $category_id = $itemdata['category_id'];
+                // $category_name = $query->select('category', $category_id, 'category_id');
               ?>
 
               <tr>
-                <td><?php echo $category_name['category_name']; ?></td>
+                <!-- <td><?php echo $category_name['category_name']; ?></td> -->
                 <td><?php echo $itemdata['item_id']; ?></td>
                 <td><?php echo $itemdata['item_name']; ?></td>
                 <td>
@@ -173,7 +169,7 @@ $query = new Query();
                           $updatedata = $query->select('item', $id, 'item_id');
                         ?>
                         <input type="hidden" name="item_id" value="<?php echo $itemdata['item_id']; ?>">
-                        <label>Category Name</label>
+                        <!-- <label>Category Name</label>
                         <select class="form-control" name="category_id">
                           <?php
                           $categoryiddatas = $query->selectall('category');
@@ -183,7 +179,7 @@ $query = new Query();
                             <?php
                           }
                           ?>
-                        </select>
+                        </select> -->
                         <label>Item Code</label>
                         <input type="text" name="item_code" class="form-control" placeholder="Item Code" value="<?php echo $updatedata['item_id']; ?>">
                         <label>Item Name</label>
@@ -234,7 +230,7 @@ $query = new Query();
         </div>
         <form action="item.php" method="post" autocomplete="off">
           <div class="modal-body">
-            <label>Category Name</label>
+            <!-- <label>Category Name</label>
             <select class="form-control" name="category_id">
               <?php
               $categoryiddatas = $query->selectall('category');
@@ -244,7 +240,7 @@ $query = new Query();
                 <?php
               }
               ?>
-            </select>
+            </select> -->
             <label>Item Code</label>
             <input type="text" name="item_id" class="form-control" placeholder="Item Code">
             <label>Item Name</label>

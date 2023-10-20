@@ -191,7 +191,7 @@ $query = new Query();
                 // acnamechange
 
                  ?>
-                <tr>
+                <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $gldata['id']; ?>">
                   <td><?php echo date('d/m/Y', strtotime($gldata['date'])); ?></td>
                   <td><?php echo $gldata['voucherno']; ?></td>
                   <td><?php echo $acname; ?></td>
@@ -200,6 +200,71 @@ $query = new Query();
                   <td><?php echo $gldata['credit']; ?></td>
                   <td><?php echo $gldata['balance']; ?></td>
                 </tr>
+
+                <!-- Data Update Modal -->
+                <div class="modal fade" id="updatemodal<?php echo $gldata['id']; ?>" tabindex="-1" role="dialog" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content" style="width:600px !important;">
+                      <div class="modal-header bg-warning text-light">
+                        <h5 class="modal-title" id="updatemodallabel">Update An Account</h5>
+                        <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true" class="h3">&times;</span>
+                        </button>
+                      </div>
+                      <form action="" method="post" autocomplete="off">
+                        <div class="modal-body">
+                          <?php
+                          $id = $gldata['id'];
+                          $updatedata = $query->select('general_ledger', $id, 'id');
+                          $voucher_no = $updatedata['voucherno'];
+                          $acstmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no='$voucher_no'");
+                          $acstmt->execute();
+                          $acdata = $acstmt->fetch(PDO::FETCH_ASSOC);
+                          $ac_code = $acdata['ac_code'];
+                          $acnamedata = $query->select('acname', $ac_code, 'code_no');
+
+                          ?>
+                          <input type="hidden" name="updateid" value="<?php echo $cashdata['id']; ?>">
+                          <div class="row">
+                            <div class="col">
+                              <label>Date</label>
+                              <input type="date" name="date" class="form-control inpv2 mb-2" value="<?= $gldata['date']; ?>">
+                            </div>
+                            <div class="col">
+                              <label>Voucher No</label>
+                              <input type="text" name="voucher_no" class="form-control inpv2 mb-2" value="<?= $gldata['voucherno']; ?>">
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col">
+                              <label>A/C Name</label>
+                              <input type="text" name="ac_name" class="form-control inpv2 mb-2" value="<?= $acnamedata['ac_name']; ?>">
+                            </div>
+                            <div class="col">
+                              <label>Particular</label>
+                              <input type="text" name="particular" class="form-control inpv2 mb-2" value="<?= $gldata['narration']; ?>">
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col">
+                              <label>Debit</label>
+                              <input type="number" name="debit" class="form-control inpv2 mb-2" value="<?= $gldata['debit']; ?>">
+                            </div>
+                            <div class="col">
+                              <label>Credit</label>
+                              <input type="number" name="credit" class="form-control inpv2 mb-2" value="<?= $gldata['credit']; ?>">
+                            </div>
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="submit" class="btn btn-warning" name="updateaccount">Update</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <!-- Update Modal -->
               <?php endforeach; ?>
               <?php
 

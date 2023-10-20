@@ -216,9 +216,26 @@ Class Query{
     // }
   }
 
-  function addcategory($table, $category_name){
+  function updatecashbookdata($date, $voucher_no, $particular, $debit, $credit, $id){
     global $pdo;
-    $stmt = $pdo->prepare("INSERT INTO $table(category_name) VALUES('$category_name');");
+
+    $balancestmt = $pdo->prepare("SELECT balance FROM cashbook WHERE id<'$id' ORDER BY id DESC");
+    $balancestmt->execute();
+    $balancedata = $balancestmt->fetch(PDO::FETCH_ASSOC);
+
+    if(!empty($balancedata)){
+      $balance = ($balancedata['balance'] + floatval($debit)) - floatval($credit);
+    }else{
+      $balance = floatval($debit) - floatval($credit);
+    }
+
+    $stmt = $pdo->prepare("UPDATE cashbook SET date='$date', voucher_no='$voucher_no', particular='$particular', debit='$debit', credit='$credit', balance='$balance' WHERE id='$id'");
+    $stmt->execute();
+  }
+
+  function addcategory($table, $item_id, $item_name){
+    global $pdo;
+    $stmt = $pdo->prepare("INSERT INTO $table(category_id, category_name) VALUES('$item_id', '$item_name');");
     $stmt->execute();
     if($stmt){
       return $successmessage = "Category Added Successfully";
@@ -227,9 +244,9 @@ Class Query{
     }
   }
 
-  function updatecategory($table, $category_name, $category_id){
+  function updatecategory($table, $category_id, $category_name, $updateid){
     global $pdo;
-    $stmt = $pdo->prepare("UPDATE $table SET category_name='$category_name' WHERE category_id=$category_id");
+    $stmt = $pdo->prepare("UPDATE $table SET category_id='$category_id', category_name='$category_name' WHERE id='$updateid'");
     $stmt->execute();
     if($stmt){
       return $successmessage = "Category Update Successfully";
@@ -240,7 +257,7 @@ Class Query{
 
   function deletecategory($table, $deleteid){
     global $pdo;
-    $stmt = $pdo->prepare("DELETE FROM $table WHERE category_id=$deleteid");
+    $stmt = $pdo->prepare("DELETE FROM $table WHERE id=$deleteid");
     $stmt->execute();
     if($stmt){
       return $successmessage = "Category Deleted Successfully";
@@ -249,10 +266,12 @@ Class Query{
     }
   }
 
-  function additem($table, $category_id, $item_code, $item_name){
+  function additem($table, $item_code, $item_name){
     global $pdo;
-    $stmt = $pdo->prepare("INSERT INTO $table(category_id, item_id, item_name) VALUES('$category_id', '$item_code', '$item_name');");
-    $stmt->execute();
+    $stmt = $pdo->prepare("INSERT INTO $table(item_name, item_id) VALUES('$item_name', :item_code);");
+    $stmt->execute([
+      ":item_code" => $item_code
+    ]);
     if($stmt){
       return $successmessage = "Item Added Successfully";
     }else{
@@ -260,10 +279,12 @@ Class Query{
     }
   }
 
-  function updateitem($table, $category_id, $item_name, $item_code ,$item_id){
+  function updateitem($table, $item_name, $item_code ,$item_id){
     global $pdo;
-    $stmt = $pdo->prepare("UPDATE $table SET category_id='$category_id', item_name='$item_name', item_id='$item_code' WHERE item_id='$item_id'");
-    $stmt->execute();
+    $stmt = $pdo->prepare("UPDATE $table SET item_name='$item_name', item_id=:item_code WHERE item_id='$item_id'");
+    $stmt->execute([
+      ":item_code" => $item_code
+    ]);
     if($stmt){
       return $successmessage = "Item Update Successfully";
     }else{
@@ -2890,6 +2911,12 @@ Class Query{
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
+  function selectallsumcheck($table, $row, $selectas, $selectwhat, $selectid){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT SUM($row) AS $selectas FROM $table WHERE $selectwhat='$selectid'");
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+  }
   function selectallsumpayable($table, $row, $selectas, $supplier_id){
     global $pdo;
     $stmt = $pdo->prepare("SELECT SUM($row) AS $selectas FROM $table WHERE supplier_id='$supplier_id'");

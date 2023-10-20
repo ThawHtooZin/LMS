@@ -113,8 +113,7 @@ $query = new Query();
                 $linkstmt = $pdo->prepare("SELECT link_id FROM payable WHERE ");
                 $link_id = $linkstmt->fetch(PDO::FETCH_ASSOC);
               ?>
-              <tr>
-
+              <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $payabledata['id']; ?>">
                 <td><?php if($payabledata['date'] != '0000-00-00'){echo date('d-m-Y', strtotime($payabledata['date'])); }; ?></td>
                 <td><?php if(!empty($payabledata['purchase_voucher_no'])){ echo $supplier_name['ac_name']; }; ?></td>
                 <td><?php echo $payabledata['purchase_voucher_no']; ?></td>
