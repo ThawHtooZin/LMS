@@ -201,7 +201,7 @@ $query = new Query();
                 <th>Debit</th>
                 <th>Credit</th>
                 <th>Balance</th>
-                <!-- <th>Action</th> -->
+                <th>Action</th>
               </tr>
               <?php
               if(isset($_POST['dbwsearch'])){
@@ -297,22 +297,33 @@ $query = new Query();
                     $credit = $cashdata['credit'] / $rateselect['dollar_rate'];
                   }
 
+
+
                   $balance = $cashdata['balance'] / $rateselect['dollar_rate'];
                   // Dollor Change
                 }
 
 
                 ?>
-              <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $cashdata['id']; ?>">
-                <td><?php echo $idd; ?></td>
-                <td><?php echo date('d-m-Y', strtotime($cashdata['date'])); ?></td>
-                <td><?php echo $cashdata['voucher_no']; ?></td>
-                <td><?php echo $acname; ?></td>
-                <td><?php echo $cashdata['particular']; ?></td>
-                <td><?php if($cashdata['debit'] == 0){echo "";}else{echo round($debit, 2);}; ?></td>
-                <td><?php if($cashdata['credit'] == 0){echo "";}else{echo round($credit, 2);}; ?></td>
-                <td><?php echo round($balance, 2); ?></td>
-              </tr>
+                <tr>
+                  <td><?php echo $idd; ?></td>
+                  <td><?php echo date('d-m-Y', strtotime($cashdata['date'])); ?></td>
+                  <td><?php echo $cashdata['voucher_no']; ?></td>
+                  <td><?php echo $acname; ?></td>
+                  <td><?php echo $cashdata['particular']; ?></td>
+                  <td><?php if($cashdata['debit'] == 0){echo "";}else{echo round($debit, 2);}; ?></td>
+                  <td><?php if($cashdata['credit'] == 0){echo "";}else{echo round($credit, 2);}; ?></td>
+                  <td><?php echo round($balance, 2); ?></td>
+                  <td>
+                    <a href="edittransaction.php?voucher_no=<?= $cashdata['voucher_no']; ?>">
+                      <button type="submit" class="btn btn-warning btn-sm text-light" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                          <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                        </svg>
+                      </button>
+                    </a>
+                  </td>
+                </tr>
               <!-- Data Update Modal -->
               <div class="modal fade" id="updatemodal<?php echo $cashdata['id']; ?>" tabindex="-1" role="dialog" aria-hidden="true">
                 <div class="modal-dialog" role="document">
@@ -379,8 +390,12 @@ $query = new Query();
               <!-- Update Modal -->
               <?php
               $idd++;
-              $ac_name = $cashdata['ac_name'];
               };
+              if(!empty($cashdata['ac_name'])){
+                $ac_name = $cashdata['ac_name'];
+              }else{
+                $ac_name = '';
+              }
                   if(!empty($_SESSION['cashbookcurrency']) && $_SESSION['cashbookcurrency'] != 'usd'){
                     $total_debit = $query->selectallsumcheck('cashbook', 'debit', 'total_debit', 'ac_name', $ac_name);
                     $total_credit = $query->selectallsumcheck('cashbook', 'credit', 'total_credit', 'ac_name', $ac_name);
@@ -396,7 +411,8 @@ $query = new Query();
                       <td></td>
                       <td><?php echo $total_debit['total_debit'] ?></td>
                       <td><?php if($total_credit['total_credit'] != 0){ echo $total_credit['total_credit'];} ?></td>
-                      <td><?php echo $balance['balance']; ?></td>
+                      <td><?php if(!empty($balance['balance'])){echo $balance['balance'];}; ?></td>
+                      <td></td>
                     </tr>
                     <?php
                   }elseif(empty($_SESSION['cashbookcurrency']) || $_SESSION['cashbookcurrency'] == 'usd'){

@@ -37,6 +37,14 @@ $query = new Query();
             <h5>General Ledger</h5>
           </div>
           <div class="card-body">
+            <?php
+            if(isset($_POST['export'])){
+              header("Content-Type: application/xls");
+              header("Content-Disposition: attachment; filename=GeneralLedger.xls");
+              header("Pragma: no-cache");
+              header("Expires: 0");
+            }
+             ?>
             <table class="table table-bordered" id="table">
               <tr style="background-color: lightgray;">
                 <th>Date</th>
@@ -290,6 +298,11 @@ $query = new Query();
                </tr>
               <?php } } ?>
             </table>
+            <?php
+            if($_POST['export']){
+              exit();
+            }
+             ?>
           </div>
         </div>
         <div class="modal fade" id="reportsmodal">

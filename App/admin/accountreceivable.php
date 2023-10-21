@@ -81,7 +81,7 @@ if(isset($_POST['addbalance'])){
               foreach ($accodeloopdatas as $accodeloopdata) :
               $acname = $query->select('acname', $accodeloopdata['ac_code'], 'code_no');
                ?>
-                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark <?php if($_SESSION['acreceivabletabs'] == $accodeloopdata['ac_code']){ echo "color"; }else{ echo ""; }; ?>" style="text-decoration:none; border:none;" name="<?= $accodeloopdata['ac_code']; ?>btn"><?= $acname['ac_name']; ?></button>
+                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark <?php if(!empty($_SESSION['acreceivabletabs']) && $_SESSION['acreceivabletabs'] == $accodeloopdata['ac_code']){ echo "color"; }else{ echo ""; }; ?>" style="text-decoration:none; border:none;" name="<?= $accodeloopdata['ac_code']; ?>btn"><?= $acname['ac_name']; ?></button>
               <?php
               endforeach;
                ?>
@@ -105,9 +105,16 @@ if(isset($_POST['addbalance'])){
                $accodeloopdatas = $accodeloopstmt->fetchAll();
                foreach ($accodeloopdatas as $accodeloopdata) :
                 if (empty($_SESSION['acreceivabletabs']) || $_SESSION['acreceivabletabs'] == "{$accodeloopdata['ac_code']}") {
-                  $receivabledatas = $query->search('receivable', 'ac_code', $_SESSION['acreceivabletabs']);
+                  if(!empty($_SESSION['acreceivabletabs'])){
+                    $receivabledatas = $query->search('receivable', 'ac_code', $_SESSION['acreceivabletabs']);
+                  }else{
+                    $receivabledatas = [];
+                  }
                 }
                 endforeach;
+                if(empty($receivabledatas)){
+                  $receivabledatas = [];
+                }
                foreach($receivabledatas as $receivabledata) :
                  $ac_name = $query->select('acname', $receivabledata['ac_code'], 'code_no');
                ?>
