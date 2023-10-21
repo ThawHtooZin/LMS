@@ -33,18 +33,13 @@ $query = new Query();
         <?php require 'navbar.php'; ?>
         <div class="card">
           <div class="card-header bg-warning text-light">
+            <form action="" class="d-inline" method="post">
+              <a href="export.php?database_name=lms&table_name=general_ledger" class="btn btn-sm ms-2 btn-success float-end">Export</a>
+            </form>
             <button type="button" class="btn btn-primary btn-sm float-end" data-bs-toggle="modal" data-bs-target="#reportsmodal">Reports</button>
             <h5>General Ledger</h5>
           </div>
           <div class="card-body">
-            <?php
-            if(isset($_POST['export'])){
-              header("Content-Type: application/xls");
-              header("Content-Disposition: attachment; filename=GeneralLedger.xls");
-              header("Pragma: no-cache");
-              header("Expires: 0");
-            }
-             ?>
             <table class="table table-bordered" id="table">
               <tr style="background-color: lightgray;">
                 <th>Date</th>
@@ -298,11 +293,6 @@ $query = new Query();
                </tr>
               <?php } } ?>
             </table>
-            <?php
-            if($_POST['export']){
-              exit();
-            }
-             ?>
           </div>
         </div>
         <div class="modal fade" id="reportsmodal">

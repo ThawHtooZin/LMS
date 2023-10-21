@@ -2761,7 +2761,7 @@ Class Query{
           $acselectstmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no'");
           $acselectstmt->execute();
           $rateselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
-          $debit = $transactiondata['debit'] - ($transactiondata['bank_charges'] * $rateselect['dollor_rate']);
+          $debit = $transactiondata['debit'] - ($transactiondata['bank_charges'] * $rateselect['dollar_rate']);
           $credit = 0;
         }else{
           $debit = $transactiondata['debit'];
