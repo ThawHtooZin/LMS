@@ -34,7 +34,17 @@ $query = new Query();
         <div class="card">
           <div class="card-header bg-warning text-light">
             <form action="" class="d-inline" method="post">
-              <a href="export.php?database_name=lms&table_name=general_ledger" class="btn btn-sm ms-2 btn-success float-end">Export</a>
+              <?php
+              if(isset($_POST['searchgeneralledger'])){
+                ?>
+                <a href="export.php?table_name=general_ledger&searchgeneralledger=true&date_from=<?= $_POST['date_from']; ?>&date_to=<?= $_POST['date_to']; ?>&ac_code=<?= $_POST['ac_code'] ?>" class="btn btn-sm ms-2 btn-success float-end">EEEEExport</a>
+                <?php
+              }else{
+                ?>
+                <a href="export.php?table_name=general_ledger" class="btn btn-sm ms-2 btn-success float-end">Export</a>
+                <?php
+              }
+               ?>
             </form>
             <button type="button" class="btn btn-primary btn-sm float-end" data-bs-toggle="modal" data-bs-target="#reportsmodal">Reports</button>
             <h5>General Ledger</h5>

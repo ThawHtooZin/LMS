@@ -1,0 +1,11 @@
+{
+    "name": "system/lms",
+    "authors": [
+        {
+            "name": "ThawHtooZin"
+        }
+    ],
+    "require": {
+        "box/spout": "^3.3"
+    }
+}
