@@ -202,12 +202,12 @@ class Bootstrap
         }
         @media screen and (min-width: 1440px){
           .contentcol{
-            left: 180px;
+            left: 223px;
             position:absolute;
             width: 85.5% !important;
           }
           .contentfullcol{
-            left: 55px;
+            left: 52px;
             position:absolute;
             width: 96% !important;
           }
