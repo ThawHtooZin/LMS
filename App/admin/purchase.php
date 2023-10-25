@@ -294,7 +294,7 @@ $query = new Query();
                             <label style="font-weight: bold;">Supplier A/C Code</label>
                             <div class="row">
                               <div class="col-6">
-                                <input type="text" name="ac_code" id="upac_code<?php echo $data['id']; ?>" class="form-control inpv2 mb-1" value="<?php echo $updatedata['supplier_id']; ?>" style="padding-top: 2px; padding-bottom: 2px;">
+                                <input type="text" name="upsupplier_code_no" id="upac_code<?php echo $data['id']; ?>" class="form-control inpv2 mb-1" value="<?php echo $updatedata['supplier_id']; ?>" style="padding-top: 2px; padding-bottom: 2px;">
                               </div>
                               <div class="col-6">
                                 <div id='ac_name'>

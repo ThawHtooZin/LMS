@@ -66,9 +66,9 @@ $query = new Query();
           <form action="" method="post">
             <div class="card-header bg-info text-light pb-3">
               <b class="h5">Link Mark Limited (F-7)</b>
-              <button type="button" class="btn btn-success btn-sm float-end ms-2 mt-2" data-bs-toggle="modal" data-bs-target="#addmodal">Add Data</button>
-              <button type="submit" name="searchbtn" class="btn btn-secondary btn-sm float-end mt-2">View</button>
-              <select name="commondity_id" class="form-control inpv2 w-25 d-inline float-end me-2 mt-2" style="height:30px !important; padding:0px 5px;">
+              <button type="button" class="btn btn-success btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#addmodal">Add Data</button>
+              <button type="submit" name="searchbtn" class="btn btn-secondary btn-sm float-end">View</button>
+              <select name="commondity_id" class="form-control inpv2 w-25 d-inline float-end me-2" style="height:30px !important; padding:0px 5px;">
                 <option value="">Select Commondity</option>
                 <?php
                 $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
@@ -84,8 +84,8 @@ $query = new Query();
                 }
                  ?>
               </select>
-              <button type="submit" name="searchbtn2" class="btn btn-secondary btn-sm float-end me-2 mt-2">View</button>
-              <select name="type" class="form-control inpv2 w-25 d-inline float-end me-2 mt-2" style="height:30px !important; padding:0px 5px;">
+              <button type="submit" name="searchbtn2" class="btn btn-secondary btn-sm float-end me-2">View</button>
+              <select name="type" class="form-control inpv2 w-25 d-inline float-end me-2" style="height:30px !important; padding:0px 5px;">
                 <option value="">Select Type</option>
                 <option value="frozen">Frozen</option>
                 <option value="tcl">TCL</option>

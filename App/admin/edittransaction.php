@@ -158,7 +158,16 @@ $query = new Query();
       $date = $_POST['date'];
       $voucher_no = $_POST['voucher_no'];
       $ac_code = $_POST['ac_code'];
-      $description = $_POST['description'];
+      if(str_contains($ac_code, '3600')){
+        $description = $_POST['bankdescription'];
+      }
+      if(str_contains($ac_code, '3300')){
+        $description = $_POST['recdescription'];
+      }
+      if(!str_contains($ac_code, '3600') && !str_contains($ac_code, '3300')){
+        $description = $_POST['description'];
+      }
+
       $currency = $_POST['currency'];
       if(!empty($_POST['rate'])){
         $rate = $_POST['rate'];
@@ -199,11 +208,14 @@ $query = new Query();
       $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total FROM transaction WHERE voucher_no='$searchvoucher_no'");
       $totalcreditstmt->execute();
       $totalcreditdata = $totalcreditstmt->fetch(PDO::FETCH_ASSOC);
+      $datestmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$searchvoucher_no'");
+      $datestmt->execute();
+      $datedata = $datestmt->fetch(PDO::FETCH_ASSOC);
 
       if($totaldebitdata['total'] != $totalcreditdata['total']){
         echo "<script>swal('Dosen\'t Match', 'Debit Credit Dosen\'t Match, Please Check again', 'warning');</script>";
       }else{
-        $date = date('Y-m-d');
+        $date = $datedata['date'];
         $voucher_no = $_GET['voucher_no'];
         $query->deloldtransaction($voucher_no);
         $query->delaccepttransaction($date, $voucher_no);
@@ -294,7 +306,7 @@ $query = new Query();
                           </div>
                           <div class="col">
                             <label>Vr. No</label>
-                            <input type="text" name="voucher_no" class="form-control inpv2 mb-1" value="<?php echo $updata['voucher_no']; ?>" style="padding-top: 2px; padding-bottom: 2px;">
+                            <input type="text" disabled name="voucher_no" class="form-control inpv2 mb-1" value="<?php echo $updata['voucher_no']; ?>" style="padding-top: 2px; padding-bottom: 2px;">
                           </div>
                           <div class="col">
                             <label>A/C Code</label>
@@ -310,7 +322,7 @@ $query = new Query();
                       <div class="row">
                         <div id="upreceive<?php echo $data['id']; ?>" class="<?php if(!str_contains($updata['ac_code'], 3600) && !str_contains($updata['ac_code'], 3300)){ echo "hide";} ?> col-4">
                            <label>Description</label>
-                           <textarea name="description" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php echo $updata['description']; ?></textarea>
+                           <textarea name="bankdescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(str_contains($updata['ac_code'], '3600')){echo $updata['description'];} ?></textarea>
                         </div>
                          <div id="upreceive2<?php echo $data['id']; ?>" class="<?php if(!str_contains($updata['ac_code'], 3300)){ echo "hide";} ?> col-2">
                            <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="sr_no" placeholder="Sr No." value="<?php echo $updata['sr_no']; ?>">
@@ -318,11 +330,11 @@ $query = new Query();
                          </div>
                          <div id="upnormal<?php echo $data['id']; ?>" class="<?php if(str_contains($updata['ac_code'], 3300) || str_contains($updata['ac_code'], 3600)){ echo "hide";} ?> col-6">
                            <label>Description</label>
-                           <textarea name="description" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php echo $updata['description']; ?></textarea>
+                           <textarea name="description" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php  if(!str_contains($updata['ac_code'], '3600') && !str_contains($updata['ac_code'], '3300')){echo $updata['description'];}?></textarea>
                          </div>
                           <div id="bankchargesdesc<?php echo $data['id']; ?>" class="hide col-4">
                             <label>Description</label>
-                            <textarea name="adddescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(!empty($_SESSION['description'])){echo $_SESSION['description']; } ?></textarea>
+                            <textarea name="recdescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(str_contains($updata['ad_code'], '3300')){ echo $updata['description']; } ?></textarea>
                           </div>
                           <div id="bankcharges<?php echo $data['id']; ?>" class="<?php if(!str_contains($updata['ac_code'], 3600)){ echo "hide";} ?>" style="width: 16.66666667%">
                             <input type="number" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="bank_charges" placeholder="Bank Charges" value="<?php if($updata['bank_charges'] != "0"){ echo $updata['bank_charges'];} ?>">
@@ -348,7 +360,7 @@ $query = new Query();
                   </form>
                   </div>
                   <script type="text/javascript">
-                    $('#upac_code<?php echo $data['id']; ?>').on('keyup', function(){
+                    $('#upac_code<?php echo $data['id']; ?>').on('blur', function(){
                       var upac_codepost = $('#upac_code<?php echo $data['id']; ?>').val();
                       var type = "";
                       if(upac_codepost.includes('/')){

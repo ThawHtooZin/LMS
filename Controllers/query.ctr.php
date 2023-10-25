@@ -31,8 +31,8 @@ Class Query{
     $logstmt = $pdo->prepare("INSERT INTO userlogs(login_time, login_date, login_username, login_password, status)  VALUES('$login_time', '$login_date', '$login_username', '$login_password', '$status')");
     $logstmt->execute();
 
-    if($status = 'Login Success'){
-      header('location:App/admin/');
+    if($status == 'Login Success'){
+      header('location:App/admin/Index.php');
     }
   }
 
@@ -344,7 +344,12 @@ Class Query{
     global $pdo;
     $stmt = $pdo->prepare("INSERT INTO $table(supplier_id, supplier_name, supplier_phone, supplier_address) VALUES('$supplier_id', '$supplier_name', '$supplier_phone', '$supplier_address');");
     $stmt->execute();
-    $acstmt = $pdo->prepare("INSERT INTO acname(code_no, ac_type, ac_name) VALUES('$supplier_id', '16', '$supplier_name');");
+
+    $acstmt = $pdo->prepare("SELECT acid FROM actype WHERE ac_type='Current Liability'");
+    $acstmt->execute();
+    $actype = $acstmt->fetch(PDO::FETCH_ASSOC);
+    $actype = $actype['acid'];
+    $acstmt = $pdo->prepare("INSERT INTO acname(code_no, ac_type, ac_name) VALUES('$supplier_id', '$actype', '$supplier_name');");
     $acstmt->execute();
     if($stmt){
       return $successmessage = "Supplier Added Successfully";
@@ -370,6 +375,8 @@ Class Query{
     global $pdo;
     $stmt = $pdo->prepare("DELETE FROM $table WHERE supplier_id='$deleteid'");
     $stmt->execute();
+    $acstmt = $pdo->prepare("DELETE FROM acname WHERE code_no='$deleteid'");
+    $acstmt->execute();
     if($stmt){
       return $successmessage = "Supplier Deleted Successfully";
     }else{

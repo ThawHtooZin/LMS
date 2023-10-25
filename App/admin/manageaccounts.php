@@ -192,7 +192,7 @@ $query = new Query();
                           $roledatas  = $query->selectall('role');
                           foreach ($roledatas as $roledata) {
                           ?>
-                          <option value="<?php echo $roledata['role_id']; ?>"><?php echo $roledata['role_name']; ?></option>
+                          <option value="<?php echo $roledata['role_id']; ?>" <?php if($updatedata['role'] == $roledata['role_id']){ echo "selected"; } ?>><?php echo $roledata['role_name']; ?></option>
                           <?php
                           }
                           ?>

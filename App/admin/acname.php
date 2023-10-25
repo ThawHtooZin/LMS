@@ -43,7 +43,7 @@ $query = new Query();
     if(isset($_POST['deletebutton'])){
       $id = $_POST['id'];
 
-      $stmt = $query->deleteacname($id);
+      $query->deleteacname($id);
 
     }
      ?>
@@ -58,20 +58,23 @@ $query = new Query();
         <div class="card">
           <div class="card-header bg-info text-light">
             <b style="font-size:18px;">Manage A/C Name</b>
-            <select class="chzn-select" name="supplier_id" style="width:15%;" data-placeholder="Supplier Name">
-              <?php
-              $actypestmt = $pdo->prepare("SELECT DISTINCT ac_type FROM acname");
-              $actypestmt->execute();
-              $actypes = $actypestmt->fetchall();
-
-              foreach ($actypes as $actype) {
-                $ac_name = $query->select('actype', $actype['ac_type'], 'acid');
-                ?>
-                <option value="<?php echo $ac_name['acid']; ?>"><?php echo $ac_name['ac_type']; ?></option>
+            <form class="d-inline" action="" method="post">
+              <select class="chzn-select" name="searchac_code" style="width:15%;" data-placeholder="Supplier Name">
                 <?php
-              }
-              ?>
-            </select>
+                $actypestmt = $pdo->prepare("SELECT DISTINCT ac_type FROM acname");
+                $actypestmt->execute();
+                $actypes = $actypestmt->fetchall();
+
+                foreach ($actypes as $actype) {
+                  $ac_name = $query->select('actype', $actype['ac_type'], 'acid');
+                  ?>
+                  <option value="<?php echo $ac_name['acid']; ?>"><?php echo $ac_name['ac_type']; ?></option>
+                  <?php
+                }
+                ?>
+              </select>
+              <button type="submit" name="searchbtn" class="btn btn-success btn-sm">Search</button>
+            </form>
             <button type="button" class="btn btn-secondary btn-sm float-end text-light" data-bs-toggle="modal" data-bs-target="#addmodal">Add A/C Name</button>
           </div>
           <div class="card-body">
@@ -83,7 +86,14 @@ $query = new Query();
                 <th>A/C Name</th>
               </tr>
               <?php
-              $datas = $query->selectall('acname');
+              if(isset($_POST['searchbtn'])){
+                $searchac_code = $_POST['searchac_code'];
+
+                $datas = $query->selectcontain('acname', 'ac_type', $searchac_code);
+
+              }else{
+                $datas = $query->selectall('acname');
+              }
               $idd = 0;
               foreach ($datas as $data) {
                 $idd++;

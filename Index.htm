@@ -1,0 +1,127 @@
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="Resources\bootstrap-5.3.1-dist\css\bootstrap.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="Resources/plugins/fontawesome-free/css/all.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="Resources/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="Resources/dist/css/adminlte.min.css">
+    <script src="Resources/jquery.resc.js"></script>
+    <script src="Resources/chosenselect/jquery-1.9.3.js"></script>
+    <script src="Resources/chosenselect/jquery-ui.js"></script>
+    <script src="Resources/chosenselect/chosen.jquery.js"></script>
+    <style media="screen">
+      .hide{
+        display: none;
+      }
+      .min-text{
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body class="hold-transition login-page">
+    <div class="login-box">
+      <div class="login-logo">
+        <a href="../../index2.html"><b>LMS</b> System</a>
+      </div>
+      <!-- /.login-logo -->
+      <div class="card">
+        <div class="card-body login-card-body">
+          <div id="started">
+            <p class="login-box-msg">Let's Get Started</p>
+            <p class="text-center min-text">Welcome To The LMS System Installation Program</p>
+            <div class="mt-5 float-end">
+              <button type="button" class="btn btn-success btn-sm" id='step-0'>Next</button>
+              <button type="button" class="btn btn-danger btn-sm">Cancel</button>
+            </div>
+          </div>
+          <div id="step-1-box" class="hide">
+            <p class="login-box-msg">Step 1 : Install XAMPP To Run The System</p>
+            <p class="min-text">The Installation Software Location : LMS/Installation/xampp-windows-installer.exe</p>
+            <p class="min-text">Note: Do not CHANGE any settings</p>
+            <div class="mt-3 float-end">
+              <button type="button" class="btn btn-success btn-sm" id='step-1'>Next</button>
+              <button type="button" class="btn btn-danger btn-sm">Cancel</button>
+            </div>
+          </div>
+          <div id="step-2-box" class="hide">
+            <p class="login-box-msg">Step 2 : Folder Placement</p>
+            <p class="min-text">For the system to run, a require location is nacessary</p>
+            <p class="min-text">Place this folder in : C:/xampp/htdoc/</p>
+            <div class="mt-3 float-end">
+              <button type="button" class="btn btn-success btn-sm" id='step-2'>Next</button>
+              <button type="button" class="btn btn-danger btn-sm">Cancel</button>
+            </div>
+          </div>
+          <div id="step-3-box" class="hide">
+            <p class="login-box-msg">Step 3 : Setting up the database</p>
+            <p class="min-text">Just click the Install Button.</p>
+            <div class="mt-3 float-end">
+              <button type="button" class="btn btn-success btn-sm" id="install">Install</button>
+              <button type="button" class="btn btn-danger btn-sm">Cancel</button>
+            </div>
+          </div>
+          <div id="loading" class="hide mt-5 mb-4">
+            <div class="login-box-msg">
+              <div class="spinner-border mb-2">
+              </div>
+              <p>Installing Database... Please Wait.</p>
+            </div>
+          </div>
+        </div>
+        <!-- /.login-card-body -->
+      </div>
+    </div>
+    <!-- Jquery -->
+    <script type="text/javascript">
+      $(document).ready(()=>{
+        if(sessionStorage.getItem('page') === null){
+          sessionStorage.setItem('page', 0);
+        };
+        $('#step-0').click(()=>{
+          sessionStorage.setItem('page', 1);
+          $('#started').hide();
+          $('#step-1-box').show();
+        });
+        $('#step-1').click(()=>{
+          sessionStorage.setItem('page', 2);
+          $('#started').hide();
+          $('#step-1-box').hide();
+          $('#step-2-box').show();
+        });
+        $('#step-2').click(()=>{
+          sessionStorage.setItem('page', 3);
+          $('#started').hide();
+          $('#step-2-box').hide();
+          $('#step-3-box').show();
+        });
+        $('#install').click(()=>{
+          if(sessionStorage.getItem('page') == 3){
+            sessionStorage.setItem('page', 0);
+            $('#loading').show();
+            $('#step-3-box').hide();
+            $(document).load('Installation/db-install.php');
+          }
+        });
+        if(sessionStorage.getItem('page') == 0){
+          $('#started').show();
+        }
+        if(sessionStorage.getItem('page') == 1){
+          $('#started').hide();
+          $('#step-1-box').show();
+        }
+        if(sessionStorage.getItem('page') == 2){
+          $('#started').hide();
+          $('#step-2-box').show();
+        }
+        if(sessionStorage.getItem('page') == 3){
+          $('#started').hide();
+          $('#step-3-box').show();
+        }
+      });
+    </script>
+  </body>
+</html>

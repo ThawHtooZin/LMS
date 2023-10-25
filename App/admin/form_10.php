@@ -65,13 +65,13 @@ $query = new Query();
                 <b>Link Mark Limited (F-10)</b>
               <button type="button" class="btn btn-success btn-sm float-end" data-bs-toggle="modal" data-bs-target="#addmodal">Add Form-10 Data</button>
               <button type="submit" name="searchbtn2" class="btn btn-secondary btn-sm float-end me-2">View</button>
-              <select name="type" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 17% !important; height: 32px !important; padding-top: 0.5px !important;">
+              <select name="type" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 17% !important; height: 27px !important; padding-top: 1.5px !important;">
                 <option value="">Select Type</option>
                 <option value="frozen">Frozen</option>
                 <option value="tcl">TCL</option>
               </select>
               <button type="submit" name="view" class="btn btn-secondary btn-sm float-end me-2">View</button>
-              <select name="commondity" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 17% !important; height: 32px !important; padding-top: 0.5px !important;">
+              <select name="commondity" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 17% !important; height: 27px !important; padding-top: 1.5px !important;">
                 <option value="">Select Commondity</option>
                 <?php
                 $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
@@ -86,7 +86,7 @@ $query = new Query();
                 }
                  ?>
               </select>
-              <select name="country" class="form-control inpv2 d-inline float-end me-2" style=" width: 17% !important; height: 32px !important; padding-top: 0.5px !important;">
+              <select name="country" class="form-control inpv2 d-inline float-end me-2" style=" width: 17% !important; height: 27px !important; padding-top: 1.5px !important;">
                 <option value="">Select Country</option>
                 <?php
                 $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock");

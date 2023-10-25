@@ -12,6 +12,14 @@ class Bootstrap
       <link rel="stylesheet" href="Resources/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
       <!-- Theme style -->
       <link rel="stylesheet" href="Resources/dist/css/adminlte.min.css">
+      <script src="../../Resources/jquery.resc.js"></script>
+
+      <script src="../../Resources/chosenselect/jquery-1.9.3.js"></script>
+
+      <script src="../../Resources/chosenselect/jquery-ui.js"></script>
+
+      <script src="../../Resources/chosenselect/chosen.jquery.js"></script>
+
     ';
   }
   function javascriptindex()
@@ -175,20 +183,39 @@ class Bootstrap
           height: 100%;
           width: 16% !important;
         }
-        .contentcol{
-          left: 197px;
-          position:absolute;
-          width: 85.5% !important;
+        @media screen and (min-width: 1300px){
+          .contentcol{
+            left: 197px;
+            position:absolute;
+            width: 85.5% !important;
+          }
+          .contentfullcol{
+            left: 44px;
+            position:absolute;
+            width: 96% !important;
+          }
+          .sidebarnocol{
+            position:absolute;
+            height: 100%;
+            width: 4.8% !important;
+          }
         }
-        .contentfullcol{
-          left: 44px;
-          position:absolute;
-          width: 96% !important;
-        }
-        .sidebarnocol{
-          position:absolute;
-          height: 100%;
-          width: 4.8% !important;
+        @media screen and (min-width: 1440px){
+          .contentcol{
+            left: 180px;
+            position:absolute;
+            width: 85.5% !important;
+          }
+          .contentfullcol{
+            left: 55px;
+            position:absolute;
+            width: 96% !important;
+          }
+          .sidebarnocol{
+            position:absolute;
+            height: 100%;
+            width: 4.8% !important;
+          }
         }
       </style>
       <script src="../../Resources/sweetalert.js" charset="utf-8"></script>

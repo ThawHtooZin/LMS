@@ -1,0 +1,5 @@
+Step 1: Install XAMPP for the program to run
+installation program location : LMS/Installation/xampp-window-installer.exe
+
+Step 2: Folder Placement
+For the system to work put this /LMS folder into : C:/xampp/htdocs/

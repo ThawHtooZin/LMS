@@ -10,14 +10,26 @@ $query = new Query();
 
 
 if($_GET['table_name'] == 'general_ledger'){
-  $date_from = $_GET['date_from'];
-  $date_to = $_GET['date_to'];
-  $ac_code = $_GET['ac_code'];
+  if (!empty($_GET['date_from'])) {
+    $date_from = $_GET['date_from'];
+  }else{
+    $date_from = false;
+  }
+  if (!empty($_GET['date_to'])) {
+    $date_to = $_GET['date_to'];
+  }else {
+    $date_to = false;
+  }
+  if(!empty($_GET['ac_code'])){
+    $ac_code = $_GET['ac_code'];
+  }else{
+    $ac_code = false;
+  }
   header("Content-Type: application/xls");
-  if(!empty($date_from) && !empty($date_to) && empty($ac_code)){
+  if($date_from !== false && $date_to !== false && $ac_code !== false){
     header("Content-Disposition: attachment; filename=GeneralLedger{$date_from}to{$date_to}and{$ac_code}.xls");
-  }elseif(!empty($date_from) || !empty($date_to) && empty($ac_code)){
-    if(!empty($date_from)){
+  }elseif($date_from !== false || $date_to !== false && $ac_code === false){
+    if($date_from !== false){
       header("Content-Disposition: attachment; filename=GeneralLedger{$date_from}.xls");
     }else{
       header("Content-Disposition: attachment; filename=GeneralLedger{$date_to}.xls");
@@ -45,17 +57,37 @@ if($_GET['table_name'] == 'general_ledger'){
       $date_to = $_GET['date_to'];
       $ac_code = $_GET['ac_code'];
 
-      if(!empty($date_from) && !empty($date_to) && empty($ac_code)){
+      if(!empty($date_from) && !empty($date_to) && !empty($ac_code)){
+        $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date` BETWEEN '$date_from' AND '$date_to' AND ac_code='$ac_code'");
+        $acnamecountstmt->execute();
+        $acnamecount = $acnamecountstmt->fetchColumn();
+        $acnamedontloop = 1;
+      }elseif(!empty($date_from) && !empty($date_to) && empty($ac_code)){
         $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date` BETWEEN '$date_from' AND '$date_to'");
         $acnamecountstmt->execute();
         $acnamecount = $acnamecountstmt->fetchColumn();
-
-      }elseif(!empty($date_from) || !empty($date_to) && empty($ac_code)){
+        $acnamedontloop = 2;
+      }elseif(!empty($date_to) || !empty($date_from) && !empty($ac_code)){
+        if(!empty($date_from)){
+          $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date`='$date_from' AND ac_code='$ac_code'");
+          $acnamecountstmt->execute();
+          $acnamecount = $acnamecountstmt->fetchColumn();
+          $acnamedontloop = 1;
+          $acnamecount = 1;
+        }elseif(!empty($date_to)){
+          $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date`='$date_to' AND ac_code='$ac_code'");
+          $acnamecountstmt->execute();
+          $acnamecount = $acnamecountstmt->fetchColumn();
+          $acnamedontloop = 1;
+          $acnamecount = 1;
+        }
+      }elseif(!empty($date_to) || !empty($date_from) && empty($ac_code)){
         if(!empty($date_from)){
           $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date`='$date_from'");
           $acnamecountstmt->execute();
           $acnamecount = $acnamecountstmt->fetchColumn();
-        }else{
+          $acnamedontloop = 2;
+        }elseif(!empty($date_to)){
           $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date`='$date_to'");
           $acnamecountstmt->execute();
           $acnamecount = $acnamecountstmt->fetchColumn();
@@ -66,23 +98,12 @@ if($_GET['table_name'] == 'general_ledger'){
         $acnamedontloop = 1;
       }
       for ($i=0; $i < $acnamecount; $i++) {
-        if(empty($acnamedontloop) || $acnamedontloop != 1){
-          $accodestmt = $pdo->prepare("SELECT DISTINCT ac_code FROM general_ledger");
-          $accodestmt->execute();
-          $accodedata = $accodestmt->fetchall();
-          $accode = $accodedata[$i]['ac_code'];
-        } elseif(empty($acnamedontloop) || $acnamedontloop == 2){
-          $accodestmt = $pdo->prepare("SELECT DISTINCT ac_code FROM general_ledger");
-          $accodestmt->execute();
-          $accodedata = $accodestmt->fetchall();
-          $accode = $accodedata[$i]['ac_code'];
-        }else {
-          $accodestmt = $pdo->prepare("SELECT DISTINCT ac_code FROM general_ledger");
-          $accodestmt->execute();
-          $accodedata = $accodestmt->fetchall();
-          $accode = $accodedata[$i]['ac_code'];
-        }
-        if(empty($acnamedontloop) || $acnamedontloop != 1){
+        $accodestmt = $pdo->prepare("SELECT DISTINCT ac_code FROM general_ledger");
+        $accodestmt->execute();
+        $accodedata = $accodestmt->fetchall();
+        $accode = $accodedata[$i]['ac_code'];
+
+        if(!empty($acnamedontloop) && $acnamedontloop > 1){
           $gldatas = $query->search('general_ledger', 'ac_code', $accode);
           $acnametoshow = $query->select('acname', $accode, 'code_no');
         }else{
