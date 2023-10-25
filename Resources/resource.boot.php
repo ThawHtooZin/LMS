@@ -200,7 +200,7 @@ class Bootstrap
             width: 4.8% !important;
           }
         }
-        @media screen and (min-width: 1440px){
+        @media screen and (min-width: 1400px){
           .contentcol{
             left: 223px;
             position:absolute;
