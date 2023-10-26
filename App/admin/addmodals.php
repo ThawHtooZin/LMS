@@ -116,7 +116,7 @@
   <div class="modal-dialog">
     <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
       <div class="modal-header bg-secondary text-light">
-        <h1 class="modal-title fs-5">New Dry Fish Charges</h1>
+        <h1 class="modal-title fs-5">Add Packing Out</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
     <form action="monthlycharges.php" method="post">
@@ -151,7 +151,7 @@
   <div class="modal-dialog">
     <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
       <div class="modal-header bg-secondary text-light">
-        <h1 class="modal-title fs-5">New Dry Fish Charges</h1>
+        <h1 class="modal-title fs-5">Add Total Balance</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
     <form action="monthlycharges.php" method="post">
