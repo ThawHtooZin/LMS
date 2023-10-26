@@ -780,12 +780,12 @@ $query = new Query();
     <script type="text/javascript">
       $("#commondity").change(function(){
         var commondity = $("#commondity").val();
-        if(commondity.includes('B01')){
-          $(".processingratediv").toggle();
-          $(".processingchargesdiv").toggle();
+        if(commondity.includes('B01') === true){
+          $(".processingratediv").hide();
+          $(".processingchargesdiv").show();
         }else{
-          $(".processingratediv").toggle();
-          $(".processingchargesdiv").toggle();
+          $(".processingratediv").show();
+          $(".processingchargesdiv").hide();
         }
       });
     </script>
