@@ -33,17 +33,6 @@ $query = new Query();
   </style>
   <body>
     <?php
-    if(isset($_POST['add'])){
-      $indate = $_POST['indate'];
-      $outdate = $_POST['outdate'];
-      $mc = $_POST['mc'];
-      $kg = $_POST['kg'];
-      $coldstorerate = $_POST['coldstorerate'];
-      $labourrate = $_POST['labourrate'];
-      $processingrate = $_POST['processingrate'];
-      $query->addcoldstore($indate, $outdate, $mc, $kg, $coldstorerate, $labourrate, $processingrate);
-    }
-
     if(isset($_POST['addfishcharges'])){
       $date = $_POST['date'];
       $ite = $_POST['ite'];

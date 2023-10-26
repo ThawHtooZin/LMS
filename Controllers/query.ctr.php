@@ -1090,21 +1090,30 @@ Class Query{
       $rowcount->execute();
       $rowcount = $rowcount->fetchColumn();
       if($ite == 'import'){
-        $importrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE date='$date' AND ite='import'");
+        $importrowstmt = $pdo->prepare("SELECT total_kg FROM gfcfishcoldstore WHERE date='$date' AND ite='import'");
         $importrowstmt->execute();
-        $importrowsdata = $importrowstmt->fetch(PDO::FETCH_ASSOC);
+        $importrowsdatas = $importrowstmt->fetchall();
+        $numbers = array();
+        foreach ($importrowsdatas as $importrowsdata) {
+            $numbers[] = $importrowsdata['total_kg']; // Add total_kg values to the $numbers array
+        }
+        if (!empty($numbers)) {
+            $total_kg = max($numbers);
+        } else {
+            $total_kg = 0;
+        }
         $lasttottalstmt = $pdo->prepare("SELECT total_charges FROM gfcfishcoldstore WHERE total_charges!=0 AND id < $id ORDER BY id DESC");
         $lasttottalstmt->execute();
         $lasttotalcharges = $lasttottalstmt->fetch(PDO::FETCH_ASSOC);
         if(!empty($importrowsdata)){
-          $coldstorecharges2 = $coldstorerate * $importrowsdata['total_kg'];
+          echo $coldstorecharges2 = $coldstorerate * $total_kg;
           if($lasttotalcharges == ''){
             $total_charges = 0 + $coldstorecharges2;
           }else{
             $total_charges = $lasttotalcharges['total_charges'] + $coldstorecharges2;
           }
         }else{
-          $coldstorecharges2 = $coldstorerate * $importrowsdata['total_kg'];
+          $coldstorecharges2 = $coldstorerate * $total_kg;
           if($lasttotalcharges == ''){
             $total_charges = 0 + $coldstorecharges2;
           }else{
