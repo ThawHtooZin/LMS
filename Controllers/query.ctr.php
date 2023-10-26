@@ -592,7 +592,7 @@ Class Query{
         $date1 = strtotime($indate);
         $date2 = strtotime($outdate);
         $diff = $date2 - $date1;
-        $day = floor($diff / (60 * 60 * 24)) + 1;
+        echo $day = floor($diff / (60 * 60 * 24)) + 1;
         $charges = $day * intval($coldstorerate) * intval($kg);
         $total_charges = intval($data['total_charges']) + intval($charges);
       }
