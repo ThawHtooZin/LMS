@@ -493,13 +493,18 @@ Class Query{
 
   // HHK QUERIES
 
-      function addmslcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $pcharges){
+      function addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $pcharges){
     global $pdo;
 
     $datastmt = $pdo->prepare("SELECT * FROM coldstore ORDER BY id DESC");
     $datastmt->execute();
     $data = $datastmt->fetch(PDO::FETCH_ASSOC);
     if(!empty($data)){
+      $commonditystmt = $pdo->prepare("SELECT * FROM category WHERE category_id='$commondity_id'");
+      $commonditystmt->execute();
+      $commondity_name = $commonditystmt->fetch(PDO::FETCH_ASSOC);
+
+      $comname = $commondity_name['category_name'];
       if($commondity_id == '11'){
         $iqfemptystmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='11' ORDER BY id DESC");
         $iqfemptystmt->execute();
@@ -527,12 +532,12 @@ Class Query{
           $charges = $day * intval($coldstorerate) * intval($kg);
           $total_charges = intval($charges);
         }
-      }elseif($commondity_id == '12'){
-        $blockemptystmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='12' ORDER BY id DESC");
+      }elseif($comname == 'Block' || $comname == 'block'){
+        $blockemptystmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='$commondity_id' ORDER BY id DESC");
         $blockemptystmt->execute();
         $blockemptydata = $blockemptystmt->fetch(PDO::FETCH_ASSOC);
         if (!empty($blockemptydata)) {
-          $blockstmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='12' ORDER BY id DESC");
+          $blockstmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='$commondity_id' ORDER BY id DESC");
           $blockstmt->execute();
           $blockdata = $blockstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -625,12 +630,12 @@ Class Query{
           $lcharges = intval($labourrate) * intval($kg);
           $totallabourcharges = intval($lcharges);
         }
-      }elseif($commondity_id == '12'){
-        $blockemptystmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='12' ORDER BY id DESC");
+      }elseif($comname == 'Block' || $comname == 'block'){
+        $blockemptystmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
         $blockemptystmt->execute();
         $blockemptydata = $blockemptystmt->fetch(PDO::FETCH_ASSOC);
         if (!empty($blockemptydata)) {
-          $blockstmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='12' ORDER BY id DESC");
+          $blockstmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
           $blockstmt->execute();
           $blockdata = $blockstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -714,12 +719,12 @@ Class Query{
           $pcharges = intval($processingrate) * intval($kg);
           $totalprocessingcharges = intval($pcharges);
         }
-      }elseif($commondity_id == '12'){
-        $processingemptystmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='12' ORDER BY id DESC");
+      }elseif($comname == 'Block' || $comname == 'block'){
+        $processingemptystmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
         $processingemptystmt->execute();
         $processingemptydata = $processingemptystmt->fetch(PDO::FETCH_ASSOC);
         if (!empty($processingemptydata)) {
-          $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='12' ORDER BY id DESC");
+          $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
           $processingstmt->execute();
           $processingdata = $processingstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -1619,222 +1624,222 @@ Class Query{
     $newstockstmt->execute();
   }
 
-  // function addmslcoldstore($indate, $outdate, $item_id, $mc, $kg, $coldstorerate, $freezingrate, $exportrate, $loose_kg, $loose_mc){
-  //   global $pdo;
-  //
-  //   $datastmt = $pdo->prepare("SELECT * FROM mslcoldstore ORDER BY id DESC");
-  //   $datastmt->execute();
-  //   $data = $datastmt->fetch(PDO::FETCH_ASSOC);
-  //   if(!empty($data)){
-  //     $emptystmt = $pdo->prepare("SELECT * FROM mslcoldstore WHERE item_id='$item_id' ORDER BY id DESC");
-  //     $emptystmt->execute();
-  //     $emptydata = $emptystmt->fetch(PDO::FETCH_ASSOC);
-  //     if (!empty($emptydata)) {
-  //       $stmt = $pdo->prepare("SELECT * FROM mslcoldstore WHERE item_id='$item_id' ORDER BY id DESC");
-  //       $stmt->execute();
-  //       $data = $stmt->fetch(PDO::FETCH_ASSOC);
-  //
-  //       $dtotal_mc = intval($data['total_mc']) + intval($mc);
-  //       $dtotal_kg = intval($data['total_kg']) + intval($kg);
-  //       $date1 = strtotime($indate);
-  //       $date2 = strtotime($outdate);
-  //       $diff = $date2 - $date1;
-  //       $day = floor($diff / (60 * 60 * 24)) + 1;
-  //       $charges = $day * intval($coldstorerate) * intval($kg);
-  //       $total_charges = intval($iqfdata['total_charges']) + intval($charges);
-  //     }else{
-  //       $dtotal_mc = intval($mc);
-  //       $dtotal_kg = intval($kg);
-  //       $date1 = strtotime($indate);
-  //       $date2 = strtotime($outdate);
-  //       $diff = $date2 - $date1;
-  //       $day = floor($diff / (60 * 60 * 24));
-  //       $charges = $day * intval($coldstorerate) * intval($kg);
-  //       $total_charges = intval($charges);
-  //     }
-  //   }else{
-  //     $dtotal_mc = intval($mc);
-  //     $dtotal_kg = intval($kg);
-  //     $date1 = strtotime($indate);
-  //     $date2 = strtotime($outdate);
-  //     $diff = $date2 - $date1;
-  //     $day = floor($diff / (60 * 60 * 24));
-  //     $charges = $day * intval($coldstorerate) * intval($kg);
-  //     $total_charges = intval($charges);
-  //   }
-  //   // Freezing ADD
-  //   $labourstmt = $pdo->prepare("SELECT * FROM mslfreezing ORDER BY id DESC");
-  //   $labourstmt->execute();
-  //   $labour = $labourstmt->fetch(PDO::FETCH_ASSOC);
-  //   if(!empty($labour)){
-  //     $emptystmt = $pdo->prepare("SELECT * FROM mslfreezing WHERE item_id='$item_id' ORDER BY id DESC");
-  //     $emptystmt->execute();
-  //     $emptydata = $emptystmt->fetch(PDO::FETCH_ASSOC);
-  //     if (!empty($emptydata)) {
-  //       $stmt = $pdo->prepare("SELECT * FROM mslfreezing WHERE item_id='$item_id' ORDER BY id DESC");
-  //       $stmt->execute();
-  //       $data = $stmt->fetch(PDO::FETCH_ASSOC);
-  //
-  //       $ftotal_mc = intval($data['total_mc']) + intval($mc);
-  //       $ftotal_kg = intval($data['total_kg']) + intval($kg);
-  //       $fcharges = intval($freezingrate) * intval($kg);
-  //       $totalfreezingcharges = intval($data['total_charges']) + intval($fcharges);
-  //     }else{
-  //       $ftotal_mc = intval($mc);
-  //       $ftotal_kg = intval($kg);
-  //       $fcharges = intval($freezingrate) * intval($kg);
-  //       $totalfreezingcharges = intval($fcharges);
-  //     }
-  //   }else{
-  //     $ftotal_mc = intval($mc);
-  //     $ftotal_kg = intval($kg);
-  //     $fcharges = intval($freezingrate) * intval($kg);
-  //     $totalfreezingcharges = intval($fcharges);
-  //   }
-  //
-  //   // Export Handling ADD
-  //   $exportstmt = $pdo->prepare("SELECT * FROM mslexportcharges ORDER BY id DESC");
-  //   $exportstmt->execute();
-  //   $export = $exportstmt->fetch(PDO::FETCH_ASSOC);
-  //   if(!empty($export)){
-  //     $exportemptystmt = $pdo->prepare("SELECT * FROM mslexportcharges WHERE item_id='$item_id' ORDER BY id DESC");
-  //     $exportemptystmt->execute();
-  //     $exportemptydata = $exportemptystmt->fetch(PDO::FETCH_ASSOC);
-  //     if (!empty($exportemptydata)) {
-  //       $exportstmt = $pdo->prepare("SELECT * FROM mslexportcharges WHERE item_id='$item_id' ORDER BY id DESC");
-  //       $exportstmt->execute();
-  //       $exportdata = $exportstmt->fetch(PDO::FETCH_ASSOC);
-  //
-  //       $etotal_mc = intval($exportdata['total_mc']) + intval($mc);
-  //       $etotal_kg = intval($exportdata['total_kg']) + intval($kg);
-  //       $echarges = intval($exportrate) * intval($kg);
-  //       $totalexportcharges = intval($exportdata['total_charges']) + intval($echarges);
-  //     }else{
-  //       $etotal_mc = intval($mc);
-  //       $etotal_kg = intval($kg);
-  //       $echarges = intval($exportrate) * intval($kg);
-  //       $totalexportcharges = intval($echarges);
-  //     }
-  //   }else{
-  //     $etotal_mc = intval($mc);
-  //     $etotal_kg = intval($kg);
-  //     $echarges = intval($exportrate) * intval($kg);
-  //     $totalexportcharges = intval($echarges);
-  //   }
-  //
-  //   // Add Stock
-  //   $stockstmt = $pdo->prepare("SELECT * FROM mslstock WHERE item_id='$item_id' ORDER BY id DESC");
-  //   $stockstmt->execute();
-  //   $stockdata = $stockstmt->fetch(PDO::FETCH_ASSOC);
-  //
-  //   $smc = $mc;
-  //   $skg = $kg;
-  //   $total_mc = $stockdata['total_mc'] - $mc;
-  //   $total_kg = $stockdata['total_kg'] - $kg;
-  //
-  //   $coldstorestmt = $pdo->prepare("INSERT INTO mslcoldstore(indate, outdate, item_id, mc, total_mc, kg, total_kg, day, rate, charges, total_charges) VALUES('$indate','$outdate','$item_id', '$mc','$dtotal_mc','$kg','$dtotal_kg','$day','$coldstorerate','$charges','$total_charges')");
-  //   $coldstorestmt->execute();
-  //   $labourstmt = $pdo->prepare("INSERT INTO mslfreezing(indate, outdate, item_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$item_id', '$mc','$ftotal_mc','$kg','$ftotal_kg','$freezingrate','$fcharges','$totalfreezingcharges')");
-  //   $labourstmt->execute();
-  //   $processingstmt = $pdo->prepare("INSERT INTO mslexportcharges(indate, outdate, item_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$item_id', '$mc','$etotal_mc','$kg','$etotal_kg','$exportrate','$echarges','$totalexportcharges')");
-  //   $processingstmt->execute();
-  //   $stockstmt = $pdo->prepare("INSERT INTO mslstock(outdate, item_id, mc, total_mc, kg, total_kg) VALUES('$outdate', '$item_id', '$smc', '$total_mc', '$skg', '$total_kg')");
-  //   $stockstmt->execute();
-  //
-  //   $datastmt = $pdo->prepare("SELECT * FROM msl_total_charges ORDER BY id DESC");
-  //   $datastmt->execute();
-  //   $data = $datastmt->fetch(PDO::FETCH_ASSOC);
-  //
-  //   if(!empty($loose_kg) && !empty($loose_mc)){
-  //     $totalcoldstorestmt = $pdo->prepare("SELECT * FROM mslcoldstore ORDER BY id DESC");
-  //     $totalcoldstorestmt->execute();
-  //     $totalcoldstoredata = $totalcoldstorestmt->fetch(PDO::FETCH_ASSOC);
-  //
-  //     $totalfreezingstmt = $pdo->prepare("SELECT * FROM mslfreezing  ORDER BY id DESC");
-  //     $totalfreezingstmt->execute();
-  //     $totalfreezingdata = $totalfreezingstmt->fetch(PDO::FETCH_ASSOC);
-  //
-  //     $totalexportstmt = $pdo->prepare("SELECT * FROM mslexportcharges ORDER BY id DESC");
-  //     $totalexportstmt->execute();
-  //     $totalexportdata = $totalexportstmt->fetch(PDO::FETCH_ASSOC);
-  //     $coldstoretotal_mc = $totalcoldstoredata['total_mc'] + intval($loose_mc);
-  //     $coldstoretotal_kg = $totalcoldstoredata['total_kg'] + intval($loose_kg);
-  //     $freezingtotal_mc = $totalfreezingdata['total_mc'] + intval($loose_mc);
-  //     $freezingtotal_kg = $totalfreezingdata['total_kg'] + intval($loose_kg);
-  //     $exporttotal_mc = $totalexportdata['total_mc'] + intval($loose_mc);
-  //     $exporttotal_kg = $totalexportdata['total_kg'] + intval($loose_kg);
-  //
-  //     $loose_total_charges = $loose_kg * $day * $coldstorerate;
-  //     $loosetotalfreezingcharges = $loose_kg * $freezingrate;
-  //     $loosetotalexportcharges = $loose_kg * $exportrate;
-  //
-  //     $totalcoldstorecharges = $totalcoldstoredata['total_charges'] + $loose_total_charges;
-  //     $totalfreezingdatacharges = $totalfreezingdata['total_charges'] + $loosetotalfreezingcharges;
-  //     $totalexportdatacharges = $totalexportdata['total_charges'] + $loosetotalexportcharges;
-  //
-  //     $coldstorestmt = $pdo->prepare("INSERT INTO mslcoldstore(indate, item_id, mc, total_mc, kg, total_kg, day, rate, charges, total_charges) VALUES('$indate','$item_id', '$loose_mc','$coldstoretotal_mc','$loose_kg','$coldstoretotal_kg','$day','$coldstorerate','$loose_total_charges','$totalcoldstorecharges')");
-  //     $coldstorestmt->execute();
-  //     $labourstmt = $pdo->prepare("INSERT INTO mslfreezing(indate, item_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$item_id', '$loose_mc','$freezingtotal_mc','$loose_kg','$ftotal_kg','$freezingtotal_kg','$loosetotalfreezingcharges','$totalfreezingdatacharges')");
-  //     $labourstmt->execute();
-  //     $processingstmt = $pdo->prepare("INSERT INTO mslexportcharges(indate, item_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$item_id', '$loose_mc','$exporttotal_mc','$loose_kg','$etotal_kg','$exporttotal_kg','$loosetotalexportcharges','$totalexportdatacharges')");
-  //     $processingstmt->execute();
-  //   }
-  //
-  //   $totalcoldstorestmt = $pdo->prepare("SELECT * FROM mslcoldstore ORDER BY id DESC");
-  //   $totalcoldstorestmt->execute();
-  //   $totalcoldstoredata = $totalcoldstorestmt->fetch(PDO::FETCH_ASSOC);
-  //
-  //   $totalfreezingstmt = $pdo->prepare("SELECT * FROM mslfreezing  ORDER BY id DESC");
-  //   $totalfreezingstmt->execute();
-  //   $totalfreezingdata = $totalfreezingstmt->fetch(PDO::FETCH_ASSOC);
-  //
-  //   $totalexportstmt = $pdo->prepare("SELECT * FROM mslexportcharges ORDER BY id DESC");
-  //   $totalexportstmt->execute();
-  //   $totalexportdata = $totalexportstmt->fetch(PDO::FETCH_ASSOC);
-  //
-  //   $totalchargesstmt = $pdo->prepare("SELECT * FROM msl_total_charges ORDER BY id DESC");
-  //   $totalchargesstmt->execute();
-  //   $totalchargesdata = $totalchargesstmt->fetch(PDO::FETCH_ASSOC);
-  //
-  //
-  //   if(!empty($totalchargesdata)){
-  //     $total_coldstore_charges = $totalcoldstoredata['total_charges'];
-  //     $total_freezing_charges = $totalfreezingdata['total_charges'];
-  //     $total_export_charges = $totalexportdata['total_charges'];
-  //     $total_charges = $totalcoldstoredata['total_charges'] + $totalfreezingdata['total_charges'] + $totalexportdata['total_charges'];
-  //     $grand_total_charges = $totalchargesdata['balance_amount'] + $total_charges;
-  //     $balance_amount = intval($grand_total_charges);
-  //   }else{
-  //     $total_coldstore_charges = $totalcoldstoredata['total_charges'];
-  //     $total_freezing_charges = $totalfreezingdata['total_charges'];
-  //     $total_export_charges = $totalexportdata['total_charges'];
-  //     $total_charges = $totalcoldstoredata['total_charges'] + $totalfreezingdata['total_charges'] + $totalexportdata['total_charges'];
-  //     $grand_total_charges = $total_charges;
-  //     $balance_amount = $grand_total_charges;
-  //   }
-  //
-  //   $stmt = $pdo->prepare("INSERT INTO msl_total_charges(item_id, total_coldstore_charges, total_freezing_charges, total_export_charges, total_charges, grand_total_charges, balance_amount) VALUES('$item_id','$total_coldstore_charges', '$total_freezing_charges', '$total_export_charges', '$total_charges', '$grand_total_charges', '$balance_amount')");
-  //   $stmt->execute();
-  // }
-  //
-  // function updatemslcoldstoretotal($id, $repacking_charges, $ice_charges){
-  //   global $pdo;
-  //
-  //   $totalchargesstmt = $pdo->prepare("SELECT * FROM msl_total_charges WHERE id='$id'");
-  //   $totalchargesstmt->execute();
-  //   $totalchargesdata =$totalchargesstmt->fetch(PDO::FETCH_ASSOC);
-  //
-  //   $idd = $id - 1;
-  //   $balancestmt = $pdo->prepare("SELECT * FROM msl_total_charges WHERE id='$idd'");
-  //   $balancestmt->execute();
-  //   $balancedata= $balancestmt->fetch(PDO::FETCH_ASSOC);
-  //
-  //   $total_charges = intval($repacking_charges) + intval($ice_charges) + $totalchargesdata['total_charges'];
-  //   $grand_total_charges = $balancedata['balance_amount'] + $total_charges;
-  //   $balance_amount = $grand_total_charges;
-  //   $updatestmt = $pdo->prepare("UPDATE msl_total_charges SET repacking_charges='$repacking_charges', ice_charges='$ice_charges', total_charges='$total_charges', grand_total_charges='$grand_total_charges', balance_amount='$balance_amount' WHERE id='$id'");
-  //   $updatestmt->execute();
-  // }
+  function addmslcoldstore($indate, $outdate, $item_id, $mc, $kg, $coldstorerate, $freezingrate, $exportrate, $loose_kg, $loose_mc){
+    global $pdo;
+
+    $datastmt = $pdo->prepare("SELECT * FROM mslcoldstore ORDER BY id DESC");
+    $datastmt->execute();
+    $data = $datastmt->fetch(PDO::FETCH_ASSOC);
+    if(!empty($data)){
+      $emptystmt = $pdo->prepare("SELECT * FROM mslcoldstore WHERE item_id='$item_id' ORDER BY id DESC");
+      $emptystmt->execute();
+      $emptydata = $emptystmt->fetch(PDO::FETCH_ASSOC);
+      if (!empty($emptydata)) {
+        $stmt = $pdo->prepare("SELECT * FROM mslcoldstore WHERE item_id='$item_id' ORDER BY id DESC");
+        $stmt->execute();
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $dtotal_mc = intval($data['total_mc']) + intval($mc);
+        $dtotal_kg = intval($data['total_kg']) + intval($kg);
+        $date1 = strtotime($indate);
+        $date2 = strtotime($outdate);
+        $diff = $date2 - $date1;
+        $day = floor($diff / (60 * 60 * 24)) + 1;
+        $charges = $day * intval($coldstorerate) * intval($kg);
+        $total_charges = intval($iqfdata['total_charges']) + intval($charges);
+      }else{
+        $dtotal_mc = intval($mc);
+        $dtotal_kg = intval($kg);
+        $date1 = strtotime($indate);
+        $date2 = strtotime($outdate);
+        $diff = $date2 - $date1;
+        $day = floor($diff / (60 * 60 * 24));
+        $charges = $day * intval($coldstorerate) * intval($kg);
+        $total_charges = intval($charges);
+      }
+    }else{
+      $dtotal_mc = intval($mc);
+      $dtotal_kg = intval($kg);
+      $date1 = strtotime($indate);
+      $date2 = strtotime($outdate);
+      $diff = $date2 - $date1;
+      $day = floor($diff / (60 * 60 * 24));
+      $charges = $day * intval($coldstorerate) * intval($kg);
+      $total_charges = intval($charges);
+    }
+    // Freezing ADD
+    $labourstmt = $pdo->prepare("SELECT * FROM mslfreezing ORDER BY id DESC");
+    $labourstmt->execute();
+    $labour = $labourstmt->fetch(PDO::FETCH_ASSOC);
+    if(!empty($labour)){
+      $emptystmt = $pdo->prepare("SELECT * FROM mslfreezing WHERE item_id='$item_id' ORDER BY id DESC");
+      $emptystmt->execute();
+      $emptydata = $emptystmt->fetch(PDO::FETCH_ASSOC);
+      if (!empty($emptydata)) {
+        $stmt = $pdo->prepare("SELECT * FROM mslfreezing WHERE item_id='$item_id' ORDER BY id DESC");
+        $stmt->execute();
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $ftotal_mc = intval($data['total_mc']) + intval($mc);
+        $ftotal_kg = intval($data['total_kg']) + intval($kg);
+        $fcharges = intval($freezingrate) * intval($kg);
+        $totalfreezingcharges = intval($data['total_charges']) + intval($fcharges);
+      }else{
+        $ftotal_mc = intval($mc);
+        $ftotal_kg = intval($kg);
+        $fcharges = intval($freezingrate) * intval($kg);
+        $totalfreezingcharges = intval($fcharges);
+      }
+    }else{
+      $ftotal_mc = intval($mc);
+      $ftotal_kg = intval($kg);
+      $fcharges = intval($freezingrate) * intval($kg);
+      $totalfreezingcharges = intval($fcharges);
+    }
+
+    // Export Handling ADD
+    $exportstmt = $pdo->prepare("SELECT * FROM mslexportcharges ORDER BY id DESC");
+    $exportstmt->execute();
+    $export = $exportstmt->fetch(PDO::FETCH_ASSOC);
+    if(!empty($export)){
+      $exportemptystmt = $pdo->prepare("SELECT * FROM mslexportcharges WHERE item_id='$item_id' ORDER BY id DESC");
+      $exportemptystmt->execute();
+      $exportemptydata = $exportemptystmt->fetch(PDO::FETCH_ASSOC);
+      if (!empty($exportemptydata)) {
+        $exportstmt = $pdo->prepare("SELECT * FROM mslexportcharges WHERE item_id='$item_id' ORDER BY id DESC");
+        $exportstmt->execute();
+        $exportdata = $exportstmt->fetch(PDO::FETCH_ASSOC);
+
+        $etotal_mc = intval($exportdata['total_mc']) + intval($mc);
+        $etotal_kg = intval($exportdata['total_kg']) + intval($kg);
+        $echarges = intval($exportrate) * intval($kg);
+        $totalexportcharges = intval($exportdata['total_charges']) + intval($echarges);
+      }else{
+        $etotal_mc = intval($mc);
+        $etotal_kg = intval($kg);
+        $echarges = intval($exportrate) * intval($kg);
+        $totalexportcharges = intval($echarges);
+      }
+    }else{
+      $etotal_mc = intval($mc);
+      $etotal_kg = intval($kg);
+      $echarges = intval($exportrate) * intval($kg);
+      $totalexportcharges = intval($echarges);
+    }
+
+    // Add Stock
+    $stockstmt = $pdo->prepare("SELECT * FROM mslstock WHERE item_id='$item_id' ORDER BY id DESC");
+    $stockstmt->execute();
+    $stockdata = $stockstmt->fetch(PDO::FETCH_ASSOC);
+
+    $smc = $mc;
+    $skg = $kg;
+    $total_mc = $stockdata['total_mc'] - $mc;
+    $total_kg = $stockdata['total_kg'] - $kg;
+
+    $coldstorestmt = $pdo->prepare("INSERT INTO mslcoldstore(indate, outdate, item_id, mc, total_mc, kg, total_kg, day, rate, charges, total_charges) VALUES('$indate','$outdate','$item_id', '$mc','$dtotal_mc','$kg','$dtotal_kg','$day','$coldstorerate','$charges','$total_charges')");
+    $coldstorestmt->execute();
+    $labourstmt = $pdo->prepare("INSERT INTO mslfreezing(indate, outdate, item_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$item_id', '$mc','$ftotal_mc','$kg','$ftotal_kg','$freezingrate','$fcharges','$totalfreezingcharges')");
+    $labourstmt->execute();
+    $processingstmt = $pdo->prepare("INSERT INTO mslexportcharges(indate, outdate, item_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$item_id', '$mc','$etotal_mc','$kg','$etotal_kg','$exportrate','$echarges','$totalexportcharges')");
+    $processingstmt->execute();
+    $stockstmt = $pdo->prepare("INSERT INTO mslstock(outdate, item_id, mc, total_mc, kg, total_kg) VALUES('$outdate', '$item_id', '$smc', '$total_mc', '$skg', '$total_kg')");
+    $stockstmt->execute();
+
+    $datastmt = $pdo->prepare("SELECT * FROM msl_total_charges ORDER BY id DESC");
+    $datastmt->execute();
+    $data = $datastmt->fetch(PDO::FETCH_ASSOC);
+
+    if(!empty($loose_kg) && !empty($loose_mc)){
+      $totalcoldstorestmt = $pdo->prepare("SELECT * FROM mslcoldstore ORDER BY id DESC");
+      $totalcoldstorestmt->execute();
+      $totalcoldstoredata = $totalcoldstorestmt->fetch(PDO::FETCH_ASSOC);
+
+      $totalfreezingstmt = $pdo->prepare("SELECT * FROM mslfreezing  ORDER BY id DESC");
+      $totalfreezingstmt->execute();
+      $totalfreezingdata = $totalfreezingstmt->fetch(PDO::FETCH_ASSOC);
+
+      $totalexportstmt = $pdo->prepare("SELECT * FROM mslexportcharges ORDER BY id DESC");
+      $totalexportstmt->execute();
+      $totalexportdata = $totalexportstmt->fetch(PDO::FETCH_ASSOC);
+      $coldstoretotal_mc = $totalcoldstoredata['total_mc'] + intval($loose_mc);
+      $coldstoretotal_kg = $totalcoldstoredata['total_kg'] + intval($loose_kg);
+      $freezingtotal_mc = $totalfreezingdata['total_mc'] + intval($loose_mc);
+      $freezingtotal_kg = $totalfreezingdata['total_kg'] + intval($loose_kg);
+      $exporttotal_mc = $totalexportdata['total_mc'] + intval($loose_mc);
+      $exporttotal_kg = $totalexportdata['total_kg'] + intval($loose_kg);
+
+      $loose_total_charges = $loose_kg * $day * $coldstorerate;
+      $loosetotalfreezingcharges = $loose_kg * $freezingrate;
+      $loosetotalexportcharges = $loose_kg * $exportrate;
+
+      $totalcoldstorecharges = $totalcoldstoredata['total_charges'] + $loose_total_charges;
+      $totalfreezingdatacharges = $totalfreezingdata['total_charges'] + $loosetotalfreezingcharges;
+      $totalexportdatacharges = $totalexportdata['total_charges'] + $loosetotalexportcharges;
+
+      $coldstorestmt = $pdo->prepare("INSERT INTO mslcoldstore(indate, item_id, mc, total_mc, kg, total_kg, day, rate, charges, total_charges) VALUES('$indate','$item_id', '$loose_mc','$coldstoretotal_mc','$loose_kg','$coldstoretotal_kg','$day','$coldstorerate','$loose_total_charges','$totalcoldstorecharges')");
+      $coldstorestmt->execute();
+      $labourstmt = $pdo->prepare("INSERT INTO mslfreezing(indate, item_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$item_id', '$loose_mc','$freezingtotal_mc','$loose_kg','$ftotal_kg','$freezingtotal_kg','$loosetotalfreezingcharges','$totalfreezingdatacharges')");
+      $labourstmt->execute();
+      $processingstmt = $pdo->prepare("INSERT INTO mslexportcharges(indate, item_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$item_id', '$loose_mc','$exporttotal_mc','$loose_kg','$etotal_kg','$exporttotal_kg','$loosetotalexportcharges','$totalexportdatacharges')");
+      $processingstmt->execute();
+    }
+
+    $totalcoldstorestmt = $pdo->prepare("SELECT * FROM mslcoldstore ORDER BY id DESC");
+    $totalcoldstorestmt->execute();
+    $totalcoldstoredata = $totalcoldstorestmt->fetch(PDO::FETCH_ASSOC);
+
+    $totalfreezingstmt = $pdo->prepare("SELECT * FROM mslfreezing  ORDER BY id DESC");
+    $totalfreezingstmt->execute();
+    $totalfreezingdata = $totalfreezingstmt->fetch(PDO::FETCH_ASSOC);
+
+    $totalexportstmt = $pdo->prepare("SELECT * FROM mslexportcharges ORDER BY id DESC");
+    $totalexportstmt->execute();
+    $totalexportdata = $totalexportstmt->fetch(PDO::FETCH_ASSOC);
+
+    $totalchargesstmt = $pdo->prepare("SELECT * FROM msl_total_charges ORDER BY id DESC");
+    $totalchargesstmt->execute();
+    $totalchargesdata = $totalchargesstmt->fetch(PDO::FETCH_ASSOC);
+
+
+    if(!empty($totalchargesdata)){
+      $total_coldstore_charges = $totalcoldstoredata['total_charges'];
+      $total_freezing_charges = $totalfreezingdata['total_charges'];
+      $total_export_charges = $totalexportdata['total_charges'];
+      $total_charges = $totalcoldstoredata['total_charges'] + $totalfreezingdata['total_charges'] + $totalexportdata['total_charges'];
+      $grand_total_charges = $totalchargesdata['balance_amount'] + $total_charges;
+      $balance_amount = intval($grand_total_charges);
+    }else{
+      $total_coldstore_charges = $totalcoldstoredata['total_charges'];
+      $total_freezing_charges = $totalfreezingdata['total_charges'];
+      $total_export_charges = $totalexportdata['total_charges'];
+      $total_charges = $totalcoldstoredata['total_charges'] + $totalfreezingdata['total_charges'] + $totalexportdata['total_charges'];
+      $grand_total_charges = $total_charges;
+      $balance_amount = $grand_total_charges;
+    }
+
+    $stmt = $pdo->prepare("INSERT INTO msl_total_charges(item_id, total_coldstore_charges, total_freezing_charges, total_export_charges, total_charges, grand_total_charges, balance_amount) VALUES('$item_id','$total_coldstore_charges', '$total_freezing_charges', '$total_export_charges', '$total_charges', '$grand_total_charges', '$balance_amount')");
+    $stmt->execute();
+  }
+
+  function updatemslcoldstoretotal($id, $repacking_charges, $ice_charges){
+    global $pdo;
+
+    $totalchargesstmt = $pdo->prepare("SELECT * FROM msl_total_charges WHERE id='$id'");
+    $totalchargesstmt->execute();
+    $totalchargesdata =$totalchargesstmt->fetch(PDO::FETCH_ASSOC);
+
+    $idd = $id - 1;
+    $balancestmt = $pdo->prepare("SELECT * FROM msl_total_charges WHERE id='$idd'");
+    $balancestmt->execute();
+    $balancedata= $balancestmt->fetch(PDO::FETCH_ASSOC);
+
+    $total_charges = intval($repacking_charges) + intval($ice_charges) + $totalchargesdata['total_charges'];
+    $grand_total_charges = $balancedata['balance_amount'] + $total_charges;
+    $balance_amount = $grand_total_charges;
+    $updatestmt = $pdo->prepare("UPDATE msl_total_charges SET repacking_charges='$repacking_charges', ice_charges='$ice_charges', total_charges='$total_charges', grand_total_charges='$grand_total_charges', balance_amount='$balance_amount' WHERE id='$id'");
+    $updatestmt->execute();
+  }
 
   function paymsltotalcharges($payment_date, $payment_amount){
     global $pdo;
