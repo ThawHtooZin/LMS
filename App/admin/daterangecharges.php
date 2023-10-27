@@ -778,8 +778,18 @@ $query = new Query();
     </div>
     <!-- Add Modal -->
     <script type="text/javascript">
-      $("#commondity").change(function(){
+      $(document).ready(()=>{
         var commondity = $("#commondity").val();
+        $("#commondity").change(function(){
+          commondity = $("#commondity").val();
+          if(commondity.includes('B01') === true){
+            $(".processingratediv").hide();
+            $(".processingchargesdiv").show();
+          }else{
+            $(".processingratediv").show();
+            $(".processingchargesdiv").hide();
+          }
+        });
         if(commondity.includes('B01') === true){
           $(".processingratediv").hide();
           $(".processingchargesdiv").show();

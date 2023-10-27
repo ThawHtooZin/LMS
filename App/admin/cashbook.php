@@ -56,10 +56,10 @@ $query = new Query();
                 <?php
                 $cashnames = $query->selectdis("cashbook", 'ac_name');
                 foreach ($cashnames as $cashname) {
-                  if($cashname['ac_name'] == '3600/002'){
-                    $btnid = "usd";
-                  }elseif($cashname['ac_name'] == '3600/001'){
+                  if($cashname['ac_name'] == '3600/001'){
                     $btnid = 'ks';
+                  }elseif($cashname['ac_name'] == '3600/002'){
+                    $btnid = "usd";
                   }
                   $acnamedata = $query->select('acname', $cashname['ac_name'], 'code_no');
                   $acname = $acnamedata['ac_name'];
@@ -448,9 +448,10 @@ $query = new Query();
                       <td></td>
                       <td></td>
                       <td></td>
-                      <td><?php echo $debit ?></td>
+                      <td><?php if(!empty($debit)){ echo $debit;} ?></td>
                       <td><?php if(!empty($credit)){ echo $credit;} ?></td>
                       <td><?php echo $balance; ?></td>
+                      <td></td>
                     </tr>
                     <?php
                   }

@@ -65,10 +65,10 @@ $query = new Query();
     if(isset($_POST['addtotalbtn'])){
       $date = $_POST['date'];
       $plugoncharges = $_POST['plugoncharges'];
-      $payment_date = $_POST['payment_date'];
-      $payment_amount = $_POST['payment_amount'];
+      // $payment_date = $_POST['payment_date'];
+      // $payment_amount = $_POST['payment_amount'];
 
-      $query->addtotal($date, $plugoncharges, $payment_date, $payment_amount);
+      $query->addtotal($date, $plugoncharges);
     }
 
     if(isset($_POST['addpaymentbtn'])){
@@ -76,6 +76,12 @@ $query = new Query();
       $payment_amount = $_POST['payment_amount'];
       $id = $_POST['id'];
       $query->addpayment($payment_date, $payment_amount, $id);
+    }
+
+    if (isset($_POST['addopeningamountbtn'])) {
+      $openingamount = $_POST['openingamount'];
+
+      $query->addopeningamount($openingamount);
     }
 
      ?>
@@ -109,7 +115,8 @@ $query = new Query();
             <button type="submit" class="btn btn-success float-end addfishcharges" data-bs-toggle="modal" data-bs-target="#addfishcharges" name="fishcoldstorebtn">Add Fish Charges</button>
             <button type="submit" class="btn btn-success float-end hide adddryfishcharges" data-bs-toggle="modal" data-bs-target="#adddryfishcharges" name="dryfishcoldstorebtn">Add Dry Fish Charges</button>
             <button type="submit" class="btn btn-success float-end hide addrepackingout" data-bs-toggle="modal" data-bs-target="#addrepackingout" name="repackingbtn">Add Repacking Out</button>
-            <button type="submit" class="btn btn-success float-end hide addtotal" data-bs-toggle="modal" data-bs-target="#addtotal" name="totalbtn">Add Total Balance</button>
+            <button type="submit" class="btn btn-secondary ms-2 float-end hide addopening" data-bs-toggle="modal" data-bs-target="#addopening" name="addopening">Add Opening Balance</button>
+            <button type="submit" class="btn btn-success float-end hide addtotal" data-bs-toggle="modal" data-bs-target="#addtotal" name="addtotalbtn">Add Total Amount</button>
           </div>
           <div class="card-body">
             <div class="text-center">
@@ -126,16 +133,17 @@ $query = new Query();
             <div class="fishcoldstore hide">
               <table class="table table-striped table-bordered table-hover">
                 <tr>
-                  <th class="text-center">Id</th>
-                  <th class="text-center">Date</th>
-                  <th class="text-center">I.T.E</th>
-                  <th class="text-center">Mc</th>
-                  <th class="text-center">Total Mc</th>
-                  <th class="text-center">Kg</th>
-                  <th class="text-center">Total Kg</th>
-                  <th class="text-center">Rate</th>
-                  <th class="text-center">Charges</th>
-                  <th class="text-center">Total Charges</th>
+                  <th>Id</th>
+                  <th>Date</th>
+                  <th>I.T.E</th>
+                  <th>Mc</th>
+                  <th>Total Mc</th>
+                  <th>Kg</th>
+                  <th>Total Kg</th>
+                  <th>Rate</th>
+                  <th>Charges</th>
+                  <th>Total Charges</th>
+                  <th>Remark</th>
                 </tr>
                 <?php
                 $fishcoldstoredatas = $query->selectall('gfcfishcoldstore');
@@ -190,7 +198,29 @@ $query = new Query();
                       // } ?></td>-->
                       <td><?php  if($fishcoldstoredata['charges'] != 0){echo $fishcoldstoredata['charges'];} ?></td>
                       <td><?php  if($fishcoldstoredata['total_charges'] != 0){echo $fishcoldstoredata['total_charges'];} ?></td>
+                      <td data-bs-toggle="modal" data-bs-target="#editremarkfishcoldstore"><?php echo $fishcoldstoredata['remark']; ?></td>
                 </tr>
+                <div class="modal fade" id="editremarkfishcoldstore">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header bg-secondary text-light">
+                        <h1 class="modal-title fs-5">Edit Remark</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                    <form action="monthlycharges.php" method="post">
+                      <input type="hidden" name="fishcoldstoreid" value="<?php echo $fishcoldstoredata['id']; ?>">
+                      <div class="modal-body">
+                        <label>Remark</label>
+                        <input type="text" name="remarkfishcoldstore" class="form-control inpv2">
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" name="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
+                        <button type="submit" name="remarkfishcoldstorebtn" class="btn btn-success">Add</button>
+                      </div>
+                    </form>
+                    </div>
+                  </div>
+                </div>
                 <?php
                 }
                  ?>
@@ -199,13 +229,14 @@ $query = new Query();
             <div class="fishlabour hide">
               <table class="table table-striped table-bordered table-hover">
                 <tr>
-                  <th class="text-center">Id</th>
-                  <th class="text-center">Date</th>
-                  <th class="text-center">I.T.E</th>
-                  <th class="text-center">Kg</th>
-                  <th class="text-center">Rate</th>
-                  <th class="text-center">Charges</th>
-                  <th class="text-center">Total Charges</th>
+                  <th>Id</th>
+                  <th>Date</th>
+                  <th>I.T.E</th>
+                  <th>Kg</th>
+                  <th>Rate</th>
+                  <th>Charges</th>
+                  <th>Total Charges</th>
+                  <th>Remark</th>
                 </tr>
                 <?php
                 $fishlabourdatas = $query->selectall("gfcfishlabour");
@@ -221,7 +252,28 @@ $query = new Query();
                   <td><?php echo $fishlabourdata['rate']; ?></td>
                   <td><?php echo $fishlabourdata['charges']; ?></td>
                   <td><?php echo $fishlabourdata['total_charges']; ?></td>
+                  <td><?php echo $fishlabourdata['remark']; ?></td>
                 </tr>
+                <div class="modal fade" id="editremarkfishcoldstore">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header bg-secondary text-light">
+                        <h1 class="modal-title fs-5">Edit Remark</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                    <form action="monthlycharges.php" method="post">
+                      <div class="modal-body">
+                        <label>Remark</label>
+                        <input type="text" name="remarkfishlabour" class="form-control inpv2">
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" name="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
+                        <button type="submit" name="remarkfishlabourbtn" class="btn btn-success">Add</button>
+                      </div>
+                    </form>
+                    </div>
+                  </div>
+                </div>
                 <?php
                 }
                  ?>
@@ -230,14 +282,15 @@ $query = new Query();
             <div class="dryfishcoldstore hide">
               <table class="table table-striped table-bordered table-hover">
                 <tr>
-                  <th class="text-center">Id</th>
-                  <th class="text-center">Date</th>
-                  <th class="text-center">I.T.E</th>
-                  <th class="text-center">Kg</th>
-                  <th class="text-center">Total Kg</th>
-                  <th class="text-center">Rate</th>
-                  <th class="text-center">Charges</th>
-                  <th class="text-center">Total Charges</th>
+                  <th>Id</th>
+                  <th>Date</th>
+                  <th>I.T.E</th>
+                  <th>Kg</th>
+                  <th>Total Kg</th>
+                  <th>Rate</th>
+                  <th>Charges</th>
+                  <th>Total Charges</th>
+                  <th>Remark</th>
                 </tr>
                 <?php
                 $dryfishcoldstoredatas = $query->selectall("gfcdryfishcoldstore");
@@ -254,7 +307,28 @@ $query = new Query();
                   <td><?php echo $dryfishcoldstoredata['rate']; ?></td>
                   <td><?php if($dryfishcoldstoredata['charges'] != 0){ echo $dryfishcoldstoredata['charges']; } ?></td>
                   <td><?php if($dryfishcoldstoredata['total_charges'] != 0){ echo $dryfishcoldstoredata['total_charges']; } ?></td>
+                  <td><?php echo $fishlabourdata['remark']; ?></td>
                 </tr>
+                <div class="modal fade" id="editremarkfishcoldstore">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header bg-secondary text-light">
+                        <h1 class="modal-title fs-5">Edit Remark</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                    <form action="monthlycharges.php" method="post">
+                      <div class="modal-body">
+                        <label>Remark</label>
+                        <input type="text" name="remarkdryfishcoldstore" class="form-control inpv2">
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" name="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
+                        <button type="submit" name="remarkdryfishcoldstorebtn" class="btn btn-success">Add</button>
+                      </div>
+                    </form>
+                    </div>
+                  </div>
+                </div>
                 <?php
                 }
                  ?>
@@ -263,13 +337,14 @@ $query = new Query();
             <div class="dryfishlabour hide">
               <table class="table table-striped table-bordered table-hover">
                 <tr>
-                  <th class="text-center">Id</th>
-                  <th class="text-center">Date</th>
-                  <th class="text-center">I.T.E</th>
-                  <th class="text-center">Kg</th>
-                  <th class="text-center">Rate</th>
-                  <th class="text-center">Charges</th>
-                  <th class="text-center">Total Charges</th>
+                  <th>Id</th>
+                  <th>Date</th>
+                  <th>I.T.E</th>
+                  <th>Kg</th>
+                  <th>Rate</th>
+                  <th>Charges</th>
+                  <th>Total Charges</th>
+                  <th>Remark</th>
                 </tr>
                 <?php
                 $dryfishlabourdatas = $query->selectall("gfcdryfishlabour");
@@ -285,7 +360,28 @@ $query = new Query();
                   <td><?php echo $dryfishlabourdata['rate']; ?></td>
                   <td><?php echo $dryfishlabourdata['charges']; ?></td>
                   <td><?php echo $dryfishlabourdata['total_charges']; ?></td>
+                  <td><?php echo $fishlabourdata['remark']; ?></td>
                 </tr>
+                <div class="modal fade" id="editremarkfishcoldstore">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header bg-secondary text-light">
+                        <h1 class="modal-title fs-5">Edit Remark</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                    <form action="monthlycharges.php" method="post">
+                      <div class="modal-body">
+                        <label>Remark</label>
+                        <input type="text" name="remarkdryfishlabour" class="form-control inpv2">
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" name="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
+                        <button type="submit" name="remarkdryfishlabour" class="btn btn-success">Add</button>
+                      </div>
+                    </form>
+                    </div>
+                  </div>
+                </div>
                 <?php
                 }
                  ?>
@@ -294,12 +390,12 @@ $query = new Query();
             <div class="repackingout hide">
               <table class="table table-striped table-bordered table-hover">
                 <tr>
-                  <th class="text-center">Id</th>
-                  <th class="text-center">Date</th>
-                  <th class="text-center">Out Kg</th>
-                  <th class="text-center">Rate</th>
-                  <th class="text-center">Charges</th>
-                  <th class="text-center">Total Charges</th>
+                  <th>Id</th>
+                  <th>Date</th>
+                  <th>Out Kg</th>
+                  <th>Rate</th>
+                  <th>Charges</th>
+                  <th>Total Charges</th>
                 </tr>
                 <?php
                 $repackingoutdatas = $query->selectall('repackingout');
@@ -342,7 +438,7 @@ $query = new Query();
                 foreach ($totaldatas as $totaldata) {
                   $idd++;
                   ?>
-                  <tr data-bs-toggle="modal" data-bs-target="#addpayment<?php echo $totaldata['id']; ?>">
+                  <tr <?php if($totaldata['payment_date'] != '0000-00-00' || $totaldata['total_charges'] != 0){ ?>data-bs-toggle="modal" data-bs-target="#addpayment<?php echo $totaldata['id']; ?>"<?php } ?>>
                     <td style="font-size:13px;"><?php if($totaldata['date'] != '0000-00-00'){echo $idd;} ?></td>
                     <td style="font-size:13px;"><?php if($totaldata['date'] != '0000-00-00'){echo date('d-m-Y', strtotime($totaldata['date']));} ?></td>
                     <td style="font-size:13px;"><?php if($totaldata['totalfishcoldstorecharges'] != '0'){echo $totaldata['totalfishcoldstorecharges'];} ?></td>
@@ -495,6 +591,7 @@ $query = new Query();
       document.querySelector(".adddryfishcharges").classList.add('hide');
       document.querySelector(".addrepackingout").classList.add('hide');
       document.querySelector(".addtotal").classList.remove('hide');
+      document.querySelector(".addopening").classList.remove('hide');
     }
     </script>
     <?php
