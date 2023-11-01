@@ -79,9 +79,10 @@ $query = new Query();
       $kg = $_POST['kg'];
       $coldstorerate = $_POST['coldstorerate'];
       $labourrate = $_POST['labourrate'];
-      $processingrate = $_POST['processingrate'];
+      $processingrate = $_POST['upprocessingrate'];
+      $upprocessingcharges = $_POST['upprocessingcharges'];
       $updateid = $_POST['updateid'];
-      $query->updatecoldstore($indate, $outdate, $commondity_id,  $mc, $kg, $coldstorerate, $labourrate, $processingrate, $updateid);
+      $query->updatecoldstore($indate, $outdate, $commondity_id,  $mc, $kg, $coldstorerate, $labourrate, $processingrate, $upprocessingcharges, $updateid);
     }
 
      ?>
@@ -131,19 +132,19 @@ $query = new Query();
             <div class="coldstorecharges hide">
                 <table class="table table-striped table-bordered table-hover">
                   <tr>
-                    <th class="text-center">Id</th>
-                    <th class="text-center">In Date</th>
-                    <th class="text-center">Out Date</th>
-                    <th class="text-center">Commondity</th>
-                    <th class="text-center">Mc</th>
-                    <th class="text-center">Total Mc</th>
-                    <th class="text-center">Kg</th>
-                    <th class="text-center">Total Kg</th>
-                    <th class="text-center">Day</th>
-                    <th class="text-center">Rate</th>
-                    <th class="text-center">Charges</th>
-                    <th class="text-center">Total Charges</th>
-                    <th class="text-center">Action</th>
+                    <th>Id</th>
+                    <th>In Date</th>
+                    <th>Out Date</th>
+                    <th>Commondity</th>
+                    <th>Mc</th>
+                    <th>Total Mc</th>
+                    <th>Kg</th>
+                    <th>Total Kg</th>
+                    <th>Day</th>
+                    <th>Rate</th>
+                    <th>Charges</th>
+                    <th>Total Charges</th>
+                    <th>Action</th>
                   </tr>
                   <?php
 
@@ -156,10 +157,18 @@ $query = new Query();
                     $commonditystmt->execute();
                     $commonditydata = $commonditystmt->fetchall();
                     $commondity_id = $commonditydata[$i]['commondity_id'];
-
+                    $commonditydata = $query->select('category', $commondity_id, 'category_id');
                   $stmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='$commondity_id'");
                   $stmt->execute();
                   $datas = $stmt->fetchall();
+
+                  ?>
+                  <tr style="font-weight:bold;">
+                    <td><?= $commonditydata['category_name']; ?></td>
+                    <td colspan="12"></td>
+                  </tr>
+                  <?php
+
                   foreach ($datas as $data) {
                     $idd++;
                     $item_id = $data['commondity_id'];
@@ -237,12 +246,12 @@ $query = new Query();
                             <div class="row" style="margin-bottom: 10px !important;">
                               <div class="col">
                                 <label>Commondity</label>
-                                <select class="form-control inpv2" name="commondity_id">
+                                <select class="form-control inpv2" name="commondity_id" id="upcommondity<?= $id; ?>">
                                   <?php
                                   $commonditydatas = $query->selectall('category');
                                   foreach ($commonditydatas as $commonditydata) {
                                     ?>
-                                    <option value="<?php echo $commonditydata['category_id']; ?>"><?php echo $commonditydata['category_name']; ?></option>
+                                    <option value="<?php echo $commonditydata['category_id']; ?>" <?php if($commonditydata['category_id'] == $data['commondity_id']){ echo "selected"; } ?>><?php echo $commonditydata['category_name']; ?></option>
                                     <?php
                                   }
                                   ?>
@@ -259,8 +268,14 @@ $query = new Query();
                                 <input type="text" name="labourrate" class="form-control inpv2" value="<?php echo $labourdataup['rate'];  ?>">
                               </div>
                             <div class="col">
-                              <label style="font-weight: bold;">Processing Rate</label>
-                              <input type="text" name="processingrate" class="form-control inpv2" value="<?php echo $processingdataup['rate'];  ?>">
+                              <div class="upprocessingratediv<?= $id; ?>">
+                                <label style="font-weight: bold;">Processing Rate</label>
+                                <input type="text" name="upprocessingrate" class="form-control inpv2" value="<?php echo $processingdataup['rate'];  ?>">
+                              </div>
+                              <div class="upprocessingchargesdiv<?= $id; ?> hide">
+                                <label style="font-weight: bold;">Processing Charges</label>
+                                <input type="number" name="upprocessingcharges" class="form-control inpv2" value="<?php echo $processingdataup['charges'];  ?>">
+                              </div>
                             </div>
                             </div>
                           </div>
@@ -274,6 +289,29 @@ $query = new Query();
                     </div>
                   </div>
                   <?php
+
+                   ?>
+                  <script type="text/javascript">
+                    var upcommondity<?= $id; ?> = $("#upcommondity<?= $id; ?>").val();
+                    $("#upcommondity<?= $id; ?>").change(function(){
+                      upcommondity<?= $id; ?> = $("#upcommondity<?= $id; ?>").val();
+                      if(upcommondity<?= $id; ?>.includes('B01') === true){
+                        $(".upprocessingratediv<?= $id; ?>").hide();
+                        $(".upprocessingchargesdiv<?= $id; ?>").show();
+                      }else{
+                        $(".upprocessingratediv<?= $id; ?>").show();
+                        $(".upprocessingchargesdiv<?= $id; ?>").hide();
+                      }
+                    });
+                    if(upcommondity<?= $id; ?>.includes('B01') === true){
+                      $(".upprocessingratediv<?= $id; ?>").hide();
+                      $(".upprocessingchargesdiv<?= $id; ?>").show();
+                    }else{
+                      $(".upprocessingratediv<?= $id; ?>").show();
+                      $(".upprocessingchargesdiv<?= $id; ?>").hide();
+                    }
+                  </script>
+                  <?php
                   }
                 }
                  ?>
@@ -282,17 +320,17 @@ $query = new Query();
             <div class="labourcharges hide">
               <table class="table table-striped table-bordered table-hover">
                 <tr>
-                  <th class="text-center">Id</th>
-                  <th class="text-center">In Date</th>
-                  <th class="text-center">Out Date</th>
-                  <th class="text-center">Commondity</th>
-                  <th class="text-center">Mc</th>
-                  <th class="text-center">Total Mc</th>
-                  <th class="text-center">Kg</th>
-                  <th class="text-center">Total Kg</th>
-                  <th class="text-center">Rate</th>
-                  <th class="text-center">Charges</th>
-                  <th class="text-center">Total Charges</th>
+                  <th>Id</th>
+                  <th>In Date</th>
+                  <th>Out Date</th>
+                  <th>Commondity</th>
+                  <th>Mc</th>
+                  <th>Total Mc</th>
+                  <th>Kg</th>
+                  <th>Total Kg</th>
+                  <th>Rate</th>
+                  <th>Charges</th>
+                  <th>Total Charges</th>
                 </tr>
                 <?php
                 $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM labour");
@@ -308,6 +346,15 @@ $query = new Query();
                 $labourstmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id'");
                 $labourstmt->execute();
                 $labourdatas = $labourstmt->fetchall();
+
+                $commonditydata = $query->select('category', $commondity_id, 'category_id');
+                ?>
+                <tr style="font-weight:bold;">
+                  <td><?= $commonditydata['category_name']; ?></td>
+                  <td colspan="12"></td>
+                </tr>
+                <?php
+
                 foreach ($labourdatas as $labourdata) {
                   $idd++;
                   $item_id = $labourdata['commondity_id'];
@@ -339,17 +386,17 @@ $query = new Query();
             <div class="processingcharges hide">
               <table class="table table-striped table-bordered table-hover">
                 <tr>
-                  <th class="text-center">Id</th>
-                  <th class="text-center">In Date</th>
-                  <th class="text-center">Out Date</th>
-                  <th class="text-center">Commondity</th>
-                  <th class="text-center">Mc</th>
-                  <th class="text-center">Total Mc</th>
-                  <th class="text-center">Kg</th>
-                  <th class="text-center">Total Kg</th>
-                  <th class="text-center">Rate</th>
-                  <th class="text-center">Charges</th>
-                  <th class="text-center">Total Charges</th>
+                  <th>Id</th>
+                  <th>In Date</th>
+                  <th>Out Date</th>
+                  <th>Commondity</th>
+                  <th>Mc</th>
+                  <th>Total Mc</th>
+                  <th>Kg</th>
+                  <th>Total Kg</th>
+                  <th>Rate</th>
+                  <th>Charges</th>
+                  <th>Total Charges</th>
                 </tr>
                 <?php
                 $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM processing");
@@ -365,6 +412,15 @@ $query = new Query();
                 $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id'");
                 $processingstmt->execute();
                 $processingdatas = $processingstmt->fetchall();
+                $commonditydata = $query->select('category', $commondity_id, 'category_id');
+
+                ?>
+                <tr style="font-weight:bold;">
+                  <td><?= $commonditydata['category_name']; ?></td>
+                  <td colspan="12"></td>
+                </tr>
+                <?php
+
                 foreach ($processingdatas as $processingdata) {
                   $idd++;
                   $item_id = $processingdata['commondity_id'];
@@ -397,20 +453,20 @@ $query = new Query();
             <div class="totalcharges hide">
               <table class="table table-striped table-bordered table-hover">
                 <tr style="font-size:13px;">
-                  <th class="text-center">Id</th>
-                  <th class="text-center">Commondity</th>
-                  <th class="text-center">Total Cold Store Charges</th>
-                  <th class="text-center">Total Labour Charges</th>
-                  <th class="text-center">Total Processing Charges</th>
-                  <th class="text-center">Repacking Charges</th>
-                  <th class="text-center">Ice Charges</th>
-                  <th class="text-center">OT Charges</th>
-                  <th class="text-center">Total Charges</th>
-                  <th class="text-center">Grand Total Charges</th>
-                  <th class="text-center">Payment Date</th>
-                  <th class="text-center">Payment Amount</th>
-                  <th class="text-center">Balance Amount</th>
-                  <th class="text-center">Remark</th>
+                  <th>Date</th>
+                  <th>Commondity</th>
+                  <th>Total Cold Store Charges</th>
+                  <th>Total Labour Charges</th>
+                  <th>Total Processing Charges</th>
+                  <th>Repacking Charges</th>
+                  <th>Ice Charges</th>
+                  <th>OT Charges</th>
+                  <th>Total Charges</th>
+                  <th>Grand Total Charges</th>
+                  <th>Payment Date</th>
+                  <th>Payment Amount</th>
+                  <th>Balance Amount</th>
+                  <th>Remark</th>
                 </tr>
                 <?php
                 $totalstmt = $pdo->prepare("SELECT * FROM total_charges");
@@ -423,7 +479,8 @@ $query = new Query();
                   $commonditydata = $query->select('category', $item_id, 'category_id');
                 ?>
                 <tr data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>">
-                  <td><?php echo $idd; ?></td>
+                  <!-- <td><?php echo $idd; ?></td> -->
+                  <td style="width: 80px;"><?php if($total_charges_data['date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($total_charges_data['date']));} ; ?></td>
                   <td><?php if(!empty($commonditydata['category_name'])){ echo $commonditydata['category_name'];} ; ?></td>
                   <td><?php if($total_charges_data['total_coldstore_charges'] != "0"){ echo $total_charges_data['total_coldstore_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['total_labour_charges'] != "0"){ echo $total_charges_data['total_labour_charges'];} ; ?></td>

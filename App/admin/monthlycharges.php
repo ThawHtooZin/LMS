@@ -84,6 +84,35 @@ $query = new Query();
       $query->addopeningamount($openingamount);
     }
 
+    // Remark Adding Query
+    if(isset($_POST['remarkfishcoldstorebtn'])){
+      $updateid = $_POST['fishcoldstoreid'];
+      $remarkfishcoldstore = $_POST['remarkfishcoldstore'];
+
+      $query->addremarkmonthly('gfcfishcoldstore', $remarkfishcoldstore, $updateid);
+    }
+
+    if(isset($_POST['remarkfishlabourbtn'])){
+      $updateid = $_POST['fishlabourid'];
+      $remarkfishlabour = $_POST['remarkfishlabour'];
+
+      $query->addremarkmonthly('gfcfishlabour', $remarkfishlabour, $updateid);
+    }
+
+    if(isset($_POST['remarkdryfishcoldstorebtn'])){
+      $updateid = $_POST['dryfishcoldstoreid'];
+      $remarkdryfishcoldstore = $_POST['remarkdryfishcoldstore'];
+
+      $query->addremarkmonthly('gfcdryfishcoldstore', $remarkdryfishcoldstore, $updateid);
+    }
+
+    if(isset($_POST['remarkdryfishlabourbtn'])){
+      $updateid = $_POST['dryfishlabourid'];
+      $remarkdryfishlabour = $_POST['remarkdryfishlabour'];
+
+      $query->addremarkmonthly('gfcdryfishlabour', $remarkdryfishlabour, $updateid);
+    }
+
      ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
@@ -133,7 +162,6 @@ $query = new Query();
             <div class="fishcoldstore hide">
               <table class="table table-striped table-bordered table-hover">
                 <tr>
-                  <th>Id</th>
                   <th>Date</th>
                   <th>I.T.E</th>
                   <th>Mc</th>
@@ -144,6 +172,7 @@ $query = new Query();
                   <th>Charges</th>
                   <th>Total Charges</th>
                   <th>Remark</th>
+                  <th>Action</th>
                 </tr>
                 <?php
                 $fishcoldstoredatas = $query->selectall('gfcfishcoldstore');
@@ -163,10 +192,25 @@ $query = new Query();
                   $istakeoutstmt->execute();
                   $istakeout = $istakeoutstmt->fetchColumn();
 
-                  // print_r($istakeout);
+                  $lastid = $fishcoldstoredata['id'] - 1;
+                  $lastrowdatastmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id='$lastid'");
+                  $lastrowdatastmt->execute();
+                  $lastrowdata = $lastrowdatastmt->fetch(PDO::FETCH_ASSOC);
+                  if (!empty($lastrowdata)) {
+                    $lastyearmonth = date("Y-m", strtotime($lastrowdata['date']));
+                    $nowyearmonth = date("Y-m", strtotime($fishcoldstoredata['date']));
+                    if ($lastyearmonth != $nowyearmonth) {
+                      ?>
+                      <tr>
+
+                        <td style="font-weight:bold;"><?=$monthName = date("F", mktime(0, 0, 0, date('m', strtotime($fishcoldstoredata['date'])), 1)); ?></td>
+                        <td colspan="10"></td>
+                      </tr>
+                      <?php
+                    }
+                  }
                  ?>
                 <tr>
-                  <td><?php echo $idd; ?></td>
                   <td><?php echo date('d-m-Y', strtotime($fishcoldstoredata['date'])); ?></td>
                   <td><?php echo $fishcoldstoredata['ite']; ?></td>
                   <td><?php if($fishcoldstoredata['mc'] == '0'){ echo "";}else{ echo $fishcoldstoredata['mc']; }; ?></td>
@@ -174,48 +218,87 @@ $query = new Query();
                   <td><?php echo $fishcoldstoredata['kg']; ?></td>
                   <td><?php echo $fishcoldstoredata['total_kg']; ?></td>
                   <td><?php echo $fishcoldstoredata['rate']; ?></td>
-                  <!-- <td><?php// if($fishcoldstoredata['charges'] != 0){
-                     //if($exportcount != 1){
-                         //if($fishcoldstoredata['ite'] == 'import'){
-                           //echo $fishcoldstoredata['charges'];
-                         //}elseif($istakeout == 1 || $istakeout == 2){
-                           //echo $fishcoldstoredata['charges'];
-                         //}
-                       //}else{
-                         //echo $fishcoldstoredata['charges'];
-                       //}
-                      //} ?></td>
-                  <td><?php //if($fishcoldstoredata['total_charges'] != 0){
-                     //if($exportcount != 1){
-                         //if($fishcoldstoredata['ite'] == 'import'){
-                           //echo $fishcoldstoredata['total_charges'];
-                         //}elseif($istakeout == 1 && $istakeout == 2){
-                           //echo $fishcoldstoredata['total_charges'];
-                         //}
-                       //}else{
-                         //echo $fishcoldstoredata['total_charges'];
-                       //}
-                      // } ?></td>-->
-                      <td><?php  if($fishcoldstoredata['charges'] != 0){echo $fishcoldstoredata['charges'];} ?></td>
-                      <td><?php  if($fishcoldstoredata['total_charges'] != 0){echo $fishcoldstoredata['total_charges'];} ?></td>
-                      <td data-bs-toggle="modal" data-bs-target="#editremarkfishcoldstore"><?php echo $fishcoldstoredata['remark']; ?></td>
+                  <td><?php  if($fishcoldstoredata['charges'] != 0){echo $fishcoldstoredata['charges'];} ?></td>
+                  <td><?php  if($fishcoldstoredata['total_charges'] != 0){echo $fishcoldstoredata['total_charges'];} ?></td>
+                  <td data-bs-toggle="modal" data-bs-target="#editremarkfishcoldstore<?= $fishcoldstoredata['id'];  ?>"><?php echo $fishcoldstoredata['remark']; ?></td>
+                  <td>
+                    <button type="submit" class="btn btn-warning btn-sm text-light d-inline" data-bs-toggle="modal" data-bs-target="#updatemodal<?= $fishcoldstoredata['id']; ?>"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                        <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                      </svg>
+                    </button>
+                  </td>
                 </tr>
-                <div class="modal fade" id="editremarkfishcoldstore">
+                <div class="modal fade" id="updatemodal<?= $fishcoldstoredata['id']; ?>">
+                  <div class="modal-dialog">
+                    <div class="modal-content" style="width: 650px;">
+                      <div class="modal-header bg-secondary text-light">
+                        <h1 class="modal-title fs-5">Edit Fish ColdStore Remark</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                    <form action="monthlycharges.php" method="post">
+                      <input type="hidden" name="fishcoldstoreid" value="<?php echo $fishcoldstoredata['id']; ?>">
+                      <div class="modal-body">
+                        <div class="row">
+                          <div class="col">
+                            <label>Date</label>
+                            <input type="date" name="datefishcoldstore" class="form-control inpv2" value="<?php if(!empty($fishcoldstoredata['date'])){ echo $fishcoldstoredata['date']; } ?>">
+                          </div>
+                          <div class="col">
+                            <label>I.T.E</label>
+                            <select class="form-control inpv2 mb-2" name="ite">
+                              <option <?php if($fishcoldstoredata['ite'] == 'import'){ echo "selected"; } ?> value="import">Import</option>
+                              <option <?php if($fishcoldstoredata['ite'] == 'export'){ echo "selected"; } ?> value="export">Export</option>
+                              <option <?php if($fishcoldstoredata['ite'] == 'takeout'){ echo "selected"; } ?> value="takeout">TakeOut</option>
+                              <option <?php if($fishcoldstoredata['ite'] == 'balance'){ echo "selected"; } ?> value="balance">Balance</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <label>Mc</label>
+                            <input type="number" name="mcfishcoldstore" class="form-control inpv2" value="<?php if(!empty($fishcoldstoredata['mc'])){ echo $fishcoldstoredata['mc']; } ?>">
+                          </div>
+                          <div class="col">
+                            <label>Kg</label>
+                            <input type="text" name="kgfishcoldstore" class="form-control inpv2" value="<?php if(!empty($fishcoldstoredata['kg'])){ echo $fishcoldstoredata['kg']; } ?>">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <label>Rate</label>
+                            <input type="text" name="ratefishcoldstore" class="form-control inpv2" value="<?php if(!empty($fishcoldstoredata['rate'])){ echo $fishcoldstoredata['rate']; } ?>">
+                          </div>
+                          <div class="col">
+                            <label>Remark</label>
+                            <input type="text" name="remarkfishcoldstore" class="form-control inpv2" value="<?php if(!empty($fishcoldstoredata['remark'])){ echo $fishcoldstoredata['remark']; } ?>">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" name="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
+                        <button type="submit" name="remarkfishcoldstorebtn" class="btn btn-success">Update</button>
+                      </div>
+                    </form>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal fade" id="editremarkfishcoldstore<?= $fishcoldstoredata['id'];  ?>">
                   <div class="modal-dialog">
                     <div class="modal-content">
                       <div class="modal-header bg-secondary text-light">
-                        <h1 class="modal-title fs-5">Edit Remark</h1>
+                        <h1 class="modal-title fs-5">Edit Fish ColdStore Remark</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                     <form action="monthlycharges.php" method="post">
                       <input type="hidden" name="fishcoldstoreid" value="<?php echo $fishcoldstoredata['id']; ?>">
                       <div class="modal-body">
                         <label>Remark</label>
-                        <input type="text" name="remarkfishcoldstore" class="form-control inpv2">
+                        <input type="text" name="remarkfishcoldstore" class="form-control inpv2" value="<?php if(!empty($fishcoldstoredata['remark'])){ echo $fishcoldstoredata['remark']; } ?>">
                       </div>
                       <div class="modal-footer">
                         <button type="button" name="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
-                        <button type="submit" name="remarkfishcoldstorebtn" class="btn btn-success">Add</button>
+                        <button type="submit" name="remarkfishcoldstorebtn" class="btn btn-success">Update</button>
                       </div>
                     </form>
                     </div>
@@ -252,23 +335,24 @@ $query = new Query();
                   <td><?php echo $fishlabourdata['rate']; ?></td>
                   <td><?php echo $fishlabourdata['charges']; ?></td>
                   <td><?php echo $fishlabourdata['total_charges']; ?></td>
-                  <td><?php echo $fishlabourdata['remark']; ?></td>
+                  <td data-bs-toggle="modal" data-bs-target="#editremarkfishlabour<?= $fishlabourdata['id'];  ?>"><?php echo $fishlabourdata['remark']; ?></td>
                 </tr>
-                <div class="modal fade" id="editremarkfishcoldstore">
+                <div class="modal fade" id="editremarkfishlabour<?= $fishlabourdata['id'];  ?>">
                   <div class="modal-dialog">
                     <div class="modal-content">
                       <div class="modal-header bg-secondary text-light">
-                        <h1 class="modal-title fs-5">Edit Remark</h1>
+                        <h1 class="modal-title fs-5">Edit Fish Labour Remark</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                     <form action="monthlycharges.php" method="post">
+                      <input type="hidden" name="fishlabourid" value="<?= $fishlabourdata['id']; ?>">
                       <div class="modal-body">
                         <label>Remark</label>
-                        <input type="text" name="remarkfishlabour" class="form-control inpv2">
+                        <input type="text" name="remarkfishlabour" class="form-control inpv2" value="<?php if(!empty($fishlabourdata['remark'])){ echo $fishlabourdata['remark']; } ?>">
                       </div>
                       <div class="modal-footer">
                         <button type="button" name="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
-                        <button type="submit" name="remarkfishlabourbtn" class="btn btn-success">Add</button>
+                        <button type="submit" name="remarkfishlabourbtn" class="btn btn-success">Update</button>
                       </div>
                     </form>
                     </div>
@@ -307,23 +391,24 @@ $query = new Query();
                   <td><?php echo $dryfishcoldstoredata['rate']; ?></td>
                   <td><?php if($dryfishcoldstoredata['charges'] != 0){ echo $dryfishcoldstoredata['charges']; } ?></td>
                   <td><?php if($dryfishcoldstoredata['total_charges'] != 0){ echo $dryfishcoldstoredata['total_charges']; } ?></td>
-                  <td><?php echo $fishlabourdata['remark']; ?></td>
+                  <td data-bs-toggle="modal" data-bs-target="#editremarkdryfishcoldstore<?= $dryfishcoldstoredata['id'];  ?>"><?php echo $dryfishcoldstoredata['remark']; ?></td>
                 </tr>
-                <div class="modal fade" id="editremarkfishcoldstore">
+                <div class="modal fade" id="editremarkdryfishcoldstore<?= $dryfishcoldstoredata['id'];  ?>">
                   <div class="modal-dialog">
                     <div class="modal-content">
                       <div class="modal-header bg-secondary text-light">
-                        <h1 class="modal-title fs-5">Edit Remark</h1>
+                        <h1 class="modal-title fs-5">Edit Dry Fish Cold Store Remark</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                     <form action="monthlycharges.php" method="post">
+                      <input type="hidden" name="dryfishcoldstoreid" value="<?= $dryfishcoldstoredata['id']; ?>">
                       <div class="modal-body">
                         <label>Remark</label>
-                        <input type="text" name="remarkdryfishcoldstore" class="form-control inpv2">
+                        <input type="text" name="remarkdryfishcoldstore" class="form-control inpv2" value="<?php if(!empty($dryfishcoldstoredata['remark'])){ echo $dryfishcoldstoredata['remark']; } ?>">
                       </div>
                       <div class="modal-footer">
                         <button type="button" name="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
-                        <button type="submit" name="remarkdryfishcoldstorebtn" class="btn btn-success">Add</button>
+                        <button type="submit" name="remarkdryfishcoldstorebtn" class="btn btn-success">Update</button>
                       </div>
                     </form>
                     </div>
@@ -360,23 +445,24 @@ $query = new Query();
                   <td><?php echo $dryfishlabourdata['rate']; ?></td>
                   <td><?php echo $dryfishlabourdata['charges']; ?></td>
                   <td><?php echo $dryfishlabourdata['total_charges']; ?></td>
-                  <td><?php echo $fishlabourdata['remark']; ?></td>
+                  <td data-bs-toggle="modal" data-bs-target="#editremarkdryfishlabour<?= $dryfishlabourdata['id'];  ?>"><?php echo $dryfishlabourdata['remark']; ?></td>
                 </tr>
-                <div class="modal fade" id="editremarkfishcoldstore">
+                <div class="modal fade" id="editremarkdryfishlabour<?= $dryfishlabourdata['id'];  ?>">
                   <div class="modal-dialog">
                     <div class="modal-content">
                       <div class="modal-header bg-secondary text-light">
-                        <h1 class="modal-title fs-5">Edit Remark</h1>
+                        <h1 class="modal-title fs-5">Edit Dry Fish Labour Remark</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                     <form action="monthlycharges.php" method="post">
+                      <input type="hidden" name="dryfishlabourid" value="<?= $dryfishlabourdata['id']; ?>">
                       <div class="modal-body">
                         <label>Remark</label>
-                        <input type="text" name="remarkdryfishlabour" class="form-control inpv2">
+                        <input type="text" name="remarkdryfishlabour" class="form-control inpv2" value="<?php if(!empty($dryfishlabourdata['remark'])){ echo $dryfishlabourdata['remark']; } ?>">
                       </div>
                       <div class="modal-footer">
                         <button type="button" name="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
-                        <button type="submit" name="remarkdryfishlabour" class="btn btn-success">Add</button>
+                        <button type="submit" name="remarkdryfishlabourbtn" class="btn btn-success">Update</button>
                       </div>
                     </form>
                     </div>

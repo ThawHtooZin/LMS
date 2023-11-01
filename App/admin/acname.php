@@ -99,7 +99,7 @@ $query = new Query();
                 $idd++;
                 $actype = $query->select('actype', $data['ac_type'], 'acid');
               ?>
-              <tr <?php if(!str_contains($data['code_no'], '4000/')){echo "data-bs-toggle='modal'";} ?> data-bs-target="#updatemodal<?php echo $data['id']; ?>">
+              <tr <?php if(!str_contains($data['code_no'], '4000/') && !str_contains($data['code_no'], '3300/')){echo "data-bs-toggle='modal'";} ?> data-bs-target="#updatemodal<?php echo $data['id']; ?>">
                 <td><?php echo $idd; ?></td>
                 <td><?php echo $data['code_no']; ?></td>
                 <td><?php echo $actype['ac_type']; ?></td>
@@ -141,10 +141,14 @@ $query = new Query();
                             <label>A/C Type</label>
                             <select class="form-control inpv2 mb-s" name="ac_type">
                               <?php
-                                $actypedatas = $query->selectall('actype');
-                               foreach ($actypedatas as $actypedata): ?>
-                               <option value="<?php echo $actypedata['acid']; ?>" <?php if($actypedata['acid'] == $updatedata['ac_type']){ echo "selected";} ?>><?php echo $actypedata['ac_type']; ?></option>
-                              <?php endforeach; ?>
+                                $actypedistdatas = $query->selectdis('actype', 'ac_type');
+                                foreach ($actypedistdatas as $actypedistdata) :
+                                  $actypedata = $query->select('actype', $actypedistdata['ac_type'], 'ac_type');
+                                ?>
+                                  <option value="<?php echo $actypedata['acid']; ?>" <?php if($actypedata['acid'] == $updatedata['ac_type']){ echo "selected";} ?>><?php echo $actypedata['ac_type']; ?></option>
+                                <?php
+                                endforeach;
+                                ?>
                             </select>
                           </div>
                         </div>

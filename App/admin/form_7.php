@@ -51,7 +51,7 @@ $query = new Query();
 
     if(isset($_POST['deleteform7'])){
       $deleteid = $_POST['deleteid'];
-      $query->deleteform7($deleteid);
+      $query->form7delete($deleteid);
     }
      ?>
     <div class="row">

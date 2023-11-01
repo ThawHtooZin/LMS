@@ -67,7 +67,7 @@ $query = new Query();
 
           <div class="card-header bg-info">
             <?php
-            if(empty($_SESSION['tabs']) || $_SESSION['tabs'] != 'actualinvoice' || $_SESSION['tabs'] != 'actualpackinglist' || $_SESSION['tabs'] != 'foambox' || $_SESSION['tabs'] != 'declare'){
+            if(empty($_SESSION['tabs']) && $_SESSION['tabs'] != 'actualinvoice' && $_SESSION['tabs'] != 'actualpackinglist' && $_SESSION['tabs'] != 'foambox' && $_SESSION['tabs'] != 'declare'){
               $_SESSION['tabs'] = 'default';
             }elseif(isset($_POST['actualinvoicebtn'])){
               $_SESSION['tabs'] = 'actualinvoice';
@@ -87,7 +87,7 @@ $query = new Query();
                 <button type="submit" class="btn btn-warning float-end btn-sm" id="actualinvoice" name="actualinvoicebtn">Actual Invoice</button>
                 <button type="submit" class="btn btn-secondary float-end btn-sm me-2" id="foambox" name="foamboxbtn">Foam Box</button>
                 <button type="submit" class="btn btn-primary float-end btn-sm me-2" id="declare" name="declarebtn">Declare List</button>
-                <button type="submit" class="btn btn-warning float-end btn-sm hide" id="actualinvoiceback" name="actualinvoiceback">Back</button>
+                <button type="submit" class="btn btn-danger float-end btn-sm hide" id="actualinvoiceback" name="actualinvoiceback">Back</button>
                 <button type="button" class="btn btn-success float-end me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#add" id="addpackingstockbtn">Add Packing Stock</button>
           </div>
         </form>
@@ -130,16 +130,12 @@ $query = new Query();
                   </tr>
                   <?php
                   $invoice_no = $_GET['invoice_no'];
-                  $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no'");
-                  $commonditycountstmt->execute();
-                  $commonditycountdatas = $commonditycountstmt->fetchColumn();
-                  for ($i=0; $i < $commonditycountdatas; $i++) {
-                      $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no'");
+                      $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' GROUP BY item_id");
                       $commonditystmt->execute();
-                      $commonditydata = $commonditystmt->fetchall();
-                      $item_id = $commonditydata[$i]['item_id'];
+                      $commonditydata = $commonditystmt->fetch(PDO::FETCH_ASSOC);
+                      $item_id = $commonditydata['item_id'];
 
-                      $sizecountsstmt = $pdo->prepare("SELECT COUNT(DISTINCT size) FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' AND item_id='$item_id'");
+                      $sizecountsstmt = $pdo->prepare("SELECT COUNT(DISTINCT size) FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no'");
                       $sizecountsstmt->execute();
                       $sizecountdatas = $sizecountsstmt->fetchColumn();
                       $no = 1;
@@ -150,7 +146,7 @@ $query = new Query();
                         $sizedata = $sizestmt->fetchall();
                         $size = $sizedata[$j]['size'];
 
-                        $stmt = $pdo->prepare("SELECT * FROM truckpackingliststockinfo WHERE size='$size' AND item_id='$item_id' AND invoice_no='$invoice_no'");
+                        $stmt = $pdo->prepare("SELECT * FROM truckpackingliststockinfo WHERE size='$size'  AND invoice_no='$invoice_no'");
                         $stmt->execute();
                         $datas = $stmt->fetchall();
                         foreach ($datas as $packingstockinfodata) {
@@ -201,7 +197,6 @@ $query = new Query();
                       <?php
                       $no++;
                       }
-                }
                    ?>
                    <?php
                    $item_id = $packingstockinfodata['item_id'];
@@ -815,7 +810,8 @@ $query = new Query();
          $("#pltext").show();
          $("#back").show();
          ';
-       }elseif($_SESSION['tabs'] == 'actualinvoice'){
+       }
+       if($_SESSION['tabs'] == 'actualinvoice'){
          echo '
          $("#declare").hide();
          $("#foambox").hide();
@@ -832,7 +828,8 @@ $query = new Query();
          $("#pltext").hide();
          $("#back").hide();
          ';
-       }elseif($_SESSION['tabs'] == 'actualpackinglist'){
+       }
+       if($_SESSION['tabs'] == 'actualpackinglist'){
          echo '
          $("#declare").show();
          $("#foambox").show();
@@ -849,7 +846,8 @@ $query = new Query();
          $("#pltext").show();
          $("#back").show();
          ';
-       }elseif($_SESSION['tabs'] == 'foambox'){
+       }
+       if($_SESSION['tabs'] == 'foambox'){
          echo '
          $("#declare").hide();
          $("#foambox").hide();
@@ -866,7 +864,8 @@ $query = new Query();
          $("#pltext").hide();
          $("#back").hide();
          ';
-       }elseif($_SESSION['tabs'] == 'declare'){
+       }
+       if($_SESSION['tabs'] == 'declare'){
          echo '
          $("#declare").hide();
          $("#foambox").hide();
