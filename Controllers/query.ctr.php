@@ -812,7 +812,6 @@ Class Query{
         }
       }
     }else{
-      echo "Noooooooooo";
       $ptotal_mc = intval($mc);
       $ptotal_kg = intval($kg);
       $pcharges = floatval($pcharges);
@@ -862,15 +861,13 @@ Class Query{
     $totalchargesdata = $totalchargesstmt->fetch(PDO::FETCH_ASSOC);
 
     if(!empty($totalchargesdata)){
-      // echo "YESSSSSSSSSSSSSS";
       $total_coldstore_charges = $totalcoldstoredata['total_charges'];
       $total_labour_charges = $totallabourdata['total_charges'];
-      echo $total_processing_charges = $totalprocessingdata['total_charges'];
+      $total_processing_charges = $totalprocessingdata['total_charges'];
       $total_charges = $totalcoldstoredata['total_charges'] + $totallabourdata['total_charges'] + $totalprocessingdata['total_charges'];
       $grand_total_charges = $totalchargesdata['balance_amount'] + $total_charges;
       $balance_amount = intval($grand_total_charges);
     }else{
-      // echo "NOOOOOOOOOOOOOOOOOOO";
       $total_coldstore_charges = $totalcoldstoredata['total_charges'];
       $total_labour_charges = $totallabourdata['total_charges'];
       $total_processing_charges = $totalprocessingdata['total_charges'];
@@ -878,7 +875,7 @@ Class Query{
       $grand_total_charges = $total_charges;
       $balance_amount = $grand_total_charges;
     }
-    echo $total_processing_charges;
+    // echo $total_processing_charges;
     $stmt = $pdo->prepare("INSERT INTO total_charges(date, commondity_id, total_coldstore_charges, total_labour_charges, total_processing_charges, total_charges, grand_total_charges, balance_amount) VALUES('$outdate', '$commondity_id','$total_coldstore_charges', '$total_labour_charges', '$total_processing_charges', '$total_charges', '$grand_total_charges', '$balance_amount')");
     $stmt->execute();
   }
@@ -3364,6 +3361,14 @@ Class Query{
      $stmt->execute();
    }
 
+   function updateform10($updateid, $newdate, $upitem_id, $upsupplier_id, $upcountry, $uptype, $upsize, $upmc, $upkg, $uppcs, $uplooseinkg, $uplooseinpcs, $uplooseoutkg, $uplooseoutpcs){
+     global $pdo;
+
+     $total_kg = (floatval($upkg) + floatval($uplooseinkg)) - floatval($uplooseoutkg);
+     $updateform10pcs = (intval($uppcs) + floatval($uplooseinpcs)) - floatval($uplooseoutpcs);
+     $updateform10stmt = $pdo->prepare("UPDATE form10stock SET date='$newdate', item_id='$upitem_id', supplier_id='$upsupplier_id', country='$upcountry', type='$uptype', size='$upsize',pcsform10='$updateform10pcs', mc='$upmc', kg='$upkg', pcs='$uppcs', looseinkg='$uplooseinkg', looseinpcs='$uplooseinpcs', looseoutkg='$uplooseoutkg', looseoutpcs='$uplooseoutpcs', total_kg='$total_kg' WHERE id='$updateid'");
+     $updateform10stmt->execute();
+   }
   // MORE SELECTS
 
   function selectsum($table, $id, $selectwhat){
