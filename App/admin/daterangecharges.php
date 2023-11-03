@@ -85,6 +85,12 @@ $query = new Query();
       $query->updatecoldstore($indate, $outdate, $commondity_id,  $mc, $kg, $coldstorerate, $labourrate, $processingrate, $upprocessingcharges, $updateid);
     }
 
+    if (isset($_POST['addremarkbtn'])) {
+      $remark = $_POST['remark'];
+      $remarkid = $_POST['remarkid'];
+
+      $query->addhhkremark($remark, $remarkid);
+    }
      ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
@@ -478,24 +484,24 @@ $query = new Query();
                   $item_id = $total_charges_data['commondity_id'];
                   $commonditydata = $query->select('category', $item_id, 'category_id');
                 ?>
-                <tr data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>">
+                <tr>
                   <!-- <td><?php echo $idd; ?></td> -->
                   <td style="width: 80px;"><?php if($total_charges_data['date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($total_charges_data['date']));} ; ?></td>
                   <td><?php if(!empty($commonditydata['category_name'])){ echo $commonditydata['category_name'];} ; ?></td>
                   <td><?php if($total_charges_data['total_coldstore_charges'] != "0"){ echo $total_charges_data['total_coldstore_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['total_labour_charges'] != "0"){ echo $total_charges_data['total_labour_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['total_processing_charges'] != "0"){ echo $total_charges_data['total_processing_charges'];} ; ?></td>
-                  <td><?php if($total_charges_data['repacking_charges'] != "0"){ echo $total_charges_data['repacking_charges'];} ; ?></td>
-                  <td><?php if($total_charges_data['ice_charges'] != "0"){ echo $total_charges_data['ice_charges'];} ; ?></td>
-                  <td><?php if($total_charges_data['ot_charges'] != "0"){ echo $total_charges_data['ot_charges'];} ; ?></td>
+                  <td data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['repacking_charges'] != "0"){ echo $total_charges_data['repacking_charges'];} ; ?></td>
+                  <td data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['ice_charges'] != "0"){ echo $total_charges_data['ice_charges'];} ; ?></td>
+                  <td data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['ot_charges'] != "0"){ echo $total_charges_data['ot_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['total_charges'] != "0"){ echo $total_charges_data['total_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['grand_total_charges'] != "0"){ echo $total_charges_data['grand_total_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['payment_date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($total_charges_data['payment_date'])); } ; ?></td>
                   <td><?php if($total_charges_data['payment_amount'] != "0"){ echo $total_charges_data['payment_amount']; }; ?></td>
                   <td><?php if($total_charges_data['balance_amount'] != "0"){ echo $total_charges_data['balance_amount'];}; ?></td>
-                  <td><?php if($total_charges_data['remark'] != "0"){ echo $total_charges_data['remark'];}; ?></td>
+                  <td data-bs-toggle="modal" data-bs-target="#remark<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['remark'] != "0"){ echo $total_charges_data['remark'];}; ?></td>
                 </tr>
-                <!-- Add Modal -->
+                <!-- Add updatetotalcharges -->
                 <div class="modal fade" id="updatetotalcharges<?php echo $total_charges_data['id']; ?>">
                   <div class="modal-dialog">
                     <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
@@ -538,7 +544,34 @@ $query = new Query();
                     </div>
                   </div>
                 </div>
-                <!-- Add Modal -->
+                <!-- Add updatetotalcharges -->
+                <!--Add Remark-->
+                <div class="modal fade" id="remark<?php echo $total_charges_data['id']; ?>">
+                  <div class="modal-dialog">
+                    <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                      <div class="modal-header bg-secondary text-light">
+                        <h1 class="modal-title fs-5">Add Total Charges Remark</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <form action="" method="post">
+                        <input type="hidden" name="remarkid" value="<?php echo $total_charges_data['id']; ?>">
+                      <div class="modal-body">
+                        <div class="">
+                          <label>Remark</label>
+                          <input type="text" name="remark" value="" class="form-control inpv2 mt-2 mb-3">
+                        </div>
+                      </div>
+                        <div class="card-footer p-3">
+                          <div class="float-end">
+                            <button type="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
+                            <button type="submit" name="addremarkbtn" class="btn btn-success">Add Remark</button>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                    </div>
+                  </div>
+                <!--Add Remark-->
                 <?php
                 }
                  ?>
@@ -707,7 +740,7 @@ $query = new Query();
       </div>
     </div>
     <!-- Add Modal -->
-    <!-- Add Modal -->
+    <!-- Add Payment -->
     <div class="modal fade" id="addpayment">
       <div class="modal-dialog">
         <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
@@ -736,8 +769,8 @@ $query = new Query();
         </div>
       </div>
     </div>
-    <!-- Add Modal -->
-    <!-- Add Modal -->
+    <!-- Add Payment -->
+    <!-- Add repackingcharges -->
     <div class="modal fade" id="repackingcharges">
       <div class="modal-dialog">
         <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">

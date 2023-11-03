@@ -3400,6 +3400,14 @@ Class Query{
      $updateform10stmt = $pdo->prepare("UPDATE form10stock SET date='$newdate', item_id='$upitem_id', supplier_id='$upsupplier_id', country='$upcountry', type='$uptype', size='$upsize',pcsform10='$updateform10pcs', mc='$upmc', kg='$upkg', pcs='$uppcs', looseinkg='$uplooseinkg', looseinpcs='$uplooseinpcs', looseoutkg='$uplooseoutkg', looseoutpcs='$uplooseoutpcs', total_kg='$total_kg' WHERE id='$updateid'");
      $updateform10stmt->execute();
    }
+
+   function addhhkremark($remark, $remarkid){
+     global $pdo;
+     
+     $addremarkstmt = $pdo->prepare("UPDATE total_charges SET remark='$remark' WHERE id='$remarkid'");
+     $addremarkstmt->execute();
+   }
+
   // MORE SELECTS
 
   function selectsum($table, $id, $selectwhat){
