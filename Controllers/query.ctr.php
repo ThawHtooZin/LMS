@@ -1171,12 +1171,12 @@ Class Query{
             $total_kg = floatval($fishcoldstore['total_kg']) + floatval($kg);
           }
           if($ite == 'export'){
-            $total_mc = intval($fishcoldstore['total_mc']) + intval($mc);
-            $total_kg = floatval($fishcoldstore['total_kg']) + floatval($kg);
+            $total_mc = intval($fishcoldstore['total_mc']) - intval($mc);
+            $total_kg = floatval($fishcoldstore['total_kg']) - floatval($kg);
           }
           if($ite == 'takeout'){
-            $total_mc = intval($fishcoldstore['total_mc']) + intval($mc);
-            $total_kg = floatval($fishcoldstore['total_kg']) + floatval($kg);
+            $total_mc = intval($fishcoldstore['total_mc']) - intval($mc);
+            $total_kg = floatval($fishcoldstore['total_kg']) - floatval($kg);
           }
         }else{
           if($ite == 'import'){
@@ -1184,12 +1184,12 @@ Class Query{
             $total_kg = floatval($fishcoldstore['total_kg']) + floatval($kg);
           }
           if($ite == 'export'){
-            $total_mc = intval($fishcoldstore['total_mc']) + intval($mc);
-            $total_kg = floatval($fishcoldstore['total_kg']) + floatval($kg);
+            $total_mc = intval($fishcoldstore['total_mc']) - intval($mc);
+            $total_kg = floatval($fishcoldstore['total_kg']) - floatval($kg);
           }
           if($ite == 'takeout'){
-            $total_mc = intval($fishcoldstore['total_mc']) + intval($mc);
-            $total_kg = floatval($fishcoldstore['total_kg']) + floatval($kg);
+            $total_mc = intval($fishcoldstore['total_mc']) - intval($mc);
+            $total_kg = floatval($fishcoldstore['total_kg']) - floatval($kg);
           }
         }
       }else{
