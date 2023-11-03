@@ -770,10 +770,12 @@ $query = new Query();
                 <label>Commondity</label>
                 <select class="form-control inpv2" name="commondity_id" id="commondity">
                   <?php
-                  $commonditydatas = $query->selectall('category');
+                  $commonditydatas = $query->selectdis('hhkstock', 'commondity_id');
                   foreach ($commonditydatas as $commonditydata) {
+                    $item_id = $commonditydata['commondity_id'];
+                    $item = $query->select('category', $item_id, 'category_id');
                     ?>
-                    <option value="<?php echo $commonditydata['category_id']; ?>"><?php echo $commonditydata['category_name']; ?></option>
+                    <option value="<?php echo $item['category_id']; ?>"><?php echo $item['category_name']; ?></option>
                     <?php
                     }
                    ?>
