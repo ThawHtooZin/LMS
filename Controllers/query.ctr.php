@@ -752,7 +752,7 @@ Class Query{
       if(str_contains(strtolower($comname), 'iqf')){
         $processingemptystmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
         $processingemptystmt->execute();
-        $processingemptydata = $iqfemptystmt->fetch(PDO::FETCH_ASSOC);
+        $processingemptydata = $processingemptystmt->fetch(PDO::FETCH_ASSOC);
         if (!empty($processingemptydata)) {
           $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
           $processingstmt->execute();
