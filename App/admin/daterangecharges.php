@@ -837,9 +837,16 @@ $query = new Query();
     <script type="text/javascript">
       $(document).ready(()=>{
         var commondity = $("#commondity").val();
+        // alert(commondity);
+        <?php
+        $blockidstmt = $pdo->prepare("SELECT category_id FROM category WHERE category_name='Block'");
+        $blockidstmt->execute();
+        $blockiddata = $blockidstmt->fetch(PDO::FETCH_ASSOC);
+        $blockid = $blockiddata['category_id'];
+        ?>
         $("#commondity").change(function(){
-          commondity = $("#commondity").val();
-          if(commondity.includes('B01') === true){
+          var commondity = $("#commondity").val();
+          if(commondity === '<?php echo $blockid; ?>'){
             $(".processingratediv").hide();
             $(".processingchargesdiv").show();
           }else{
@@ -847,13 +854,13 @@ $query = new Query();
             $(".processingchargesdiv").hide();
           }
         });
-        if(commondity.includes('B01') === true){
-          $(".processingratediv").hide();
-          $(".processingchargesdiv").show();
-        }else{
-          $(".processingratediv").show();
-          $(".processingchargesdiv").hide();
-        }
+        // if(commondity.includes('B01') === true){
+        //   $(".processingratediv").hide();
+        //   $(".processingchargesdiv").show();
+        // }else{
+        //   $(".processingratediv").show();
+        //   $(".processingchargesdiv").hide();
+        // }
       });
     </script>
     <script type="text/javascript">
