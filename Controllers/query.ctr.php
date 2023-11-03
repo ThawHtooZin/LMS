@@ -875,7 +875,7 @@ Class Query{
     $datastmt->execute();
     $data = $datastmt->fetch(PDO::FETCH_ASSOC);
 
-    $totalcoldstorestmt = $pdo->prepare("SELECT total_charges FROM coldstore ORDER BY id DESC");
+    $totalcoldstorestmt = $pdo->prepare("SELECT * FROM coldstore ORDER BY id DESC");
     $totalcoldstorestmt->execute();
     $totalcoldstoredata = $totalcoldstorestmt->fetch(PDO::FETCH_ASSOC);
 
@@ -892,17 +892,17 @@ Class Query{
     $totalchargesdata = $totalchargesstmt->fetch(PDO::FETCH_ASSOC);
 
     if(!empty($totalchargesdata)){
-      $total_coldstore_charges = $totalcoldstoredata['total_charges'];
-      $total_labour_charges = $totallabourdata['total_charges'];
-      $total_processing_charges = $totalprocessingdata['total_charges'];
-      $total_charges = $totalcoldstoredata['total_charges'] + $totallabourdata['total_charges'] + $totalprocessingdata['total_charges'];
+      $total_coldstore_charges = $totalcoldstoredata['charges'];
+      $total_labour_charges = $totallabourdata['charges'];
+      $total_processing_charges = $totalprocessingdata['charges'];
+      $total_charges = $totalcoldstoredata['charges'] + $totallabourdata['charges'] + $totalprocessingdata['charges'];
       $grand_total_charges = $totalchargesdata['balance_amount'] + $total_charges;
       $balance_amount = intval($grand_total_charges);
     }else{
-      $total_coldstore_charges = $totalcoldstoredata['total_charges'];
-      $total_labour_charges = $totallabourdata['total_charges'];
-      $total_processing_charges = $totalprocessingdata['total_charges'];
-      $total_charges = $totalcoldstoredata['total_charges'] + $totallabourdata['total_charges'] + $totalprocessingdata['total_charges'];
+      $total_coldstore_charges = $totalcoldstoredata['charges'];
+      $total_labour_charges = $totallabourdata['charges'];
+      $total_processing_charges = $totalprocessingdata['charges'];
+      $total_charges = $totalcoldstoredata['charges'] + $totallabourdata['charges'] + $totalprocessingdata['charges'];
       $grand_total_charges = $total_charges;
       $balance_amount = $grand_total_charges;
     }
@@ -1023,18 +1023,12 @@ Class Query{
     $ice_charges = $totaldata['ice_charges'];
     $ot_charges = $totaldata['ot_charges'];
 
-    echo $total_coldstore_charges = $total_charges;
-    echo "<br>";
-    echo $total_labour_charges = $totallabourcharges;
-    echo "<br>";
-    echo $total_processing_charges = $totalprocessingcharges;
-    echo "<br>";
-    echo $total_charges_of_total = $total_charges + $totallabourcharges + $totalprocessingcharges + $total_repacking_charges + $ice_charges + $ot_charges;
-    echo "<br>";
-    echo $grand_total_charges = $total_charges_of_total + $lastbalance;
-    echo "<br>";
-    echo $balance_amount = $total_charges_of_total + $lastbalance;
-    echo "<br>";
+    $total_coldstore_charges = $charges;
+    $total_labour_charges = $lcharges;
+    $total_processing_charges = $pcharges;
+    $total_charges_of_total = $charges + $lcharges + $pcharges + $total_repacking_charges + $ice_charges + $ot_charges;
+    $grand_total_charges = $total_charges_of_total + $lastbalance;
+    $balance_amount = $total_charges_of_total + $lastbalance;
 
 
     $coldstorestmt = $pdo->prepare("UPDATE coldstore SET indate='$indate', outdate='$outdate',commondity_id='$commondity_id', mc='$mc', total_mc='$dtotal_mc', kg='$kg', total_kg='$dtotal_kg', day='$day', rate='$coldstorerate', charges='$charges', total_charges='$total_charges' WHERE id='$updateid'");
