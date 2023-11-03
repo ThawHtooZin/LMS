@@ -397,16 +397,6 @@ CREATE TABLE `item` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO item VALUES("2","1000/H01","Hilsa");
-INSERT INTO item VALUES("3","1000/K01","Koral");
-INSERT INTO item VALUES("4","1000/D01","D-puti");
-INSERT INTO item VALUES("5","1000/B01","Batashi");
-INSERT INTO item VALUES("6","1000/B02","Baby Koral");
-INSERT INTO item VALUES("8","1000/C01","Chondana");
-INSERT INTO item VALUES("9","1000/B03","Boal");
-INSERT INTO item VALUES("11","1000/P01","Poa");
-INSERT INTO item VALUES("13","1000/T01","Taposhi");
-
 
 
 

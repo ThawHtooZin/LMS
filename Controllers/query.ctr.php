@@ -36,6 +36,22 @@ Class Query{
     }
   }
 
+  function logout(){
+    global $pdo;
+
+    date_default_timezone_set('Asia/Yangon');
+    $logout_time = date('h:i:s');
+    $logout_date = date('Y:m:d');
+    $username = $_SESSION['username'];
+    $status = "Logout Success";
+
+    $logstmt = $pdo->prepare("INSERT INTO userlogs(login_time, login_date, login_username, status)  VALUES('$logout_time', '$logout_date', '$username', '$status')");
+    $logstmt->execute();
+
+    session_destroy();
+
+    header('location:../../Login.php');
+  }
 
   function selectall($table){
     global $pdo;
@@ -538,7 +554,7 @@ Class Query{
 
     $comname = $commondity_name['category_name'];
     if(!empty($data)){
-      if(str_contains($comname, 'iqf')){
+      if(str_contains(strtolower($comname), 'iqf')){
         $iqfemptystmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='$commondity_id' ORDER BY id DESC");
         $iqfemptystmt->execute();
         $iqfemptydata = $iqfemptystmt->fetch(PDO::FETCH_ASSOC);
@@ -565,7 +581,7 @@ Class Query{
           $charges = $day * intval($coldstorerate) * intval($kg);
           $total_charges = intval($charges);
         }
-      }elseif($comname == 'Block' || $comname == 'block'){
+      }elseif(str_contains(strtolower($comname), 'block')){
         $blockemptystmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='$commondity_id' ORDER BY id DESC");
         $blockemptystmt->execute();
         $blockemptydata = $blockemptystmt->fetch(PDO::FETCH_ASSOC);
@@ -592,7 +608,7 @@ Class Query{
           $charges = $day * intval($coldstorerate) * intval($kg);
           $total_charges = intval($charges);
         }
-      }elseif(str_contains($comname, 'pujanut')){
+      }elseif(str_contains(strtolower($comname), 'pujanut')){
         $pjnemptystmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='$commondity_id' ORDER BY id DESC");
         $pjnemptystmt->execute();
         $pjnemptydata = $pjnemptystmt->fetch(PDO::FETCH_ASSOC);
@@ -644,7 +660,7 @@ Class Query{
     $labourstmt->execute();
     $labour = $labourstmt->fetch(PDO::FETCH_ASSOC);
     if(!empty($labour)){
-      if(str_contains($comname, 'iqf')){
+      if(str_contains(strtolower($comname), 'iqf')){
         $iqfemptystmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
         $iqfemptystmt->execute();
         $iqfemptydata = $iqfemptystmt->fetch(PDO::FETCH_ASSOC);
@@ -663,7 +679,7 @@ Class Query{
           $lcharges = intval($labourrate) * intval($kg);
           $totallabourcharges = intval($lcharges);
         }
-      }elseif($comname == 'Block' || $comname == 'block'){
+      }elseif(str_contains(strtolower($comname), 'block')){
         $blockemptystmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
         $blockemptystmt->execute();
         $blockemptydata = $blockemptystmt->fetch(PDO::FETCH_ASSOC);
@@ -682,7 +698,7 @@ Class Query{
           $lcharges = intval($labourrate) * intval($kg);
           $totallabourcharges = intval($lcharges);
         }
-      }elseif(str_contains($comname, 'pujanut')){
+      }elseif(str_contains(strtolower($comname), 'pujanut')){
         $pjnemptystmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
         $pjnemptystmt->execute();
         $pjnemptydata = $pjnemptystmt->fetch(PDO::FETCH_ASSOC);
@@ -812,10 +828,17 @@ Class Query{
         }
       }
     }else{
-      $ptotal_mc = intval($mc);
-      $ptotal_kg = intval($kg);
-      $pcharges = floatval($pcharges);
-      $totalprocessingcharges = intval($pcharges);
+      if(str_contains(strtolower($comname), 'block')){
+        $ptotal_mc = intval($mc);
+        $ptotal_kg = intval($kg);
+        $pcharges = floatval($pcharges);
+        $totalprocessingcharges = intval($pcharges);
+      }else{
+        $ptotal_mc = intval($mc);
+        $ptotal_kg = intval($kg);
+        $pcharges = intval($processingrate) * intval($kg);
+        $totalprocessingcharges = intval($pcharges);
+      }
     }
 
     // Add Stock
