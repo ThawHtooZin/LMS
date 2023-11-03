@@ -866,7 +866,7 @@ Class Query{
     $labourstmt->execute();
     $processingstmt = $pdo->prepare("INSERT INTO processing(indate, outdate, commondity_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$commondity_id', '$mc','$ptotal_mc','$kg','$ptotal_kg','$processingrate','$pcharges','$totalprocessingcharges')");
     $processingstmt->execute();
-    $coldstoredatas = $this->selectall('coldstore');
+    $coldstoredatas = $this->selectdesc('coldstore');
     $coldstoreid = $coldstoredatas[0]['id'];
     $stockstmt = $pdo->prepare("INSERT INTO hhkstock(outdate, commondity_id, mc, total_mc, kg, total_kg, balance, link_id) VALUES('$outdate', '$commondity_id', '$smc', '$total_mc', '$skg', '$total_kg', '$balance', '$coldstoreid')");
     $stockstmt->execute();
@@ -3537,6 +3537,13 @@ Class Query{
   function selectgroupby($table, $groupbywhat){
     global $pdo;
     $stmt = $pdo->prepare("SELECT * FROM $table GROUP BY $groupbywhat");
+    $stmt->execute();
+    return $stmt->fetchall();
+  }
+
+  function selectdesc($table){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM $table ORDER BY id DESC");
     $stmt->execute();
     return $stmt->fetchall();
   }
