@@ -846,11 +846,19 @@ Class Query{
     $stockstmt->execute();
     $stockdata = $stockstmt->fetch(PDO::FETCH_ASSOC);
 
-    $smc = $mc;
-    $skg = $kg;
-    $total_mc = $stockdata['total_mc'] - $mc;
-    $total_kg = $stockdata['total_kg'] - $kg;
-    $balance = $stockdata['balance'] - $total_kg;
+    if(!empty($stockdata)){
+      $smc = $mc;
+      $skg = $kg;
+      $total_mc = $stockdata['total_mc'] - $smc;
+      $total_kg = $stockdata['total_kg'] - $skg;
+      $balance = $stockdata['balance'] - $total_kg;
+    }else{
+      $smc = $mc;
+      $skg = $kg;
+      $total_mc = $smc;
+      $total_kg = $skg;
+      $balance = $total_kg;
+    }
 
     $coldstorestmt = $pdo->prepare("INSERT INTO coldstore(indate, outdate, commondity_id, mc, total_mc, kg, total_kg, day, rate, charges, total_charges) VALUES('$indate','$outdate','$commondity_id', '$mc','$dtotal_mc','$kg','$dtotal_kg','$day','$coldstorerate','$charges','$total_charges')");
     $coldstorestmt->execute();
