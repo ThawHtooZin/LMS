@@ -3448,7 +3448,8 @@ Class Query{
    function updatestock($indate, $commondity_id, $mc, $kg, $updateid){
      global $pdo;
 
-     $stmt = $pdo->prepare("UPDATE hhkstock SET indate='$indate', commondity_id='$commondity_id', mc='$mc', kg='$kg', total_mc='$mc', total_kg='$kg'; WHERE id='$updateid'");
+     echo $updateid;
+     $stmt = $pdo->prepare("UPDATE hhkstock SET indate='$indate', commondity_id='$commondity_id', mc='$mc', kg='$kg', total_mc='$mc', total_kg='$kg' WHERE id='$updateid'");
      $stmt->execute();
    }
 
