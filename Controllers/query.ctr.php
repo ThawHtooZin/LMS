@@ -1062,6 +1062,24 @@ Class Query{
         $updatestmt->execute();
       }
 
+      // Stock Update
+      // echo $updateid;
+      // $stockstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE link_id > '$updateid' AND commondity_id='$commondity_id'");
+      // $stockstmt->execute();
+      // $stockdatas = $stockstmt->fetchall();
+      // print "<pre>";
+      // print_r($stockdatas);
+      //   foreach ($stockdatas as $stockdata) {
+      //     $updateid = $stockdata['link_id'];
+      //     $id = $stockdata['link_id'] - 1;
+      //     $stmt = $pdo->prepare("SELECT * FROM hhkstock WHERE link_id='$id' AND commondity_id='$commondity_id'");
+      //     $stmt->execute();
+      //     $data = $stmt->fetch(PDO::FETCH_ASSOC);
+      //     $totalmc = $data['total_mc'] - $stockdata['mc'];
+      //     $totalkg = floatval($data['total_kg']) - floatval($stockdata['kg']);
+      //     $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$totalmc', total_kg='$totalkg' WHERE id='$updateid'");
+      //     $updatestmt->execute();
+      //   }
     //
   }
 
@@ -3403,7 +3421,7 @@ Class Query{
 
    function addhhkremark($remark, $remarkid){
      global $pdo;
-     
+
      $addremarkstmt = $pdo->prepare("UPDATE total_charges SET remark='$remark' WHERE id='$remarkid'");
      $addremarkstmt->execute();
    }
