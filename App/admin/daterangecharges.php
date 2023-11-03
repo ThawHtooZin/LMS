@@ -854,13 +854,13 @@ $query = new Query();
             $(".processingchargesdiv").hide();
           }
         });
-        // if(commondity.includes('B01') === true){
-        //   $(".processingratediv").hide();
-        //   $(".processingchargesdiv").show();
-        // }else{
-        //   $(".processingratediv").show();
-        //   $(".processingchargesdiv").hide();
-        // }
+        if(commondity === '<?php echo $blockid; ?>'){
+          $(".processingratediv").hide();
+          $(".processingchargesdiv").show();
+        }else{
+          $(".processingratediv").show();
+          $(".processingchargesdiv").hide();
+        }
       });
     </script>
     <script type="text/javascript">
