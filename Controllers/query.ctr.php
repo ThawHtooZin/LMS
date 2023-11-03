@@ -1002,6 +1002,41 @@ Class Query{
       $stotal_kg = floatval($kg);
     }
 
+    //Total Charges
+    $totalidstmt = $pdo->prepare("SELECT id FROM total_charges WHERE commondity_id='$commondity_id' AND date='$outdate'");
+    $totalidstmt->execute();
+    $totalid = $totalidstmt->fetch(PDO::FETCH_ASSOC);
+    $totalid = $totalid['id'];
+    $lasttotalstmt = $pdo->prepare("SELECT * FROM total_charges WHERE id < '$totalid'");
+    $lasttotalstmt->execute();
+    $lasttotaldata = $lasttotalstmt->fetch(PDO::FETCH_ASSOC);
+    $totalstmt = $pdo->prepare("SELECT * FROM total_charges WHERE id='$totalid'");
+    $totalstmt->execute();
+    $totaldata = $totalstmt->fetch(PDO::FETCH_ASSOC);
+    if(!empty($lasttotaldata)){
+      $lastbalance = $lasttotaldata['balance_amount'];
+    }else{
+      $lastbalance = 0;
+    }
+
+    $total_repacking_charges = $totaldata['repacking_charges'];
+    $ice_charges = $totaldata['ice_charges'];
+    $ot_charges = $totaldata['ot_charges'];
+
+    echo $total_coldstore_charges = $total_charges;
+    echo "<br>";
+    echo $total_labour_charges = $totallabourcharges;
+    echo "<br>";
+    echo $total_processing_charges = $totalprocessingcharges;
+    echo "<br>";
+    echo $total_charges_of_total = $total_charges + $totallabourcharges + $totalprocessingcharges + $total_repacking_charges + $ice_charges + $ot_charges;
+    echo "<br>";
+    echo $grand_total_charges = $total_charges_of_total + $lastbalance;
+    echo "<br>";
+    echo $balance_amount = $total_charges_of_total + $lastbalance;
+    echo "<br>";
+
+
     $coldstorestmt = $pdo->prepare("UPDATE coldstore SET indate='$indate', outdate='$outdate',commondity_id='$commondity_id', mc='$mc', total_mc='$dtotal_mc', kg='$kg', total_kg='$dtotal_kg', day='$day', rate='$coldstorerate', charges='$charges', total_charges='$total_charges' WHERE id='$updateid'");
     $coldstorestmt->execute();
     $labourstmt = $pdo->prepare("UPDATE labour SET indate='$indate', outdate='$outdate',commondity_id='$commondity_id', mc='$mc', total_mc='$ltotal_mc', kg='$kg', total_kg='$ltotal_kg', rate='$labourrate', charges='$lcharges', total_charges='$totallabourcharges' WHERE id='$updateid'");
@@ -1010,6 +1045,8 @@ Class Query{
     $processingstmt->execute();
     $stockstmt = $pdo->prepare("UPDATE hhkstock SET mc='$mc', total_mc='$stotal_mc', kg='$kg', total_kg='$stotal_kg' WHERE link_id='$updateid'");
     $stockstmt->execute();
+    $totalupdatestmt = $pdo->prepare("UPDATE total_charges SET total_coldstore_charges='$total_coldstore_charges', total_labour_charges='$total_labour_charges', total_processing_charges='$total_processing_charges', total_charges='$total_charges_of_total', grand_total_charges='$grand_total_charges', balance_amount='$balance_amount' WHERE commondity_id='$commondity_id' AND date='$outdate'");
+    $totalupdatestmt->execute();
 
     // ColdStore Update
     $cstmt = $pdo->prepare("SELECT * FROM coldstore WHERE id > '$updateid' AND commondity_id='$commondity_id'");
@@ -1062,25 +1099,7 @@ Class Query{
         $updatestmt->execute();
       }
 
-      // Stock Update
-      // echo $updateid;
-      // $stockstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE link_id > '$updateid' AND commondity_id='$commondity_id'");
-      // $stockstmt->execute();
-      // $stockdatas = $stockstmt->fetchall();
-      // print "<pre>";
-      // print_r($stockdatas);
-      //   foreach ($stockdatas as $stockdata) {
-      //     $updateid = $stockdata['link_id'];
-      //     $id = $stockdata['link_id'] - 1;
-      //     $stmt = $pdo->prepare("SELECT * FROM hhkstock WHERE link_id='$id' AND commondity_id='$commondity_id'");
-      //     $stmt->execute();
-      //     $data = $stmt->fetch(PDO::FETCH_ASSOC);
-      //     $totalmc = $data['total_mc'] - $stockdata['mc'];
-      //     $totalkg = floatval($data['total_kg']) - floatval($stockdata['kg']);
-      //     $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$totalmc', total_kg='$totalkg' WHERE id='$updateid'");
-      //     $updatestmt->execute();
-      //   }
-    //
+
   }
 
   function updatecoldstoretotal($id, $repacking_charges, $ice_charges, $ot_charges){

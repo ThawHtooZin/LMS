@@ -116,7 +116,8 @@ $query = new Query();
             <button type="submit" class="btn btn-success float-end addnewstock" data-bs-toggle="modal" data-bs-target="#newstock">Add New Stock</button>
             <button type="submit" class="btn btn-success float-end addnewcharges" data-bs-toggle="modal" data-bs-target="#newcharges">Add New Charges</button>
             <button type="submit" class="btn btn-success float-end hide addrepackingcharges" data-bs-toggle="modal" data-bs-target="#repackingcharges">Add Repacking Charges</button>
-            <button type="submit" class="btn btn-dark text-light float-end hide addtotalcharges" data-bs-toggle="modal" data-bs-target="#addpayment">Add Payment</button>
+            <button type="submit" class="btn btn-dark text-light float-end hide addtotalcharges ms-2" data-bs-toggle="modal" data-bs-target="#addpayment">Add Payment</button>
+            <a href="export.php?table_name=daterangecharges" class="btn btn-success text-light export float-end">Export to Excel</a>
           </div>
           <div class="card-body">
             <div class="text-center">
@@ -997,6 +998,7 @@ $query = new Query();
       }
     ?>
     function showtotal(){
+      document.querySelector(".export").classList.remove("hide");
       document.querySelector(".addtotalcharges").classList.remove("hide");
       document.querySelector(".addnewcharges").classList.add("hide");
       document.querySelector(".addrepackingcharges").classList.add('hide');
@@ -1013,6 +1015,7 @@ $query = new Query();
       document.querySelector(".repackingcharges").classList.add('hide');
     }
     function showcoldstore(){
+      document.querySelector(".export").classList.add("hide");
       document.querySelector(".addtotalcharges").classList.add("hide");
       document.querySelector(".addnewcharges").classList.remove("hide");
       document.querySelector(".addrepackingcharges").classList.add('hide');
@@ -1029,6 +1032,7 @@ $query = new Query();
       document.querySelector(".repackingcharges").classList.add('hide');
     }
     function showlabour(){
+      document.querySelector(".export").classList.add("hide");
       document.querySelector(".addtotalcharges").classList.add("hide");
       document.querySelector(".addnewcharges").classList.remove("hide");
       document.querySelector(".addrepackingcharges").classList.add('hide');
@@ -1045,6 +1049,7 @@ $query = new Query();
       document.querySelector(".repackingcharges").classList.add('hide');
     }
     function showprocessing(){
+      document.querySelector(".export").classList.add("hide");
       document.querySelector(".addtotalcharges").classList.add("hide");
       document.querySelector(".addnewcharges").classList.remove("hide");
       document.querySelector(".addrepackingcharges").classList.add('hide');
@@ -1061,6 +1066,7 @@ $query = new Query();
       document.querySelector(".repackingcharges").classList.add('hide');
     }
     function showrepacking(){
+      document.querySelector(".export").classList.add("hide");
       document.querySelector(".addtotalcharges").classList.add("hide");
       document.querySelector(".addnewcharges").classList.add("hide");
       document.querySelector(".addrepackingcharges").classList.remove('hide');
@@ -1077,6 +1083,7 @@ $query = new Query();
       document.querySelector(".repackingcharges").classList.remove('hide');
     }
     function showstock(){
+      document.querySelector(".export").classList.add("hide");
       document.querySelector(".addtotalcharges").classList.add("hide");
       document.querySelector(".addnewcharges").classList.add("hide");
       document.querySelector(".addrepackingcharges").classList.add('hide');

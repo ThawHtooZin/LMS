@@ -241,6 +241,61 @@ if($_GET['table_name'] == 'general_ledger'){
 
   <?php
 }
+if($_GET['table_name'] == 'daterangecharges'){
+  header("Content-Type: application/xls");
+  header("Content-Disposition: attachment; filename=hhktotalcharges.xls");
+  header("Pragma: no-cache");
+  header("Expires: 0");
+  ?>
+  <table class="table table-bordered" border="1">
+    <tr style="font-size:19px;">
+      <th>Date</th>
+      <th>Commondity</th>
+      <th>Total Cold Store Charges</th>
+      <th>Total Labour Charges</th>
+      <th>Total Processing Charges</th>
+      <th>Repacking Charges</th>
+      <th>Ice Charges</th>
+      <th>OT Charges</th>
+      <th>Total Charges</th>
+      <th>Grand Total Charges</th>
+      <th>Payment Date</th>
+      <th>Payment Amount</th>
+      <th>Balance Amount</th>
+      <th>Remark</th>
+    </tr>
+    <?php
+    $totalstmt = $pdo->prepare("SELECT * FROM total_charges");
+    $totalstmt->execute();
+    $totaldatas = $totalstmt->fetchall();
+    $idd = 0;
+    foreach ($totaldatas as $total_charges_data) {
+      $idd++;
+      $item_id = $total_charges_data['commondity_id'];
+      $commonditydata = $query->select('category', $item_id, 'category_id');
+    ?>
+    <tr>
+      <td><?php if($total_charges_data['date'] != "0000-00-00"){ echo date('d/m/Y', strtotime($total_charges_data['date']));} ; ?></td>
+      <td><?php if(!empty($commonditydata['category_name'])){ echo $commonditydata['category_name'];} ; ?></td>
+      <td><?php if($total_charges_data['total_coldstore_charges'] != "0"){ echo $total_charges_data['total_coldstore_charges'];} ; ?></td>
+      <td><?php if($total_charges_data['total_labour_charges'] != "0"){ echo $total_charges_data['total_labour_charges'];} ; ?></td>
+      <td><?php if($total_charges_data['total_processing_charges'] != "0"){ echo $total_charges_data['total_processing_charges'];} ; ?></td>
+      <td data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['repacking_charges'] != "0"){ echo $total_charges_data['repacking_charges'];} ; ?></td>
+      <td data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['ice_charges'] != "0"){ echo $total_charges_data['ice_charges'];} ; ?></td>
+      <td data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['ot_charges'] != "0"){ echo $total_charges_data['ot_charges'];} ; ?></td>
+      <td><?php if($total_charges_data['total_charges'] != "0"){ echo $total_charges_data['total_charges'];} ; ?></td>
+      <td><?php if($total_charges_data['grand_total_charges'] != "0"){ echo $total_charges_data['grand_total_charges'];} ; ?></td>
+      <td><?php if($total_charges_data['payment_date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($total_charges_data['payment_date'])); } ; ?></td>
+      <td><?php if($total_charges_data['payment_amount'] != "0"){ echo $total_charges_data['payment_amount']; }; ?></td>
+      <td><?php if($total_charges_data['balance_amount'] != "0"){ echo $total_charges_data['balance_amount'];}; ?></td>
+      <td data-bs-toggle="modal" data-bs-target="#remark<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['remark'] != "0"){ echo $total_charges_data['remark'];}; ?></td>
+    </tr>
+    <?php
+    }
+     ?>
+  </table>
+  <?php
+}
 exit();
 
 
