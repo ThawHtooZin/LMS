@@ -91,6 +91,16 @@ $query = new Query();
 
       $query->addhhkremark($remark, $remarkid);
     }
+
+    if (isset($_POST['updatestockbtn'])) {
+      $indate = $_POST['upindate'];
+      $commondity_id = $_POST['upcommondity'];
+      $mc = $_POST['upmc'];
+      $kg = $_POST['upkg'];
+      $updateid = $_POST['upidstock'];
+
+      $query->updatestock($indate, $commondity_id, $mc, $kg, $updateid);
+    }
      ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
@@ -667,54 +677,67 @@ $query = new Query();
                   <td><?php echo $hhkstockdata['total_mc']; ?></td>
                   <td><?php echo $hhkstockdata['kg']; ?></td>
                   <td><?php echo $hhkstockdata['total_kg']; ?></td>
-                  <td><?php if($outdatecheckdata['outdate'] == '0000-00-00' && empty($editcheckdata)){echo '
-                    <button class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#stockupdatemodal'.$hhkstockdata['id'].'">
+                  <td><?php if($outdatecheckdata['outdate'] == '0000-00-00' && empty($editcheckdata)): ?>
+                    <button type="button" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#stockupdatemodal<?= $hhkstockdata['id']; ?>">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                           <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
                           <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
                       </svg>
                     </button>
-                    ';} ?></td>
+                  <?php endif; ?>
+                </td>
                 </tr>
-                <div class="modal fade" id="$stockupdatemodal<?= $hhkstockdata['id']; ?>" aria-labelledby="newcharges">
+                <div class="modal fade" id="stockupdatemodal<?= $hhkstockdata['id']; ?>">
                   <div class="modal-dialog">
                     <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
                       <div class="modal-header bg-secondary text-light">
-                        <h1 class="modal-title fs-5">New Charges</h1>
+                        <h1 class="modal-title fs-5">Edit Remaining Stock</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <form action="daterangecharges.php" method="post">
                         <input type="hidden" name="upidstock" value="<?= $hhkstockdata['id']; ?>">
-                      <div class="modal-body">
-                        <div class="row">
-                          <div class="col">
-                            <label>In Date</label>
-                            <input type="date" name="upindate" value="<?= $hhkstockdata['indate']; ?>">
+                        <div class="modal-body">
+                          <div class="row">
+                            <div class="col">
+                              <label>In Date</label>
+                              <input type="date" name="upindate" value="<?= $hhkstockdata['indate']; ?>" class="form-control inpv2 mb-2">
+                            </div>
+                            <div class="col">
+                              <label>Commondity</label>
+                              <select class="form-control inpv2" name="upcommondity">
+                                <?php
+                                $commonditydatas = $query->selectall('category');
+                                foreach ($commonditydatas as $commonditydata) {
+                                  ?>
+                                  <option value="<?php echo $commonditydata['category_id']; ?>" <?php if($commonditydata['category_id'] == $hhkstockdata['commondity_id']): echo "selected"; endif; ?>><?php echo $commonditydata['category_name']; ?></option>
+                                  <?php
+                                  }
+                                 ?>
+                              </select>
+                            </div>
                           </div>
-                          <div class="col">
-
+                          <div class="row">
+                            <div class="col">
+                              <label>Mc</label>
+                              <input type="number" name="upmc" value="<?= $hhkstockdata['mc']; ?>" class="form-control inpv2 mb-2">
+                            </div>
+                            <div class="col">
+                              <label>Kg</label>
+                              <input type="text" name="upkg" value="<?= $hhkstockdata['kg']; ?>" class="form-control inpv2 mb-2">
+                            </div>
                           </div>
                         </div>
-                        <div class="row">
-                          <div class="col">
-
-                          </div>
-                          <div class="col">
-
-                          </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="submit" class="btn btn-warning text-light" name="updatestockbtn">Update</button>
                         </div>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success" name="add">Add</button>
-                      </div>
-                    </form>
+                      </form>
                     </div>
                   </div>
                 </div>
                 <?php
+                    }
                   }
-                }
                  ?>
               </table>
             </div>

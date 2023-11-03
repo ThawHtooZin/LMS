@@ -3403,9 +3403,16 @@ Class Query{
 
    function addhhkremark($remark, $remarkid){
      global $pdo;
-     
+
      $addremarkstmt = $pdo->prepare("UPDATE total_charges SET remark='$remark' WHERE id='$remarkid'");
      $addremarkstmt->execute();
+   }
+
+   function updatestock($indate, $commondity_id, $mc, $kg, $updateid){
+     global $pdo;
+
+     $stmt = $pdo->prepare("UPDATE hhkstock SET indate='$indate', commondity_id='$commondity_id', mc='$mc', kg='$kg', total_mc='$mc', total_kg='$kg'; WHERE id='$updateid'");
+     $stmt->execute();
    }
 
   // MORE SELECTS
