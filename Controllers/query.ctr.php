@@ -1457,10 +1457,10 @@ Class Query{
     $oldcoldstoredatastmt->execute();
     $oldcoldstoredata = $oldcoldstoredatastmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!empty($olddata)) {
+    if (!empty($oldcoldstoredata)) {
       if ($upite == 'import' || $upite == 'Import') {
-        $total_mc = $upmc + $oldcoldstoredataoldcoldstoredata['total_mc'];
-        $total_kg = $upkg + $oldcoldstoredataoldcoldstoredata['total_kg'];
+        $total_mc = $upmc + $oldcoldstoredata['total_mc'];
+        $total_kg = $upkg + $oldcoldstoredata['total_kg'];
         $charges = $upcoldstorerate * $total_kg;
         $total_charges = $charges + $oldcoldstoredata['total_charges'];
       }
