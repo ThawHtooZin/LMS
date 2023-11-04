@@ -868,6 +868,7 @@ Class Query{
     $processingstmt->execute();
     $coldstoredatas = $this->selectdesc('coldstore');
     $coldstoreid = $coldstoredatas[0]['id'];
+
     $stockstmt = $pdo->prepare("INSERT INTO hhkstock(outdate, commondity_id, mc, total_mc, kg, total_kg, balance, link_id) VALUES('$outdate', '$commondity_id', '$smc', '$total_mc', '$skg', '$total_kg', '$balance', '$coldstoreid')");
     $stockstmt->execute();
     // echo "execute";

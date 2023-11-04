@@ -161,14 +161,14 @@ $query = new Query();
                     <th>In Date</th>
                     <th>Out Date</th>
                     <th>Commondity</th>
-                    <th>Mc</th>
-                    <th>Total Mc</th>
-                    <th>Kg</th>
-                    <th>Total Kg</th>
-                    <th>Day</th>
-                    <th>Rate</th>
-                    <th>Charges</th>
-                    <th>Total Charges</th>
+                    <th style="text-align:center;">Mc</th>
+                    <th style="text-align:center;">Total Mc</th>
+                    <th style="text-align:center;">Kg</th>
+                    <th style="text-align:center;">Total Kg</th>
+                    <th style="text-align:center;">Day</th>
+                    <th style="text-align:center;">Rate</th>
+                    <th style="text-align:center;">Charges</th>
+                    <th style="text-align:center;">Total Charges</th>
                     <th>Action</th>
                   </tr>
                   <?php
@@ -213,14 +213,14 @@ $query = new Query();
                     <td><?php echo date('d-m-Y', strtotime($data['indate'])); ?></td>
                     <td><?php echo date('d-m-Y', strtotime($data['outdate'])); ?></td>
                     <td><?php echo $commonditydata['category_name']; ?></td>
-                    <td><?php echo $data['mc']; ?></td>
-                    <td><?php echo $data['total_mc']; ?></td>
-                    <td><?php echo $data['kg']; ?></td>
-                    <td><?php echo $data['total_kg']; ?></td>
-                    <td><?php echo $data['day']; ?></td>
-                    <td><?php echo $data['rate']; ?></td>
-                    <td><?php echo $data['charges']; ?></td>
-                    <td><?php echo $data['total_charges']; ?></td>
+                    <td style="text-align:right;"><?php echo $data['mc']; ?></td>
+                    <td style="text-align:right;"><?php echo $data['total_mc']; ?></td>
+                    <td style="text-align:right;"><?php echo $data['kg']; ?></td>
+                    <td style="text-align:right;"><?php echo $data['total_kg']; ?></td>
+                    <td style="text-align:right;"><?php echo $data['day']; ?></td>
+                    <td style="text-align:right;"><?php echo $data['rate']; ?></td>
+                    <td style="text-align:right;"><?php echo $data['charges']; ?></td>
+                    <td style="text-align:right;"><?php echo $data['total_charges']; ?></td>
                     <td><a href="daterangecharges.php" style="<?php if($data['id'] == $commondata['id']){ echo "display:none;"; } ?>" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#coldstoreupdatemodal<?php echo $data['id']; ?>">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
     <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
@@ -349,13 +349,13 @@ $query = new Query();
                   <th>In Date</th>
                   <th>Out Date</th>
                   <th>Commondity</th>
-                  <th>Mc</th>
-                  <th>Total Mc</th>
-                  <th>Kg</th>
-                  <th>Total Kg</th>
-                  <th>Rate</th>
-                  <th>Charges</th>
-                  <th>Total Charges</th>
+                  <th style="text-align:center;">Mc</th>
+                  <th style="text-align:center;">Total Mc</th>
+                  <th style="text-align:center;">Kg</th>
+                  <th style="text-align:center;">Total Kg</th>
+                  <th style="text-align:center;">Rate</th>
+                  <th style="text-align:center;">Charges</th>
+                  <th style="text-align:center;">Total Charges</th>
                 </tr>
                 <?php
                 $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM labour");
@@ -390,13 +390,13 @@ $query = new Query();
                   <td><?php echo date('d-m-Y', strtotime($labourdata['indate']));  ?></td>
                   <td><?php echo date('d-m-Y', strtotime($labourdata['outdate'])); ?></td>
                   <td><?php echo $commonditydata['category_name']; ?></td>
-                  <td><?php echo $labourdata['mc']; ?></td>
-                  <td><?php echo $labourdata['total_mc']; ?></td>
-                  <td><?php echo $labourdata['kg']; ?></td>
-                  <td><?php echo $labourdata['total_kg']; ?></td>
-                  <td><?php echo $labourdata['rate']; ?></td>
-                  <td><?php echo $labourdata['charges']; ?></td>
-                  <td><?php echo $labourdata['total_charges']; ?></td>
+                  <td style="text-align:right;"><?php echo $labourdata['mc']; ?></td>
+                  <td style="text-align:right;"><?php echo $labourdata['total_mc']; ?></td>
+                  <td style="text-align:right;"><?php echo $labourdata['kg']; ?></td>
+                  <td style="text-align:right;"><?php echo $labourdata['total_kg']; ?></td>
+                  <td style="text-align:right;"><?php echo $labourdata['rate']; ?></td>
+                  <td style="text-align:right;"><?php echo $labourdata['charges']; ?></td>
+                  <td style="text-align:right;"><?php echo $labourdata['total_charges']; ?></td>
                   <!-- <button type="submit" name="deletebutton" class="btn btn-danger">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
                   </button> -->
@@ -415,13 +415,13 @@ $query = new Query();
                   <th>In Date</th>
                   <th>Out Date</th>
                   <th>Commondity</th>
-                  <th>Mc</th>
-                  <th>Total Mc</th>
-                  <th>Kg</th>
-                  <th>Total Kg</th>
-                  <th>Rate</th>
-                  <th>Charges</th>
-                  <th>Total Charges</th>
+                  <th style="text-align:center;">Mc</th>
+                  <th style="text-align:center;">Total Mc</th>
+                  <th style="text-align:center;">Kg</th>
+                  <th style="text-align:center;">Total Kg</th>
+                  <th style="text-align:center;">Rate</th>
+                  <th style="text-align:center;">Charges</th>
+                  <th style="text-align:center;">Total Charges</th>
                 </tr>
                 <?php
                 $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM processing");
@@ -456,13 +456,13 @@ $query = new Query();
                   <td><?php echo date('d-m-Y', strtotime($processingdata['indate']));  ?></td>
                   <td><?php echo date('d-m-Y', strtotime($processingdata['outdate'])); ?></td>
                   <td><?php echo $commonditydata['category_name']; ?></td>
-                  <td><?php echo $processingdata['mc']; ?></td>
-                  <td><?php echo $processingdata['total_mc']; ?></td>
-                  <td><?php echo $processingdata['kg']; ?></td>
-                  <td><?php echo $processingdata['total_kg']; ?></td>
-                  <td><?php echo $processingdata['rate']; ?></td>
-                  <td><?php echo $processingdata['charges']; ?></td>
-                  <td><?php echo $processingdata['total_charges']; ?></td>
+                  <td style="text-align:right;"><?php echo $processingdata['mc']; ?></td>
+                  <td style="text-align:right;"><?php echo $processingdata['total_mc']; ?></td>
+                  <td style="text-align:right;"><?php echo $processingdata['kg']; ?></td>
+                  <td style="text-align:right;"><?php echo $processingdata['total_kg']; ?></td>
+                  <td style="text-align:right;"><?php echo $processingdata['rate']; ?></td>
+                  <td style="text-align:right;"><?php echo $processingdata['charges']; ?></td>
+                  <td style="text-align:right;"><?php echo $processingdata['total_charges']; ?></td>
 
                   <!-- <button type="submit" name="deletebutton" class="btn btn-danger">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
@@ -480,17 +480,17 @@ $query = new Query();
                 <tr style="font-size:13px;">
                   <th>Date</th>
                   <th>Commondity</th>
-                  <th>Total Cold Store Charges</th>
-                  <th>Total Labour Charges</th>
-                  <th>Total Processing Charges</th>
-                  <th>Repacking Charges</th>
-                  <th>Ice Charges</th>
-                  <th>OT Charges</th>
-                  <th>Total Charges</th>
-                  <th>Grand Total Charges</th>
-                  <th>Payment Date</th>
-                  <th>Payment Amount</th>
-                  <th>Balance Amount</th>
+                  <th style="text-align:center;">Total Cold Store Charges</th>
+                  <th style="text-align:center;">Total Labour Charges</th>
+                  <th style="text-align:center;">Total Processing Charges</th>
+                  <th style="text-align:center;">Repacking Charges</th>
+                  <th style="text-align:center;">Ice Charges</th>
+                  <th style="text-align:center;">OT Charges</th>
+                  <th style="text-align:center;">Total Charges</th>
+                  <th style="text-align:center;">Grand Total Charges</th>
+                  <th style="text-align:center;">Payment Date</th>
+                  <th style="text-align:center;">Payment Amount</th>
+                  <th style="text-align:center;">Balance Amount</th>
                   <th>Remark</th>
                 </tr>
                 <?php
@@ -504,7 +504,7 @@ $query = new Query();
                   $commonditydata = $query->select('category', $item_id, 'category_id');
 
                   $nowid = $total_charges_data['id'];
-                  $laststmt = $pdo->prepare("SELECT * FROM total_charges WHERE id < '$nowid'");
+                  $laststmt = $pdo->prepare("SELECT * FROM total_charges WHERE id < '$nowid' ORDER BY id DESC");
                   $laststmt->execute();
                   $lastdata = $laststmt->fetch(PDO::FETCH_ASSOC);
 
@@ -542,17 +542,17 @@ $query = new Query();
                   <!-- <td><?php echo $idd; ?></td> -->
                   <td style="width: 80px;"><?php if($total_charges_data['date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($total_charges_data['date']));} ; ?></td>
                   <td><?php if(!empty($commonditydata['category_name'])){ echo $commonditydata['category_name'];} ; ?></td>
-                  <td><?php if($total_charges_data['total_coldstore_charges'] != "0"){ echo $total_charges_data['total_coldstore_charges'];} ; ?></td>
-                  <td><?php if($total_charges_data['total_labour_charges'] != "0"){ echo $total_charges_data['total_labour_charges'];} ; ?></td>
-                  <td><?php if($total_charges_data['total_processing_charges'] != "0"){ echo $total_charges_data['total_processing_charges'];} ; ?></td>
-                  <td data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['repacking_charges'] != "0"){ echo $total_charges_data['repacking_charges'];} ; ?></td>
-                  <td data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['ice_charges'] != "0"){ echo $total_charges_data['ice_charges'];} ; ?></td>
-                  <td data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['ot_charges'] != "0"){ echo $total_charges_data['ot_charges'];} ; ?></td>
-                  <td><?php if($total_charges_data['total_charges'] != "0"){ echo $total_charges_data['total_charges'];} ; ?></td>
-                  <td><?php if($total_charges_data['grand_total_charges'] != "0"){ echo $grand_total_charges;} ; ?></td>
-                  <td><?php if($total_charges_data['payment_date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($total_charges_data['payment_date'])); } ; ?></td>
-                  <td><?php if($total_charges_data['payment_amount'] != "0"){ echo $total_charges_data['payment_amount']; }; ?></td>
-                  <td><?php if($total_charges_data['balance_amount'] != "0"){ echo $total_charges_data['balance_amount'];}; ?></td>
+                  <td style="text-align:center;"><?php if($total_charges_data['total_coldstore_charges'] != "0"){ echo $total_charges_data['total_coldstore_charges'];} ; ?></td>
+                  <td style="text-align:center;"><?php if($total_charges_data['total_labour_charges'] != "0"){ echo $total_charges_data['total_labour_charges'];} ; ?></td>
+                  <td style="text-align:center;"><?php if($total_charges_data['total_processing_charges'] != "0"){ echo $total_charges_data['total_processing_charges'];} ; ?></td>
+                  <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['repacking_charges'] != "0"){ echo $total_charges_data['repacking_charges'];} ; ?></td>
+                  <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['ice_charges'] != "0"){ echo $total_charges_data['ice_charges'];} ; ?></td>
+                  <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['ot_charges'] != "0"){ echo $total_charges_data['ot_charges'];} ; ?></td>
+                  <td style="text-align:center;"><?php if($total_charges_data['total_charges'] != "0"){ echo $total_charges_data['total_charges'];} ; ?></td>
+                  <td style="text-align:center;"><?php if($total_charges_data['grand_total_charges'] != "0"){ echo $grand_total_charges;} ; ?></td>
+                  <td style="text-align:center;"><?php if($total_charges_data['payment_date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($total_charges_data['payment_date'])); } ; ?></td>
+                  <td style="text-align:center;"><?php if($total_charges_data['payment_amount'] != "0"){ echo $total_charges_data['payment_amount']; }; ?></td>
+                  <td style="text-align:center;"><?php if($total_charges_data['balance_amount'] != "0"){ echo $total_charges_data['balance_amount'];}; ?></td>
                   <td data-bs-toggle="modal" data-bs-target="#remark<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['remark'] != "0"){ echo $total_charges_data['remark'];}; ?></td>
                 </tr>
                 <!-- Add updatetotalcharges -->
@@ -636,15 +636,15 @@ $query = new Query();
                 <tr>
                   <th>Id</th>
                   <th>Date</th>
-                  <th>In MC</th>
-                  <th>In Kg</th>
-                  <th>Out MC</th>
-                  <th>Out Kg</th>
-                  <th>Diff MC</th>
-                  <th>Diff Kg</th>
-                  <th>Rate</th>
-                  <th>Charges</th>
-                  <th>Total Charges</th>
+                  <th style="text-align:center;">In MC</th>
+                  <th style="text-align:center;">In Kg</th>
+                  <th style="text-align:center;">Out MC</th>
+                  <th style="text-align:center;">Out Kg</th>
+                  <th style="text-align:center;">Diff MC</th>
+                  <th style="text-align:center;">Diff Kg</th>
+                  <th style="text-align:center;">Rate</th>
+                  <th style="text-align:center;">Charges</th>
+                  <th style="text-align:center;">Total Charges</th>
                 </tr>
                 <?php
                 $repackingdatas = $query->selectall('repacking');
@@ -652,18 +652,18 @@ $query = new Query();
                 foreach ($repackingdatas as $repackingdata) {
                   $idd++;
                  ?>
-                 <tr>
+                 <tr style="text-align:right;">
                    <td><?php echo $idd; ?></td>
                    <td><?php echo date('d-m-Y', strtotime($repackingdata['date'])); ?></td>
-                   <td><?php echo $repackingdata['in_mc']; ?></td>
-                   <td><?php echo $repackingdata['in_kg']; ?></td>
-                   <td><?php echo $repackingdata['out_mc']; ?></td>
-                   <td><?php echo $repackingdata['out_kg']; ?></td>
-                   <td><?php echo $repackingdata['diff_mc']; ?></td>
-                   <td><?php echo $repackingdata['diff_kg']; ?></td>
-                   <td><?php echo $repackingdata['rate']; ?></td>
-                   <td><?php echo $repackingdata['charges']; ?></td>
-                   <td><?php echo $repackingdata['total_charges']; ?></td>
+                   <td style="text-align:right;"><?php echo $repackingdata['in_mc']; ?></td>
+                   <td style="text-align:right;"><?php echo $repackingdata['in_kg']; ?></td>
+                   <td style="text-align:right;"><?php echo $repackingdata['out_mc']; ?></td>
+                   <td style="text-align:right;"><?php echo $repackingdata['out_kg']; ?></td>
+                   <td style="text-align:right;"><?php echo $repackingdata['diff_mc']; ?></td>
+                   <td style="text-align:right;"><?php echo $repackingdata['diff_kg']; ?></td>
+                   <td style="text-align:right;"><?php echo $repackingdata['rate']; ?></td>
+                   <td style="text-align:right;"><?php echo $repackingdata['charges']; ?></td>
+                   <td style="text-align:right;"><?php echo $repackingdata['total_charges']; ?></td>
                  </tr>
                 <?php
                 }
@@ -676,10 +676,10 @@ $query = new Query();
                   <th>In Date</th>
                   <th>Out Date</th>
                   <th>Commondity</th>
-                  <th>Mc</th>
-                  <th>Total Mc</th>
-                  <th>Kg</th>
-                  <th>Balance Kg</th>
+                  <th style="text-align:center;">Mc</th>
+                  <th style="text-align:center;">Total Mc</th>
+                  <th style="text-align:center;">Kg</th>
+                  <th style="text-align:center;">Balance Kg</th>
                   <th>Action</th>
                 </tr>
                 <?php
@@ -732,10 +732,10 @@ $query = new Query();
                   <td><?php if($hhkstockdata['indate'] != "0000-00-00"){ echo date('d-m-Y', strtotime($hhkstockdata['indate'])); }; ?></td>
                   <td><?php if($hhkstockdata['outdate'] != "0000-00-00"){ echo date('d-m-Y', strtotime($hhkstockdata['outdate'])); }; ?></td>
                   <td><?php echo $commonditydata['category_name']; ?></td>
-                  <td><?php echo $hhkstockdata['mc']; ?></td>
-                  <td><?php echo $hhkstockdata['total_mc']; ?></td>
-                  <td><?php echo $hhkstockdata['kg']; ?></td>
-                  <td><?php echo $hhkstockdata['total_kg']; ?></td>
+                  <td style="text-align:right;"><?php echo $hhkstockdata['mc']; ?></td>
+                  <td style="text-align:right;"><?php echo $hhkstockdata['total_mc']; ?></td>
+                  <td style="text-align:right;"><?php echo $hhkstockdata['kg']; ?></td>
+                  <td style="text-align:right;"><?php echo $hhkstockdata['total_kg']; ?></td>
                   <td><?php if($outdatecheckdata['outdate'] == '0000-00-00' && empty($editcheckdata)): ?>
                     <button type="button" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#stockupdatemodal<?= $hhkstockdata['id']; ?>">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
