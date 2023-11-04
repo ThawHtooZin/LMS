@@ -293,8 +293,8 @@ $query = new Query();
                               <button type="button" name="button" class="btn btn-danger" data-bs-toggle="modal">Delete</button>
                               <button type="submit" name="updatefishcoldstorebtn" class="btn btn-success">Update</button>
                             <?php else: ?>
-                            <button type="submit" name="updatefishcoldstorebtn" class="btn btn-success">Cancle</button>
-                            <button type="button" name="button" class="btn btn-danger" data-bs-toggle="modal">Delete</button>
+                            <button type="button" name="updatefishcoldstorebtn" data-bs-toggle="modal" class="btn btn-success">Cancel</button>
+                            <button type="submit" name="button" class="btn btn-danger">Delete</button>
                           <?php endif; ?>
                           </div>
                         </div>

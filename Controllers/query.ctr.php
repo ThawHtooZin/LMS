@@ -1337,8 +1337,8 @@ Class Query{
           $lasttottalstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE total_charges!=0 AND id < $id AND date!='$date' ORDER BY id DESC");
           $lasttottalstmt->execute();
           $lasttotalcharges = $lasttottalstmt->fetchall();
-          if(!empty($importrowsdata[0]['total_kg'])){
-            $coldstorecharges2 = $coldstorerate * $importrowsdata[0]['total_kg'];
+          if(!empty($fishcoldstore['total_kg'])){
+            $coldstorecharges2 = $coldstorerate * $fishcoldstore['total_kg'];
           }else{
             $coldstorecharges2 = 0;
           }
@@ -1399,7 +1399,7 @@ Class Query{
           $coldstoreupdatestmt->execute();
         }
       }
-      
+
       // Labour Add
       $fishlabourstmt = $pdo->prepare("SELECT * FROM gfcfishlabour ORDER BY id DESC");
       $fishlabourstmt->execute();
