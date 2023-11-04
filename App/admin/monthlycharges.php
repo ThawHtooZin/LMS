@@ -233,16 +233,30 @@ $query = new Query();
                   $chargeslastrowdata = $chargeslastrowdatastmt->fetch(PDO::FETCH_ASSOC);
 
                   if(!empty($lastrowdata)){
-                    if($fishcoldstoredata['total_mc'] != $lastrowdata['total_mc'] + $fishcoldstoredata['mc']){
-                      $total_mc = $lastrowdata['total_mc'] + $fishcoldstoredata['mc'];
-                      $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc' WHERE id='$lastid' AND total_mc!='0'");
-                      $updatestmt->execute();
-                    }
+                    if($fishcoldstoredata['ite'] != 'export' || $fishcoldstoredata['ite'] != 'takeout'){
+                      if($fishcoldstoredata['total_mc'] != $lastrowdata['total_mc'] + $fishcoldstoredata['mc']){
+                        $total_mc = $lastrowdata['total_mc'] + $fishcoldstoredata['mc'];
+                        $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc' WHERE id='$lastid' AND total_mc!='0'");
+                        $updatestmt->execute();
+                      }
 
-                    if($fishcoldstoredata['total_kg'] != $lastrowdata['total_kg'] + $fishcoldstoredata['kg']){
-                      $total_kg = $lastrowdata['total_kg'] + $fishcoldstoredata['kg'];
-                      $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_kg='$total_kg' WHERE id='$lastid' AND total_kg!='0'");
-                      $updatestmt->execute();
+                      if($fishcoldstoredata['total_kg'] != $lastrowdata['total_kg'] + $fishcoldstoredata['kg']){
+                        $total_kg = $lastrowdata['total_kg'] + $fishcoldstoredata['kg'];
+                        $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_kg='$total_kg' WHERE id='$lastid' AND total_kg!='0'");
+                        $updatestmt->execute();
+                      }
+                    }else{
+                      if($fishcoldstoredata['total_mc'] != $lastrowdata['total_mc'] + $fishcoldstoredata['mc']){
+                        $total_mc = $lastrowdata['total_mc'] - $fishcoldstoredata['mc'];
+                        $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc' WHERE id='$lastid' AND total_mc!='0'");
+                        $updatestmt->execute();
+                      }
+
+                      if($fishcoldstoredata['total_kg'] != $lastrowdata['total_kg'] + $fishcoldstoredata['kg']){
+                        $total_kg = $lastrowdata['total_kg'] - $fishcoldstoredata['kg'];
+                        $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_kg='$total_kg' WHERE id='$lastid' AND total_kg!='0'");
+                        $updatestmt->execute();
+                      }
                     }
 
                     if($fishcoldstoredata['total_charges'] != $chargeslastrowdata['total_charges'] + $fishcoldstoredata['charges']){
