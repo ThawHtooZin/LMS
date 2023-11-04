@@ -1340,7 +1340,7 @@ Class Query{
           if(!empty($importrowsdata[0]['total_kg'])){
             $coldstorecharges2 = $coldstorerate * $importrowsdata[0]['total_kg'];
           }else{
-            $coldstorecharges2 = $coldstorerate;
+            $coldstorecharges2 = 0;
           }
           if(!empty($lasttotalcharges[0]['total_charges'])){
             if($monthsameornot === false){
@@ -1370,7 +1370,7 @@ Class Query{
           $coldstoreupdatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET charges='$coldstorecharges2', total_charges='$total_charges' WHERE id='$id'");
           $coldstoreupdatestmt->execute();
         }
-      }elseif($rowcount == 2 && $ite == 'takeout'){
+      }elseif($rowcount >= 2 && $ite == 'takeout'){
         $importrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE date!='$date' AND id < $id ORDER BY id DESC");
         $importrowstmt->execute();
         $importrowsdata = $importrowstmt->fetchall();
@@ -1380,7 +1380,7 @@ Class Query{
         if(!empty($importrowsdata[0]['total_kg'])){
           $coldstorecharges2 = $coldstorerate * $importrowsdata[0]['total_kg'];
         }else{
-          $coldstorecharges2 = $coldstorerate;
+          $coldstorecharges2 = 0;
         }
         if(!empty($lasttotalcharges[0]['total_charges'])){
           if($monthsameornot === false){
@@ -1399,8 +1399,7 @@ Class Query{
           $coldstoreupdatestmt->execute();
         }
       }
-
-
+      
       // Labour Add
       $fishlabourstmt = $pdo->prepare("SELECT * FROM gfcfishlabour ORDER BY id DESC");
       $fishlabourstmt->execute();

@@ -208,10 +208,11 @@ $query = new Query();
                   $istakeoutstmt->execute();
                   $istakeout = $istakeoutstmt->fetchColumn();
 
-                  $lastid = $fishcoldstoredata['id'] - 1;
-                  $lastrowdatastmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id='$lastid'");
+                  $lastid = $fishcoldstoredata['id'];
+                  $lastrowdatastmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$lastid' ORDER BY id DESC");
                   $lastrowdatastmt->execute();
                   $lastrowdata = $lastrowdatastmt->fetch(PDO::FETCH_ASSOC);
+
                   if (!empty($lastrowdata)) {
                     $lastyearmonth = date("Y-m", strtotime($lastrowdata['date']));
                     $nowyearmonth = date("Y-m", strtotime($fishcoldstoredata['date']));
