@@ -145,7 +145,8 @@ $query = new Query();
             <button type="submit" class="btn btn-success float-end hide adddryfishcharges" data-bs-toggle="modal" data-bs-target="#adddryfishcharges" name="dryfishcoldstorebtn">Add Dry Fish Charges</button>
             <button type="submit" class="btn btn-success float-end hide addrepackingout" data-bs-toggle="modal" data-bs-target="#addrepackingout" name="repackingbtn">Add Repacking Out</button>
             <button type="submit" class="btn btn-secondary ms-2 float-end hide addopening" data-bs-toggle="modal" data-bs-target="#addopening" name="addopening">Add Opening Balance</button>
-            <button type="submit" class="btn btn-success float-end hide addtotal" data-bs-toggle="modal" data-bs-target="#addtotal" name="addtotalbtn">Add Total Amount</button>
+            <button type="submit" class="btn btn-success float-end hide addtotal ms-2" data-bs-toggle="modal" data-bs-target="#addtotal" name="addtotalbtn">Add Total Amount</button>
+            <a href="export.php?table_name=monthlycharges" class="btn btn-success text-light export float-end">Export to Excel</a>
           </div>
           <div class="card-body">
             <div class="text-center">
@@ -570,6 +571,7 @@ $query = new Query();
       }
     ?>
     function showfishcoldstore(){
+      document.querySelector(".export").classList.add('hide');
       document.querySelector(".fishcoldstore").classList.remove('hide');
       document.querySelector(".fishcoldstorelink").classList.add('color');
       document.querySelector(".fishlabour").classList.add('hide');
@@ -589,6 +591,7 @@ $query = new Query();
 
     }
     function showfishlabour(){
+      document.querySelector(".export").classList.add('hide');
       document.querySelector(".fishlabour").classList.remove('hide');
       document.querySelector(".fishlabourlink").classList.add('color');
       document.querySelector(".fishcoldstore").classList.add('hide');
@@ -607,6 +610,7 @@ $query = new Query();
       document.querySelector(".addtotal").classList.add('hide');
     }
     function showdryfishcoldstore(){
+      document.querySelector(".export").classList.add('hide');
       document.querySelector(".dryfishcoldstore").classList.remove('hide');
       document.querySelector(".dryfishcoldstorelink").classList.add('color');
       document.querySelector(".fishcoldstore").classList.add('hide');
@@ -625,6 +629,7 @@ $query = new Query();
       document.querySelector(".addtotal").classList.add('hide');
     }
     function showdryfishlabour(){
+      document.querySelector(".export").classList.add('hide');
       document.querySelector(".dryfishlabour").classList.remove('hide');
       document.querySelector(".dryfishlabourlink").classList.add('color');
       document.querySelector(".fishcoldstore").classList.add('hide');
@@ -643,6 +648,7 @@ $query = new Query();
       document.querySelector(".addtotal").classList.add('hide');
     }
     function showrepackingout(){
+      document.querySelector(".export").classList.add('hide');
       document.querySelector(".repackingout").classList.remove('hide');
       document.querySelector(".repackingoutlink").classList.add('color');
       document.querySelector(".fishcoldstore").classList.add('hide');
@@ -661,6 +667,7 @@ $query = new Query();
       document.querySelector(".addtotal").classList.add('hide');
     }
     function showtotal(){
+      document.querySelector(".export").classList.remove('hide');
       document.querySelector(".totalamount").classList.remove('hide');
       document.querySelector(".totalamountlink").classList.add('color');
       document.querySelector(".fishcoldstore").classList.add('hide');

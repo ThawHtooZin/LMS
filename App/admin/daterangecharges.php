@@ -122,7 +122,9 @@ $query = new Query();
           <div class="card-body">
             <div class="text-center">
               <?php
-              if(isset($_POST['coldstorebtn'])){
+              if(empty($_SESSION['tabs'])){
+                $_SESSION['tabs'] = "remainingstock";
+              }elseif(isset($_POST['coldstorebtn'])){
                 $_SESSION['tabs'] = "coldstore";
               }elseif(isset($_POST['labourbtn'])){
                 $_SESSION['tabs'] = "labour";
@@ -716,7 +718,7 @@ $query = new Query();
                     $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$total_mc', total_kg='$total_kg' WHERE id='$nowid' AND commondity_id='$commondity_id'");
                     $updatestmt->execute();
                   }else{
-                    
+
                   }
 
                   ?>
