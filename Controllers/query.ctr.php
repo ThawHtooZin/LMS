@@ -1220,7 +1220,9 @@ Class Query{
         $coldstorestmt->execute();
       }
 
-
+      $fishcoldstorestmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore ORDER BY id DESC");
+      $fishcoldstorestmt->execute();
+      $fishcoldstore = $fishcoldstorestmt->fetch(PDO::FETCH_ASSOC);
       if(!empty($fishcoldstore)){
         if($fishcoldstore['date'] == $date){
 
@@ -1361,7 +1363,7 @@ Class Query{
           $lasttottalstmt->execute();
           $lasttotalcharges = $lasttottalstmt->fetch(PDO::FETCH_ASSOC);
           $importrowsdata['total_kg'];
-          $coldstorecharges2 = $coldstorerate * $importrowsdata['total_kg'];
+          $coldstorecharges2 = $coldstorerate * $fishcoldstore['total_kg'];
           if($monthsameornot === false){
             $total_charges = $coldstorecharges2;
           }else{
@@ -1371,14 +1373,19 @@ Class Query{
           $coldstoreupdatestmt->execute();
         }
       }elseif($rowcount >= 2 && $ite == 'takeout'){
+        $fishcoldstorestmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id < $id ORDER BY id DESC");
+        $fishcoldstorestmt->execute();
+        $fishcoldstore = $fishcoldstorestmt->fetch(PDO::FETCH_ASSOC);
         $importrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE date!='$date' AND id < $id ORDER BY id DESC");
         $importrowstmt->execute();
         $importrowsdata = $importrowstmt->fetchall();
         $lasttottalstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE total_charges!=0 AND id < $id AND date!='$date' ORDER BY id DESC");
         $lasttottalstmt->execute();
         $lasttotalcharges = $lasttottalstmt->fetchall();
-        if(!empty($importrowsdata[0]['total_kg'])){
-          $coldstorecharges2 = $coldstorerate * $importrowsdata[0]['total_kg'];
+        if(!empty($fishcoldstore['total_kg'])){
+          echo $fishcoldstore['total_kg'];
+          $coldstorecharges2 = $coldstorerate * $fishcoldstore['total_kg'];
+          echo 'asdfasdfasdf';
         }else{
           $coldstorecharges2 = 0;
         }
