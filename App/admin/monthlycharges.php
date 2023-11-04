@@ -335,7 +335,7 @@ $query = new Query();
                           <?php endif; ?>
                           </div>
                         </div>
-                        <div class="modal-footer float-end">
+                        <!-- <div class="modal-footer float-end">
                           <?php if ($checkitedata == 1): ?>
                             <button type="button" name="button" class="btn btn-danger" data-bs-toggle="modal">Delete</button>
                             <button type="submit" name="updatefishcoldstorebtn" class="btn btn-success">Update</button>
@@ -343,7 +343,7 @@ $query = new Query();
                           <button type="submit" name="updatefishcoldstorebtn" class="btn btn-success">Cancle</button>
                           <button type="button" name="button" class="btn btn-danger" data-bs-toggle="modal">Delete</button>
                         <?php endif; ?>
-                        </div>
+                        </div> -->
                       </div>
                     </form>
                     </div>
