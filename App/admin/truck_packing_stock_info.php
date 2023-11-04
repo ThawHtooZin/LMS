@@ -67,7 +67,7 @@ $query = new Query();
 
           <div class="card-header bg-info">
             <?php
-            if(empty($_SESSION['tabs']) && $_SESSION['tabs'] != 'actualinvoice' && $_SESSION['tabs'] != 'actualpackinglist' && $_SESSION['tabs'] != 'foambox' && $_SESSION['tabs'] != 'declare'){
+            if($_SESSION['tabs'] != 'actualinvoice' && $_SESSION['tabs'] != 'actualpackinglist' && $_SESSION['tabs'] != 'foambox' && $_SESSION['tabs'] != 'declare'){
               $_SESSION['tabs'] = 'default';
             }elseif(isset($_POST['actualinvoicebtn'])){
               $_SESSION['tabs'] = 'actualinvoice';

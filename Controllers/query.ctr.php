@@ -1007,7 +1007,7 @@ Class Query{
     $totalidstmt->execute();
     $totalid = $totalidstmt->fetch(PDO::FETCH_ASSOC);
     $totalid = $totalid['id'];
-    $lasttotalstmt = $pdo->prepare("SELECT * FROM total_charges WHERE id < '$totalid'");
+    $lasttotalstmt = $pdo->prepare("SELECT * FROM total_charges WHERE id < '$totalid' ORDER BY id DESC");
     $lasttotalstmt->execute();
     $lasttotaldata = $lasttotalstmt->fetch(PDO::FETCH_ASSOC);
     $totalstmt = $pdo->prepare("SELECT * FROM total_charges WHERE id='$totalid'");
@@ -1027,8 +1027,6 @@ Class Query{
     $total_labour_charges = $lcharges;
     $total_processing_charges = $pcharges;
     $total_charges_of_total = $charges + $lcharges + $pcharges + $total_repacking_charges + $ice_charges + $ot_charges;
-    $grand_total_charges = $total_charges_of_total + $lastbalance;
-    $balance_amount = $total_charges_of_total + $lastbalance;
 
 
     $coldstorestmt = $pdo->prepare("UPDATE coldstore SET indate='$indate', outdate='$outdate',commondity_id='$commondity_id', mc='$mc', total_mc='$dtotal_mc', kg='$kg', total_kg='$dtotal_kg', day='$day', rate='$coldstorerate', charges='$charges', total_charges='$total_charges' WHERE id='$updateid'");
@@ -1039,7 +1037,7 @@ Class Query{
     $processingstmt->execute();
     $stockstmt = $pdo->prepare("UPDATE hhkstock SET mc='$mc', total_mc='$stotal_mc', kg='$kg', total_kg='$stotal_kg' WHERE link_id='$updateid'");
     $stockstmt->execute();
-    $totalupdatestmt = $pdo->prepare("UPDATE total_charges SET total_coldstore_charges='$total_coldstore_charges', total_labour_charges='$total_labour_charges', total_processing_charges='$total_processing_charges', total_charges='$total_charges_of_total', grand_total_charges='$grand_total_charges', balance_amount='$balance_amount' WHERE commondity_id='$commondity_id' AND date='$outdate'");
+    $totalupdatestmt = $pdo->prepare("UPDATE total_charges SET total_coldstore_charges='$total_coldstore_charges', total_labour_charges='$total_labour_charges', total_processing_charges='$total_processing_charges', total_charges='$total_charges_of_total' WHERE commondity_id='$commondity_id' AND date='$outdate'");
     $totalupdatestmt->execute();
 
     // ColdStore Update

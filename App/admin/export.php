@@ -296,6 +296,55 @@ if($_GET['table_name'] == 'daterangecharges'){
   </table>
   <?php
 }
+
+if ($_GET['table_name'] == 'monthlycharges') {
+  header("Content-Type: application/xls");
+  header("Content-Disposition: attachment; filename=gfctotalcharges.xls");
+  header("Pragma: no-cache");
+  header("Expires: 0");
+  ?>
+  <table border="1">
+    <tr style="font-size:19px;">
+      <th style="padding-top: 17px;" class="text-center">Id</th>
+      <th style="padding-top: 17px;" class="text-center">Date</th>
+      <th class="text-center">Total Cold Store Charges</th>
+      <th class="text-center">Total Labour Charges</th>
+      <th class="text-center">Total Repacking Charges</th>
+      <th class="text-center">Total Dry Fish CS Charges</th>
+      <th class="text-center">Total Dry FIsh LB Charges</th>
+      <th class="text-center">Plug On Charges</th>
+      <th class="text-center">Total Charges</th>
+      <th class="text-center">Payment Date</th>
+      <th class="text-center">Payment Amount</th>
+      <th class="text-center">Balance Amount</th>
+    </tr>
+    <?php
+    $totaldatas = $query->selectall('gfctotal');
+    $idd = 0;
+    foreach ($totaldatas as $totaldata) {
+      $idd++;
+      ?>
+      <tr>
+        <td style="font-size:13px;"><?php if($totaldata['date'] != '0000-00-00'){echo $idd;} ?></td>
+        <td style="font-size:13px;"><?php if($totaldata['date'] != '0000-00-00'){echo date('d-m-Y', strtotime($totaldata['date']));} ?></td>
+        <td style="font-size:13px;"><?php if($totaldata['totalfishcoldstorecharges'] != '0'){echo $totaldata['totalfishcoldstorecharges'];} ?></td>
+        <td style="font-size:13px;"><?php if($totaldata['totalfishlabourcharges'] != '0'){echo $totaldata['totalfishlabourcharges'];} ?></td>
+        <td style="font-size:13px;"><?php if($totaldata['totalrepackingcharges'] != '0'){echo $totaldata['totalrepackingcharges'];} ?></td>
+        <td style="font-size:13px;"><?php if($totaldata['totaldryfishcoldstorecharges'] != '0'){echo $totaldata['totaldryfishcoldstorecharges'];} ?></td>
+        <td style="font-size:13px;"><?php if($totaldata['totaldryfishlabourcharges'] != '0'){echo $totaldata['totaldryfishlabourcharges'];} ?></td>
+        <td style="font-size:13px;"><?php if($totaldata['plugoncharges'] != '0'){echo $totaldata['plugoncharges'];} ?></td>
+        <td style="font-size:13px;"><?php if($totaldata['total_charges'] != '0'){echo $totaldata['total_charges'];} ?></td>
+        <td style="font-size:13px;"><?php if($totaldata['payment_date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($totaldata['payment_date'])); }; ?></td>
+        <td style="font-size:13px;"><?php if($totaldata['payment_amount'] != "0"){ echo $totaldata['payment_amount']; }; ?></td>
+        <td style="font-size:13px;"><?php echo $totaldata['balance_amount']; ?></td>
+      </tr>
+    <?php
+    }
+     ?>
+  </table>
+  <?php
+}
+
 exit();
 
 
