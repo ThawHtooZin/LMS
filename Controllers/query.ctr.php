@@ -1443,6 +1443,44 @@ Class Query{
 
   }
 
+  function updatefishcoldstore($newdate, $upite, $upmc, $upkg, $uprate, $upid){
+    global $pdo;
+
+    $olddatastmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id < $upid AND date != '$newdate' ORDER BY id DESC");
+    $olddatastmt->execute();
+    $olddata = $olddatastmt->fetch(PDO::FETCH_ASSOC);
+
+    // 1 row update
+    if (!empty($olddata)) {
+      if ($upite == 'import' || $upite == 'Import') {
+        $total_mc = $upmc + $olddata['total_mc'];
+        $total_kg = $upkg + $olddata['total_kg'];
+        $charges = $uprate * $total_kg;
+        $total_charges = $charges + $olddata['total_charges'];
+      }
+      if($upite == 'export' || $upite == 'Export'){
+        $total_mc = $olddata['total_mc'] - $upmc;
+        $total_kg = $olddata['total_kg'] - $upkg;
+        $charges = $uprate * $total_kg;
+        $total_charges = $charges + $olddata['total_charges'];
+      }
+      if($upite == 'takeout' || $upite == 'TakeOut'){
+        $total_mc = $olddata['total_mc'] - $upmc;
+        $total_kg = $olddata['total_kg'] - $upkg;
+        $charges = $uprate * $total_kg;
+        $total_charges = $charges + $olddata['total_charges'];
+      }
+    }else{
+      $total_mc = $upmc;
+      $total_kg = $upkg;
+      $charges = $uprate * $total_kg;
+      $total_charges = $charges + $total_kg;
+    }
+    $upfishcoldstorestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET date='$newdate', ite='$upite', mc='$upmc', total_mc='$total_mc', kg='$upkg', total_kg='$total_kg', rate='$uprate', charges='$charges', total_charges='$total_charges' WHERE id = '$upid'");
+    $upfishcoldstorestmt->execute();
+    // 1 row update
+  }
+
   function adddryfishcharges($date, $ite, $kg, $drycoldstorerate, $labourrate, $damagekg){
     global $pdo;
 
@@ -1738,7 +1776,7 @@ Class Query{
       $addtotalstmt = $pdo->prepare("INSERT INTO gfctotal(date, totalfishcoldstorecharges, totalfishlabourcharges, totalrepackingcharges, totaldryfishcoldstorecharges, totaldryfishlabourcharges, plugoncharges, total_charges, balance_amount) VALUES('$date', '$totalfishcoldstorecharges', '$totalfishlabourcharges', '$totalrepackingcharges', '$totaldryfishcoldstorecharges', '$totaldryfishlabourcharges', '$plugoncharges', '$total_charges', '$balance')");
       $addtotalstmt->execute();
     }else{
-      $total_charges = $totalfishcoldstorecharges + $totalfishlabourcharges + $totaldryfishcoldstorecharges + $totaldryfishlabourcharges + $totalrepackingcharges + $plugoncharges;
+      $total_charges = $totalfishcoldstorecharges + $totalfishlabourcharges + $totaldryfishcoldstorecharges + $totaldryfishlabourcharges + $totalrepackingcharges + intval($plugoncharges);
       $balance = $total_charges;
       $addtotalstmt = $pdo->prepare("INSERT INTO gfctotal(date, totalfishcoldstorecharges, totalfishlabourcharges, totalrepackingcharges, totaldryfishcoldstorecharges, totaldryfishlabourcharges, plugoncharges, total_charges, balance_amount) VALUES('$date', '$totalfishcoldstorecharges', '$totalfishlabourcharges', '$totalrepackingcharges', '$totaldryfishcoldstorecharges', '$totaldryfishlabourcharges', '$plugoncharges', '$total_charges', '$balance')");
       $addtotalstmt->execute();
