@@ -227,6 +227,31 @@ $query = new Query();
                       <?php
                     }
                   }
+
+                  $chargeslastrowdatastmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$lastid' AND total_charges!='0' ORDER BY id DESC");
+                  $chargeslastrowdatastmt->execute();
+                  $chargeslastrowdata = $chargeslastrowdatastmt->fetch(PDO::FETCH_ASSOC);
+
+                  if(!empty($lastrowdata)){
+                    if($fishcoldstoredata['total_mc'] != $lastrowdata['total_mc'] + $fishcoldstoredata['mc']){
+                      $total_mc = $lastrowdata['total_mc'] + $fishcoldstoredata['mc'];
+                      $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc' WHERE id='$lastid' AND total_mc!='0'");
+                      $updatestmt->execute();
+                    }
+
+                    if($fishcoldstoredata['total_kg'] != $lastrowdata['total_kg'] + $fishcoldstoredata['kg']){
+                      $total_kg = $lastrowdata['total_kg'] + $fishcoldstoredata['kg'];
+                      $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_kg='$total_kg' WHERE id='$lastid' AND total_kg!='0'");
+                      $updatestmt->execute();
+                    }
+
+                    if($fishcoldstoredata['total_charges'] != $chargeslastrowdata['total_charges'] + $fishcoldstoredata['charges']){
+                      $total_charges = $chargeslastrowdata['total_charges'] + $fishcoldstoredata['charges'];
+                      $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_charges='$total_charges' WHERE id='$lastid' AND total_charges!='0'");
+                      $updatestmt->execute();
+                    }
+                  }
+
                  ?>
                 <tr>
                   <td><?php echo date('d-m-Y', strtotime($fishcoldstoredata['date'])); ?></td>
@@ -300,6 +325,14 @@ $query = new Query();
                              ?>
                             <label>Labour Rate</label>
                             <input type="text" name="upratefishlabour" class="form-control inpv2" value="<?php echo $labourrate['rate']; ?>">
+                          <div class="col mt-4 mb-3">
+                            <?php if ($checkitedata == 1): ?>
+                              <button type="button" name="button" class="btn btn-danger" data-bs-toggle="modal">Delete</button>
+                              <button type="submit" name="updatefishcoldstorebtn" class="btn btn-success">Update</button>
+                            <?php else: ?>
+                            <button type="button" name="updatefishcoldstorebtn" data-bs-toggle="modal" class="btn btn-success">Cancel</button>
+                            <button type="submit" name="button" class="btn btn-danger">Delete</button>
+                          <?php endif; ?>
                           </div>
                         </div>
                         <div class="modal-footer float-end">
