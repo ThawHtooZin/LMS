@@ -494,6 +494,41 @@ $query = new Query();
                   $idd++;
                   $item_id = $total_charges_data['commondity_id'];
                   $commonditydata = $query->select('category', $item_id, 'category_id');
+
+                  $nowid = $total_charges_data['id'];
+                  $laststmt = $pdo->prepare("SELECT * FROM total_charges WHERE id < '$nowid'");
+                  $laststmt->execute();
+                  $lastdata = $laststmt->fetch(PDO::FETCH_ASSOC);
+
+                  if(!empty($lastdata)){
+                    // grand_total_charges
+                    $grand_total_charges = $total_charges_data['total_charges'] + $lastdata['balance_amount'];
+                    if($grand_total_charges != $total_charges_data['grand_total_charges']){
+                      $updatestmt = $pdo->prepare("UPDATE total_charges SET grand_total_charges='$grand_total_charges' WHERE id='$nowid'");
+                      $updatestmt->execute();
+                    }
+
+                    // balance_amount
+                    $balance_amount = $grand_total_charges - $total_charges_data['payment_amount'];
+                    if($balance_amount != $total_charges_data['balance_amount']){
+                      $balanceupdatestmt = $pdo->prepare("UPDATE total_charges SET balance_amount='$balance_amount' WHERE id='$nowid'");
+                      $balanceupdatestmt->execute();
+                    }
+                  }else{
+                    // grand_total_charges
+                    $grand_total_charges = $total_charges_data['total_charges'] + 0;
+                    if($grand_total_charges != $total_charges_data['grand_total_charges']){
+                      $updatestmt = $pdo->prepare("UPDATE total_charges SET grand_total_charges='$grand_total_charges' WHERE id='$nowid'");
+                      $updatestmt->execute();
+                    }
+
+                    // balance_amount
+                    $balance_amount = $grand_total_charges - $total_charges_data['payment_amount'];
+                    if($balance_amount != $total_charges_data['balance_amount']){
+                      $balanceupdatestmt = $pdo->prepare("UPDATE balance_amount SET balance_amount='$balance_amount' WHERE id='$nowid'");
+                      $balanceupdatestmt->execute();
+                    }
+                  }
                 ?>
                 <tr>
                   <!-- <td><?php echo $idd; ?></td> -->
@@ -506,7 +541,7 @@ $query = new Query();
                   <td data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['ice_charges'] != "0"){ echo $total_charges_data['ice_charges'];} ; ?></td>
                   <td data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['ot_charges'] != "0"){ echo $total_charges_data['ot_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['total_charges'] != "0"){ echo $total_charges_data['total_charges'];} ; ?></td>
-                  <td><?php if($total_charges_data['grand_total_charges'] != "0"){ echo $total_charges_data['grand_total_charges'];} ; ?></td>
+                  <td><?php if($total_charges_data['grand_total_charges'] != "0"){ echo $grand_total_charges;} ; ?></td>
                   <td><?php if($total_charges_data['payment_date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($total_charges_data['payment_date'])); } ; ?></td>
                   <td><?php if($total_charges_data['payment_amount'] != "0"){ echo $total_charges_data['payment_amount']; }; ?></td>
                   <td><?php if($total_charges_data['balance_amount'] != "0"){ echo $total_charges_data['balance_amount'];}; ?></td>
@@ -669,6 +704,21 @@ $query = new Query();
                   $outdatecheckstmt = $pdo->prepare("SELECT outdate FROM hhkstock WHERE id='$nowid'");
                   $outdatecheckstmt->execute();
                   $outdatecheckdata = $outdatecheckstmt->fetch(PDO::FETCH_ASSOC);
+
+                  // Update
+                  $laststmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id < '$nowid' AND commondity_id='$commondity_id' ORDER BY id DESC");
+                  $laststmt->execute();
+                  $lastdata = $laststmt->fetch(PDO::FETCH_ASSOC);
+                  if(!empty($lastdata)){
+                    // Total Mc and Kg
+                    $total_mc = $lastdata['total_mc'] - $hhkstockdata['mc'];
+                    $total_kg = $lastdata['total_kg'] - $hhkstockdata['kg'];
+                    $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$total_mc', total_kg='$total_kg' WHERE id='$nowid' AND commondity_id='$commondity_id'");
+                    $updatestmt->execute();
+                  }else{
+                    
+                  }
+
                   ?>
                 <tr>
                   <td><?php if($hhkstockdata['indate'] != "0000-00-00"){ echo date('d-m-Y', strtotime($hhkstockdata['indate'])); }; ?></td>
