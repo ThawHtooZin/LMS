@@ -3439,12 +3439,83 @@ Class Query{
      $addremarkstmt->execute();
    }
 
-   function updatestock($indate, $commondity_id, $mc, $kg, $updateid){
+   function updatehhkstock($indate, $commondity_id, $mc, $kg, $updateid){
      global $pdo;
 
-     echo $updateid;
-     $stmt = $pdo->prepare("UPDATE hhkstock SET indate='$indate', commondity_id='$commondity_id', mc='$mc', kg='$kg', total_mc='$mc', total_kg='$kg' WHERE id='$updateid'");
+     $oldstockstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id < '$updateid' AND commondity_id='$commondity_id' AND outdate='0000-00-00' ORDER BY id DESC");
+     $oldstockstmt->execute();
+     $oldstockdatas = $oldstockstmt->fetch(PDO::FETCH_ASSOC);
+
+     if (!empty($oldstockdatas)) {
+       $total_mc = $oldstockdatas['total_mc'] + $mc;
+       $total_kg = $oldstockdatas['total_kg'] + $kg;
+     }else{
+       $total_mc = $mc;
+       $total_kg = $kg;
+     }
+
+     $stmt = $pdo->prepare("UPDATE hhkstock SET indate='$indate', commondity_id='$commondity_id', mc='$mc', kg='$kg', total_mc='$total_mc', total_kg='$total_kg' WHERE id='$updateid'");
      $stmt->execute();
+
+     //stock update
+     $stockupstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id > '$updateid' AND commondity_id='$commondity_id' AND outdate='0000-00-00'");
+     $stockupstmt->execute();
+     $stockupdatas = $stockupstmt->fetchall();
+       foreach ($stockupdatas as $stockupdata) {
+         $id = $stockupdata['id'];
+         $stmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id < '$id' ORDER BY id DESC");
+         $stmt->execute();
+         $data = $stmt->fetch(PDO::FETCH_ASSOC);
+         $totalmc = $data['total_mc'] + $stockupdata['mc'];
+         $totalkg = $data['total_kg'] + $stockupdata['kg'];
+         $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$totalmc', total_kg='$totalkg' WHERE id='$id'");
+         $updatestmt->execute();
+       }
+}
+
+   function deletehhkstock($updateid){
+      global $pdo;
+
+      $stmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id='$updateid'");
+      $stmt->execute();
+      $data = $stmt->fetch(PDO::FETCH_ASSOC);
+      $commondity_id = $data['commondity_id'];
+
+
+      $deletehhkstockstmt = $pdo->prepare("DELETE FROM hhkstock WHERE id='$updateid'");
+      $deletehhkstockstmt->execute();
+
+      //stock update (1)
+      $stockupstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id > '$updateid' AND commondity_id='$commondity_id' AND outdate='0000-00-00' LIMIT 1");
+      $stockupstmt->execute();
+      $stockupdata = $stockupstmt->fetch(PDO::FETCH_ASSOC);
+      if(!empty($stockupdata)){
+        $oneid = $stockupdata['id'];
+        $stmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id='$oneid'");
+        $stmt->execute();
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+        $totalmc = $data['mc'];
+        $totalkg = $data['kg'];
+        $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$totalmc', total_kg='$totalkg' WHERE id='$oneid'");
+        $updatestmt->execute();
+      }
+
+        //All stock update
+        $stockallupstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id > '$updateid' AND commondity_id='$commondity_id' AND outdate='0000-00-00'");
+        $stockallupstmt->execute();
+        $stockallupdatas = $stockallupstmt->fetchall();
+          foreach ($stockallupdatas as $stockallupdata) {
+            $id = $stockallupdata['id'];
+            $stmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id < '$id' AND commondity_id='$commondity_id' AND outdate='0000-00-00' ORDER BY id DESC");
+            $stmt->execute();
+            $data = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!empty($data)) {
+              $totalmc = $data['total_mc'] + $stockallupdata['mc'];
+              $totalkg = $data['total_kg'] + $stockallupdata['kg'];
+              $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$totalmc', total_kg='$totalkg' WHERE id='$id'");
+              $updatestmt->execute();
+            }
+          }
    }
 
   // MORE SELECTS

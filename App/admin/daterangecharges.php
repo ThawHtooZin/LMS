@@ -99,7 +99,13 @@ $query = new Query();
       $kg = $_POST['upkg'];
       $updateid = $_POST['upidstock'];
 
-      $query->updatestock($indate, $commondity_id, $mc, $kg, $updateid);
+      $query->updatehhkstock($indate, $commondity_id, $mc, $kg, $updateid);
+    }
+
+    if (isset($_POST['deletestockbtn'])) {
+      $updateid = $_POST['upidstock'];
+
+      $query->deletehhkstock($updateid);
     }
      ?>
     <div class="row">
@@ -688,6 +694,7 @@ $query = new Query();
                   <?php endif; ?>
                 </td>
                 </tr>
+                <!-- Edit Stock Modal -->
                 <div class="modal fade" id="stockupdatemodal<?= $hhkstockdata['id']; ?>">
                   <div class="modal-dialog">
                     <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
@@ -729,13 +736,14 @@ $query = new Query();
                           </div>
                         </div>
                         <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                          <button type="submit" class="btn btn-warning text-light" name="updatestockbtn">Update</button>
+                          <button type="submit" class="btn btn-danger" name="deletestockbtn">Delete</button>
+                          <button type="submit" class="btn btn-success text-light" name="updatestockbtn">Update</button>
                         </div>
                       </form>
                     </div>
                   </div>
                 </div>
+                <!-- Edit Stock Modal -->
                 <?php
                     }
                   }
@@ -901,7 +909,7 @@ $query = new Query();
       </div>
     </div>
     <!-- Add Modal -->
-    <!-- Add Modal -->
+    <!-- Add Stock Modal -->
     <div class="modal fade" id="newstock">
       <div class="modal-dialog">
         <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
@@ -949,7 +957,7 @@ $query = new Query();
         </div>
       </div>
     </div>
-    <!-- Add Modal -->
+    <!-- Add Stock Modal -->
     <script type="text/javascript">
       $(document).ready(()=>{
         var commondity = $("#commondity").val();
