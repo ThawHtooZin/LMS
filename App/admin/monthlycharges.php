@@ -118,11 +118,12 @@ $query = new Query();
       $upite = $_POST['upfishite'];
       $upmc = $_POST['upmcfishcoldstore'];
       $upkg = $_POST['upkgfishcoldstore'];
-      $uprate = $_POST['upratefishcoldstore'];
+      $upcoldstorerate = $_POST['upratefishcoldstore'];
+      $uplabourrate = $_POST['upratefishlabour'];
       $upid = $_POST['upfishcoldstoreid'];
 
       // echo "HEHE";
-      $query->updatefishcoldstore($newdate, $upite, $upmc, $upkg, $uprate, $upid);
+      $query->updatefishcoldstore($newdate, $upite, $upmc, $upkg, $upcoldstorerate, $uplabourrate, $upid);
     }
      ?>
     <div class="row">
@@ -285,18 +286,30 @@ $query = new Query();
                         </div>
                         <div class="row">
                           <div class="col">
-                            <label>Rate</label>
+                            <label>Coldstore Rate</label>
                             <input type="text" name="upratefishcoldstore" class="form-control inpv2" value="<?php if(!empty($fishcoldstoredata['rate'])){ echo $fishcoldstoredata['rate']; } ?>">
                           </div>
-                          <div class="col mt-4 mb-3">
-                            <?php if ($checkitedata == 1): ?>
-                              <button type="button" name="button" class="btn btn-danger" data-bs-toggle="modal">Delete</button>
-                              <button type="submit" name="updatefishcoldstorebtn" class="btn btn-success">Update</button>
-                            <?php else: ?>
-                            <button type="submit" name="updatefishcoldstorebtn" class="btn btn-success">Cancle</button>
-                            <button type="button" name="button" class="btn btn-danger" data-bs-toggle="modal">Delete</button>
-                          <?php endif; ?>
+                          <div class="col">
+                            <?php
+                            $coldstoredate = $fishcoldstoredata['date'];
+                            $coldstoreite = $fishcoldstoredata['ite'];
+
+                            $labourratestmt = $pdo->prepare("SELECT rate FROM gfcfishlabour WHERE date='$coldstoredate' AND ite ='$coldstoreite'");
+                            $labourratestmt->execute();
+                            $labourrate = $labourratestmt->fetch(PDO::FETCH_ASSOC);
+                             ?>
+                            <label>Labour Rate</label>
+                            <input type="text" name="upratefishlabour" class="form-control inpv2" value="<?php echo $labourrate['rate']; ?>">
                           </div>
+                        </div>
+                        <div class="modal-footer float-end">
+                          <?php if ($checkitedata == 1): ?>
+                            <button type="button" name="button" class="btn btn-danger" data-bs-toggle="modal">Delete</button>
+                            <button type="submit" name="updatefishcoldstorebtn" class="btn btn-success">Update</button>
+                          <?php else: ?>
+                          <button type="submit" name="updatefishcoldstorebtn" class="btn btn-success">Cancle</button>
+                          <button type="button" name="button" class="btn btn-danger" data-bs-toggle="modal">Delete</button>
+                        <?php endif; ?>
                         </div>
                       </div>
                     </form>
