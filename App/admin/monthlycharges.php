@@ -209,8 +209,8 @@ $query = new Query();
                   $istakeoutstmt->execute();
                   $istakeout = $istakeoutstmt->fetchColumn();
 
-                  $lastid = $fishcoldstoredata['id'];
-                  $lastrowdatastmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$lastid' ORDER BY id DESC");
+                  $nowid = $fishcoldstoredata['id'];
+                  $lastrowdatastmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$nowid' ORDER BY id DESC");
                   $lastrowdatastmt->execute();
                   $lastrowdata = $lastrowdatastmt->fetch(PDO::FETCH_ASSOC);
 
@@ -228,44 +228,64 @@ $query = new Query();
                     }
                   }
 
-                  $chargeslastrowdatastmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$lastid' AND total_charges!='0' ORDER BY id DESC");
-                  $chargeslastrowdatastmt->execute();
-                  $chargeslastrowdata = $chargeslastrowdatastmt->fetch(PDO::FETCH_ASSOC);
-
+                  $lastrowdatastmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$nowid' ORDER BY id DESC");
+                  $lastrowdatastmt->execute();
+                  $lastrowdata = $lastrowdatastmt->fetch(PDO::FETCH_ASSOC);
                   if(!empty($lastrowdata)){
-                    if($fishcoldstoredata['ite'] != 'export' || $fishcoldstoredata['ite'] != 'takeout'){
+                    
+                    if($fishcoldstoredata['ite'] != 'export' && $fishcoldstoredata['ite'] != 'takeout'){
                       if($fishcoldstoredata['total_mc'] != $lastrowdata['total_mc'] + $fishcoldstoredata['mc']){
                         $total_mc = $lastrowdata['total_mc'] + $fishcoldstoredata['mc'];
-                        $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc' WHERE id='$lastid' AND total_mc!='0'");
+                        $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc' WHERE id='$nowid' AND total_mc!='0'");
                         $updatestmt->execute();
                       }
 
                       if($fishcoldstoredata['total_kg'] != $lastrowdata['total_kg'] + $fishcoldstoredata['kg']){
                         $total_kg = $lastrowdata['total_kg'] + $fishcoldstoredata['kg'];
-                        $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_kg='$total_kg' WHERE id='$lastid' AND total_kg!='0'");
+                        $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_kg='$total_kg' WHERE id='$nowid' AND total_kg!='0'");
                         $updatestmt->execute();
                       }
                     }else{
                       if($fishcoldstoredata['total_mc'] != $lastrowdata['total_mc'] + $fishcoldstoredata['mc']){
                         $total_mc = $lastrowdata['total_mc'] - $fishcoldstoredata['mc'];
-                        $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc' WHERE id='$lastid' AND total_mc!='0'");
+                        $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc' WHERE id='$nowid' AND total_mc!='0'");
                         $updatestmt->execute();
                       }
 
                       if($fishcoldstoredata['total_kg'] != $lastrowdata['total_kg'] + $fishcoldstoredata['kg']){
                         $total_kg = $lastrowdata['total_kg'] - $fishcoldstoredata['kg'];
-                        $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_kg='$total_kg' WHERE id='$lastid' AND total_kg!='0'");
+                        $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_kg='$total_kg' WHERE id='$nowid' AND total_kg!='0'");
                         $updatestmt->execute();
+                      }
+
+                      if(strtolower($fishcoldstoredata['ite']) == 'takeout'){
+                        $chargeslastrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$nowid' AND date='$date' AND ite='takeout' ORDER BY id DESC");
+                        $chargeslastrowstmt->execute();
+                        $chargeslastrowdata = $chargeslastrowstmt->fetch(PDO::FETCH_ASSOC);
+                        if(!empty($chargeslastrowdata)){
+                          $coldstorecharges2 = $chargeslastrowdata['total_kg'] * $fishcoldstoredata['rate'];
+                        }else{
+                          $coldstorecharges2 = $fishcoldstoredata['total_kg'] * $fishcoldstoredata['rate'];
+                        }
                       }
                     }
 
-                    if($fishcoldstoredata['total_charges'] != $chargeslastrowdata['total_charges'] + $fishcoldstoredata['charges']){
-                      $total_charges = $chargeslastrowdata['total_charges'] + $fishcoldstoredata['charges'];
-                      $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_charges='$total_charges' WHERE id='$lastid' AND total_charges!='0'");
+
+                    $totalchargeslastrowdatastmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$nowid' AND total_charges!='0' ORDER BY id DESC");
+                    $totalchargeslastrowdatastmt->execute();
+                    $totalchargeslastrowdata = $totalchargeslastrowdatastmt->fetch(PDO::FETCH_ASSOC);
+                    if(!empty($totalchargeslastrowdata['total_charges'])){
+                      $fishtotal_charges = $totalchargeslastrowdata['total_charges'] + $fishcoldstoredata['charges'];
+                    }else{
+                      $fishtotal_charges = $fishcoldstoredata['charges'];
+                    }
+
+                    if($fishcoldstoredata['total_charges'] != $fishtotal_charges){
+                      $total_charges = $totalchargeslastrowdata['total_charges'] + $fishcoldstoredata['charges'];
+                      $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_charges='$total_charges' WHERE id='$nowid' AND total_charges!='0'");
                       $updatestmt->execute();
                     }
                   }
-
                  ?>
                 <tr>
                   <td><?php echo date('d-m-Y', strtotime($fishcoldstoredata['date'])); ?></td>
