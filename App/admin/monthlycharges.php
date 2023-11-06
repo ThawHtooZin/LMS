@@ -190,6 +190,7 @@ $query = new Query();
                 <?php
                 $fishcoldstoredatas = $query->selectall('gfcfishcoldstore');
                 $idd = 0;
+                $gfcdatecoldstore = $query->selectdesc('gfcfishcoldstore');
                 foreach ($fishcoldstoredatas as $fishcoldstoredata) {
                   $idd++;
                   $date = $fishcoldstoredata['date'];
@@ -228,63 +229,115 @@ $query = new Query();
                     }
                   }
 
+                  // Update Queries
                   $lastrowdatastmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$nowid' ORDER BY id DESC");
                   $lastrowdatastmt->execute();
                   $lastrowdata = $lastrowdatastmt->fetch(PDO::FETCH_ASSOC);
-                  if(!empty($lastrowdata)){
-                    
-                    if($fishcoldstoredata['ite'] != 'export' && $fishcoldstoredata['ite'] != 'takeout'){
-                      if($fishcoldstoredata['total_mc'] != $lastrowdata['total_mc'] + $fishcoldstoredata['mc']){
-                        $total_mc = $lastrowdata['total_mc'] + $fishcoldstoredata['mc'];
-                        $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc' WHERE id='$nowid' AND total_mc!='0'");
-                        $updatestmt->execute();
-                      }
 
-                      if($fishcoldstoredata['total_kg'] != $lastrowdata['total_kg'] + $fishcoldstoredata['kg']){
-                        $total_kg = $lastrowdata['total_kg'] + $fishcoldstoredata['kg'];
-                        $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_kg='$total_kg' WHERE id='$nowid' AND total_kg!='0'");
-                        $updatestmt->execute();
-                      }
-                    }else{
-                      if($fishcoldstoredata['total_mc'] != $lastrowdata['total_mc'] + $fishcoldstoredata['mc']){
-                        $total_mc = $lastrowdata['total_mc'] - $fishcoldstoredata['mc'];
-                        $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc' WHERE id='$nowid' AND total_mc!='0'");
-                        $updatestmt->execute();
-                      }
+                  if (!empty($fishcoldstoredata)) {
+                    $lastdate = $fishcoldstoredata['date'];
+                  }else{
+                    $lastdate = '0000-00-00';
+                  }
 
-                      if($fishcoldstoredata['total_kg'] != $lastrowdata['total_kg'] + $fishcoldstoredata['kg']){
-                        $total_kg = $lastrowdata['total_kg'] - $fishcoldstoredata['kg'];
-                        $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_kg='$total_kg' WHERE id='$nowid' AND total_kg!='0'");
-                        $updatestmt->execute();
-                      }
+                  $nowtimestamp = strtotime($date);
+                  $nowyearmonth = date("Y-m", $nowtimestamp);
 
-                      if(strtolower($fishcoldstoredata['ite']) == 'takeout'){
-                        $chargeslastrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$nowid' AND date='$date' AND ite='takeout' ORDER BY id DESC");
-                        $chargeslastrowstmt->execute();
-                        $chargeslastrowdata = $chargeslastrowstmt->fetch(PDO::FETCH_ASSOC);
-                        if(!empty($chargeslastrowdata)){
-                          $coldstorecharges2 = $chargeslastrowdata['total_kg'] * $fishcoldstoredata['rate'];
-                        }else{
+                  $lasttimestamp = strtotime($lastdate);
+                  $lastyearmonth = date("Y-m", $lasttimestamp);
+
+                  if ($nowyearmonth == $lastyearmonth) {
+                    $monthsameornot = true;
+                  }else{
+                    $monthsameornot = false;
+                  }
+
+                  if($monthsameornot === true){
+                    if(!empty($lastrowdata)){
+                      if($fishcoldstoredata['ite'] == 'balance'){
+                        $total_mc = $lastrowdata['total_mc'];
+                        $total_kg = $lastrowdata['total_kg'];
+                        $charges = $total_kg * $fishcoldstoredata['rate'];
+                        $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc', total_kg='$total_kg', charges='$charges' WHERE id='$nowid' AND total_mc!='0'");
+                        $updatestmt->execute();
+                      }else{
+                        if($fishcoldstoredata['ite'] != 'export' && $fishcoldstoredata['ite'] != 'takeout'){
+                          if($fishcoldstoredata['total_mc'] != $lastrowdata['total_mc'] + $fishcoldstoredata['mc']){
+                            $total_mc = $lastrowdata['total_mc'] + $fishcoldstoredata['mc'];
+                            $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc' WHERE id='$nowid' AND total_mc!='0'");
+                            $updatestmt->execute();
+                          }
+                          if($fishcoldstoredata['total_kg'] != $lastrowdata['total_kg'] + $fishcoldstoredata['kg']){
+                            $total_kg = $lastrowdata['total_kg'] + $fishcoldstoredata['kg'];
+                            $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_kg='$total_kg' WHERE id='$nowid' AND total_kg!='0'");
+                            $updatestmt->execute();
+                          }
+
                           $coldstorecharges2 = $fishcoldstoredata['total_kg'] * $fishcoldstoredata['rate'];
+                          $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET charges='$coldstorecharges2' WHERE id='$nowid'");
+                            $updatestmt->execute();
+                        }else{
+                          if($fishcoldstoredata['total_mc'] != $lastrowdata['total_mc'] + $fishcoldstoredata['mc']){
+                            $total_mc = $lastrowdata['total_mc'] - $fishcoldstoredata['mc'];
+                            $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc' WHERE id='$nowid' AND total_mc!='0'");
+                            $updatestmt->execute();
+                          }
+
+                          if($fishcoldstoredata['total_kg'] != $lastrowdata['total_kg'] + $fishcoldstoredata['kg']){
+                            $total_kg = $lastrowdata['total_kg'] - $fishcoldstoredata['kg'];
+                            $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_kg='$total_kg' WHERE id='$nowid' AND total_kg!='0'");
+                            $updatestmt->execute();
+                          }
+
+
+                          if(strtolower($fishcoldstoredata['ite']) == 'takeout'){
+                            $chargeslastrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$nowid' AND date='$date' AND ite='takeout' ORDER BY id DESC");
+                            $chargeslastrowstmt->execute();
+                            $chargeslastrowdata = $chargeslastrowstmt->fetch(PDO::FETCH_ASSOC);
+                            if(!empty($chargeslastrowdata)){
+                              $coldstorecharges2 = $chargeslastrowdata['total_kg'] * $fishcoldstoredata['rate'];
+                            }else{
+                              $coldstorecharges2 = $fishcoldstoredata['total_kg'] * $fishcoldstoredata['rate'];
+                            }
+                            $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET charges='$coldstorecharges2' WHERE id='$nowid' AND
+                              ite='takeout' && charges!='0'");
+                              $updatestmt->execute();
+                          }elseif($fishcoldstoredata['ite'] == 'export'){
+                            $chargeslastrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$nowid' AND date='$date' AND ite='export' ORDER BY id DESC");
+                            $chargeslastrowstmt->execute();
+                            $chargeslastrowdata = $chargeslastrowstmt->fetch(PDO::FETCH_ASSOC);
+                            if(!empty($chargeslastrowdata)){
+                              $coldstorecharges2 = $chargeslastrowdata['total_kg'] * $fishcoldstoredata['rate'];
+                            }else{
+                              $coldstorecharges2 = $fishcoldstoredata['total_kg'] * $fishcoldstoredata['rate'];
+                            }
+                            $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET charges='$coldstorecharges2' WHERE id='$nowid' AND
+                              ite='export' && charges!='0'");
+                              $updatestmt->execute();
+                          }
+
+
                         }
                       }
-                    }
 
 
-                    $totalchargeslastrowdatastmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$nowid' AND total_charges!='0' ORDER BY id DESC");
-                    $totalchargeslastrowdatastmt->execute();
-                    $totalchargeslastrowdata = $totalchargeslastrowdatastmt->fetch(PDO::FETCH_ASSOC);
-                    if(!empty($totalchargeslastrowdata['total_charges'])){
-                      $fishtotal_charges = $totalchargeslastrowdata['total_charges'] + $fishcoldstoredata['charges'];
-                    }else{
-                      $fishtotal_charges = $fishcoldstoredata['charges'];
-                    }
+                      $totalchargeslastrowdatastmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$nowid' AND total_charges!='0' ORDER BY id DESC");
+                      $totalchargeslastrowdatastmt->execute();
+                      $totalchargeslastrowdata = $totalchargeslastrowdatastmt->fetch(PDO::FETCH_ASSOC);
+                      if(!empty($totalchargeslastrowdata['total_charges'])){
+                        $fishtotal_charges = $totalchargeslastrowdata['total_charges'] + $fishcoldstoredata['charges'];
+                      }else{
+                        $fishtotal_charges = $fishcoldstoredata['charges'];
+                      }
 
-                    if($fishcoldstoredata['total_charges'] != $fishtotal_charges){
-                      $total_charges = $totalchargeslastrowdata['total_charges'] + $fishcoldstoredata['charges'];
-                      $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_charges='$total_charges' WHERE id='$nowid' AND total_charges!='0'");
-                      $updatestmt->execute();
+                      if($fishcoldstoredata['total_charges'] != $fishtotal_charges){
+                        $total_charges = $totalchargeslastrowdata['total_charges'] + $fishcoldstoredata['charges'];
+                        $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_charges='$total_charges' WHERE id='$nowid' AND total_charges!='0'");
+                        $updatestmt->execute();
+                      }
                     }
+                  }else{
+
                   }
                  ?>
                 <tr>
@@ -300,7 +353,9 @@ $query = new Query();
                   <td data-bs-toggle="modal" data-bs-target="#editremarkfishcoldstore<?= $fishcoldstoredata['id'];  ?>"><?php echo $fishcoldstoredata['remark']; ?></td>
                   <?php //if ($checkitedata == 1): ?>
                     <td>
-                      <button type="submit" class="btn btn-warning btn-sm text-light d-inline" data-bs-toggle="modal" data-bs-target="#updatemodal<?= $fishcoldstoredata['id']; ?>"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                      <button type="submit" class="btn btn-warning btn-sm text-light d-inline"
+                      <?php if(date('Y-m', strtotime($fishcoldstoredata['date'])) == date('Y-m', strtotime($gfcdatecoldstore[0]['date']))){echo 'data-bs-toggle="modal"';}else{ echo 'onclick="swal(\'Sorry!\', \'You cannot edit from last month.\', \'warning\');"'; };  ?>
+                       data-bs-target="#updatemodal<?= $fishcoldstoredata['id']; ?>"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                           <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
                           <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
                         </svg>
@@ -325,7 +380,7 @@ $query = new Query();
                           </div>
                           <div class="col">
                             <label>I.T.E</label>
-                            <select class="form-control inpv2 mb-2" name="upfishite">
+                            <select class="form-control inpv2 mb-2" name="upfishite" id='ite<?= $fishcoldstoredata['id']; ?>'>
                               <option <?php if($fishcoldstoredata['ite'] == 'import'){ echo "selected"; } ?> value="import">Import</option>
                               <option <?php if($fishcoldstoredata['ite'] == 'export'){ echo "selected"; } ?> value="export">Export</option>
                               <option <?php if($fishcoldstoredata['ite'] == 'takeout'){ echo "selected"; } ?> value="takeout">TakeOut</option>
@@ -349,16 +404,19 @@ $query = new Query();
                             <input type="text" name="upratefishcoldstore" class="form-control inpv2" value="<?php if(!empty($fishcoldstoredata['rate'])){ echo $fishcoldstoredata['rate']; } ?>">
                           </div>
                           <div class="col">
-                            <?php
-                            $coldstoredate = $fishcoldstoredata['date'];
-                            $coldstoreite = $fishcoldstoredata['ite'];
+                            <div id="labour<?= $fishcoldstoredata['id']; ?>">
+                              <?php
+                              $coldstoredate = $fishcoldstoredata['date'];
+                              $coldstoreite = $fishcoldstoredata['ite'];
 
-                            $labourratestmt = $pdo->prepare("SELECT rate FROM gfcfishlabour WHERE date='$coldstoredate' AND ite ='$coldstoreite'");
-                            $labourratestmt->execute();
-                            $labourrate = $labourratestmt->fetch(PDO::FETCH_ASSOC);
-                             ?>
-                            <label>Labour Rate</label>
-                            <input type="text" name="upratefishlabour" class="form-control inpv2" value="<?php echo $labourrate['rate']; ?>">
+                              $labourratestmt = $pdo->prepare("SELECT rate FROM gfcfishlabour WHERE date='$coldstoredate' AND ite ='$coldstoreite'");
+                              $labourratestmt->execute();
+                              $labourrate = $labourratestmt->fetch(PDO::FETCH_ASSOC);
+                              ?>
+                              <label>Labour Rate</label>
+                              <input type="text" name="upratefishlabour" class="form-control inpv2" value="<?php echo $labourrate['rate']; ?>">
+
+                            </div>
                           <div class="modal-footer mt-3">
                             <?php if ($checkitedata == 1): ?>
                               <button type="button" name="button" class="btn btn-danger" data-bs-toggle="modal">Delete</button>
@@ -374,6 +432,17 @@ $query = new Query();
                     </div>
                   </div>
                 </div>
+                <script>
+                      $('#ite<?= $fishcoldstoredata['id']; ?>').change(()=>{
+                        var value = $('#ite<?= $fishcoldstoredata['id']; ?>').val();
+
+                        if(value == 'balance'){
+                          $('#labour<?= $fishcoldstoredata['id']; ?>').hide();
+                        }else{
+                          $('#labour<?= $fishcoldstoredata['id']; ?>').show();
+                        }
+                      });
+                </script>
                 <div class="modal fade" id="editremarkfishcoldstore<?= $fishcoldstoredata['id'];  ?>">
                   <div class="modal-dialog">
                     <div class="modal-content">
@@ -776,6 +845,10 @@ $query = new Query();
       document.querySelector(".addtotal").classList.remove('hide');
       document.querySelector(".addopening").classList.remove('hide');
     }
+
+
+
+
     </script>
     <?php
     $bootstrap->javascript();

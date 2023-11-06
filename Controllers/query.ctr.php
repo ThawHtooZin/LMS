@@ -1156,8 +1156,8 @@ Class Query{
     if($ite == 'balance'){
       if(!empty($fishcoldstore)){
         $total_mc = $fishcoldstore['total_mc'];
-        $total_kg = $fishcoldstore['total_kg'];
-        $charges = floatval($coldstorerate) * floatval($total_kg);
+         $total_kg = floatval($fishcoldstore['total_kg']);
+         $charges = floatval($coldstorerate) * floatval($total_kg);
         if($monthsameornot === false){
           $total_charges = $charges;
         }else{
@@ -1209,6 +1209,7 @@ Class Query{
         $total_kg = floatval($kg);
       }
 
+
       $coldstorestmt = $pdo->prepare("INSERT INTO gfcfishcoldstore(date, ite, mc, total_mc, kg, total_kg, rate) VALUES('$date', '$ite', '$mc', '$total_mc', '$kg', '$total_kg', '$coldstorerate')");
       $coldstorestmt->execute();
       if(!empty($damagekg)){
@@ -1218,6 +1219,17 @@ Class Query{
         $total_kg_damage = floatval($fishcoldstore2['total_kg']) - floatval($damagekg);
         $coldstorestmt = $pdo->prepare("INSERT INTO gfcfishcoldstore(date, ite, total_mc, kg, total_kg, rate) VALUES('$date', '$ite', '$total_mc', '$damagekg', '$total_kg_damage', '$coldstorerate')");
         $coldstorestmt->execute();
+      }
+      $nowid = $this->selectdesc('gfcfishcoldstore');
+      $nowid = $nowid[0]['id'];
+      $balancecheckstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE date='$date' AND ite='balance' AND id<'$nowid'");
+      $balancecheckstmt->execute();
+      $balancecheck = $balancecheckstmt->fetch(PDO::FETCH_ASSOC);
+
+      if(!empty($balancecheck)){
+        $balanceid = $balancecheck['id'];
+        $balancestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET charges='0', total_charges='0' WHERE id='$balanceid'");
+        $balancestmt->execute();
       }
 
       $fishcoldstorestmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore ORDER BY id DESC");
@@ -1294,7 +1306,7 @@ Class Query{
         if(!empty($importrowsdatas)){
           $coldstorecharges2 = $coldstorerate * $total_kg;
           if($lasttotalcharges == ''){
-            $total_charges = 0 + $coldstorecharges2;
+            $total_charges = $coldstorecharges2;
           }else{
             if($monthsameornot === false){
               $total_charges = $coldstorecharges2;
@@ -1474,6 +1486,10 @@ Class Query{
         $total_mc = $oldcoldstoredata['total_mc'] - $upmc;
         $total_kg = $oldcoldstoredata['total_kg'] - $upkg;
       }
+      if(str_contains(strtolower($upite), 'balance')){
+        $total_mc = $oldcoldstoredata['total_mc'];
+        $total_kg = $oldcoldstoredata['total_kg'];
+      }
     }else{
       $total_mc = $upmc;
       $total_kg = $upkg;
@@ -1492,12 +1508,14 @@ Class Query{
         $charges = $upcoldstorerate * $total_kg;
         $total_charges = $charges + $oldchargescoldstoredata['total_charges'];
       }
+      if(str_contains(strtolower($upite), 'balance')){
+        $charges = $upcoldstorerate * $total_kg;
+        $total_charges = $charges + $oldchargescoldstoredata['total_charges'];
+      }
     }else{
       $charges = $upcoldstorerate * $total_kg;
       $total_charges = $charges;
     }
-    $upfishcoldstorestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET date='$newdate', ite='$upite', mc='$upmc', total_mc='$total_mc', kg='$upkg', total_kg='$total_kg', rate='$upcoldstorerate', charges='$charges', total_charges='$total_charges' WHERE id = '$upid'");
-    $upfishcoldstorestmt->execute();
 
     // fishcoldstore 1 row update
 
@@ -1525,17 +1543,27 @@ Class Query{
     $oldlabourdata = $oldlabourdatastmt->fetch(PDO::FETCH_ASSOC);
 
     if (!empty($oldlabourdata)) {
-      $labourcharges = $uplabourrate * $upkg;
+      $labourcharges = intval($uplabourrate) * floatval($upkg);
       $labourtotal_charges = $labourcharges + $oldlabourdata['total_charges'];
      }else{
-      $labourcharges = $uplabourrate * $total_kg;
+      $labourcharges = $uplabourrate * floatval($total_kg);
       $labourtotal_charges = $labourcharges;
     }
 
+    // fishlabour 1 row update
+
+    // Labour
     $upfishcoldstorestmt = $pdo->prepare("UPDATE gfcfishlabour SET date='$newdate', ite='$upite', kg='$upkg', rate='$uplabourrate', charges='$labourcharges', total_charges='$labourtotal_charges' WHERE date = '$coldstoredate' AND ite = '$coldstoreite'");
     $upfishcoldstorestmt->execute();
 
-    // fishlabour 1 row update
+    // Coldstore
+    if($upite == 'balance'){
+      $upfishcoldstorestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET date='$newdate', ite='$upite', mc='0', total_mc='$total_mc', kg='0', total_kg='$total_kg', rate='$upcoldstorerate', charges='$charges', total_charges='$total_charges' WHERE id = '$upid'");
+      $upfishcoldstorestmt->execute();
+    }else{
+      $upfishcoldstorestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET date='$newdate', ite='$upite', mc='$upmc', total_mc='$total_mc', kg='$upkg', total_kg='$total_kg', rate='$upcoldstorerate', charges='$charges', total_charges='$total_charges' WHERE id = '$upid'");
+      $upfishcoldstorestmt->execute();
+    }
   }
 
   function adddryfishcharges($date, $ite, $kg, $drycoldstorerate, $labourrate, $damagekg){
