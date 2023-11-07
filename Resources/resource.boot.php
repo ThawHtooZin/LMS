@@ -284,6 +284,15 @@ class Bootstrap
     });
     $('.table').removeClass('table-bordered');
     $('th').css('background-color', 'black');
+
+    $(document).keydown(function(event) {
+      // Check if Ctrl key and Enter key are pressed
+      if (event.ctrlKey && event.key === 'Enter') {
+        var filename = window.location.pathname.split('/').pop();;
+
+        window.location.href="linkpage.php?filename="+filename;
+      }
+    });
     </script>
     <?php
   }

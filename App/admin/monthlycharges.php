@@ -682,6 +682,22 @@ $query = new Query();
                 $totaldatas = $query->selectall('gfctotal');
                 $idd = 0;
                 foreach ($totaldatas as $totaldata) {
+
+                  $idtotal = $totaldata['id'];
+                  $totallastrowstmt = $pdo->prepare("SELECT * FROM gfctotal WHERE id<'$idtotal' ORDER BY id DESC");
+                  $totallastrowstmt->execute();
+                  $totallastrowdata = $totallastrowstmt->fetch(PDO::FETCH_ASSOC);
+
+                  if(!empty($totallastrowdata)){
+                    $balance_amount = $totaldata['total_charges'] + $total_charges;
+                    $totaleditstmt = $pdo->prepare("UPDATE gfctotal SET balance_amount='$balance_amount' WHERE id='$idtotal'");
+                    $totaleditstmt->execute();
+                  }else {
+                    $balance_amount = $totaldata['total_charges'];
+                    $totaleditstmt = $pdo->prepare("UPDATE gfctotal SET balance_amount='$balance_amount' WHERE id='$idtotal'");
+                    $totaleditstmt->execute();
+                  }
+
                   $idd++;
                   ?>
                   <tr <?php if($totaldata['payment_date'] != '0000-00-00' || $totaldata['total_charges'] != 0){ ?>data-bs-toggle="modal" data-bs-target="#addpayment<?php echo $totaldata['id']; ?>"<?php } ?>>
@@ -845,10 +861,6 @@ $query = new Query();
       document.querySelector(".addtotal").classList.remove('hide');
       document.querySelector(".addopening").classList.remove('hide');
     }
-
-
-
-
     </script>
     <?php
     $bootstrap->javascript();
