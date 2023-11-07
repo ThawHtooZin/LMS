@@ -1564,6 +1564,8 @@ Class Query{
       $upfishcoldstorestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET date='$newdate', ite='$upite', mc='$upmc', total_mc='$total_mc', kg='$upkg', total_kg='$total_kg', rate='$upcoldstorerate', charges='$charges', total_charges='$total_charges' WHERE id = '$upid'");
       $upfishcoldstorestmt->execute();
     }
+
+    
   }
 
   function adddryfishcharges($date, $ite, $kg, $drycoldstorerate, $labourrate, $damagekg){
@@ -1855,7 +1857,7 @@ Class Query{
       $totalrepackingcharges = 0;
     }
     if(!empty($totalbalancedata)){
-      $total_charges = $totalfishcoldstorecharges + $totalfishlabourcharges + $totaldryfishcoldstorecharges + $totaldryfishlabourcharges + $totalrepackingcharges + $plugoncharges;
+      $total_charges = floatval($totalfishcoldstorecharges) + floatval($totalfishlabourcharges) + floatval($totaldryfishcoldstorecharges) + floatval($totaldryfishlabourcharges) + floatval($totalrepackingcharges) + floatval($plugoncharges);
 
       $balance = $totalbalancedata['balance_amount'] + $total_charges;
       $addtotalstmt = $pdo->prepare("INSERT INTO gfctotal(date, totalfishcoldstorecharges, totalfishlabourcharges, totalrepackingcharges, totaldryfishcoldstorecharges, totaldryfishlabourcharges, plugoncharges, total_charges, balance_amount) VALUES('$date', '$totalfishcoldstorecharges', '$totalfishlabourcharges', '$totalrepackingcharges', '$totaldryfishcoldstorecharges', '$totaldryfishlabourcharges', '$plugoncharges', '$total_charges', '$balance')");

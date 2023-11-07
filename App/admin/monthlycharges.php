@@ -172,6 +172,7 @@ $query = new Query();
               </form>
             </div>
             <hr>
+            <!-- GFC FISH COLDSTORE -->
             <div class="fishcoldstore hide">
               <table class="table table-striped table-bordered table-hover">
                 <tr>
@@ -261,7 +262,7 @@ $query = new Query();
                         $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc', total_kg='$total_kg', charges='$charges' WHERE id='$nowid' AND total_mc!='0'");
                         $updatestmt->execute();
                       }else{
-                        if($fishcoldstoredata['ite'] != 'export' && $fishcoldstoredata['ite'] != 'takeout'){
+                        if(strtolower($fishcoldstoredata['ite']) == 'import'){
                           if($fishcoldstoredata['total_mc'] != $lastrowdata['total_mc'] + $fishcoldstoredata['mc']){
                             $total_mc = $lastrowdata['total_mc'] + $fishcoldstoredata['mc'];
                             $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc' WHERE id='$nowid' AND total_mc!='0'");
@@ -277,16 +278,18 @@ $query = new Query();
                           $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET charges='$coldstorecharges2' WHERE id='$nowid'");
                             $updatestmt->execute();
                         }else{
-                          if($fishcoldstoredata['total_mc'] != $lastrowdata['total_mc'] + $fishcoldstoredata['mc']){
-                            $total_mc = $lastrowdata['total_mc'] - $fishcoldstoredata['mc'];
-                            $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc' WHERE id='$nowid' AND total_mc!='0'");
-                            $updatestmt->execute();
-                          }
+                          if(strtolower($fishcoldstoredata['ite']) == 'export'){
+                            if($fishcoldstoredata['total_mc'] != $lastrowdata['total_mc'] - $fishcoldstoredata['mc']){
+                              $total_mc = $lastrowdata['total_mc'] - $fishcoldstoredata['mc'];
+                              $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc' WHERE id='$nowid' AND ite='export' AND date='$date' AND total_mc!='0'");
+                              $updatestmt->execute();
+                            }
 
-                          if($fishcoldstoredata['total_kg'] != $lastrowdata['total_kg'] + $fishcoldstoredata['kg']){
-                            $total_kg = $lastrowdata['total_kg'] - $fishcoldstoredata['kg'];
-                            $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_kg='$total_kg' WHERE id='$nowid' AND total_kg!='0'");
-                            $updatestmt->execute();
+                            if($fishcoldstoredata['total_kg'] != $lastrowdata['total_kg'] - $fishcoldstoredata['kg']){
+                              $total_kg = $lastrowdata['total_kg'] - $fishcoldstoredata['kg'];
+                              $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_kg='$total_kg' WHERE id='$nowid' AND total_kg!='0'");
+                              $updatestmt->execute();
+                            }
                           }
 
 
@@ -472,7 +475,6 @@ $query = new Query();
             <div class="fishlabour hide">
               <table class="table table-striped table-bordered table-hover">
                 <tr>
-                  <th>Id</th>
                   <th>Date</th>
                   <th>I.T.E</th>
                   <th>Kg</th>
@@ -483,12 +485,28 @@ $query = new Query();
                 </tr>
                 <?php
                 $fishlabourdatas = $query->selectall("gfcfishlabour");
-                $idd = 0;
                 foreach ($fishlabourdatas as $fishlabourdata) {
-                  $idd++;
+
+                  $nowid = $fishlabourdata['id'];
+                  $lastrowdatastmt = $pdo->prepare("SELECT * FROM gfcfishlabour WHERE id<'$nowid' ORDER BY id DESC");
+                  $lastrowdatastmt->execute();
+                  $lastrowdata = $lastrowdatastmt->fetch(PDO::FETCH_ASSOC);
+
+                  if (!empty($lastrowdata)) {
+                    $lastyearmonth = date("Y-m", strtotime($lastrowdata['date']));
+                    $nowyearmonth = date("Y-m", strtotime($fishlabourdata['date']));
+                    if ($lastyearmonth != $nowyearmonth) {
+                      ?>
+                      <tr>
+
+                        <td style="font-weight:bold;"><?=$monthName = date("F", mktime(0, 0, 0, date('m', strtotime($fishlabourdata['date'])), 1)); ?></td>
+                        <td colspan="10"></td>
+                      </tr>
+                      <?php
+                    }
+                  }
                  ?>
                 <tr>
-                  <td><?php echo $idd; ?></td>
                   <td><?php echo date('d-m-Y', strtotime($fishlabourdata['date'])); ?></td>
                   <td><?php echo $fishlabourdata['ite']; ?></td>
                   <td><?php echo $fishlabourdata['kg']; ?></td>
@@ -526,7 +544,6 @@ $query = new Query();
             <div class="dryfishcoldstore hide">
               <table class="table table-striped table-bordered table-hover">
                 <tr>
-                  <th>Id</th>
                   <th>Date</th>
                   <th>I.T.E</th>
                   <th>Kg</th>
@@ -538,12 +555,28 @@ $query = new Query();
                 </tr>
                 <?php
                 $dryfishcoldstoredatas = $query->selectall("gfcdryfishcoldstore");
-                $idd = 0;
                 foreach ($dryfishcoldstoredatas as $dryfishcoldstoredata) {
-                  $idd++;
+
+                  $nowid = $dryfishcoldstoredata['id'];
+                  $lastrowdatastmt = $pdo->prepare("SELECT * FROM gfcdryfishcoldstore WHERE id<'$nowid' ORDER BY id DESC");
+                  $lastrowdatastmt->execute();
+                  $lastrowdata = $lastrowdatastmt->fetch(PDO::FETCH_ASSOC);
+
+                  if (!empty($lastrowdata)) {
+                    $lastyearmonth = date("Y-m", strtotime($lastrowdata['date']));
+                    $nowyearmonth = date("Y-m", strtotime($dryfishcoldstoredata['date']));
+                    if ($lastyearmonth != $nowyearmonth) {
+                      ?>
+                      <tr>
+
+                        <td style="font-weight:bold;"><?=$monthName = date("F", mktime(0, 0, 0, date('m', strtotime($dryfishcoldstoredata['date'])), 1)); ?></td>
+                        <td colspan="10"></td>
+                      </tr>
+                      <?php
+                    }
+                  }
                  ?>
                 <tr>
-                  <td><?php echo $idd; ?></td>
                   <td><?php echo date('d-m-Y', strtotime($dryfishcoldstoredata['date'])); ?></td>
                   <td><?php echo $dryfishcoldstoredata['ite']; ?></td>
                   <td><?php echo $dryfishcoldstoredata['kg']; ?></td>
@@ -582,7 +615,6 @@ $query = new Query();
             <div class="dryfishlabour hide">
               <table class="table table-striped table-bordered table-hover">
                 <tr>
-                  <th>Id</th>
                   <th>Date</th>
                   <th>I.T.E</th>
                   <th>Kg</th>
@@ -593,12 +625,27 @@ $query = new Query();
                 </tr>
                 <?php
                 $dryfishlabourdatas = $query->selectall("gfcdryfishlabour");
-                $idd = 0;
                 foreach ($dryfishlabourdatas as $dryfishlabourdata) {
-                  $idd++;
+                  $nowid = $dryfishlabourdata['id'];
+                  $lastrowdatastmt = $pdo->prepare("SELECT * FROM gfcdryfishlabour WHERE id<'$nowid' ORDER BY id DESC");
+                  $lastrowdatastmt->execute();
+                  $lastrowdata = $lastrowdatastmt->fetch(PDO::FETCH_ASSOC);
+
+                  if (!empty($lastrowdata)) {
+                    $lastyearmonth = date("Y-m", strtotime($lastrowdata['date']));
+                    $nowyearmonth = date("Y-m", strtotime($dryfishlabourdata['date']));
+                    if ($lastyearmonth != $nowyearmonth) {
+                      ?>
+                      <tr>
+
+                        <td style="font-weight:bold;"><?=$monthName = date("F", mktime(0, 0, 0, date('m', strtotime($dryfishlabourdata['date'])), 1)); ?></td>
+                        <td colspan="10"></td>
+                      </tr>
+                      <?php
+                    }
+                  }
                  ?>
                 <tr>
-                  <td><?php echo $idd; ?></td>
                   <td><?php echo date('d-m-Y', strtotime($dryfishlabourdata['date'])); ?></td>
                   <td><?php echo $dryfishlabourdata['ite']; ?></td>
                   <td><?php echo $dryfishlabourdata['kg']; ?></td>
@@ -665,7 +712,6 @@ $query = new Query();
             <div class="totalamount hide">
               <table class="table table-striped table-bordered table-hover">
                 <tr>
-                  <th style="font-size:13px; padding-top: 17px;" class="text-center">Id</th>
                   <th style="font-size:13px; padding-top: 17px;" class="text-center">Date</th>
                   <th style="font-size:13px;" class="text-center">Total Cold Store Charges</th>
                   <th style="font-size:13px;" class="text-center">Total Labour Charges</th>
@@ -680,28 +726,11 @@ $query = new Query();
                 </tr>
                 <?php
                 $totaldatas = $query->selectall('gfctotal');
-                $idd = 0;
                 foreach ($totaldatas as $totaldata) {
-
-                  $idtotal = $totaldata['id'];
-                  $totallastrowstmt = $pdo->prepare("SELECT * FROM gfctotal WHERE id<'$idtotal' ORDER BY id DESC");
-                  $totallastrowstmt->execute();
-                  $totallastrowdata = $totallastrowstmt->fetch(PDO::FETCH_ASSOC);
-
-                  if(!empty($totallastrowdata)){
-                    $balance_amount = $totaldata['total_charges'] + $total_charges;
-                    $totaleditstmt = $pdo->prepare("UPDATE gfctotal SET balance_amount='$balance_amount' WHERE id='$idtotal'");
-                    $totaleditstmt->execute();
-                  }else {
-                    $balance_amount = $totaldata['total_charges'];
-                    $totaleditstmt = $pdo->prepare("UPDATE gfctotal SET balance_amount='$balance_amount' WHERE id='$idtotal'");
-                    $totaleditstmt->execute();
-                  }
 
                   $idd++;
                   ?>
                   <tr <?php if($totaldata['payment_date'] != '0000-00-00' || $totaldata['total_charges'] != 0){ ?>data-bs-toggle="modal" data-bs-target="#addpayment<?php echo $totaldata['id']; ?>"<?php } ?>>
-                    <td style="font-size:13px;"><?php if($totaldata['date'] != '0000-00-00'){echo $idd;} ?></td>
                     <td style="font-size:13px;"><?php if($totaldata['date'] != '0000-00-00'){echo date('d-m-Y', strtotime($totaldata['date']));} ?></td>
                     <td style="font-size:13px;"><?php if($totaldata['totalfishcoldstorecharges'] != '0'){echo $totaldata['totalfishcoldstorecharges'];} ?></td>
                     <td style="font-size:13px;"><?php if($totaldata['totalfishlabourcharges'] != '0'){echo $totaldata['totalfishlabourcharges'];} ?></td>
@@ -861,6 +890,9 @@ $query = new Query();
       document.querySelector(".addtotal").classList.remove('hide');
       document.querySelector(".addopening").classList.remove('hide');
     }
+    </script>
+    <script type="text/javascript">
+       console.log('<?php echo $_SESSION['reloadtime']; ?>');
     </script>
     <?php
     $bootstrap->javascript();
