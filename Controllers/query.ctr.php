@@ -1167,13 +1167,23 @@ Class Query{
         $coldstorestmt = $pdo->prepare("INSERT INTO gfcfishcoldstore(date, ite, total_mc, total_kg, rate, charges, total_charges) VALUES('$date', '$ite', '$total_mc', '$total_kg', '$coldstorerate', '$charges', '$total_charges')");
         $coldstorestmt->execute();
       }else{
-        $total_mc = 0;
-        $total_kg = 0;
-        $charges = 0;
-        $total_charges = 0;
+        if(!empty($mc) && !empty($kg)){
+          $total_mc = $mc;
+          $total_kg = $kg;
+          $charges = $total_kg * $coldstorerate;
+          $total_charges = $charges;
 
-        $coldstorestmt = $pdo->prepare("INSERT INTO gfcfishcoldstore(date, ite, total_mc, total_kg, rate, charges, total_charges) VALUES('$date', '$ite', '$total_mc', '$total_kg', '$coldstorerate', '$charges', '$total_charges')");
-        $coldstorestmt->execute();
+          $coldstorestmt = $pdo->prepare("INSERT INTO gfcfishcoldstore(date, ite, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$date', '$ite', '$mc', '$total_mc', '$kg', '$total_kg', '$coldstorerate', '$charges', '$total_charges')");
+          $coldstorestmt->execute();
+        }else{
+          $total_mc = 0;
+          $total_kg = 0;
+          $charges = 0;
+          $total_charges = 0;
+
+          $coldstorestmt = $pdo->prepare("INSERT INTO gfcfishcoldstore(date, ite, total_mc, total_kg, rate, charges, total_charges) VALUES('$date', '$ite', '$total_mc', '$total_kg', '$coldstorerate', '$charges', '$total_charges')");
+          $coldstorestmt->execute();
+        }
       }
     }else{
       if(!empty($fishcoldstore)){
@@ -1546,7 +1556,7 @@ Class Query{
       $labourcharges = intval($uplabourrate) * floatval($upkg);
       $labourtotal_charges = $labourcharges + $oldlabourdata['total_charges'];
      }else{
-      $labourcharges = $uplabourrate * floatval($total_kg);
+      $labourcharges = floatval($uplabourrate) * floatval($total_kg);
       $labourtotal_charges = $labourcharges;
     }
 
@@ -1565,7 +1575,7 @@ Class Query{
       $upfishcoldstorestmt->execute();
     }
 
-    
+
   }
 
   function adddryfishcharges($date, $ite, $kg, $drycoldstorerate, $labourrate, $damagekg){
@@ -3642,6 +3652,23 @@ Class Query{
           }
    }
 
+   function deletefish($deletedate){
+     global $pdo;
+
+     $stmt = $pdo->prepare("DELETE FROM gfcfishcoldstore WHERE date='$deletedate'");
+     $stmt->execute();
+
+     $stmt = $pdo->prepare("DELETE FROM gfcfishlabour WHERE date='$deletedate'");
+     $stmt->execute();
+   }
+
+   function deletedryfish($deletedate){
+     global $pdo;
+
+     $stmt = $pdo->prepare("DELETE * FROM gfcdryfishcoldstore WHERE date='$deletedate'");
+     $stmt->execute();
+   }
+
   // MORE SELECTS
 
   function selectsum($table, $id, $selectwhat){
@@ -3778,6 +3805,13 @@ Class Query{
   function selectdesc($table){
     global $pdo;
     $stmt = $pdo->prepare("SELECT * FROM $table ORDER BY id DESC");
+    $stmt->execute();
+    return $stmt->fetchall();
+  }
+
+  function selectorderby($table, $orderby){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM $table ORDER BY $orderby");
     $stmt->execute();
     return $stmt->fetchall();
   }

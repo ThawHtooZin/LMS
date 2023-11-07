@@ -125,6 +125,16 @@ $query = new Query();
       // echo "HEHE";
       $query->updatefishcoldstore($newdate, $upite, $upmc, $upkg, $upcoldstorerate, $uplabourrate, $upid);
     }
+
+    if(isset($_POST['deletefishbtn'])){
+      $deletedate = $_POST['deletedatefish'];
+      $query->deletefish($deletedate);
+    }
+
+    if(isset($_POST['deletedryfishbtn'])){
+      $deletedate = $_POST['deletedatedryfish'];
+      $query->deletedryfish($deletedate);
+    }
      ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
@@ -189,7 +199,7 @@ $query = new Query();
                   <th>Action</th>
                 </tr>
                 <?php
-                $fishcoldstoredatas = $query->selectall('gfcfishcoldstore');
+                $fishcoldstoredatas = $query->selectall('gfcfishcoldstore', 'date');
                 $idd = 0;
                 $gfcdatecoldstore = $query->selectdesc('gfcfishcoldstore');
                 foreach ($fishcoldstoredatas as $fishcoldstoredata) {
@@ -407,26 +417,27 @@ $query = new Query();
                             <input type="text" name="upratefishcoldstore" class="form-control inpv2" value="<?php if(!empty($fishcoldstoredata['rate'])){ echo $fishcoldstoredata['rate']; } ?>">
                           </div>
                           <div class="col">
-                            <div id="labour<?= $fishcoldstoredata['id']; ?>">
-                              <?php
-                              $coldstoredate = $fishcoldstoredata['date'];
-                              $coldstoreite = $fishcoldstoredata['ite'];
+                            <?php
+                            $coldstoredate = $fishcoldstoredata['date'];
+                            $coldstoreite = $fishcoldstoredata['ite'];
 
-                              $labourratestmt = $pdo->prepare("SELECT rate FROM gfcfishlabour WHERE date='$coldstoredate' AND ite ='$coldstoreite'");
-                              $labourratestmt->execute();
-                              $labourrate = $labourratestmt->fetch(PDO::FETCH_ASSOC);
-                              ?>
+                            $labourratestmt = $pdo->prepare("SELECT rate FROM gfcfishlabour WHERE date='$coldstoredate' AND ite ='$coldstoreite'");
+                            $labourratestmt->execute();
+                            $labourrate = $labourratestmt->fetch(PDO::FETCH_ASSOC);
+                            ?>
+                            <div id="labour<?= $fishcoldstoredata['id']; ?>" style="<?php if(empty($labourrate)){echo "display:none;";}; ?>">
                               <label>Labour Rate</label>
-                              <input type="text" name="upratefishlabour" class="form-control inpv2" value="<?php echo $labourrate['rate']; ?>">
+                              <input type="text" name="upratefishlabour" class="form-control inpv2" value="<?php if(!empty($labourrate)){echo $labourrate['rate'];}; ?>">
 
                             </div>
+                            <input type="hidden" name="deletedatefish" value="<?= $fishcoldstoredata['date']; ?>">
                           <div class="modal-footer mt-3">
-                            <?php if ($checkitedata == 1): ?>
-                              <button type="button" name="button" class="btn btn-danger" data-bs-toggle="modal">Delete</button>
+                            <?php if ($checkitedata == 1 && $fishcoldstoredata['ite'] != 'balance'): ?>
+                              <button type="submit" name="deletefishbtn" class="btn btn-danger">Delete</button>
                               <button type="submit" name="updatefishcoldstorebtn" class="btn btn-success">Update</button>
                             <?php else: ?>
-                            <button type="button" name="updatefishcoldstorebtn" data-bs-toggle="modal" class="btn btn-success">Cancel</button>
-                            <button type="submit" name="button" class="btn btn-danger">Delete</button>
+                            <button type="button" data-bs-toggle="modal" class="btn btn-success">Cancel</button>
+                            <button type="submit" name="deletefishbtn" class="btn btn-danger">Delete</button>
                           <?php endif; ?>
                           </div>
                         </div>
@@ -484,7 +495,7 @@ $query = new Query();
                   <th>Remark</th>
                 </tr>
                 <?php
-                $fishlabourdatas = $query->selectall("gfcfishlabour");
+                $fishlabourdatas = $query->selectall('gfcfishlabour', 'date');
                 foreach ($fishlabourdatas as $fishlabourdata) {
 
                   $nowid = $fishlabourdata['id'];
@@ -554,7 +565,7 @@ $query = new Query();
                   <th>Remark</th>
                 </tr>
                 <?php
-                $dryfishcoldstoredatas = $query->selectall("gfcdryfishcoldstore");
+                $dryfishcoldstoredatas = $query->selectall('gfcdryfishcoldstore', 'date');
                 foreach ($dryfishcoldstoredatas as $dryfishcoldstoredata) {
 
                   $nowid = $dryfishcoldstoredata['id'];
@@ -624,7 +635,7 @@ $query = new Query();
                   <th>Remark</th>
                 </tr>
                 <?php
-                $dryfishlabourdatas = $query->selectall("gfcdryfishlabour");
+                $dryfishlabourdatas = $query->selectall('gfcdryfishlabour', 'date');
                 foreach ($dryfishlabourdatas as $dryfishlabourdata) {
                   $nowid = $dryfishlabourdata['id'];
                   $lastrowdatastmt = $pdo->prepare("SELECT * FROM gfcdryfishlabour WHERE id<'$nowid' ORDER BY id DESC");
