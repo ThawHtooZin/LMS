@@ -32,7 +32,7 @@ $query = new Query();
       <div class="contentcol" id="content">
         <?php require 'navbar.php'; ?>
         <div class="card">
-          <div class="card-header bg-warning text-light">
+          <div class="card-header bg-primary text-light">
             <form action="" class="d-inline" method="post">
               <?php
               if(isset($_POST['searchgeneralledger'])){
@@ -46,8 +46,8 @@ $query = new Query();
               }
                ?>
             </form>
-            <button type="button" class="btn btn-primary btn-sm float-end" data-bs-toggle="modal" data-bs-target="#reportsmodal">Reports</button>
-            <h5>General Ledger</h5>
+            <button type="button" class="btn btn-info btn-sm float-end" data-bs-toggle="modal" data-bs-target="#reportsmodal">Reports</button>
+            <h5>Sale Ledger</h5>
           </div>
           <div class="card-body">
             <table class="table table-bordered" id="table">
@@ -178,20 +178,17 @@ $query = new Query();
                   <?php
                   }
               }else{
-                $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger");
+                $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger WHERE ac_code LIKE '5000%'");
                 $acnamecountstmt->execute();
                 $acnamecount = $acnamecountstmt->fetchColumn();
                 for ($i=0; $i < $acnamecount; $i++) {
-                  $accodestmt = $pdo->prepare("SELECT DISTINCT ac_code FROM general_ledger");
+                  $accodestmt = $pdo->prepare("SELECT DISTINCT ac_code FROM general_ledger WHERE ac_code LIKE '5000%'");
                   $accodestmt->execute();
                   $accodedata = $accodestmt->fetchall();
                   $accode = $accodedata[$i]['ac_code'];
                 $gldatas = $query->search('general_ledger', 'ac_code', $accode);
                 $acname = $query->select('acname', $accode, 'code_no');
                ?>
-               <tr>
-                 <td colspan="7"><b><u><?php echo "Account No. : " . $accode . " - " . $acname['ac_name']; ?></u></b></td>
-               </tr>
               <?php foreach($gldatas as $gldata) : ?>
                 <?php
                 $ac_code = $gldata['ac_code'];
@@ -336,7 +333,7 @@ $query = new Query();
                 <h1 class="modal-title fs-5">General Ledger Reports</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
-            <form action="general_ledger.php" method="post">
+            <form action="sales.php" method="post">
               <div class="modal-body">
                 <div class="row">
                   <div class="col">
@@ -346,18 +343,6 @@ $query = new Query();
                   <div class="col">
                     <label>Date To</label>
                     <input type="date" name="date_to" class="form-control inpv2 mb-2">
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col">
-                    <label>Account No</label>
-                    <input type="text" name="ac_code" class="form-control inpv2 mb-2" id="ac_code">
-                  </div>
-                  <div class="col">
-                    <label>Account Name</label>
-                    <div class="" id="ac_name">
-                      <input type="text" disabled class="form-control inpv2 mb-2">
-                    </div>
                   </div>
                 </div>
               </div>

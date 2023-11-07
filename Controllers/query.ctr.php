@@ -475,6 +475,11 @@ Class Query{
       echo '<script>swal("Error!", "Error accors when added Purchase Voucher", "error");</script>';
     }
 
+    // General Ledger Add
+
+    $glstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, credit) VALUES('$date', '$voucher_no', '$supplier_name', '$amount')");
+    $glstmt->execute();
+
   }
 
   function updatepurchase($table, $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price, $no){
@@ -1236,12 +1241,6 @@ Class Query{
       $balancecheckstmt->execute();
       $balancecheck = $balancecheckstmt->fetch(PDO::FETCH_ASSOC);
 
-      if(!empty($balancecheck)){
-        $balanceid = $balancecheck['id'];
-        $balancestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET charges='0', total_charges='0' WHERE id='$balanceid'");
-        $balancestmt->execute();
-      }
-
       $fishcoldstorestmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore ORDER BY id DESC");
       $fishcoldstorestmt->execute();
       $fishcoldstore = $fishcoldstorestmt->fetch(PDO::FETCH_ASSOC);
@@ -1297,7 +1296,13 @@ Class Query{
       $rowcount = $pdo->prepare("SELECT COUNT(*) FROM gfcfishcoldstore WHERE date='$date'");
       $rowcount->execute();
       $rowcount = $rowcount->fetchColumn();
+
       if($ite == 'import'){
+        if(!empty($balancecheck)){
+          $balanceid = $balancecheck['id'];
+          $balancestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET charges='0', total_charges='0' WHERE id='$balanceid'");
+          $balancestmt->execute();
+        }
         $importrowstmt = $pdo->prepare("SELECT total_kg FROM gfcfishcoldstore WHERE date='$date' AND ite='import'");
         $importrowstmt->execute();
         $importrowsdatas = $importrowstmt->fetchall();
@@ -3068,7 +3073,14 @@ Class Query{
         }
       }
       $generalledgerstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, balance, narration,sr_no, container_no, bank_charges, acid) VALUES('$date','$voucher_no','$ac_code', '$debit', '$credit', '$balance', '$description', '$sr_no', '$container_no', '$bank_charges', '$acid')");
-      $generalledgerstmt->execute();
+
+      $checkglstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE voucherno='$voucher_no' AND ac_code='$ac_code'");
+      $checkglstmt->execute();
+      $checkgl = $checkglstmt->fetchall();
+      if(empty($checkgl)){
+        $generalledgerstmt->execute();
+      }
+
       echo "<script>swal('Success', 'Accepted Successfully', 'success');</script>";
     }
 
@@ -3106,15 +3118,26 @@ Class Query{
         if(!empty($receivedata['invoice_amount'])){
           $invoice_amount = $receivedata['invoice_amount'];
           if (!empty($receivedata['balance'])) {
-            $balance = intval($receivedata['balance']) - intval($paid_amount);
+            $balance = floatval($currencydata['usd_amount']) - intval($paid_amount);
           }else{
-            $balance = intval($receivedata['balance'] + $invoice_amount) - intval($paid_amount);
+            $balance = floatval($currencydata['usd_amount'] + $invoice_amount) - intval($paid_amount);
           }
         }else{
           $invoice_amount = 0;
+          $balance = $invoice_amount - $paid_amount;
         }
         $receivestmt = $pdo->prepare("INSERT INTO receivable(ac_code, paid_date, payment_no, particulars, paid_amount, balance) VALUES('$ac_code', '$date', '$voucher_no', '$description', '$paid_amount', '$balance')");
-        $receivestmt->execute();
+        $checkrestmt = $pdo->prepare("SELECT * FROM receivable WHERE payment_no='$voucher_no'");
+        $checkrestmt->execute();
+        $checkre = $checkrestmt->fetchall();
+        $checkresrstmt = $pdo->prepare("SELECT * FROM receivable WHERE sr_no='$voucher_no'");
+        $checkresrstmt->execute();
+        $checkresr = $checkresrstmt->fetchall();
+        if(empty($checkre)){
+          if(empty($checkresr)){
+            $receivestmt->execute();
+          }
+        }
       }
     }
 
@@ -3133,20 +3156,8 @@ Class Query{
         $payabledatastmt->execute();
         $payablesearchdata = $payabledatastmt->fetch(PDO::FETCH_ASSOC);
         if(!empty($payablesearchdata)){
-          if($payablesearchdata['paid_amount'] == '0'){
-            if($payablesearchdata['balance'] != 0){
-              $balance = $payablesearchdata['balance'] - $paid_amount;
-              $rowid = $payablesearchdata['id'];
-              $payablestmt = $pdo->prepare("UPDATE payable SET supplier_id='$supplier_id', paid_date='$date', paid_voucher='$voucher_no', remark='$description', paid_amount='$paid_amount', balance='$balance' WHERE id='$rowid'");
-            }else{
-              $balance = $payablesearchdata['purchase_amount'] - $paid_amount;
-              $rowid = $payablesearchdata['id'];
-              $payablestmt = $pdo->prepare("UPDATE payable SET supplier_id='$supplier_id', paid_date='$date', paid_voucher='$voucher_no', remark='$description', paid_amount='$paid_amount', balance='$balance' WHERE id='$rowid'");
-            }
-          }else{
             $balance = $payablesearchdata['balance'] - $paid_amount;
             $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '$date', '$voucher_no', '$description', '$paid_amount', '$balance')");
-          }
         }else{
           $balance = 0;
           $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '$date', '$voucher_no', '$description', '$paid_amount', '$balance')");
@@ -3166,7 +3177,13 @@ Class Query{
           $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, purchase_amount, balance) VALUES('$supplier_id', '$voucher_no', '$addamt', '$balance')");
         }
       }
-      $payablestmt->execute();
+
+      $checkapstmt = $pdo->prepare("SELECT * FROM payable WHERE paid_voucher='$voucher_no'");
+      $checkapstmt->execute();
+      $checkap = $checkapstmt->fetchall();
+      if(empty($checkap)){
+        $payablestmt->execute();
+      }
     }
 
     // Cash Book
@@ -3226,9 +3243,15 @@ Class Query{
       }
       $balance = ($balance + $debit) - $credit;
       $cashbookstmt = $pdo->prepare("INSERT INTO cashbook(date, ac_name, particular, debit, credit, balance, voucher_no) VALUES('$date', '$ac_name', :description, '$debit', '$credit', '$balance', '$voucher_no')");
-      $cashbookstmt->execute([
-        ':description' => $description
-      ]);
+
+      $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no='$voucher_no'");
+      $checkcbstmt->execute();
+      $checkcb = $checkcbstmt->fetchall();
+      if(empty($checkcb)){
+        $cashbookstmt->execute([
+          ':description' => $description
+        ]);
+      }
     }
   }
 
@@ -3354,20 +3377,8 @@ Class Query{
         $payabledatastmt->execute();
         $payablesearchdata = $payabledatastmt->fetch(PDO::FETCH_ASSOC);
         if(!empty($payablesearchdata)){
-          if($payablesearchdata['paid_amount'] == '0'){
-            if($payablesearchdata['balance'] != 0){
-              $balance = $payablesearchdata['balance'] - $paid_amount;
-              $rowid = $payablesearchdata['id'];
-              $payablestmt = $pdo->prepare("UPDATE payable SET supplier_id='$supplier_id', paid_date='$date', paid_voucher='$voucher_no', remark='$description', paid_amount='$paid_amount', balance='$balance' WHERE id='$rowid'");
-            }else{
-              $balance = $payablesearchdata['purchase_amount'] - $paid_amount;
-              $rowid = $payablesearchdata['id'];
-              $payablestmt = $pdo->prepare("UPDATE payable SET supplier_id='$supplier_id', paid_date='$date', paid_voucher='$voucher_no', remark='$description', paid_amount='$paid_amount', balance='$balance' WHERE id='$rowid'");
-            }
-          }else{
             $balance = $payablesearchdata['balance'] - $paid_amount;
             $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '$date', '$voucher_no', '$description', '$paid_amount', '$balance')");
-          }
         }else{
           $balance = 0;
           $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '$date', '$voucher_no', '$description', '$paid_amount', '$balance')");
