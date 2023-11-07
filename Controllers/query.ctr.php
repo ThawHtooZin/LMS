@@ -1796,6 +1796,107 @@ Class Query{
 
   }
 
+  function updatedryfishcoldstore($newdate, $upite, $upkg, $upcoldstorerate, $uplabourrate, $upid){
+    global $pdo;
+
+        // dryfishcoldstore 1 row update
+        $oldcoldstoredatastmt = $pdo->prepare("SELECT * FROM gfcdryfishcoldstore WHERE id < $upid AND date != '$newdate' ORDER BY id DESC");
+        $oldcoldstoredatastmt->execute();
+        $oldcoldstoredata = $oldcoldstoredatastmt->fetch(PDO::FETCH_ASSOC);
+
+        $oldchargescoldstoredatastmt = $pdo->prepare("SELECT * FROM gfcdryfishcoldstore WHERE id < $upid AND date != '$newdate' AND total_charges!='0' ORDER BY id DESC");
+        $oldchargescoldstoredatastmt->execute();
+        $oldchargescoldstoredata = $oldchargescoldstoredatastmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!empty($oldcoldstoredata)) {
+          if (str_contains(strtolower($upite), 'import')) {
+            $total_kg = $upkg + $oldcoldstoredata['total_kg'];
+          }
+          if(str_contains(strtolower($upite), 'export')){
+            $total_kg = $oldcoldstoredata['total_kg'] - $upkg;
+          }
+          if(str_contains(strtolower($upite), 'takeout')){
+            $total_kg = $oldcoldstoredata['total_kg'] - $upkg;
+          }
+          if(str_contains(strtolower($upite), 'balance')){
+            $total_kg = $oldcoldstoredata['total_kg'];
+          }
+        }else{
+          $total_kg = $upkg;
+        }
+
+        if(!empty($oldchargescoldstoredata)){
+          if (str_contains(strtolower($upite), 'import')) {
+            $charges = $upcoldstorerate * $total_kg;
+            $total_charges = $charges + $oldchargescoldstoredata['total_charges'];
+          }
+          if(str_contains(strtolower($upite), 'export')){
+            $charges = $upcoldstorerate * $total_kg;
+            $total_charges = $charges + $oldchargescoldstoredata['total_charges'];
+          }
+          if(str_contains(strtolower($upite), 'takeout')){
+            $charges = $upcoldstorerate * $total_kg;
+            $total_charges = $charges + $oldchargescoldstoredata['total_charges'];
+          }
+          if(str_contains(strtolower($upite), 'balance')){
+            $charges = $upcoldstorerate * $total_kg;
+            $total_charges = $charges + $oldchargescoldstoredata['total_charges'];
+          }
+        }else{
+          $charges = $upcoldstorerate * $total_kg;
+          $total_charges = $charges;
+        }
+
+        // dryfishcoldstore 1 row update
+
+
+        // dryfishlabour 1 row update
+
+        $dataforlabourstmt = $pdo->prepare("SELECT * FROM gfcdryfishcoldstore WHERE id='$upid'");
+        $dataforlabourstmt->execute();
+        $dataforlabour = $dataforlabourstmt->fetch(PDO::FETCH_ASSOC);
+
+        $coldstoredate = $dataforlabour['date'];
+        $coldstoreite = $dataforlabour['ite'];
+
+        $uplabourstmt = $pdo->prepare("SELECT id FROM gfcdryfishlabour WHERE date='$coldstoredate' AND ite='$coldstoreite'");
+        $uplabourstmt->execute();
+        $uplabour = $uplabourstmt->fetch(PDO::FETCH_ASSOC);
+        if(!empty($uplabour)){
+          $uplabourid = $uplabour['id'];
+        }else{
+          $uplabourid = 0;
+        }
+
+        $oldlabourdatastmt = $pdo->prepare("SELECT * FROM gfcdryfishlabour WHERE id < '$uplabourid' AND date != '$newdate' ORDER BY id DESC");
+        $oldlabourdatastmt->execute();
+        $oldlabourdata = $oldlabourdatastmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!empty($oldlabourdata)) {
+          $labourcharges = intval($uplabourrate) * floatval($upkg);
+          $labourtotal_charges = $labourcharges + $oldlabourdata['total_charges'];
+         }else{
+          $labourcharges = floatval($uplabourrate) * floatval($total_kg);
+          $labourtotal_charges = $labourcharges;
+        }
+
+        // dryfishlabour 1 row update
+
+        // Labour
+        $updryfishcoldstorestmt = $pdo->prepare("UPDATE gfcdryfishlabour SET date='$newdate', ite='$upite', kg='$upkg', rate='$uplabourrate', charges='$labourcharges', total_charges='$labourtotal_charges' WHERE date = '$coldstoredate' AND ite = '$coldstoreite'");
+        $updryfishcoldstorestmt->execute();
+
+        // Coldstore
+        if($upite == 'balance'){
+          $updryfishcoldstorestmt = $pdo->prepare("UPDATE gfcdryfishcoldstore SET date='$newdate', ite='$upite', kg='0', total_kg='$total_kg', rate='$upcoldstorerate', charges='$charges', total_charges='$total_charges' WHERE id = '$upid'");
+          $updryfishcoldstorestmt->execute();
+        }else{
+          $updryfishcoldstorestmt = $pdo->prepare("UPDATE gfcdryfishcoldstore SET date='$newdate', ite='$upite', kg='$upkg', total_kg='$total_kg', rate='$upcoldstorerate', charges='$charges', total_charges='$total_charges' WHERE id = '$upid'");
+          $updryfishcoldstorestmt->execute();
+        }
+
+  }
+
   function addrepackingout($date, $outkg, $rprate){
     global $pdo;
 
@@ -3665,7 +3766,10 @@ Class Query{
    function deletedryfish($deletedate){
      global $pdo;
 
-     $stmt = $pdo->prepare("DELETE * FROM gfcdryfishcoldstore WHERE date='$deletedate'");
+     $stmt = $pdo->prepare("DELETE FROM gfcdryfishcoldstore WHERE date='$deletedate'");
+     $stmt->execute();
+
+     $stmt = $pdo->prepare("DELETE FROM gfcdryfishlabour WHERE date='$deletedate'");
      $stmt->execute();
    }
 

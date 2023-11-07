@@ -122,8 +122,18 @@ $query = new Query();
       $uplabourrate = $_POST['upratefishlabour'];
       $upid = $_POST['upfishcoldstoreid'];
 
-      // echo "HEHE";
       $query->updatefishcoldstore($newdate, $upite, $upmc, $upkg, $upcoldstorerate, $uplabourrate, $upid);
+    }
+
+    if (isset($_POST['updatedryfishcoldstorebtn'])) {
+      $newdate = $_POST['updatedryfishcoldstore'];
+      $upite = $_POST['updryfishite'];
+      $upkg = $_POST['upkgdryfishcoldstore'];
+      $upcoldstorerate = $_POST['upratedryfishcoldstore'];
+      $uplabourrate = $_POST['upratedryfishlabour'];
+      $upid = $_POST['updryfishcoldstoreid'];
+
+      $query->updatedryfishcoldstore($newdate, $upite, $upkg, $upcoldstorerate, $uplabourrate, $upid);
     }
 
     if(isset($_POST['deletefishbtn'])){
@@ -302,6 +312,19 @@ $query = new Query();
                             }
                           }
 
+                          if(strtolower($fishcoldstoredata['ite']) == 'takeout'){
+                            if($fishcoldstoredata['total_mc'] != $lastrowdata['total_mc'] - $fishcoldstoredata['mc']){
+                              $total_mc = $lastrowdata['total_mc'] - $fishcoldstoredata['mc'];
+                              $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc' WHERE id='$nowid' AND ite='takeout' AND date='$date' AND total_mc!='0'");
+                              $updatestmt->execute();
+                            }
+
+                            if($fishcoldstoredata['total_kg'] != $lastrowdata['total_kg'] - $fishcoldstoredata['kg']){
+                              $total_kg = $lastrowdata['total_kg'] - $fishcoldstoredata['kg'];
+                              $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_kg='$total_kg' WHERE id='$nowid' AND total_kg!='0'");
+                              $updatestmt->execute();
+                            }
+                          }
 
                           if(strtolower($fishcoldstoredata['ite']) == 'takeout'){
                             $chargeslastrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$nowid' AND date='$date' AND ite='takeout' ORDER BY id DESC");
@@ -446,6 +469,7 @@ $query = new Query();
                     </div>
                   </div>
                 </div>
+              </div>
                 <script>
                       $('#ite<?= $fishcoldstoredata['id']; ?>').change(()=>{
                         var value = $('#ite<?= $fishcoldstoredata['id']; ?>').val();
@@ -456,28 +480,35 @@ $query = new Query();
                           $('#labour<?= $fishcoldstoredata['id']; ?>').show();
                         }
                       });
+                      var value = $('#ite<?= $fishcoldstoredata['id']; ?>').val();
+
+                      if(value == 'balance'){
+                        $('#labour<?= $fishcoldstoredata['id']; ?>').hide();
+                      }else{
+                        $('#labour<?= $fishcoldstoredata['id']; ?>').show();
+                      }
                 </script>
-                <div class="modal fade" id="editremarkfishcoldstore<?= $fishcoldstoredata['id'];  ?>">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header bg-secondary text-light">
-                        <h1 class="modal-title fs-5">Edit Fish ColdStore Remark</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  <div class="modal fade" id="editremarkfishcoldstore<?= $fishcoldstoredata['id'];  ?>">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header bg-secondary text-light">
+                          <h1 class="modal-title fs-5">Edit Fish ColdStore Remark</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                      <form action="monthlycharges.php" method="post">
+                        <input type="hidden" name="fishcoldstoreid" value="<?php echo $fishcoldstoredata['id']; ?>">
+                        <div class="modal-body">
+                          <label>Remark</label>
+                          <input type="text" name="remarkfishcoldstore" class="form-control inpv2" value="<?php if(!empty($fishcoldstoredata['remark'])){ echo $fishcoldstoredata['remark']; } ?>">
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" name="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
+                          <button type="submit" name="remarkfishcoldstorebtn" class="btn btn-success">Update</button>
+                        </div>
+                      </form>
                       </div>
-                    <form action="monthlycharges.php" method="post">
-                      <input type="hidden" name="fishcoldstoreid" value="<?php echo $fishcoldstoredata['id']; ?>">
-                      <div class="modal-body">
-                        <label>Remark</label>
-                        <input type="text" name="remarkfishcoldstore" class="form-control inpv2" value="<?php if(!empty($fishcoldstoredata['remark'])){ echo $fishcoldstoredata['remark']; } ?>">
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" name="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
-                        <button type="submit" name="remarkfishcoldstorebtn" class="btn btn-success">Update</button>
-                      </div>
-                    </form>
                     </div>
                   </div>
-                </div>
                 <?php
                 }
                  ?>
@@ -563,10 +594,31 @@ $query = new Query();
                   <th>Charges</th>
                   <th>Total Charges</th>
                   <th>Remark</th>
+                  <th>Action</th>
                 </tr>
                 <?php
                 $dryfishcoldstoredatas = $query->selectall('gfcdryfishcoldstore', 'date');
+
+                $gfcdatedrycoldstore = $query->selectdesc('gfcdryfishcoldstore');
                 foreach ($dryfishcoldstoredatas as $dryfishcoldstoredata) {
+
+
+                  $date = $dryfishcoldstoredata['date'];
+                  $checkitestmt = $pdo->prepare("SELECT COUNT(ite) FROM gfcdryfishcoldstore WHERE date='$date'");
+                  $checkitestmt->execute();
+                  $checkitedata = $checkitestmt->fetchColumn();
+
+                  $fishcoldstoremaxstmt = $pdo->prepare("SELECT MAX(charges) AS charges FROM gfcdryfishcoldstore WHERE date='$date'");
+                  $fishcoldstoremaxstmt->execute();
+                  $fishcoldstoremaxdata = $fishcoldstoremaxstmt->fetch(PDO::FETCH_ASSOC);
+
+                  $exportstmt = $pdo->prepare("SELECT COUNT(*) FROM gfcdryfishcoldstore WHERE date='$date'");
+                  $exportstmt->execute();
+                  $exportcount = $exportstmt->fetchColumn();
+
+                  $istakeoutstmt =$pdo->prepare("SELECT COUNT(*) FROM gfcdryfishcoldstore WHERE date='$date' AND ite='takeout' AND ite='import' OR ite='export'");
+                  $istakeoutstmt->execute();
+                  $istakeout = $istakeoutstmt->fetchColumn();
 
                   $nowid = $dryfishcoldstoredata['id'];
                   $lastrowdatastmt = $pdo->prepare("SELECT * FROM gfcdryfishcoldstore WHERE id<'$nowid' ORDER BY id DESC");
@@ -586,6 +638,115 @@ $query = new Query();
                       <?php
                     }
                   }
+
+                  // Update Queries
+                  $lastrowdatastmt = $pdo->prepare("SELECT * FROM gfcdryfishcoldstore WHERE id<'$nowid' ORDER BY id DESC");
+                  $lastrowdatastmt->execute();
+                  $lastrowdata = $lastrowdatastmt->fetch(PDO::FETCH_ASSOC);
+
+                  if (!empty($dryfishcoldstoredata)) {
+                    $lastdate = $dryfishcoldstoredata['date'];
+                  }else{
+                    $lastdate = '0000-00-00';
+                  }
+
+                  $nowtimestamp = strtotime($date);
+                  $nowyearmonth = date("Y-m", $nowtimestamp);
+
+                  $lasttimestamp = strtotime($lastdate);
+                  $lastyearmonth = date("Y-m", $lasttimestamp);
+
+                  if ($nowyearmonth == $lastyearmonth) {
+                    $monthsameornot = true;
+                  }else{
+                    $monthsameornot = false;
+                  }
+
+                  if($monthsameornot === true){
+                    if(!empty($lastrowdata)){
+                      if($dryfishcoldstoredata['ite'] == 'balance'){
+                        $total_kg = $lastrowdata['total_kg'];
+                        $charges = $total_kg * $dryfishcoldstoredata['rate'];
+                        $updatestmt = $pdo->prepare("UPDATE gfcdryfishcoldstore SET total_kg='$total_kg', charges='$charges' WHERE id='$nowid'");
+                        $updatestmt->execute();
+                      }else{
+                        if(strtolower($dryfishcoldstoredata['ite']) == 'import'){
+                          if($dryfishcoldstoredata['total_kg'] != $lastrowdata['total_kg'] + $dryfishcoldstoredata['kg']){
+                            $total_kg = $lastrowdata['total_kg'] + $dryfishcoldstoredata['kg'];
+                            $updatestmt = $pdo->prepare("UPDATE gfcdryfishcoldstore SET total_kg='$total_kg' WHERE id='$nowid' AND total_kg!='0'");
+                            $updatestmt->execute();
+                          }
+
+                          $coldstorecharges2 = $dryfishcoldstoredata['total_kg'] * $dryfishcoldstoredata['rate'];
+                          $updatestmt = $pdo->prepare("UPDATE gfcdryfishcoldstore SET charges='$coldstorecharges2' WHERE id='$nowid'");
+                            $updatestmt->execute();
+                        }else{
+                          if(strtolower($dryfishcoldstoredata['ite']) == 'export'){
+
+                            if($dryfishcoldstoredata['total_kg'] != $lastrowdata['total_kg'] - $dryfishcoldstoredata['kg']){
+                              $total_kg = $lastrowdata['total_kg'] - $dryfishcoldstoredata['kg'];
+                              $updatestmt = $pdo->prepare("UPDATE gfcdryfishcoldstore SET total_kg='$total_kg' WHERE id='$nowid' AND total_kg!='0'");
+                              $updatestmt->execute();
+                            }
+                          }
+
+                          if(strtolower($dryfishcoldstoredata['ite']) == 'takeout'){
+                            if($dryfishcoldstoredata['total_kg'] != $lastrowdata['total_kg'] - $dryfishcoldstoredata['kg']){
+                              $total_kg = $lastrowdata['total_kg'] - $dryfishcoldstoredata['kg'];
+                              $updatestmt = $pdo->prepare("UPDATE gfcdryfishcoldstore SET total_kg='$total_kg' WHERE id='$nowid' AND total_kg!='0'");
+                              $updatestmt->execute();
+                            }
+                          }
+
+                          if(strtolower($dryfishcoldstoredata['ite']) == 'takeout'){
+                            $chargeslastrowstmt = $pdo->prepare("SELECT * FROM gfcdryfishcoldstore WHERE id<'$nowid' AND date='$date' AND ite='takeout' ORDER BY id DESC");
+                            $chargeslastrowstmt->execute();
+                            $chargeslastrowdata = $chargeslastrowstmt->fetch(PDO::FETCH_ASSOC);
+                            if(!empty($chargeslastrowdata)){
+                              $coldstorecharges2 = $chargeslastrowdata['total_kg'] * $dryfishcoldstoredata['rate'];
+                            }else{
+                              $coldstorecharges2 = $dryfishcoldstoredata['total_kg'] * $dryfishcoldstoredata['rate'];
+                            }
+                            $updatestmt = $pdo->prepare("UPDATE gfcdryfishcoldstore SET charges='$coldstorecharges2' WHERE id='$nowid' AND
+                              ite='takeout' && charges!='0'");
+                              $updatestmt->execute();
+                          }elseif($dryfishcoldstoredata['ite'] == 'export'){
+                            $chargeslastrowstmt = $pdo->prepare("SELECT * FROM gfcdryfishcoldstore WHERE id<'$nowid' AND date='$date' AND ite='export' ORDER BY id DESC");
+                            $chargeslastrowstmt->execute();
+                            $chargeslastrowdata = $chargeslastrowstmt->fetch(PDO::FETCH_ASSOC);
+                            if(!empty($chargeslastrowdata)){
+                              $coldstorecharges2 = $chargeslastrowdata['total_kg'] * $dryfishcoldstoredata['rate'];
+                            }else{
+                              $coldstorecharges2 = $dryfishcoldstoredata['total_kg'] * $dryfishcoldstoredata['rate'];
+                            }
+                            $updatestmt = $pdo->prepare("UPDATE gfcdryfishcoldstore SET charges='$coldstorecharges2' WHERE id='$nowid' AND
+                              ite='export' && charges!='0'");
+                              $updatestmt->execute();
+                          }
+
+
+                        }
+                      }
+
+
+                      $totalchargeslastrowdatastmt = $pdo->prepare("SELECT * FROM gfcdryfishcoldstore WHERE id<'$nowid' AND total_charges!='0' ORDER BY id DESC");
+                      $totalchargeslastrowdatastmt->execute();
+                      $totalchargeslastrowdata = $totalchargeslastrowdatastmt->fetch(PDO::FETCH_ASSOC);
+                      if(!empty($totalchargeslastrowdata['total_charges'])){
+                        $fishtotal_charges = $totalchargeslastrowdata['total_charges'] + $dryfishcoldstoredata['charges'];
+                      }else{
+                        $fishtotal_charges = $dryfishcoldstoredata['charges'];
+                      }
+
+                      if($dryfishcoldstoredata['total_charges'] != $fishtotal_charges){
+                        $total_charges = $totalchargeslastrowdata['total_charges'] + $dryfishcoldstoredata['charges'];
+                        $updatestmt = $pdo->prepare("UPDATE gfcdryfishcoldstore SET total_charges='$total_charges' WHERE id='$nowid' AND total_charges!='0'");
+                        $updatestmt->execute();
+                      }
+                    }
+                  }else{
+
+                  }
                  ?>
                 <tr>
                   <td><?php echo date('d-m-Y', strtotime($dryfishcoldstoredata['date'])); ?></td>
@@ -596,7 +757,102 @@ $query = new Query();
                   <td><?php if($dryfishcoldstoredata['charges'] != 0){ echo $dryfishcoldstoredata['charges']; } ?></td>
                   <td><?php if($dryfishcoldstoredata['total_charges'] != 0){ echo $dryfishcoldstoredata['total_charges']; } ?></td>
                   <td data-bs-toggle="modal" data-bs-target="#editremarkdryfishcoldstore<?= $dryfishcoldstoredata['id'];  ?>"><?php echo $dryfishcoldstoredata['remark']; ?></td>
+                  <?php //if ($checkitedata == 1): ?>
+                    <td>
+                      <button type="submit" class="btn btn-warning btn-sm text-light d-inline"
+                      <?php if(date('Y-m', strtotime($dryfishcoldstoredata['date'])) == date('Y-m', strtotime($gfcdatedrycoldstore[0]['date']))){echo 'data-bs-toggle="modal"';}else{ echo 'onclick="swal(\'Sorry!\', \'You cannot edit from last month.\', \'warning\');"'; };  ?>
+                       data-bs-target="#updatemodaldryfish<?= $dryfishcoldstoredata['id']; ?>"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                          <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                        </svg>
+                      </button>
+                    </td>
                 </tr>
+                <div class="modal fade" id="updatemodaldryfish<?= $dryfishcoldstoredata['id']; ?>">
+                  <div class="modal-dialog">
+                    <div class="modal-content" style="width: 650px;">
+                      <div class="modal-header bg-secondary text-light">
+                        <h1 class="modal-title fs-5">Edit Fish ColdStore Remark</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                    <form action="monthlycharges.php" method="post">
+                      <input type="hidden" name="updryfishcoldstoreid" value="<?php echo $dryfishcoldstoredata['id']; ?>">
+                      <div class="modal-body">
+                        <div class="row">
+                          <div class="col">
+                            <label>Date</label>
+                            <input type="date" name="updatedryfishcoldstore" class="form-control inpv2" value="<?php if(!empty($dryfishcoldstoredata['date'])){ echo $dryfishcoldstoredata['date']; } ?>">
+                          </div>
+                          <div class="col">
+                            <label>I.T.E</label>
+                            <select class="form-control inpv2 mb-2" name="updryfishite" id='ite<?= $dryfishcoldstoredata['id']; ?>'>
+                              <option <?php if($dryfishcoldstoredata['ite'] == 'import'){ echo "selected"; } ?> value="import">Import</option>
+                              <option <?php if($dryfishcoldstoredata['ite'] == 'export'){ echo "selected"; } ?> value="export">Export</option>
+                              <option <?php if($dryfishcoldstoredata['ite'] == 'takeout'){ echo "selected"; } ?> value="takeout">TakeOut</option>
+                              <option <?php if($dryfishcoldstoredata['ite'] == 'balance'){ echo "selected"; } ?> value="balance">Balance</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <label>Kg</label>
+                            <input type="text" name="upkgdryfishcoldstore" class="form-control inpv2" value="<?php if(!empty($dryfishcoldstoredata['kg'])){ echo $dryfishcoldstoredata['kg']; } ?>">
+                          </div>
+                          <div class="col">
+                            <label>Coldstore Rate</label>
+                            <input type="text" name="upratedryfishcoldstore" class="form-control inpv2" value="<?php if(!empty($dryfishcoldstoredata['rate'])){ echo $dryfishcoldstoredata['rate']; } ?>">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <?php
+                            $coldstoredate = $dryfishcoldstoredata['date'];
+                            $coldstoreite = $dryfishcoldstoredata['ite'];
+
+                            $labourratestmt = $pdo->prepare("SELECT rate FROM gfcdryfishlabour WHERE date='$coldstoredate' AND ite ='$coldstoreite'");
+                            $labourratestmt->execute();
+                            $labourrate = $labourratestmt->fetch(PDO::FETCH_ASSOC);
+                            ?>
+                            <div id="labour<?= $dryfishcoldstoredata['id']; ?>" style="<?php if(empty($labourrate)){echo "display:none;";}; ?>">
+                              <label>Labour Rate</label>
+                              <input type="text" name="upratedryfishlabour" class="form-control inpv2" value="<?php if(!empty($labourrate)){echo $labourrate['rate'];}; ?>">
+
+                            </div>
+                            <input type="hidden" name="deletedatedryfish" value="<?= $dryfishcoldstoredata['date']; ?>">
+                          <div class="modal-footer mt-3">
+                            <?php if ($checkitedata == 1 && $dryfishcoldstoredata['ite'] != 'balance'): ?>
+                              <button type="submit" name="deletedryfishbtn" class="btn btn-danger">Delete</button>
+                              <button type="submit" name="updatedryfishcoldstorebtn" class="btn btn-success">Update</button>
+                            <?php else: ?>
+                            <button type="button" data-bs-toggle="modal" class="btn btn-success">Cancel</button>
+                            <button type="submit" name="deletedryfishbtn" class="btn btn-danger">Delete</button>
+                          <?php endif; ?>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+                <script>
+                      $('#ite<?= $dryfishcoldstoredata['id']; ?>').change(()=>{
+                        var value = $('#ite<?= $dryfishcoldstoredata['id']; ?>').val();
+
+                        if(value == 'balance'){
+                          $('#labour<?= $dryfishcoldstoredata['id']; ?>').hide();
+                        }else{
+                          $('#labour<?= $dryfishcoldstoredata['id']; ?>').show();
+                        }
+                      });
+                      var value = $('#ite<?= $dryfishcoldstoredata['id']; ?>').val();
+
+                      if(value == 'balance'){
+                        $('#labour<?= $dryfishcoldstoredata['id']; ?>').hide();
+                      }else{
+                        $('#labour<?= $dryfishcoldstoredata['id']; ?>').show();
+                      }
+                </script>
                 <div class="modal fade" id="editremarkdryfishcoldstore<?= $dryfishcoldstoredata['id'];  ?>">
                   <div class="modal-dialog">
                     <div class="modal-content">
