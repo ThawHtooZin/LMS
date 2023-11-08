@@ -476,9 +476,33 @@ Class Query{
     }
 
     // General Ledger Add
+    $vouchercheckstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE voucherno='$voucher_no' AND ac_code LIKE '4000%'");
+    $vouchercheckstmt->execute();
+    $vouchercheck = $vouchercheckstmt->fetch(PDO::FETCH_ASSOC);
+    if(empty($vouchercheck)){
+      $balance = 0 - $amount;
+      $glstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, credit, balance) VALUES('$date', '$voucher_no', '$supplier_name', '$amount', '$balance')");
+      $glstmt->execute();
+    }else{
+      $vouchercheckstmt = $pdo->prepare("SELECT SUM(credit) AS credit FROM general_ledger WHERE voucherno='$voucher_no' AND ac_code LIKE '4000%'");
+      $vouchercheckstmt->execute();
+      $creditdata = $vouchercheckstmt->fetch(PDO::FETCH_ASSOC);
+      $total_credit = $creditdata['credit'] + $amount;
 
-    $glstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, credit) VALUES('$date', '$voucher_no', '$supplier_name', '$amount')");
-    $glstmt->execute();
+      $nowid = $vouchercheck['id'];
+      $balancestmt = $pdo->prepare("SELECT * FROM general_ledger WHERE id<'$nowid' AND ac_code LIKE '4000%' ORDER BY id DESC");
+      $balancestmt->execute();
+      $balancecheck = $balancestmt->fetch(PDO::FETCH_ASSOC);
+
+      if(!empty($balancecheck)){
+        $balance = ($balancecheck['balance'] + intval($vouchercheck['debit'])) - $total_credit;
+      }else {
+        $balance = (0 + intval($vouchercheck['debit'])) - $total_credit;
+      }
+
+      $updatestmt = $pdo->prepare("UPDATE general_ledger SET credit='$total_credit', balance='$balance' WHERE voucherno='$voucher_no' AND ac_code LIKE '4000%'");
+      $updatestmt->execute();
+    }
 
   }
 

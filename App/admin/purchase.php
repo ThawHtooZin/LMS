@@ -150,7 +150,6 @@ $query = new Query();
                 $supplierdatastmt = $pdo->prepare("SELECT * FROM purchase GROUP BY supplier_id");
                 $supplierdatastmt->execute();
                 $supplierdatas = $supplierdatastmt->fetchall();
-                print_r($supplierdatas);
                 foreach ($supplierdatas as $supplierdata) {
                   $supplier_name = $query->select('supplier', $supplierdata['supplier_id'], 'supplier_id');
                   ?>

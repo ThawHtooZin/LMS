@@ -207,7 +207,6 @@ $query = new Query();
                 $dollarratestmt->execute();
                 $dollarrate = $dollarratestmt->fetch(PDO::FETCH_ASSOC);
 
-                print_r($dollarrate['dollar_rate']);
                 // acnamechange
 
                 $balance = $gldata['balance'] / $dollarrate['dollar_rate'];
