@@ -1138,11 +1138,16 @@ Class Query{
       }
     }
 
-    $fishcoldstorestmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore ORDER BY id DESC");
+    $fishcoldstorestmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE date<'$date' ORDER BY id DESC");
     $fishcoldstorestmt->execute();
     $fishcoldstore = $fishcoldstorestmt->fetch(PDO::FETCH_ASSOC);
-    if (!empty($fishcoldstore)) {
-      $lastdate = $fishcoldstore['date'];
+
+    $checkfishcoldstorestmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore ORDER BY id DESC");
+    $checkfishcoldstorestmt->execute();
+    $checkfishcoldstore = $checkfishcoldstorestmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!empty($checkfishcoldstore)) {
+      $lastdate = $checkfishcoldstore['date'];
     }else{
       $lastdate = '0000-00-00';
     }
@@ -1436,6 +1441,27 @@ Class Query{
       }
 
       // Labour Add
+
+      $fishlabourstmt = $pdo->prepare("SELECT * FROM gfcfishlabour ORDER BY id DESC");
+      $fishlabourstmt->execute();
+      $fishlabour = $fishlabourstmt->fetch(PDO::FETCH_ASSOC);
+      if (!empty($fishlabour)) {
+        $lastdate = $fishlabour['date'];
+      }else{
+        $lastdate = '0000-00-00';
+      }
+
+      $nowtimestamp = strtotime($date);
+      $nowyearmonth = date("Y-m", $nowtimestamp);
+
+      $lasttimestamp = strtotime($lastdate);
+      $lastyearmonth = date("Y-m", $lasttimestamp);
+
+      if ($nowyearmonth == $lastyearmonth) {
+        $monthsameornot = true;
+      }else{
+        $monthsameornot = false;
+      }
       $fishlabourstmt = $pdo->prepare("SELECT * FROM gfcfishlabour ORDER BY id DESC");
       $fishlabourstmt->execute();
       $fishlabour = $fishlabourstmt->fetch(PDO::FETCH_ASSOC);
@@ -1923,6 +1949,10 @@ Class Query{
   function addtotal($date, $plugoncharges){
     global $pdo;
 
+    if(empty($plugoncharges)){
+      $plugoncharges = 0;
+    }
+
     $totalbalancestmt = $pdo->prepare("SELECT * FROM gfctotal ORDER BY id DESC");
     $totalbalancestmt->execute();
     $totalbalancedata = $totalbalancestmt->fetch(PDO::FETCH_ASSOC);
@@ -1947,31 +1977,65 @@ Class Query{
     $dryfishlabourstmt->execute();
     $dryfishlabourdata = $dryfishlabourstmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!empty($fishcoldstoredata['total_charges'])) {
-      $totalfishcoldstorecharges = $fishcoldstoredata['total_charges'];
+    $laststmt = $pdo->prepare("SELECT * FROM gfctotal ORDER BY id DESC");
+    $laststmt->execute();
+    $lastdata = $laststmt->fetch(PDO::FETCH_ASSOC);
+
+    if(!empty($lastdata)){
+      if (!empty($fishcoldstoredata['total_charges'])) {
+        $totalfishcoldstorecharges = $fishcoldstoredata['total_charges'] - $lastdata['totalfishcoldstorecharges'];
+      }else{
+        $totalfishcoldstorecharges = 0;
+      }
+      if (!empty($fishlabourdata['total_charges'])) {
+        $totalfishlabourcharges = $fishlabourdata['total_charges'] - $lastdata['totalfishlabourcharges'];
+      }else{
+        $totalfishlabourcharges = 0;
+      }
+      if (!empty($dryfishcoldstoredata['total_charges'])) {
+        $totaldryfishcoldstorecharges = $dryfishcoldstoredata['total_charges'] - $lastdata['totaldryfishcoldstorecharges'];
+      }else{
+        $totaldryfishcoldstorecharges = 0;
+      }
+      if (!empty($dryfishlabourdata['total_charges'])) {
+        $totaldryfishlabourcharges = $dryfishlabourdata['total_charges'] - $lastdata['totaldryfishlabourcharges'];
+      }else{
+        $totaldryfishlabourcharges = 0;
+      }
+      if (!empty($repackingdata['total_charges'])) {
+        $totalrepackingcharges = $repackingdata['total_charges'];
+      }else{
+        $totalrepackingcharges = 0;
+      }
     }else{
-      $totalfishcoldstorecharges = 0;
+      if (!empty($fishcoldstoredata['total_charges'])) {
+        $totalfishcoldstorecharges = $fishcoldstoredata['total_charges'];
+      }else{
+        $totalfishcoldstorecharges = 0;
+      }
+      if (!empty($fishlabourdata['total_charges'])) {
+        $totalfishlabourcharges = $fishlabourdata['total_charges'];
+      }else{
+        $totalfishlabourcharges = 0;
+      }
+      if (!empty($dryfishcoldstoredata['total_charges'])) {
+        $totaldryfishcoldstorecharges = $dryfishcoldstoredata['total_charges'];
+      }else{
+        $totaldryfishcoldstorecharges = 0;
+      }
+      if (!empty($dryfishlabourdata['total_charges'])) {
+        $totaldryfishlabourcharges = $dryfishlabourdata['total_charges'];
+      }else{
+        $totaldryfishlabourcharges = 0;
+      }
+      if (!empty($repackingdata['total_charges'])) {
+        $totalrepackingcharges = $repackingdata['total_charges'];
+      }else{
+        $totalrepackingcharges = 0;
+      }
     }
-    if (!empty($fishlabourdata['total_charges'])) {
-      $totalfishlabourcharges = $fishlabourdata['total_charges'];
-    }else{
-      $totalfishlabourcharges = 0;
-    }
-    if (!empty($dryfishcoldstoredata['total_charges'])) {
-      $totaldryfishcoldstorecharges = $dryfishcoldstoredata['total_charges'];
-    }else{
-      $totaldryfishcoldstorecharges = 0;
-    }
-    if (!empty($dryfishlabourdata['total_charges'])) {
-      $totaldryfishlabourcharges = $dryfishlabourdata['total_charges'];
-    }else{
-      $totaldryfishlabourcharges = 0;
-    }
-    if (!empty($repackingdata['total_charges'])) {
-      $totalrepackingcharges = $repackingdata['total_charges'];
-    }else{
-      $totalrepackingcharges = 0;
-    }
+
+
     if(!empty($totalbalancedata)){
       $total_charges = floatval($totalfishcoldstorecharges) + floatval($totalfishlabourcharges) + floatval($totaldryfishcoldstorecharges) + floatval($totaldryfishlabourcharges) + floatval($totalrepackingcharges) + floatval($plugoncharges);
 
@@ -3044,7 +3108,10 @@ Class Query{
           $bankchargesstmt = $pdo->prepare("SELECT bank_charges FROM transaction WHERE ac_code='3300%'");
           $bankchargesstmt->execute();
           $bankchargesdata = $bankchargesstmt->fetch(PDO::FETCH_ASSOC);
-          $debit = $transactiondata['debit'] - $transactiondata['bank_charges'];
+          $dollarratestmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='debit'");
+          $dollarratestmt->execute();
+          $dollarrate = $dollarratestmt->fetch(PDO::FETCH_ASSOC);
+          $debit = $transactiondata['debit'] - ($transactiondata['bank_charges'] * $dollarrate['dollar_rate']);
           $credit = 0;
         }else{
           $debit = $transactiondata['debit'];
@@ -3134,9 +3201,10 @@ Class Query{
         $checkresrstmt->execute();
         $checkresr = $checkresrstmt->fetchall();
         if(empty($checkre)){
-          if(empty($checkresr)){
-            $receivestmt->execute();
-          }
+          $receivestmt->execute();
+        }
+        if(empty($checkresr)){
+          $receivestmt->execute();
         }
       }
     }
@@ -3767,20 +3835,20 @@ Class Query{
    function deletefish($deletedate){
      global $pdo;
 
-     $stmt = $pdo->prepare("DELETE FROM gfcfishcoldstore WHERE date='$deletedate'");
+     $stmt = $pdo->prepare("DELETE FROM gfcfishcoldstore WHERE date>='$deletedate'");
      $stmt->execute();
 
-     $stmt = $pdo->prepare("DELETE FROM gfcfishlabour WHERE date='$deletedate'");
+     $stmt = $pdo->prepare("DELETE FROM gfcfishlabour WHERE date>='$deletedate'");
      $stmt->execute();
    }
 
    function deletedryfish($deletedate){
      global $pdo;
 
-     $stmt = $pdo->prepare("DELETE FROM gfcdryfishcoldstore WHERE date='$deletedate'");
+     $stmt = $pdo->prepare("DELETE FROM gfcdryfishcoldstore WHERE date>='$deletedate'");
      $stmt->execute();
 
-     $stmt = $pdo->prepare("DELETE FROM gfcdryfishlabour WHERE date='$deletedate'");
+     $stmt = $pdo->prepare("DELETE FROM gfcdryfishlabour WHERE date>='$deletedate'");
      $stmt->execute();
    }
 

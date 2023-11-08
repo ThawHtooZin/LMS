@@ -456,7 +456,8 @@ $query = new Query();
                             <input type="hidden" name="deletedatefish" value="<?= $fishcoldstoredata['date']; ?>">
                           <div class="modal-footer mt-3">
                             <?php if ($checkitedata == 1 && $fishcoldstoredata['ite'] != 'balance'): ?>
-                              <button type="submit" name="deletefishbtn" class="btn btn-danger">Delete</button>
+                              <button type="button" data-bs-toggle="modal" class="btn btn-secondary">Cancel</button>
+                              <!-- <button type="submit" name="deletefishbtn" class="btn btn-danger">Delete</button> -->
                               <button type="submit" name="updatefishcoldstorebtn" class="btn btn-success">Update</button>
                             <?php else: ?>
                             <button type="button" data-bs-toggle="modal" class="btn btn-success">Cancel</button>

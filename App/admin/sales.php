@@ -37,11 +37,11 @@ $query = new Query();
               <?php
               if(isset($_POST['searchgeneralledger'])){
                 ?>
-                <a href="export.php?table_name=general_ledger&searchgeneralledger=true&date_from=<?= $_POST['date_from']; ?>&date_to=<?= $_POST['date_to']; ?>&ac_code=<?= $_POST['ac_code'] ?>" class="btn btn-sm ms-2 btn-success float-end">Export</a>
+                <a href="export.php?table_name=sales&searchgeneralledger=true&date_from=<?= $_POST['date_from']; ?>&date_to=<?= $_POST['date_to']; ?>&ac_code=<?= $_POST['ac_code'] ?>" class="btn btn-sm ms-2 btn-success float-end">Export</a>
                 <?php
               }else{
                 ?>
-                <a href="export.php?table_name=general_ledger" class="btn btn-sm ms-2 btn-success float-end">Export</a>
+                <a href="export.php?table_name=general_ledger" class="btn btn-sm ms-2 btn-warning float-end">Export</a>
                 <?php
               }
                ?>
@@ -191,9 +191,6 @@ $query = new Query();
                ?>
               <?php foreach($gldatas as $gldata) : ?>
                 <?php
-                $ac_code = $gldata['ac_code'];
-                $acname = $query->select('acname', $ac_code, 'code_no');
-
                 // acnamechange
                 $voucher_no = $gldata['voucherno'];
                 $ac_code = $gldata['ac_code'];
@@ -203,102 +200,27 @@ $query = new Query();
                 if(!empty($acselect['ac_code'])){
                   $accode = $acselect['ac_code'];
 
-                  if(str_contains($accode, '4000/')){
-                    $acname = 'Supplier';
-                  }else {
-                    $acnamedata = $query->select('acname', $accode, 'code_no');
-                    $acname = $acnamedata['ac_name'];
-                  }
-                }else{
-                  if(str_contains($accode, '4000/')){
-                    $acname = 'Purchase';
-                  }else {
-                    $acnamedata = $query->select('acname', $accode, 'code_no');
-                    $acname = $acnamedata['ac_name'];
-                  }
+                  $acname = $query->select('acname', $accode, 'code_no');
                 }
 
+                $dollarratestmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='credit'");
+                $dollarratestmt->execute();
+                $dollarrate = $dollarratestmt->fetch(PDO::FETCH_ASSOC);
+
+                print_r($dollarrate['dollar_rate']);
                 // acnamechange
 
+                $balance = $gldata['balance'] / $dollarrate['dollar_rate'];
                  ?>
                 <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $gldata['id']; ?>">
                   <td><?php echo date('d/m/Y', strtotime($gldata['date'])); ?></td>
                   <td><?php echo $gldata['voucherno']; ?></td>
-                  <td><?php echo $acname; ?></td>
+                  <td><?php echo $acname['ac_name']; ?></td>
                   <td><?php echo $gldata['narration']; ?></td>
                   <td><?php echo $gldata['debit']; ?></td>
-                  <td><?php echo $gldata['credit']; ?></td>
-                  <td><?php echo $gldata['balance']; ?></td>
+                  <td><?php echo $dollarrate['usd_amount']; ?></td>
+                  <td><?php echo $balance; ?></td>
                 </tr>
-
-                <!-- Data Update Modal -->
-                <!-- <div class="modal fade" id="updatemodal<?php echo $gldata['id']; ?>" tabindex="-1" role="dialog" aria-hidden="true">
-                  <div class="modal-dialog" role="document">
-                    <div class="modal-content" style="width:600px !important;">
-                      <div class="modal-header bg-warning text-light">
-                        <h5 class="modal-title" id="updatemodallabel">Update An Account</h5>
-                        <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true" class="h3">&times;</span>
-                        </button>
-                      </div>
-                      <form action="" method="post" autocomplete="off">
-                        <div class="modal-body">
-                          <?php
-                          $id = $gldata['id'];
-                          $updatedata = $query->select('general_ledger', $id, 'id');
-                          $voucher_no = $updatedata['voucherno'];
-                          $acstmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no='$voucher_no'");
-                          $acstmt->execute();
-                          $acdata = $acstmt->fetch(PDO::FETCH_ASSOC);
-                          if(!empty($acdata)){
-                            $ac_code = $acdata['ac_code'];
-                          }else{
-
-                          }
-                          $acnamedata = $query->select('acname', $ac_code, 'code_no');
-
-                          ?>
-                          <input type="hidden" name="updateid" value="<?php echo $cashdata['id']; ?>">
-                          <div class="row">
-                            <div class="col">
-                              <label>Date</label>
-                              <input type="date" name="date" class="form-control inpv2 mb-2" value="<?= $gldata['date']; ?>">
-                            </div>
-                            <div class="col">
-                              <label>Voucher No</label>
-                              <input type="text" name="voucher_no" class="form-control inpv2 mb-2" value="<?= $gldata['voucherno']; ?>">
-                            </div>
-                          </div>
-                          <div class="row">
-                            <div class="col">
-                              <label>A/C Name</label>
-                              <input type="text" name="ac_name" class="form-control inpv2 mb-2" value="<?= $acnamedata['ac_name']; ?>">
-                            </div>
-                            <div class="col">
-                              <label>Particular</label>
-                              <input type="text" name="particular" class="form-control inpv2 mb-2" value="<?= $gldata['narration']; ?>">
-                            </div>
-                          </div>
-                          <div class="row">
-                            <div class="col">
-                              <label>Debit</label>
-                              <input type="number" name="debit" class="form-control inpv2 mb-2" value="<?= $gldata['debit']; ?>">
-                            </div>
-                            <div class="col">
-                              <label>Credit</label>
-                              <input type="number" name="credit" class="form-control inpv2 mb-2" value="<?= $gldata['credit']; ?>">
-                            </div>
-                          </div>
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                          <button type="submit" class="btn btn-warning" name="updateaccount">Update</button>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div> -->
-                <!-- Update Modal -->
               <?php endforeach; ?>
               <?php
 
@@ -312,14 +234,17 @@ $query = new Query();
               $totalcredit = $creditstmt->fetch(PDO::FETCH_ASSOC);
               $totalbalance = $totaldebit['total_debit'] - $totalcredit['total_credit'];
 
+              $totaldebit = $totaldebit['total_debit'] / $dollarrate['dollar_rate'];
+              $totalcredit = $totalcredit['total_credit'] / $dollarrate['dollar_rate'];
+              $totalbalance = $totalbalance / $dollarrate['dollar_rate'];
                ?>
                <tr style="font-weight:bold;">
                  <td>Total:</td>
                  <td></td>
                  <td></td>
                  <td></td>
-                 <td><?= $totaldebit['total_debit']; ?></td>
-                 <td><?= $totalcredit['total_credit']; ?></td>
+                 <td><?= $totaldebit; ?></td>
+                 <td><?= $totalcredit; ?></td>
                  <td><?= $totalbalance; ?></td>
                </tr>
               <?php } } ?>
@@ -384,12 +309,12 @@ $query = new Query();
         $('#table').show();
       })
     });
-    $(window).on('load', function(){
-      <?php if($_SERVER['REQUEST_METHOD'] != 'POST') : ?>
-      $('#reportsmodal').modal('show');
-      $('#table').hide();
-      <?php endif; ?>
-    });
+    // $(window).on('load', function(){
+    //   <?php if($_SERVER['REQUEST_METHOD'] != 'POST') : ?>
+    //   $('#reportsmodal').modal('show');
+    //   $('#table').hide();
+    //   <?php endif; ?>
+    // });
     </script>
   </body>
 </html>
