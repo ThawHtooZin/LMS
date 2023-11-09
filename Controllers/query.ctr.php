@@ -1191,14 +1191,23 @@ Class Query{
       if(!empty($fishcoldstore)){
         $total_mc = $fishcoldstore['total_mc'];
          $total_kg = floatval($fishcoldstore['total_kg']);
-         $charges = floatval($coldstorerate) * floatval($total_kg);
+         if(!empty($coldstorerate)){
+           $charges = floatval($coldstorerate) * floatval($total_kg);
+         }else{
+           $charges = floatval($fishcoldstore['rate']) * floatval($total_kg);
+         }
         if($monthsameornot === false){
           $total_charges = $charges;
         }else{
           $total_charges = $charges + $fishcoldstore['total_charges'];
         }
 
-        $coldstorestmt = $pdo->prepare("INSERT INTO gfcfishcoldstore(date, ite, total_mc, total_kg, rate, charges, total_charges) VALUES('$date', '$ite', '$total_mc', '$total_kg', '$coldstorerate', '$charges', '$total_charges')");
+        if(!empty($coldstorerate)){
+          $coldstorestmt = $pdo->prepare("INSERT INTO gfcfishcoldstore(date, ite, total_mc, total_kg, rate, charges, total_charges) VALUES('$date', '$ite', '$total_mc', '$total_kg', '$coldstorerate', '$charges', '$total_charges')");
+        }else{
+          $coldstorerate = $fishcoldstore['rate'];
+          $coldstorestmt = $pdo->prepare("INSERT INTO gfcfishcoldstore(date, ite, total_mc, total_kg, rate, charges, total_charges) VALUES('$date', '$ite', '$total_mc', '$total_kg', '$coldstorerate', '$charges', '$total_charges')");
+        }
         $coldstorestmt->execute();
       }else{
         if(!empty($mc) && !empty($kg)){
