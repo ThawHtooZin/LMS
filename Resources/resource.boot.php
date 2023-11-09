@@ -185,7 +185,7 @@ class Bootstrap
         }
         @media screen and (min-width: 1300px){
           .contentcol{
-            left: 197px;
+            left: 14.5%;
             position:absolute;
             width: 85.5% !important;
           }
@@ -202,7 +202,7 @@ class Bootstrap
         }
         @media screen and (min-width: 1400px){
           .contentcol{
-            left: 223px;
+            left: 14.5%;
             position:absolute;
             width: 85.5% !important;
           }

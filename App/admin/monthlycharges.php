@@ -255,13 +255,14 @@ $query = new Query();
                   $lastrowdatastmt->execute();
                   $lastrowdata = $lastrowdatastmt->fetch(PDO::FETCH_ASSOC);
 
-                  if (!empty($fishcoldstoredata)) {
-                    $lastdate = $fishcoldstoredata['date'];
+                  if (!empty($lastrowdata)) {
+                     $lastdate = $lastrowdata['date'];
                   }else{
                     $lastdate = '0000-00-00';
                   }
 
-                  $nowtimestamp = strtotime($date);
+
+                  $nowtimestamp = strtotime($fishcoldstoredata['date']);
                   $nowyearmonth = date("Y-m", $nowtimestamp);
 
                   $lasttimestamp = strtotime($lastdate);
@@ -276,11 +277,13 @@ $query = new Query();
                   if($monthsameornot === true){
                     if(!empty($lastrowdata)){
                       if($fishcoldstoredata['ite'] == 'balance'){
-                        $total_mc = $lastrowdata['total_mc'];
-                        $total_kg = $lastrowdata['total_kg'];
-                        $charges = $total_kg * $fishcoldstoredata['rate'];
-                        $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc', total_kg='$total_kg', charges='$charges' WHERE id='$nowid' AND total_mc!='0'");
-                        $updatestmt->execute();
+                        if($fishcoldstoredata['charges'] != $fishcoldstoredata['total_charges']){
+                          $total_mc = $lastrowdata['total_mc'];
+                          $total_kg = $lastrowdata['total_kg'];
+                          $charges = $total_kg * $fishcoldstoredata['rate'];
+                          $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc', total_kg='$total_kg', charges='$charges' WHERE id='$nowid' AND total_mc!='0'");
+                          $updatestmt->execute();
+                        }
                       }else{
                         if(strtolower($fishcoldstoredata['ite']) == 'import'){
                           if($fishcoldstoredata['total_mc'] != $lastrowdata['total_mc'] + $fishcoldstoredata['mc']){
@@ -375,6 +378,7 @@ $query = new Query();
                   }else{
 
                   }
+
                  ?>
                 <tr>
                   <td><?php echo date('d-m-Y', strtotime($fishcoldstoredata['date'])); ?></td>

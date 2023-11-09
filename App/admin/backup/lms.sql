@@ -1196,6 +1196,3 @@ INSERT INTO userlogs VALUES("74","10:44:09.000000","2023-11-09","admin","admin",
 INSERT INTO userlogs VALUES("75","10:49:53.000000","2023-11-09","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("76","12:10:03.000000","2023-11-09","admin","admin","Login Success");
 INSERT INTO userlogs VALUES("77","12:14:41.000000","2023-11-09","admin","admin","Login Success");
-
-
-
