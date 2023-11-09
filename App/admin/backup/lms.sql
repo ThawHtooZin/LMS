@@ -313,6 +313,7 @@ CREATE TABLE `gfcdryfishcoldstore` (
   `rate` varchar(11) NOT NULL,
   `charges` bigint(15) NOT NULL,
   `total_charges` bigint(15) NOT NULL,
+  `remark` text NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -329,6 +330,7 @@ CREATE TABLE `gfcdryfishlabour` (
   `rate` varchar(11) NOT NULL,
   `charges` bigint(15) NOT NULL,
   `total_charges` bigint(15) NOT NULL,
+  `remark` text NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -348,9 +350,12 @@ CREATE TABLE `gfcfishcoldstore` (
   `rate` varchar(11) NOT NULL,
   `charges` bigint(13) NOT NULL,
   `total_charges` bigint(14) NOT NULL,
+  `remark` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=392 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=395 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+INSERT INTO gfcfishcoldstore VALUES("392","2023-10-31","import","100","100","900","900","1.5","1350","1350","");
+INSERT INTO gfcfishcoldstore VALUES("394","2023-11-01","balance","0","100","","900","1.5","1350","2700","");
 
 
 
@@ -364,9 +369,11 @@ CREATE TABLE `gfcfishlabour` (
   `rate` varchar(11) NOT NULL,
   `charges` bigint(15) NOT NULL,
   `total_charges` bigint(15) NOT NULL,
+  `remark` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=291 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=292 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+INSERT INTO gfcfishlabour VALUES("291","2023-10-31","import","900","3","2700","2700","");
 
 
 
@@ -403,6 +410,7 @@ CREATE TABLE `gfctotal` (
   `payment_date` date NOT NULL,
   `payment_amount` bigint(15) NOT NULL,
   `balance_amount` bigint(15) NOT NULL,
+  `remark` text NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
