@@ -207,7 +207,7 @@ $query = new Query();
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header bg-secondary text-light">
-          <h5 class="modal-title" id="addmodellabel">Create New Category</h5>
+          <h5 class="modal-title" id="addmodellabel">New Coldstore Item</h5>
           <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true" class="h3">&times;</span>
           </button>
@@ -221,7 +221,7 @@ $query = new Query();
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-success" name="addbutton">Create Category</button>
+            <button type="submit" class="btn btn-success" name="addbutton">Add</button>
           </div>
         </form>
       </div>

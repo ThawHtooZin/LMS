@@ -382,7 +382,7 @@ Class Query{
     $stmt = $pdo->prepare("INSERT INTO $table(supplier_id, supplier_name, supplier_phone, supplier_address) VALUES('$supplier_id', '$supplier_name', '$supplier_phone', '$supplier_address');");
     $stmt->execute();
 
-    $acstmt = $pdo->prepare("SELECT acid FROM actype WHERE ac_type='Current Asset'");
+    $acstmt = $pdo->prepare("SELECT acid FROM actype WHERE ac_type='Current Liability'");
     $acstmt->execute();
     $actype = $acstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -937,7 +937,7 @@ Class Query{
       $balance_amount = $grand_total_charges;
     }
     // echo $total_processing_charges;
-    $stmt = $pdo->prepare("INSERT INTO total_charges(date, commondity_id, total_coldstore_charges, total_labour_charges, total_processing_charges, total_charges, grand_total_charges, balance_amount) VALUES('$outdate', '$commondity_id','$total_coldstore_charges', '$total_labour_charges', '$total_processing_charges', '$total_charges', '$grand_total_charges', '$balance_amount')");
+    $stmt = $pdo->prepare("INSERT INTO total_charges(date, commondity_id, total_coldstore_charges, total_labour_charges, total_processing_charges, total_charges, grand_total_charges, balance_amount, link_id) VALUES('$outdate', '$commondity_id','$total_coldstore_charges', '$total_labour_charges', '$total_processing_charges', '$total_charges', '$grand_total_charges', '$balance_amount', '$coldstoreid')");
     $stmt->execute();
   }
 
@@ -1067,7 +1067,7 @@ Class Query{
     $processingstmt->execute();
     $stockstmt = $pdo->prepare("UPDATE hhkstock SET mc='$mc', total_mc='$stotal_mc', kg='$kg', total_kg='$stotal_kg' WHERE link_id='$updateid'");
     $stockstmt->execute();
-    $totalupdatestmt = $pdo->prepare("UPDATE total_charges SET total_coldstore_charges='$total_coldstore_charges', total_labour_charges='$total_labour_charges', total_processing_charges='$total_processing_charges', total_charges='$total_charges_of_total' WHERE commondity_id='$commondity_id' AND date='$outdate'");
+    $totalupdatestmt = $pdo->prepare("UPDATE total_charges SET total_coldstore_charges='$total_coldstore_charges', total_labour_charges='$total_labour_charges', total_processing_charges='$total_processing_charges', total_charges='$total_charges_of_total' WHERE commondity_id='$commondity_id' AND date='$outdate' AND link_id='$updateid'");
     $totalupdatestmt->execute();
 
     // ColdStore Update

@@ -67,7 +67,7 @@ $query = new Query();
 
           <div class="card-header bg-info">
             <?php
-            if($_SESSION['tabs'] != 'actualinvoice' && $_SESSION['tabs'] != 'actualpackinglist' && $_SESSION['tabs'] != 'foambox' && $_SESSION['tabs'] != 'declare'){
+            if(empty($_SESSION) && $_SESSION['tabs'] != 'actualinvoice' && $_SESSION['tabs'] != 'actualpackinglist' && $_SESSION['tabs'] != 'foambox' && $_SESSION['tabs'] != 'declare'){
               $_SESSION['tabs'] = 'default';
             }elseif(isset($_POST['actualinvoicebtn'])){
               $_SESSION['tabs'] = 'actualinvoice';
@@ -130,23 +130,19 @@ $query = new Query();
                   </tr>
                   <?php
                   $invoice_no = $_GET['invoice_no'];
-                      $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' GROUP BY item_id");
-                      $commonditystmt->execute();
-                      $commonditydata = $commonditystmt->fetch(PDO::FETCH_ASSOC);
-                      $item_id = $commonditydata['item_id'];
 
-                      $sizecountsstmt = $pdo->prepare("SELECT COUNT(DISTINCT size) FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no'");
-                      $sizecountsstmt->execute();
-                      $sizecountdatas = $sizecountsstmt->fetchColumn();
-                      $no = 1;
-                      for ($j=0; $j < $sizecountdatas; $j++) {
+                  $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM truckactualinvoice WHERE invoice_no='$invoice_no'");
+                  $commonditycountstmt->execute();
+                  $commonditycountdatas = $commonditycountstmt->fetchColumn();
+                  $no = 1;
+                  for ($i=0; $i < $commonditycountdatas; $i++) {
+                    $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM truckactualinvoice WHERE invoice_no='$invoice_no'");
+                    $commonditystmt->execute();
+                    $commonditydata = $commonditystmt->fetchall();
+                    $item_id = $commonditydata[$i]['item_id'];
+                    $invoice_no = $_GET['invoice_no'];
 
-                        $sizestmt = $pdo->prepare("SELECT DISTINCT size FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no'");
-                        $sizestmt->execute();
-                        $sizedata = $sizestmt->fetchall();
-                        $size = $sizedata[$j]['size'];
-
-                        $stmt = $pdo->prepare("SELECT * FROM truckpackingliststockinfo WHERE size='$size'  AND invoice_no='$invoice_no'");
+                        $stmt = $pdo->prepare("SELECT * FROM truckpackingliststockinfo WHERE item_id='$item_id' AND invoice_no='$invoice_no' ORDER BY size");
                         $stmt->execute();
                         $datas = $stmt->fetchall();
                         foreach ($datas as $packingstockinfodata) {
@@ -196,7 +192,7 @@ $query = new Query();
                       </tr>
                       <?php
                       $no++;
-                      }
+                    }
                    ?>
                    <?php
                    $item_id = $packingstockinfodata['item_id'];

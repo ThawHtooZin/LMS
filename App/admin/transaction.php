@@ -231,9 +231,9 @@ $query = new Query();
               <form action="" method="post">
 
               <h5 class="text-light d-inline">Add Transaction</h5>
-              <button type="submit" id="acceptbtn" class="hide btn btn-primary btn-sm ms-2 float-end" name="accept">Accept</button>
-              <button type="button" id="finishbtn" class="btn btn-success btn-sm ms-2 float-end">Finished</button>
-              <button type="button" id="notfinishbtn" class="hide btn btn-danger btn-sm ms-2 float-end">Not Finished</button>
+              <button type="submit" class=" btn btn-primary btn-sm ms-2 float-end" name="accept">Accept</button>
+              <!-- <button type="button" id="finishbtn" class="btn btn-success btn-sm ms-2 float-end">Finished</button> -->
+              <!-- <button type="button" id="notfinishbtn" class="hide btn btn-danger btn-sm ms-2 float-end">Not Finished</button> -->
               <button type="button" class="btn btn-secondary btn-sm float-end" data-bs-toggle="collapse" data-bs-target="#adddiv" id="add">Add</button>
             </div>
           </form>
