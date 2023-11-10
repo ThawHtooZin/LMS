@@ -35,14 +35,26 @@ $query = new Query();
           <div class="card-header bg-primary text-light">
             <form action="" class="d-inline" method="post">
               <?php
-              if(isset($_POST['searchgeneralledger'])){
+              if (!isset($_POST['search'])) {
                 ?>
-                <a href="export.php?table_name=sales&searchgeneralledger=true&date_from=<?= $_POST['date_from']; ?>&date_to=<?= $_POST['date_to']; ?>&ac_code=<?= $_POST['ac_code'] ?>" class="btn btn-sm ms-2 btn-success float-end">Export</a>
+                <a href="export.php?table_name=sales" class="btn btn-sm ms-2 btn-success float-end">Export</a>
                 <?php
               }else{
-                ?>
-                <a href="export.php?table_name=general_ledger" class="btn btn-sm ms-2 btn-warning float-end">Export</a>
-                <?php
+                if(isset($_POST['search']) && !empty($_POST['date_from']) && !empty($_POST['date_to'])){
+                  ?>
+                  <a href="export.php?table_name=sales&date_from=<?= $_POST['date_from']; ?>&date_to=<?= $_POST['date_to'] ?>" class="btn btn-sm ms-2 btn-success float-end">Export</a>
+                  <?php
+                }else{
+                  if(!empty($_POST['date_from'])){
+                    ?>
+                    <a href="export.php?table_name=sales&date_from=<?= $_POST['date_from']; ?>" class="btn btn-sm ms-2 btn-success float-end">Export</a>
+                    <?php
+                  }elseif(!empty($_POST['date_to'])){
+                    ?>
+                    <a href="export.php?table_name=sales&date_to=<?= $_POST['date_to'] ?>" class="btn btn-sm ms-2 btn-success float-end">Export</a>
+                    <?php
+                  }
+                }
               }
                ?>
             </form>
@@ -61,69 +73,37 @@ $query = new Query();
                 <th>Balance</th>
               </tr>
               <?php
-              if (isset($_POST['searchgeneralledger'])) {
+              if (isset($_POST['search'])) {
                 $date_from = $_POST['date_from'];
                 $date_to = $_POST['date_to'];
-                $ac_code = $_POST['ac_code'];
 
-                if(!empty($date_from) && !empty($date_to) && !empty($ac_code)){
-                  $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date` BETWEEN '$date_from' AND '$date_to' AND ac_code='$ac_code'");
-                  $acnamecountstmt->execute();
-                  $acnamecount = $acnamecountstmt->fetchColumn();
-                  $acnamedontloop = 1;
-                }elseif(!empty($date_from) && !empty($date_to) && empty($ac_code)){
-                  $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date` BETWEEN '$date_from' AND '$date_to'");
+                if(!empty($date_from) && !empty($date_to)){
+                  $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date` BETWEEN '$date_from' AND '$date_to' AND ac_code LIKE '5000%'");
                   $acnamecountstmt->execute();
                   $acnamecount = $acnamecountstmt->fetchColumn();
                   $acnamedontloop = 2;
-                }elseif(!empty($date_to) || !empty($date_from) && !empty($ac_code)){
+                }elseif(!empty($date_to) || !empty($date_from)){
                   if(!empty($date_from)){
-                    $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date`='$date_from' AND ac_code='$ac_code'");
-                    $acnamecountstmt->execute();
-                    $acnamecount = $acnamecountstmt->fetchColumn();
-                    $acnamedontloop = 1;
-                    $acnamecount = 1;
-                  }elseif(!empty($date_to)){
-                    $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date`='$date_to' AND ac_code='$ac_code'");
-                    $acnamecountstmt->execute();
-                    $acnamecount = $acnamecountstmt->fetchColumn();
-                    $acnamedontloop = 1;
-                    $acnamecount = 1;
-                  }
-                }elseif(!empty($date_to) || !empty($date_from) && empty($ac_code)){
-                  if(!empty($date_from)){
-                    $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date`='$date_from'");
+                    $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date`='$date_from' AND ac_code LIKE '5000%'");
                     $acnamecountstmt->execute();
                     $acnamecount = $acnamecountstmt->fetchColumn();
                     $acnamedontloop = 2;
                   }elseif(!empty($date_to)){
-                    $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date`='$date_to'");
+                    $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date`='$date_to' AND ac_code LIKE '5000%'");
                     $acnamecountstmt->execute();
                     $acnamecount = $acnamecountstmt->fetchColumn();
                     $acnamedontloop = 2;
                   }
-                }else{
-                  $acnamecount = 1;
-                  $acnamedontloop = 1;
                 }
                 for ($i=0; $i < $acnamecount; $i++) {
-                  $accodestmt = $pdo->prepare("SELECT DISTINCT ac_code FROM general_ledger");
+                  $accodestmt = $pdo->prepare("SELECT DISTINCT ac_code FROM general_ledger where ac_code LIKE '5000%'");
                   $accodestmt->execute();
                   $accodedata = $accodestmt->fetchall();
                   $accode = $accodedata[$i]['ac_code'];
 
-                  if(!empty($acnamedontloop) && $acnamedontloop > 1){
-                    $gldatas = $query->search('general_ledger', 'ac_code', $accode);
-                    $acnametoshow = $query->select('acname', $accode, 'code_no');
-                  }else{
-                    $gldatas = $query->search('general_ledger', 'ac_code', $ac_code);
-                    $acnametoshow = $query->select('acname', $ac_code, 'code_no');
-                  }
-                  ?>
-                  <tr>
-                    <td colspan="7"><b><u><?php echo "Account No. : " . $ac_code . " - " . $acnametoshow['ac_name']; ?></u></b></td>
-                  </tr>
-                  <?php
+                  $gldatas = $query->search('general_ledger', 'ac_code', $accode);
+                  $acnametoshow = $query->select('acname', $accode, 'code_no');
+
                   foreach($gldatas as $gldata) : ?>
                     <?php
                     $ac_code = $gldata['ac_code'];
@@ -145,7 +125,13 @@ $query = new Query();
                     }
                     // acnamechange
 
-                    $balance = $gldata['debit'] - $gldata['credit'];
+                    $dollarratestmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='credit'");
+                    $dollarratestmt->execute();
+                    $dollarrate = $dollarratestmt->fetch(PDO::FETCH_ASSOC);
+
+                    // acnamechange
+
+                    $searchbalance = $gldata['balance'] / $dollarrate['dollar_rate'];
                      ?>
                     <tr>
                       <td><?php echo date('d/m/Y', strtotime($gldata['date'])); ?></td>
@@ -153,8 +139,8 @@ $query = new Query();
                       <td><?php echo $acname; ?></td>
                       <td><?php echo $gldata['narration']; ?></td>
                       <td><?php echo $gldata['debit']; ?></td>
-                      <td><?php echo $gldata['credit']; ?></td>
-                      <td><?php echo $gldata['balance']; ?></td>
+                      <td><?php echo $dollarrate['usd_amount']; ?></td>
+                      <td><?php echo $searchbalance; ?></td>
                     </tr>
                   <?php endforeach;
                   $debitstmt = $pdo->prepare("SELECT SUM(debit) AS total_debit FROM general_ledger WHERE ac_code='$ac_code'");
@@ -164,15 +150,18 @@ $query = new Query();
                   $creditstmt->execute();
                   $totalcredit = $creditstmt->fetch(PDO::FETCH_ASSOC);
                   $totalbalance = $totaldebit['total_debit'] - $totalcredit['total_credit'];
-                  $balance = $totaldebit['total_debit'] - $totalcredit['total_credit'];
+
+                  $totaldebit = $totaldebit['total_debit'] / $dollarrate['dollar_rate'];
+                  $totalcredit = $totalcredit['total_credit'] / $dollarrate['dollar_rate'];
+                  $totalbalance = $totalbalance / $dollarrate['dollar_rate'];
                   ?>
                   <tr style="font-weight:bold;">
                     <td>Total:</td>
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td><?= $totaldebit['total_debit']; ?></td>
-                    <td><?= $totalcredit['total_credit']; ?></td>
+                    <td><?= $totaldebit; ?></td>
+                    <td><?= $totalcredit; ?></td>
                     <td><?= $totalbalance; ?></td>
                   </tr>
                   <?php
@@ -272,7 +261,7 @@ $query = new Query();
               </div>
               <div class="modal-footer">
                 <button type="button" name="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
-                <button type="submit" name="searchgeneralledger" class="btn btn-success">Search</button>
+                <button type="submit" name="search" class="btn btn-success">Search</button>
               </div>
             </form>
             </div>

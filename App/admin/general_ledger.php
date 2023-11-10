@@ -59,6 +59,7 @@ $query = new Query();
                 <th>Debit</th>
                 <th>Cerdit</th>
                 <th>Balance</th>
+                <th>Action</th>
               </tr>
               <?php
               if (isset($_POST['searchgeneralledger'])) {
@@ -121,7 +122,7 @@ $query = new Query();
                   }
                   ?>
                   <tr>
-                    <td colspan="7"><b><u><?php echo "Account No. : " . $ac_code . " - " . $acnametoshow['ac_name']; ?></u></b></td>
+                    <td colspan="8"><b><u><?php echo "Account No. : " . $ac_code . " - " . $acnametoshow['ac_name']; ?></u></b></td>
                   </tr>
                   <?php
                   foreach($gldatas as $gldata) : ?>
@@ -155,6 +156,15 @@ $query = new Query();
                       <td><?php echo $gldata['debit']; ?></td>
                       <td><?php echo $gldata['credit']; ?></td>
                       <td><?php echo $gldata['balance']; ?></td>
+                      <td>
+                        <a href="edittransaction.php?voucher_no=<?= $gldata['paid_voucher']; ?>&file=general_ledger" style="<?php if(str_contains(strtolower($acname), 'purchase')){ echo "display:none;"; } ?>">
+                          <button type="submit" class="btn btn-warning btn-sm text-light" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                              <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                              <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                            </svg>
+                          </button>
+                        </a>
+                      </td>
                     </tr>
                   <?php endforeach;
                   $debitstmt = $pdo->prepare("SELECT SUM(debit) AS total_debit FROM general_ledger WHERE ac_code='$ac_code'");
@@ -174,6 +184,7 @@ $query = new Query();
                     <td><?= $totaldebit['total_debit']; ?></td>
                     <td><?= $totalcredit['total_credit']; ?></td>
                     <td><?= $totalbalance; ?></td>
+                    <td></td>
                   </tr>
                   <?php
                   }
@@ -232,6 +243,15 @@ $query = new Query();
                   <td><?php echo $gldata['debit']; ?></td>
                   <td><?php echo $gldata['credit']; ?></td>
                   <td><?php echo $gldata['balance']; ?></td>
+                  <td>
+                    <a href="edittransaction.php?voucher_no=<?= $gldata['voucherno']; ?>&file=general_ledger" style="<?php if(str_contains(strtolower($acname), 'purchase')){ echo "display:none;"; } ?>">
+                      <button type="submit" class="btn btn-warning btn-sm text-light" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                          <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                        </svg>
+                      </button>
+                    </a>
+                  </td>
                 </tr>
 
                 <!-- Data Update Modal -->
@@ -324,6 +344,7 @@ $query = new Query();
                  <td><?= $totaldebit['total_debit']; ?></td>
                  <td><?= $totalcredit['total_credit']; ?></td>
                  <td><?= $totalbalance; ?></td>
+                 <td></td>
                </tr>
               <?php } } ?>
             </table>

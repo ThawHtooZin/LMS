@@ -38,6 +38,7 @@ $query = new Query();
         <div class="card">
           <div class="card-header bg-info text-light">
             <h5>Payable Reports</h5>
+            <a href="export.php?table_name=payable" class="btn btn-success btn-sm ms-2 float-end">Export To Excel</a>
             <form action="" method="post" class="d-inline">
               <button type="submit" name="print" class="btn btn-success float-end btn-sm d-inline" onclick="window.open('print/payablereportprint.php');">Print</button>
             </form>

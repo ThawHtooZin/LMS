@@ -345,6 +345,254 @@ if ($_GET['table_name'] == 'monthlycharges') {
   <?php
 }
 
+if($_GET['table_name'] == 'sales'){
+  header("Content-Type: application/xls");
+  header("Content-Disposition: attachment; filename=salesexport.xls");
+  header("Pragma: no-cache");
+  header("Expires: 0");
+
+?>
+<table border="1">
+<?php
+  $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger WHERE ac_code LIKE '5000%'");
+  $acnamecountstmt->execute();
+  $acnamecount = $acnamecountstmt->fetchColumn();
+
+
+  if(!empty($date_from) && !empty($date_to)){
+    $date_from = $_GET['date_from'];
+    $date_to = $_GET['date_to'];
+    $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date` BETWEEN '$date_from' AND '$date_to' AND ac_code LIKE '5000%'");
+    $acnamecountstmt->execute();
+    $acnamecount = $acnamecountstmt->fetchColumn();
+    $acnamedontloop = 2;
+  }elseif(!empty($date_to) || !empty($date_from)){
+    if(!empty($date_from)){
+      $date_from = $_GET['date_from'];
+      $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date`='$date_from' AND ac_code LIKE '5000%'");
+      $acnamecountstmt->execute();
+      $acnamecount = $acnamecountstmt->fetchColumn();
+      $acnamedontloop = 2;
+    }elseif(!empty($date_to)){
+      $date_to = $_GET['date_to'];
+      $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date`='$date_to' AND ac_code LIKE '5000%'");
+      $acnamecountstmt->execute();
+      $acnamecount = $acnamecountstmt->fetchColumn();
+      $acnamedontloop = 2;
+    }
+  }
+
+  for ($i=0; $i < $acnamecount; $i++) {
+    $accodestmt = $pdo->prepare("SELECT DISTINCT ac_code FROM general_ledger WHERE ac_code LIKE '5000%'");
+    $accodestmt->execute();
+    $accodedata = $accodestmt->fetchall();
+    $accode = $accodedata[$i]['ac_code'];
+  $gldatas = $query->search('general_ledger', 'ac_code', $accode);
+  $acname = $query->select('acname', $accode, 'code_no');
+ ?>
+ <tr style="background-color: lightgray;">
+   <th>Date</th>
+   <th>Voucher No</th>
+   <th>Account Name</th>
+   <th>Description</th>
+   <th>Debit</th>
+   <th>Cerdit</th>
+   <th>Balance</th>
+ </tr>
+<?php foreach($gldatas as $gldata) : ?>
+
+  <?php
+  // acnamechange
+  $voucher_no = $gldata['voucherno'];
+  $ac_code = $gldata['ac_code'];
+  $acselectstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$voucher_no' AND ac_code!='$ac_code'");
+  $acselectstmt->execute();
+  $acselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
+  if(!empty($acselect['ac_code'])){
+    $accode = $acselect['ac_code'];
+
+    $acname = $query->select('acname', $accode, 'code_no');
+  }
+
+  $dollarratestmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='credit'");
+  $dollarratestmt->execute();
+  $dollarrate = $dollarratestmt->fetch(PDO::FETCH_ASSOC);
+
+  // acnamechange
+
+  $balance = $gldata['balance'] / $dollarrate['dollar_rate'];
+   ?>
+  <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $gldata['id']; ?>">
+    <td><?php echo date('d/m/Y', strtotime($gldata['date'])); ?></td>
+    <td><?php echo $gldata['voucherno']; ?></td>
+    <td><?php echo $acname['ac_name']; ?></td>
+    <td><?php echo $gldata['narration']; ?></td>
+    <td><?php echo $gldata['debit']; ?></td>
+    <td><?php echo $dollarrate['usd_amount']; ?></td>
+    <td><?php echo $balance; ?></td>
+  </tr>
+<?php endforeach; ?>
+<?php
+
+$ac_code = $gldata['ac_code'];
+$acname = $query->select('acname', $ac_code, 'code_no');
+$debitstmt = $pdo->prepare("SELECT SUM(debit) AS total_debit FROM general_ledger WHERE ac_code='$ac_code'");
+$debitstmt->execute();
+$totaldebit = $debitstmt->fetch(PDO::FETCH_ASSOC);
+$creditstmt = $pdo->prepare("SELECT SUM(credit) AS total_credit FROM general_ledger WHERE ac_code='$ac_code'");
+$creditstmt->execute();
+$totalcredit = $creditstmt->fetch(PDO::FETCH_ASSOC);
+$totalbalance = $totaldebit['total_debit'] - $totalcredit['total_credit'];
+
+$totaldebit = $totaldebit['total_debit'] / $dollarrate['dollar_rate'];
+$totalcredit = $totalcredit['total_credit'] / $dollarrate['dollar_rate'];
+$totalbalance = $totalbalance / $dollarrate['dollar_rate'];
+ ?>
+ <tr style="font-weight:bold;">
+   <td>Total:</td>
+   <td></td>
+   <td></td>
+   <td></td>
+   <td><?= $totaldebit; ?></td>
+   <td><?= $totalcredit; ?></td>
+   <td><?= $totalbalance; ?></td>
+ </tr>
+<?php }
+?>
+</table>
+<?php
+}
+
+if($_GET['table_name'] == 'receivable'){
+  header("Content-Type: application/xls");
+  header("Content-Disposition: attachment; filename=receivablereport.xls");
+  header("Pragma: no-cache");
+  header("Expires: 0");
+?>
+  <table class="table table-hover table-striped table-bordered mt-3" border="1">
+    <tr>
+      <th>Date</th>
+      <!-- <th>A/C Name</th> -->
+      <th>Sr No.</th>
+      <th>Contianer No</th>
+      <th>Invoice Amount($)</th>
+      <th>Paid Date</th>
+      <th>Voucher No</th>
+      <th>Particulars</th>
+      <th>Paid Amount($)</th>
+      <th>Balance($)</th>
+    </tr>
+    <?php
+    $accodeloopstmt = $pdo->prepare("SELECT DISTINCT ac_code FROM receivable");
+    $accodeloopstmt->execute();
+    $accodeloopdatas = $accodeloopstmt->fetchAll();
+    foreach ($accodeloopdatas as $accodeloopdata) :
+     if (empty($_GET['country']) || $_GET['country'] == "{$accodeloopdata['ac_code']}") {
+       if(!empty($_GET['country'])){
+         $receivabledatas = $query->search('receivable', 'ac_code', $_GET['country']);
+       }else{
+         $receivabledatas = [];
+       }
+     }
+     endforeach;
+     if(empty($receivabledatas)){
+       $receivabledatas = [];
+     }
+    foreach($receivabledatas as $receivabledata) :
+      $ac_name = $query->select('acname', $receivabledata['ac_code'], 'code_no');
+    ?>
+    <!-- <tr <?php// if($receivabledata['sr_no']){ ?>data-bs-toggle="modal" data-bs-target="#paymentmodal<?php// echo $receivabledata['id']; ?>"<?php //} ?>> -->
+    <tr>
+      <td><?php if($receivabledata['date'] != '0000-00-00'){ echo date('d-m-Y', strtotime($receivabledata['date'])); }; ?></td>
+      <!-- <td><?php //if(!empty($receivabledata['invoice_amount'])){ if(!empty($ac_name['ac_name'])){ echo $ac_name['ac_name'];} } ?></td> -->
+      <td><?php echo $receivabledata['sr_no']; ?></td>
+      <td><?php echo $receivabledata['container_no']; ?></td>
+      <td><?php echo $receivabledata['invoice_amount']; ?></td>
+      <td><?php if($receivabledata['paid_date'] != '0000-00-00'){ echo date('d-m-Y', strtotime($receivabledata['paid_date'])); } ?></td>
+      <td><?php echo $receivabledata['payment_no']; ?></td>
+      <td><?php echo $receivabledata['particulars']; ?></td>
+      <td><?php if($receivabledata['paid_amount'] != 0){ echo $receivabledata['paid_amount'];} ?></td>
+      <td><?php echo $receivabledata['balance']; ?></td>
+    </tr>
+    <?php
+    $ac_code = $receivabledata['ac_code'];
+    endforeach;
+     ?>
+  </table>
+
+<?php
+}
+
+if ($_GET['table_name'] == 'payable') {
+  header("Content-Type: application/xls");
+  header("Content-Disposition: attachment; filename=payableexport.xls");
+  header("Pragma: no-cache");
+  header("Expires: 0");
+  ?>
+
+  <table class="mt-3 table table-bordered table-striped rounded">
+    <tr>
+      <th>No</th>
+      <th>Supplier Name</th>
+      <th>Opening Amount</th>
+      <th>Add Amt</th>
+      <th>Paid Amt</th>
+      <th>Balance</th>
+      <th>Detail</th>
+    </tr>
+    <?php
+    $payablesuppliers = $query->selectdis('payable', 'supplier_id');
+    $id = 0;
+    foreach ($payablesuppliers as $payablesupplier) :
+      $supplier_id = $payablesupplier['supplier_id'];
+      $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id'");
+      $payablestmt->execute();
+      $payabledata = $payablestmt->fetch(PDO::FETCH_ASSOC);
+
+      $idofrow = $payabledata['id'];
+      $openingamountstmt = $pdo->prepare("SELECT balance FROM payable WHERE supplier_id='$supplier_id' AND id < '$idofrow' AND report_date!='0000-00-00' ORDER BY id DESC");
+      $openingamountstmt->execute();
+      $openingamount = $openingamountstmt->fetch(PDO::FETCH_ASSOC);
+
+      $purchaseamtstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS purchase_amount FROM payable WHERE supplier_id='$supplier_id'");
+      $purchaseamtstmt->execute();
+      $purchaseamt = $purchaseamtstmt->fetch(PDO::FETCH_ASSOC);
+
+      $paidamtstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE supplier_id='$supplier_id'");
+      $paidamtstmt->execute();
+      $paidamt = $paidamtstmt->fetch(PDO::FETCH_ASSOC);
+
+      $id++;
+      if (!empty($openingamount['balance'])) {
+        $openingamt = $openingamount['balance'];
+      }else{
+        $openingamt = 0;
+      }
+      $balance =  ($openingamt + $purchaseamt['purchase_amount']) - $paidamt['paid_amount'];
+
+      $supplier_id = $payablesupplier['supplier_id'];
+      $supplierdata = $query->select('acname', $supplier_id, 'code_no');
+
+    ?>
+    <tr style="<?php if($balance['balance'] == 0){ echo "display:none;";} ?>">
+      <td><?= $id; ?></td>
+      <td><?= $supplierdata['ac_name']; ?></td>
+      <td <?php if(empty($openingamount['balance'])){ echo "data-bs-toggle='modal' data-bs-target='#addbalancemodal'";} ?>><?php if(!empty($openingamount['balance'])){ echo $openingamount['balance']; } ?></td>
+      <td><?= $purchaseamt['purchase_amount']; ?></td>
+      <td><?= $paidamt['paid_amount']; ?></td>
+      <td><?= $balance; ?></td>
+      <td><a href="acpayabledetail.php?supplier_id=<?= $supplier_id; ?>" class="btn btn-primary btn-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-check" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/></svg>
+      </a></td>
+    </tr>
+    <?php
+    endforeach;
+     ?>
+  </table>
+
+  <?php
+}
+
 exit();
 
 

@@ -237,10 +237,8 @@ $query = new Query();
             <div class="card-header bg-info">
 
               <h5 class="text-light d-inline">Edit Transaction</h5>
-              <button type="submit" id="acceptbtn" class="hide btn btn-primary btn-sm ms-2 float-end" name="accept">Accept</button>
-              <button type="button" id="finishbtn" class="btn btn-success btn-sm ms-2 float-end">Finished</button>
-              <button type="button" id="notfinishbtn" class="hide btn btn-danger btn-sm ms-2 float-end">Not Finished</button>
-              <a href="cashbook.php" class="btn btn-danger btn-sm float-end">Exit</a>
+              <button type="submit" class="btn btn-primary btn-sm ms-2 float-end" name="accept">Accept</button>
+              <a href="<?php if ($_GET['file'] == 'payable') {echo 'acpayable.php';} if ($_GET['file'] == 'receivable') {echo 'accountreceivable.php';} if ($_GET['file'] == 'cashbook') {echo 'cashbook.php';} if ($_GET['file'] == 'general_ledger') {echo 'general_ledger.php';} ?>" class="btn btn-danger btn-sm float-end">Exit</a>
               <!-- <button type="button" class="btn btn-secondary btn-sm float-end" data-bs-toggle="collapse" data-bs-target="#adddiv" id="add">Add</button> -->
             </div>
           </form>
@@ -256,7 +254,12 @@ $query = new Query();
                 <th>Credit</th>
               </tr>
               <?php
-              $stmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$searchvoucher_no'");
+              if($searchvoucher_no != ''){
+                $stmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$searchvoucher_no'");
+              }else{
+                $searchsr_no = $_GET['sr_no'];
+                $stmt = $pdo->prepare("SELECT * FROM transaction WHERE sr_no='$searchsr_no'");
+              }
               $stmt->execute();
               $datas = $stmt->fetchall();
               $no = 0;

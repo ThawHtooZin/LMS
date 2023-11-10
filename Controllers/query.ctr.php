@@ -484,7 +484,7 @@ Class Query{
       $glstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, credit, balance) VALUES('$date', '$voucher_no', '$supplier_name', '$amount', '$balance')");
       $glstmt->execute();
     }else{
-      $vouchercheckstmt = $pdo->prepare("SELECT SUM(credit) AS credit FROM general_ledger WHERE voucherno='$voucher_no' AND ac_code LIKE '4000%'");
+      $vouchercheckstmt = $pdo->prepare("SELECT SUM(credit) AS credit FROM general_ledger WHERE voucherno='$voucher_no' AND ac_code='$supplier_names'");
       $vouchercheckstmt->execute();
       $creditdata = $vouchercheckstmt->fetch(PDO::FETCH_ASSOC);
       $total_credit = $creditdata['credit'] + $amount;
@@ -3166,12 +3166,14 @@ Class Query{
       if (!empty($balancedata['balance'])) {
         $balance = ($balancedata['balance'] + $debit) - $credit;
       }else{
-        if($debit != 0){
-          $balance = $debit;
-        }else{
-          $balance = 0 - $credit;
-        }
+        // if($debit != 0){
+        //   $balance = $debit;
+        // }else{
+        //   $balance = 0 - $credit;
+        // }
+        $balance = $debit - $credit;
       }
+
       $generalledgerstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, balance, narration,sr_no, container_no, bank_charges, acid) VALUES('$date','$voucher_no','$ac_code', '$debit', '$credit', '$balance', '$description', '$sr_no', '$container_no', '$bank_charges', '$acid')");
 
       $checkglstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE voucherno='$voucher_no' AND ac_code='$ac_code'");
@@ -3205,7 +3207,12 @@ Class Query{
         $container_no = $receivabledata['container_no'];
         $balance = $currencydata['usd_amount'];
         $receivestmt = $pdo->prepare("INSERT INTO receivable(date, ac_code, sr_no, container_no, invoice_amount, balance) VALUES('$date', '$ac_code', '$sr_no', '$container_no', '$invoice_amount', '$balance')");
-        $receivestmt->execute();
+        $checkresrstmt = $pdo->prepare("SELECT * FROM receivable WHERE sr_no='$sr_no'");
+        $checkresrstmt->execute();
+        $checkresr = $checkresrstmt->fetchall();
+        if(empty($checkresr)){
+          $receivestmt->execute();
+        }
       }elseif($receivabledata['credit'] != 0){
         $debitorcredit = 'credit';
         $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='$debitorcredit'");
@@ -3226,18 +3233,12 @@ Class Query{
           $invoice_amount = 0;
           $balance = $invoice_amount - $paid_amount;
         }
-        $receivestmt = $pdo->prepare("INSERT INTO receivable(ac_code, paid_date, payment_no, particulars, paid_amount, balance) VALUES('$ac_code', '$date', '$voucher_no', '$description', '$paid_amount', '$balance')");
+        $receiveinsertstmt = $pdo->prepare("INSERT INTO receivable(ac_code, paid_date, payment_no, particulars, paid_amount, balance) VALUES('$ac_code', '$date', '$voucher_no', '$description', '$paid_amount', '$balance')");
         $checkrestmt = $pdo->prepare("SELECT * FROM receivable WHERE payment_no='$voucher_no'");
         $checkrestmt->execute();
         $checkre = $checkrestmt->fetchall();
-        $checkresrstmt = $pdo->prepare("SELECT * FROM receivable WHERE sr_no='$voucher_no'");
-        $checkresrstmt->execute();
-        $checkresr = $checkresrstmt->fetchall();
         if(empty($checkre)){
-          $receivestmt->execute();
-        }
-        if(empty($checkresr)){
-          $receivestmt->execute();
+          $receiveinsertstmt->execute();
         }
       }
     }
