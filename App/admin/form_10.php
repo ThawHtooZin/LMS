@@ -194,7 +194,13 @@ $query = new Query();
                 </tr>
                 <?php
                 }
-                $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country'");
+
+                $supplieridstmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
+                $supplieridstmt->execute();
+                $supplierdata = $supplieridstmt->fetch(PDO::FETCH_ASSOC);
+                $supplier_id = $supplierdata['supplier_id'];
+
+                $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id'");
                 $totalf7kgstmt->execute();
                 $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
 

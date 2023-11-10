@@ -2,6 +2,8 @@
 
 include "database.db.php";
 
+require 'ValidatorInstance.php';
+
 Class Query{
 
   function login($username, $password){

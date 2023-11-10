@@ -1,38 +1,40 @@
 <?php
-$connection = mysqli_connect('localhost','root','','lms');
-$tables = array();
-$result = mysqli_query($connection,"SHOW TABLES");
-while($row = mysqli_fetch_row($result)){
-  $tables[] = $row[0];
-}
-$return = '';
-foreach($tables as $table){
-  $result = mysqli_query($connection,"SELECT * FROM ".$table);
-  $num_fields = mysqli_num_fields($result);
 
-  $return .= 'DROP TABLE '.$table.';';
-  $row2 = mysqli_fetch_row(mysqli_query($connection,"SHOW CREATE TABLE ".$table));
-  $return .= "\n\n".$row2[1].";\n\n";
+// Enable error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-  for($i=0;$i<$num_fields;$i++){
-    while($row = mysqli_fetch_row($result)){
-      $return .= "INSERT INTO ".$table." VALUES(";
-      for($j=0;$j<$num_fields;$j++){
-        $row[$j] = addslashes($row[$j]);
-        if(isset($row[$j])){ $return .= '"'.$row[$j].'"';}
-        else{ $return .= '""';}
-        if($j<$num_fields-1){ $return .= ',';}
-      }
-      $return .= ");\n";
+function copyDirectory($source, $destination)
+{
+  if(is_dir($source))
+  {
+    if(!is_dir($destination))
+    {
+      mkdir($destination, 0777, true);
     }
+
+    $files = scandir($source);
+    foreach ($files as $file) {
+      if ($file != '.' && $file != "..") {
+        $src = "$source/$file";
+        $dst = "$destination/$file";
+
+        if (is_file($src)) {
+          copyDirectory($src, $dst);
+        } else {
+          copy($src, $dst);
+        }
+      }
+    }
+  } elseif (is_file($source)) {
+    copy($source, $destination);
   }
-  $return .= "\n\n\n";
 }
-//save file
-$handle = fopen("backup/lms.sql","w+");
-$handle2 = fopen("../../../../DataBackup/lms.sql","w+");
-fwrite($handle,$return);
-fclose($handle);
-fwrite($handle2,$return);
-fclose($handle2);
-echo '<script>alert("successfully backup!"); window.location.href="backupandrestore.php";</script>';
+
+// Use the CopyDirectory Function
+$sourceDirectory = '../../../../mysql/data/lms';
+$destinationDirectory = '../../../DatabaseBackup/lms';
+
+copyDirectory($sourceDirectory, $destinationDirectory);
+
+?>

@@ -471,7 +471,10 @@ $query = new Query();
                     <label>Supplier Name</label>
                     <select class="form-control inpv2 mb-2" name="supplier_id">
                       <?php
-                      $supplierdatas = $query->search('acname', 'ac_type', 4000);
+                      $supplierstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no LIKE '4000%'");
+                      $supplierstmt->execute();
+                      $supplierdatas = $supplierstmt->fetchall();
+
                       foreach ($supplierdatas as $supplierdata) {
                         ?>
                         <option value="<?php echo $supplierdata['code_no']; ?>"><?php echo $supplierdata['ac_name']; ?></option>

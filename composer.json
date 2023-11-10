@@ -6,6 +6,7 @@
         }
     ],
     "require": {
-        "box/spout": "^3.3"
+        "box/spout": "^3.3",
+        "respect/validation": "^2.2"
     }
 }

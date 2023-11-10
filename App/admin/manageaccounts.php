@@ -4,6 +4,8 @@ include '../../Auth/authrize.ctr.php';
 include '../../Resources/resource.boot.php';
 include '../../Controllers/query.ctr.php';
 
+$v = require '../../Controllers/ValidatorInstance.php';
+
 $auth = new auth();
 $auth->checkadmin();
 $bootstrap = new Bootstrap();
@@ -55,7 +57,13 @@ $query = new Query();
               $email = $_POST['email'];
               $role = $_POST['role'];
 
-              $message = $query->createaccount('accounts', $username, $password, $email, $role);
+              
+              if($v->special()->stringType()->length(3, 4)->validate($username)){
+                $message = $query->createaccount('accounts', $username, $password, $email, $role);
+              }else{
+                echo "<script>swal('Warning!', 'Username must not contains special characters', 'warning');</script>";
+              }
+
             }
             ?>
             <?php
