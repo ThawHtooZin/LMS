@@ -379,8 +379,13 @@ Class Query{
 
   function addsupplier($table, $supplier_id, $supplier_name, $supplier_phone, $supplier_address){
     global $pdo;
+
+    $accheckstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no='$supplier_id'");
+    $accheckstmt->execute();
+    $accheck = $accheckstmt->fetchAll();
+
     $stmt = $pdo->prepare("INSERT INTO $table(supplier_id, supplier_name, supplier_phone, supplier_address) VALUES('$supplier_id', '$supplier_name', '$supplier_phone', '$supplier_address');");
-    $stmt->execute();
+
 
     $acstmt = $pdo->prepare("SELECT acid FROM actype WHERE ac_type='Current Liability'");
     $acstmt->execute();
@@ -393,31 +398,43 @@ Class Query{
       $actype = $actype['acid'];
     }else{
       $actypestmt = $pdo->prepare("INSERT INTO actype(ac_type) VALUES('Current Liability')");
-      $actypestmt->execute();
+      if(empty($accheck)){
+        $actypestmt->execute();
+      }
       $acstmt = $pdo->prepare("SELECT acid FROM actype WHERE ac_type='Current Liability'");
-      $acstmt->execute();
+      if(empty($accheck)){
+        $acstmt->execute();
+      }
       $actype = $acstmt->fetch(PDO::FETCH_ASSOC);
       $actype = $actype['acid'];
     }
     $acstmt = $pdo->prepare("INSERT INTO acname(code_no, ac_type, ac_name) VALUES('$supplier_id', '$actype', '$supplier_name');");
-    $acstmt->execute();
-    if($stmt){
-      return $successmessage = "Supplier Added Successfully";
+
+    if(empty($accheck)){
+      $stmt->execute();
+      $acstmt->execute();
+      echo '<script>swal("Success!", "Supplier Added Successfully", "success");</script>';
     }else{
-      return $errmessage = "Error accors when adding Supplier";
+      echo '<script>swal("Error!", "Sorry, this ac_code is already exits", "warning");</script>';
     }
   }
 
   function updatesupplier($table, $supplier_name, $supplier_phone, $supplier_address, $updateid){
     global $pdo;
+
+    $accheckstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no='$supplier_name'");
+    $accheckstmt->execute();
+    $accheck = $accheckstmt->fetchAll();
+
     $stmt = $pdo->prepare("UPDATE $table SET supplier_name='$supplier_name', supplier_phone='$supplier_phone', supplier_address='$supplier_address' WHERE supplier_id='$updateid'");
-    $stmt->execute();
     $acstmt = $pdo->prepare("UPDATE acname SET ac_name='$supplier_name' WHERE code_no='$updateid'");
-    $acstmt->execute();
-    if($stmt){
-      return $successmessage = "Supplier Update Successfully";
+
+    if (empty($accheck)) {
+      $stmt->execute();
+      $acstmt->execute();
+      echo '<script>swal("Success!", "Supplier Updated Successfully", "success");</script>';
     }else{
-      return $errmessage = "Error accors when updating Supplier";
+      echo "<script>swal('Error', 'Duplicate A/C Name' , 'error')</script>";
     }
   }
 
@@ -428,9 +445,10 @@ Class Query{
     $acstmt = $pdo->prepare("DELETE FROM acname WHERE code_no='$deleteid'");
     $acstmt->execute();
     if($stmt){
-      return $successmessage = "Supplier Deleted Successfully";
+      echo '<script>swal("success!", "Supplier Deleted Successfully", "success");</script>';
     }else{
-      return $errmessage = "Error accors when deleted Supplier";
+      return $errmessage = "";
+      echo '<script>swal("Warning", "Error accors when deleted Supplier", "warning");</script>';
     }
   }
 
@@ -2939,18 +2957,36 @@ Class Query{
   function addactype($actype){
     global $pdo;
 
+    $accheckstmt = $pdo->prepare("SELECT * FROM actype WHERE ac_type='$code_no'");
+    $accheckstmt->execute();
+    $accheck = $accheckstmt->fetchAll();
+
     $stmt = $pdo->prepare("INSERT INTO actype(ac_type) VALUES('$actype')");
-    $stmt->execute();
-    if($stmt){
+
+    if (empty($accheck)) {
+      $stmt->execute();
       echo "<script>swal('Success', 'Added A/C Type' , 'success')</script>";
+    }else{
+      echo "<script>swal('Error', 'Duplicate A/C Name' , 'error')</script>";
     }
   }
 
   function updateactype($actype, $id){
     global $pdo;
 
+    $accheckstmt = $pdo->prepare("SELECT * FROM actype WHERE ac_type='$code_no'");
+    $accheckstmt->execute();
+    $accheck = $accheckstmt->fetchAll();
+
     $stmt = $pdo->prepare("UPDATE actype SET ac_type='$actype' WHERE acid = '$id'");
-    $stmt->execute();
+
+    if (empty($accheck)) {
+      $stmt->execute();
+      echo "<script>swal('Success', 'Updated A/C Type' , 'success')</script>";
+    }else{
+      echo "<script>swal('Error', 'Duplicate A/C Name' , 'error')</script>";
+    }
+
     if($stmt){
       echo "<script>swal('Success', 'Updated A/C Type' , 'success')</script>";
     }
@@ -2969,20 +3005,34 @@ Class Query{
   function addacname($code_no, $actype, $acname){
     global $pdo;
 
+    $accheckstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no='$code_no'");
+    $accheckstmt->execute();
+    $accheck = $accheckstmt->fetchAll();
+
     $stmt = $pdo->prepare("INSERT INTO acname(code_no, ac_type, ac_name) VALUES('$code_no', '$actype', '$acname')");
-    $stmt->execute();
-    if($stmt){
-      echo "<script>swal('Success', 'Added A/C Type' , 'success')</script>";
+
+    if (empty($accheck)) {
+      echo "<script>swal('Success', 'Added A/C name' , 'success')</script>";
+      $stmt->execute();
+    }else{
+      echo "<script>swal('Error', 'Duplicate A/C Name' , 'error')</script>";
     }
   }
 
   function updateacname($code_no, $actype, $acname, $id){
     global $pdo;
 
+    $accheckstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no='$code_no'");
+    $accheckstmt->execute();
+    $accheck = $accheckstmt->fetchAll();
+
     $stmt = $pdo->prepare("UPDATE acname SET code_no='$code_no', ac_type='$actype', ac_name='$acname' WHERE id = '$id'");
-    $stmt->execute();
-    if($stmt){
-      echo "<script>swal('Success', 'Updated A/C Type' , 'success')</script>";
+
+    if (empty($accheck)) {
+      $stmt->execute();
+      echo "<script>swal('Success', 'Updated A/C Name' , 'success')</script>";
+    }else{
+      echo "<script>swal('Error', 'Duplicate A/C Name' , 'error')</script>";
     }
   }
 

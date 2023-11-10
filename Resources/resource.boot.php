@@ -245,7 +245,7 @@ class Bootstrap
     //   console.log(stm);
     // })();
     </script>
-
+    
     ';
     ?>
     <script type="text/javascript">

@@ -83,7 +83,7 @@ $query = new Query();
                 <option value="tcl">TCL</option>
               </select>
               <button type="submit" name="view" class="btn btn-secondary btn-sm float-end me-2">View</button>
-              <select name="commondity" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 17% !important; height: 27px !important; padding-top: 1.5px !important;">
+              <select name="commondity" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
                 <option value="">Select Commondity</option>
                 <?php
                 $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
@@ -98,7 +98,7 @@ $query = new Query();
                 }
                  ?>
               </select>
-              <select name="country" class="form-control inpv2 d-inline float-end me-2" style=" width: 17% !important; height: 27px !important; padding-top: 1.5px !important;">
+              <select name="country" class="form-control inpv2 d-inline float-end me-2" style=" width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
                 <option value="">Select Country</option>
                 <?php
                 $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock");
@@ -111,6 +111,7 @@ $query = new Query();
                 }
                  ?>
               </select>
+              <input type="date"  name="searchdate" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
             </form>
             </div>
           <div class="card-body">
@@ -153,10 +154,11 @@ $query = new Query();
                 <th>Kg</th>
               </tr>
               <?php
-              if(isset($_POST['view']) && !empty($_POST['commondity']) && !empty($_POST['country'])){
+              if(isset($_POST['view']) && !empty($_POST['commondity']) && !empty($_POST['country']) && !empty($_POST['searchdate'])){
                 $commondity_id = $_POST['commondity'];
                 $country = $_POST['country'];
-                $stmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+                $searchdate = $_POST['searchdate'];
+                $stmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
                 $stmt->execute();
                 $datas = $stmt->fetchall();
                 foreach ($datas as $data) {
@@ -196,7 +198,7 @@ $query = new Query();
                 $totalf7kgstmt->execute();
                 $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
 
-                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
                 $totalkgstmt->execute();
                 $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
                 $result1 = round($totalkgdata['total_kg'], 2) - round($totalf7kgdata['total_kg'], 2);

@@ -201,7 +201,7 @@ $query = new Query();
                 $acname = $query->select('acname', $accode, 'code_no');
                ?>
                <tr>
-                 <td colspan="7"><b><u><?php echo "Account No. : " . $accode . " - " . $acname['ac_name']; ?></u></b></td>
+                 <td colspan="8"><b><u><?php echo "Account No. : " . $accode . " - " . $acname['ac_name']; ?></u></b></td>
                </tr>
               <?php foreach($gldatas as $gldata) : ?>
                 <?php
