@@ -22,6 +22,22 @@ $query = new Query();
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
   <body>
+    <script type="text/javascript">
+    <?php
+    if(!empty($_GET['status']) && $_GET['status'] == 'success'){
+      ?>
+      swal('Success!', 'Successfully Backuped the database', 'success');
+      <?php
+    }
+    ?>
+    </script>
+    <?php
+    if(isset($_POST['confirm'])){
+      $destinationDirectory = $_POST['location'];
+
+
+    }
+     ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
         <?php
@@ -38,13 +54,35 @@ $query = new Query();
             <div class="container mt-5">
               <div class="row">
                 <div class="col text-center">
+                  <!-- <button type="button" data-bs-toggle="modal" data-bs-target="#backupmodal" class="btn btn-success">Backup The Database</button> -->
                   <a href="backup.php" class="btn btn-success">Backup The Database</a>
                 </div>
                 <div class="col text-center">
-                  <button type="button" class="btn btn-info text-light" data-bs-toggle="modal" data-bs-target="#modal">Restore The Database</button>
+                  <button type="button" class="btn btn-info text-light" onclick="swal('Notice!', 'Please contact the service team to restore the database.', 'info');">Restore The Database</button>
                 </div>
               </div>
             </div>
+            <!-- Card -->
+            <div class="modal fade" id="backupmodal">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header bg-success text-light">
+                    <h5 class="modal-title">Choose The Backup Location</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <form action="" method="post">
+                    <div class="modal-body">
+                      <input type="file" name="location" class="form-control">
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="submit" class="btn btn-success" name="confirm">Confirm</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <!-- Card -->
           </div>
         </div>
       </div>

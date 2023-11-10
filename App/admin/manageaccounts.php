@@ -4,7 +4,7 @@ include '../../Auth/authrize.ctr.php';
 include '../../Resources/resource.boot.php';
 include '../../Controllers/query.ctr.php';
 
-$v = require '../../Controllers/ValidatorInstance.php';
+require '../../Controllers/ValidatorInstance.php';
 
 $auth = new auth();
 $auth->checkadmin();
@@ -57,11 +57,19 @@ $query = new Query();
               $email = $_POST['email'];
               $role = $_POST['role'];
 
-              
-              if($v->special()->stringType()->length(3, 4)->validate($username)){
-                $message = $query->createaccount('accounts', $username, $password, $email, $role);
-              }else{
-                echo "<script>swal('Warning!', 'Username must not contains special characters', 'warning');</script>";
+
+              if (
+                  $validator->regex('/[a-zA-Z]/')->validate($username)
+                  && $validator->regex('/[a-zA-Z]/')->length(8, 50)->validate($password)
+              ) {
+                  try {
+                      $validator->email()->assert($email);
+                      $message = $query->createaccount('accounts', $username, $password, $email, $role);
+                  } catch (\Respect\Validation\Exceptions\ValidationException $e) {
+                      echo "<script>swal('Warning!', 'Invalid Data in Fields', 'warning');</script>";
+                  }
+              } else {
+                  echo "<script>swal('Warning!', 'Invalid Data in Fields', 'warning');</script>";
               }
 
             }
@@ -255,7 +263,7 @@ $query = new Query();
             <label>Password</label>
             <input type="password" name="password" class="form-control" placeholder="Password">
             <label>Email</label>
-            <input type="email" name="email" class="form-control" placeholder="Email">
+            <input type="text" name="email" class="form-control" placeholder="Email">
             <label>Role</label>
             <select class="form-control" name="role">
               <option value="">Select Role</option>

@@ -1,40 +1,25 @@
 <?php
+function copyDirectory($source, $destination) {
 
-// Enable error reporting
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+  if (!is_dir($destination)) {
+      mkdir($destination . '/lms', 0755, true);
+   }
 
-function copyDirectory($source, $destination)
-{
-  if(is_dir($source))
-  {
-    if(!is_dir($destination))
-    {
-      mkdir($destination, 0777, true);
-    }
-
-    $files = scandir($source);
-    foreach ($files as $file) {
-      if ($file != '.' && $file != "..") {
-        $src = "$source/$file";
-        $dst = "$destination/$file";
-
-        if (is_file($src)) {
-          copyDirectory($src, $dst);
-        } else {
-          copy($src, $dst);
-        }
+   $files = scandir($source);
+   foreach ($files as $file) {
+      if ($file !== '.' && $file !== '..') {
+         $sourceFile = $source . '/' . $file;
+         $destinationFile = $destination . '/' . $file;
+         if (is_dir($sourceFile)) {
+            copyDirectory($sourceFile, $destinationFile);
+         } else {
+            copy($sourceFile, $destinationFile);
+         }
       }
-    }
-  } elseif (is_file($source)) {
-    copy($source, $destination);
-  }
+   }
 }
-
-// Use the CopyDirectory Function
-$sourceDirectory = '../../../../mysql/data/lms';
-$destinationDirectory = '../../../DatabaseBackup/lms';
-
+$sourceDirectory = __DIR__ . '/../../../../mysql/data/lms';
+$destinationDirectory = __DIR__ . '/../../../../DataBackup/lms';
 copyDirectory($sourceDirectory, $destinationDirectory);
-
-?>
+header('location:backupandrestore.php?status=success');
+ ?>
