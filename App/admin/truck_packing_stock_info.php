@@ -34,7 +34,17 @@ $query = new Query();
       $query->addtruckpackinglistinfo($commondity, $size, $pcsperbox, $kgperbox, $mc, $invoice_no);
     }
 
-    if (isset($_POST['updatebtn'])) {
+    if(isset($_POST['updatepackinglist'])){
+      $commondity = $_POST['upitem_id'];
+      $size = $_POST['upsize'];
+      $pcsperbox = $_POST['uppcsperbox'];
+      $kgperbox = $_POST['upkgperbox'];
+      $mc = $_POST['upmc'];
+      $invoice_no = $_POST['upinvoice_no'];
+      $query->addtruckpackinglistinfo($commondity, $size, $pcsperbox, $kgperbox, $mc, $invoice_no);
+    }
+
+    if (isset($_POST['usdadd'])) {
       $usd = $_POST['usd'];
       $updateid = $_POST['updateid'];
       $query->updatetruckactualinvoice($usd, $updateid);
@@ -127,6 +137,7 @@ $query = new Query();
                     <th>Mc</th>
                     <th>Total Net Weight</th>
                     <th>Total Gross Weight</th>
+                    <th>Action</th>
                   </tr>
                   <?php
                   $invoice_no = $_GET['invoice_no'];
@@ -166,7 +177,71 @@ $query = new Query();
                         <td><?php echo $packingstockinfodata['mc']; ?></td>
                         <td><?php echo $packingstockinfodata['netweight']; ?></td>
                         <td><?php echo $packingstockinfodata['totalgrossweight']; ?></td>
+                        <td>
+                          <button type="button" data-bs-toggle="modal" data-bs-target="#actualpackinglisteditmodal<?= $packingstockinfodata['id']; ?>" class="btn btn-warning btn-sm text-light"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                              <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                              <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                            </svg></button>
+                        </td>
                       </tr>
+                      <div class="modal fade" id="actualpackinglisteditmodal<?= $packingstockinfodata['id']; ?>">
+                        <div class="modal-dialog">
+                          <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                            <div class="modal-header bg-secondary text-light">
+                              <h1 class="modal-title fs-5">Edit Packing List</h1>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                          <form action="" method="post">
+                            <input type="hidden" name="upid" value="<?= $packingstockinfodata['id']; ?>">
+                            <div class="modal-body">
+                              <div class="row">
+                                <div class="col">
+                                  <label>Commondity</label>
+                                  <select class="form-control inpv2 mb-2" name="upitem_id">
+                                    <?php
+                                    $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
+                                    $form7commonditystmt->execute();
+                                    $form7commonditydatas = $form7commonditystmt->fetchall();
+                                    foreach ($form7commonditydatas as $form7commonditydata) {
+                                      $item_id = $form7commonditydata['item_id'];
+                                      $commonditydata = $query->select('item', $item_id, 'item_id');
+                                      ?>
+                                      <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                                      <?php
+                                    }
+                                    ?>
+                                  </select>
+                                </div>
+                                <div class="col">
+                                  <label>Size</label>
+                                  <input type="text" name="upsize" class="form-control inpv2 mb-2">
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col">
+                                  <label>Pcs Per Box</label>
+                                  <input type="number" name="uppcsperbox" class="form-control inpv2 mb-2">
+                                </div>
+                                <div class="col">
+                                  <label>Kg Per Box</label>
+                                  <input type="text" name="upkgperbox" class="form-control inpv2 mb-2">
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col">
+                                  <label>Mc</label>
+                                  <input type="number" name="upmc" class="form-control inpv2 mb-2">
+                                </div>
+                                <div class="col mt-4">
+                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                  <button type="submit" class="btn btn-warning text-light" name="updatepackinglist">Edit</button>
+                                </div>
+                              </div>
+                            </div>
+                          </form>
+                          </div>
+                        </div>
+                      </div>
                       <?php
                       $item_id = $packingstockinfodata['item_id'];
                       $size = $packingstockinfodata['size'];
@@ -189,6 +264,7 @@ $query = new Query();
                       <td><?php echo $totalmcdata['totalmc']; ?></td>
                       <td><?php if(!empty($netweightdata['netweight'])){ echo $netweightdata['netweight']; }; ?></td>
                       <td><?php if(!empty($totalgrssweightdata['totalgrossweight'])){ echo $totalgrssweightdata['totalgrossweight']; }; ?></td>
+                      <td></td>
                       </tr>
                       <?php
                       $no++;
@@ -217,6 +293,7 @@ $query = new Query();
                      <td style="font-weight:bold !important;"><?php echo $totalmcdata['totalmc']; ?></td>
                      <td style="font-weight:bold !important;"><?php if(!empty($netweightdata['netweight'])){ echo $netweightdata['netweight']; }; ?></td>
                      <td style="font-weight:bold !important;"><?php if(!empty($totalgrssweightdata['totalgrossweight'])){ echo $totalgrssweightdata['totalgrossweight']; }; ?></td>
+                     <td></td>
                    </tr>
                 </table>
                 <h5 style="text-transform:uppercase;">Total Foam Box - <?php if(!empty($foamboxdata['total_foambox_no'])){ echo $foamboxdata['total_foambox_no'] . " Box"; }; ?></h5>
@@ -295,7 +372,7 @@ $query = new Query();
                          $lastcommondity->execute();
                          $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
                            ?>
-                           <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $packingstockinfodata['id']; ?>">
+                           <tr data-bs-toggle="modal" data-bs-target="#usdadd<?php echo $packingstockinfodata['id']; ?>">
                              <td><?php if(empty($lastcommondity)){ echo $no1;}; ?></td>
                              <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
                              <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['size'];} ?></td>
@@ -307,7 +384,7 @@ $query = new Query();
                            </tr>
                          <?php
                          ?>
-                         <div class="modal fade" id="updatemodal<?php echo $packingstockinfodata['id']; ?>">
+                         <div class="modal fade" id="usdadd<?php echo $packingstockinfodata['id']; ?>">
                            <div class="modal-dialog" role="document">
                              <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
                                <div class="modal-header bg-info text-light">
@@ -323,7 +400,7 @@ $query = new Query();
                                    </div>
                                    <div class="modal-footer">
                                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                     <button type="submit" class="btn btn-success" name="updatebtn">Update</button>
+                                     <button type="submit" class="btn btn-success" name="usdadd">Update</button>
                                    </div>
                                  </div>
                                </div>
@@ -540,7 +617,6 @@ $query = new Query();
                     <td><?php echo $totalkgperboxdata['total_kgperbox']; ?></td>
                     <td><?php echo $totalmcdata['totalmc']; ?></td>
                     <td><?php if(!empty($netweightdata['netweight'])){ echo $netweightdata['netweight']; }; ?></td>
-                    <td></td>
                   </tr>
                </table>
                <h5 style="text-transform:uppercase;">Total Foam Box - <?php if(!empty($foamboxdata['total_foambox_no'])){ echo $foamboxdata['total_foambox_no'] . " Box"; }; ?></h5>

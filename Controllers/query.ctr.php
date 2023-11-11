@@ -2515,7 +2515,7 @@ Class Query{
 
   }
 
-  function addpackinglist($date, $customer_id, $country, $invoiceno, $containerno, $vessel_no, $voyname, $fda){
+  function addpackinglist($date, $customer_id, $country, $invoiceno, $containerno, $vessel_name, $voyname, $fda){
     global $pdo;
 
     $addpackingliststmt = $pdo->prepare("INSERT INTO packingliststock(date, customer_id, country, invoiceno, containerno, vessel_name, voyname, fda) VALUES('$date', '$customer_id', '$country', '$invoiceno', '$containerno', '$vessel_name', '$voyname', '$fda')");
@@ -2777,6 +2777,13 @@ Class Query{
 
     $addpackingliststmt = $pdo->prepare("INSERT INTO truckpackingliststock(date, invoice_no, truck_no) VALUES('$date', '$invoice_no', '$truck_no')");
     $addpackingliststmt->execute();
+  }
+
+  function edittruckpackinglist($upid, $date, $invoice_no, $truck_no){
+    global $pdo;
+
+    $stmt = $pdo->prepare("UPDATE truckpackingliststock SET date='$date', invoice_no='$invoice_no', truck_no='$truck_no' WHERE id='$upid'");
+    $stmt->execute();
   }
 
   function addtruckpackinglistinfo($commondity, $size, $pcsperbox, $kgperbox, $mc, $invoice_no){
@@ -3941,6 +3948,8 @@ Class Query{
      $stmt = $pdo->prepare("DELETE FROM gfcdryfishlabour WHERE date>='$deletedate'");
      $stmt->execute();
    }
+
+
 
   // MORE SELECTS
 
