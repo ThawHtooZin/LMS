@@ -2643,7 +2643,11 @@ Class Query{
     $hhkmcstmt->execute();
     $hhkmcdata = $hhkmcstmt->fetch(PDO::FETCH_ASSOC);
 
-    $balance_mc = $hhkmcdata['balance_mc'] - $transfermc;
+    if(!empty($hhkmcdata['balance_mc'])){
+      $balance_mc = $hhkmcdata['balance_mc'] - $transfermc;
+    }else{
+      $balance_mc = 0 - $transfermc;
+    }
     $transfermcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transfersize', '$transferkg', '$transfermc', '$balance_mc')");
     $transfermcstmt->execute();
 

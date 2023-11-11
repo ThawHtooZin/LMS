@@ -74,9 +74,10 @@ $query = new Query();
              ?>
             <form action="" method="post" class="text-center">
               <?php
-              $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form7stock WHERE country IS NOT NULL");
+              $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
               $countrystmt->execute();
               $countrydatas = $countrystmt->fetchall();
+
               foreach ($countrydatas as $countrydata) {
                 $btnname = $countrydata['country'] . "btn";
                 if(isset($_POST[$btnname])){
@@ -136,6 +137,23 @@ $query = new Query();
               }
                ?>
             </table>
+            <script type="text/javascript">
+            <?php
+                if($_SESSION['tabs'] == $countrydata['country']){
+                  echo "show" . $countrydata['country'] . "();";
+                  if($_SESSION['tabs'] == $countrydata['country']){
+                  echo ' function show' . $countrydata['country'] .'(){';
+                    // foreach ($countrydatas as $countrydata) {
+                    //   echo 'document.querySelector("#'.$countrydata['country'].'table").classList.add(\'hide\');';
+                    //   echo 'document.querySelector(".'.$countrydata['country'].'link").classList.remove(\'color\');';
+                    // }
+                    echo 'document.querySelector("#'.$_SESSION['tabs'].'table").classList.remove(\'hide\');';
+                    echo 'document.querySelector(".'.$_SESSION['tabs'].'link").classList.add(\'color\');';
+                    echo '}';
+                  }
+                }
+             ?>
+            </script>
             <?php
             }
              ?>
@@ -218,26 +236,6 @@ $query = new Query();
         </div>
       </div>
     </div>
-
-    <script type="text/javascript">
-    <?php
-      foreach ($countrydatas as $countrydata) {
-        if($_SESSION['tabs'] == $countrydata['country']){
-          echo "show" . $countrydata['country'] . "();";
-          if($_SESSION['tabs'] == $countrydata['country']){
-          echo ' function show' . $countrydata['country'] .'(){';
-            foreach ($countrydatas as $countrydata) {
-              echo 'document.querySelector("#'.$countrydata['country'].'table").classList.add(\'hide\');';
-              echo 'document.querySelector(".'.$countrydata['country'].'link").classList.remove(\'color\');';
-            }
-            echo 'document.querySelector("#'.$_SESSION['tabs'].'table").classList.remove(\'hide\');';
-            echo 'document.querySelector(".'.$_SESSION['tabs'].'link").classList.add(\'color\');';
-            echo '}';
-          }
-        }
-      }
-     ?>
-    </script>
     <?php
     $bootstrap->javascript();
     ?>
