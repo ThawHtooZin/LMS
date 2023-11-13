@@ -77,7 +77,7 @@ $query = new Query();
 
           <div class="card-header bg-info">
             <?php
-            if(empty($_SESSION) && $_SESSION['tabs'] != 'actualinvoice' && $_SESSION['tabs'] != 'actualpackinglist' && $_SESSION['tabs'] != 'foambox' && $_SESSION['tabs'] != 'declare'){
+            if(empty($_SESSION) || $_SESSION['tabs'] != 'actualinvoice' && $_SESSION['tabs'] != 'actualpackinglist' && $_SESSION['tabs'] != 'foambox' && $_SESSION['tabs'] != 'declare'){
               $_SESSION['tabs'] = 'default';
             }elseif(isset($_POST['actualinvoicebtn'])){
               $_SESSION['tabs'] = 'actualinvoice';
@@ -206,7 +206,7 @@ $query = new Query();
                                       $item_id = $form7commonditydata['item_id'];
                                       $commonditydata = $query->select('item', $item_id, 'item_id');
                                       ?>
-                                      <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                                      <option value="<?php echo $commonditydata['item_id']; ?>" <?php if($packingstockinfodata['item_id'] == $commonditydata['item_id']){ echo 'selected';} ?>><?php echo $commonditydata['item_name']; ?></option>
                                       <?php
                                     }
                                     ?>
@@ -214,13 +214,13 @@ $query = new Query();
                                 </div>
                                 <div class="col">
                                   <label>Size</label>
-                                  <input type="text" name="upsize" class="form-control inpv2 mb-2">
+                                  <input type="text" name="upsize" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['size']; ?>">
                                 </div>
                               </div>
                               <div class="row">
                                 <div class="col">
                                   <label>Pcs Per Box</label>
-                                  <input type="number" name="uppcsperbox" class="form-control inpv2 mb-2">
+                                  <input type="number" name="uppcsperbox" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['pcsperbox'] ?>">
                                 </div>
                                 <div class="col">
                                   <label>Kg Per Box</label>
