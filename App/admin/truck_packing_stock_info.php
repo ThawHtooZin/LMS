@@ -102,6 +102,7 @@ $query = new Query();
                 <form action="" method="post">
                   <button type="submit" name="searchcommonditybtn" class="btn btn-sm btn-success float-end me-2">Search</button>
                   <select class="form-control float-end me-2 inpv2" style="width: 14%;" name="searchcommondity">
+                    <option value="">All Commondity</option>
                     <?php
                     $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM truckpackingliststockinfo");
                     $commonditystmt->execute();
@@ -143,6 +144,7 @@ $query = new Query();
                $emptyornot = $query->select('truckpackingliststockinfo', $invoice_no, 'invoice_no');
                if (!empty($emptyornot)) {
               if (isset($_POST['searchcommonditybtn'])) {
+                $_SESSION['tabs'] = 'default';
                 ?>
                 <div class="packingstocktable">
                   <table class="table table-striped table-hover table-bordered">
@@ -526,6 +528,7 @@ $query = new Query();
                $emptyornotactualinvoice = $query->select('truckactualinvoice', $invoice_no, 'invoice_no');
                if(!empty($emptyornotactualinvoice)){
                  if (isset($_POST['searchcommonditybtn'])) {
+                   $_SESSION['tabs'] = 'actualinvoice';
                    ?>
                    <div class="actualinvoicetable hide">
                      <table class="table table-striped table-hover table-bordered">

@@ -3963,6 +3963,20 @@ Class Query{
      $stmt->execute();
    }
 
+   function editgfcmcstockremark($remark, $updateid){
+     global $pdo;
+
+     $stmt = $pdo->prepare("UPDATE gfcmcstock SET remark='$remark' WHERE id='$updateid'");
+     $stmt->execute();
+   }
+
+   function editgfcmcstocklooseinorout($loosein_size, $loosein_kg, $looseout_size, $looseout_kg, $loosein_pcs, $looseout_pcs, $updateid){
+     global $pdo;
+
+     $stmt = $pdo->prepare("UPDATE gfcmcstock SET loosein_size='$loosein_size', loosein_kg='$loosein_kg', loosein_pcs='$loosein_pcs', looseout_size='$looseout_size', looseout_kg='$looseout_kg', looseout_pcs='$looseout_pcs' WHERE id='$updateid'");
+     $stmt->execute();
+   }
+
   // MORE SELECTS
 
   function selectsum($table, $id, $selectwhat){

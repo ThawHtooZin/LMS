@@ -22,6 +22,26 @@ $query = new Query();
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
   <body>
+    <?php
+
+        if(isset($_POST['remarkeditbtn'])){
+          $updateid = $_POST['remarkupdateid'];
+          $remark = $_POST['remarkedit'];
+          $query->editgfcmcstockremark($remark, $updateid);
+        }
+
+        if (isset($_POST['editlooseinoutbtn'])) {
+          $updateid = $_POST['editlooseinoutid'];
+          $loosein_size = $_POST['loosein_size'];
+          $loosein_kg = $_POST['loosein_kg'];
+          $looseout_size = $_POST['looseout_size'];
+          $looseout_kg = $_POST['looseout_kg'];
+          $loosein_pcs = $_POST['loosein_pcs'];
+          $looseout_pcs = $_POST['looseout_pcs'];
+
+          $query->editgfcmcstocklooseinorout($loosein_size, $loosein_kg, $looseout_size, $looseout_kg, $loosein_pcs, $looseout_pcs, $updateid);
+        }
+     ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
         <?php
@@ -61,14 +81,25 @@ $query = new Query();
           <div class="card-body">
             <table class="table table-hover table-bordered table-striped">
               <tr>
-                <th>Date</th>
-                <th>Particular</th>
-                <th>Commondity</th>
-                <th>Country</th>
+                <th rowspan="2" style="padding-top: 22px;">Date</th>
+                <th rowspan="2" style="padding-top: 22px;">Particular</th>
+                <th rowspan="2" style="padding-top: 22px;">Commondity</th>
+                <th rowspan="2" style="padding-top: 22px;">Country</th>
+                <th rowspan="2" style="padding-top: 22px;">Size</th>
+                <th rowspan="2" style="padding-top: 22px;">Kg</th>
+                <th rowspan="2" style="padding-top: 22px;">Mc</th>
+                <th rowspan="2" class="text-center" style="padding-top: 15px !important;">Balance <br>Mc</th>
+                <th colspan="3" style="text-align: center;">Loose In</th>
+                <th colspan="3" style="text-align: center;">Loose Out</th>
+                <th rowspan="2" style="padding-top: 22px; padding-left: 22px;">Remark</th>
+              </tr>
+              <tr>
                 <th>Size</th>
                 <th>Kg</th>
-                <th>Mc</th>
-                <th>Balance Mc</th>
+                <th>Pcs</th>
+                <th>Size</th>
+                <th>Kg</th>
+                <th>Pcs</th>
               </tr>
               <?php
 
@@ -97,7 +128,82 @@ $query = new Query();
                 <td><?php echo $sizeinfodata['kg']; ?></td>
                 <td><?php echo $sizeinfodata['mc']; ?></td>
                 <td><?php echo $sizeinfodata['balance_mc']; ?></td>
+                <td data-bs-toggle="modal" data-bs-target="#loosemodal<?= $sizeinfodata['id']; ?>"><?php echo $sizeinfodata['loosein_size']; ?></td>
+                <td data-bs-toggle="modal" data-bs-target="#loosemodal<?= $sizeinfodata['id']; ?>"><?php echo $sizeinfodata['loosein_kg']; ?></td>
+                <td data-bs-toggle="modal" data-bs-target="#loosemodal<?= $sizeinfodata['id']; ?>"><?php  if($sizeinfodata['loosein_pcs'] != 0){echo $sizeinfodata['loosein_pcs'];}; ?></td>
+                <td data-bs-toggle="modal" data-bs-target="#loosemodal<?= $sizeinfodata['id']; ?>"><?php echo $sizeinfodata['looseout_size']; ?></td>
+                <td data-bs-toggle="modal" data-bs-target="#loosemodal<?= $sizeinfodata['id']; ?>"><?php echo $sizeinfodata['looseout_kg']; ?></td>
+                <td data-bs-toggle="modal" data-bs-target="#loosemodal<?= $sizeinfodata['id']; ?>"><?php  if($sizeinfodata['looseout_pcs'] != 0){echo $sizeinfodata['looseout_pcs'];}; ?></td>
+                <td data-bs-toggle="modal" data-bs-target="#remark<?= $sizeinfodata['id']; ?>"><?php echo $sizeinfodata['remark']; ?></td>
               </tr>
+              <div class="modal fade" id="loosemodal<?= $sizeinfodata['id']; ?>">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header bg-info text-light">
+                      <h5 class="modal-title">loose In/Out Edit Data</h5>
+                    </div>
+                    <form action="" method="post">
+                      <input type="hidden" name="editlooseinoutid" value="<?= $sizeinfodata['id']; ?>" class="form-control inpv2">
+                      <div class="modal-body">
+                        <div class="row">
+                          <div class="col">
+                            <label>loose In Size</label>
+                            <input type="text" name="loosein_size" value="<?= $sizeinfodata['loosein_size']; ?>" class="form-control inpv2 mb-2">
+                          </div>
+                          <div class="col">
+                            <label>loose Out Size</label>
+                            <input type="text" name="looseout_size" value="<?= $sizeinfodata['looseout_size']; ?>" class="form-control inpv2 mb-2">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <label>loose In Kg</label>
+                            <input type="text" name="loosein_kg" value="<?= $sizeinfodata['loosein_kg']; ?>" class="form-control inpv2 mb-2">
+                          </div>
+                          <div class="col">
+                            <label>loose Out Kg</label>
+                            <input type="text" name="looseout_kg" value="<?= $sizeinfodata['looseout_kg']; ?>" class="form-control inpv2 mb-2">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <label>loose in Pcs</label>
+                            <input type="number" name="loosein_pcs" value="<?= $sizeinfodata['loosein_pcs']; ?>" class="form-control inpv2 mb-2">
+                          </div>
+                          <div class="col">
+                            <label>loose out Pcs</label>
+                            <input type="number" name="looseout_pcs" value="<?= $sizeinfodata['looseout_pcs']; ?>" class="form-control inpv2 mb-2">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cloose</button>
+                        <button type="submit" class="btn btn-primary" name="editlooseinoutbtn">Save</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div class="modal fade" id="remark<?= $sizeinfodata['id']; ?>">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header bg-info text-light">
+                      <h5 class="modal-title">Make A Remark</h5>
+                    </div>
+                    <form action="" method="post">
+                      <input type="hidden" name="remarkupdateid" value="<?= $sizeinfodata['id']; ?>">
+                      <div class="modal-body">
+                        <label for="">Remark</label>
+                        <textarea name="remarkedit" rows="3" cols="80" class="form-control inpv2"><?= $sizeinfodata['remark']; ?></textarea>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cloose</button>
+                        <button type="submit" class="btn btn-primary" name="remarkeditbtn">Save</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
               <?php
               }
 

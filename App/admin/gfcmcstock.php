@@ -177,7 +177,7 @@ $query = new Query();
                 <label>Commondity</label>
                 <select class="form-control inpv2 mb-2" name="exportcommondity_id">
                   <?php
-                  $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
+                  $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
                   $form7commonditystmt->execute();
                   $form7commonditydatas = $form7commonditystmt->fetchall();
                   foreach ($form7commonditydatas as $form7commonditydata) {
