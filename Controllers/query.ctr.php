@@ -504,7 +504,7 @@ Class Query{
       $glstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, credit, balance) VALUES('$date', '$voucher_no', '$supplier_name', '$amount', '$balance')");
       $glstmt->execute();
     }else{
-      $vouchercheckstmt = $pdo->prepare("SELECT SUM(credit) AS credit FROM general_ledger WHERE voucherno='$voucher_no' AND ac_code='$supplier_names'");
+      $vouchercheckstmt = $pdo->prepare("SELECT SUM(credit) AS credit FROM general_ledger WHERE voucherno='$voucher_no' AND ac_code='$supplier_name'");
       $vouchercheckstmt->execute();
       $creditdata = $vouchercheckstmt->fetch(PDO::FETCH_ASSOC);
       $total_credit = $creditdata['credit'] + $amount;
@@ -3949,7 +3949,19 @@ Class Query{
      $stmt->execute();
    }
 
+   function edithhkmcstockremark($remark, $updateid){
+     global $pdo;
 
+     $stmt = $pdo->prepare("UPDATE hhkmcstock SET remark='$remark' WHERE id='$updateid'");
+     $stmt->execute();
+   }
+
+   function edithhkmcstocklooseinorout($loosein_size, $loosein_kg, $looseout_size, $looseout_kg, $loosein_pcs, $looseout_pcs, $updateid){
+     global $pdo;
+
+     $stmt = $pdo->prepare("UPDATE hhkmcstock SET loosein_size='$loosein_size', loosein_kg='$loosein_kg', loosein_pcs='$loosein_pcs', looseout_size='$looseout_size', looseout_kg='$looseout_kg', looseout_pcs='$looseout_pcs' WHERE id='$updateid'");
+     $stmt->execute();
+   }
 
   // MORE SELECTS
 

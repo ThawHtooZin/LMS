@@ -73,7 +73,7 @@ $query = new Query();
             <select class="form-control w-25 d-inline float-end" style="height:30px; padding-left:10px; padding-top:2px;" name="commondity_id">
               <option value="">View Each Commondity</option>
               <?php
-              $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form7stock WHERE country IS NOT NULL");
+              $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
               $countrystmt->execute();
               $countrydatas = $countrystmt->fetchall();
 

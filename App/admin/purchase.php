@@ -472,7 +472,7 @@ $query = new Query();
               </div>
               <div class="col">
                 <label style="font-weight: bold;">Voucher No</label>
-                <input type="number" name="voucher_no" class="form-control inpv2 mb-2" value="<?php echo rand(0, 9999); ?>">
+                <input type="number" name="voucher_no" class="form-control inpv2 mb-2" value="">
               </div>
             </div>
             <div class="row">
