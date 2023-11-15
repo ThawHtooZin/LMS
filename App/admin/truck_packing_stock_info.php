@@ -100,9 +100,9 @@ $query = new Query();
                 <button type="submit" class="btn btn-danger float-end btn-sm hide" id="actualinvoiceback" name="actualinvoiceback">Back</button>
                 <button type="button" class="btn btn-success float-end me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#add" id="addpackingstockbtn">Add Packing Stock</button>
                 <form action="" method="post">
-                  <button type="submit" name="searchcommonditybtn" class="btn btn-sm btn-dark float-end me-2">View</button>
-                  <select class="form-control float-end me-2 inpv2" style="width: 16%; height: 28px; padding-top:3px;" name="searchcommondity">
-                    <option value="">Commondity Search</option>
+                  <button type="submit" name="searchcommonditybtn" class="btn btn-sm btn-success float-end me-2">Search</button>
+                  <select class="form-control float-end me-2 inpv2" style="width: 14%;" name="searchcommondity">
+                    <option value="">All Commondity</option>
                     <?php
                     $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM truckpackingliststockinfo");
                     $commonditystmt->execute();
@@ -143,7 +143,7 @@ $query = new Query();
                $invoice_no = $_GET['invoice_no'];
                $emptyornot = $query->select('truckpackingliststockinfo', $invoice_no, 'invoice_no');
                if (!empty($emptyornot)) {
-              if (isset($_POST['searchcommonditybtn'])) {
+              if (isset($_POST['searchcommonditybtn']) && !empty($_POST['searchcommondity'])) {
                 ?>
                 <div class="packingstocktable">
                   <table class="table table-striped table-hover table-bordered">
@@ -524,7 +524,7 @@ $query = new Query();
                $invoice_no = $_GET['invoice_no'];
                $emptyornotactualinvoice = $query->select('truckactualinvoice', $invoice_no, 'invoice_no');
                if(!empty($emptyornotactualinvoice)){
-                 if (isset($_POST['searchcommonditybtn'])) {
+                 if (isset($_POST['searchcommonditybtn']) && !empty($_POST['searchcommondity'])) {
                    $searchcommondity = $_POST['searchcommondity'];
                    ?>
                    <div class="actualinvoicetable hide">
@@ -837,7 +837,7 @@ $query = new Query();
              $invoice_no = $_GET['invoice_no'];
              $emptyornotfoambox = $query->select('truckfoambox', $invoice_no, 'invoice_no');
              if(!empty($emptyornotfoambox)){
-               if (isset($_POST['searchcommonditybtn'])) {
+               if (isset($_POST['searchcommonditybtn']) && !empty($_POST['searchcommondity'])) {
                  $searchcommondity = $_POST['searchcommondity'];
                 ?>
                 <div class="foamboxtable">
@@ -1128,7 +1128,7 @@ $query = new Query();
              $invoice_no = $_GET['invoice_no'];
              $emptyornotdeclare = $query->select('truckdeclare', $invoice_no, 'invoice_no');
              if(!empty($emptyornotdeclare)){
-               if (isset($_POST['searchcommonditybtn'])) {
+               if (isset($_POST['searchcommonditybtn']) && !empty($_POST['searchcommondity'])) {
                  $searchcommondity = $_POST['searchcommondity'];
                  ?>
                  <div class="declaretable">
