@@ -2871,7 +2871,11 @@ Class Query{
     $mcstmt->execute();
     $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
 
-    $netweight = $mcdata['mc'] * $kgperbox;
+    if(!empty($kgperbox)){
+      $netweight = $mcdata['mc'] * floatval($kgperbox);
+    }else{
+      $netweight = 0;
+    }
 
     $updatepcsperboxstmt = $pdo->prepare("UPDATE truckdeclare SET kgperbox='$kgperbox', netweight='$netweight' WHERE id='$kgperboxid'");
     $updatepcsperboxstmt->execute();
