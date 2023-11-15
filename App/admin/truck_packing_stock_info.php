@@ -100,9 +100,9 @@ $query = new Query();
                 <button type="submit" class="btn btn-danger float-end btn-sm hide" id="actualinvoiceback" name="actualinvoiceback">Back</button>
                 <button type="button" class="btn btn-success float-end me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#add" id="addpackingstockbtn">Add Packing Stock</button>
                 <form action="" method="post">
-                  <button type="submit" name="searchcommonditybtn" class="btn btn-sm btn-success float-end me-2">Search</button>
-                  <select class="form-control float-end me-2 inpv2" style="width: 14%;" name="searchcommondity">
-                    <option value="">All Commondity</option>
+                  <button type="submit" name="searchcommonditybtn" class="btn btn-sm btn-dark float-end me-2">View</button>
+                  <select class="form-control float-end me-2 inpv2" style="width: 16%; height: 28px; padding-top:3px;" name="searchcommondity">
+                    <option value="">Commondity Search</option>
                     <?php
                     $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM truckpackingliststockinfo");
                     $commonditystmt->execute();

@@ -89,10 +89,10 @@ $query = new Query();
             $invoice_nodata = $invoice_nostmt->fetch(PDO::FETCH_ASSOC);
              ?>
              <div class="row text-center">
-               <div class="col">
+               <div class="col" style="font-weight:bold !important;">
                  Date : <?php echo date('d-m-Y', strtotime($invoice_nodata['date']));  ?>
                </div>
-               <div class="col">
+               <div class="col" style="font-weight:bold !important;">
                  Invoice No : <?php echo $invoice_nodata['invoice_no'];  ?>
                </div>
              </div>
@@ -101,17 +101,17 @@ $query = new Query();
               <table class="table table-striped table-hover table-bordered text-center">
                 <tr>
                   <!-- <th rowspan="2" style="padding-top:40px;">Date</th> -->
-                  <th style="padding-top:20px !important;">Commondity</th>
-                  <th style="padding-top:20px !important;">Size</th>
-                  <th>Export total_kg</th>
-                  <th>Price Per Viss</th>
-                  <th>Price Per Kg</th>
+                  <th style="padding-top:10px !important;">Commondity</th>
+                  <th style="padding-top:10px !important;">Size</th>
+                  <th style="padding-top:10px !important;">Export total_kg</th>
+                  <th style="padding-top:10px !important;">Price Per Viss</th>
+                  <th style="padding-top:10px !important;">Price Per Kg</th>
                   <th style="padding-top:20px !important;">%</th>
-                  <th>Packing Charges</th>
-                  <th>YGN To MT</th>
-                  <th>Mt To Technck</th>
-                  <th>Labour Charges</th>
-                  <th>Packing & Transport</th>
+                  <th style="padding-top:10px !important;">Packing Charges</th>
+                  <th style="padding-top:10px !important;">YGN To MT</th>
+                  <th style="padding-top:10px !important;">Mt To Technck</th>
+                  <th style="padding-top:10px !important;">Labour Charges</th>
+                  <th style="padding-top:10px !important;">Packing & Transport</th>
                 </tr>
                 <tr>
 
@@ -211,12 +211,12 @@ $query = new Query();
                 <div style="width: 550px; margin-left:2px;">
                   <table class="table table-striped table-hover table-bordered">
                     <tr class="text-center">
-                      <th style="padding-top:20px !important;">Commondity</th>
-                      <th style="padding-top:20px !important;">Size</th>
-                      <th style="padding-top:20px !important;">Total</th>
-                      <th>Grand Total</th>
-                      <th>Dollar Rate</th>
-                      <th>Costing USD</th>
+                      <th style="padding: 13px !important;">Commondity</th>
+                      <th style="padding: 13px !important;">Size</th>
+                      <th style="padding: 13px !important;">Total</th>
+                      <th style="padding: 13px !important;">Grand Total</th>
+                      <th style="padding: 13px !important;">Dollar Rate</th>
+                      <th style="padding: 13px !important;">Costing USD</th>
                     </tr>
                     <?php
                     $stmt = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE invoice_no='$invoice_no' GROUP BY size,item_id ORDER BY id");
@@ -279,11 +279,11 @@ $query = new Query();
                 <div style="width: 550px;">
                   <table class="table table-striped table-hover table-bordered">
                     <tr class="text-center">
-                      <th>Selling Rate</th>
-                      <th>Profit Per Kg</th>
-                      <th>Original Cost</th>
-                      <th>Sellling Amount</th>
-                      <th>Total Profit</th>
+                      <th style="padding: 13px !important;">Selling Rate</th>
+                      <th style="padding: 13px !important;">Profit Per Kg</th>
+                      <th style="padding: 13px !important;">Original Cost</th>
+                      <th style="padding: 13px !important;">Sellling Amount</th>
+                      <th style="padding: 13px !important;">Total Profit</th>
                     </tr>
                     <?php
                     $stmt = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE invoice_no='$invoice_no' GROUP BY size,item_id ORDER BY id");
