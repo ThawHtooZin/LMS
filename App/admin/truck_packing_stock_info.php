@@ -966,6 +966,7 @@ $query = new Query();
                        <td><?php echo $totalkgperboxdata['total_kgperbox']; ?></td>
                        <td><?php echo $totalmcdata['totalmc']; ?></td>
                        <td><?php if(!empty($netweightdata['netweight'])){ echo $netweightdata['netweight']; }; ?></td>
+                       <td></td>
                      </tr>
                   </table>
                   <h5 style="text-transform:uppercase;">Total Foam Box - <?php if(!empty($foamboxdata['total_foambox_no'])){ echo $foamboxdata['total_foambox_no'] . " Box"; }; ?></h5>
@@ -1099,6 +1100,7 @@ $query = new Query();
                     <td><?php echo $totalkgperboxdata['total_kgperbox']; ?></td>
                     <td><?php echo $totalmcdata['totalmc']; ?></td>
                     <td><?php if(!empty($netweightdata['netweight'])){ echo $netweightdata['netweight']; }; ?></td>
+                    <td></td>
                   </tr>
                </table>
                <h5 style="text-transform:uppercase;">Total Foam Box - <?php if(!empty($foamboxdata['total_foambox_no'])){ echo $foamboxdata['total_foambox_no'] . " Box"; }; ?></h5>
