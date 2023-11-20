@@ -40,8 +40,8 @@ $query = new Query();
       $pcsperbox = $_POST['uppcsperbox'];
       $kgperbox = $_POST['upkgperbox'];
       $mc = $_POST['upmc'];
-      $invoice_no = $_POST['upinvoice_no'];
-      $query->addtruckpackinglistinfo($commondity, $size, $pcsperbox, $kgperbox, $mc, $invoice_no);
+      $updateid = $_POST['upid'];
+      $query->updatetruckpackinglistinfo($commondity, $size, $pcsperbox, $kgperbox, $mc, $updateid);
     }
 
     if (isset($_POST['usdadd'])) {
@@ -158,7 +158,6 @@ $query = new Query();
                       <th>Action</th>
                     </tr>
                     <?php
-                    $invoice_no = $_GET['invoice_no'];
                     $searchcommondity = $_POST['searchcommondity'];
                     $sizecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT size) FROM truckactualinvoice WHERE invoice_no='$invoice_no'");
                     $sizecountstmt->execute();
@@ -171,7 +170,7 @@ $query = new Query();
                       $size = $sizedata[$i]['size'];
                       $invoice_no = $_GET['invoice_no'];
 
-                          $stmt = $pdo->prepare("SELECT * FROM truckpackingliststockinfo WHERE size='$size' AND invoice_no='$invoice_no' AND  item_id='$searchcommondity'");
+                          $stmt = $pdo->prepare("SELECT * FROM truckpackingliststockinfo WHERE size='$size' AND invoice_no='$invoice_no' AND item_id='$searchcommondity'");
                           $stmt->execute();
                           $datas = $stmt->fetchall();
                           foreach ($datas as $packingstockinfodata) {
@@ -242,13 +241,13 @@ $query = new Query();
                                   </div>
                                   <div class="col">
                                     <label>Kg Per Box</label>
-                                    <input type="text" name="upkgperbox" class="form-control inpv2 mb-2">
+                                    <input type="text" name="upkgperbox" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['kgperbox']; ?>">
                                   </div>
                                 </div>
                                 <div class="row">
                                   <div class="col">
                                     <label>Mc</label>
-                                    <input type="number" name="upmc" class="form-control inpv2 mb-2">
+                                    <input type="number" name="upmc" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['mc']; ?>">
                                   </div>
                                   <div class="col mt-4">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -264,25 +263,25 @@ $query = new Query();
                         $item_id = $packingstockinfodata['item_id'];
                         $size = $packingstockinfodata['size'];
                         }
-                        $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' AND item_id='$item_id' AND size='$size'");
+                        $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' AND item_id='$searchcommondity' AND size='$size'");
                         $totalmcstmt->execute();
                         $totalmcdata = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
-                        $netweightstmt = $pdo->prepare("SELECT SUM(netweight) AS netweight FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' AND item_id='$item_id' AND size='$size'");
+                        $netweightstmt = $pdo->prepare("SELECT SUM(netweight) AS netweight FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' AND item_id='$searchcommondity' AND size='$size'");
                         $netweightstmt->execute();
                         $netweightdata = $netweightstmt->fetch(PDO::FETCH_ASSOC);
-                        $totalgrssweightstmt = $pdo->prepare("SELECT SUM(totalgrossweight) AS totalgrossweight FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' AND item_id='$item_id' AND size='$size'");
+                        $totalgrssweightstmt = $pdo->prepare("SELECT SUM(totalgrossweight) AS totalgrossweight FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' AND item_id='$searchcommondity ' AND size='$size'");
                         $totalgrssweightstmt->execute();
                         $totalgrssweightdata = $totalgrssweightstmt->fetch(PDO::FETCH_ASSOC);
                         ?>
-                        <tr style="font-weight:bold;">
-                        <td></td>
-                        <td>Sub Total</td>
-                        <td></td>
-                        <td></td>
-                        <td><?php echo $totalmcdata['totalmc']; ?></td>
-                        <td><?php if(!empty($netweightdata['netweight'])){ echo $netweightdata['netweight']; }; ?></td>
-                        <td><?php if(!empty($totalgrssweightdata['totalgrossweight'])){ echo $totalgrssweightdata['totalgrossweight']; }; ?></td>
-                        <td></td>
+                        <tr style="font-weight:bold; <?php if(empty($totalmcdata['totalmc'])){ echo 'display: none !important;'; } ?>">
+                          <td></td>
+                          <td>Sub Total</td>
+                          <td></td>
+                          <td></td>
+                          <td><?php echo $totalmcdata['totalmc']; ?></td>
+                          <td><?php if(!empty($netweightdata['netweight'])){ echo $netweightdata['netweight']; }; ?></td>
+                          <td><?php if(!empty($totalgrssweightdata['totalgrossweight'])){ echo $totalgrssweightdata['totalgrossweight']; }; ?></td>
+                          <td></td>
                         </tr>
                         <?php
                         $no++;
@@ -417,13 +416,13 @@ $query = new Query();
                                   </div>
                                   <div class="col">
                                     <label>Kg Per Box</label>
-                                    <input type="text" name="upkgperbox" class="form-control inpv2 mb-2">
+                                    <input type="text" name="upkgperbox" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['kgperbox']; ?>">
                                   </div>
                                 </div>
                                 <div class="row">
                                   <div class="col">
                                     <label>Mc</label>
-                                    <input type="number" name="upmc" class="form-control inpv2 mb-2">
+                                    <input type="number" name="upmc" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['mc']; ?>">
                                   </div>
                                   <div class="col mt-4">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -603,10 +602,9 @@ $query = new Query();
                              </div>
                            </div>
                            <?php
+                             $item_id = $packingstockinfodata['item_id'];
+                             $size = $packingstockinfodata['size'];
                          }
-                         $no1++;
-                         $item_id = $packingstockinfodata['item_id'];
-                         $size = $packingstockinfodata['size'];
                          $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' AND item_id='$item_id' AND size='$size'");
                          $totalmcstmt->execute();
                          $totalmcdata = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
@@ -617,7 +615,7 @@ $query = new Query();
                          $totalusdstmt->execute();
                          $totalusddata = $totalusdstmt->fetch(PDO::FETCH_ASSOC);
                          ?>
-                         <tr style="font-weight:bold;">
+                         <tr style="font-weight:bold; <?php if(empty($totalmcdata['totalmc'])){ echo 'display:none;'; } ?>">
                            <td></td>
                            <td>Sub Total</td>
                            <td></td>
@@ -628,6 +626,7 @@ $query = new Query();
                            <td><?php echo $totalusddata['total_usd']; ?></td>
                          </tr>
                          <?php
+                         $no1++;
                        }
                        ?>
                        <?php
@@ -743,9 +742,8 @@ $query = new Query();
                              </div>
                            </div>
                            <?php
+                           $item_id = $packingstockinfodata['item_id'];
                          }
-                         $no1++;
-                         $item_id = $packingstockinfodata['item_id'];
                          $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' AND item_id='$item_id'");
                          $totalmcstmt->execute();
                          $totalmcdata = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
@@ -767,6 +765,7 @@ $query = new Query();
                            <td><?php echo $totalusddata['total_usd']; ?></td>
                          </tr>
                          <?php
+                         $no1++;
                        }
                        ?>
                        <?php
@@ -896,7 +895,7 @@ $query = new Query();
                       <div class="modal-dialog" role="document">
                         <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
                           <div class="modal-header bg-info text-light">
-                            <h1 class="modal-title fs-5">Add Packing Stock</h1>
+                            <h1 class="modal-title fs-5">Add Foam Box</h1>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                           </div>
                           <div class="modal-body">
@@ -916,10 +915,9 @@ $query = new Query();
                       </div>
                     </div>
                     <?php
-                    }
-                    $no2++;
                     $item_id = $packingstockinfodata['item_id'];
                     $size = $packingstockinfodata['size'];
+                    }
                     $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' AND item_id='$item_id' AND size='$size'");
                     $totalmcstmt->execute();
                     $totalmcdata = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
@@ -930,7 +928,7 @@ $query = new Query();
                     $totalkgperboxstmt->execute();
                     $totalkgperboxdata = $totalkgperboxstmt->fetch(PDO::FETCH_ASSOC);
                     ?>
-                    <tr style="font-weight:bold;">
+                    <tr style="font-weight:bold; <?php if(empty($totalkgperboxdata['total_kgperbox'])){echo 'display:none;';} ?>">
                     <td></td>
                     <td>Sub Total</td>
                     <td></td>
@@ -941,6 +939,7 @@ $query = new Query();
                     <td></td>
                     </tr>
                     <?php
+                    $no2++;
                   }
                      ?>
                      <?php
@@ -1031,7 +1030,7 @@ $query = new Query();
                    <div class="modal-dialog" role="document">
                      <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
                        <div class="modal-header bg-info text-light">
-                         <h1 class="modal-title fs-5">Add Packing Stock</h1>
+                         <h1 class="modal-title fs-5">Add Foam Box</h1>
                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                        </div>
                        <div class="modal-body">
@@ -1051,9 +1050,8 @@ $query = new Query();
                    </div>
                  </div>
                  <?php
-                 }
-                 $no2++;
                  $item_id = $packingstockinfodata['item_id'];
+                 }
                  $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' AND item_id='$item_id'");
                  $totalmcstmt->execute();
                  $totalmcdata = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
@@ -1064,7 +1062,7 @@ $query = new Query();
                  $totalkgperboxstmt->execute();
                  $totalkgperboxdata = $totalkgperboxstmt->fetch(PDO::FETCH_ASSOC);
                  ?>
-                 <tr style="font-weight:bold;">
+                 <tr style="font-weight:bold; <?php if(empty($totalkgperboxdata['total_kgperbox'])){echo 'display:none;';} ?>">
                  <td></td>
                  <td>Sub Total</td>
                  <td></td>
@@ -1075,6 +1073,7 @@ $query = new Query();
                  <td></td>
                  </tr>
                  <?php
+                 $no2++;
                }
                   ?>
                   <?php
@@ -1187,7 +1186,7 @@ $query = new Query();
                        <div class="modal-dialog" role="document">
                          <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
                            <div class="modal-header bg-info text-light">
-                             <h1 class="modal-title fs-5">Add Packing Stock</h1>
+                             <h1 class="modal-title fs-5">Add Kg Per Box</h1>
                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                            </div>
                            <div class="modal-body">
@@ -1195,7 +1194,7 @@ $query = new Query();
                                <input type="hidden" name="kgperboxid" value="<?php echo $packingstockinfodata['id']; ?>">
                              <div class="modal-body">
                                <label>Kg Per Box</label>
-                               <input type="text" name="kgperbox" class="form-control inpv2 mb-2">
+                               <input type="text" name="kgperbox" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['kgperbox']; ?>">
                              </div>
                            </div>
                            <div class="modal-footer">
@@ -1207,10 +1206,9 @@ $query = new Query();
                        </div>
                      </div>
                      <?php
-                     }
-                     $no3++;
                      $item_id = $packingstockinfodata['item_id'];
                      $size = $packingstockinfodata['size'];
+                     }
                      $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' AND item_id='$item_id' AND size='$size'");
                      $totalmcstmt->execute();
                      $totalmcdata = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
@@ -1221,7 +1219,7 @@ $query = new Query();
                      $totalkgperboxstmt->execute();
                      $totalkgperboxdata = $totalkgperboxstmt->fetch(PDO::FETCH_ASSOC);
                      ?>
-                     <tr style="font-weight:bold;">
+                     <tr style="font-weight:bold; <?php if(empty($totalkgperboxdata['total_kgperbox'])){echo 'display:none; ';} ?>">
                      <td></td>
                      <td>Sub Total</td>
                      <td></td>
@@ -1231,6 +1229,7 @@ $query = new Query();
                      <td><?php if(!empty($netweightdata['netweight'])){ echo $netweightdata['netweight']; }; ?></td>
                      </tr>
                      <?php
+                     $no3++;
                    }
                       ?>
                       <?php
@@ -1318,7 +1317,7 @@ $query = new Query();
                    <div class="modal-dialog" role="document">
                      <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
                        <div class="modal-header bg-info text-light">
-                         <h1 class="modal-title fs-5">Add Packing Stock</h1>
+                         <h1 class="modal-title fs-5">Add Kg Per Box</h1>
                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                        </div>
                        <div class="modal-body">
@@ -1326,7 +1325,7 @@ $query = new Query();
                            <input type="hidden" name="kgperboxid" value="<?php echo $packingstockinfodata['id']; ?>">
                          <div class="modal-body">
                            <label>Kg Per Box</label>
-                           <input type="text" name="kgperbox" class="form-control inpv2 mb-2">
+                           <input type="text" name="kgperbox" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['kgperbox']; ?>">
                          </div>
                        </div>
                        <div class="modal-footer">
@@ -1338,9 +1337,8 @@ $query = new Query();
                    </div>
                  </div>
                  <?php
-                 }
-                 $no3++;
                  $item_id = $packingstockinfodata['item_id'];
+                 }
                  $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' AND item_id='$item_id'");
                  $totalmcstmt->execute();
                  $totalmcdata = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
@@ -1361,6 +1359,7 @@ $query = new Query();
                  <td><?php if(!empty($netweightdata['netweight'])){ echo $netweightdata['netweight']; }; ?></td>
                  </tr>
                  <?php
+                 $no3++;
                }
                   ?>
                   <?php

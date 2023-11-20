@@ -593,6 +593,10 @@ if ($_GET['table_name'] == 'payable') {
   <?php
 }
 
+if ($_GET['table_name'] = 'truckpackingstockinfo') {
+  
+}
+
 exit();
 
 
