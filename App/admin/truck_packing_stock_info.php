@@ -202,7 +202,7 @@ $query = new Query();
                               </svg></button>
                           </td>
                         </tr>
-                        <div class="modal fade" id="actualpackinglisteditmodal<?= $packingstockinfodata['id']; ?>">
+                        <!-- <div class="modal fade" id="actualpackinglisteditmodal<?= $packingstockinfodata['id']; ?>">
                           <div class="modal-dialog">
                             <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
                               <div class="modal-header bg-secondary text-light">
@@ -238,17 +238,17 @@ $query = new Query();
                                 <div class="row">
                                   <div class="col">
                                     <label>Pcs Per Box</label>
-                                    <input type="number" name="uppcsperbox" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['pcsperbox'] ?>">
+                                    <input type="number" name="uppcsperbox" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['pcsperbox']; ?>">
                                   </div>
                                   <div class="col">
                                     <label>Kg Per Box</label>
-                                    <input type="text" name="upkgperbox" class="form-control inpv2 mb-2">
+                                    <input type="text" name="upkgperbox" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['kgperbox']; ?>">
                                   </div>
                                 </div>
                                 <div class="row">
                                   <div class="col">
                                     <label>Mc</label>
-                                    <input type="number" name="upmc" class="form-control inpv2 mb-2">
+                                    <input type="number" name="upmc" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['mc']; ?>">
                                   </div>
                                   <div class="col mt-4">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -259,7 +259,7 @@ $query = new Query();
                             </form>
                             </div>
                           </div>
-                        </div>
+                        </div> -->
                         <?php
                         $item_id = $packingstockinfodata['item_id'];
                         $size = $packingstockinfodata['size'];
@@ -417,13 +417,13 @@ $query = new Query();
                                   </div>
                                   <div class="col">
                                     <label>Kg Per Box</label>
-                                    <input type="text" name="upkgperbox" class="form-control inpv2 mb-2">
+                                    <input type="text" name="upkgperbox" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['kgperbox']; ?>">
                                   </div>
                                 </div>
                                 <div class="row">
                                   <div class="col">
                                     <label>Mc</label>
-                                    <input type="number" name="upmc" class="form-control inpv2 mb-2">
+                                    <input type="number" name="upmc" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['mc'];?>">
                                   </div>
                                   <div class="col mt-4">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

@@ -450,7 +450,7 @@ Class Query{
       echo '<script>swal("success!", "Supplier Deleted Successfully", "success");</script>';
     }else{
       return $errmessage = "";
-      echo '<script>swal("Warning", "Error accors when deleted Supplier", "warning");</script>';
+      echo "<script>swal('Warning', 'Error accors when deleted Supplier', 'warning');</script>";
     }
   }
 
@@ -2244,7 +2244,7 @@ Class Query{
         $diff = $date2 - $date1;
         $day = floor($diff / (60 * 60 * 24)) + 1;
         $charges = $day * intval($coldstorerate) * intval($kg);
-        $total_charges = intval($iqfdata['total_charges']) + intval($charges);
+        $total_charges = intval($data['total_charges']) + intval($charges);
       }else{
         $dtotal_mc = intval($mc);
         $dtotal_kg = intval($kg);
@@ -2792,19 +2792,25 @@ Class Query{
     $totalnetweight = $kgperbox * $mc;
     $totalgrossweight = $mc * 60;
 
+    
     $addtruckpackingliststmt = $pdo->prepare("INSERT INTO truckpackingliststockinfo(item_id, size, pcsperbox, kgperbox, mc, netweight, totalgrossweight, invoice_no) VALUES('$commondity', '$size', '$pcsperbox', '$kgperbox', '$mc', '$totalnetweight', '$totalgrossweight', '$invoice_no')");
     $addtruckpackingliststmt->execute();
 
-    $addinvoicestmt = $pdo->prepare("INSERT INTO truckactualinvoice(item_id, size, pcsperbox, kgperbox, mc, netweight, invoice_no) VALUES('$commondity', '$size', '$pcsperbox', '$kgperbox', '$mc', '$totalnetweight', '$invoice_no')");
+    $stmt = $pdo->prepare("SELECT * FROM truckpackingliststockinfo ORDER BY id DESC");
+    $stmt->execute();
+    $stmt = $stmt->fetch(PDO::FETCH_ASSOC);
+    $id = $stmt['id'];
+
+    $addinvoicestmt = $pdo->prepare("INSERT INTO truckactualinvoice(item_id, size, pcsperbox, kgperbox, mc, netweight, invoice_no, link_id) VALUES('$commondity', '$size', '$pcsperbox', '$kgperbox', '$mc', '$totalnetweight', '$invoice_no', '$id')");
     $addinvoicestmt->execute();
 
-    $addfoambox = $pdo->prepare("INSERT INTO truckfoambox(item_id, size, pcsperbox, kgperbox, mc, netweight, invoice_no) VALUES('$commondity', '$size', '$pcsperbox', '$kgperbox', '$mc', '$totalnetweight', '$invoice_no')");
+    $addfoambox = $pdo->prepare("INSERT INTO truckfoambox(item_id, size, pcsperbox, kgperbox, mc, netweight, invoice_no, link_id) VALUES('$commondity', '$size', '$pcsperbox', '$kgperbox', '$mc', '$totalnetweight', '$invoice_no', '$id')");
     $addfoambox->execute();
 
-    $adddeclare = $pdo->prepare("INSERT INTO truckdeclare(item_id, size, pcsperbox, mc, invoice_no) VALUES('$commondity', '$size', '$pcsperbox', '$mc', '$invoice_no')");
+    $adddeclare = $pdo->prepare("INSERT INTO truckdeclare(item_id, size, pcsperbox, mc, invoice_no, link_id) VALUES('$commondity', '$size', '$pcsperbox', '$mc', '$invoice_no', '$id')");
     $adddeclare->execute();
 
-    $adddeclare = $pdo->prepare("INSERT INTO trucktotalcosting(item_id, size, total_kg, invoice_no) VALUES('$commondity', '$size', '$kgperbox', '$invoice_no')");
+    $adddeclare = $pdo->prepare("INSERT INTO trucktotalcosting(item_id, size, total_kg, invoice_no, link_id) VALUES('$commondity', '$size', '$kgperbox', '$invoice_no', '$id')");
     $adddeclare->execute();
   }
 
@@ -2974,7 +2980,7 @@ Class Query{
   function addactype($actype){
     global $pdo;
 
-    $accheckstmt = $pdo->prepare("SELECT * FROM actype WHERE ac_type='$code_no'");
+    $accheckstmt = $pdo->prepare("SELECT * FROM actype WHERE ac_type='$actype'");
     $accheckstmt->execute();
     $accheck = $accheckstmt->fetchAll();
 
@@ -2991,7 +2997,7 @@ Class Query{
   function updateactype($actype, $id){
     global $pdo;
 
-    $accheckstmt = $pdo->prepare("SELECT * FROM actype WHERE ac_type='$code_no'");
+    $accheckstmt = $pdo->prepare("SELECT * FROM actype WHERE ac_type='$actype'");
     $accheckstmt->execute();
     $accheck = $accheckstmt->fetchAll();
 
@@ -3979,6 +3985,12 @@ Class Query{
 
      $stmt = $pdo->prepare("UPDATE gfcmcstock SET loosein_size='$loosein_size', loosein_kg='$loosein_kg', loosein_pcs='$loosein_pcs', looseout_size='$looseout_size', looseout_kg='$looseout_kg', looseout_pcs='$looseout_pcs' WHERE id='$updateid'");
      $stmt->execute();
+   }
+
+   function FunctionName(){
+    global $pdo;
+
+    $stmt = $pdo->prepare("UPDATE ");
    }
 
   // MORE SELECTS
