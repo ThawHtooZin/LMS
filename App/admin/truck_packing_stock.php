@@ -100,8 +100,9 @@ $bootstrap->css();
     $date = $_POST['update'];
     $invoice_no = $_POST['upinvoice_no'];
     $truck_no = $_POST['uptruck_no'];
+    $oldinvoiceno = $_POST['oldinvoiceno'];
 
-  $query->edittruckpackinglist($upid, $date, $invoice_no, $truck_no);
+  $query->edittruckpackinglist($upid, $date, $invoice_no, $truck_no, $oldinvoiceno);
   }
   ?>
   <div class="row">
@@ -168,6 +169,7 @@ $bootstrap->css();
                     </div>
                   <form action="" method="post">
                     <input type="hidden" name="upid" value="<?= $packingdata['id']; ?>">
+                    <input type="hidden" name="oldinvoiceno" value="<?= $packingdata['invoice_no']; ?>">
                     <div class="modal-body">
                       <div class="row">
                         <div class="col">

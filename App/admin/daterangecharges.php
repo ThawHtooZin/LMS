@@ -32,7 +32,11 @@ $query = new Query();
       $coldstorerate = $_POST['coldstorerate'];
       $labourrate = $_POST['labourrate'];
       $processingrate = $_POST['processingrate'];
-      $pcharges = $_POST['processingcharges'];
+      if (empty($_POST['processingcharges'])) {
+        $pcharges = 0;
+      }else{
+        $pcharges = $_POST['processingcharges'];
+      }
       $query->addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $pcharges);
     }
 
@@ -106,6 +110,20 @@ $query = new Query();
       $updateid = $_POST['upidstock'];
 
       $query->deletehhkstock($updateid);
+    }
+
+    if(isset($_POST['kgimportbtn'])){
+      $importkg = $_POST['importkg'];
+      $rowid = $_POST['rowid'];
+
+      $query->kgimport($importkg, $rowid);
+    }
+
+    if(isset($_POST['chargesimportbtn'])){
+      $charges = $_POST['importcharges'];
+      $rowid = $_POST['rowid'];
+
+      $query->chargesimport($charges, $rowid);
     }
      ?>
     <div class="row">
@@ -439,6 +457,8 @@ $query = new Query();
                 $processingdatas = $processingstmt->fetchall();
                 $commonditydata = $query->select('category', $commondity_id, 'category_id');
 
+
+
                 ?>
                 <tr style="font-weight:bold;">
                   <td><?= $commonditydata['category_name']; ?></td>
@@ -447,6 +467,27 @@ $query = new Query();
                 <?php
 
                 foreach ($processingdatas as $processingdata) {
+                  $lastid = $processingdata['id'];
+                  $commondity_id = $processingdata['commondity_id'];
+                  $commonditydata = $query->select('category', $commondity_id, 'category_id');
+                  if(str_contains(strtolower($commonditydata['category_name']), 'block')){
+                    $lastrowstmt = $pdo->prepare("SELECT * FROM processing WHERE id<'$lastid' AND commondity_id='$commondity_id' ORDER BY id DESC ");
+                    $lastrowstmt->execute();
+                    $lastrowdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
+                    if(!empty($lastrowdata)){
+                      $totalkg = intval($processingdata['kg']) + $lastrowdata['total_kg'];
+                      $total_charges = intval($processingdata['charges']) + $lastrowdata['total_charges'];
+                    }else {
+                      $totalkg = intval($processingdata['kg']);
+                      $total_charges = intval($processingdata['charges']);
+                    }
+                    $blockkgupdatestmt = $pdo->prepare("UPDATE processing SET total_kg='$totalkg' WHERE id='$lastid'");
+                    $blockkgupdatestmt->execute();
+
+                    $blocktotalchargesstmt = $pdo->prepare("UPDATE processing SET total_charges='$total_charges' WHERE id='$lastid'");
+                    $blocktotalchargesstmt->execute();
+                  }
+
                   $idd++;
                   $item_id = $processingdata['commondity_id'];
                   $commonditydata = $query->select('category', $item_id, 'category_id');
@@ -458,17 +499,58 @@ $query = new Query();
                   <td><?php echo $commonditydata['category_name']; ?></td>
                   <td style="text-align:right;"><?php echo $processingdata['mc']; ?></td>
                   <td style="text-align:right;"><?php echo $processingdata['total_mc']; ?></td>
-                  <td style="text-align:right;"><?php echo $processingdata['kg']; ?></td>
+                  <td style="text-align:right;" <?php if(str_contains(strtolower($commonditydata['category_name']), 'block')){echo 'data-bs-toggle="modal" data-bs-target="#importkg' . $processingdata["id"] . '"';} ?>><?php echo $processingdata['kg']; ?></td>
                   <td style="text-align:right;"><?php echo $processingdata['total_kg']; ?></td>
                   <td style="text-align:right;"><?php echo $processingdata['rate']; ?></td>
-                  <td style="text-align:right;"><?php echo $processingdata['charges']; ?></td>
+                  <td style="text-align:right;" <?php if(str_contains(strtolower($commonditydata['category_name']), 'block')){echo 'data-bs-toggle="modal" data-bs-target="#importcharges' . $processingdata["id"] . '"';} ?>><?php if($processingdata['charges'] != 0){ echo $processingdata['charges'];} ?></td>
                   <td style="text-align:right;"><?php echo $processingdata['total_charges']; ?></td>
-
                   <!-- <button type="submit" name="deletebutton" class="btn btn-danger">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
                   </button> -->
                   </td>
                 </tr>
+                <div class="modal fade" id="importkg<?= $processingdata['id']; ?>">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Import Kg</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <form action="" method="post">
+                        <input type="hidden" name="rowid" value="<?= $processingdata['id']; ?>">
+                        <div class="modal-body">
+                          <label>Kg</label>
+                          <input type="text" name="importkg" class="form-control inpv2 mb-2" value="<?= $processingdata['kg']; ?>">
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="submit" class="btn btn-primary" name="kgimportbtn">Add</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal fade" id="importcharges<?= $processingdata['id']; ?>">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Import Charges</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <form action="" method="post">
+                        <input type="hidden" name="rowid" value="<?= $processingdata['id']; ?>">
+                        <div class="modal-body">
+                          <label>Charges</label>
+                          <input type="text" name="importcharges" class="form-control inpv2 mb-2" value="<?= $processingdata['charges']; ?>">
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="submit" class="btn btn-primary" name="chargesimportbtn">Add</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
                 <?php
                 }
                 }
@@ -713,20 +795,6 @@ $query = new Query();
                   $outdatecheckstmt->execute();
                   $outdatecheckdata = $outdatecheckstmt->fetch(PDO::FETCH_ASSOC);
 
-                  // Update
-                  $laststmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id < '$nowid' AND commondity_id='$commondity_id' ORDER BY id DESC");
-                  $laststmt->execute();
-                  $lastdata = $laststmt->fetch(PDO::FETCH_ASSOC);
-                  if(!empty($lastdata)){
-                    // Total Mc and Kg
-                    $total_mc = $lastdata['total_mc'] - $hhkstockdata['mc'];
-                    $total_kg = $lastdata['total_kg'] - $hhkstockdata['kg'];
-                    $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$total_mc', total_kg='$total_kg' WHERE id='$nowid' AND commondity_id='$commondity_id'");
-                    $updatestmt->execute();
-                  }else{
-
-                  }
-
                   ?>
                 <tr>
                   <td><?php if($hhkstockdata['indate'] != "0000-00-00"){ echo date('d-m-Y', strtotime($hhkstockdata['indate'])); }; ?></td>
@@ -867,12 +935,12 @@ $query = new Query();
                 <label style="font-weight: bold;">Processing Rate</label>
                 <input type="text" name="processingrate" class="form-control inpv2">
               </div>
-              <div class="processingchargesdiv hide">
+              <!-- <div class="processingchargesdiv hide">
                 <label style="font-weight: bold;">Processing Charges</label>
                 <input type="number" name="processingcharges" class="form-control inpv2">
-              </div>
-              </div>
+              </div> -->
             </div>
+          </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
