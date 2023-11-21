@@ -2564,10 +2564,15 @@ Class Query{
     $addpackingliststmt = $pdo->prepare("INSERT INTO packingliststockinfo(commondity_id, size, packingkgperbox, mc, totalnetweight, totalgrossweight, infoid) VALUES('$commondity', '$size', '$packingkgperbox', '$mc', '$totalnetweight', '$totalgrossweight', '$infoid')");
     $addpackingliststmt->execute();
 
-    $addinvoicestmt = $pdo->prepare("INSERT INTO actualinvoice(commondity_id, size, packingkgperbox, mc, totalnetweight, infoid) VALUES('$commondity', '$size', '$packingkgperbox', '$mc', '$totalnetweight', '$infoid')");
+    $linkidstmt = $pdo->prepare("SELECT * FROM packingliststockinfo ORDER BY id DESC");
+    $linkidstmt->execute();
+    $linkiddata = $linkidstmt->fetch(PDO::FETCH_ASSOC);
+
+    $linkid = $linkiddata['id'];
+    $addinvoicestmt = $pdo->prepare("INSERT INTO actualinvoice(commondity_id, size, packingkgperbox, mc, totalnetweight, infoid, link_id) VALUES('$commondity', '$size', '$packingkgperbox', '$mc', '$totalnetweight', '$infoid', '$linkid')");
     $addinvoicestmt->execute();
 
-    $addinvoicecostingstmt = $pdo->prepare("INSERT INTO invoice_costing(commondity_id, size, kg, infoid) VALUES('$commondity', '$size', '$packingkgperbox', '$infoid')");
+    $addinvoicecostingstmt = $pdo->prepare("INSERT INTO invoice_costing(commondity_id, size, kg, infoid, link_id) VALUES('$commondity', '$size', '$packingkgperbox', '$infoid', '$linkid')");
     $addinvoicecostingstmt->execute();
   }
 
@@ -2847,7 +2852,7 @@ Class Query{
     $totalnetweight = $kgperbox * $mc;
     $totalgrossweight = $mc * 60;
 
-    
+
     $addtruckpackingliststmt = $pdo->prepare("INSERT INTO truckpackingliststockinfo(item_id, size, pcsperbox, kgperbox, mc, netweight, totalgrossweight, invoice_no) VALUES('$commondity', '$size', '$pcsperbox', '$kgperbox', '$mc', '$totalnetweight', '$totalgrossweight', '$invoice_no')");
     $addtruckpackingliststmt->execute();
 
