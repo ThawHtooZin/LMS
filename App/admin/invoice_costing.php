@@ -280,22 +280,29 @@ $query = new Query();
                    $commondity_id = $commonditydata[$i]['commondity_id'];
                    $infoid = $_GET['infoid'];
 
-                   $stmt = $pdo->prepare("SELECT * FROM invoice_costing WHERE commondity_id='$commondity_id' AND infoid='$infoid' GROUP BY size ORDER BY id DESC");
+                   $stmt = $pdo->prepare("SELECT * FROM invoice_costing WHERE commondity_id='$commondity_id' AND infoid='$infoid' GROUP BY size ORDER BY size");
                    $stmt->execute();
                    $invoicecostingdatas = $stmt->fetchall();
                    foreach ($invoicecostingdatas as $invoicecostingdata) {
                      $item_id = $invoicecostingdata['commondity_id'];
+                     $lastid = $invoicecostingdata['id'];
+                     $infoid = $_GET['infoid'];
                      $commonditydata = $query->select('item', $item_id, 'item_id');
 
                      $size = $invoicecostingdata['size'];
 
-
                      $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS totalkg FROM invoice_costing WHERE commondity_id='$commondity_id' AND size='$size'");
                      $totalkgstmt->execute();
                      $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+
+
+                      $lastcommondity = $pdo->prepare("SELECT * FROM invoice_costing WHERE id < $lastid AND commondity_id='$item_id' AND infoid='$infoid'");
+                      $lastcommondity->execute();
+                      $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
+
                   ?>
                  <tr data-bs-toggle="modal" data-bs-target="#updatemodal2<?php echo $invoicecostingdata['id']; ?>">
-                   <td><?php echo $commonditydata['item_name']; ?></td>
+                   <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; } ?></td>
                    <td><?php echo $invoicecostingdata['size']; ?></td>
                    <td><?php echo $totalkgdata['totalkg']; ?></td>
                    <td><?php if(round(floatval($invoicecostingdata['total_usd']), 2) != 0){ echo round(floatval($invoicecostingdata['total_usd']), 2);}; ?></td>
@@ -346,8 +353,8 @@ $query = new Query();
                  $totalkgprofitdata = $totalkgprofitstmt->fetch(PDO::FETCH_ASSOC);
                  ?>
                  <tr>
-                 <td></td>
                  <td style="font-weight:bold;">Total</td>
+                 <td></td>
                  <td></td>
                  <td></td>
                  <td></td>
