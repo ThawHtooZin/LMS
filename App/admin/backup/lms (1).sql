@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 21, 2023 at 04:32 AM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Generation Time: Nov 21, 2023 at 08:55 AM
+-- Server version: 10.4.24-MariaDB
+-- PHP Version: 8.0.17
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -29,9 +29,9 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `accounts` (
   `id` int(11) NOT NULL,
-  `username` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
+  `username` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `role` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -53,7 +53,7 @@ CREATE TABLE `acname` (
   `code_no` varchar(255) NOT NULL,
   `ac_type` int(11) NOT NULL,
   `ac_name` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `acname`
@@ -94,15 +94,20 @@ CREATE TABLE `actualinvoice` (
   `totalnetweight` varchar(11) NOT NULL,
   `usd` varchar(11) NOT NULL,
   `total_usd` varchar(11) NOT NULL,
-  `infoid` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `infoid` int(11) NOT NULL,
+  `link_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `actualinvoice`
 --
 
-INSERT INTO `actualinvoice` (`id`, `commondity_id`, `size`, `packingkgperbox`, `mc`, `totalnetweight`, `usd`, `total_usd`, `infoid`) VALUES
-(18, '1', '2up', '100', 10, '1000', '', '', 8);
+INSERT INTO `actualinvoice` (`id`, `commondity_id`, `size`, `packingkgperbox`, `mc`, `totalnetweight`, `usd`, `total_usd`, `infoid`, `link_id`) VALUES
+(22, '1', '2up', '20', 30, '600', '', '', 8, 29),
+(23, '1', '3up', '23', 30, '690', '', '', 8, 30),
+(24, '1', '5up', '23', 30, '690', '', '', 8, 31),
+(25, '1', '3up', '22', 23, '506', '', '', 8, 32),
+(26, '1', '2up', '23', 43, '989', '', '', 8, 33);
 
 -- --------------------------------------------------------
 
@@ -113,7 +118,7 @@ INSERT INTO `actualinvoice` (`id`, `commondity_id`, `size`, `packingkgperbox`, `
 CREATE TABLE `actype` (
   `acid` int(11) NOT NULL,
   `ac_type` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `actype`
@@ -144,7 +149,7 @@ CREATE TABLE `bankdetail` (
   `swift_code` varchar(200) NOT NULL,
   `bank_branch_address` varchar(200) NOT NULL,
   `branch_name` varchar(200) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -155,13 +160,13 @@ CREATE TABLE `bankdetail` (
 CREATE TABLE `cashbook` (
   `id` int(11) NOT NULL,
   `date` date NOT NULL,
-  `sr_no` varchar(25) NOT NULL,
-  `ac_name` varchar(25) NOT NULL,
-  `particular` text NOT NULL,
+  `sr_no` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
+  `ac_name` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
+  `particular` text COLLATE utf8_unicode_ci NOT NULL,
   `debit` bigint(20) DEFAULT NULL,
   `credit` bigint(20) DEFAULT NULL,
   `balance` bigint(25) NOT NULL,
-  `voucher_no` varchar(25) NOT NULL
+  `voucher_no` varchar(25) COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -182,8 +187,8 @@ INSERT INTO `cashbook` (`id`, `date`, `sr_no`, `ac_name`, `particular`, `debit`,
 
 CREATE TABLE `category` (
   `id` int(11) NOT NULL,
-  `category_id` varchar(22) NOT NULL,
-  `category_name` varchar(255) NOT NULL
+  `category_id` varchar(22) COLLATE utf8_unicode_ci NOT NULL,
+  `category_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -206,13 +211,13 @@ CREATE TABLE `coldstore` (
   `id` int(11) NOT NULL,
   `indate` date NOT NULL,
   `outdate` date NOT NULL,
-  `commondity_id` varchar(11) NOT NULL,
+  `commondity_id` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `mc` int(11) NOT NULL,
   `total_mc` int(11) NOT NULL,
-  `kg` varchar(12) NOT NULL,
-  `total_kg` varchar(11) NOT NULL,
+  `kg` varchar(12) COLLATE utf8_unicode_ci NOT NULL,
+  `total_kg` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `day` int(11) NOT NULL,
-  `rate` varchar(12) NOT NULL,
+  `rate` varchar(12) COLLATE utf8_unicode_ci NOT NULL,
   `charges` int(11) NOT NULL,
   `total_charges` bigint(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -240,7 +245,7 @@ CREATE TABLE `container` (
   `container_no` int(11) NOT NULL,
   `country` varchar(20) NOT NULL,
   `date` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -255,7 +260,7 @@ CREATE TABLE `currency` (
   `mmk_amount` bigint(25) NOT NULL,
   `usd_amount` bigint(25) NOT NULL,
   `voucher_no` varchar(36) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `currency`
@@ -280,10 +285,10 @@ INSERT INTO `currency` (`id`, `dollar_rate`, `debitorcredit`, `mmk_amount`, `usd
 --
 
 CREATE TABLE `customers` (
-  `customer_id` varchar(100) NOT NULL,
-  `customer_name` varchar(255) NOT NULL,
-  `customer_detail` text NOT NULL,
-  `customer_address` text NOT NULL
+  `customer_id` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `customer_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `customer_detail` text COLLATE utf8_unicode_ci NOT NULL,
+  `customer_address` text COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -316,7 +321,7 @@ CREATE TABLE `form7stock` (
   `pcspervr` varchar(15) NOT NULL,
   `pcsperf7` int(11) NOT NULL,
   `link_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `form7stock`
@@ -359,7 +364,7 @@ CREATE TABLE `form10stock` (
   `looseoutpcs` int(11) NOT NULL,
   `total_kg` varchar(11) NOT NULL,
   `percentage` varchar(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `form10stock`
@@ -391,7 +396,7 @@ CREATE TABLE `general_ledger` (
   `container_no` varchar(25) NOT NULL,
   `bank_charges` float NOT NULL,
   `acid` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `general_ledger`
@@ -428,7 +433,7 @@ CREATE TABLE `gfcdryfishcoldstore` (
   `charges` bigint(15) NOT NULL,
   `total_charges` bigint(15) NOT NULL,
   `remark` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -445,7 +450,7 @@ CREATE TABLE `gfcdryfishlabour` (
   `charges` bigint(15) NOT NULL,
   `total_charges` bigint(15) NOT NULL,
   `remark` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -465,7 +470,7 @@ CREATE TABLE `gfcfishcoldstore` (
   `charges` bigint(13) NOT NULL,
   `total_charges` bigint(14) NOT NULL,
   `remark` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `gfcfishcoldstore`
@@ -492,7 +497,7 @@ CREATE TABLE `gfcfishlabour` (
   `charges` bigint(15) NOT NULL,
   `total_charges` bigint(15) NOT NULL,
   `remark` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `gfcfishlabour`
@@ -525,7 +530,7 @@ CREATE TABLE `gfcmcstock` (
   `looseout_kg` varchar(20) NOT NULL,
   `looseout_pcs` varchar(20) NOT NULL,
   `remark` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `gfcmcstock`
@@ -556,7 +561,7 @@ CREATE TABLE `gfctotal` (
   `payment_amount` bigint(15) NOT NULL,
   `balance_amount` bigint(15) NOT NULL,
   `remark` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -581,7 +586,7 @@ CREATE TABLE `hhkmcstock` (
   `looseout_kg` varchar(20) NOT NULL,
   `looseout_pcs` bigint(15) NOT NULL,
   `remark` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `hhkmcstock`
@@ -612,7 +617,7 @@ CREATE TABLE `hhkstock` (
   `total_kg` varchar(11) NOT NULL,
   `balance` varchar(11) NOT NULL,
   `link_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `hhkstock`
@@ -657,15 +662,20 @@ CREATE TABLE `invoice_costing` (
   `profitorlossperkg` varchar(11) NOT NULL,
   `profit_amount` varchar(11) NOT NULL,
   `total_kg_price` varchar(11) NOT NULL,
-  `infoid` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `infoid` int(11) NOT NULL,
+  `link_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `invoice_costing`
 --
 
-INSERT INTO `invoice_costing` (`id`, `commondity_id`, `size`, `kg`, `priceperviss`, `priceperkg`, `yield`, `total_price`, `usd`, `packing_material`, `ocean_pacific`, `tax`, `agent`, `transport`, `total_usd`, `sellingpriceperkg`, `total_selling_price`, `profitorlossperkg`, `profit_amount`, `total_kg_price`, `infoid`) VALUES
-(8, '1', '2up', '100', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 8);
+INSERT INTO `invoice_costing` (`id`, `commondity_id`, `size`, `kg`, `priceperviss`, `priceperkg`, `yield`, `total_price`, `usd`, `packing_material`, `ocean_pacific`, `tax`, `agent`, `transport`, `total_usd`, `sellingpriceperkg`, `total_selling_price`, `profitorlossperkg`, `profit_amount`, `total_kg_price`, `infoid`, `link_id`) VALUES
+(12, '1', '2up', '20', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 8, 29),
+(13, '1', '3up', '23', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 8, 30),
+(14, '1', '5up', '23', '1100', '673.1946144', '4.5', '644.2053726', '0.214666666', '0.3', '0.04', '0.3', '0.3', '0.2', '1.354666666', '', '', '', '', '31.15733333', 8, 31),
+(15, '1', '3up', '22', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 8, 32),
+(16, '1', '2up', '23', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 8, 33);
 
 -- --------------------------------------------------------
 
@@ -675,8 +685,8 @@ INSERT INTO `invoice_costing` (`id`, `commondity_id`, `size`, `kg`, `pricepervis
 
 CREATE TABLE `item` (
   `id` int(11) NOT NULL,
-  `item_id` varchar(22) NOT NULL,
-  `item_name` varchar(255) NOT NULL
+  `item_id` varchar(22) COLLATE utf8_unicode_ci NOT NULL,
+  `item_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -701,12 +711,12 @@ CREATE TABLE `labour` (
   `id` int(11) NOT NULL,
   `indate` date NOT NULL,
   `outdate` date NOT NULL,
-  `commondity_id` varchar(11) NOT NULL,
+  `commondity_id` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `mc` int(11) NOT NULL,
   `total_mc` int(11) NOT NULL,
-  `kg` varchar(11) NOT NULL,
-  `total_kg` varchar(11) NOT NULL,
-  `rate` varchar(11) NOT NULL,
+  `kg` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `total_kg` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `rate` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `charges` int(11) NOT NULL,
   `total_charges` bigint(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -733,13 +743,13 @@ CREATE TABLE `mslcoldstore` (
   `id` int(11) NOT NULL,
   `indate` date NOT NULL,
   `outdate` date NOT NULL,
-  `item_id` varchar(11) NOT NULL,
+  `item_id` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `mc` int(11) NOT NULL,
   `total_mc` int(11) NOT NULL,
-  `kg` varchar(12) NOT NULL,
-  `total_kg` varchar(11) NOT NULL,
+  `kg` varchar(12) COLLATE utf8_unicode_ci NOT NULL,
+  `total_kg` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `day` int(11) NOT NULL,
-  `rate` varchar(12) NOT NULL,
+  `rate` varchar(12) COLLATE utf8_unicode_ci NOT NULL,
   `charges` int(11) NOT NULL,
   `total_charges` bigint(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -754,12 +764,12 @@ CREATE TABLE `mslexportcharges` (
   `id` int(11) NOT NULL,
   `indate` date NOT NULL,
   `outdate` date NOT NULL,
-  `item_id` varchar(11) NOT NULL,
+  `item_id` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `mc` int(11) NOT NULL,
   `total_mc` int(11) NOT NULL,
-  `kg` varchar(15) NOT NULL,
-  `total_kg` varchar(11) NOT NULL,
-  `rate` varchar(15) NOT NULL,
+  `kg` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `total_kg` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `rate` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
   `charges` int(11) NOT NULL,
   `total_charges` bigint(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -774,12 +784,12 @@ CREATE TABLE `mslfreezing` (
   `id` int(11) NOT NULL,
   `indate` date NOT NULL,
   `outdate` date NOT NULL,
-  `item_id` varchar(11) NOT NULL,
+  `item_id` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `mc` int(11) NOT NULL,
   `total_mc` int(11) NOT NULL,
-  `kg` varchar(11) NOT NULL,
-  `total_kg` varchar(11) NOT NULL,
-  `rate` varchar(11) NOT NULL,
+  `kg` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `total_kg` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `rate` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `charges` int(11) NOT NULL,
   `total_charges` bigint(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -799,7 +809,7 @@ CREATE TABLE `mslrepacking` (
   `price` varchar(11) NOT NULL,
   `amount` varchar(11) NOT NULL,
   `total_charges` varchar(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -817,7 +827,7 @@ CREATE TABLE `mslstock` (
   `kg` varchar(11) NOT NULL,
   `total_kg` varchar(11) NOT NULL,
   `balance` varchar(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -840,7 +850,7 @@ CREATE TABLE `msl_total_charges` (
   `payment_amount` bigint(19) NOT NULL,
   `balance_amount` bigint(19) NOT NULL,
   `remark` bigint(19) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -858,7 +868,7 @@ CREATE TABLE `packingliststock` (
   `vessel_name` varchar(33) NOT NULL,
   `voyname` varchar(55) NOT NULL,
   `fda` varchar(56) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `packingliststock`
@@ -884,14 +894,18 @@ CREATE TABLE `packingliststockinfo` (
   `usd` varchar(11) NOT NULL,
   `total_usd` varchar(11) NOT NULL,
   `infoid` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `packingliststockinfo`
 --
 
 INSERT INTO `packingliststockinfo` (`id`, `commondity_id`, `size`, `packingkgperbox`, `mc`, `totalnetweight`, `totalgrossweight`, `usd`, `total_usd`, `infoid`) VALUES
-(25, '1', '2up', 100, 10, 1000, '1010', '', '', 8);
+(29, '1', '2up', 20, 30, 600, '630', '', '', 8),
+(30, '1', '3up', 23, 30, 690, '720', '', '', 8),
+(31, '1', '5up', 23, 30, 690, '720', '', '', 8),
+(32, '1', '3up', 22, 23, 506, '529', '', '', 8),
+(33, '1', '2up', 23, 43, 989, '1032', '', '', 8);
 
 -- --------------------------------------------------------
 
@@ -920,7 +934,7 @@ CREATE TABLE `packingmaterial` (
   `plastic_size` varchar(11) NOT NULL,
   `pcsperlb` int(11) NOT NULL,
   `pcspermc` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -931,12 +945,12 @@ CREATE TABLE `packingmaterial` (
 CREATE TABLE `payable` (
   `id` int(11) NOT NULL,
   `date` date NOT NULL,
-  `supplier_id` varchar(15) NOT NULL,
-  `purchase_voucher_no` varchar(25) NOT NULL,
+  `supplier_id` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `purchase_voucher_no` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
   `purchase_amount` bigint(19) NOT NULL,
   `paid_date` date NOT NULL,
-  `paid_voucher` varchar(25) NOT NULL,
-  `remark` varchar(255) NOT NULL,
+  `paid_voucher` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
+  `remark` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `paid_amount` bigint(25) NOT NULL,
   `balance` bigint(25) NOT NULL,
   `link_id` int(11) NOT NULL,
@@ -970,7 +984,7 @@ CREATE TABLE `permission` (
   `id` int(11) NOT NULL,
   `role_id` int(11) NOT NULL,
   `permission` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `permission`
@@ -989,12 +1003,12 @@ CREATE TABLE `processing` (
   `id` int(11) NOT NULL,
   `indate` date NOT NULL,
   `outdate` date NOT NULL,
-  `commondity_id` varchar(11) NOT NULL,
+  `commondity_id` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `mc` int(11) NOT NULL,
   `total_mc` int(11) NOT NULL,
-  `kg` varchar(15) NOT NULL,
-  `total_kg` varchar(11) NOT NULL,
-  `rate` varchar(15) NOT NULL,
+  `kg` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `total_kg` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `rate` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
   `charges` int(11) NOT NULL,
   `total_charges` bigint(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -1021,11 +1035,11 @@ CREATE TABLE `purchase` (
   `no` int(11) NOT NULL,
   `date` date NOT NULL,
   `voucher_no` int(11) NOT NULL,
-  `supplier_id` varchar(255) NOT NULL,
-  `tclfrozen` varchar(255) NOT NULL,
-  `commodity` varchar(255) NOT NULL,
-  `size` varchar(11) NOT NULL,
-  `viss` varchar(11) NOT NULL,
+  `supplier_id` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `tclfrozen` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `commodity` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `size` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `viss` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `pcs` int(11) NOT NULL,
   `price` int(11) NOT NULL,
   `amount` int(11) NOT NULL
@@ -1062,7 +1076,7 @@ CREATE TABLE `receivable` (
   `particulars` varchar(255) NOT NULL,
   `paid_amount` int(11) NOT NULL,
   `balance` bigint(25) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `receivable`
@@ -1090,7 +1104,7 @@ CREATE TABLE `repacking` (
   `rate` varchar(11) NOT NULL,
   `charges` varchar(11) NOT NULL,
   `total_charges` varchar(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -1105,7 +1119,7 @@ CREATE TABLE `repackingout` (
   `rate` varchar(11) NOT NULL,
   `charges` bigint(15) NOT NULL,
   `total_charges` bigint(15) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -1116,7 +1130,7 @@ CREATE TABLE `repackingout` (
 CREATE TABLE `role` (
   `role_id` int(11) NOT NULL,
   `role_name` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `role`
@@ -1132,10 +1146,10 @@ INSERT INTO `role` (`role_id`, `role_name`) VALUES
 --
 
 CREATE TABLE `supplier` (
-  `supplier_name` varchar(255) NOT NULL,
-  `supplier_phone` varchar(255) NOT NULL,
-  `supplier_address` varchar(255) NOT NULL,
-  `supplier_id` varchar(25) NOT NULL
+  `supplier_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `supplier_phone` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `supplier_address` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `supplier_id` varchar(25) COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -1170,7 +1184,7 @@ CREATE TABLE `tclmcstock` (
   `loading_no` int(11) NOT NULL,
   `loading_mc` int(11) NOT NULL,
   `grandtotal_mc` bigint(77) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -1195,7 +1209,7 @@ CREATE TABLE `total_charges` (
   `balance_amount` bigint(19) NOT NULL,
   `remark` bigint(19) NOT NULL,
   `link_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `total_charges`
@@ -1227,7 +1241,7 @@ CREATE TABLE `transaction` (
   `sr_no` varchar(25) NOT NULL,
   `container_no` varchar(25) NOT NULL,
   `bank_charges` float NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `transaction`
@@ -1263,7 +1277,7 @@ CREATE TABLE `truckactualinvoice` (
   `total_usd` float NOT NULL,
   `invoice_no` varchar(15) NOT NULL,
   `link_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `truckactualinvoice`
@@ -1304,7 +1318,7 @@ CREATE TABLE `truckdeclare` (
   `netweight` float NOT NULL,
   `invoice_no` varchar(15) NOT NULL,
   `link_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `truckdeclare`
@@ -1347,7 +1361,7 @@ CREATE TABLE `truckfoambox` (
   `total_foambox_no` varchar(255) NOT NULL,
   `invoice_no` varchar(15) DEFAULT NULL,
   `link_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `truckfoambox`
@@ -1383,7 +1397,7 @@ CREATE TABLE `truckpackingliststock` (
   `date` date NOT NULL,
   `invoice_no` varchar(11) NOT NULL,
   `truck_no` varchar(16) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `truckpackingliststock`
@@ -1409,7 +1423,7 @@ CREATE TABLE `truckpackingliststockinfo` (
   `netweight` float NOT NULL,
   `totalgrossweight` float NOT NULL,
   `invoice_no` varchar(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `truckpackingliststockinfo`
@@ -1454,7 +1468,7 @@ CREATE TABLE `truckpackingmaterial` (
   `form10kg` float NOT NULL,
   `costperkg` float NOT NULL,
   `invoice_no` varchar(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -1487,7 +1501,7 @@ CREATE TABLE `trucktotalcosting` (
   `profit` float NOT NULL,
   `invoice_no` varchar(11) NOT NULL,
   `link_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `trucktotalcosting`
@@ -1526,7 +1540,7 @@ CREATE TABLE `userlogs` (
   `login_username` varchar(125) NOT NULL,
   `login_password` varchar(125) NOT NULL,
   `status` varchar(55) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `userlogs`
@@ -1556,7 +1570,8 @@ INSERT INTO `userlogs` (`id`, `login_time`, `login_date`, `login_username`, `log
 (93, '09:33:11.000000', '2023-11-17', 'admin', 'admin', 'Login Success'),
 (94, '01:25:27.000000', '2023-11-20', 'admin', 'admin', 'Login Success'),
 (95, '07:03:33.000000', '2023-11-20', 'admin', 'admin', 'Login Success'),
-(96, '09:03:07.000000', '2023-11-21', 'admin', 'admin', 'Login Success');
+(96, '09:03:07.000000', '2023-11-21', 'admin', 'admin', 'Login Success'),
+(97, '01:46:16.000000', '2023-11-21', 'admin', 'admin', 'Login Success');
 
 --
 -- Indexes for dumped tables
@@ -1906,7 +1921,7 @@ ALTER TABLE `acname`
 -- AUTO_INCREMENT for table `actualinvoice`
 --
 ALTER TABLE `actualinvoice`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `actype`
@@ -2020,7 +2035,7 @@ ALTER TABLE `hhkstock`
 -- AUTO_INCREMENT for table `invoice_costing`
 --
 ALTER TABLE `invoice_costing`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `item`
@@ -2080,7 +2095,7 @@ ALTER TABLE `packingliststock`
 -- AUTO_INCREMENT for table `packingliststockinfo`
 --
 ALTER TABLE `packingliststockinfo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `packingmaterial`
@@ -2200,7 +2215,7 @@ ALTER TABLE `trucktotalcosting`
 -- AUTO_INCREMENT for table `userlogs`
 --
 ALTER TABLE `userlogs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=97;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
