@@ -227,7 +227,7 @@ $query = new Query();
                      <form action="" method="post">
                        <input type="hidden" name="upid" value="<?= $packingstockinfodata['id']; ?>">
                        <div class="modal-body">
-                        <label>Total Net Weight</label>
+                        <label>Total Gross Weight</label>
                         <input type="text" name="totalgrossweightupdata" class="form-control">
                        </div>
                        <div class="modal-footer">
