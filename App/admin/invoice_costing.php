@@ -94,7 +94,7 @@ $query = new Query();
                ?>
                <table class="table table-striped table-hover table-bordered actualinvoicetable">
                  <tr class="text-center">
-                   <th>No</th>
+                   <!-- <th>No</th> -->
                    <th>Fish Name</th>
                    <th>Size</th>
                    <th>Kg</th>
@@ -115,6 +115,7 @@ $query = new Query();
                  $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM invoice_costing WHERE infoid='$infoid'");
                  $commonditycountstmt->execute();
                  $commonditycountdatas = $commonditycountstmt->fetchColumn();
+                 $no = 1;
                  for ($i=0; $i < $commonditycountdatas; $i++) {
                    $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM invoice_costing WHERE infoid='$infoid'");
                    $commonditystmt->execute();
@@ -122,23 +123,29 @@ $query = new Query();
                    $commondity_id = $commonditydata[$i]['commondity_id'];
                    $infoid = $_GET['infoid'];
 
-                   $stmt = $pdo->prepare("SELECT * FROM invoice_costing WHERE commondity_id='$commondity_id' GROUP BY size ORDER BY id DESC");
+                   $stmt = $pdo->prepare("SELECT * FROM invoice_costing WHERE commondity_id='$commondity_id' GROUP BY size ORDER BY size");
                    $stmt->execute();
                    $invoicecostingdatas = $stmt->fetchall();
 
                    foreach ($invoicecostingdatas as $invoicecostingdata) {
+                     $lastid = $invoicecostingdata['id'];
                      $item_id = $invoicecostingdata['commondity_id'];
                      $commonditydata = $query->select('item', $item_id, 'item_id');
                      $size = $invoicecostingdata['size'];
-
+                     $infoid = $_GET['infoid'];
 
                      $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS totalkg FROM invoice_costing WHERE commondity_id='$commondity_id' AND size='$size'");
                      $totalkgstmt->execute();
                      $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+
+
+                     $lastcommondity = $pdo->prepare("SELECT * FROM invoice_costing WHERE id < $lastid AND commondity_id='$item_id' AND infoid='$infoid'");
+                     $lastcommondity->execute();
+                     $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
                   ?>
                  <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $invoicecostingdata['id']; ?>">
-                   <td><?php echo $invoicecostingdata['id']; ?></td>
-                   <td><?php echo $commonditydata['item_name']; ?></td>
+                   <!-- <td><?php //echo $no; ?></td> -->
+                   <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name'];} ?></td>
                    <td><?php echo $invoicecostingdata['size']; ?></td>
                    <td><?php echo $totalkgdata['totalkg']; ?></td>
                    <td><?php if($invoicecostingdata['priceperviss'] != 0){ echo $invoicecostingdata['priceperviss'];}; ?></td>
@@ -183,7 +190,7 @@ $query = new Query();
                            </div>
                            <div class="col">
                              <label>Ocean Pacific</label>
-                             <input type="text" name="ocean_pacific" class="form-control inpv2 mb-2" value="<?php if($invoicecostingdata['ocean_pacific'] != ''){echo $invoicecostingdata['ocean_pacific'];}else{ echo $_SESSION['ocean_pacific']; }; ?>">
+                             <input type="text" name="ocean_pacific" class="form-control inpv2 mb-2" value="<?php if($invoicecostingdata['ocean_pacific'] != ''){echo $invoicecostingdata['ocean_pacific'];}else{ if(!empty($_SESSION['ocean_pacific'])){ echo $_SESSION['ocean_pacific']; } }; ?>">
                            </div>
                          </div>
                          <div class="row">
@@ -193,13 +200,13 @@ $query = new Query();
                            </div>
                            <div class="col">
                              <label>Agent</label>
-                             <input type="text" name="agent" class="form-control inpv2 mb-2" value="<?php if($invoicecostingdata['agent'] != ''){echo $invoicecostingdata['agent'];}else{ echo $_SESSION['agent']; }; ?>">
+                             <input type="text" name="agent" class="form-control inpv2 mb-2" value="<?php if($invoicecostingdata['agent'] != ''){echo $invoicecostingdata['agent'];}else{ if(!empty($_SESSION['agent'])){ echo $_SESSION['agent']; } }; ?>">
                            </div>
                          </div>
                          <div class="row">
                            <div class="col">
                              <label>Transport</label>
-                             <input type="text" name="transport" class="form-control inpv2 mb-2" value="<?php if($invoicecostingdata['transport'] != ''){echo $invoicecostingdata['transport'];}else{ echo $_SESSION['transport']; }; ?>">
+                             <input type="text" name="transport" class="form-control inpv2 mb-2" value="<?php if($invoicecostingdata['transport'] != ''){echo $invoicecostingdata['transport'];}else{ if(!empty($_SESSION['transport'])){ echo $_SESSION['transport']; } }; ?>">
                            </div>
                            <div class="col">
                              <label>Dollar Rate</label>
@@ -217,6 +224,7 @@ $query = new Query();
                  </div>
               </div>
                  <?php
+                 // $no++;
                  }
                  $item_id = $invoicecostingdata['commondity_id'];
                  $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS totalkg FROM invoice_costing WHERE infoid='$infoid' AND commondity_id='$item_id'");
@@ -227,7 +235,7 @@ $query = new Query();
                  $totalkgpricedata = $totalkgpricestmt->fetch(PDO::FETCH_ASSOC);
                  ?>
                  <tr>
-                 <td></td>
+                 <!-- <td></td> -->
                  <td style="font-weight:bold;">Total</td>
                  <td></td>
                  <td style="font-weight:bold;"><?php echo $totalkgdata['totalkg']; ?></td>

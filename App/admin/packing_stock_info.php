@@ -57,7 +57,15 @@ $query = new Query();
       }
     }
 
-    
+    if (isset($_POST['updatepackinglist'])) {
+      $upitem_id = $_POST['upitem_id'];
+      $upsize = $_POST['upsize'];
+      $upkgperbox = $_POST['upkgperbox'];
+      $upmc = $_POST['upmc'];
+      $upid = $_POST['upid'];
+
+      $query->updatepackinglist($upitem_id, $upsize, $upkgperbox, $upmc, $upid);
+    }
      ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
@@ -227,7 +235,7 @@ $query = new Query();
                          <div class="row">
                            <div class="col">
                              <label>Packing Kg Per Box</label>
-                             <input type="text" name="uppcsperbox" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['packingkgperbox'] ?>">
+                             <input type="text" name="upkgperbox" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['packingkgperbox'] ?>">
                            </div>
                            <div class="col">
                              <label>Mc</label>

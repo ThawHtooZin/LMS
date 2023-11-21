@@ -2661,6 +2661,21 @@ Class Query{
     $addbankdetailstmt->execute();
   }
 
+  function updatepackinglist($upitem_id, $upsize, $upkgperbox, $upmc, $upid){
+    global $pdo;
+
+    $totalnetweight = $upkgperbox * $upmc;
+    $totalgrossweight = $totalnetweight + $upmc;
+
+    $updatepackingliststmt = $pdo->prepare("UPDATE packingliststockinfo SET commondity_id='$upitem_id', size='$upsize', packingkgperbox='$upkgperbox', mc='$upmc', totalnetweight='$totalnetweight', totalgrossweight='$totalgrossweight' WHERE id='$upid'");
+    $updatepackingliststmt->execute();
+
+    $updatepackingliststmt = $pdo->prepare("UPDATE actualinvoice SET commondity_id='$upitem_id', size='$upsize', packingkgperbox='$upkgperbox', mc='$upmc', totalnetweight='$totalnetweight' WHERE link_id='$upid'");
+    $updatepackingliststmt->execute();
+
+    $updatepackingliststmt = $pdo->prepare("UPDATE invoice_costing SET commondity_id='$upitem_id', size='$upsize', kg='$upkgperbox' WHERE link_id='$upid'");
+    $updatepackingliststmt->execute();
+  }
   function addmcstock($date, $particular, $country, $commondity_id, $size, $kg, $mc){
     global $pdo;
 
@@ -4060,6 +4075,7 @@ Class Query{
     $stmt = $pdo->prepare("UPDATE processing SET charges='$charges' WHERE id='$rowid'");
     $stmt->execute();
   }
+
 
   // MORE SELECTS
 
