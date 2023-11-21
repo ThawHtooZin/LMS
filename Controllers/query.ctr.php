@@ -4076,6 +4076,12 @@ Class Query{
     $stmt->execute();
   }
 
+  function updatetotalgrossweight($upid, $totalgrossweightupdata){
+    global $pdo;
+
+    $stmt = $pdo->prepare("UPDATE packingliststockinfo SET totalgrossweight='$totalgrossweightupdata' WHERE id='$upid'");
+    $stmt->execute();
+  }
 
   // MORE SELECTS
 
