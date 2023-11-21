@@ -56,6 +56,8 @@ $query = new Query();
           $query->addbankdetail($company_name,$company_address,$usd,$account_type,$bank_name,$swift_code,$bank_branch_address,$branch_name,$infoid);
       }
     }
+
+    
      ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
@@ -261,6 +263,7 @@ $query = new Query();
                    <th>Mc</th>
                    <th>Total Net Weight</th>
                    <th>Total Gross Weight</th>
+                   <th>Action</th>
                  </tr>
                  <?php
                  $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM packingliststockinfo WHERE infoid='$infoid'");
@@ -299,7 +302,68 @@ $query = new Query();
                    <td><?php echo $packingstockinfodata['mc']; ?></td>
                    <td><?php echo $packingstockinfodata['totalnetweight']; ?></td>
                    <td><?php echo $packingstockinfodata['totalgrossweight']; ?></td>
+                   <td>
+                     <button type="submit" data-bs-toggle="modal" data-bs-target="#updatepackinglist<?php echo $packingstockinfodata['id']; ?>" class="btn btn-warning d-inline text-light btn-sm" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                         <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                         <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                       </svg>
+                     </button>
+                   </td>
                  </tr>
+                 <div class="modal fade" id="updatepackinglist<?= $packingstockinfodata['id']; ?>">
+                   <div class="modal-dialog">
+                     <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                       <div class="modal-header bg-secondary text-light">
+                         <h1 class="modal-title fs-5">Edit Packing List</h1>
+                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                       </div>
+                     <form action="" method="post">
+                       <input type="hidden" name="upid" value="<?= $packingstockinfodata['id']; ?>">
+                       <div class="modal-body">
+                         <div class="row">
+                           <div class="col">
+                             <label>Commondity</label>
+                             <select class="form-control inpv2 mb-2" name="upitem_id">
+                               <?php
+                               $upcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM packingliststockinfo");
+                               $upcommonditystmt->execute();
+                               $upcommonditydatas = $upcommonditystmt->fetchall();
+                               foreach ($upcommonditydatas as $upcommonditydata) {
+                                 $item_id = $upcommonditydata['commondity_id'];
+                                 $commonditydata = $query->select('item', $item_id, 'item_id');
+                                 ?>
+                                 <option value="<?php echo $commonditydata['item_id']; ?>" <?php if($packingstockinfodata['commondity_id'] == $commonditydata['item_id']){ echo 'selected';} ?>><?php echo $commonditydata['item_name']; ?></option>
+                                 <?php
+                               }
+                               ?>
+                             </select>
+                           </div>
+                           <div class="col">
+                             <label>Size</label>
+                             <input type="text" name="upsize" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['size']; ?>">
+                           </div>
+                         </div>
+                         <div class="row">
+                           <div class="col">
+                             <label>Packing Kg Per Box</label>
+                             <input type="text" name="uppcsperbox" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['packingkgperbox'] ?>">
+                           </div>
+                           <div class="col">
+                             <label>Mc</label>
+                             <input type="number" name="upmc" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['mc']; ?>">
+                            </div>
+                         </div>
+                         <div class="modal-footer">
+                           <div class="mt-2">
+                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                             <button type="submit" class="btn btn-success text-light" name="updatepackinglist">Edit</button>
+                           </div>
+                         </div>
+                       </div>
+                     </div>
+                   </form>
+                   </div>
+                 </div>
                  <?php
                  ?>
                  <?php
@@ -323,7 +387,8 @@ $query = new Query();
                  <td><?php echo $totalmcdata['totalmc']; ?></td>
                  <td><?php if(!empty($totalnetweightdata['totalnetweight'])){ echo $totalnetweightdata['totalnetweight']; }; ?></td>
                  <td><?php if(!empty($totalgrssweightdata['totalgrossweight'])){ echo $totalgrssweightdata['totalgrossweight']; }; ?></td>
-                 </tr>
+                 <td></td>
+                </tr>
                  <?php
                   }
                   $no++;
@@ -348,6 +413,7 @@ $query = new Query();
                     <td style="font-weight:bold !important;"><?php echo $totalmcdata['totalmc']; ?></td>
                     <td style="font-weight:bold !important;"><?php if(!empty($totalnetweightdata['totalnetweight'])){ echo $totalnetweightdata['totalnetweight']; }; ?></td>
                     <td style="font-weight:bold !important;"><?php if(!empty($totalgrssweightdata['totalgrossweight'])){ echo $totalgrssweightdata['totalgrossweight']; }; ?></td>
+                    <td></td>
                   </tr>
                </table>
                 <?php
