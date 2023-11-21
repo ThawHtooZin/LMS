@@ -93,16 +93,21 @@ $query = new Query();
             $infostmt->execute();
             $infodata = $infostmt->fetch(PDO::FETCH_ASSOC);
              ?>
-             <div class="row">
+             <div class="row" style="font-weight: bold;">
                <div class="col-1">
 
                </div>
                <div class="col-7">
                  <?php
                    $customer_id = $infodata['customer_id'];
-                   $customerdata = $query->select('acname', $customer_id, 'code_no');
-                   echo $customerdata['ac_name'];
-                  ?>
+                   $acnamedata = $query->select('acname', $customer_id, 'code_no');
+                   $customerdata = $query->select('customers', $customer_id, 'customer_id');
+                   echo $acnamedata['ac_name'];
+                   ?><br><?php
+                   echo $customerdata['customer_detail'];
+                   ?><br><?php
+                   echo $customerdata['customer_address'];
+                   ?>
                </div>
                <div class="col-3">
                  Date : <?php echo date('d-m-Y', strtotime($infodata['date']));  ?>

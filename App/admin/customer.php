@@ -230,7 +230,7 @@ $query = new Query();
                                             <label>Customer Address</label>
                                             <input type="text" name="customer_address" class="form-control"
                                                 value="<?php echo $updatedata['customer_address']; ?>">
-                                        </div>s
+                                        </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary"
                                                 data-bs-dismiss="modal">Close</button>

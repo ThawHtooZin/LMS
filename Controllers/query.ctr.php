@@ -347,11 +347,19 @@ Class Query{
     $acvalidcheck = $acvalidcheckstmt->fetchall();
 
     if (empty($acvalidcheck)) {
-      $stmt = $pdo->prepare("INSERT INTO $table(customer_id, customer_name, customer_detail, customer_address) VALUES('$customer_id', '$customer_name', '$customer_detail', '$customer_address');");
-      $stmt->execute();
-      $acstmt = $pdo->prepare("INSERT INTO acname(code_no, ac_type, ac_name) VALUES('$customer_id', '$actype', '$customer_name');");
-      $acstmt->execute();
-      echo "<script>swal('Success!', 'Customer added success!', 'success');</script>";
+      if (!empty($customer_id)) {
+        if (str_contains($customer_id,"3300")) {
+          $stmt = $pdo->prepare("INSERT INTO $table(customer_id, customer_name, customer_detail, customer_address) VALUES('$customer_id', '$customer_name', '$customer_detail', '$customer_address');");
+          $stmt->execute();
+          $acstmt = $pdo->prepare("INSERT INTO acname(code_no, ac_type, ac_name) VALUES('$customer_id', '$actype', '$customer_name');");
+          $acstmt->execute();
+          echo "<script>swal('Success!', 'Customer added success!', 'success');</script>";
+        }else{
+          echo "<script>swal('Error!', 'Not a valid code for customer', 'warning');</script>";
+        }
+      }else{
+        echo "<script>swal('Error!', 'Invalid Fields', 'warning');</script>";
+      }
     }else{
       echo "<script>swal('Error!', 'Sorry, customer already exists', 'warning');</script>";
     }
@@ -2579,9 +2587,10 @@ Class Query{
     global $pdo;
 
     if($priceperviss != 0 || $yield != 0 || $packing_material != 0){
-      $priceperkg = intval($priceperviss) * 1.634;
+      $priceperkg = intval($priceperviss) / 1.634;
       if(str_contains($yield, '-')){
-        $percentage = (100 - intval($yield)) / 100;
+        $yield = explode('-', $yield);
+        $percentage = (100 - intval($yield[1])) / 100;
       }else{
          $percentage = (100 + round($yield, 4)) / 100;
       }
