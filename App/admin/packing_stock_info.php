@@ -90,7 +90,7 @@ $query = new Query();
             <span class=" text-light" id="pltext" style="font-size:20px; font-weight:bold;">Actual Packing List</span>
             <span class=" text-light hide" id="itext" style="font-size:20px; font-weight:bold;">Actual Invoice</span>
             <button type="submit" class="btn btn-danger float-end btn-sm" id="actualinvoice" name="actualinvoicebtn">Actual Invoice</button>
-            <button type="submit" class="btn btn-warning float-end btn-sm hide" id="actualinvoiceback" name="actualinvoiceback">Packing Stock</button>
+            <button type="submit" class="btn btn-primary float-end btn-sm hide" id="actualinvoiceback" name="actualinvoiceback">Packing Stock</button>
             <button type="button" class="btn btn-success float-end me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#add" id="addpackingstockbtn">Add Packing Stock</button>
             <a href="packing_stock.php" class="btn btn-secondary float-end me-2 btn-sm" id="back">Back</a>
             <form action="" method="post">
