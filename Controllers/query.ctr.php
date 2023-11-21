@@ -2586,10 +2586,16 @@ Class Query{
   function updateinvoicecosting($priceperviss, $yield, $packing_material, $ocean_pacific, $tax, $agent, $transport, $updateid, $dollar, $commondity_id, $size){
     global $pdo;
 
+    $_SESSION['ocean_pacific'] = $ocean_pacific;
+    $_SESSION['agent'] = $agent;
+    $_SESSION['transport'] = $transport;
+    $_SESSION['dollar'] = $dollar;
+
     if($priceperviss != 0 || $yield != 0 || $packing_material != 0){
       $priceperkg = intval($priceperviss) / 1.634;
       if(str_contains($yield, '-')){
         $yield = explode('-', $yield);
+        $yield = $yield[1];
         $percentage = (100 - intval($yield[1])) / 100;
       }else{
          $percentage = (100 + round($yield, 4)) / 100;
@@ -2602,7 +2608,7 @@ Class Query{
       $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
       $total_price = $priceperkg / $percentage;
       $usd = intval($total_price) / intval($dollar);
-      $total_usd = $usd + $packing_material + $ocean_pacific + $tax + $agent + $transport;
+      $total_usd = floatval($usd) + floatval($packing_material) + floatval($ocean_pacific) + floatval($tax) + floatval($agent) + floatval($transport);
       $total_kg_price = $total_usd * $totalkgdata['totalkg'];
 
       $updateinvoicecostingstmt = $pdo->prepare("UPDATE invoice_costing SET priceperviss='$priceperviss', priceperkg='$priceperkg', yield='$yield', total_price='$total_price', usd='$usd', packing_material='$packing_material', ocean_pacific='$ocean_pacific', tax='$tax', agent='$agent', transport='$transport', total_usd='$total_usd', total_kg_price='$total_kg_price'
