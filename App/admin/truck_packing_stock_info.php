@@ -422,11 +422,7 @@ $query = new Query();
                                 <div class="row">
                                   <div class="col">
                                     <label>Mc</label>
-<<<<<<< HEAD
-                                    <input type="number" name="upmc" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['mc'];?>">
-=======
                                     <input type="number" name="upmc" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['mc']; ?>">
->>>>>>> 206c00fc3d086544e589ec689992cb18293b36a1
                                   </div>
                                   <div class="col mt-4">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

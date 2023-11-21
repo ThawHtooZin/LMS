@@ -37,7 +37,15 @@ $query = new Query();
       }else{
         $pcharges = $_POST['processingcharges'];
       }
-      $query->addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $pcharges);
+      $mccheckstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+      $mccheckstmt->execute();
+      $mccheck = $mccheckstmt->fetch(PDO::FETCH_ASSOC);
+      if($mccheck['total_mc'] >= $mc){
+        $query->addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $pcharges);
+      }else{
+        echo "<script>swal('Sorry!', 'Mc not enough, Please check the stock and try again', 'warning');</script>";
+      }
+
     }
 
     if(isset($_POST['updatetotalcharges'])){
@@ -45,7 +53,8 @@ $query = new Query();
       $repacking_charges = $_POST['repacking_charges'];
       $ice_charges = $_POST['ice_charges'];
       $ot_charges = $_POST['ot_charges'];
-      $query->updatecoldstoretotal($id, $repacking_charges, $ice_charges, $ot_charges);
+      $total_processing_charges = $_POST['total_processing_charges'];
+      $query->updatecoldstoretotal($id, $repacking_charges, $ice_charges, $ot_charges, $total_processing_charges);
     }
 
     if(isset($_POST['paymentbtn'])){
@@ -239,7 +248,7 @@ $query = new Query();
                     <td style="text-align:right;"><?php echo $data['rate']; ?></td>
                     <td style="text-align:right;"><?php echo $data['charges']; ?></td>
                     <td style="text-align:right;"><?php echo $data['total_charges']; ?></td>
-                    <td><a href="daterangecharges.php" style="<?php if($data['id'] == $commondata['id']){ echo "display:none;"; } ?>" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#coldstoreupdatemodal<?php echo $data['id']; ?>">
+                    <td><a href="daterangecharges.php" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#coldstoreupdatemodal<?php echo $data['id']; ?>">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
     <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
     <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
@@ -626,7 +635,7 @@ $query = new Query();
                   <td><?php if(!empty($commonditydata['category_name'])){ echo $commonditydata['category_name'];} ; ?></td>
                   <td style="text-align:center;"><?php if($total_charges_data['total_coldstore_charges'] != "0"){ echo $total_charges_data['total_coldstore_charges'];} ; ?></td>
                   <td style="text-align:center;"><?php if($total_charges_data['total_labour_charges'] != "0"){ echo $total_charges_data['total_labour_charges'];} ; ?></td>
-                  <td style="text-align:center;"><?php if($total_charges_data['total_processing_charges'] != "0"){ echo $total_charges_data['total_processing_charges'];} ; ?></td>
+                  <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['total_processing_charges'] != "0"){ echo $total_charges_data['total_processing_charges'];} ; ?></td>
                   <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['repacking_charges'] != "0"){ echo $total_charges_data['repacking_charges'];} ; ?></td>
                   <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['ice_charges'] != "0"){ echo $total_charges_data['ice_charges'];} ; ?></td>
                   <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['ot_charges'] != "0"){ echo $total_charges_data['ot_charges'];} ; ?></td>
@@ -670,11 +679,15 @@ $query = new Query();
                             <label>Ot Charges</label>
                             <input type="number" name="ot_charges" class="form-control inpv2 mb-2" value="<?php if(!empty($updatedata['ot_charges'])){ echo $updatedata['ot_charges']; } ?>">
                           </div>
-                          <div class="col mt-4">
-                            <button type="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
-                            <button type="submit" name="updatetotalcharges" class="btn btn-warning">Update</button>
+                          <div class="col">
+                            <label>Processing Charges</label>
+                            <input type="number" name="total_processing_charges" class="form-control inpv2 mb-2" value="<?php if(!empty($updatedata['total_processing_charges'])){ echo $updatedata['total_processing_charges']; } ?>">
                           </div>
                         </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
+                        <button type="submit" name="updatetotalcharges" class="btn btn-warning">Update</button>
                       </div>
                     </form>
                     </div>

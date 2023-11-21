@@ -321,10 +321,8 @@ Class Query{
     }
   }
 
-  function addcustomer($table, $customer_id, $customer_name, $customer_phone, $customer_address){
+  function addcustomer($table, $customer_id, $customer_name, $customer_detail, $customer_address){
     global $pdo;
-    $stmt = $pdo->prepare("INSERT INTO $table(customer_id, customer_name, customer_phone, customer_address) VALUES('$customer_id', '$customer_name', '$customer_phone', '$customer_address');");
-    $stmt->execute();
 
     $acstmt = $pdo->prepare("SELECT acid FROM actype WHERE ac_type='Current Asset'");
     $acstmt->execute();
@@ -344,25 +342,31 @@ Class Query{
       $actype = $actype['acid'];
     }
 
-    $acstmt = $pdo->prepare("INSERT INTO acname(code_no, ac_type, ac_name) VALUES('$customer_id', '$actype', '$customer_name');");
-    $acstmt->execute();
-    if($stmt){
-      return $successmessage = "Customer Added Successfully";
+    $acvalidcheckstmt = $pdo->prepare("SELECT * FROM customers WHERE customer_id='$customer_id'");
+    $acvalidcheckstmt->execute();
+    $acvalidcheck = $acvalidcheckstmt->fetchall();
+
+    if (empty($acvalidcheck)) {
+      $stmt = $pdo->prepare("INSERT INTO $table(customer_id, customer_name, customer_detail, customer_address) VALUES('$customer_id', '$customer_name', '$customer_detail', '$customer_address');");
+      $stmt->execute();
+      $acstmt = $pdo->prepare("INSERT INTO acname(code_no, ac_type, ac_name) VALUES('$customer_id', '$actype', '$customer_name');");
+      $acstmt->execute();
+      echo "<script>swal('Success!', 'Customer added success!', 'success');</script>";
     }else{
-      return $errmessage = "Error accors when adding Customer";
+      echo "<script>swal('Error!', 'Sorry, customer already exists', 'warning');</script>";
     }
   }
 
-  function updatecustomer($table, $customer_name, $customer_phone, $customer_address, $updateid){
+  function updatecustomer($table, $customer_name, $customer_detail, $customer_address, $updateid){
     global $pdo;
-    $stmt = $pdo->prepare("UPDATE $table SET customer_name='$customer_name', customer_phone='$customer_phone', customer_address='$customer_address' WHERE customer_id='$updateid'");
+    $stmt = $pdo->prepare("UPDATE $table SET customer_name='$customer_name', customer_detail='$customer_detail', customer_address='$customer_address' WHERE customer_id='$updateid'");
     $stmt->execute();
     $acstmt = $pdo->prepare("UPDATE acname SET ac_name='$customer_name' WHERE code_no='$updateid'");
     $acstmt->execute();
     if($stmt){
-      return $successmessage = "Item Update Successfully";
+      echo "<script>swal('Success!', 'Customer updated successfully', 'success');</script>";
     }else{
-      return $errmessage = "Error accors when updating Item";
+      echo "<script>swal('Error!', 'Error accour', 'warning');</script>";
     }
   }
 
@@ -373,9 +377,9 @@ Class Query{
     $acstmt = $pdo->prepare("DELETE FROM acname WHERE code_no='$deleteid'");
     $acstmt->execute();
     if($stmt){
-      return $successmessage = "Item Deleted Successfully";
+      echo "<script>swal('Success!', 'Customer deleted successfully', 'success');</script>";
     }else{
-      return $errmessage = "Error accors when deleted Item";
+      echo "<script>swal('Error!', 'Error accour', 'warning');</script>";
     }
   }
 
@@ -449,7 +453,6 @@ Class Query{
     if($stmt){
       echo '<script>swal("success!", "Supplier Deleted Successfully", "success");</script>';
     }else{
-      return $errmessage = "";
       echo "<script>swal('Warning', 'Error accors when deleted Supplier', 'warning');</script>";
     }
   }
@@ -1015,34 +1018,34 @@ Class Query{
     }
 
     // Processing
-    $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE id < '$updateid' AND commondity_id='$commondity_id'");
-    $processingstmt->execute();
-    $processing = $processingstmt->fetch(PDO::FETCH_ASSOC);
-    if(!str_contains(strtolower($comname), 'block')){
-      if(!empty($processing)){
-        $ptotal_mc = $processing['total_mc'] + intval($mc);
-        $ptotal_kg = $processing['total_kg'] + floatval($kg);
-        $pcharges = intval($processingrate) * floatval($kg);
-        $totalprocessingcharges = intval($processing['total_charges']) + intval($pcharges);
-      }else{
-        $ptotal_mc = intval($mc);
-        $ptotal_kg = floatval($kg);
-        $pcharges = intval($processingrate) * floatval($kg);
-        $totalprocessingcharges = intval($pcharges);
-      }
-    }else{
-      if(!empty($processing)){
-        $ptotal_mc = $processing['total_mc'] + intval($mc);
-        $ptotal_kg = $processing['total_kg'] + floatval($kg);
-        $pcharges = $upprocessingcharges;
-        $totalprocessingcharges = intval($processing['total_charges']) + intval($pcharges);
-      }else{
-        $ptotal_mc = intval($mc);
-        $ptotal_kg = floatval($kg);
-        $pcharges = $upprocessingcharges;
-        $totalprocessingcharges = intval($pcharges);
-      }
-    }
+    // $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE id < '$updateid' AND commondity_id='$commondity_id'");
+    // $processingstmt->execute();
+    // $processing = $processingstmt->fetch(PDO::FETCH_ASSOC);
+    // if(!str_contains(strtolower($comname), 'block')){
+    //   if(!empty($processing)){
+    //     $ptotal_mc = $processing['total_mc'] + intval($mc);
+    //     $ptotal_kg = $processing['total_kg'] + floatval($kg);
+    //     $pcharges = intval($processingrate) * floatval($kg);
+    //     $totalprocessingcharges = intval($processing['total_charges']) + intval($pcharges);
+    //   }else{
+    //     $ptotal_mc = intval($mc);
+    //     $ptotal_kg = floatval($kg);
+    //     $pcharges = intval($processingrate) * floatval($kg);
+    //     $totalprocessingcharges = intval($pcharges);
+    //   }
+    // }else{
+    //   if(!empty($processing)){
+    //     $ptotal_mc = $processing['total_mc'] + intval($mc);
+    //     $ptotal_kg = $processing['total_kg'] + floatval($kg);
+    //     $pcharges = $upprocessingcharges;
+    //     $totalprocessingcharges = intval($processing['total_charges']) + intval($pcharges);
+    //   }else{
+    //     $ptotal_mc = intval($mc);
+    //     $ptotal_kg = floatval($kg);
+    //     $pcharges = $upprocessingcharges;
+    //     $totalprocessingcharges = intval($pcharges);
+    //   }
+    // }
 
     // Stock
     $stockstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE link_id < '$updateid' ORDER BY id DESC");
@@ -1079,19 +1082,16 @@ Class Query{
 
     $total_coldstore_charges = $charges;
     $total_labour_charges = $lcharges;
-    $total_processing_charges = $pcharges;
-    $total_charges_of_total = $charges + $lcharges + $pcharges + $total_repacking_charges + $ice_charges + $ot_charges;
+    $total_charges_of_total = $charges + $lcharges + $total_repacking_charges + $ice_charges + $ot_charges;
 
 
     $coldstorestmt = $pdo->prepare("UPDATE coldstore SET indate='$indate', outdate='$outdate',commondity_id='$commondity_id', mc='$mc', total_mc='$dtotal_mc', kg='$kg', total_kg='$dtotal_kg', day='$day', rate='$coldstorerate', charges='$charges', total_charges='$total_charges' WHERE id='$updateid'");
     $coldstorestmt->execute();
     $labourstmt = $pdo->prepare("UPDATE labour SET indate='$indate', outdate='$outdate',commondity_id='$commondity_id', mc='$mc', total_mc='$ltotal_mc', kg='$kg', total_kg='$ltotal_kg', rate='$labourrate', charges='$lcharges', total_charges='$totallabourcharges' WHERE id='$updateid'");
     $labourstmt->execute();
-    $processingstmt = $pdo->prepare("UPDATE processing SET indate='$indate', outdate='$outdate',commondity_id='$commondity_id', mc='$mc', total_mc='$ptotal_mc', kg='$kg', total_kg='$ptotal_kg', rate='$processingrate', charges='$pcharges', total_charges='$totalprocessingcharges' WHERE id='$updateid'");
-    $processingstmt->execute();
     $stockstmt = $pdo->prepare("UPDATE hhkstock SET mc='$mc', total_mc='$stotal_mc', kg='$kg', total_kg='$stotal_kg' WHERE link_id='$updateid'");
     $stockstmt->execute();
-    $totalupdatestmt = $pdo->prepare("UPDATE total_charges SET total_coldstore_charges='$total_coldstore_charges', total_labour_charges='$total_labour_charges', total_processing_charges='$total_processing_charges', total_charges='$total_charges_of_total' WHERE commondity_id='$commondity_id' AND date='$outdate' AND link_id='$updateid'");
+    $totalupdatestmt = $pdo->prepare("UPDATE total_charges SET total_coldstore_charges='$total_coldstore_charges', total_labour_charges='$total_labour_charges', total_charges='$total_charges_of_total' WHERE commondity_id='$commondity_id' AND date='$outdate' AND link_id='$updateid'");
     $totalupdatestmt->execute();
 
     // ColdStore Update
@@ -1103,10 +1103,17 @@ Class Query{
         $stmt = $pdo->prepare("SELECT * FROM coldstore WHERE id='$id'");
         $stmt->execute();
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-        $totalmc = $stmtdata['mc'] + $data['total_mc'];
-        $totalkg = $stmtdata['kg'] + $data['total_kg'];
-        $charges = $stmtdata['kg'] * $stmtdata['rate'] * $stmtdata['day'];
-        $NewCharges = $stmtdata['charges'] + $data['total_charges'];
+        if (!empty($data)) {
+          $totalmc = $stmtdata['mc'] + $data['total_mc'];
+          $totalkg = $stmtdata['kg'] + $data['total_kg'];
+          $charges = $stmtdata['kg'] * $stmtdata['rate'] * $stmtdata['day'];
+          $NewCharges = $stmtdata['charges'] + $data['total_charges'];
+        }else{
+          $totalmc = $stmtdata['mc'];
+          $totalkg = $stmtdata['kg'];
+          $charges = $stmtdata['kg'] * $stmtdata['rate'] * $stmtdata['day'];
+          $NewCharges = $stmtdata['charges'];
+        }
         $updatestmt = $pdo->prepare("UPDATE coldstore SET total_mc='$totalmc', total_kg='$totalkg', charges='$charges', total_charges='$NewCharges' WHERE id=". $stmtdata['id']);
         $updatestmt->execute();
       }
@@ -1120,10 +1127,17 @@ Class Query{
         $stmt = $pdo->prepare("SELECT * FROM labour WHERE id='$id' AND commondity_id='$commondity_id'");
         $stmt->execute();
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-        $totalmc = $lstmtdata['mc'] + $data['total_mc'];
-        $totalkg = $lstmtdata['kg'] + $data['total_kg'];
-        $charges = $lstmtdata['kg'] * $lstmtdata['rate'];
-        $lNewCharges = $lstmtdata['charges'] + $data['total_charges'];
+        if (!empty($data)) {
+          $totalmc = $lstmtdata['mc'] + $data['total_mc'];
+          $totalkg = $lstmtdata['kg'] + $data['total_kg'];
+          $charges = $lstmtdata['kg'] * $lstmtdata['rate'];
+          $lNewCharges = $lstmtdata['charges'] + $data['total_charges'];
+        }else{
+          $totalmc = $lstmtdata['mc'];
+          $totalkg = $lstmtdata['kg'];
+          $charges = $lstmtdata['kg'] * $lstmtdata['rate'];
+          $lNewCharges = $lstmtdata['charges'];
+        }
         $updatestmt = $pdo->prepare("UPDATE labour SET total_mc='$totalmc', total_kg='$totalkg', charges='$charges', total_charges='$lNewCharges' WHERE id=". $lstmtdata['id']);
         $updatestmt->execute();
       }
@@ -1137,10 +1151,17 @@ Class Query{
         $stmt = $pdo->prepare("SELECT * FROM processing WHERE id='$id' AND commondity_id='$commondity_id'");
         $stmt->execute();
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-        $totalmc = $pstmtdata['mc'] + $data['total_mc'];
-        $totalkg = floatval($pstmtdata['kg']) + floatval($data['total_kg']);
-        $charges = floatval($pstmtdata['kg']) * floatval($pstmtdata['rate']);
-        $pNewCharges = $pstmtdata['charges'] + $data['total_charges'];
+        if (!empty($data)) {
+          $totalmc = $pstmtdata['mc'] + $data['total_mc'];
+          $totalkg = floatval($pstmtdata['kg']) + floatval($data['total_kg']);
+          $charges = floatval($pstmtdata['kg']) * floatval($pstmtdata['rate']);
+          $pNewCharges = $pstmtdata['charges'] + $data['total_charges'];
+        }else{
+          $totalmc = $pstmtdata['mc'];
+          $totalkg = floatval($pstmtdata['kg']);
+          $charges = floatval($pstmtdata['kg']) * floatval($pstmtdata['rate']);
+          $pNewCharges = $pstmtdata['charges'];
+        }
         $updatestmt = $pdo->prepare("UPDATE processing SET total_mc='$totalmc', total_kg='$totalkg', charges='$charges', total_charges='$pNewCharges' WHERE id=". $pstmtdata['id']);
         $updatestmt->execute();
       }
@@ -1148,7 +1169,7 @@ Class Query{
 
   }
 
-  function updatecoldstoretotal($id, $repacking_charges, $ice_charges, $ot_charges){
+  function updatecoldstoretotal($id, $repacking_charges, $ice_charges, $ot_charges, $total_processing_charges){
     global $pdo;
 
     $totalchargesstmt = $pdo->prepare("SELECT * FROM total_charges WHERE id='$id'");
@@ -1160,14 +1181,14 @@ Class Query{
     $balancestmt->execute();
     $balancedata= $balancestmt->fetch(PDO::FETCH_ASSOC);
 
-    $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($ot_charges) + $totalchargesdata['total_charges'];
+    $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($ot_charges) + $total_processing_charges + $totalchargesdata['total_charges'];
     if(!empty($balancedata['balance_amount'])){
       $grand_total_charges = $balancedata['balance_amount'] + $total_charges;
     }else{
       $grand_total_charges = $total_charges;
     }
     $balance_amount = $grand_total_charges;
-    $updatestmt = $pdo->prepare("UPDATE total_charges SET repacking_charges='$repacking_charges', ice_charges='$ice_charges', ot_charges='$ot_charges', total_charges='$total_charges', grand_total_charges='$grand_total_charges', balance_amount='$balance_amount' WHERE id='$id'");
+    $updatestmt = $pdo->prepare("UPDATE total_charges SET repacking_charges='$repacking_charges', ice_charges='$ice_charges', ot_charges='$ot_charges', total_processing_charges='$total_processing_charges', total_charges='$total_charges', grand_total_charges='$grand_total_charges', balance_amount='$balance_amount' WHERE id='$id'");
     $updatestmt->execute();
   }
 
@@ -4005,6 +4026,20 @@ Class Query{
      $stmt = $pdo->prepare("UPDATE gfcmcstock SET loosein_size='$loosein_size', loosein_kg='$loosein_kg', loosein_pcs='$loosein_pcs', looseout_size='$looseout_size', looseout_kg='$looseout_kg', looseout_pcs='$looseout_pcs' WHERE id='$updateid'");
      $stmt->execute();
    }
+
+   function kgimport($importkg, $rowid){
+    global $pdo;
+
+    $stmt = $pdo->prepare("UPDATE processing SET kg='$importkg' WHERE id='$rowid'");
+    $stmt->execute();
+  }
+
+  function chargesimport($charges, $rowid){
+    global $pdo;
+
+    $stmt = $pdo->prepare("UPDATE processing SET charges='$charges' WHERE id='$rowid'");
+    $stmt->execute();
+  }
 
   // MORE SELECTS
 
