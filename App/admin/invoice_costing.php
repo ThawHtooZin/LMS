@@ -35,7 +35,7 @@ $query = new Query();
       $dollar = $_POST['dollar'];
       $updateid = $_POST['updateid'];
       $commondity_id = $_POST['commondity_id'];
-      $size=  $_POST['size'];
+      $size = $_POST['size'];
 
 
       $query->updateinvoicecosting($priceperviss, $yield, $packing_material, $ocean_pacific, $tax, $agent, $transport, $updateid, $dollar, $commondity_id, $size);
@@ -156,7 +156,7 @@ $query = new Query();
                  </tr>
                  <div class="modal fade" id="updatemodal<?php echo $invoicecostingdata['id']; ?>">
                    <div class="modal-dialog" role="document">
-                     <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                     <div class="modal-content" style="width: 450px; !important; margin-left: 100px !important; margin-top:70px !important;">
                        <div class="modal-header bg-info text-light">
                          <h1 class="modal-title fs-5">Update Invoice Costing</h1>
                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -169,41 +169,41 @@ $query = new Query();
                          <div class="row">
                            <div class="col">
                              <label>Price Per Viss</label>
-                             <input type="text" name="priceperviss" class="form-control inpv2 mb-2">
+                             <input type="text" name="priceperviss" class="form-control inpv2 mb-2" value="<?= $invoicecostingdata['priceperviss']; ?>">
                            </div>
                            <div class="col">
                              <label>Yield</label>
-                             <input type="text" name="yield" class="form-control inpv2 mb-2">
+                             <input type="text" name="yield" class="form-control inpv2 mb-2" value="<?= $invoicecostingdata['yield']; ?>">
                            </div>
                          </div>
                          <div class="row">
                            <div class="col">
                              <label>Packing Material</label>
-                             <input type="text" name="packing_material" class="form-control inpv2 mb-2">
+                             <input type="text" name="packing_material" class="form-control inpv2 mb-2" value="<?= $invoicecostingdata['packing_material']; ?>">
                            </div>
                            <div class="col">
                              <label>Ocean Pacific</label>
-                             <input type="text" name="ocean_pacific" class="form-control inpv2 mb-2">
+                             <input type="text" name="ocean_pacific" class="form-control inpv2 mb-2" value="<?php if($invoicecostingdata['ocean_pacific'] != ''){echo $invoicecostingdata['ocean_pacific'];}else{ echo $_SESSION['ocean_pacific']; }; ?>">
                            </div>
                          </div>
                          <div class="row">
                            <div class="col">
                              <label>Tax</label>
-                             <input type="text" name="tax" class="form-control inpv2 mb-2">
+                             <input type="text" name="tax" class="form-control inpv2 mb-2" value="<?= $invoicecostingdata['tax']; ?>">
                            </div>
                            <div class="col">
                              <label>Agent</label>
-                             <input type="text" name="agent" class="form-control inpv2 mb-2">
+                             <input type="text" name="agent" class="form-control inpv2 mb-2" value="<?php if($invoicecostingdata['agent'] != ''){echo $invoicecostingdata['agent'];}else{ echo $_SESSION['agent']; }; ?>">
                            </div>
                          </div>
                          <div class="row">
                            <div class="col">
                              <label>Transport</label>
-                             <input type="text" name="transport" class="form-control inpv2 mb-2">
+                             <input type="text" name="transport" class="form-control inpv2 mb-2" value="<?php if($invoicecostingdata['transport'] != ''){echo $invoicecostingdata['transport'];}else{ echo $_SESSION['transport']; }; ?>">
                            </div>
                            <div class="col">
                              <label>Dollar Rate</label>
-                             <input type="text" name="dollar" class="form-control inpv2 mb-2">
+                             <input type="text" name="dollar" class="form-control inpv2 mb-2" value="<?php if(!empty($_SESSION['dollar'])){echo $_SESSION['dollar'];}; ?>">
                            </div>
                          </div>
                        </div>
