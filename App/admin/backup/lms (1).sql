@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 20, 2023 at 07:37 AM
+-- Generation Time: Nov 21, 2023 at 04:32 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -65,7 +65,6 @@ INSERT INTO `acname` (`id`, `code_no`, `ac_type`, `ac_name`) VALUES
 (79, '4000/A01', 28, 'Aung Aung '),
 (80, '4000/K01', 28, 'Kyi Sin'),
 (81, '4000/P01', 28, 'Parti'),
-(82, '3300/001', 29, 'USA'),
 (83, '3300/002', 29, 'CANADA'),
 (84, '3300/003', 29, 'DAKA'),
 (85, '3300/004', 29, 'BRUNAI'),
@@ -77,7 +76,8 @@ INSERT INTO `acname` (`id`, `code_no`, `ac_type`, `ac_name`) VALUES
 (91, '9100/004', 31, 'Food & Refreshment'),
 (92, '3600/001', 29, 'Main Cash'),
 (93, '5000/001', 30, 'Revenue'),
-(97, '4000/M01', 28, 'MgMg');
+(97, '4000/M01', 28, 'MgMg'),
+(101, '3300/001', 29, 'USA');
 
 -- --------------------------------------------------------
 
@@ -96,6 +96,13 @@ CREATE TABLE `actualinvoice` (
   `total_usd` varchar(11) NOT NULL,
   `infoid` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `actualinvoice`
+--
+
+INSERT INTO `actualinvoice` (`id`, `commondity_id`, `size`, `packingkgperbox`, `mc`, `totalnetweight`, `usd`, `total_usd`, `infoid`) VALUES
+(18, '1', '2up', '100', 10, '1000', '', '', 8);
 
 -- --------------------------------------------------------
 
@@ -275,7 +282,7 @@ INSERT INTO `currency` (`id`, `dollar_rate`, `debitorcredit`, `mmk_amount`, `usd
 CREATE TABLE `customers` (
   `customer_id` varchar(100) NOT NULL,
   `customer_name` varchar(255) NOT NULL,
-  `customer_phone` bigint(14) NOT NULL,
+  `customer_detail` text NOT NULL,
   `customer_address` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -283,12 +290,12 @@ CREATE TABLE `customers` (
 -- Dumping data for table `customers`
 --
 
-INSERT INTO `customers` (`customer_id`, `customer_name`, `customer_phone`, `customer_address`) VALUES
-('3300/001', 'USA', 0, ''),
-('3300/002', 'CANADA', 0, ''),
-('3300/003', 'DAKA', 0, ''),
-('3300/004', 'BRUNAI', 0, ''),
-('3300/005', 'JAPAN', 0, '');
+INSERT INTO `customers` (`customer_id`, `customer_name`, `customer_detail`, `customer_address`) VALUES
+('3300/001', 'USA', '', ''),
+('3300/002', 'CANADA', '', ''),
+('3300/003', 'DAKA', '', ''),
+('3300/004', 'BRUNAI', '\r\n', ''),
+('3300/005', 'JAPAN', '\r\n', '');
 
 -- --------------------------------------------------------
 
@@ -653,6 +660,13 @@ CREATE TABLE `invoice_costing` (
   `infoid` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `invoice_costing`
+--
+
+INSERT INTO `invoice_costing` (`id`, `commondity_id`, `size`, `kg`, `priceperviss`, `priceperkg`, `yield`, `total_price`, `usd`, `packing_material`, `ocean_pacific`, `tax`, `agent`, `transport`, `total_usd`, `sellingpriceperkg`, `total_selling_price`, `profitorlossperkg`, `profit_amount`, `total_kg_price`, `infoid`) VALUES
+(8, '1', '2up', '100', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 8);
+
 -- --------------------------------------------------------
 
 --
@@ -846,6 +860,13 @@ CREATE TABLE `packingliststock` (
   `fda` varchar(56) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `packingliststock`
+--
+
+INSERT INTO `packingliststock` (`id`, `date`, `customer_id`, `country`, `invoiceno`, `containerno`, `vessel_name`, `voyname`, `fda`) VALUES
+(8, '2023-11-01', '3300/001', 'USA', '00001', 'KND', 'HEHE', 'YOYOYO', 'FATHERDOUGHTERASS');
+
 -- --------------------------------------------------------
 
 --
@@ -864,6 +885,13 @@ CREATE TABLE `packingliststockinfo` (
   `total_usd` varchar(11) NOT NULL,
   `infoid` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `packingliststockinfo`
+--
+
+INSERT INTO `packingliststockinfo` (`id`, `commondity_id`, `size`, `packingkgperbox`, `mc`, `totalnetweight`, `totalgrossweight`, `usd`, `total_usd`, `infoid`) VALUES
+(25, '1', '2up', 100, 10, 1000, '1010', '', '', 8);
 
 -- --------------------------------------------------------
 
@@ -1178,8 +1206,8 @@ INSERT INTO `total_charges` (`id`, `date`, `commondity_id`, `total_coldstore_cha
 (81, '2023-11-05', 2, 1350, 360, 42300, 0, 0, 0, 44010, 70020, '0000-00-00', 0, 70020, 0, 99),
 (82, '2023-11-05', 1, 2025, 540, 36450, 0, 0, 0, 39015, 109035, '0000-00-00', 0, 109035, 0, 100),
 (83, '2023-11-05', 1, 6750, 1800, 121500, 0, 0, 0, 130050, 239085, '0000-00-00', 0, 239085, 0, 101),
-(84, '2023-11-10', 3, 1620, 360, 0, 0, 0, 0, 1980, 241065, '0000-00-00', 0, 241065, 0, 102),
-(86, '2023-11-15', 3, 10650, 2840, 0, 0, 0, 0, 13490, 254555, '0000-00-00', 0, 254555, 0, 104);
+(84, '2023-11-10', 3, 1620, 360, 0, 0, 0, 0, 2100, 241185, '0000-00-00', 0, 241185, 0, 102),
+(86, '2023-11-15', 3, 10650, 2840, 10000, 10, 10, 10, 123670, 364855, '0000-00-00', 0, 364855, 0, 104);
 
 -- --------------------------------------------------------
 
@@ -1525,7 +1553,10 @@ INSERT INTO `userlogs` (`id`, `login_time`, `login_date`, `login_username`, `log
 (90, '10:39:18.000000', '2023-11-15', 'admin', 'admin', 'Login Success'),
 (91, '10:56:49.000000', '2023-11-15', 'admin', 'admin', 'Login Success'),
 (92, '01:59:53.000000', '2023-11-15', 'admin', 'admin', 'Login Success'),
-(93, '09:33:11.000000', '2023-11-17', 'admin', 'admin', 'Login Success');
+(93, '09:33:11.000000', '2023-11-17', 'admin', 'admin', 'Login Success'),
+(94, '01:25:27.000000', '2023-11-20', 'admin', 'admin', 'Login Success'),
+(95, '07:03:33.000000', '2023-11-20', 'admin', 'admin', 'Login Success'),
+(96, '09:03:07.000000', '2023-11-21', 'admin', 'admin', 'Login Success');
 
 --
 -- Indexes for dumped tables
@@ -1869,13 +1900,13 @@ ALTER TABLE `accounts`
 -- AUTO_INCREMENT for table `acname`
 --
 ALTER TABLE `acname`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
 
 --
 -- AUTO_INCREMENT for table `actualinvoice`
 --
 ALTER TABLE `actualinvoice`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `actype`
@@ -1989,7 +2020,7 @@ ALTER TABLE `hhkstock`
 -- AUTO_INCREMENT for table `invoice_costing`
 --
 ALTER TABLE `invoice_costing`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `item`
@@ -2043,13 +2074,13 @@ ALTER TABLE `msl_total_charges`
 -- AUTO_INCREMENT for table `packingliststock`
 --
 ALTER TABLE `packingliststock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `packingliststockinfo`
 --
 ALTER TABLE `packingliststockinfo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `packingmaterial`
@@ -2169,7 +2200,7 @@ ALTER TABLE `trucktotalcosting`
 -- AUTO_INCREMENT for table `userlogs`
 --
 ALTER TABLE `userlogs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=94;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=97;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
