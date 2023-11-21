@@ -147,6 +147,7 @@ $query = new Query();
                  $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM packingliststockinfo WHERE infoid='$infoid'");
                  $commonditycountstmt->execute();
                  $commonditycountdatas = $commonditycountstmt->fetchColumn();
+                 $no = 1;
                  for ($i=0; $i < $commonditycountdatas; $i++) {
                    $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM packingliststockinfo WHERE infoid='$infoid'");
                    $commonditystmt->execute();
@@ -158,12 +159,23 @@ $query = new Query();
                    $stmt->execute();
                    $datas = $stmt->fetchall();
                    foreach ($datas as $packingstockinfodata) {
+
                      $item_id = $packingstockinfodata['commondity_id'];
                      $commonditydata = $query->select('item', $item_id, 'item_id');
+                     $lastid = $packingstockinfodata['id'];
+                     $size = $packingstockinfodata['size'];
+                     $infoid = $packingstockinfodata['infoid'];
+                     $checklast = $pdo->prepare("SELECT * FROM packingliststockinfo WHERE id < $lastid AND commondity_id='$item_id' AND size='$size' AND infoid='$infoid'");
+                     $checklast->execute();
+                     $checklastavaliable = $checklast->fetch(PDO::FETCH_ASSOC);
+                     $lastcommondity = $pdo->prepare("SELECT * FROM packingliststockinfo WHERE id < $lastid AND commondity_id='$item_id' AND infoid='$infoid'");
+                     $lastcommondity->execute();
+                     $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
                   ?>
                  <tr>
-                   <td><?php echo $packingstockinfodata['id']; ?></td>
-                   <td><?php echo $commonditydata['item_name']; ?></td>
+                   <td><?php if(empty($lastcommondity)){ echo $no; }?></td>
+                   <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
+                   <!-- <td><?php// if(empty($checklastavaliable)){ echo $packingstockinfodata['size']; } ?></td> -->
                    <td><?php echo $packingstockinfodata['size']; ?></td>
                    <td><?php echo $packingstockinfodata['packingkgperbox']; ?></td>
                    <td><?php echo $packingstockinfodata['mc']; ?></td>
@@ -196,6 +208,7 @@ $query = new Query();
                  </tr>
                  <?php
                }
+               $no++;
                   ?>
                   <?php
                   $item_id = $packingstockinfodata['commondity_id'];
