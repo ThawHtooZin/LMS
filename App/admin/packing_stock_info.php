@@ -619,15 +619,15 @@ $query = new Query();
                        $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
 
                          ?>
-                         <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $packingstockinfodata['id']; ?>">
+                         <tr>
                            <td><?php if(empty($lastcommondity)){ echo $no; } ?></td>
                            <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name'];}; ?></td>
                            <td><?php if(empty($checklastavaliable)){ echo $packingstockinfodata['size'];}; ?></td>
                            <td><?php echo $packingstockinfodata['packingkgperbox']; ?></td>
                            <td><?php echo $packingstockinfodata['mc']; ?></td>
                            <td><?php echo $packingstockinfodata['totalnetweight']; ?></td>
-                           <td><?php if($packingstockinfodata['usd'] != 0 ){ echo $packingstockinfodata['usd'];} ?></td>
-                           <td><?php if($packingstockinfodata['total_usd'] != 0 ){ echo $packingstockinfodata['total_usd'];} ?></td>
+                           <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $packingstockinfodata['id']; ?>"><?php if($packingstockinfodata['usd'] != 0 ){ echo $packingstockinfodata['usd'];} ?></td>
+                           <td <?php if(str_contains($commonditydata['item_name'], 'block')){ echo 'data-bs-toggle="modal"'; } ?> data-bs-target="#updatetotalusd<?php echo $packingstockinfodata['id']; ?>"><?php if($packingstockinfodata['total_usd'] != 0 ){ echo $packingstockinfodata['total_usd'];} ?></td>
                          </tr>
                        <div class="modal fade" id="updatemodal<?php echo $packingstockinfodata['id']; ?>">
                          <div class="modal-dialog" role="document">
@@ -641,6 +641,29 @@ $query = new Query();
                                  <input type="hidden" name="updateid" value="<?php echo $packingstockinfodata['id']; ?>">
                                  <div class="modal-body">
                                    <label>FOD/USD</label>
+                                   <input type="text" name="usd" class="form-control inpv2 mb-2 mt-2">
+                                 </div>
+                                 <div class="modal-footer">
+                                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                   <button type="submit" class="btn btn-success" name="updatebtn">Update</button>
+                                 </div>
+                               </div>
+                             </div>
+                           </form>
+                         </div>
+                       </div>
+                       <div class="modal fade" id="updatetotalusd<?php echo $packingstockinfodata['id']; ?>">
+                         <div class="modal-dialog" role="document">
+                           <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                             <div class="modal-header bg-info text-light">
+                               <h1 class="modal-title fs-5">Update Price Of Total USD</h1>
+                               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                             </div>
+                             <div class="modal-body">
+                               <form action="" method="post">
+                                 <input type="hidden" name="updateid" value="<?php echo $packingstockinfodata['id']; ?>">
+                                 <div class="modal-body">
+                                   <label>Total USD</label>
                                    <input type="text" name="usd" class="form-control inpv2 mb-2 mt-2">
                                  </div>
                                  <div class="modal-footer">
