@@ -158,7 +158,7 @@ $query = new Query();
                    $commondity_id = $commonditydata[$i]['commondity_id'];
                    $infoid = $_GET['infoid'];
 
-                   $stmt = $pdo->prepare("SELECT * FROM packingliststockinfo WHERE commondity_id='$commondity_id' AND infoid='$infoid'");
+                   $stmt = $pdo->prepare("SELECT * FROM packingliststockinfo WHERE commondity_id='$commondity_id' AND infoid='$infoid' ORDER BY size");
                    $stmt->execute();
                    $datas = $stmt->fetchall();
                    foreach ($datas as $packingstockinfodata) {
@@ -178,8 +178,7 @@ $query = new Query();
                  <tr>
                    <td><?php if(empty($lastcommondity)){ echo $no; }?></td>
                    <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
-                   <!-- <td><?php// if(empty($checklastavaliable)){ echo $packingstockinfodata['size']; } ?></td> -->
-                   <td><?php echo $packingstockinfodata['size']; ?></td>
+                   <td><?php if(empty($checklastavaliable)){ echo $packingstockinfodata['size']; } ?></td>
                    <td><?php echo $packingstockinfodata['packingkgperbox']; ?></td>
                    <td><?php echo $packingstockinfodata['mc']; ?></td>
                    <td><?php echo $packingstockinfodata['totalnetweight']; ?></td>
