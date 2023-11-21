@@ -238,14 +238,15 @@ $query = new Query();
                   $no++;
                   ?>
                   <?php
+                  $searchcommondity = $_POST['searchcommondity'];
                   $size = $packingstockinfodata['size'];
-                  $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM packingliststockinfo WHERE infoid='$infoid'");
+                  $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM packingliststockinfo WHERE infoid='$infoid' AND commondity_id='$searchcommondity'");
                   $totalmcstmt->execute();
                   $totalmcdata = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
-                  $totalnetweightstmt = $pdo->prepare("SELECT SUM(totalnetweight) AS totalnetweight FROM packingliststockinfo WHERE infoid='$infoid'");
+                  $totalnetweightstmt = $pdo->prepare("SELECT SUM(totalnetweight) AS totalnetweight FROM packingliststockinfo WHERE infoid='$infoid' AND commondity_id='$searchcommondity'");
                   $totalnetweightstmt->execute();
                   $totalnetweightdata = $totalnetweightstmt->fetch(PDO::FETCH_ASSOC);
-                  $totalgrssweightstmt = $pdo->prepare("SELECT SUM(totalgrossweight) AS totalgrossweight FROM packingliststockinfo WHERE infoid='$infoid'");
+                  $totalgrssweightstmt = $pdo->prepare("SELECT SUM(totalgrossweight) AS totalgrossweight FROM packingliststockinfo WHERE infoid='$infoid' AND commondity_id='$searchcommondity'");
                   $totalgrssweightstmt->execute();
                   $totalgrssweightdata = $totalgrssweightstmt->fetch(PDO::FETCH_ASSOC);
                    ?>
@@ -451,7 +452,7 @@ $query = new Query();
                 <?php
               }
                 ?>
-               <!-- =============================================================== -->
+               <!-- ========================================================= -->
                <div class="actualinvoicetable hide">
                 <?php
                   if (isset($_POST['searchcommonditybtn']) && !empty($_POST['searchcommondity'])) {
@@ -505,8 +506,8 @@ $query = new Query();
                            <td><?php echo $packingstockinfodata['packingkgperbox']; ?></td>
                            <td><?php echo $packingstockinfodata['mc']; ?></td>
                            <td><?php echo $packingstockinfodata['totalnetweight']; ?></td>
-                           <td><?php echo $packingstockinfodata['usd']; ?></td>
-                           <td><?php echo $packingstockinfodata['total_usd']; ?></td>
+                           <td><?php if($packingstockinfodata['usd'] != 0 ){ echo $packingstockinfodata['usd'];} ?></td>
+                           <td><?php if($packingstockinfodata['total_usd'] != 0 ){ echo $packingstockinfodata['total_usd'];} ?></td>
                          </tr>
                        <div class="modal fade" id="updatemodal<?php echo $packingstockinfodata['id']; ?>">
                          <div class="modal-dialog" role="document">
@@ -556,8 +557,9 @@ $query = new Query();
                    }
                    ?>
                    <?php
+                   $searchcommondity = $_POST['searchcommondity'];
                    $size = $packingstockinfodata['size'];
-                   $totalusdstmt = $pdo->prepare("SELECT SUM(total_usd) AS total_usd FROM actualinvoice WHERE infoid='$infoid'");
+                   $totalusdstmt = $pdo->prepare("SELECT SUM(total_usd) AS total_usd FROM actualinvoice WHERE infoid='$infoid' AND commondity_id='$searchcommondity'");
                    $totalusdstmt->execute();
                    $totalusddata = $totalusdstmt->fetch(PDO::FETCH_ASSOC);
                    ?>
@@ -624,8 +626,8 @@ $query = new Query();
                            <td><?php echo $packingstockinfodata['packingkgperbox']; ?></td>
                            <td><?php echo $packingstockinfodata['mc']; ?></td>
                            <td><?php echo $packingstockinfodata['totalnetweight']; ?></td>
-                           <td><?php echo $packingstockinfodata['usd']; ?></td>
-                           <td><?php echo $packingstockinfodata['total_usd']; ?></td>
+                           <td><?php if($packingstockinfodata['usd'] != 0 ){ echo $packingstockinfodata['usd'];} ?></td>
+                           <td><?php if($packingstockinfodata['total_usd'] != 0 ){ echo $packingstockinfodata['total_usd'];} ?></td>
                          </tr>
                        <div class="modal fade" id="updatemodal<?php echo $packingstockinfodata['id']; ?>">
                          <div class="modal-dialog" role="document">
