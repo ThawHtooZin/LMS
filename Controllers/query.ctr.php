@@ -2580,9 +2580,17 @@ Class Query{
 
     $totalnetweight = $packingkgperbox * $mc;
     $totalgrossweight = $totalnetweight + $mc;
+    $commondity;
+    $checkitemname = $this->select('item', $commondity, 'item_id');
 
-    $addpackingliststmt = $pdo->prepare("INSERT INTO packingliststockinfo(commondity_id, size, packingkgperbox, mc, totalnetweight, totalgrossweight, infoid) VALUES('$commondity', '$size', '$packingkgperbox', '$mc', '$totalnetweight', '$totalgrossweight', '$infoid')");
-    $addpackingliststmt->execute();
+    if(str_contains($checkitemname['item_name'],"block") || str_contains($checkitemname['item_name'],"balachaung")){
+      $addpackingliststmt = $pdo->prepare("INSERT INTO packingliststockinfo(commondity_id, size, packingkgperbox, mc, totalnetweight, infoid) VALUES('$commondity', '$size', '$packingkgperbox', '$mc', '$totalnetweight', '$infoid')");
+      $addpackingliststmt->execute();
+    }else{
+      $addpackingliststmt = $pdo->prepare("INSERT INTO packingliststockinfo(commondity_id, size, packingkgperbox, mc, totalnetweight, totalgrossweight, infoid) VALUES('$commondity', '$size', '$packingkgperbox', '$mc', '$totalnetweight', '$totalgrossweight', '$infoid')");
+      $addpackingliststmt->execute();
+    }
+
 
     $linkidstmt = $pdo->prepare("SELECT * FROM packingliststockinfo ORDER BY id DESC");
     $linkidstmt->execute();
@@ -2605,13 +2613,6 @@ Class Query{
 
     $total_usd = $usd * intval($netweight['totalnetweight']);
     $updateusdstmt = $pdo->prepare("UPDATE actualinvoice SET usd='$usd', total_usd='$total_usd' WHERE id='$updateid'");
-    $updateusdstmt->execute();
-  }
-
-  function updateblockusd($usd, $updateid){
-    global $pdo;
-
-    $updateusdstmt = $pdo->prepare("UPDATE actualinvoice SET usd='$usd' WHERE id='$updateid'");
     $updateusdstmt->execute();
   }
 
@@ -3966,35 +3967,47 @@ Class Query{
    function updatehhkstock($indate, $commondity_id, $mc, $kg, $updateid){
      global $pdo;
 
-     $oldstockstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id < '$updateid' AND commondity_id='$commondity_id' AND outdate='0000-00-00' ORDER BY id DESC");
-     $oldstockstmt->execute();
-     $oldstockdatas = $oldstockstmt->fetch(PDO::FETCH_ASSOC);
+     $kgcheck = $pdo->prepare("SELECT SUM(kg) AS kg FROM hhkstock WHERE outdate!='0000-00-00' AND commondity_id='$commondity_id'");
+     $kgcheck->execute();
+     $totalkg = $kgcheck->fetch(PDO::FETCH_ASSOC);
 
-     if (!empty($oldstockdatas)) {
-       $total_mc = $oldstockdatas['total_mc'] + $mc;
-       $total_kg = $oldstockdatas['total_kg'] + $kg;
+     $mccheck = $pdo->prepare("SELECT SUM(mc) AS mc FROM hhkstock WHERE outdate!='0000-00-00' AND commondity_id='$commondity_id'");
+     $mccheck->execute();
+     $totalmc = $mccheck->fetch(PDO::FETCH_ASSOC);
+
+     if($totalkg['kg'] < $kg && $totalmc['mc'] < $mc){
+      $oldstockstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id < '$updateid' AND commondity_id='$commondity_id' AND outdate='0000-00-00' ORDER BY id DESC");
+      $oldstockstmt->execute();
+      $oldstockdatas = $oldstockstmt->fetch(PDO::FETCH_ASSOC);
+
+      if (!empty($oldstockdatas)) {
+        $total_mc = $oldstockdatas['total_mc'] + $mc;
+        $total_kg = $oldstockdatas['total_kg'] + $kg;
+      }else{
+        $total_mc = $mc;
+        $total_kg = $kg;
+      }
+
+      $stmt = $pdo->prepare("UPDATE hhkstock SET indate='$indate', commondity_id='$commondity_id', mc='$mc', kg='$kg', total_mc='$total_mc', total_kg='$total_kg' WHERE id='$updateid'");
+      $stmt->execute();
+
+      //stock update
+      $stockupstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id > '$updateid' AND commondity_id='$commondity_id' AND outdate='0000-00-00'");
+      $stockupstmt->execute();
+      $stockupdatas = $stockupstmt->fetchall();
+        foreach ($stockupdatas as $stockupdata) {
+          $id = $stockupdata['id'];
+          $stmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id < '$id' ORDER BY id DESC");
+          $stmt->execute();
+          $data = $stmt->fetch(PDO::FETCH_ASSOC);
+          $totalmc = $data['total_mc'] + $stockupdata['mc'];
+          $totalkg = $data['total_kg'] + $stockupdata['kg'];
+          $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$totalmc', total_kg='$totalkg' WHERE id='$id'");
+          $updatestmt->execute();
+        }
      }else{
-       $total_mc = $mc;
-       $total_kg = $kg;
+      echo "<script>swal('Warning!', 'out kg and mc is more than changed kg and mc', 'warning');</script>";
      }
-
-     $stmt = $pdo->prepare("UPDATE hhkstock SET indate='$indate', commondity_id='$commondity_id', mc='$mc', kg='$kg', total_mc='$total_mc', total_kg='$total_kg' WHERE id='$updateid'");
-     $stmt->execute();
-
-     //stock update
-     $stockupstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id > '$updateid' AND commondity_id='$commondity_id' AND outdate='0000-00-00'");
-     $stockupstmt->execute();
-     $stockupdatas = $stockupstmt->fetchall();
-       foreach ($stockupdatas as $stockupdata) {
-         $id = $stockupdata['id'];
-         $stmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id < '$id' ORDER BY id DESC");
-         $stmt->execute();
-         $data = $stmt->fetch(PDO::FETCH_ASSOC);
-         $totalmc = $data['total_mc'] + $stockupdata['mc'];
-         $totalkg = $data['total_kg'] + $stockupdata['kg'];
-         $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$totalmc', total_kg='$totalkg' WHERE id='$id'");
-         $updatestmt->execute();
-       }
 }
 
    function deletehhkstock($updateid){
@@ -4111,12 +4124,6 @@ Class Query{
     $stmt->execute();
   }
 
-  function updatetotalusd($totalusd, $updateid){
-    global $pdo;
-
-    $stmt = $pdo->prepare("UPDATE actualinvoice SET total_usd='$totalusd' WHERE id='$updateid'");
-    $stmt->execute();
-  }
   // MORE SELECTS
 
   function selectsum($table, $id, $selectwhat){
