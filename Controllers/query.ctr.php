@@ -2615,8 +2615,9 @@ Class Query{
       if(str_contains($yield, '-')){
         $yield = explode('-', $yield);
         $yield = $yield[1];
-        $percentage = (100 - intval($yield[1])) / 100;
+        $percentage = (100 - intval($yield)) / 100;
       }else{
+         $yield;
          $percentage = (100 + round($yield, 4)) / 100;
       }
       $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS totalkg FROM invoice_costing WHERE commondity_id='$commondity_id' AND size='$size'");
