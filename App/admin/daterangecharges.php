@@ -260,7 +260,7 @@ $query = new Query();
                   </tr>
                   <div class="modal fade" id="coldstoreupdatemodal<?php echo $data['id']; ?>">
                     <div class="modal-dialog" role="document">
-                      <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
                         <div class="modal-header bg-warning text-light">
                           <h1 class="modal-title fs-5">Update Charges</h1>
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -649,7 +649,7 @@ $query = new Query();
                 <!-- Add updatetotalcharges -->
                 <div class="modal fade" id="updatetotalcharges<?php echo $total_charges_data['id']; ?>">
                   <div class="modal-dialog">
-                    <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                    <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
                       <div class="modal-header bg-secondary text-light">
                         <h1 class="modal-title fs-5">Edit Total Charges</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -697,7 +697,7 @@ $query = new Query();
                 <!--Add Remark-->
                 <div class="modal fade" id="remark<?php echo $total_charges_data['id']; ?>">
                   <div class="modal-dialog">
-                    <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                    <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
                       <div class="modal-header bg-secondary text-light">
                         <h1 class="modal-title fs-5">Add Total Charges Remark</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -808,6 +808,23 @@ $query = new Query();
                   $outdatecheckstmt->execute();
                   $outdatecheckdata = $outdatecheckstmt->fetch(PDO::FETCH_ASSOC);
 
+                  $lastrowstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id<'$nowid' AND commondity_id='$commondity_id' ORDER BY id DESC");
+                  $lastrowstmt->execute();
+                  $lastrowdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
+
+                  if(!empty($lastrowdata)){
+                    if ($lastrowdata['total_mc'] - $hhkstockdata['mc'] != $hhkstockdata['total_mc']) {
+                      $totalmc = $lastrowdata['total_mc'] - $hhkstockdata['mc'];
+                      $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$totalmc' WHERE id='$nowid'");
+                      $updatestmt->execute();
+                    }
+                    if ($lastrowdata['total_kg'] - $hhkstockdata['kg'] != $hhkstockdata['total_kg']) {
+                      $totalkg = $lastrowdata['total_kg'] - $hhkstockdata['kg'];
+                      $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_kg='$totalkg' WHERE id='$nowid'");
+                      $updatestmt->execute();
+                    }
+                  }                  
+
                   ?>
                 <tr>
                   <td><?php if($hhkstockdata['indate'] != "0000-00-00"){ echo date('d-m-Y', strtotime($hhkstockdata['indate'])); }; ?></td>
@@ -817,7 +834,7 @@ $query = new Query();
                   <td style="text-align:right;"><?php echo $hhkstockdata['total_mc']; ?></td>
                   <td style="text-align:right;"><?php echo $hhkstockdata['kg']; ?></td>
                   <td style="text-align:right;"><?php echo $hhkstockdata['total_kg']; ?></td>
-                  <td><?php if($outdatecheckdata['outdate'] == '0000-00-00' && empty($editcheckdata)): ?>
+                  <td><?php if($outdatecheckdata['outdate'] == '0000-00-00'): ?>
                     <button type="button" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#stockupdatemodal<?= $hhkstockdata['id']; ?>">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                           <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
@@ -830,7 +847,7 @@ $query = new Query();
                 <!-- Edit Stock Modal -->
                 <div class="modal fade" id="stockupdatemodal<?= $hhkstockdata['id']; ?>">
                   <div class="modal-dialog">
-                    <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                    <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
                       <div class="modal-header bg-secondary text-light">
                         <h1 class="modal-title fs-5">Edit Remaining Stock</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -869,8 +886,8 @@ $query = new Query();
                           </div>
                         </div>
                         <div class="modal-footer">
-                          <button type="submit" class="btn btn-danger" name="deletestockbtn">Delete</button>
                           <button type="submit" class="btn btn-success text-light" name="updatestockbtn">Update</button>
+                          <button type="submit" class="btn btn-danger" name="deletestockbtn">Delete</button>
                         </div>
                       </form>
                     </div>
@@ -890,7 +907,7 @@ $query = new Query();
     <!-- Add Modal -->
     <div class="modal fade" id="newcharges" aria-labelledby="newcharges">
       <div class="modal-dialog">
-        <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+        <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
           <div class="modal-header bg-secondary text-light">
             <h1 class="modal-title fs-5">New Charges</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -967,7 +984,7 @@ $query = new Query();
     <!-- Add Payment -->
     <div class="modal fade" id="addpayment">
       <div class="modal-dialog">
-        <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+        <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
           <div class="modal-header bg-secondary text-light">
             <h1 class="modal-title fs-5">Add Payment</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -997,7 +1014,7 @@ $query = new Query();
     <!-- Add repackingcharges -->
     <div class="modal fade" id="repackingcharges">
       <div class="modal-dialog">
-        <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+        <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
           <div class="modal-header bg-secondary text-light">
             <h1 class="modal-title fs-5">Repacking Charges</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1045,7 +1062,7 @@ $query = new Query();
     <!-- Add Stock Modal -->
     <div class="modal fade" id="newstock">
       <div class="modal-dialog">
-        <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+        <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
           <div class="modal-header bg-secondary text-light">
             <h1 class="modal-title fs-5">Add New Stock</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
