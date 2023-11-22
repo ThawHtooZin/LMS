@@ -39,7 +39,22 @@ $query = new Query();
       $usd = $_POST['usd'];
       $updateid = $_POST['updateid'];
 
-      $query->updateactualinvoice($usd, $updateid);
+      $itemstmt = $pdo->prepare("SELECT * FROM item WHERE item_name LIKE '%Block%' OR item_name LIKE '%block%'");
+      $itemstmt->execute();
+      $itemdata = $itemstmt->fetch(PDO::FETCH_ASSOC);
+      $item_id = $itemdata['item_id'];
+
+      $commonditystmt = $pdo->prepare("SELECT * FROM actualinvoice WHERE id='$updateid'");
+      $commonditystmt->execute();
+      $commonditydata = $commonditystmt->fetch(PDO::FETCH_ASSOC);
+      $commondity_id = $commonditydata['commondity_id'];
+
+      if ($item_id != $commondity_id) {
+        $query->updateactualinvoice($usd, $updateid);
+      }else{
+        $query->updateblockusd($usd, $updateid);
+      }
+
     }
     if(isset($_POST['bankingbtn'])){
       if(!empty($_POST['company_name'])){
@@ -71,6 +86,13 @@ $query = new Query();
       $totalgrossweightupdata = $_POST['totalgrossweightupdata'];
 
       $query->updatetotalgrossweight($upid, $totalgrossweightupdata);
+    }
+
+    if (isset($_POST['updatetotalusdbtn'])) {
+      $totalusd = $_POST['totalusd'];
+      $updateid = $_POST['updateid'];
+
+      $query->updatetotalusd($totalusd, $updateid);
     }
      ?>
     <div class="row">
@@ -107,7 +129,7 @@ $query = new Query();
                 $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM packingliststockinfo");
                 $commonditystmt->execute();
                 $commonditydatas = $commonditystmt->fetchall();
-                
+
                 foreach ($commonditydatas as $commonditydata) {
                   $commondityname = $query->select('item', $commonditydata['commondity_id'], 'item_id');
                   ?>
@@ -336,7 +358,7 @@ $query = new Query();
                    <td><?php echo $packingstockinfodata['packingkgperbox']; ?></td>
                    <td><?php echo $packingstockinfodata['mc']; ?></td>
                    <td><?php echo $packingstockinfodata['totalnetweight']; ?></td>
-                   <td <?php if(str_contains($commonditydata['item_name'], 'block')){echo 'data-bs-toggle="modal"'; } ?> data-bs-target="#totalnetweightmodal<?= $packingstockinfodata['id']; ?>"><?php echo $packingstockinfodata['totalgrossweight']; ?></td>
+                   <td <?php if(str_contains(strtolower($commonditydata['item_name']), 'block')){echo 'data-bs-toggle="modal"'; } ?> data-bs-target="#totalnetweightmodal<?= $packingstockinfodata['id']; ?>"><?php echo $packingstockinfodata['totalgrossweight']; ?></td>
                    <td>
                      <button type="submit" data-bs-toggle="modal" data-bs-target="#updatepackinglist<?php echo $packingstockinfodata['id']; ?>" class="btn btn-warning d-inline text-light btn-sm" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
@@ -545,14 +567,14 @@ $query = new Query();
                      $lastcommondity->execute();
                      $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
                          ?>
-                         <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $packingstockinfodata['id']; ?>">
+                         <tr>
                            <td><?php if(empty($lastcommondity)){ echo $no; } ?></td>
                            <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name'];}; ?></td>
                            <td><?php if(empty($checklastavaliable)){ echo $packingstockinfodata['size'];}; ?></td>
                            <td><?php echo $packingstockinfodata['packingkgperbox']; ?></td>
                            <td><?php echo $packingstockinfodata['mc']; ?></td>
                            <td><?php echo $packingstockinfodata['totalnetweight']; ?></td>
-                           <td><?php if($packingstockinfodata['usd'] != 0 ){ echo $packingstockinfodata['usd'];} ?></td>
+                           <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $packingstockinfodata['id']; ?>"><?php if($packingstockinfodata['usd'] != 0 ){ echo $packingstockinfodata['usd'];} ?></td>
                            <td><?php if($packingstockinfodata['total_usd'] != 0 ){ echo $packingstockinfodata['total_usd'];} ?></td>
                          </tr>
                        <div class="modal fade" id="updatemodal<?php echo $packingstockinfodata['id']; ?>">
@@ -673,7 +695,7 @@ $query = new Query();
                            <td><?php echo $packingstockinfodata['mc']; ?></td>
                            <td><?php echo $packingstockinfodata['totalnetweight']; ?></td>
                            <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $packingstockinfodata['id']; ?>"><?php if($packingstockinfodata['usd'] != 0 ){ echo $packingstockinfodata['usd'];} ?></td>
-                           <td <?php if(str_contains($commonditydata['item_name'], 'block')){ echo 'data-bs-toggle="modal"'; } ?> data-bs-target="#updatetotalusd<?php echo $packingstockinfodata['id']; ?>"><?php if($packingstockinfodata['total_usd'] != 0 ){ echo $packingstockinfodata['total_usd'];} ?></td>
+                           <td <?php if(str_contains(strtolower($commonditydata['item_name']), 'block')){ echo 'data-bs-toggle="modal"'; } ?> data-bs-target="#updatetotalusd<?php echo $packingstockinfodata['id']; ?>"><?php if($packingstockinfodata['total_usd'] != 0 ){ echo $packingstockinfodata['total_usd'];} ?></td>
                          </tr>
                        <div class="modal fade" id="updatemodal<?php echo $packingstockinfodata['id']; ?>">
                          <div class="modal-dialog" role="document">
@@ -701,7 +723,7 @@ $query = new Query();
                        <div class="modal fade" id="updatetotalusd<?php echo $packingstockinfodata['id']; ?>">
                          <div class="modal-dialog" role="document">
                            <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
-                             <div class="modal-header bg-info text-light">
+                             <div class="modal-header bg-primary text-light">
                                <h1 class="modal-title fs-5">Update Price Of Total USD</h1>
                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                              </div>
@@ -710,11 +732,11 @@ $query = new Query();
                                  <input type="hidden" name="updateid" value="<?php echo $packingstockinfodata['id']; ?>">
                                  <div class="modal-body">
                                    <label>Total USD</label>
-                                   <input type="text" name="usd" class="form-control inpv2 mb-2 mt-2">
+                                   <input type="text" name="totalusd" class="form-control inpv2 mb-2 mt-2">
                                  </div>
                                  <div class="modal-footer">
                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                   <button type="submit" class="btn btn-success" name="updatebtn">Update</button>
+                                   <button type="submit" class="btn btn-success" name="updatetotalusdbtn">Update</button>
                                  </div>
                                </div>
                              </div>
