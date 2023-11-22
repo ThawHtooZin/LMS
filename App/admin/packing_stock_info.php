@@ -424,18 +424,19 @@ $query = new Query();
                  <div class="modal fade" id="totalnetweightmodal<?= $packingstockinfodata['id']; ?>">
                    <div class="modal-dialog">
                      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
-                       <div class="modal-header bg-secondary text-light">
-                         <h1 class="modal-title fs-5">Edit Packing List</h1>
+                       <div class="modal-header bg-warning text-light">
+                         <h1 class="modal-title fs-5">Edit Gross Weight</h1>
                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                        </div>
                      <form action="" method="post">
                        <input type="hidden" name="upid" value="<?= $packingstockinfodata['id']; ?>">
                        <div class="modal-body">
-                        <label>Total Net Weight</label>
+                        <label>Total Gross Weight</label>
                         <input type="text" name="totalgrossweightupdata" class="form-control">
                        </div>
                        <div class="modal-footer">
-                        <button name="totalgrossweightupdatebtn" class="btn btn-warning text-light">Update</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button name="totalgrossweightupdatebtn" class="btn btn-success text-light">Update</button>
                        </div>
                      </div>
                    </form>
