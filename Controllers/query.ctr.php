@@ -2555,6 +2555,13 @@ Class Query{
     $addpackingliststmt->execute();
   }
 
+  function editpackinglist($date, $customer_id, $country, $invoiceno, $containerno, $vessel_name, $voyname, $fda, $updateid){
+    global $pdo;
+
+    $editpackingstockstmt = $pdo->prepare("UPDATE packingliststock SET date='$date', customer_id='$customer_id', country='$country', invoiceno='$invoiceno', containerno='$containerno', vessel_name='$vessel_name', voyname='$voyname', fda='$fda' WHERE id='$updateid'");
+    $editpackingstockstmt->execute();
+  }
+
   function addpackinglistinfo($commondity, $size, $packingkgperbox, $mc, $infoid){
     global $pdo;
 
