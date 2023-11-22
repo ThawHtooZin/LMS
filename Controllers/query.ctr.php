@@ -2616,6 +2616,21 @@ Class Query{
     $updateusdstmt->execute();
   }
 
+
+  function updateblockusd($usd, $updateid){
+    global $pdo;
+
+    $updateusdstmt = $pdo->prepare("UPDATE actualinvoice SET usd='$usd' WHERE id='$updateid'");
+    $updateusdstmt->execute();
+  }
+
+
+  function updatetotalusd($totalusd, $updateid){
+    global $pdo;
+
+    $updateusdstmt = $pdo->prepare("UPDATE actualinvoice SET total_usd='$totalusd' WHERE id='$updateid'");
+    $updateusdstmt->execute();
+  }
   function updateinvoicecosting($priceperviss, $yield, $packing_material, $ocean_pacific, $tax, $agent, $transport, $updateid, $dollar, $commondity_id, $size){
     global $pdo;
 

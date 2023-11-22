@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 21, 2023 at 08:55 AM
+-- Generation Time: Nov 22, 2023 at 08:38 AM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.0.17
 
@@ -77,7 +77,8 @@ INSERT INTO `acname` (`id`, `code_no`, `ac_type`, `ac_name`) VALUES
 (92, '3600/001', 29, 'Main Cash'),
 (93, '5000/001', 30, 'Revenue'),
 (97, '4000/M01', 28, 'MgMg'),
-(101, '3300/001', 29, 'USA');
+(101, '3300/001', 29, 'USA'),
+(102, '3300/006', 29, 'jamuna');
 
 -- --------------------------------------------------------
 
@@ -103,11 +104,17 @@ CREATE TABLE `actualinvoice` (
 --
 
 INSERT INTO `actualinvoice` (`id`, `commondity_id`, `size`, `packingkgperbox`, `mc`, `totalnetweight`, `usd`, `total_usd`, `infoid`, `link_id`) VALUES
-(22, '1', '2up', '20', 30, '600', '', '', 8, 29),
-(23, '1', '3up', '23', 30, '690', '', '', 8, 30),
+(22, '1', '2up', '20', 30, '600', '0', '0', 8, 29),
+(23, '1', '3up', '23', 30, '690', '0', '0', 8, 30),
 (24, '1', '5up', '23', 30, '690', '', '', 8, 31),
 (25, '1', '3up', '22', 23, '506', '', '', 8, 32),
-(26, '1', '2up', '23', 43, '989', '', '', 8, 33);
+(26, '1', '2up', '23', 43, '989', '0', '0', 8, 33),
+(27, '2', '3up', '21', 23, '483', '0', '0', 8, 34),
+(28, '2', '4up', '22', 29, '638', '', '', 8, 35),
+(30, '7', '2up', '21', 32, '672', '', '', 8, 37),
+(31, '1', '2up', '20', 30, '600', '2.00', '1200', 9, 38),
+(32, '7', '3up', '22', 43, '946', '', '', 9, 39),
+(33, '1', '3up', '22', 43, '946', '', '', 9, 40);
 
 -- --------------------------------------------------------
 
@@ -227,12 +234,7 @@ CREATE TABLE `coldstore` (
 --
 
 INSERT INTO `coldstore` (`id`, `indate`, `outdate`, `commondity_id`, `mc`, `total_mc`, `kg`, `total_kg`, `day`, `rate`, `charges`, `total_charges`) VALUES
-(98, '2023-11-01', '2023-11-05', '1', 10, 10, '90', '90', 5, '3', 1350, 1350),
-(99, '2023-11-01', '2023-11-05', '2', 10, 10, '90', '90', 5, '3', 1350, 1350),
-(100, '2023-11-01', '2023-11-05', '1', 15, 25, '135', '225', 5, '3', 2025, 3375),
-(101, '2023-11-01', '2023-11-05', '1', 50, 75, '450', '675', 5, '3', 6750, 10125),
-(102, '2023-11-05', '2023-11-10', '3', 10, 20, '90', '180', 6, '3', 1620, 2970),
-(104, '2023-11-11', '2023-11-15', '3', 90, 90, '710', '710', 5, '3', 10650, 10650);
+(109, '2023-11-01', '2023-11-02', '1', 10, 10, '90', '90', 2, '3', 540, 540);
 
 -- --------------------------------------------------------
 
@@ -300,7 +302,8 @@ INSERT INTO `customers` (`customer_id`, `customer_name`, `customer_detail`, `cus
 ('3300/002', 'CANADA', '', ''),
 ('3300/003', 'DAKA', '', ''),
 ('3300/004', 'BRUNAI', '\r\n', ''),
-('3300/005', 'JAPAN', '\r\n', '');
+('3300/005', 'JAPAN', '\r\n', ''),
+('3300/006', 'jamuna', 'importer & whsaler', 'can');
 
 -- --------------------------------------------------------
 
@@ -338,7 +341,8 @@ INSERT INTO `form7stock` (`id`, `date`, `item_id`, `supplier_name`, `country`, `
 (168, '0000-00-00', '1', '4000/P01', 'NY', 'frozen', '1up', '', '', '', 5, 156),
 (169, '0000-00-00', '1', '4000/P01', 'NY', 'frozen', '3up', '', '', '', 2, 156),
 (172, '2023-11-02', '1', '4000/K01', NULL, 'frozen', '2up', '100', '163.4', '', 0, 159),
-(173, '2023-11-02', '5', '4000/A01', NULL, 'frozen', '3up', '100', '163.4', '', 0, 160);
+(173, '2023-11-02', '5', '4000/A01', NULL, 'frozen', '3up', '100', '163.4', '', 0, 160),
+(175, '2023-11-05', '7', '4000/A01', 'Can', 'frozen', '2up', '100', '163.4', '', 21, 162);
 
 -- --------------------------------------------------------
 
@@ -375,7 +379,8 @@ INSERT INTO `form10stock` (`id`, `date`, `item_id`, `supplier_id`, `country`, `t
 (71, '2023-11-09', '2', '4000/A01', 'DAKA', 'tcl', '4up', 100, 100, '900', 100, '', 0, '', 0, '900', ''),
 (72, '2023-11-01', '1', '4000/P01', 'NY', 'frozen', '2up', 19, 20, '60', 18, '3', 1, '', 0, '63', ''),
 (73, '2023-11-01', '1', '4000/P01', 'NY', 'frozen', '1up', 5, 20, '120', 5, '', 0, '', 0, '120', ''),
-(74, '2023-11-01', '1', '4000/P01', 'NY', 'frozen', '3up', 4, 6, '12', 4, '', 0, '', 0, '12', '');
+(74, '2023-11-01', '1', '4000/P01', 'NY', 'frozen', '3up', 4, 6, '12', 4, '', 0, '', 0, '12', ''),
+(75, '2023-11-10', '7', '4000/A01', 'Can', 'frozen', '2up', 20, 12, '150', 20, '', 0, '', 0, '150', '');
 
 -- --------------------------------------------------------
 
@@ -415,7 +420,8 @@ INSERT INTO `general_ledger` (`id`, `date`, `voucherno`, `ac_code`, `debit`, `cr
 (735, '2023-11-09', 'D0001', '3600/001', 0, 10000, 110000, 'HEHE', '', '', 0, 29),
 (738, '2023-11-09', 'B0001', '4000/K01', 20000, 0, -20000, 'paid to supplier', '', '', 0, 28),
 (739, '2023-11-09', 'B0001', '3600/001', 0, 20000, 90000, 'paid to Kyi Sin', '', '', 0, 29),
-(740, '2023-11-01', '1710', '4000/B01', 0, 0, 0, '', '', '', 0, 0);
+(740, '2023-11-01', '1710', '4000/B01', 0, 0, 0, '', '', '', 0, 0),
+(741, '2023-11-05', '111111', '4000/A01', 0, 2100000, -2100000, '', '', '', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -624,16 +630,8 @@ CREATE TABLE `hhkstock` (
 --
 
 INSERT INTO `hhkstock` (`id`, `indate`, `outdate`, `commondity_id`, `mc`, `total_mc`, `kg`, `total_kg`, `balance`, `link_id`) VALUES
-(25, '2023-11-01', '0000-00-00', '1', 100, 100, '900', '900', '900', 0),
-(26, '2023-11-01', '0000-00-00', '2', 200, 200, '1800', '1800', '900', 0),
-(34, '0000-00-00', '2023-11-05', '1', 10, 90, '90', '810', '90', 98),
-(35, '0000-00-00', '2023-11-05', '2', 10, 190, '90', '1710', '-810', 99),
-(36, '0000-00-00', '2023-11-05', '1', 15, 75, '135', '675', '-630', 100),
-(37, '0000-00-00', '2023-11-05', '1', 50, 25, '450', '225', '-810', 101),
-(38, '2023-11-05', '0000-00-00', '3', 100, 100, '900', '900', '900', 0),
-(39, '0000-00-00', '2023-11-10', '3', 10, 180, '90', '1620', '90', 102),
-(40, '2023-11-11', '0000-00-00', '3', 100, 190, '900', '1710', '1800', 0),
-(42, '0000-00-00', '2023-11-15', '3', 90, 100, '710', '1000', '7190', 104);
+(43, '2023-11-01', '0000-00-00', '1', 500, 500, '4500', '4500', '900', 0),
+(48, '0000-00-00', '2023-11-02', '1', 10, 490, '90', '4410', '-2700', 109);
 
 -- --------------------------------------------------------
 
@@ -675,7 +673,13 @@ INSERT INTO `invoice_costing` (`id`, `commondity_id`, `size`, `kg`, `pricepervis
 (13, '1', '3up', '23', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 8, 30),
 (14, '1', '5up', '23', '1100', '673.1946144', '4.5', '644.2053726', '0.214666666', '0.3', '0.04', '0.3', '0.3', '0.2', '1.354666666', '', '', '', '', '31.15733333', 8, 31),
 (15, '1', '3up', '22', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 8, 32),
-(16, '1', '2up', '23', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 8, 33);
+(16, '1', '2up', '23', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 8, 33),
+(17, '2', '3up', '21', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '', '', '', '', '0', 8, 34),
+(18, '2', '4up', '22', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '', '', '', '', '0', 8, 35),
+(20, '7', '2up', '21', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 8, 37),
+(21, '1', '2up', '20', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 9, 38),
+(22, '7', '3up', '22', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 9, 39),
+(23, '1', '3up', '22', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 9, 40);
 
 -- --------------------------------------------------------
 
@@ -699,7 +703,9 @@ INSERT INTO `item` (`id`, `item_id`, `item_name`) VALUES
 (16, '3', 'Rohu'),
 (17, '4', 'Koral'),
 (18, '5', 'Baby Koral'),
-(19, '6', 'Puti');
+(19, '6', 'Puti'),
+(20, '7', 'Balachaung(Block)'),
+(21, '8', 'block');
 
 -- --------------------------------------------------------
 
@@ -726,12 +732,7 @@ CREATE TABLE `labour` (
 --
 
 INSERT INTO `labour` (`id`, `indate`, `outdate`, `commondity_id`, `mc`, `total_mc`, `kg`, `total_kg`, `rate`, `charges`, `total_charges`) VALUES
-(98, '2023-11-01', '2023-11-05', '1', 10, 10, '90', '90', '4', 360, 360),
-(99, '2023-11-01', '2023-11-05', '2', 10, 10, '90', '90', '4', 360, 360),
-(100, '2023-11-01', '2023-11-05', '1', 15, 25, '135', '225', '4', 540, 900),
-(101, '2023-11-01', '2023-11-05', '1', 50, 75, '450', '675', '4', 1800, 2700),
-(102, '2023-11-05', '2023-11-10', '3', 10, 20, '90', '180', '4', 360, 720),
-(104, '2023-11-11', '2023-11-15', '3', 90, 90, '710', '710', '4', 2840, 2840);
+(109, '2023-11-01', '2023-11-02', '1', 10, 10, '90', '90', '4', 360, 360);
 
 -- --------------------------------------------------------
 
@@ -875,7 +876,8 @@ CREATE TABLE `packingliststock` (
 --
 
 INSERT INTO `packingliststock` (`id`, `date`, `customer_id`, `country`, `invoiceno`, `containerno`, `vessel_name`, `voyname`, `fda`) VALUES
-(8, '2023-11-01', '3300/001', 'USA', '00001', 'KND', 'HEHE', 'YOYOYO', 'FATHERDOUGHTERASS');
+(8, '2023-11-01', '3300/004', 'USA', '01010101', 'KND', 'HEHE', 'HOHOHOHOH', 'FATHER'),
+(9, '2023-11-20', '3300/006', 'Can', '111111', 'nm654', '2453656', 'VOYNAMEEEE', '14278338350');
 
 -- --------------------------------------------------------
 
@@ -905,7 +907,13 @@ INSERT INTO `packingliststockinfo` (`id`, `commondity_id`, `size`, `packingkgper
 (30, '1', '3up', 23, 30, 690, '720', '', '', 8),
 (31, '1', '5up', 23, 30, 690, '720', '', '', 8),
 (32, '1', '3up', 22, 23, 506, '529', '', '', 8),
-(33, '1', '2up', 23, 43, 989, '1032', '', '', 8);
+(33, '1', '2up', 23, 43, 989, '1032', '', '', 8),
+(34, '2', '3up', 21, 23, 483, '506', '', '', 8),
+(35, '2', '4up', 22, 29, 638, '667', '', '', 8),
+(37, '7', '2up', 21, 32, 672, '704', '', '', 8),
+(38, '1', '2up', 20, 30, 600, '630', '', '', 9),
+(39, '7', '3up', 22, 43, 946, '500', '', '', 9),
+(40, '1', '3up', 22, 43, 946, '989', '', '', 9);
 
 -- --------------------------------------------------------
 
@@ -972,7 +980,8 @@ INSERT INTO `payable` (`id`, `date`, `supplier_id`, `purchase_voucher_no`, `purc
 (249, '2023-11-02', '4000/K01', '8013', 100000, '0000-00-00', '', '', 0, 150000, 159, 70000, '2023-11-10'),
 (250, '2023-11-02', '4000/A01', '3524', 220000, '0000-00-00', '', '', 0, 220000, 160, 220000, '2023-11-10'),
 (251, '0000-00-00', '4000/K01', '', 0, '2023-11-09', 'D0001', 'HEHE', 10000, 140000, 0, 0, '0000-00-00'),
-(253, '0000-00-00', '4000/K01', '', 0, '2023-11-09', 'B0001', 'paid to supplier', 20000, 120000, 0, 0, '0000-00-00');
+(253, '0000-00-00', '4000/K01', '', 0, '2023-11-09', 'B0001', 'paid to supplier', 20000, 120000, 0, 0, '0000-00-00'),
+(255, '2023-11-05', '4000/A01', '111111', 2100000, '0000-00-00', '', '', 0, 2320000, 162, 0, '0000-00-00');
 
 -- --------------------------------------------------------
 
@@ -1018,12 +1027,8 @@ CREATE TABLE `processing` (
 --
 
 INSERT INTO `processing` (`id`, `indate`, `outdate`, `commondity_id`, `mc`, `total_mc`, `kg`, `total_kg`, `rate`, `charges`, `total_charges`) VALUES
-(98, '2023-11-01', '2023-11-05', '1', 10, 10, '90', '90', '270', 24300, 24300),
-(99, '2023-11-01', '2023-11-05', '2', 10, 10, '90', '90', '470', 42300, 42300),
-(100, '2023-11-01', '2023-11-05', '1', 15, 25, '135', '225', '270', 36450, 60750),
-(101, '2023-11-01', '2023-11-05', '1', 50, 75, '450', '675', '270', 121500, 182250),
-(102, '2023-11-05', '2023-11-10', '3', 10, 10, '110', '110', '', 11000, 11000),
-(104, '2023-11-11', '2023-11-15', '3', 90, 90, '100', '210', '', 0, 11000);
+(107, '2023-11-01', '2023-11-02', '1', 10, 10, '90', '90', '270', 24300, 24300),
+(109, '2023-11-01', '2023-11-02', '1', 10, 10, '90', '180', '270', 24300, 48600);
 
 -- --------------------------------------------------------
 
@@ -1056,7 +1061,8 @@ INSERT INTO `purchase` (`no`, `date`, `voucher_no`, `supplier_id`, `tclfrozen`, 
 (155, '2023-11-01', 2581, '4000/P01', 'frozen', '5', '2up', '50', 0, 2000, 100000),
 (156, '2023-11-01', 2581, '4000/P01', 'frozen', '1', '2up', '100', 0, 1000, 100000),
 (159, '2023-11-02', 8013, '4000/K01', 'frozen', '1', '2up', '100', 0, 1000, 100000),
-(160, '2023-11-02', 3524, '4000/A01', 'frozen', '5', '3up', '100', 0, 2200, 220000);
+(160, '2023-11-02', 3524, '4000/A01', 'frozen', '5', '3up', '100', 0, 2200, 220000),
+(162, '2023-11-05', 111111, '4000/A01', 'frozen', '7', '2up', '100', 0, 21000, 2100000);
 
 -- --------------------------------------------------------
 
@@ -1216,12 +1222,7 @@ CREATE TABLE `total_charges` (
 --
 
 INSERT INTO `total_charges` (`id`, `date`, `commondity_id`, `total_coldstore_charges`, `total_labour_charges`, `total_processing_charges`, `repacking_charges`, `ice_charges`, `ot_charges`, `total_charges`, `grand_total_charges`, `payment_date`, `payment_amount`, `balance_amount`, `remark`, `link_id`) VALUES
-(80, '2023-11-05', 1, 1350, 360, 24300, 0, 0, 0, 26010, 26010, '0000-00-00', 0, 26010, 0, 98),
-(81, '2023-11-05', 2, 1350, 360, 42300, 0, 0, 0, 44010, 70020, '0000-00-00', 0, 70020, 0, 99),
-(82, '2023-11-05', 1, 2025, 540, 36450, 0, 0, 0, 39015, 109035, '0000-00-00', 0, 109035, 0, 100),
-(83, '2023-11-05', 1, 6750, 1800, 121500, 0, 0, 0, 130050, 239085, '0000-00-00', 0, 239085, 0, 101),
-(84, '2023-11-10', 3, 1620, 360, 0, 0, 0, 0, 2100, 241185, '0000-00-00', 0, 241185, 0, 102),
-(86, '2023-11-15', 3, 10650, 2840, 10000, 10, 10, 10, 123670, 364855, '0000-00-00', 0, 364855, 0, 104);
+(91, '2023-11-02', 1, 540, 360, 243000, 0, 0, 0, 900, 900, '0000-00-00', 0, 252000, 0, 109);
 
 -- --------------------------------------------------------
 
@@ -1571,7 +1572,9 @@ INSERT INTO `userlogs` (`id`, `login_time`, `login_date`, `login_username`, `log
 (94, '01:25:27.000000', '2023-11-20', 'admin', 'admin', 'Login Success'),
 (95, '07:03:33.000000', '2023-11-20', 'admin', 'admin', 'Login Success'),
 (96, '09:03:07.000000', '2023-11-21', 'admin', 'admin', 'Login Success'),
-(97, '01:46:16.000000', '2023-11-21', 'admin', 'admin', 'Login Success');
+(97, '01:46:16.000000', '2023-11-21', 'admin', 'admin', 'Login Success'),
+(98, '10:00:47.000000', '2023-11-22', 'admin', 'admin', 'Login Success'),
+(99, '01:45:30.000000', '2023-11-22', 'admin', 'admin', 'Login Success');
 
 --
 -- Indexes for dumped tables
@@ -1915,13 +1918,13 @@ ALTER TABLE `accounts`
 -- AUTO_INCREMENT for table `acname`
 --
 ALTER TABLE `acname`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=103;
 
 --
 -- AUTO_INCREMENT for table `actualinvoice`
 --
 ALTER TABLE `actualinvoice`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `actype`
@@ -1951,7 +1954,7 @@ ALTER TABLE `category`
 -- AUTO_INCREMENT for table `coldstore`
 --
 ALTER TABLE `coldstore`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=110;
 
 --
 -- AUTO_INCREMENT for table `container`
@@ -1969,19 +1972,19 @@ ALTER TABLE `currency`
 -- AUTO_INCREMENT for table `form7stock`
 --
 ALTER TABLE `form7stock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=175;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=176;
 
 --
 -- AUTO_INCREMENT for table `form10stock`
 --
 ALTER TABLE `form10stock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=75;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
 -- AUTO_INCREMENT for table `general_ledger`
 --
 ALTER TABLE `general_ledger`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=741;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=742;
 
 --
 -- AUTO_INCREMENT for table `gfcdryfishcoldstore`
@@ -2029,25 +2032,25 @@ ALTER TABLE `hhkmcstock`
 -- AUTO_INCREMENT for table `hhkstock`
 --
 ALTER TABLE `hhkstock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT for table `invoice_costing`
 --
 ALTER TABLE `invoice_costing`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `item`
 --
 ALTER TABLE `item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `labour`
 --
 ALTER TABLE `labour`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=110;
 
 --
 -- AUTO_INCREMENT for table `mslcoldstore`
@@ -2089,13 +2092,13 @@ ALTER TABLE `msl_total_charges`
 -- AUTO_INCREMENT for table `packingliststock`
 --
 ALTER TABLE `packingliststock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `packingliststockinfo`
 --
 ALTER TABLE `packingliststockinfo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `packingmaterial`
@@ -2107,7 +2110,7 @@ ALTER TABLE `packingmaterial`
 -- AUTO_INCREMENT for table `payable`
 --
 ALTER TABLE `payable`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=255;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=256;
 
 --
 -- AUTO_INCREMENT for table `permission`
@@ -2119,13 +2122,13 @@ ALTER TABLE `permission`
 -- AUTO_INCREMENT for table `processing`
 --
 ALTER TABLE `processing`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=110;
 
 --
 -- AUTO_INCREMENT for table `purchase`
 --
 ALTER TABLE `purchase`
-  MODIFY `no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=162;
+  MODIFY `no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=163;
 
 --
 -- AUTO_INCREMENT for table `receivable`
@@ -2161,7 +2164,7 @@ ALTER TABLE `tclmcstock`
 -- AUTO_INCREMENT for table `total_charges`
 --
 ALTER TABLE `total_charges`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=87;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=92;
 
 --
 -- AUTO_INCREMENT for table `transaction`
@@ -2215,7 +2218,7 @@ ALTER TABLE `trucktotalcosting`
 -- AUTO_INCREMENT for table `userlogs`
 --
 ALTER TABLE `userlogs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
