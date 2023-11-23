@@ -949,11 +949,7 @@ Class Query{
       $processingstmt = $pdo->prepare("INSERT INTO processing(indate, outdate, commondity_id, mc, total_mc) VALUES('$indate','$outdate','$commondity_id', '$mc','$ptotal_mc')");
       $processingstmt->execute();
     }else{
-<<<<<<< HEAD
-      $processingstmt = $pdo->prepare("INSERT INTO processing(indate, outdate, commondity_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$commondity_id', '$mc','$ptotal_mc','$kg','$ptotal_kg', '$processingrate','$pcharges','$totalprocessingcharges')");
-=======
       $processingstmt = $pdo->prepare("INSERT INTO processing(indate, outdate, commondity_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$commondity_id', '$mc','$ptotal_mc','$kg','$ptotal_kg','$processingrate','$pcharges','$totalprocessingcharges')");
->>>>>>> 3aa8d03ef67774769a4fe636261ef1e89a40faeb
       $processingstmt->execute();
     }
     $coldstoredatas = $this->selectdesc('coldstore');
@@ -1130,7 +1126,7 @@ Class Query{
     }else{
       $labourstmt = $pdo->prepare("UPDATE processing SET indate='$indate', outdate='$outdate',commondity_id='$commondity_id', mc='$mc', total_mc='$ptotal_mc', kg='$kg', total_kg='$ptotal_kg', rate='$processingrate', charges='$pcharges', total_charges='$totalprocessingcharges' WHERE id='$updateid'");
       $labourstmt->execute();
-    } 
+    }
     $stockstmt = $pdo->prepare("UPDATE hhkstock SET mc='$mc', total_mc='$stotal_mc', kg='$kg', total_kg='$stotal_kg' WHERE link_id='$updateid'");
     $stockstmt->execute();
     $totalupdatestmt = $pdo->prepare("UPDATE total_charges SET commondity_id='$commondity_id', total_coldstore_charges='$total_coldstore_charges', total_labour_charges='$total_labour_charges', total_processing_charges='$total_processing_charges', total_charges='$total_charges_of_total' WHERE link_id='$updateid'");
