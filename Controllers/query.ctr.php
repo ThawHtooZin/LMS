@@ -1104,7 +1104,7 @@ Class Query{
     }else{
       $labourstmt = $pdo->prepare("UPDATE processing SET indate='$indate', outdate='$outdate',commondity_id='$commondity_id', mc='$mc', total_mc='$ptotal_mc', kg='$kg', total_kg='$ptotal_kg', rate='$processingrate', charges='$pcharges', total_charges='$totalprocessingcharges' WHERE id='$updateid'");
       $labourstmt->execute();
-    }
+    } 
     $stockstmt = $pdo->prepare("UPDATE hhkstock SET mc='$mc', total_mc='$stotal_mc', kg='$kg', total_kg='$stotal_kg' WHERE link_id='$updateid'");
     $stockstmt->execute();
     $totalupdatestmt = $pdo->prepare("UPDATE total_charges SET commondity_id='$commondity_id', total_coldstore_charges='$total_coldstore_charges', total_labour_charges='$total_labour_charges', total_processing_charges='$total_processing_charges', total_charges='$total_charges_of_total' WHERE link_id='$updateid'");
