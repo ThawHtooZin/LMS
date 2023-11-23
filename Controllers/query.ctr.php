@@ -284,25 +284,47 @@ Class Query{
     }
   }
 
-  function additem($table, $item_code, $item_name){
-    global $pdo;
-    $stmt = $pdo->prepare("INSERT INTO $table(item_name, item_id) VALUES('$item_name', :item_code);");
-    $stmt->execute([
-      ":item_code" => $item_code
-    ]);
-    if($stmt){
-      return $successmessage = "Item Added Successfully";
-    }else{
-      return $errmessage = "Error accors when adding Item";
-    }
-  }
+  // function additem($table, $item_code, $item_name){
+  //   global $pdo;
+  //   $stmt = $pdo->prepare("INSERT INTO $table(item_name, item_id) VALUES('$item_name', :item_code);");
+  //   $stmt->execute([
+  //     ":item_code" => $item_code
+  //   ]);
+  //   if($stmt){
+  //     return $successmessage = "Item Added Successfully";
+  //   }else{
+  //     return $errmessage = "Error accors when adding Item";
+  //   }
+  // }
 
-  function updateitem($table, $item_name, $item_code ,$item_id){
+    function additem($table, $item_name){
+      global $pdo;
+      $stmt = $pdo->prepare("INSERT INTO $table(item_name) VALUES('$item_name');");
+      $stmt->execute();
+      if($stmt){
+        return $successmessage = "Item Added Successfully";
+      }else{
+        return $errmessage = "Error accors when adding Item";
+      }
+    }
+
+  // function updateitem($table, $item_name, $item_code ,$item_id){
+  //   global $pdo;
+  //   $stmt = $pdo->prepare("UPDATE $table SET item_name='$item_name', item_id=:item_code WHERE item_id='$item_id'");
+  //   $stmt->execute([
+  //     ":item_code" => $item_code
+  //   ]);
+  //   if($stmt){
+  //     return $successmessage = "Item Update Successfully";
+  //   }else{
+  //     return $errmessage = "Error accors when updating Item";
+  //   }
+  // }
+
+  function updateitem($table, $item_name, $item_id){
     global $pdo;
-    $stmt = $pdo->prepare("UPDATE $table SET item_name='$item_name', item_id=:item_code WHERE item_id='$item_id'");
-    $stmt->execute([
-      ":item_code" => $item_code
-    ]);
+    $stmt = $pdo->prepare("UPDATE $table SET item_name='$item_name' WHERE item_id='$item_id'");
+    $stmt->execute();
     if($stmt){
       return $successmessage = "Item Update Successfully";
     }else{

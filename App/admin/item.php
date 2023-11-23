@@ -42,16 +42,18 @@ $query = new Query();
             }
             if(isset($_POST['updatebutton'])){
               $item_name = $_POST['item_name'];
-              $item_code = $_POST['item_code'];
+              // $item_code = $_POST['item_code'];
               $item_id = $_POST['item_id'];
 
-              $message = $query->updateitem('item', $item_name, $item_code, $item_id);
+              // $message = $query->updateitem('item', $item_name, $item_code, $item_id);
+              $message = $query->updateitem('item', $item_name, $item_id);
             }
             if(isset($_POST['addbutton'])){
-              $item_code = $_POST['item_id'];
+              // $item_code = $_POST['item_id'];
               $item_name = $_POST['item_name'];
 
-              $message = $query->additem('item', $item_code,  $item_name);
+              // $message = $query->additem('item', $item_code,  $item_name);
+              $message = $query->additem('item', $item_name);
             }
             ?>
             <?php
@@ -111,7 +113,7 @@ $query = new Query();
             <table class="mt-3 table table-bordered table-striped rounded">
               <tr>
                 <!-- <th>Category Name</th> -->
-                <th>Item Code</th>
+                <th>Id</th>
                 <th>Item Name</th>
                 <th>Action</th>
               </tr>
@@ -127,6 +129,7 @@ $query = new Query();
               $itemdatas = $stmt->fetchAll();
               ?>
               <?php
+              $no = 1;
               foreach ($itemdatas as $itemdata) {
                 // $category_id = $itemdata['category_id'];
                 // $category_name = $query->select('category', $category_id, 'category_id');
@@ -134,7 +137,7 @@ $query = new Query();
 
               <tr>
                 <!-- <td><?php echo $category_name['category_name']; ?></td> -->
-                <td><?php echo $itemdata['item_id']; ?></td>
+                <td><?php echo $no; ?></td>
                 <td><?php echo $itemdata['item_name']; ?></td>
                 <td>
                   <input type="hidden" name="updateid" value="<?php echo $itemdata['item_id']; ?>">
@@ -180,8 +183,8 @@ $query = new Query();
                           }
                           ?>
                         </select> -->
-                        <label>Item Code</label>
-                        <input type="text" name="item_code" class="form-control" placeholder="Item Code" value="<?php echo $updatedata['item_id']; ?>">
+                        <!-- <label>Item Code</label>
+                        <input type="text" name="item_code" class="form-control" placeholder="Item Code" value="<?php echo $updatedata['item_id']; ?>"> -->
                         <label>Item Name</label>
                         <input type="text" name="item_name" class="form-control" placeholder="Item Name" value="<?php echo $updatedata['item_name']; ?>">
                       </div>
@@ -195,6 +198,7 @@ $query = new Query();
               </div>
               <!-- Update Modal -->
               <?php
+              $no++;
               };
               ?>
 
@@ -241,8 +245,8 @@ $query = new Query();
               }
               ?>
             </select> -->
-            <label>Item Code</label>
-            <input type="text" name="item_id" class="form-control" placeholder="Item Code">
+            <!-- <label>Item Code</label>
+            <input type="text" name="item_id" class="form-control" placeholder="Item Code"> -->
             <label>Item Name</label>
             <input type="text" name="item_name" class="form-control" placeholder="Item Name">
           </div>

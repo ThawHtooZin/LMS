@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 22, 2023 at 08:38 AM
+-- Generation Time: Nov 23, 2023 at 06:01 AM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.0.17
 
@@ -688,8 +688,7 @@ INSERT INTO `invoice_costing` (`id`, `commondity_id`, `size`, `kg`, `pricepervis
 --
 
 CREATE TABLE `item` (
-  `id` int(11) NOT NULL,
-  `item_id` varchar(22) COLLATE utf8_unicode_ci NOT NULL,
+  `item_id` int(11) NOT NULL,
   `item_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -697,15 +696,14 @@ CREATE TABLE `item` (
 -- Dumping data for table `item`
 --
 
-INSERT INTO `item` (`id`, `item_id`, `item_name`) VALUES
-(14, '1', 'Hilsa'),
-(15, '2', 'D Puti'),
-(16, '3', 'Rohu'),
-(17, '4', 'Koral'),
-(18, '5', 'Baby Koral'),
-(19, '6', 'Puti'),
-(20, '7', 'Balachaung(Block)'),
-(21, '8', 'block');
+INSERT INTO `item` (`item_id`, `item_name`) VALUES
+(1, 'Hilsa'),
+(2, 'D Puti'),
+(3, 'Rohu'),
+(4, 'Koral'),
+(5, 'Baby Koral'),
+(7, 'Balachaung(Block)'),
+(8, 'Block');
 
 -- --------------------------------------------------------
 
@@ -1722,7 +1720,7 @@ ALTER TABLE `invoice_costing`
 -- Indexes for table `item`
 --
 ALTER TABLE `item`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`item_id`);
 
 --
 -- Indexes for table `labour`
@@ -2044,7 +2042,7 @@ ALTER TABLE `invoice_costing`
 -- AUTO_INCREMENT for table `item`
 --
 ALTER TABLE `item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `labour`
