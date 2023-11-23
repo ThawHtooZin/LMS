@@ -55,7 +55,7 @@ $query = new Query();
         $query->updateactualinvoice($usd, $updateid);
       }
     }
-    
+
     if(isset($_POST['bankingbtn'])){
       if(!empty($_POST['company_name'])){
           $company_name = $_POST['company_name'];
@@ -358,7 +358,7 @@ $query = new Query();
                    <td><?php echo $packingstockinfodata['packingkgperbox']; ?></td>
                    <td><?php echo $packingstockinfodata['mc']; ?></td>
                    <td><?php echo $packingstockinfodata['totalnetweight']; ?></td>
-                   <td <?php if(str_contains(strtolower($commonditydata['item_name']), 'block')){echo 'data-bs-toggle="modal"'; } ?> data-bs-target="#totalnetweightmodal<?= $packingstockinfodata['id']; ?>"><?php echo $packingstockinfodata['totalgrossweight']; ?></td>
+                   <td <?php if(str_contains(strtolower($commonditydata['item_name']), 'block') || str_contains(strtolower($commonditydata['item_name']), 'bala')){echo 'data-bs-toggle="modal"'; } ?> data-bs-target="#totalnetweightmodal<?= $packingstockinfodata['id']; ?>"><?php echo $packingstockinfodata['totalgrossweight']; ?></td>
                    <td>
                      <button type="submit" data-bs-toggle="modal" data-bs-target="#updatepackinglist<?php echo $packingstockinfodata['id']; ?>" class="btn btn-warning d-inline text-light btn-sm" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
@@ -696,7 +696,7 @@ $query = new Query();
                            <td><?php echo $packingstockinfodata['mc']; ?></td>
                            <td><?php echo $packingstockinfodata['totalnetweight']; ?></td>
                            <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $packingstockinfodata['id']; ?>"><?php if($packingstockinfodata['usd'] != 0 ){ echo $packingstockinfodata['usd'];} ?></td>
-                           <td <?php if(str_contains(strtolower($commonditydata['item_name']), 'block')){ echo 'data-bs-toggle="modal"'; } ?> data-bs-target="#updatetotalusd<?php echo $packingstockinfodata['id']; ?>"><?php if($packingstockinfodata['total_usd'] != 0 ){ echo $packingstockinfodata['total_usd'];} ?></td>
+                           <td <?php if(str_contains(strtolower($commonditydata['item_name']), 'bala')){ echo 'data-bs-toggle="modal"'; } ?> data-bs-target="#updatetotalusd<?php echo $packingstockinfodata['id']; ?>"><?php if($packingstockinfodata['total_usd'] != 0 ){ echo $packingstockinfodata['total_usd'];} ?></td>
                          </tr>
                        <div class="modal fade" id="updatemodal<?php echo $packingstockinfodata['id']; ?>">
                          <div class="modal-dialog" role="document">
