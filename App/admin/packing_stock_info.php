@@ -39,23 +39,23 @@ $query = new Query();
       $usd = $_POST['usd'];
       $updateid = $_POST['updateid'];
 
-      $itemstmt = $pdo->prepare("SELECT * FROM item WHERE item_name LIKE '%Block%' OR item_name LIKE '%block%'");
-      $itemstmt->execute();
-      $itemdata = $itemstmt->fetch(PDO::FETCH_ASSOC);
-      $item_id = $itemdata['item_id'];
-
       $commonditystmt = $pdo->prepare("SELECT * FROM actualinvoice WHERE id='$updateid'");
       $commonditystmt->execute();
       $commonditydata = $commonditystmt->fetch(PDO::FETCH_ASSOC);
       $commondity_id = $commonditydata['commondity_id'];
 
-      if ($item_id != $commondity_id) {
-        $query->updateactualinvoice($usd, $updateid);
-      }else{
-        $query->updateblockusd($usd, $updateid);
-      }
+      $itemstmt = $pdo->prepare("SELECT * FROM item WHERE item_id='$commondity_id'");
+      $itemstmt->execute();
+      $itemdata = $itemstmt->fetch(PDO::FETCH_ASSOC);
+      $item = $itemdata['item_name'];
 
+      if (str_contains(strtolower($item), 'block')) {
+        $query->updateblockusd($usd, $updateid);
+      }else{
+        $query->updateactualinvoice($usd, $updateid);
+      }
     }
+    
     if(isset($_POST['bankingbtn'])){
       if(!empty($_POST['company_name'])){
           $company_name = $_POST['company_name'];
