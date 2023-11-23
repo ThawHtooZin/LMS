@@ -284,25 +284,47 @@ Class Query{
     }
   }
 
-  function additem($table, $item_code, $item_name){
-    global $pdo;
-    $stmt = $pdo->prepare("INSERT INTO $table(item_name, item_id) VALUES('$item_name', :item_code);");
-    $stmt->execute([
-      ":item_code" => $item_code
-    ]);
-    if($stmt){
-      return $successmessage = "Item Added Successfully";
-    }else{
-      return $errmessage = "Error accors when adding Item";
-    }
-  }
+  // function additem($table, $item_code, $item_name){
+  //   global $pdo;
+  //   $stmt = $pdo->prepare("INSERT INTO $table(item_name, item_id) VALUES('$item_name', :item_code);");
+  //   $stmt->execute([
+  //     ":item_code" => $item_code
+  //   ]);
+  //   if($stmt){
+  //     return $successmessage = "Item Added Successfully";
+  //   }else{
+  //     return $errmessage = "Error accors when adding Item";
+  //   }
+  // }
 
-  function updateitem($table, $item_name, $item_code ,$item_id){
+    function additem($table, $item_name){
+      global $pdo;
+      $stmt = $pdo->prepare("INSERT INTO $table(item_name) VALUES('$item_name');");
+      $stmt->execute();
+      if($stmt){
+        return $successmessage = "Item Added Successfully";
+      }else{
+        return $errmessage = "Error accors when adding Item";
+      }
+    }
+
+  // function updateitem($table, $item_name, $item_code ,$item_id){
+  //   global $pdo;
+  //   $stmt = $pdo->prepare("UPDATE $table SET item_name='$item_name', item_id=:item_code WHERE item_id='$item_id'");
+  //   $stmt->execute([
+  //     ":item_code" => $item_code
+  //   ]);
+  //   if($stmt){
+  //     return $successmessage = "Item Update Successfully";
+  //   }else{
+  //     return $errmessage = "Error accors when updating Item";
+  //   }
+  // }
+
+  function updateitem($table, $item_name, $item_id){
     global $pdo;
-    $stmt = $pdo->prepare("UPDATE $table SET item_name='$item_name', item_id=:item_code WHERE item_id='$item_id'");
-    $stmt->execute([
-      ":item_code" => $item_code
-    ]);
+    $stmt = $pdo->prepare("UPDATE $table SET item_name='$item_name' WHERE item_id='$item_id'");
+    $stmt->execute();
     if($stmt){
       return $successmessage = "Item Update Successfully";
     }else{
@@ -927,7 +949,7 @@ Class Query{
       $processingstmt = $pdo->prepare("INSERT INTO processing(indate, outdate, commondity_id, mc, total_mc) VALUES('$indate','$outdate','$commondity_id', '$mc','$ptotal_mc')");
       $processingstmt->execute();
     }else{
-      $processingstmt = $pdo->prepare("INSERT INTO processing(indate, outdate, commondity_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$commondity_id', '$mc','$ptotal_mc','$kg','$ptotal_kg', '$processingrate','$pcharges','$totalprocessingcharges')");
+      $processingstmt = $pdo->prepare("INSERT INTO processing(indate, outdate, commondity_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$commondity_id', '$mc','$ptotal_mc','$kg','$ptotal_kg','$processingrate','$pcharges','$totalprocessingcharges')");
       $processingstmt->execute();
     }
     $coldstoredatas = $this->selectdesc('coldstore');
@@ -1104,7 +1126,7 @@ Class Query{
     }else{
       $labourstmt = $pdo->prepare("UPDATE processing SET indate='$indate', outdate='$outdate',commondity_id='$commondity_id', mc='$mc', total_mc='$ptotal_mc', kg='$kg', total_kg='$ptotal_kg', rate='$processingrate', charges='$pcharges', total_charges='$totalprocessingcharges' WHERE id='$updateid'");
       $labourstmt->execute();
-    } 
+    }
     $stockstmt = $pdo->prepare("UPDATE hhkstock SET mc='$mc', total_mc='$stotal_mc', kg='$kg', total_kg='$stotal_kg' WHERE link_id='$updateid'");
     $stockstmt->execute();
     $totalupdatestmt = $pdo->prepare("UPDATE total_charges SET commondity_id='$commondity_id', total_coldstore_charges='$total_coldstore_charges', total_labour_charges='$total_labour_charges', total_processing_charges='$total_processing_charges', total_charges='$total_charges_of_total' WHERE link_id='$updateid'");
@@ -2611,6 +2633,21 @@ Class Query{
     $updateusdstmt->execute();
   }
 
+
+  function updateblockusd($usd, $updateid){
+    global $pdo;
+
+    $updateusdstmt = $pdo->prepare("UPDATE actualinvoice SET usd='$usd' WHERE id='$updateid'");
+    $updateusdstmt->execute();
+  }
+
+
+  function updatetotalusd($totalusd, $updateid){
+    global $pdo;
+
+    $updateusdstmt = $pdo->prepare("UPDATE actualinvoice SET total_usd='$totalusd' WHERE id='$updateid'");
+    $updateusdstmt->execute();
+  }
   function updateinvoicecosting($priceperviss, $yield, $packing_material, $ocean_pacific, $tax, $agent, $transport, $updateid, $dollar, $commondity_id, $size){
     global $pdo;
 
