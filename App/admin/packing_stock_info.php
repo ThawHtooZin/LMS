@@ -189,7 +189,7 @@ $query = new Query();
              if (!empty($emptyornot)) {
                if (isset($_POST['searchcommonditybtn']) && !empty($_POST['searchcommondity'])) {
                 ?>
-                <table class="table table-striped table-hover table-bordered actualinvoicetable " id="packingstocktable">
+                <table class="table table-striped table-hover table-bordered" id="packingstocktable">
                  <tr>
                    <th>No</th>
                    <th>Commondity</th>
@@ -311,7 +311,7 @@ $query = new Query();
                 <?php
                }else{
                 ?>
-                <table class="table table-striped table-hover table-bordered actualinvoicetable " id="packingstocktable">
+                <table class="table table-striped table-hover table-bordered" id="packingstocktable">
                  <tr>
                    <th>No</th>
                    <th>Commondity</th>
@@ -723,7 +723,7 @@ $query = new Query();
                        </div>
                        <div class="modal fade" id="updatetotalusd<?php echo $packingstockinfodata['id']; ?>">
                          <div class="modal-dialog" role="document">
-                           <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                           <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
                              <div class="modal-header bg-primary text-light">
                                <h1 class="modal-title fs-5">Update Price Of Total USD</h1>
                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
