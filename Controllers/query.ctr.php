@@ -927,11 +927,7 @@ Class Query{
       $processingstmt = $pdo->prepare("INSERT INTO processing(indate, outdate, commondity_id, mc, total_mc) VALUES('$indate','$outdate','$commondity_id', '$mc','$ptotal_mc')");
       $processingstmt->execute();
     }else{
-<<<<<<< HEAD
       $processingstmt = $pdo->prepare("INSERT INTO processing(indate, outdate, commondity_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$commondity_id', '$mc','$ptotal_mc','$kg','$ptotal_kg', '$processingrate','$pcharges','$totalprocessingcharges')");
-=======
-      $processingstmt = $pdo->prepare("INSERT INTO processing(indate, outdate, commondity_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$commondity_id', '$mc','$ptotal_mc','$kg','$ptotal_kg','$processingrate','$pcharges','$totalprocessingcharges')");
->>>>>>> 3aa8d03ef67774769a4fe636261ef1e89a40faeb
       $processingstmt->execute();
     }
     $coldstoredatas = $this->selectdesc('coldstore');
