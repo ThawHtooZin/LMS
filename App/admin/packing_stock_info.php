@@ -311,7 +311,7 @@ $query = new Query();
                 <?php
                }else{
                 ?>
-                <table class="table table-striped table-hover table-bordered actualinvoicetable " id="packingstocktable">
+                <table class="table table-striped table-hover table-bordered actualinvoicetable" id="packingstocktable">
                  <tr>
                    <th>No</th>
                    <th>Commondity</th>
@@ -498,6 +498,7 @@ $query = new Query();
                }
               }else{
                 ?>
+                <!-- ========================PACKING LIST EMPTY================================= -->
                 <table class="table table-striped table-bordered table-hover">
                   <tr>
                     <th>No</th>
@@ -521,7 +522,7 @@ $query = new Query();
                 <?php
               }
                 ?>
-               <!-- ========================================================= -->
+               <!-- ========================ACTUAL INVOICE================================= -->
                <div class="actualinvoicetable hide">
                 <?php
                   if (isset($_POST['searchcommonditybtn']) && !empty($_POST['searchcommondity'])) {
@@ -605,10 +606,10 @@ $query = new Query();
                        $no++;
                      }
                      $size = $packingstockinfodata['size'];
-                     $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM packingliststockinfo WHERE infoid='$infoid' AND size='$size'");
+                     $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM packingliststockinfo WHERE infoid='$infoid' AND size='$size' AND commondity_id='$searchcommondity'");
                      $totalmcstmt->execute();
                      $totalmcdata = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
-                     $totalnetweightstmt = $pdo->prepare("SELECT SUM(totalnetweight) AS totalnetweight FROM packingliststockinfo WHERE infoid='$infoid' AND size='$size'");
+                     $totalnetweightstmt = $pdo->prepare("SELECT SUM(totalnetweight) AS totalnetweight FROM packingliststockinfo WHERE infoid='$infoid' AND size='$size' AND commondity_id='$searchcommondity'");
                      $totalnetweightstmt->execute();
                      $totalnetweightdata = $totalnetweightstmt->fetch(PDO::FETCH_ASSOC);
                      ?>
