@@ -93,9 +93,8 @@ $query = new Query();
       $coldstorerate = $_POST['coldstorerate'];
       $labourrate = $_POST['labourrate'];
       $processingrate = $_POST['upprocessingrate'];
-      $upprocessingcharges = $_POST['upprocessingcharges'];
       $updateid = $_POST['updateid'];
-      $query->updatecoldstore($indate, $outdate, $commondity_id,  $mc, $kg, $coldstorerate, $labourrate, $processingrate, $upprocessingcharges, $updateid);
+      $query->updatecoldstore($indate, $outdate, $commondity_id,  $mc, $kg, $coldstorerate, $labourrate, $processingrate, $updateid);
     }
 
     if (isset($_POST['addremarkbtn'])) {
@@ -324,10 +323,6 @@ $query = new Query();
                                 <label style="font-weight: bold;">Processing Rate</label>
                                 <input type="text" name="upprocessingrate" class="form-control inpv2" value="<?php echo $processingdataup['rate'];  ?>">
                               </div>
-                              <div class="upprocessingchargesdiv<?= $id; ?> hide">
-                                <label style="font-weight: bold;">Processing Charges</label>
-                                <input type="number" name="upprocessingcharges" class="form-control inpv2" value="<?php echo $processingdataup['charges'];  ?>">
-                              </div>
                             </div>
                             </div>
                           </div>
@@ -341,13 +336,14 @@ $query = new Query();
                     </div>
                   </div>
                   <?php
-
+                    $blockid = $query->selectoncecontain('category', 'category_name', 'Block');
+                    
                    ?>
                   <script type="text/javascript">
                     var upcommondity<?= $id; ?> = $("#upcommondity<?= $id; ?>").val();
                     $("#upcommondity<?= $id; ?>").change(function(){
                       upcommondity<?= $id; ?> = $("#upcommondity<?= $id; ?>").val();
-                      if(upcommondity<?= $id; ?>.includes('B01') === true){
+                      if(upcommondity<?= $id; ?> == <?= $blockid['category_id']; ?>){
                         $(".upprocessingratediv<?= $id; ?>").hide();
                         $(".upprocessingchargesdiv<?= $id; ?>").show();
                       }else{
@@ -355,13 +351,10 @@ $query = new Query();
                         $(".upprocessingchargesdiv<?= $id; ?>").hide();
                       }
                     });
-                    if(upcommondity<?= $id; ?>.includes('B01') === true){
-                      $(".upprocessingratediv<?= $id; ?>").hide();
-                      $(".upprocessingchargesdiv<?= $id; ?>").show();
-                    }else{
-                      $(".upprocessingratediv<?= $id; ?>").show();
-                      $(".upprocessingchargesdiv<?= $id; ?>").hide();
-                    }
+                    if(upcommondity<?= $id; ?> == <?= $blockid['category_id']; ?>){
+                        $(".upprocessingratediv<?= $id; ?>").hide();
+                        $(".upprocessingchargesdiv<?= $id; ?>").show();
+                      }
                   </script>
                   <?php
                   }
@@ -624,7 +617,7 @@ $query = new Query();
                     // balance_amount
                     $balance_amount = $grand_total_charges - $total_charges_data['payment_amount'];
                     if($balance_amount != $total_charges_data['balance_amount']){
-                      $balanceupdatestmt = $pdo->prepare("UPDATE balance_amount SET balance_amount='$balance_amount' WHERE id='$nowid'");
+                      $balanceupdatestmt = $pdo->prepare("UPDATE total_charges SET balance_amount='$balance_amount' WHERE id='$nowid'");
                       $balanceupdatestmt->execute();
                     }
                   }
@@ -886,8 +879,9 @@ $query = new Query();
                           </div>
                         </div>
                         <div class="modal-footer">
+                          <button type="submit" class="btn btn-danger" name="deletestockbtn" style="<?php if(!empty($editcheckdata)){ echo 'display:none;'; } ?>">Delete</button>
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="<?php if(empty($editcheckdata)){ echo 'display:none;'; } ?>">Cancel</button>
                           <button type="submit" class="btn btn-success text-light" name="updatestockbtn">Update</button>
-                          <button type="submit" class="btn btn-danger" name="deletestockbtn">Delete</button>
                         </div>
                       </form>
                     </div>
