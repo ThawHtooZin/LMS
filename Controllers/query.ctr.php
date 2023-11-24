@@ -2969,6 +2969,28 @@ Class Query{
     $adddeclare->execute();
   }
 
+  function updatetruckpackinglistinfo($commondity, $size, $pcsperbox, $kgperbox, $mc, $updateid){
+    global $pdo;
+
+    $totalnetweight = floatval($kgperbox) * intval($mc);
+    $totalgrossweight = intval($mc) * 60;
+
+    $updatetruckpackingliststmt = $pdo->prepare("UPDATE truckpackingliststockinfo SET item_id='$commondity', size='$size', pcsperbox='$pcsperbox', kgperbox='$kgperbox', mc='$mc', netweight='$totalnetweight', totalgrossweight='$totalgrossweight' WHERE id='$updateid'");
+    $updatetruckpackingliststmt->execute();
+
+    $updatedeclarestmt = $pdo->prepare("UPDATE truckdeclare SET item_id='$commondity', size='$size', pcsperbox='$pcsperbox', mc='$mc' WHERE link_id='$updateid'");
+    $updatedeclarestmt->execute();
+
+    $updatefoamboxstmt = $pdo->prepare("UPDATE truckfoambox SET item_id='$commondity', size='$size', pcsperbox='$pcsperbox', kgperbox='$kgperbox', mc='$mc', netweight='$totalnetweight' WHERE link_id='$updateid'");
+    $updatefoamboxstmt->execute();
+
+    $updateinvoicestmt = $pdo->prepare("UPDATE truckactualinvoice SET item_id='$commondity', size='$size', pcsperbox='$pcsperbox', kgperbox='$kgperbox', mc='$mc', netweight='$totalnetweight' WHERE link_id='$updateid'");
+    $updateinvoicestmt->execute();
+
+    $updatetrucktotalcostingstmt = $pdo->prepare("UPDATE trucktotalcosting SET item_id='$commondity', size='$size', total_kg='$kgperbox' WHERE link_id='$updateid'");
+    $updatetrucktotalcostingstmt->execute();
+  }
+
   function updatetruckactualinvoice($usd, $updateid){
     global $pdo;
 
