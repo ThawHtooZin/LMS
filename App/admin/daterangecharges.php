@@ -660,7 +660,7 @@ $query = new Query();
                         <div class="row">
                           <div class="col">
                             <label>Repacking Charges</label>
-                            <input type="number" name="repacking_charges" class="form-control inpv2 mb-2" value="<?php if(!empty($updatedata['repacking_charges'])){ echo $updatedata['repacking_charges']; } ?>">
+                            <input type="text" name="repacking_charges" class="form-control inpv2 mb-2" value="<?php if(!empty($updatedata['repacking_charges'])){ echo $updatedata['repacking_charges']; } ?>">
                           </div>
                           <div class="col">
                             <label>Ice Charges</label>
