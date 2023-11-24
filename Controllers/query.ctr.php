@@ -2940,13 +2940,13 @@ Class Query{
     $addinvoicestmt = $pdo->prepare("INSERT INTO truckactualinvoice(item_id, size, pcsperbox, kgperbox, mc, netweight, invoice_no, link_id) VALUES('$commondity', '$size', '$pcsperbox', '$kgperbox', '$mc', '$totalnetweight', '$invoice_no', '$lastid')");
     $addinvoicestmt->execute();
 
-    $addfoambox = $pdo->prepare("INSERT INTO truckfoambox(item_id, size, pcsperbox, kgperbox, mc, netweight, invoice_no) VALUES('$commondity', '$size', '$pcsperbox', '$kgperbox', '$mc', '$totalnetweight', '$invoice_no')");
+    $addfoambox = $pdo->prepare("INSERT INTO truckfoambox(item_id, size, pcsperbox, kgperbox, mc, netweight, invoice_no, link_id) VALUES('$commondity', '$size', '$pcsperbox', '$kgperbox', '$mc', '$totalnetweight', '$invoice_no', '$lastid')");
     $addfoambox->execute();
 
-    $adddeclare = $pdo->prepare("INSERT INTO truckdeclare(item_id, size, pcsperbox, mc, invoice_no) VALUES('$commondity', '$size', '$pcsperbox', '$mc', '$invoice_no')");
+    $adddeclare = $pdo->prepare("INSERT INTO truckdeclare(item_id, size, pcsperbox, mc, invoice_no, link_id) VALUES('$commondity', '$size', '$pcsperbox', '$mc', '$invoice_no', '$lastid')");
     $adddeclare->execute();
 
-    $adddeclare = $pdo->prepare("INSERT INTO trucktotalcosting(item_id, size, total_kg, invoice_no) VALUES('$commondity', '$size', '$kgperbox', '$invoice_no')");
+    $adddeclare = $pdo->prepare("INSERT INTO trucktotalcosting(item_id, size, total_kg, invoice_no, link_id) VALUES('$commondity', '$size', '$kgperbox', '$invoice_no', '$lastid')");
     $adddeclare->execute();
   }
 
