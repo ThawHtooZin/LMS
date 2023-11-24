@@ -1219,9 +1219,6 @@ Class Query{
     $balancestmt->execute();
     $balancedata= $balancestmt->fetch(PDO::FETCH_ASSOC);
 
-<<<<<<< HEAD
-    $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($ot_charges) + intval($total_processing_charges) + intval($totalchargesdata['total_charges']);
-=======
     if(!empty($total_processing_charges)){
       $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($ot_charges) + intval($total_processing_charges) + intval($totalchargesdata['total_charges']);
     }else{
@@ -1242,7 +1239,6 @@ Class Query{
     }else{
       $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($totalchargesdata['total_charges']) + intval($totalchargesdata['total_processing_charges']) - intval($totalchargesdata['ot_charges']);
     }
->>>>>>> 7818c6fa385bd0c7748758116c0912b268c1f9e1
     if(!empty($balancedata['balance_amount'])){
       $grand_total_charges = $balancedata['balance_amount'] + $total_charges;
     }else{
