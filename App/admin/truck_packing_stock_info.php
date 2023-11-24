@@ -77,16 +77,18 @@ $query = new Query();
 
           <div class="card-header bg-info">
             <?php
-            if(empty($_SESSION['tabs']) && $_SESSION['tabs'] != 'actualinvoice' && $_SESSION['tabs'] != 'actualpackinglist' && $_SESSION['tabs'] != 'foambox' && $_SESSION['tabs'] != 'declare'){
-              $_SESSION['tabs'] = 'default';
-            }elseif(isset($_POST['actualinvoicebtn'])){
-              $_SESSION['tabs'] = 'actualinvoice';
-            }elseif(isset($_POST['actualinvoiceback'])){
-              $_SESSION['tabs'] = 'actualpackinglist';
-            }elseif(isset($_POST['foamboxbtn'])){
-              $_SESSION['tabs'] = 'foambox';
-            }elseif(isset($_POST['declarebtn'])){
-              $_SESSION['tabs'] = 'declare';
+            if(!empty($_SESSION)){
+              if(empty($_SESSION['tabs']) && $_SESSION['tabs'] != 'actualinvoice' && $_SESSION['tabs'] != 'actualpackinglist' && $_SESSION['tabs'] != 'foambox' && $_SESSION['tabs'] != 'declare'){
+                $_SESSION['tabs'] = 'default';
+              }elseif(isset($_POST['actualinvoicebtn'])){
+                $_SESSION['tabs'] = 'actualinvoice';
+              }elseif(isset($_POST['actualinvoiceback'])){
+                $_SESSION['tabs'] = 'actualpackinglist';
+              }elseif(isset($_POST['foamboxbtn'])){
+                $_SESSION['tabs'] = 'foambox';
+              }elseif(isset($_POST['declarebtn'])){
+                $_SESSION['tabs'] = 'declare';
+              }
             }
              ?>
                 <span class=" text-light" id="fbtext" style="font-size:20px; font-weight:bold;">Foam Box</span>
