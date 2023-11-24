@@ -1144,7 +1144,7 @@ Class Query{
         if (!empty($data)) {
           $totalmc = $stmtdata['mc'] + $data['total_mc'];
           $totalkg = $stmtdata['kg'] + $data['total_kg'];
-          $charges = $stmtdata['kg'] * $stmtdata['rate'] * $stmtdata['day'];
+          $charges = floatval($stmtdata['kg']) * floatval($stmtdata['rate']) * intval($stmtdata['day']);
           $NewCharges = $stmtdata['charges'] + $data['total_charges'];
         }else{
           $totalmc = $stmtdata['mc'];
@@ -1219,7 +1219,7 @@ Class Query{
     $balancestmt->execute();
     $balancedata= $balancestmt->fetch(PDO::FETCH_ASSOC);
 
-    $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($ot_charges) + $total_processing_charges + $totalchargesdata['total_charges'];
+    $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($ot_charges) + intval($total_processing_charges) + intval($totalchargesdata['total_charges']);
     if(!empty($balancedata['balance_amount'])){
       $grand_total_charges = $balancedata['balance_amount'] + $total_charges;
     }else{
@@ -2957,7 +2957,7 @@ Class Query{
     $netweightstmt->execute();
     $netweight = $netweightstmt->fetch(PDO::FETCH_ASSOC);
 
-    $total_usd = $usd * intval($netweight['netweight']);
+    $total_usd = intval($usd) * floatval($netweight['netweight']);
     $updateusdstmt = $pdo->prepare("UPDATE truckactualinvoice SET usd='$usd', total_usd='$total_usd' WHERE id='$updateid'");
     $updateusdstmt->execute();
   }

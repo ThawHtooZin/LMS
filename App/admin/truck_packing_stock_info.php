@@ -573,8 +573,8 @@ $query = new Query();
                                <td><?php echo $packingstockinfodata['kgperbox']; ?></td>
                                <td><?php echo $packingstockinfodata['mc']; ?></td>
                                <td><?php echo $packingstockinfodata['netweight']; ?></td>
-                               <td><?php echo $packingstockinfodata['usd']; ?></td>
-                               <td><?php echo $packingstockinfodata['total_usd']; ?></td>
+                               <td><?php if($packingstockinfodata['usd'] != 0){ echo $packingstockinfodata['usd'];} ; ?></td>
+                               <td><?php if($packingstockinfodata['total_usd'] != 0){ echo $packingstockinfodata['total_usd'];} ; ?></td>
                              </tr>
                            <?php
                            ?>
@@ -623,7 +623,7 @@ $query = new Query();
                            <td><?php echo $totalmcdata['totalmc']; ?></td>
                            <td><?php if(!empty($netweightdata['netweight'])){ echo $netweightdata['netweight']; }; ?></td>
                            <td></td>
-                           <td><?php echo $totalusddata['total_usd']; ?></td>
+                           <td><?php if($totalusddata['total_usd'] != 0){ echo $totalusddata['total_usd'];} ; ?></td>
                          </tr>
                          <?php
                          $no1++;
@@ -713,8 +713,8 @@ $query = new Query();
                                <td><?php echo $packingstockinfodata['kgperbox']; ?></td>
                                <td><?php echo $packingstockinfodata['mc']; ?></td>
                                <td><?php echo $packingstockinfodata['netweight']; ?></td>
-                               <td><?php echo $packingstockinfodata['usd']; ?></td>
-                               <td><?php echo $packingstockinfodata['total_usd']; ?></td>
+                               <td><?php if($packingstockinfodata['usd'] != 0){ echo $packingstockinfodata['usd'];} ; ?></td>
+                               <td><?php if($packingstockinfodata['total_usd'] != 0){ echo $packingstockinfodata['total_usd'];} ; ?></td>
                              </tr>
                            <?php
                            ?>
@@ -762,7 +762,7 @@ $query = new Query();
                            <td><?php echo $totalmcdata['totalmc']; ?></td>
                            <td><?php if(!empty($netweightdata['netweight'])){ echo $netweightdata['netweight']; }; ?></td>
                            <td></td>
-                           <td><?php echo $totalusddata['total_usd']; ?></td>
+                           <td><?php if($totalusddata['total_usd'] != 0){ echo $totalusddata['total_usd'];} ; ?></td>
                          </tr>
                          <?php
                          $no1++;
@@ -1209,7 +1209,7 @@ $query = new Query();
                      $item_id = $packingstockinfodata['item_id'];
                      $size = $packingstockinfodata['size'];
                      }
-                     $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' AND item_id='$item_id' AND size='$size'");
+                     $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM truckdeclare WHERE invoice_no='$invoice_no' AND item_id='$item_id' AND size='$size'");
                      $totalmcstmt->execute();
                      $totalmcdata = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
                      $netweightstmt = $pdo->prepare("SELECT SUM(netweight) AS netweight FROM truckdeclare WHERE invoice_no='$invoice_no' AND item_id='$item_id' AND size='$size'");
@@ -1219,7 +1219,7 @@ $query = new Query();
                      $totalkgperboxstmt->execute();
                      $totalkgperboxdata = $totalkgperboxstmt->fetch(PDO::FETCH_ASSOC);
                      ?>
-                     <tr style="font-weight:bold; <?php if(empty($totalkgperboxdata['total_kgperbox'])){echo 'display:none; ';} ?>">
+                     <tr style="font-weight:bold;">
                      <td></td>
                      <td>Sub Total</td>
                      <td></td>

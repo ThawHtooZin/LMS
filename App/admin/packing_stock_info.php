@@ -311,11 +311,7 @@ $query = new Query();
                 <?php
                }else{
                 ?>
-<<<<<<< HEAD
-                <table class="table table-striped table-hover table-bordered actualinvoicetable" id="packingstocktable">
-=======
                 <table class="table table-striped table-hover table-bordered" id="packingstocktable">
->>>>>>> bd1d8f2c87f9e6afcc99314c27eb6b80c4daa3b6
                  <tr>
                    <th>No</th>
                    <th>Commondity</th>
