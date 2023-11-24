@@ -806,15 +806,28 @@ $query = new Query();
                   $lastrowdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
 
                   if(!empty($lastrowdata)){
-                    if ($lastrowdata['total_mc'] - $hhkstockdata['mc'] != $hhkstockdata['total_mc']) {
-                      $totalmc = $lastrowdata['total_mc'] - $hhkstockdata['mc'];
-                      $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$totalmc' WHERE id='$nowid'");
-                      $updatestmt->execute();
-                    }
-                    if ($lastrowdata['total_kg'] - $hhkstockdata['kg'] != $hhkstockdata['total_kg']) {
-                      $totalkg = $lastrowdata['total_kg'] - $hhkstockdata['kg'];
-                      $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_kg='$totalkg' WHERE id='$nowid'");
-                      $updatestmt->execute();
+                    if($hhkstockdata['indate'] == '0000-00-00'){
+                      if ($lastrowdata['total_mc'] - $hhkstockdata['mc'] != $hhkstockdata['total_mc']) {
+                        $totalmc = $lastrowdata['total_mc'] - $hhkstockdata['mc'];
+                        $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$totalmc' WHERE id='$nowid'");
+                        $updatestmt->execute();
+                      }
+                      if ($lastrowdata['total_kg'] - $hhkstockdata['kg'] != $hhkstockdata['total_kg']) {
+                        $totalkg = $lastrowdata['total_kg'] - $hhkstockdata['kg'];
+                        $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_kg='$totalkg' WHERE id='$nowid'");
+                        $updatestmt->execute();
+                      }
+                    }else{
+                      if ($lastrowdata['total_mc'] + $hhkstockdata['mc'] != $hhkstockdata['total_mc']) {
+                        $totalmc = $lastrowdata['total_mc'] + $hhkstockdata['mc'];
+                        $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$totalmc' WHERE id='$nowid'");
+                        $updatestmt->execute();
+                      }
+                      if ($lastrowdata['total_kg'] + $hhkstockdata['kg'] != $hhkstockdata['total_kg']) {
+                        $totalkg = $lastrowdata['total_kg'] + $hhkstockdata['kg'];
+                        $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_kg='$totalkg' WHERE id='$nowid'");
+                        $updatestmt->execute();
+                      }
                     }
                   }                  
 

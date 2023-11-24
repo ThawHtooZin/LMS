@@ -1007,7 +1007,7 @@ Class Query{
     $comname = $commondity_name['category_name'];
 
     // ColdStore
-    $datastmt = $pdo->prepare("SELECT * FROM coldstore WHERE id < '$updateid'");
+    $datastmt = $pdo->prepare("SELECT * FROM coldstore WHERE id < '$updateid' AND commondity_id='$commondity_id'");
     $datastmt->execute();
     $data = $datastmt->fetch(PDO::FETCH_ASSOC);
     if(!empty($data)){
@@ -1031,7 +1031,7 @@ Class Query{
     }
 
     // Labour
-    $labourstmt = $pdo->prepare("SELECT * FROM labour WHERE id < '$updateid'");
+    $labourstmt = $pdo->prepare("SELECT * FROM labour WHERE id < '$updateid' AND commondity_id='$commondity_id'");
     $labourstmt->execute();
     $labour = $labourstmt->fetch(PDO::FETCH_ASSOC);
     if(!empty($labour)){
@@ -1219,7 +1219,26 @@ Class Query{
     $balancestmt->execute();
     $balancedata= $balancestmt->fetch(PDO::FETCH_ASSOC);
 
-    $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($ot_charges) + $total_processing_charges + $totalchargesdata['total_charges'];
+    if(!empty($total_processing_charges)){
+      $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($ot_charges) + intval($total_processing_charges) + intval($totalchargesdata['total_charges']);
+    }else{
+      $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($ot_charges) + intval($totalchargesdata['total_charges']) - intval($totalchargesdata['total_processing_charges']);
+    }
+    if(!empty($repacking_charges)){
+      $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($ot_charges) + intval($total_processing_charges) + intval($totalchargesdata['total_charges']);
+    }else{
+      $total_charges = intval($ice_charges) + intval($ot_charges) + intval($totalchargesdata['total_charges']) + intval($totalchargesdata['total_processing_charges']) - intval($totalchargesdata['repacking_charges']);
+    }
+    if(!empty($ice_charges)){
+      $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($ot_charges) + intval($total_processing_charges) + intval($totalchargesdata['total_charges']);
+    }else{
+      $total_charges = intval($repacking_charges) + intval($ot_charges) + intval($totalchargesdata['total_charges']) + intval($totalchargesdata['total_processing_charges']) - intval($totalchargesdata['ice_charges']);
+    }
+    if(!empty($ot_charges)){
+      $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($ot_charges) + intval($total_processing_charges) + intval($totalchargesdata['total_charges']);
+    }else{
+      $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($totalchargesdata['total_charges']) + intval($totalchargesdata['total_processing_charges']) - intval($totalchargesdata['ot_charges']);
+    }
     if(!empty($balancedata['balance_amount'])){
       $grand_total_charges = $balancedata['balance_amount'] + $total_charges;
     }else{
