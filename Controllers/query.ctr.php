@@ -1007,7 +1007,7 @@ Class Query{
     $comname = $commondity_name['category_name'];
 
     // ColdStore
-    $datastmt = $pdo->prepare("SELECT * FROM coldstore WHERE id < '$updateid'");
+    $datastmt = $pdo->prepare("SELECT * FROM coldstore WHERE id < '$updateid' AND commondity_id='$commondity_id'");
     $datastmt->execute();
     $data = $datastmt->fetch(PDO::FETCH_ASSOC);
     if(!empty($data)){
@@ -1031,7 +1031,7 @@ Class Query{
     }
 
     // Labour
-    $labourstmt = $pdo->prepare("SELECT * FROM labour WHERE id < '$updateid'");
+    $labourstmt = $pdo->prepare("SELECT * FROM labour WHERE id < '$updateid' AND commondity_id='$commondity_id'");
     $labourstmt->execute();
     $labour = $labourstmt->fetch(PDO::FETCH_ASSOC);
     if(!empty($labour)){
@@ -1219,7 +1219,30 @@ Class Query{
     $balancestmt->execute();
     $balancedata= $balancestmt->fetch(PDO::FETCH_ASSOC);
 
+<<<<<<< HEAD
     $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($ot_charges) + intval($total_processing_charges) + intval($totalchargesdata['total_charges']);
+=======
+    if(!empty($total_processing_charges)){
+      $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($ot_charges) + intval($total_processing_charges) + intval($totalchargesdata['total_charges']);
+    }else{
+      $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($ot_charges) + intval($totalchargesdata['total_charges']) - intval($totalchargesdata['total_processing_charges']);
+    }
+    if(!empty($repacking_charges)){
+      $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($ot_charges) + intval($total_processing_charges) + intval($totalchargesdata['total_charges']);
+    }else{
+      $total_charges = intval($ice_charges) + intval($ot_charges) + intval($totalchargesdata['total_charges']) + intval($totalchargesdata['total_processing_charges']) - intval($totalchargesdata['repacking_charges']);
+    }
+    if(!empty($ice_charges)){
+      $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($ot_charges) + intval($total_processing_charges) + intval($totalchargesdata['total_charges']);
+    }else{
+      $total_charges = intval($repacking_charges) + intval($ot_charges) + intval($totalchargesdata['total_charges']) + intval($totalchargesdata['total_processing_charges']) - intval($totalchargesdata['ice_charges']);
+    }
+    if(!empty($ot_charges)){
+      $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($ot_charges) + intval($total_processing_charges) + intval($totalchargesdata['total_charges']);
+    }else{
+      $total_charges = intval($repacking_charges) + intval($ice_charges) + intval($totalchargesdata['total_charges']) + intval($totalchargesdata['total_processing_charges']) - intval($totalchargesdata['ot_charges']);
+    }
+>>>>>>> 7818c6fa385bd0c7748758116c0912b268c1f9e1
     if(!empty($balancedata['balance_amount'])){
       $grand_total_charges = $balancedata['balance_amount'] + $total_charges;
     }else{
@@ -2948,6 +2971,28 @@ Class Query{
 
     $adddeclare = $pdo->prepare("INSERT INTO trucktotalcosting(item_id, size, total_kg, invoice_no, link_id) VALUES('$commondity', '$size', '$kgperbox', '$invoice_no', '$lastid')");
     $adddeclare->execute();
+  }
+
+  function updatetruckpackinglistinfo($commondity, $size, $pcsperbox, $kgperbox, $mc, $updateid){
+    global $pdo;
+
+    $totalnetweight = floatval($kgperbox) * intval($mc);
+    $totalgrossweight = intval($mc) * 60;
+
+    $updatetruckpackingliststmt = $pdo->prepare("UPDATE truckpackingliststockinfo SET item_id='$commondity', size='$size', pcsperbox='$pcsperbox', kgperbox='$kgperbox', mc='$mc', netweight='$totalnetweight', totalgrossweight='$totalgrossweight' WHERE id='$updateid'");
+    $updatetruckpackingliststmt->execute();
+
+    $updatedeclarestmt = $pdo->prepare("UPDATE truckdeclare SET item_id='$commondity', size='$size', pcsperbox='$pcsperbox', mc='$mc' WHERE link_id='$updateid'");
+    $updatedeclarestmt->execute();
+
+    $updatefoamboxstmt = $pdo->prepare("UPDATE truckfoambox SET item_id='$commondity', size='$size', pcsperbox='$pcsperbox', kgperbox='$kgperbox', mc='$mc', netweight='$totalnetweight' WHERE link_id='$updateid'");
+    $updatefoamboxstmt->execute();
+
+    $updateinvoicestmt = $pdo->prepare("UPDATE truckactualinvoice SET item_id='$commondity', size='$size', pcsperbox='$pcsperbox', kgperbox='$kgperbox', mc='$mc', netweight='$totalnetweight' WHERE link_id='$updateid'");
+    $updateinvoicestmt->execute();
+
+    $updatetrucktotalcostingstmt = $pdo->prepare("UPDATE trucktotalcosting SET item_id='$commondity', size='$size', total_kg='$kgperbox' WHERE link_id='$updateid'");
+    $updatetrucktotalcostingstmt->execute();
   }
 
   function updatetruckactualinvoice($usd, $updateid){
