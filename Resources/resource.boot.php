@@ -179,7 +179,7 @@ class Bootstrap
           border-radius: 0 !important;
         }
         .sidebarcol{
-          position:absolute;
+          position:fixed;
           height: 100%;
           width: 16% !important;
         }
@@ -195,7 +195,7 @@ class Bootstrap
             width: 96% !important;
           }
           .sidebarnocol{
-            position:absolute;
+            position:fixed;
             height: 100%;
             width: 4.8% !important;
           }
@@ -212,7 +212,7 @@ class Bootstrap
             width: 96% !important;
           }
           .sidebarnocol{
-            position:absolute;
+            position:fixed;
             height: 100%;
             width: 4.8% !important;
           }

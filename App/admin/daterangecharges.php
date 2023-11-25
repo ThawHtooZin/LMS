@@ -54,7 +54,8 @@ $query = new Query();
       $ice_charges = $_POST['ice_charges'];
       $ot_charges = $_POST['ot_charges'];
       $total_processing_charges = $_POST['total_processing_charges'];
-      $query->updatecoldstoretotal($id, $repacking_charges, $ice_charges, $ot_charges, $total_processing_charges);
+      $extra_charges = $_POST['extra_charges'];
+      $query->updatecoldstoretotal($id, $repacking_charges, $ice_charges, $ot_charges, $total_processing_charges, $extra_charges);
     }
 
     if(isset($_POST['paymentbtn'])){
@@ -570,12 +571,13 @@ $query = new Query();
                   <th style="text-align:center;">Repacking Charges</th>
                   <th style="text-align:center;">Ice Charges</th>
                   <th style="text-align:center;">OT Charges</th>
+                  <th style="text-align:center;">Extra Charges</th>
                   <th style="text-align:center;">Total Charges</th>
                   <th style="text-align:center;">Grand Total Charges</th>
                   <th style="text-align:center;">Payment Date</th>
                   <th style="text-align:center;">Payment Amount</th>
                   <th style="text-align:center;">Balance Amount</th>
-                  <th>Remark</th>
+                  <th style="text-align: center; width: 150px;">Remark</th>
                 </tr>
                 <?php
                 $totalstmt = $pdo->prepare("SELECT * FROM total_charges");
@@ -632,12 +634,13 @@ $query = new Query();
                   <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['repacking_charges'] != "0"){ echo $total_charges_data['repacking_charges'];} ; ?></td>
                   <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['ice_charges'] != "0"){ echo $total_charges_data['ice_charges'];} ; ?></td>
                   <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['ot_charges'] != "0"){ echo $total_charges_data['ot_charges'];} ; ?></td>
+                  <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['extra_charges'] != "0"){ echo $total_charges_data['extra_charges'];} ; ?></td>
                   <td style="text-align:center;"><?php if($total_charges_data['total_charges'] != "0"){ echo $total_charges_data['total_charges'];} ; ?></td>
                   <td style="text-align:center;"><?php if($total_charges_data['grand_total_charges'] != "0"){ echo $grand_total_charges;} ; ?></td>
                   <td style="text-align:center;"><?php if($total_charges_data['payment_date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($total_charges_data['payment_date'])); } ; ?></td>
                   <td style="text-align:center;"><?php if($total_charges_data['payment_amount'] != "0"){ echo $total_charges_data['payment_amount']; }; ?></td>
                   <td style="text-align:center;"><?php if($total_charges_data['balance_amount'] != "0"){ echo $total_charges_data['balance_amount'];}; ?></td>
-                  <td data-bs-toggle="modal" data-bs-target="#remark<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['remark'] != "0"){ echo $total_charges_data['remark'];}; ?></td>
+                  <td data-bs-toggle="modal" data-bs-target="#remark<?php echo $total_charges_data['id']; ?>" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px;"><?php if($total_charges_data['remark'] != "0"){ echo $total_charges_data['remark'];}; ?></td>
                 </tr>
                 <!-- Add updatetotalcharges -->
                 <div class="modal fade" id="updatetotalcharges<?php echo $total_charges_data['id']; ?>">
@@ -677,10 +680,16 @@ $query = new Query();
                             <input type="number" name="total_processing_charges" class="form-control inpv2 mb-2" value="<?php if(!empty($updatedata['total_processing_charges'])){ echo $updatedata['total_processing_charges']; } ?>">
                           </div>
                         </div>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
-                        <button type="submit" name="updatetotalcharges" class="btn btn-warning">Update</button>
+                        <div class="row">
+                          <div class="col">
+                          <label>Extra Charges</label>
+                            <input type="number" name="extra_charges" class="form-control inpv2 mb-2" value="<?php if(!empty($updatedata['extra_charges'])){ echo $updatedata['extra_charges']; } ?>">
+                          </div>
+                          <div class="col mt-4">
+                            <button type="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
+                            <button type="submit" name="updatetotalcharges" class="btn btn-warning">Update</button>
+                          </div>
+                        </div>
                       </div>
                     </form>
                     </div>
@@ -700,7 +709,7 @@ $query = new Query();
                       <div class="modal-body">
                         <div class="">
                           <label>Remark</label>
-                          <input type="text" name="remark" value="" class="form-control inpv2 mt-2 mb-3">
+                          <input type="text" name="remark" value="<?= $total_charges_data['remark']; ?>" class="form-control inpv2 mt-2 mb-3">
                         </div>
                       </div>
                         <div class="card-footer p-3">

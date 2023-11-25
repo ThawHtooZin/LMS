@@ -864,7 +864,6 @@ Class Query{
         }else{
           $ptotal_mc = intval($mc);
           $ptotal_kg = intval($kg);
-          $pcharges = $pcharges;
           $totalprocessingcharges = intval($pcharges);
         }
       }elseif(str_contains(strtolower($comname), 'pujanut')){
@@ -1207,7 +1206,7 @@ Class Query{
 
   }
 
-  function updatecoldstoretotal($id, $repacking_charges, $ice_charges, $ot_charges, $total_processing_charges){
+  function updatecoldstoretotal($id, $repacking_charges, $ice_charges, $ot_charges, $total_processing_charges, $extra_charges){
     global $pdo;
 
     $totalchargesstmt = $pdo->prepare("SELECT * FROM total_charges WHERE id='$id'");
@@ -1229,7 +1228,7 @@ Class Query{
     $balancestmt->execute();
     $balancedata= $balancestmt->fetch(PDO::FETCH_ASSOC);
     
-    $total_charges = floatval($repacking_charges) + floatval($ice_charges) + floatval($ot_charges) + floatval($total_processing_charges) + floatval($coldstoredata['charges']) + floatval($labourdata['charges']);
+    $total_charges = floatval($repacking_charges) + floatval($ice_charges) + floatval($ot_charges) + floatval($total_processing_charges) + floatval($extra_charges) + floatval($coldstoredata['charges']) + floatval($labourdata['charges']);
 
     if(!empty($balancedata['balance_amount'])){
       $grand_total_charges = $balancedata['balance_amount'] + $total_charges;
@@ -1237,7 +1236,7 @@ Class Query{
       $grand_total_charges = $total_charges;
     }
     $balance_amount = $grand_total_charges;
-    $updatestmt = $pdo->prepare("UPDATE total_charges SET repacking_charges='$repacking_charges', ice_charges='$ice_charges', ot_charges='$ot_charges', total_processing_charges='$total_processing_charges', total_charges='$total_charges', grand_total_charges='$grand_total_charges', balance_amount='$balance_amount' WHERE id='$id'");
+    $updatestmt = $pdo->prepare("UPDATE total_charges SET repacking_charges='$repacking_charges', ice_charges='$ice_charges', ot_charges='$ot_charges', extra_charges='$extra_charges', total_processing_charges='$total_processing_charges', total_charges='$total_charges', grand_total_charges='$grand_total_charges', balance_amount='$balance_amount' WHERE id='$id'");
     $updatestmt->execute();
   }
 
@@ -2729,7 +2728,7 @@ Class Query{
   function addbankdetail($company_name,$company_address,$usd,$account_type,$bank_name,$swift_code,$bank_branch_address,$branch_name,$infoid){
     global $pdo;
 
-    $addbankdetailstmt = $pdo->prepare("INSERT INTO bankdetail(company_name,company_address,usd,account_type,bank_name,swift_code,bank_branch_address,branch_name,infoid) VALUES('$company_name','$company_address','$usd','$account_type','$bank_name','$swift_code','$bank_branch_address','$branch_name','$infoid')");
+    $addbankdetailstmt = $pdo->prepare("UPDATE bankdetail SET company_name='$company_name',company_address='$company_address',usd='$usd',account_type='$account_type',bank_name='$bank_name',swift_code='$swift_code',bank_branch_address='$bank_branch_address',branch_name='$branch_name' WHERE infoid='$infoid'");
     $addbankdetailstmt->execute();
   }
 
@@ -3959,8 +3958,8 @@ Class Query{
       return $this->search('general_ledger', 'ac_code', $ac_code);
     }else{
       return $this->selectdbw('general_ledger', $date_from, $date_to);
-      $searchstmt->execute();
-      return $searchdata = $searchstmt->fetchall();
+      // $searchstmt->execute();
+      // return $searchdata = $searchstmt->fetchall();
     }
    }
 

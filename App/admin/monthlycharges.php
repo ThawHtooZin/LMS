@@ -209,7 +209,7 @@ $query = new Query();
                   <th>Action</th>
                 </tr>
                 <?php
-                $fishcoldstoredatas = $query->selectall('gfcfishcoldstore', 'date');
+                $fishcoldstoredatas = $query->selectall('gfcfishcoldstore');
                 $idd = 0;
                 $gfcdatecoldstore = $query->selectdesc('gfcfishcoldstore');
                 foreach ($fishcoldstoredatas as $fishcoldstoredata) {
@@ -304,13 +304,13 @@ $query = new Query();
                           if(strtolower($fishcoldstoredata['ite']) == 'export'){
                             if($fishcoldstoredata['total_mc'] != $lastrowdata['total_mc'] - $fishcoldstoredata['mc']){
                               $total_mc = $lastrowdata['total_mc'] - $fishcoldstoredata['mc'];
-                              $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc' WHERE id='$nowid' AND ite='export' AND date='$date' AND total_mc!='0'");
+                              $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_mc='$total_mc' WHERE id='$nowid' AND ite='export' AND date='$date'");
                               $updatestmt->execute();
                             }
 
                             if($fishcoldstoredata['total_kg'] != $lastrowdata['total_kg'] - $fishcoldstoredata['kg']){
                               $total_kg = $lastrowdata['total_kg'] - $fishcoldstoredata['kg'];
-                              $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_kg='$total_kg' WHERE id='$nowid' AND total_kg!='0'");
+                              $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_kg='$total_kg' WHERE id='$nowid'");
                               $updatestmt->execute();
                             }
                           }
@@ -330,7 +330,7 @@ $query = new Query();
                           }
 
                           if(strtolower($fishcoldstoredata['ite']) == 'takeout'){
-                            $chargeslastrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$nowid' AND date='$date' AND ite='takeout' ORDER BY id DESC");
+                            $chargeslastrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$nowid' ORDER BY id DESC");
                             $chargeslastrowstmt->execute();
                             $chargeslastrowdata = $chargeslastrowstmt->fetch(PDO::FETCH_ASSOC);
                             if(!empty($chargeslastrowdata)){
@@ -342,7 +342,7 @@ $query = new Query();
                               ite='takeout' && charges!='0'");
                               $updatestmt->execute();
                           }elseif($fishcoldstoredata['ite'] == 'export'){
-                            $chargeslastrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$nowid' AND date='$date' AND ite='export' ORDER BY id DESC");
+                            $chargeslastrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$nowid' ORDER BY id DESC");
                             $chargeslastrowstmt->execute();
                             $chargeslastrowdata = $chargeslastrowstmt->fetch(PDO::FETCH_ASSOC);
                             if(!empty($chargeslastrowdata)){
@@ -370,7 +370,11 @@ $query = new Query();
                       }
 
                       if($fishcoldstoredata['total_charges'] != $fishtotal_charges){
-                        $total_charges = $totalchargeslastrowdata['total_charges'] + $fishcoldstoredata['charges'];
+                        if(!empty($totalchargeslastrowdata['total_charges'])){
+                          $total_charges = $totalchargeslastrowdata['total_charges'] + $fishcoldstoredata['charges'];
+                        }else{
+                          $total_charges = 0 + $fishcoldstoredata['charges'];
+                        }
                         $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET total_charges='$total_charges' WHERE id='$nowid' AND total_charges!='0'");
                         $updatestmt->execute();
                       }
@@ -531,7 +535,7 @@ $query = new Query();
                   <th>Remark</th>
                 </tr>
                 <?php
-                $fishlabourdatas = $query->selectall('gfcfishlabour', 'date');
+                $fishlabourdatas = $query->selectall('gfcfishlabour');
                 foreach ($fishlabourdatas as $fishlabourdata) {
 
                   $nowid = $fishlabourdata['id'];
@@ -602,7 +606,7 @@ $query = new Query();
                   <th>Action</th>
                 </tr>
                 <?php
-                $dryfishcoldstoredatas = $query->selectall('gfcdryfishcoldstore', 'date');
+                $dryfishcoldstoredatas = $query->selectall('gfcdryfishcoldstore');
 
                 $gfcdatedrycoldstore = $query->selectdesc('gfcdryfishcoldstore');
                 foreach ($dryfishcoldstoredatas as $dryfishcoldstoredata) {
@@ -896,7 +900,7 @@ $query = new Query();
                   <th>Remark</th>
                 </tr>
                 <?php
-                $dryfishlabourdatas = $query->selectall('gfcdryfishlabour', 'date');
+                $dryfishlabourdatas = $query->selectall('gfcdryfishlabour');
                 foreach ($dryfishlabourdatas as $dryfishlabourdata) {
                   $nowid = $dryfishlabourdata['id'];
                   $lastrowdatastmt = $pdo->prepare("SELECT * FROM gfcdryfishlabour WHERE id<'$nowid' ORDER BY id DESC");
