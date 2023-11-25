@@ -2731,9 +2731,18 @@ Class Query{
 
   function addbankdetail($company_name,$company_address,$usd,$account_type,$bank_name,$swift_code,$bank_branch_address,$branch_name,$infoid){
     global $pdo;
+    
+    $stmt = $pdo->prepare("SELECT * FROM bankdetail WHERE infoid='$infoid'");
+    $stmt->execute();
+    $checkavaliable = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $addbankdetailstmt = $pdo->prepare("UPDATE bankdetail SET company_name='$company_name',company_address='$company_address',usd='$usd',account_type='$account_type',bank_name='$bank_name',swift_code='$swift_code',bank_branch_address='$bank_branch_address',branch_name='$branch_name' WHERE infoid='$infoid'");
-    $addbankdetailstmt->execute();
+    if(!empty($checkavaliable)){
+      $updatebankdetailstmt = $pdo->prepare("UPDATE bankdetail SET company_name='$company_name',company_address='$company_address',usd='$usd',account_type='$account_type',bank_name='$bank_name',swift_code='$swift_code',bank_branch_address='$bank_branch_address',branch_name='$branch_name' WHERE infoid='$infoid'");
+      $updatebankdetailstmt->execute();
+    }else{
+      $addbankdetailstmt = $pdo->prepare("INSERT INTO bankdetail(company_name, company_address, usd, account_type, bank_name, swift_code, bank_branch_address, branch_name, infoid) VALUES('$company_name', '$company_address', '$usd', '$account_type', '$bank_name', '$swift_code', '$bank_branch_address', '$branch_name', '$infoid');");
+      $addbankdetailstmt->execute();
+    }
   }
 
   function updatepackinglist($upitem_id, $upsize, $upkgperbox, $upmc, $upid){

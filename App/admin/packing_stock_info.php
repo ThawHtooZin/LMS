@@ -827,7 +827,7 @@ $query = new Query();
                        <td style="visibility:hidden;">--------------</td>
                        <td class="datas"><p><?php if(!empty($packingstockinfobankdata['account_type'])){echo $packingstockinfobankdata['account_type'];}; ?></p></td>
                      </tr>
-                     <tr>
+                     <tr> 
                        <td><p>Bank Name : </p></td>
                        <td class="inputs"><p><input type="text" name="bank_name" class="form-control inpv2" placeholder="Enter Bank Name" value="<?php if(!empty($packingstockinfobankdata)){echo $packingstockinfobankdata['bank_name'];} ?>"></p></td>
                        <td style="visibility:hidden;">--------------</td>
