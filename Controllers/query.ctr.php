@@ -1218,16 +1218,16 @@ Class Query{
     $coldstorestmt = $pdo->prepare("SELECT * FROM coldstore WHERE id='$link_id'");
     $coldstorestmt->execute();
     $coldstoredata = $coldstorestmt->fetch(PDO::FETCH_ASSOC);
-    
+
     $labourstmt = $pdo->prepare("SELECT * FROM labour WHERE id='$link_id'");
     $labourstmt->execute();
     $labourdata = $labourstmt->fetch(PDO::FETCH_ASSOC);
-    
+
 
     $balancestmt = $pdo->prepare("SELECT * FROM total_charges WHERE id<'$id' ORDER BY id DESC");
     $balancestmt->execute();
     $balancedata= $balancestmt->fetch(PDO::FETCH_ASSOC);
-    
+
     $total_charges = floatval($repacking_charges) + floatval($ice_charges) + floatval($ot_charges) + floatval($total_processing_charges) + floatval($extra_charges) + floatval($coldstoredata['charges']) + floatval($labourdata['charges']);
 
     if(!empty($balancedata['balance_amount'])){
@@ -2109,22 +2109,26 @@ Class Query{
 
     if(!empty($lastdata)){
       if (!empty($fishcoldstoredata['total_charges'])) {
-        $totalfishcoldstorecharges = $fishcoldstoredata['total_charges'] - $lastdata['totalfishcoldstorecharges'];
+        // $totalfishcoldstorecharges = $lastdata['totalfishcoldstorecharges'] - $fishcoldstoredata['total_charges'];
+        $totalfishcoldstorecharges = $fishcoldstoredata['total_charges'];
       }else{
         $totalfishcoldstorecharges = 0;
       }
       if (!empty($fishlabourdata['total_charges'])) {
-        $totalfishlabourcharges = $fishlabourdata['total_charges'] - $lastdata['totalfishlabourcharges'];
+        // $totalfishlabourcharges = $lastdata['totalfishlabourcharges'] - $fishlabourdata['total_charges'];
+        $totalfishlabourcharges = $fishlabourdata['total_charges'];
       }else{
         $totalfishlabourcharges = 0;
       }
       if (!empty($dryfishcoldstoredata['total_charges'])) {
-        $totaldryfishcoldstorecharges = $dryfishcoldstoredata['total_charges'] - $lastdata['totaldryfishcoldstorecharges'];
+        // $totaldryfishcoldstorecharges = $dryfishcoldstoredata['total_charges'] - $lastdata['totaldryfishcoldstorecharges'];
+        $totaldryfishcoldstorecharges = $dryfishcoldstoredata['total_charges'];
       }else{
         $totaldryfishcoldstorecharges = 0;
       }
       if (!empty($dryfishlabourdata['total_charges'])) {
-        $totaldryfishlabourcharges = $dryfishlabourdata['total_charges'] - $lastdata['totaldryfishlabourcharges'];
+        // $totaldryfishlabourcharges = $dryfishlabourdata['total_charges'] - $lastdata['totaldryfishlabourcharges'];
+        $totaldryfishlabourcharges = $dryfishlabourdata['total_charges'];
       }else{
         $totaldryfishlabourcharges = 0;
       }
