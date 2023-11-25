@@ -805,13 +805,13 @@ $query = new Query();
                      </tr>
                      <tr>
                        <td><p>Company Name : </p></td>
-                       <td class="inputs"><p><input type="text" name="company_name" class="form-control inpv2" placeholder="Enter Company Name" value="<?= $packingstockinfobankdata['company_name']; ?>"></p></td>
+                       <td class="inputs"><p><input type="text" name="company_name" class="form-control inpv2" placeholder="Enter Company Name" value="<?php if(!empty($packingstockinfodata)){ echo $packingstockinfobankdata['company_name'];}; ?>"></p></td>
                        <td style="visibility:hidden;">--------------</td>
                        <td class="datas"><p><?php if(!empty($packingstockinfobankdata['company_name'])){echo $packingstockinfobankdata['company_name'];}; ?></p></td>
                      </tr>
                      <tr>
                        <td><p>Company Address : </p></td>
-                       <td class="inputs"><p><input type="text" name="company_address" class="form-control inpv2" placeholder="Enter Company Address" value="<?= $packingstockinfobankdata['company_address']; ?>"></p></td>
+                       <td class="inputs"><p><input type="text" name="company_address" class="form-control inpv2" placeholder="Enter Company Address" value="<?php if(!empty($packingstockinfodata)){ echo $packingstockinfobankdata['company_address'];}; ?>"></p></td>
                        <td style="visibility:hidden;">--------------</td>
                        <td class="datas"><p><?php if(!empty($packingstockinfobankdata['company_address'])){echo $packingstockinfobankdata['company_address'];}; ?></p></td>
                      </tr>
@@ -823,31 +823,31 @@ $query = new Query();
                      </tr>
                      <tr>
                        <td><p>Account Type : </p></td>
-                       <td class="inputs"><p><input type="text" name="account_type" class="form-control inpv2" placeholder="Enter Account Type" value="<?= $packingstockinfobankdata['account_type']; ?>"></p></td>
+                       <td class="inputs"><p><input type="text" name="account_type" class="form-control inpv2" placeholder="Enter Account Type" value="<?php if(!empty($packingstockinfodata)){ echo $packingstockinfobankdata['account_type'];}; ?>"></p></td>
                        <td style="visibility:hidden;">--------------</td>
                        <td class="datas"><p><?php if(!empty($packingstockinfobankdata['account_type'])){echo $packingstockinfobankdata['account_type'];}; ?></p></td>
                      </tr>
                      <tr>
                        <td><p>Bank Name : </p></td>
-                       <td class="inputs"><p><input type="text" name="bank_name" class="form-control inpv2" placeholder="Enter Bank Name" value="<?= $packingstockinfobankdata['bank_name']; ?>"></p></td>
+                       <td class="inputs"><p><input type="text" name="bank_name" class="form-control inpv2" placeholder="Enter Bank Name" value="<?php if(!empty($packingstockinfodata)){ echo $packingstockinfobankdata['bank_name'];}; ?>"></p></td>
                        <td style="visibility:hidden;">--------------</td>
                        <td class="datas"><p><?php if(!empty($packingstockinfobankdata['bank_name'])){echo $packingstockinfobankdata['bank_name'];}; ?></p></td>
                      </tr>
                      <tr>
                        <td><p>Swift Code : </p></td>
-                       <td class="inputs"><p><input type="text" name="swift_code" class="form-control inpv2" placeholder="Enter Swift Code" value="<?= $packingstockinfobankdata['swift_code']; ?>"></p></td>
+                       <td class="inputs"><p><input type="text" name="swift_code" class="form-control inpv2" placeholder="Enter Swift Code" value="<?php if(!empty($packingstockinfodata)){ echo $packingstockinfobankdata['swift_code'];}; ?>"></p></td>
                        <td style="visibility:hidden;">--------------</td>
                        <td class="datas"><p><?php if(!empty($packingstockinfobankdata['swift_code'])){echo $packingstockinfobankdata['swift_code'];}; ?></p></td>
                      </tr>
                      <tr>
                        <td><p>Bank Branch Address : </p></td>
-                       <td class="inputs"><p><input type="text" name="bank_branch_address" class="form-control inpv2" placeholder="Enter Bank Branch Address" value="<?= $packingstockinfobankdata['bank_branch_address']; ?>"></p></td>
+                       <td class="inputs"><p><input type="text" name="bank_branch_address" class="form-control inpv2" placeholder="Enter Bank Branch Address" value="<?php if(!empty($packingstockinfodata)){ echo $packingstockinfobankdata['bank_branch_address'];}; ?>"></p></td>
                        <td style="visibility:hidden;">--------------</td>
                        <td class="datas"><p><?php if(!empty($packingstockinfobankdata['bank_branch_address'])){echo $packingstockinfobankdata['bank_branch_address'];}; ?></p></td>
                      </tr>
                      <tr>
                        <td><p>Branch Name : </p></td>
-                       <td class="inputs"><p><input type="text" name="branch_name" class="form-control inpv2" placeholder="Enter Branch Name" value="<?= $packingstockinfobankdata['branch_name']; ?>"></p></td>
+                       <td class="inputs"><p><input type="text" name="branch_name" class="form-control inpv2" placeholder="Enter Branch Name" value="<?php if(!empty($packingstockinfodata)){ echo $packingstockinfobankdata['branch_name'];}; ?>"></p></td>
                        <td style="visibility:hidden;">--------------</td>
                        <td class="datas"><p><?php if(!empty($packingstockinfobankdata['branch_name'])){echo $packingstockinfobankdata['branch_name'];}; ?></p></td>
                      </tr>
