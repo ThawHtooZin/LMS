@@ -299,8 +299,16 @@ Class Query{
 
     function additem($table, $item_name){
       global $pdo;
-      $stmt = $pdo->prepare("INSERT INTO $table(item_name) VALUES('$item_name');");
-      $stmt->execute();
+      $checkstmt = $pdo->prepare("SELECT * FROM $table");
+      $checkstmt->execute();
+      $checkdata = $checkstmt->fetchall();
+      if(empty($checkdata)){
+        $stmt = $pdo->prepare("INSERT INTO $table(item_id, item_name) VALUES(1001, '$item_name');");
+        $stmt->execute();
+      }else{
+        $stmt = $pdo->prepare("INSERT INTO $table(item_name) VALUES('$item_name');");
+        $stmt->execute();
+      }
       if($stmt){
         return $successmessage = "Item Added Successfully";
       }else{
@@ -2661,6 +2669,7 @@ Class Query{
   function updateinvoicecosting($priceperviss, $yield, $packing_material, $ocean_pacific, $tax, $agent, $transport, $updateid, $dollar, $commondity_id, $size){
     global $pdo;
 
+    $_SESSION['yield'] = $yield;
     $_SESSION['ocean_pacific'] = $ocean_pacific;
     $_SESSION['agent'] = $agent;
     $_SESSION['transport'] = $transport;
@@ -2669,9 +2678,8 @@ Class Query{
     if($priceperviss != 0 || $yield != 0 || $packing_material != 0){
       $priceperkg = intval($priceperviss) / 1.634;
       if(str_contains($yield, '-')){
-        $yield = explode('-', $yield);
-        $yield = $yield[1];
-        $percentage = (100 - intval($yield)) / 100;
+        $explodedyield = explode('-', $yield);
+        $percentage = (100 - intval($explodedyield)) / 100;
       }else{
          $yield;
          $percentage = (100 + round($yield, 4)) / 100;
@@ -2686,7 +2694,7 @@ Class Query{
       $usd = intval($total_price) / intval($dollar);
       $total_usd = floatval($usd) + floatval($packing_material) + floatval($ocean_pacific) + floatval($tax) + floatval($agent) + floatval($transport);
       $total_kg_price = $total_usd * $totalkgdata['totalkg'];
-
+      
       $updateinvoicecostingstmt = $pdo->prepare("UPDATE invoice_costing SET priceperviss='$priceperviss', priceperkg='$priceperkg', yield='$yield', total_price='$total_price', usd='$usd', packing_material='$packing_material', ocean_pacific='$ocean_pacific', tax='$tax', agent='$agent', transport='$transport', total_usd='$total_usd', total_kg_price='$total_kg_price'
       WHERE id='$updateid'");
       $updateinvoicecostingstmt->execute();
@@ -2725,7 +2733,7 @@ Class Query{
     $updatestockstmt->execute();
   }
 
-  function addbankdetail($company_name,$company_address,$usd,$account_type,$bank_name,$swift_code,$bank_branch_address,$branch_name,$infoid){
+  function addbankdetail($company_name,$company_address,$usd,$account_type,$bank_name,$swift_code,$bank_branch_address,$infoid){
     global $pdo;
     
     $stmt = $pdo->prepare("SELECT * FROM bankdetail WHERE infoid='$infoid'");
@@ -2733,10 +2741,10 @@ Class Query{
     $checkavaliable = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if(!empty($checkavaliable)){
-      $updatebankdetailstmt = $pdo->prepare("UPDATE bankdetail SET company_name='$company_name',company_address='$company_address',usd='$usd',account_type='$account_type',bank_name='$bank_name',swift_code='$swift_code',bank_branch_address='$bank_branch_address',branch_name='$branch_name' WHERE infoid='$infoid'");
+      $updatebankdetailstmt = $pdo->prepare("UPDATE bankdetail SET company_name='$company_name',company_address='$company_address',usd='$usd',account_type='$account_type',bank_name='$bank_name',swift_code='$swift_code',bank_branch_address='$bank_branch_address' WHERE infoid='$infoid'");
       $updatebankdetailstmt->execute();
     }else{
-      $addbankdetailstmt = $pdo->prepare("INSERT INTO bankdetail(company_name, company_address, usd, account_type, bank_name, swift_code, bank_branch_address, branch_name, infoid) VALUES('$company_name', '$company_address', '$usd', '$account_type', '$bank_name', '$swift_code', '$bank_branch_address', '$branch_name', '$infoid');");
+      $addbankdetailstmt = $pdo->prepare("INSERT INTO bankdetail(company_name, company_address, usd, account_type, bank_name, swift_code, bank_branch_address, infoid) VALUES('$company_name', '$company_address', '$usd', '$account_type', '$bank_name', '$swift_code', '$bank_branch_address', '$infoid');");
       $addbankdetailstmt->execute();
     }
   }

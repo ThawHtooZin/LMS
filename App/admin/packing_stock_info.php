@@ -65,10 +65,9 @@ $query = new Query();
           $bank_name = $_POST['bank_name'];
           $swift_code = $_POST['swift_code'];
           $bank_branch_address = $_POST['bank_branch_address'];
-          $branch_name = $_POST['branch_name'];
           $infoid = $_GET['infoid'];
 
-          $query->addbankdetail($company_name,$company_address,$usd,$account_type,$bank_name,$swift_code,$bank_branch_address,$branch_name,$infoid);
+          $query->addbankdetail($company_name,$company_address,$usd,$account_type,$bank_name,$swift_code,$bank_branch_address,$infoid);
       }
     }
 
@@ -844,12 +843,6 @@ $query = new Query();
                        <td class="inputs"><p><input type="text" name="bank_branch_address" class="form-control inpv2" placeholder="Enter Bank Branch Address" value="<?php if(!empty($packingstockinfobankdata)){echo $packingstockinfobankdata['bank_branch_address'];} ?>"></p></td>
                        <td style="visibility:hidden;">--------------</td>
                        <td class="datas"><p><?php if(!empty($packingstockinfobankdata['bank_branch_address'])){echo $packingstockinfobankdata['bank_branch_address'];}; ?></p></td>
-                     </tr>
-                     <tr>
-                       <td><p>Branch Name : </p></td>
-                       <td class="inputs"><p><input type="text" name="branch_name" class="form-control inpv2" placeholder="Enter Branch Name" value="<?php if(!empty($packingstockinfobankdata)){echo $packingstockinfobankdata['branch_name'];} ?>"></p></td>
-                       <td style="visibility:hidden;">--------------</td>
-                       <td class="datas"><p><?php if(!empty($packingstockinfobankdata['branch_name'])){echo $packingstockinfobankdata['branch_name'];}; ?></p></td>
                      </tr>
                    </table>
                    <button type="submit" class="inputs btn btn-success text-light" name="bankingbtn">Done</button>

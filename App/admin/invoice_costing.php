@@ -180,7 +180,7 @@ $query = new Query();
                            </div>
                            <div class="col">
                              <label>Yield</label>
-                             <input type="text" name="yield" class="form-control inpv2 mb-2" value="<?= $invoicecostingdata['yield']; ?>">
+                             <input type="text" name="yield" class="form-control inpv2 mb-2" value="<?php if($invoicecostingdata['yield'] != ''){echo $invoicecostingdata['yield'];}else{ if(!empty($_SESSION['yield'])){ echo $_SESSION['yield']; } }; ?>">
                            </div>
                          </div>
                          <div class="row">

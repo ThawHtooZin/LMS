@@ -75,7 +75,7 @@ $query = new Query();
             }else{
               $pageno = 1;
             }
-            $numOfrecs = 10;
+            $numOfrecs = 12;
             $offset = ($pageno -1) * $numOfrecs;
             ?>
                     <form action="supplier.php" method="post" class=" d-inline">
@@ -241,7 +241,7 @@ $query = new Query();
                 <form action="supplier.php" method="post" autocomplete="off">
                     <div class="modal-body">
                         <label>Supplier ID</label>
-                        <input type="text" name="supplier_id" class="form-control" placeholder="Supplier ID">
+                        <input type="text" name="supplier_id" class="form-control" placeholder="Supplier ID" value="4000/">
                         <label>Supplier Name</label>
                         <input type="text" name="supplier_name" class="form-control" placeholder="Supplier Name">
                         <label>Supplier Phone</label>
