@@ -380,7 +380,7 @@ $query = new Query();
                         </tr>
                         <div class="modal fade" id="actualpackinglisteditmodal<?= $packingstockinfodata['id']; ?>">
                           <div class="modal-dialog">
-                            <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                            <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
                               <div class="modal-header bg-secondary text-light">
                                 <h1 class="modal-title fs-5">Edit Packing List</h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -582,7 +582,7 @@ $query = new Query();
                            ?>
                            <div class="modal fade" id="usdadd<?php echo $packingstockinfodata['id']; ?>">
                              <div class="modal-dialog" role="document">
-                               <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                               <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
                                  <div class="modal-header bg-info text-light">
                                    <h1 class="modal-title fs-5">Update Price Of USD</h1>
                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -722,7 +722,7 @@ $query = new Query();
                            ?>
                            <div class="modal fade" id="usdadd<?php echo $packingstockinfodata['id']; ?>">
                              <div class="modal-dialog" role="document">
-                               <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                               <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
                                  <div class="modal-header bg-info text-light">
                                    <h1 class="modal-title fs-5">Update Price Of USD</h1>
                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -895,7 +895,7 @@ $query = new Query();
                      ?>
                     <div class="modal fade" id="addfoambox<?php echo $packingstockinfodata['id']; ?>">
                       <div class="modal-dialog" role="document">
-                        <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                        <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
                           <div class="modal-header bg-info text-light">
                             <h1 class="modal-title fs-5">Add Foam Box</h1>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1030,7 +1030,7 @@ $query = new Query();
                   ?>
                  <div class="modal fade" id="addfoambox<?php echo $packingstockinfodata['id']; ?>">
                    <div class="modal-dialog" role="document">
-                     <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                     <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
                        <div class="modal-header bg-info text-light">
                          <h1 class="modal-title fs-5">Add Foam Box</h1>
                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1186,7 +1186,7 @@ $query = new Query();
                       ?>
                      <div class="modal fade" id="updatekgperbox<?php echo $packingstockinfodata['id']; ?>">
                        <div class="modal-dialog" role="document">
-                         <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                         <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
                            <div class="modal-header bg-info text-light">
                              <h1 class="modal-title fs-5">Add Kg Per Box</h1>
                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1317,7 +1317,7 @@ $query = new Query();
                   ?>
                  <div class="modal fade" id="updatekgperbox<?php echo $packingstockinfodata['id']; ?>">
                    <div class="modal-dialog" role="document">
-                     <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                     <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
                        <div class="modal-header bg-info text-light">
                          <h1 class="modal-title fs-5">Add Kg Per Box</h1>
                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1412,7 +1412,7 @@ $query = new Query();
              <!-- =============================================================== -->
              <div class="modal fade" id="add">
                <div class="modal-dialog" role="document">
-                 <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                 <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
                    <div class="modal-header bg-info text-light">
                      <h1 class="modal-title fs-5">Add Packing Stock</h1>
                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

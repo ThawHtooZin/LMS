@@ -50,8 +50,9 @@ $query = new Query();
       $id = $_POST['id'];
       $size = $_POST['size'];
       $item_id = $_POST['item_id'];
-
-      $query->updateselingrate($selling_rate, $id, $size, $item_id);
+      $voucher_no = $_GET['invoice_no'];
+      
+      $query->updatesellingrate($selling_rate, $id, $size, $item_id, $voucher_no);
     }
 
     if(isset($_POST['updatetotal'])){

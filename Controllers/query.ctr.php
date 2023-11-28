@@ -3015,7 +3015,7 @@ Class Query{
     $netweightstmt->execute();
     $netweight = $netweightstmt->fetch(PDO::FETCH_ASSOC);
 
-    $total_usd = intval($usd) * floatval($netweight['netweight']);
+    $total_usd = intval($usd) * floatval($netweight['kgperbox']);
     $updateusdstmt = $pdo->prepare("UPDATE truckactualinvoice SET usd='$usd', total_usd='$total_usd' WHERE id='$updateid'");
     $updateusdstmt->execute();
   }
@@ -3131,7 +3131,7 @@ Class Query{
     $updatestmt->execute();
   }
 
-  function updateselingrate($selling_rate, $id, $size, $item_id){
+  function updatesellingrate($selling_rate, $id, $size, $item_id, $invoice_no){
     global $pdo;
 
     $sizestmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM trucktotalcosting WHERE size='$size' AND item_id='$item_id'");
@@ -3148,6 +3148,14 @@ Class Query{
     $selling_amount = floatval($sizedata['total_kg']) * $selling_rate;
     $profit = $selling_amount - $original_cost;
 
+    $invoicestmt = $pdo->prepare("SELECT * FROM truckactualinvoice WHERE invoice_no='$invoice_no' AND item_id='$item_id' AND size='$size'");
+    $invoicestmt->execute();
+    $invoicedata = $invoicestmt->fetch(PDO::FETCH_ASSOC);
+    $kgperbox = $invoicedata['kgperbox'];
+    $total_usd = $kgperbox * $selling_rate;
+
+    $addusdstmt = $pdo->prepare("UPDATE truckactualinvoice SET usd='$selling_rate', total_usd='$total_usd' WHERE invoice_no='$invoice_no' AND item_id='$item_id' AND size='$size'");
+    $addusdstmt->execute();
     $updatestmt = $pdo->prepare("UPDATE trucktotalcosting SET selling_rate='$selling_rate', profitperkg='$profitperkg', original_cost='$original_cost', selling_amount='$selling_amount', profit='$profit' WHERE id='$id'");
     $updatestmt->execute();
   }
