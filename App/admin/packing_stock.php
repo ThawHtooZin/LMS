@@ -170,12 +170,12 @@ $query = new Query();
                             <label for="">Customer name</label>
                             <select class="form-control inpv2 mb-2" name="customer_idup">
                               <?php
-                                $customerstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no LIKE '3300%'");
+                                $customerstmt = $pdo->prepare("SELECT * FROM customers");
                                 $customerstmt->execute();
                                 $customerdatas = $customerstmt->fetchall();
                               foreach ($customerdatas as $customerdatas) {
                               ?>
-                              <option value="<?php echo $customerdatas['code_no']; ?>" <?php if($customerdatas['code_no'] == $packingdata['customer_id']){ echo 'selected'; } ?>><?php echo $customerdatas['ac_name']; ?></option>
+                              <option value="<?php echo $customerdatas['code_no']; ?>" <?php if($customerdatas['customer_id'] == $packingdata['customer_id']){ echo 'selected'; } ?>><?php echo $customerdatas['customer_name']; ?></option>
                               <?php
                                 }
                               ?>
@@ -244,12 +244,12 @@ $query = new Query();
                         <label>Customer Name</label>
                         <select class="form-control inpv2 mb-2" name="customer_id">
                           <?php
-                            $customerstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no LIKE '3300%'");
+                            $customerstmt = $pdo->prepare("SELECT * FROM customers");
                             $customerstmt->execute();
                             $customerdatas = $customerstmt->fetchall();
                            foreach ($customerdatas as $customerdatas) {
                            ?>
-                           <option value="<?php echo $customerdatas['code_no']; ?>"><?php echo $customerdatas['ac_name']; ?></option>
+                           <option value="<?php echo $customerdatas['customer_id']; ?>"><?php echo $customerdatas['customer_name']; ?></option>
                            <?php
                             }
                            ?>
