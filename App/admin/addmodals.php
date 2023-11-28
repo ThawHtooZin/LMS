@@ -190,7 +190,7 @@
 
 <!-- Container Modals -->
 
-<div class="modal fade" id="addpackingmaterialcosting" tabindex="-1" role="dialog" >
+<div class="modal fade" id="addpackingmaterialcosting<?php echo $packingmaterialdata['id']; ?>" tabindex="-1" role="dialog" >
   <div class="modal-dialog" role="document">
     <div class="modal-content" style="width: 850px; !important; margin-top:70px !important;">
       <div class="modal-header bg-secondary text-light">
@@ -203,6 +203,7 @@
         <div class="modal-body">
           <div class="row">
             <div class="col">
+              <input type="hidden" name="upid" value="<?php echo $packingmaterialdata['id']; ?>">
               <label>Commondity</label>
               <select class="form-control inpv2 mb-2" name="commondity">
               <?php
@@ -291,7 +292,7 @@
               <input type="number" name="pcspermc" class="form-control inpv2 mb-2">
             </div>
             <div class="col">
-              <label>Today Dollor Price</label>
+              <label>Dollar Rate</label>
               <input type="text" name="tdydollorprice" class="form-control inpv2 mb-2">
             </div>
           </div>
