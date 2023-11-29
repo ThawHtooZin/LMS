@@ -31,7 +31,8 @@ $query = new Query();
       $kgperbox = $_POST['kgperbox'];
       $mc = $_POST['mc'];
       $invoice_no = $_POST['invoice_no'];
-      $query->addtruckpackinglistinfo($commondity, $size, $pcsperbox, $kgperbox, $mc, $invoice_no);
+      $infoid = $_GET['infoid'];
+      $query->addtruckpackinglistinfo($commondity, $size, $pcsperbox, $kgperbox, $mc, $invoice_no, $infoid);
     }
 
     if(isset($_POST['updatepackinglist'])){

@@ -2201,7 +2201,7 @@ Class Query{
     $addpaymentstmt->execute();
   }
 
-  function addpackingmaterial($upid, $commondity_id, $fish_size, $plastic, $jcv, $inner_box, $sticker, $mc_plastic, $carton_box, $tape, $penon, $p_sticker, $plastic_rope, $micellion, $processing, $plastic_size, $pcsperlb, $pcspermc, $tdydollorprice){
+  function updatepackingmaterial($upid, $plastic, $jcv, $inner_box, $sticker, $mc_plastic, $carton_box, $tape, $penon, $p_sticker, $plastic_rope, $micellion, $processing, $plastic_size, $pcsperlb, $pcspermc, $tdydollorprice){
     global $pdo;
 
     $plastic = intval($plastic) * intval($pcspermc) / intval($pcsperlb) / 20;
@@ -2216,10 +2216,11 @@ Class Query{
     $total = intval($plastic) + intval($jcv) + intval($inner_box) + intval($sticker) + intval($mc_plastic) + intval($carton_box) + intval($tape) + intval($penon) + intval($p_sticker) + intval($plastic_rope) + intval($micellion) + intval($processing);
     $perkgcost = $total / $tdydollorprice;
     $perkgcost = round($perkgcost, 2);
-    $addpackingmaterialstmt = $pdo->prepare("INSERT INTO packingmaterial(commondity_id, fish_size, plastic, jcv, inner_box, sticker, mc_plastic, carton_box, tape, penon, p_sticker, plastic_rope, micellion, processing, total, perkgcost, plastic_size, pcsperlb, pcspermc)
-    VALUES('$commondity_id', '$fish_size', '$plastic', '$jcv', '$inner_box', '$sticker', '$mc_plastic', '$carton_box', '$tape', '$penon', '$p_sticker', '$plastic_rope', '$micellion', '$processing', '$total', '$perkgcost', '$plastic_size', '$pcsperlb', '$pcspermc')");
-    $addpackingmaterialstmt->execute();
-    $addpackingmaterialstmt = $pdo->prepare("UPDATE packingmaterial SET commondity_id='$commondity_id', fish_size='$fish_size', plastic='$plastic', jcv='$jcv', inner_box='$inner_box', sticker='$sticker', mc_plastic='$mc_plastic', carton_box='$carton_box', tape='$tape', penon='$penon', p_sticker='$p_sticker', plastic_rope='$plastic_rope', micellion='$micellion', processing='$processing', total='$total', perkgcost='$perkgcost', plastic_size='$plastic_size', pcsperlb='$pcsperlb', pcspermc='$pcspermc' WHERE id='$upid'");
+    // $addpackingmaterialstmt = $pdo->prepare("INSERT INTO packingmaterial(commondity_id, fish_size, plastic, jcv, inner_box, sticker, mc_plastic, carton_box, tape, penon, p_sticker, plastic_rope, micellion, processing, total, perkgcost, plastic_size, pcsperlb, pcspermc)
+    // VALUES('$commondity_id', '$fish_size', '$plastic', '$jcv', '$inner_box', '$sticker', '$mc_plastic', '$carton_box', '$tape', '$penon', '$p_sticker', '$plastic_rope', '$micellion', '$processing', '$total', '$perkgcost', '$plastic_size', '$pcsperlb', '$pcspermc')");
+    // $addpackingmaterialstmt->execute();
+    echo $upid;
+    $addpackingmaterialstmt = $pdo->prepare("UPDATE packingmaterial SET plastic='$plastic', jcv='$jcv', inner_box='$inner_box', sticker='$sticker', mc_plastic='$mc_plastic', carton_box='$carton_box', tape='$tape', penon='$penon', p_sticker='$p_sticker', plastic_rope='$plastic_rope', micellion='$micellion', processing='$processing', total='$total', perkgcost='$perkgcost', plastic_size='$plastic_size', pcsperlb='$pcsperlb', pcspermc='$pcspermc' WHERE id='$upid'");
     $addpackingmaterialstmt->execute();
   }
 
@@ -2641,10 +2642,10 @@ Class Query{
     $addinvoicestmt = $pdo->prepare("INSERT INTO actualinvoice(commondity_id, size, packingkgperbox, mc, totalnetweight, infoid, link_id) VALUES('$commondity', '$size', '$packingkgperbox', '$mc', '$totalnetweight', '$infoid', '$linkid')");
     $addinvoicestmt->execute();
 
-    $addpackingmaterialstmt = $pdo->prepare("INSERT INTO packingmaterial(commondity_id, fish_size, link_id) VALUES('$commondity', '$size', '$linkid')");
+    $addpackingmaterialstmt = $pdo->prepare("INSERT INTO packingmaterial(commondity_id, fish_size, link_id, infoid) VALUES('$commondity', '$size', '$linkid', '$infoid')");
     $addpackingmaterialstmt->execute();
 
-    $addinvoicecostingstmt = $pdo->prepare("INSERT INTO invoice_costing(commondity_id, size, kg, infoid, link_id) VALUES('$commondity', '$size', '$packingkgperbox', '$infoid', '$linkid')");
+    $addinvoicecostingstmt = $pdo->prepare("INSERT INTO invoice_costing(commondity_id, size, kg, link_id, infoid) VALUES('$commondity', '$size', '$packingkgperbox', '$linkid',  '$infoid')");
     $addinvoicecostingstmt->execute();
   }
 
@@ -2763,15 +2764,19 @@ Class Query{
 
     $totalnetweight = $upkgperbox * $upmc;
     $totalgrossweight = $totalnetweight + $upmc;
-
+    
+    
     $updatepackingliststmt = $pdo->prepare("UPDATE packingliststockinfo SET commondity_id='$upitem_id', size='$upsize', packingkgperbox='$upkgperbox', mc='$upmc', totalnetweight='$totalnetweight', totalgrossweight='$totalgrossweight' WHERE id='$upid'");
     $updatepackingliststmt->execute();
-
+    
     $updatepackingliststmt = $pdo->prepare("UPDATE actualinvoice SET commondity_id='$upitem_id', size='$upsize', packingkgperbox='$upkgperbox', mc='$upmc', totalnetweight='$totalnetweight' WHERE link_id='$upid'");
     $updatepackingliststmt->execute();
-
+    
     $updatepackingliststmt = $pdo->prepare("UPDATE invoice_costing SET commondity_id='$upitem_id', size='$upsize', kg='$upkgperbox' WHERE link_id='$upid'");
     $updatepackingliststmt->execute();
+
+    $updatepackingmaterialstmt = $pdo->prepare("UPDATE packingmaterial SET commondity_id='$upitem_id', fish_size='$upsize' WHERE link_id='$upid'");
+    $updatepackingmaterialstmt->execute();
   }
   function addmcstock($date, $particular, $country, $commondity_id, $size, $kg, $mc){
     global $pdo;
@@ -2958,7 +2963,7 @@ Class Query{
     $updatetrucktotalcostingstmt->execute();
   }
 
-  function addtruckpackinglistinfo($commondity, $size, $pcsperbox, $kgperbox, $mc, $invoice_no){
+  function addtruckpackinglistinfo($commondity, $size, $pcsperbox, $kgperbox, $mc, $invoice_no, $infoid){
     global $pdo;
 
     $totalnetweight = $kgperbox * $mc;
@@ -2982,7 +2987,7 @@ Class Query{
     $adddeclare = $pdo->prepare("INSERT INTO truckdeclare(item_id, size, pcsperbox, mc, invoice_no, link_id) VALUES('$commondity', '$size', '$pcsperbox', '$mc', '$invoice_no', '$lastid')");
     $adddeclare->execute();
 
-    $adddeclare = $pdo->prepare("INSERT INTO trucktotalcosting(item_id, size, total_kg, invoice_no, link_id) VALUES('$commondity', '$size', '$kgperbox', '$invoice_no', '$lastid')");
+    $adddeclare = $pdo->prepare("INSERT INTO trucktotalcosting(item_id, size, total_kg, invoice_no, link_id, infoid) VALUES('$commondity', '$size', '$kgperbox', '$invoice_no', '$lastid', '$infoid')");
     $adddeclare->execute();
   }
 
