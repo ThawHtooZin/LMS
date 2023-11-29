@@ -184,7 +184,6 @@ class Bootstrap
           width: 16% !important;
         }
 
-        // Modal cursor css
         [data-bs-toggle] {
           cursor: pointer !important;
         }
@@ -192,8 +191,6 @@ class Bootstrap
         [data-bs-toggle]:hover {
           cursor: pointer !important;
         }
-        //  Modal cursor css
-
         @media screen and (min-width: 1300px){
           .contentcol{
             left: 14.5%;
