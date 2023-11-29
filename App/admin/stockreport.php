@@ -138,40 +138,39 @@ $query = new Query();
               </tr>
               <?php
               $id = 0;
-                $hhkmcstockkgstmt = $pdo->prepare("SELECT DISTINCT size FROM hhkmcstock WHERE country='$country'");
-                $hhkmcstockkgstmt->execute();
-                $hhkmcstockkgdatas = $hhkmcstockkgstmt->fetchall();
+                $hhkmcstockcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country='$country'");
+                $hhkmcstockcommonditystmt->execute();
+                $hhkmcstockcommonditydatas = $hhkmcstockcommonditystmt->rowCount();
 
-              foreach ($hhkmcstockkgdatas as $hhkmcstockdata) {
-                $size = $hhkmcstockdata['size'];
+              for ($i=0; $i < $hhkmcstockcommonditydatas; $i++) {
+                $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country='$country'");
+                $commonditystmt->execute();
+                $commonditydata = $commonditystmt->fetchall();
+                $commondity_id = $commonditydata[$i]['commondity_id'];
 
                 if(isset($_POST['commonditybtn']) && !empty($_POST['commondity_id'])){
-                  $commondity_id = $_POST['commondity_id'];
-                  $hhkcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id'");
-                  $hhkcommonditystmt->execute();
-                  $hhkcommonditydatas = $hhkcommonditystmt->fetchall();
+                  $searchcommondity_id = $_POST['commondity_id'];
+                  $searchstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id='$searchcommondity_id' AND country='$country'");
+                  $searchstmt->execute();
+                  $datas = $searchstmt->fetchall();
                 }else{
-                  $hhkcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE size='$size' AND country='$country'");
-                  $hhkcommonditystmt->execute();
-                  $hhkcommonditydatas = $hhkcommonditystmt->fetchall();
+                  $stmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id='$commondity_id' AND country='$country' AND particular NOT LIKE '%to%' ");
+                  $stmt->execute();
+                  $datas = $stmt->fetchall();
                 }
 
-                foreach ($hhkcommonditydatas as $hhkcommonditydata) {
 
-                  $item_id = $hhkcommonditydata['commondity_id'];
+                foreach ($datas as $hhkdata) {
+                  $id++;
+                  $size = $hhkdata['size'];
+                  $item_id = $hhkdata['commondity_id']; 
                   $commonditydata = $query->select('item', $item_id, 'item_id');
 
                   $hhkcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE size='$size' AND commondity_id='$item_id'");
                   $hhkcommonditystmt->execute();
                   $hhkcommonditydatas = $hhkcommonditystmt->fetchall();
-
-                  $hhkkgstmt = $pdo->prepare("SELECT DISTINCT kg FROM hhkmcstock WHERE size='$size' AND commondity_id='$item_id'");
-                  $hhkkgstmt->execute();
-                  $hhkkgdatas = $hhkkgstmt->fetchall();
-
-                  foreach ($hhkkgdatas as $hhkkgdata) {
-                    $id++;
-                    $kg = $hhkkgdata['kg'];
+                  
+                    $kg = $hhkdata['kg'];
 
                     $fetchallstmt = $pdo->prepare("SELECT balance_mc FROM hhkmcstock WHERE size='$size' AND commondity_id='$item_id' AND kg='$kg' ORDER BY id DESC");
                     $fetchallstmt->execute();
@@ -232,7 +231,6 @@ $query = new Query();
                ?>
             </table>
             <?php
-            }
              ?>
           </div>
         </div>
