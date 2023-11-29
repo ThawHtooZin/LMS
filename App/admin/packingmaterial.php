@@ -32,8 +32,8 @@ $query = new Query();
 
             <h5 class="d-inline">Manage Packing Material Costing</h5>
             <a href="packing_stock.php" class="btn btn-danger float-end me-2 btn-sm ms-2" id="back">Back</a>
-            <a href="#" class="detailbtn btn btn-info float-end text-light btn-sm" onclick="showdetail()">Show Detail</a>
-            <a href="#" class="overviewbtn btn btn-info text-light float-end hide btn-sm" onclick="showoverview()">Show OverView</a>
+            <button  class="detailbtn btn btn-info float-end text-light btn-sm" onclick="showdetail()">Show Detail</button>
+            <button  class="overviewbtn btn btn-info text-light float-end hide btn-sm" onclick="showoverview()">Show OverView</button>
             <!-- <button type="button" class="btn btn-primary btn-sm float-end me-2">
               Add Packing Meterial Costing
             </button> -->
@@ -41,8 +41,7 @@ $query = new Query();
           <div class="card-body">
             <?php
             if(isset($_POST['addpackingmaterialbtn'])){
-              $commondity_id = $_POST['commondity'];
-              $fish_size = $_POST['fish_size'];
+              $upid = $_POST['upid'];
               $plastic = $_POST['plastic'];
               $jcv = $_POST['jcv'];
               $inner_box = $_POST['inner_box'];
@@ -60,7 +59,7 @@ $query = new Query();
               $pcspermc = $_POST['pcspermc'];
               $tdydollorprice = $_POST['tdydollorprice'];
 
-              $query->addpackingmaterial($commondity_id, $fish_size, $plastic, $jcv, $inner_box, $sticker, $mc_plastic, $carton_box, $tape, $penon, $p_sticker, $plastic_rope, $micellion, $processing, $plastic_size, $pcsperlb, $pcspermc, $tdydollorprice);
+              $query->updatepackingmaterial($upid,$plastic, $jcv, $inner_box, $sticker, $mc_plastic, $carton_box, $tape, $penon, $p_sticker, $plastic_rope, $micellion, $processing, $plastic_size, $pcsperlb, $pcspermc, $tdydollorprice);
             }
             ?>
             <?php
@@ -117,7 +116,7 @@ $query = new Query();
                 <th>Per Kg Cost</th>
               </tr>
               <?php
-              $packingmaterialdatas = $query->selectall("packingmaterial");
+              $packingmaterialdatas = $query->search("packingmaterial", 'infoid', $infoid);
               // print_r($packingmaterialdatas);
               // exit();
               foreach ($packingmaterialdatas as $packingmaterialdata) {
@@ -159,13 +158,13 @@ $query = new Query();
                 <th>Pcs Per MC</th>
               </tr>
               <?php
-              $packingmaterialdetaildatas = $query->selectall("packingmaterial");
+              $packingmaterialdetaildatas = $query->search("packingmaterial", 'infoid', $infoid);
               // print_r($packingmaterialdetaildatas);
               foreach ($packingmaterialdetaildatas as $packingmaterialdata) {
               ?>
               <tr>
                 <td><?php echo $packingmaterialdata['id']; ?></td>
-                <td><?php echo $packingmaterialdata['plastic']; ?></td>
+                <td><?php if($packingmaterialdata == 0){echo round($packingmaterialdata['plastic'], 2);}else{echo $packingmaterialdata['plastic'];} ?></td>
                 <td><?php echo $packingmaterialdata['jcv']; ?></td>
                 <td><?php echo $packingmaterialdata['inner_box']; ?></td>
                 <td><?php echo $packingmaterialdata['sticker']; ?></td>
@@ -173,8 +172,8 @@ $query = new Query();
                 <td><?php echo $packingmaterialdata['carton_box']; ?></td>
                 <td><?php echo $packingmaterialdata['tape']; ?></td>
                 <td><?php echo $packingmaterialdata['penon']; ?></td>
-                <td><?php echo $packingmaterialdata['p_sticker']; ?></td>
-                <td><?php echo $packingmaterialdata['plastic_rope']; ?></td>
+                <td><?php echo $packingmaterialdata['p_sticker']; ?></td> 
+                <td><?php if($packingmaterialdata == 0){echo round($packingmaterialdata['plastic_rope'], 2);}else{echo $packingmaterialdata['plastic_rope'];} ?></td>
                 <td><?php echo $packingmaterialdata['plastic_size']; ?></td>
                 <td><?php echo $packingmaterialdata['pcsperlb']; ?></td>
                 <td><?php echo $packingmaterialdata['pcspermc']; ?></td>

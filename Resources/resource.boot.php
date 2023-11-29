@@ -191,6 +191,13 @@ class Bootstrap
           width: 16% !important;
         }
 
+        [data-bs-toggle] {
+          cursor: pointer !important;
+        }
+
+        [data-bs-toggle]:hover {
+          cursor: pointer !important;
+        }
         @media screen and (min-width: 1300px){
           .contentcol{
             left: 14.5%;

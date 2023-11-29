@@ -123,7 +123,7 @@ $query = new Query();
                    $commondity_id = $commonditydata[$i]['commondity_id'];
                    $infoid = $_GET['infoid'];
 
-                   $stmt = $pdo->prepare("SELECT * FROM invoice_costing WHERE commondity_id='$commondity_id' GROUP BY size ORDER BY size");
+                   $stmt = $pdo->prepare("SELECT * FROM invoice_costing WHERE commondity_id='$commondity_id' AND infoid='$infoid' GROUP BY size ORDER BY size");
                    $stmt->execute();
                    $invoicecostingdatas = $stmt->fetchall();
 
