@@ -28,26 +28,17 @@ $query = new Query();
       <div class="contentcol" id="content">
         <?php require 'navbar.php'; ?>
         <div class="card">
-          <div class="card-header bg-warning text-light"  style="padding:-10px;">
+          <div class="card-header bg-success text-light"  style="padding:-10px;">
 
             <h5 class="d-inline">Manage Packing Material Costing</h5>
-            <button type="button" class="btn btn-success btn-sm float-end" data-bs-toggle="modal" data-bs-target="#addpackingmaterialcosting">
+            <a href="packing_stock.php" class="btn btn-danger float-end me-2 btn-sm ms-2" id="back">Back</a>
+            <a href="#" class="detailbtn btn btn-info float-end text-light btn-sm" onclick="showdetail()">Show Detail</a>
+            <a href="#" class="overviewbtn btn btn-info text-light float-end hide btn-sm" onclick="showoverview()">Show OverView</a>
+            <!-- <button type="button" class="btn btn-primary btn-sm float-end me-2">
               Add Packing Meterial Costing
-            </button>
+            </button> -->
           </div>
           <div class="card-body">
-            <?php
-            if(isset($_POST['deletebutton'])){
-              $deleteid = $_POST['deleteid'];
-              $message = $query->deletecategory('category', $deleteid);
-            }
-            if(isset($_POST['updatebutton'])){
-              $category_name = $_POST['category_name'];
-              $category_id = $_POST['category_id'];
-
-              $message = $query->updatecategory('category', $category_name, $category_id);
-            }
-            ?>
             <?php
             if(isset($_POST['addpackingmaterialbtn'])){
               $commondity_id = $_POST['commondity'];
@@ -72,19 +63,49 @@ $query = new Query();
               $query->addpackingmaterial($commondity_id, $fish_size, $plastic, $jcv, $inner_box, $sticker, $mc_plastic, $carton_box, $tape, $penon, $p_sticker, $plastic_rope, $micellion, $processing, $plastic_size, $pcsperlb, $pcspermc, $tdydollorprice);
             }
             ?>
-            <a href="#" class="detailbtn btn btn-info float-end text-light btn-sm" onclick="showdetail()">Show Detail</a>
-            <a href="#" class="overviewbtn btn btn-primary float-end hide btn-sm" onclick="showoverview()">Show OverView</a>
             <?php
+            $infoid = $_GET['infoid'];
 
-            if (!empty($_GET['pageno'])) {
-              $pageno = $_GET['pageno'];
-            }else{
-              $pageno = 1;
-            }
-            $numOfrecs = 9;
-            $offset = ($pageno -1) * $numOfrecs;
-            ?>
-            <table class="mt-5 table table-bordered table-striped rounded overview">
+            $infostmt = $pdo->prepare("SELECT * FROM packingliststock WHERE id='$infoid'");
+            $infostmt->execute();
+            $infodata = $infostmt->fetch(PDO::FETCH_ASSOC);
+             ?>
+             <div class="row" style="font-weight: bold;">
+               <div class="col-1">
+
+               </div>
+               <div class="col-7">
+                 <?php
+                   $customer_id = $infodata['customer_id'];
+                   $acnamedata = $query->select('acname', $customer_id, 'code_no');
+                   $customerdata = $query->select('customers', $customer_id, 'customer_id');
+                   echo $acnamedata['ac_name'];
+                   ?><br><?php
+                   echo $customerdata['customer_detail'];
+                   ?><br><?php
+                   echo $customerdata['customer_address'];
+                   ?>
+               </div>
+               <div class="col-3">
+                 Date : <?php echo date('d-m-Y', strtotime($infodata['date']));  ?>
+                 <br>
+                 Invoice No : <?php echo $infodata['invoiceno'];  ?>
+                 <br>
+                 CTNR No : <?php echo $infodata['containerno'];  ?>
+                 <br>
+                 VESSEL NAME : <?php echo $infodata['vessel_name']; ?>
+                 <br>
+                 VOY NAME : <?php echo $infodata['voyname']; ?>
+                 <br>
+                 FDA : <?php echo $infodata['fda']; ?>
+
+               </div>
+               <div class="col-1">
+
+               </div>
+             </div>
+
+            <table class="mt-3 table table-bordered table-striped rounded overview">
               <tr>
                 <th>Id</th>
                 <th>Commondity</th>
@@ -97,10 +118,12 @@ $query = new Query();
               </tr>
               <?php
               $packingmaterialdatas = $query->selectall("packingmaterial");
+              // print_r($packingmaterialdatas);
+              // exit();
               foreach ($packingmaterialdatas as $packingmaterialdata) {
                 $itemdata = $query->select('item', $packingmaterialdata['commondity_id'], 'item_id');
               ?>
-              <tr>
+              <tr data-bs-toggle="modal" data-bs-target="#addpackingmaterialcosting<?php echo $packingmaterialdata['id']; ?>">
                 <td><?php echo $packingmaterialdata['id']; ?></td>
                 <td><?php echo $itemdata['item_name']; ?></td>
                 <td><?php echo $packingmaterialdata['fish_size']; ?></td>
@@ -118,7 +141,7 @@ $query = new Query();
               ?>
             </table>
 
-            <table class="mt-5 table table-bordered table-striped rounded hide detail">
+            <table class="mt-3 table table-bordered table-striped rounded hide detail">
               <tr class="info">
                 <th>Id</th>
                 <th>Plastic</th>
@@ -136,12 +159,13 @@ $query = new Query();
                 <th>Pcs Per MC</th>
               </tr>
               <?php
-              $packingmaterialdatas = $query->selectall("packingmaterial");
-              foreach ($packingmaterialdatas as $packingmaterialdata) {
+              $packingmaterialdetaildatas = $query->selectall("packingmaterial");
+              // print_r($packingmaterialdetaildatas);
+              foreach ($packingmaterialdetaildatas as $packingmaterialdata) {
               ?>
               <tr>
                 <td><?php echo $packingmaterialdata['id']; ?></td>
-                <td><?php echo round($packingmaterialdata['plastic'], 2); ?></td>
+                <td><?php echo $packingmaterialdata['plastic']; ?></td>
                 <td><?php echo $packingmaterialdata['jcv']; ?></td>
                 <td><?php echo $packingmaterialdata['inner_box']; ?></td>
                 <td><?php echo $packingmaterialdata['sticker']; ?></td>
@@ -150,7 +174,7 @@ $query = new Query();
                 <td><?php echo $packingmaterialdata['tape']; ?></td>
                 <td><?php echo $packingmaterialdata['penon']; ?></td>
                 <td><?php echo $packingmaterialdata['p_sticker']; ?></td>
-                <td><?php echo round($packingmaterialdata['plastic_rope'], 2); ?></td>
+                <td><?php echo $packingmaterialdata['plastic_rope']; ?></td>
                 <td><?php echo $packingmaterialdata['plastic_size']; ?></td>
                 <td><?php echo $packingmaterialdata['pcsperlb']; ?></td>
                 <td><?php echo $packingmaterialdata['pcspermc']; ?></td>
@@ -160,19 +184,6 @@ $query = new Query();
               ?>
             </table>
             <br>
-            <div aria-label="Page navigation example" style="float:right;">
-              <ul class="pagination">
-                <li class="page-item"><a class="page-link" href="?pageno=1">First</a></li>
-                <li class="page-item <?php if($pageno <= 1){echo 'disabled';} ?>">
-                  <a class="page-link" href="<?php if($pageno <= 1){echo '#';} else {echo "?pageno=".($pageno-1);} ?>">Previous</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#"><?php echo $pageno; ?></a></li>
-                <li class="page-item <?php if($pageno >= $total_pages){echo 'disabled';}; ?>">
-                  <a class="page-link" href="<?php if($pageno >= $total_pages){echo '#';}else{echo "?pageno=".($pageno+1);} ?>">Next</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="?pageno=<?php echo $total_pages; ?>">Last</a> </li>
-              </ul>
-            </div>
           </div>
         </div>
       </div>

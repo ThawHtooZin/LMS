@@ -1,5 +1,4 @@
 <?php
-
 class Bootstrap
 {
   function cssindex()
@@ -74,6 +73,14 @@ class Bootstrap
           padding: 0; /* Reset padding */
           margin: 0; /* Reset margin */
           /* Other style adjustments */
+      }
+      
+      [data-bs-toggle] {
+        cursor: pointer !important;
+      }
+
+      [data-bs-toggle]:hover {
+        cursor: pointer !important;
       }
       *{
         font-size: 13px;
@@ -253,7 +260,7 @@ class Bootstrap
     //   console.log(stm);
     // })();
     </script>
-    
+
     ';
     ?>
     <script type="text/javascript">
