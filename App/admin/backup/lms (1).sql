@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 28, 2023 at 08:45 AM
+-- Generation Time: Nov 29, 2023 at 06:55 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -153,7 +153,12 @@ CREATE TABLE `actualinvoice` (
 
 INSERT INTO `actualinvoice` (`id`, `commondity_id`, `size`, `packingkgperbox`, `mc`, `totalnetweight`, `usd`, `total_usd`, `infoid`, `link_id`) VALUES
 (1, '1023', '3up', '25', 14, '350', '1', '25', 1, 1),
-(2, '1023', '4up', '25', 15, '375', '2', '50', 1, 2);
+(2, '1023', '4up', '25', 15, '375', '2', '50', 1, 2),
+(3, '1023', '5up', '21', 14, '294', '', '', 2, 3),
+(4, '1023', '2up', '10', 10, '100', '', '', 3, 4),
+(5, '1023', '3up', '10', 10, '100', '', '', 3, 5),
+(6, '1023', '3up', '10', 10, '100', '', '', 3, 6),
+(7, '1023', '3up', '10', 10, '100', '', '', 3, 7);
 
 -- --------------------------------------------------------
 
@@ -633,7 +638,10 @@ CREATE TABLE `invoice_costing` (
 
 INSERT INTO `invoice_costing` (`id`, `commondity_id`, `size`, `kg`, `priceperviss`, `priceperkg`, `yield`, `total_price`, `usd`, `packing_material`, `ocean_pacific`, `tax`, `agent`, `transport`, `total_usd`, `sellingpriceperkg`, `total_selling_price`, `profitorlossperkg`, `profit_amount`, `total_kg_price`, `infoid`, `link_id`) VALUES
 (1, '1023', '3up', '25', '1000', '611.9951040', '5.9', '577.8990595', '0.195593220', '0.03', '0.043', '0.02', '0.3', '0.2', '0.788593220', '1', '25', '0.21140678', '5.2851695', '19.71483050', 1, 1),
-(2, '1023', '4up', '25', '1000', '611.9951040', '5.9', '577.8990595', '0.195593220', '0.03', '0.043', '0.04', '0.3', '0.2', '0.808593220', '2', '50', '1.19140678', '29.7851695', '20.21483050', 1, 2);
+(2, '1023', '4up', '25', '1000', '611.9951040', '5.9', '577.8990595', '0.195593220', '0.03', '0.043', '0.04', '0.3', '0.2', '0.808593220', '2', '50', '1.19140678', '29.7851695', '20.21483050', 1, 2),
+(3, '1023', '5up', '21', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 2, 3),
+(6, '1023', '3up', '10', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 3, 6),
+(7, '1023', '3up', '10', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 3, 7);
 
 -- --------------------------------------------------------
 
@@ -851,7 +859,9 @@ CREATE TABLE `packingliststock` (
 --
 
 INSERT INTO `packingliststock` (`id`, `date`, `customer_id`, `country`, `invoiceno`, `containerno`, `vessel_name`, `voyname`, `fda`) VALUES
-(1, '2023-11-25', '3300/SAF', 'NY', '12345', '123', 'HEHE', 'ac0007', 'abcdefg');
+(1, '2023-11-25', '3300/SAF', 'NY', '12345', '123', 'HEHE', 'ac0007', 'abcdefg'),
+(2, '2023-11-25', '3300/SAF', 'NY', '112244', 'KND', 'HEHE', 'YOYOYO', 'abcdefg'),
+(3, '2023-11-25', '3300/CAN', 'CAN', '12222', 'KND', 'HEHE', 'YOYOYO', 'abcdefg');
 
 -- --------------------------------------------------------
 
@@ -878,7 +888,10 @@ CREATE TABLE `packingliststockinfo` (
 
 INSERT INTO `packingliststockinfo` (`id`, `commondity_id`, `size`, `packingkgperbox`, `mc`, `totalnetweight`, `totalgrossweight`, `usd`, `total_usd`, `infoid`) VALUES
 (1, '1023', '3up', 25, 14, 350, '364', '', '', 1),
-(2, '1023', '4up', 25, 15, 375, '390', '', '', 1);
+(2, '1023', '4up', 25, 15, 375, '390', '', '', 1),
+(3, '1023', '5up', 21, 14, 294, '308', '', '', 2),
+(6, '1023', '3up', 10, 10, 100, '110', '', '', 3),
+(7, '1023', '3up', 10, 10, 100, '110', '', '', 3);
 
 -- --------------------------------------------------------
 
@@ -906,8 +919,19 @@ CREATE TABLE `packingmaterial` (
   `perkgcost` varchar(11) NOT NULL,
   `plastic_size` varchar(11) NOT NULL,
   `pcsperlb` int(11) NOT NULL,
-  `pcspermc` int(11) NOT NULL
+  `pcspermc` int(11) NOT NULL,
+  `link_id` int(11) NOT NULL,
+  `infoid` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `packingmaterial`
+--
+
+INSERT INTO `packingmaterial` (`id`, `commondity_id`, `fish_size`, `plastic`, `jcv`, `inner_box`, `sticker`, `mc_plastic`, `carton_box`, `tape`, `penon`, `p_sticker`, `plastic_rope`, `micellion`, `processing`, `total`, `perkgcost`, `plastic_size`, `pcsperlb`, `pcspermc`, `link_id`, `infoid`) VALUES
+(1, '1023', '5up', '12.13963963', '8.85', '', '19.25', '24.5', '72', 3, 16, 4, '4.571428571', 50, 350, 560, '0.19', '111', 111, 11, 3, 1),
+(4, '1023', '3up', '', '', '', '', '', '', 0, 0, 0, '', 0, 0, 0, '', '', 0, 0, 6, 3),
+(5, '1023', '3up', '', '', '', '', '', '', 0, 0, 0, '', 0, 0, 0, '', '', 0, 0, 7, 3);
 
 -- --------------------------------------------------------
 
@@ -956,7 +980,7 @@ CREATE TABLE `permission` (
 --
 
 INSERT INTO `permission` (`id`, `role_id`, `permission`) VALUES
-(1, 1, 'manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_acpayable,manage_accountreceivable,manage_transactionmanage_general_ledger,manage_customers,manage_supplier,manage_coldstoreitem,manage_item,manage_actype,manage_acname,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,sale_report,purchase_report,payable_report');
+(1, 1, 'manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_acpayable,manage_accountreceivable,manage_transactionmanage_general_ledger,manage_customers,manage_supplier,manage_coldstoreitem,manage_item,manage_actype,manage_acname,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,sale_report,purchase_report,payable_report');
 
 -- --------------------------------------------------------
 
@@ -1237,6 +1261,13 @@ CREATE TABLE `truckactualinvoice` (
   `link_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `truckactualinvoice`
+--
+
+INSERT INTO `truckactualinvoice` (`id`, `item_id`, `size`, `pcsperbox`, `kgperbox`, `mc`, `netweight`, `usd`, `total_usd`, `invoice_no`, `link_id`) VALUES
+(1, '1023', '3up', 100, 100, 10, 1000, 8, 800, 'MOP001', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -1254,6 +1285,13 @@ CREATE TABLE `truckdeclare` (
   `invoice_no` varchar(15) NOT NULL,
   `link_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `truckdeclare`
+--
+
+INSERT INTO `truckdeclare` (`id`, `item_id`, `size`, `pcsperbox`, `kgperbox`, `mc`, `netweight`, `invoice_no`, `link_id`) VALUES
+(1, '1023', '3up', 100, 0, 10, 0, 'MOP001', 1);
 
 -- --------------------------------------------------------
 
@@ -1275,6 +1313,13 @@ CREATE TABLE `truckfoambox` (
   `link_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `truckfoambox`
+--
+
+INSERT INTO `truckfoambox` (`id`, `item_id`, `size`, `pcsperbox`, `kgperbox`, `mc`, `netweight`, `foambox_no`, `total_foambox_no`, `invoice_no`, `link_id`) VALUES
+(1, '1023', '3up', 100, 100, 10, 1000, '', '', 'MOP001', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -1287,6 +1332,13 @@ CREATE TABLE `truckpackingliststock` (
   `invoice_no` varchar(11) NOT NULL,
   `truck_no` varchar(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `truckpackingliststock`
+--
+
+INSERT INTO `truckpackingliststock` (`id`, `date`, `invoice_no`, `truck_no`) VALUES
+(1, '2023-11-25', 'MOP001', '31');
 
 -- --------------------------------------------------------
 
@@ -1305,6 +1357,13 @@ CREATE TABLE `truckpackingliststockinfo` (
   `totalgrossweight` float NOT NULL,
   `invoice_no` varchar(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `truckpackingliststockinfo`
+--
+
+INSERT INTO `truckpackingliststockinfo` (`id`, `item_id`, `size`, `pcsperbox`, `kgperbox`, `mc`, `netweight`, `totalgrossweight`, `invoice_no`) VALUES
+(1, '1023', '3up', 100, 100, 10, 1000, 600, 'MOP001');
 
 -- --------------------------------------------------------
 
@@ -1361,6 +1420,13 @@ CREATE TABLE `trucktotalcosting` (
   `link_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `trucktotalcosting`
+--
+
+INSERT INTO `trucktotalcosting` (`id`, `date`, `item_id`, `size`, `total_kg`, `priceperviss`, `priceperkg`, `percentage`, `packing_charges`, `ygntomt_charges`, `mttotechnck_charges`, `labour_charges`, `packingandtransport`, `total`, `grand_total`, `rate`, `costing_usd`, `selling_rate`, `profitperkg`, `original_cost`, `selling_amount`, `profit`, `invoice_no`, `link_id`) VALUES
+(1, '0000-00-00', '1023', '3up', 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 0, 800, 800, 'MOP001', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -1382,7 +1448,8 @@ CREATE TABLE `userlogs` (
 
 INSERT INTO `userlogs` (`id`, `login_time`, `login_date`, `login_username`, `login_password`, `status`) VALUES
 (1, '01:09:54.000000', '2023-11-28', 'admin', 'admin', 'Login Success'),
-(2, '01:19:21.000000', '2023-11-28', 'admin', 'admin', 'Login Success');
+(2, '01:19:21.000000', '2023-11-28', 'admin', 'admin', 'Login Success'),
+(3, '11:14:10.000000', '2023-11-29', 'admin', 'admin', 'Login Success');
 
 --
 -- Indexes for dumped tables
@@ -1732,7 +1799,7 @@ ALTER TABLE `acname`
 -- AUTO_INCREMENT for table `actualinvoice`
 --
 ALTER TABLE `actualinvoice`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `actype`
@@ -1846,7 +1913,7 @@ ALTER TABLE `hhkstock`
 -- AUTO_INCREMENT for table `invoice_costing`
 --
 ALTER TABLE `invoice_costing`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `item`
@@ -1900,19 +1967,19 @@ ALTER TABLE `msl_total_charges`
 -- AUTO_INCREMENT for table `packingliststock`
 --
 ALTER TABLE `packingliststock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `packingliststockinfo`
 --
 ALTER TABLE `packingliststockinfo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `packingmaterial`
 --
 ALTER TABLE `packingmaterial`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `payable`
@@ -1990,31 +2057,31 @@ ALTER TABLE `transaction`
 -- AUTO_INCREMENT for table `truckactualinvoice`
 --
 ALTER TABLE `truckactualinvoice`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `truckdeclare`
 --
 ALTER TABLE `truckdeclare`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `truckfoambox`
 --
 ALTER TABLE `truckfoambox`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `truckpackingliststock`
 --
 ALTER TABLE `truckpackingliststock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `truckpackingliststockinfo`
 --
 ALTER TABLE `truckpackingliststockinfo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `truckpackingmaterial`
@@ -2026,13 +2093,13 @@ ALTER TABLE `truckpackingmaterial`
 -- AUTO_INCREMENT for table `trucktotalcosting`
 --
 ALTER TABLE `trucktotalcosting`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `userlogs`
 --
 ALTER TABLE `userlogs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
