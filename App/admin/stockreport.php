@@ -67,7 +67,7 @@ $query = new Query();
           <form class="" action="" method="post">
           <div class="card-header bg-success">
 
-            <h4 style="font-weight:bold;" class="text-light d-inline">Stock Reports</h4>
+            <h4 style="font-weight:bold;" class="text-light d-inline">Mc Reports</h4>
 
             <button type="submit" name="commonditybtn" class="btn btn-info text-light btn-sm float-end ms-2">View</button>
             <select class="form-control w-25 d-inline float-end" style="height:26px; padding-left:10px; padding-top:2px;" name="commondity_id">

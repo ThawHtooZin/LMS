@@ -349,7 +349,7 @@ $permissions = $permission['permission'];
       </li>
       <?php
       }
-      if(str_contains($permissions, 'manage_form7') == 1 || str_contains($permissions, 'manage_form10') == 1 ||str_contains($permissions, 'hhkmcstock') == 1 ||str_contains($permissions, 'manage_gfcmcstock') == 1 ||str_contains($permissions, 'manage_stockreport') == 1){
+      if(str_contains($permissions, 'manage_form7') == 1 || str_contains($permissions, 'manage_form10') == 1 ||str_contains($permissions, 'hhkmcstock') == 1 ||str_contains($permissions, 'manage_gfcmcstock') == 1){
        ?>
       <li class=" p-1" style=" font-weight:bold; border-bottom: 1px solid rgb(255,255,255,0.2); " >
         <a href="#" class="nav-link text-white report" id="sidebarlink" data-bs-toggle="collapse" data-bs-target="#stock-collapse" aria-expanded="false">
@@ -407,7 +407,7 @@ $permissions = $permission['permission'];
             }
             ?>
             <?php
-            if(str_contains($permissions, ',')){
+            if(str_contains($permissions, ',manage_tclmcstock')){
               ?>
             <li class="nav-item">
               <a href="tclmcstock.php" class="nav-link h text-light"  style="font-size:14px !important; ">
@@ -419,12 +419,12 @@ $permissions = $permission['permission'];
             }
             ?>
             <?php
-            if(str_contains($permissions, 'manage_stockreport')){
+            if(str_contains($permissions, ',manage_mcreport')){
               ?>
             <li class="nav-item">
               <a href="stockreport.php" class="nav-link h text-light"  style="font-size:14px !important; ">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
-                - Stock Report
+                - Mc Report
               </a>
             </li>
             <?php
@@ -485,7 +485,7 @@ $permissions = $permission['permission'];
       </li>
       <?php
       }
-      if(str_contains($permissions, 'sale_report') == 1 || str_contains($permissions, 'purchase_report') == 1){
+      if(str_contains($permissions, 'sale_report') == 1 || str_contains($permissions, 'purchase_report') == 1 || str_contains($permissions, 'manage_stockreport') == 1){
        ?>
       <li class=" p-1" style=" font-weight:bold; border-bottom: 1px solid rgb(255,255,255,0.2); " >
         <a href="#" class="nav-link text-white report" id="sidebarlink" data-bs-toggle="collapse" data-bs-target="#report-collapse" aria-expanded="false">
@@ -525,6 +525,18 @@ $permissions = $permission['permission'];
               <a href="payablereport.php" class="nav-link h text-light"  style="font-size:14px !important; ">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Payable Report
+              </a>
+            </li>
+            <?php
+            }
+            ?>
+            <?php
+            if(str_contains($permissions, 'manage_stockreport')){
+              ?>
+            <li class="nav-item">
+              <a href="mainstockreport.php" class="nav-link h text-light"  style="font-size:14px !important; ">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - Stock Report
               </a>
             </li>
             <?php

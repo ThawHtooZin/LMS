@@ -191,6 +191,10 @@ class Bootstrap
           width: 16% !important;
         }
 
+        .card-header b{
+          font-size: 19px !important;
+        }
+
         [data-bs-toggle] {
           cursor: pointer !important;
         }
@@ -217,9 +221,9 @@ class Bootstrap
         }
         @media screen and (min-width: 1400px){
           .contentcol{
-            left: 14.5%;
+            left: 14.55%;
             position:absolute;
-            width: 85.5% !important;
+            width: 85.4% !important;
           }
           .contentfullcol{
             left: 52px;

@@ -31,7 +31,7 @@ $query = new Query();
         <div class="card">
           <div class="card-header bg-warning text-light">
 
-            <b>Manage Sales Report</b>
+            <h4>Manage Purchase Report</h4>
           </div>
           <div class="card-body">
             <label>Reports</label>
