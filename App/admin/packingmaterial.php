@@ -119,13 +119,25 @@ $query = new Query();
               $packingmaterialdatas = $query->search("packingmaterial", 'infoid', $infoid);
               // print_r($packingmaterialdatas);
               // exit();
+              $noo = 1;
               foreach ($packingmaterialdatas as $packingmaterialdata) {
                 $itemdata = $query->select('item', $packingmaterialdata['commondity_id'], 'item_id');
+                $item_id = $packingmaterialdata['commondity_id'];
+                $lastid = $packingmaterialdata['id'];
+                $size = $packingmaterialdata['fish_size'];
+                $infoid = $packingmaterialdata['infoid'];
+                $checklast = $pdo->prepare("SELECT * FROM packingmaterial WHERE id < $lastid AND commondity_id='$item_id' AND fish_size='$size' AND infoid='$infoid'");
+                $checklast->execute();
+                $checklastavaliable = $checklast->fetch(PDO::FETCH_ASSOC);
+                $lastcommondity = $pdo->prepare("SELECT * FROM packingmaterial WHERE id < $lastid AND commondity_id='$item_id' AND infoid='$infoid'");
+                $lastcommondity->execute();
+                $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
+
               ?>
               <tr data-bs-toggle="modal" data-bs-target="#addpackingmaterialcosting<?php echo $packingmaterialdata['id']; ?>">
-                <td><?php echo $packingmaterialdata['id']; ?></td>
-                <td><?php echo $itemdata['item_name']; ?></td>
-                <td><?php echo $packingmaterialdata['fish_size']; ?></td>
+                <td><?php if(empty($lastcommondity)){ echo $noo; } ?></td>
+                <td><?php if(empty($lastcommondity)){ echo $itemdata['item_name']; }; ?></td>
+                <td><?php if(empty($checklastavaliable)){ echo $packingmaterialdata['fish_size']; } ?></td>
                 <?php
                 $micandpro = $packingmaterialdata['micellion'] + $packingmaterialdata['processing'];
                  ?>
@@ -136,6 +148,7 @@ $query = new Query();
                 <td><?php echo $packingmaterialdata['perkgcost']; ?></td>
               </tr>
               <?php
+              $noo++;
               };
               ?>
             </table>
@@ -160,10 +173,11 @@ $query = new Query();
               <?php
               $packingmaterialdetaildatas = $query->search("packingmaterial", 'infoid', $infoid);
               // print_r($packingmaterialdetaildatas);
+              $no = 1;
               foreach ($packingmaterialdetaildatas as $packingmaterialdata) {
               ?>
               <tr>
-                <td><?php echo $packingmaterialdata['id']; ?></td>
+                <td><?php echo $no; ?></td>
                 <td><?php if($packingmaterialdata == 0){echo round($packingmaterialdata['plastic'], 2);}else{echo $packingmaterialdata['plastic'];} ?></td>
                 <td><?php echo $packingmaterialdata['jcv']; ?></td>
                 <td><?php echo $packingmaterialdata['inner_box']; ?></td>
@@ -172,13 +186,14 @@ $query = new Query();
                 <td><?php echo $packingmaterialdata['carton_box']; ?></td>
                 <td><?php echo $packingmaterialdata['tape']; ?></td>
                 <td><?php echo $packingmaterialdata['penon']; ?></td>
-                <td><?php echo $packingmaterialdata['p_sticker']; ?></td> 
+                <td><?php echo $packingmaterialdata['p_sticker']; ?></td>
                 <td><?php if($packingmaterialdata == 0){echo round($packingmaterialdata['plastic_rope'], 2);}else{echo $packingmaterialdata['plastic_rope'];} ?></td>
                 <td><?php echo $packingmaterialdata['plastic_size']; ?></td>
                 <td><?php echo $packingmaterialdata['pcsperlb']; ?></td>
                 <td><?php echo $packingmaterialdata['pcspermc']; ?></td>
               </tr>
               <?php
+              $no++;
               };
               ?>
             </table>
