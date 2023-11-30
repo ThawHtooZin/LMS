@@ -39,6 +39,9 @@ $query = new Query();
                 if ($_POST['searchtype'] == 'hhkloosereport') {
                     $_SESSION['stockreporttype'] = 'hhkloosereport';
                 }
+                if ($_POST['searchtype'] == 'hhkkgreport') {
+                    $_SESSION['stockreporttype'] = 'hhkkgreport';
+                }
                 
             }        
 

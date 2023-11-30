@@ -48,10 +48,18 @@ $query = new Query();
       $transfercheckstmt->execute();
       $transfercheck = $transfercheckstmt->fetch(PDO::FETCH_ASSOC);
 
-      if($transfercheck['balance_mc'] >= $transfermc){
-        echo $query->transfermcstock($transferdate, $transferparticular, $transfercountry, $transfercommondity_id, $transfersize, $transferkg, $transfermc);
+      $validcheckstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE kg='$transferkg' AND size='$transfersize' AND country='$transfercountry' AND commondity_id='$transfercommondity_id' ORDER BY id DESC");
+      $validcheckstmt->execute();
+      $validcheck = $validcheckstmt->fetch(PDO::FETCH_ASSOC);
+
+      if(!empty($validcheck)){
+        if($transfercheck['balance_mc'] >= $transfermc){
+          echo $query->transfermcstock($transferdate, $transferparticular, $transfercountry, $transfercommondity_id, $transfersize, $transferkg, $transfermc);
+        }else{
+          echo '<script>swal("Sorry!", "Not Enough Mc!", "warning");</script>';
+        }
       }else{
-        echo '<script>swal("Sorry!", "Not Enough Mc!", "warning");</script>';
+      echo '<script>swal("Sorry!", "Not Valid data for transfering!", "warning");</script>';
       }
     }
      ?>
