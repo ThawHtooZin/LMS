@@ -42,33 +42,73 @@ $query = new Query();
                 if ($_POST['searchtype'] == 'hhkkgreport') {
                     $_SESSION['stockreporttype'] = 'hhkkgreport';
                 }
+                if ($_POST['searchtype'] == 'gfcloosereport') {
+                    $_SESSION['stockreporttype'] = 'gfcloosereport';
+                }
+                if ($_POST['searchtype'] == 'gfckgreport') {
+                    $_SESSION['stockreporttype'] = 'gfckgreport';
+                }
                 
-            }        
+            }
+            if(isset($_POST['mcreport'])) {
+                echo "<script>window.location.href='stockreport.php';</script>";
+            }
+            if (isset($_POST['hhkloosereport'])) {
+                $_SESSION['stockreporttype'] = 'hhkloosereport';
+            }
+            if (isset($_POST['hhkkgreport'])) {
+                $_SESSION['stockreporttype'] = 'hhkkgreport';
+            }
+            if (isset($_POST['gfcloosereport'])) {
+                $_SESSION['stockreporttype'] = 'gfcloosereport';
+            }
+            if (isset($_POST['gfckgreport'])) {
+                $_SESSION['stockreporttype'] = 'gfckgreport';
+            }
 
         ?>
         <div class="card">
             <div class="card-header bg-info text-light">
                 <form class="row" action="" method="post">
                     <div class="col-9">
-                        <h4>Stock Reports</h4>
+                        <?php
+                        if(!empty($_SESSION)){
+                            ?>
+                                <h4>Stock Reports</h4>
+                            <?php
+                        }else{
+                            if($_SESSION['stockreporttype'] == 'hhkloosereport'){
+                                ?>
+                                    <h4>HHK Loose Reports</h4>
+                                <?php
+                            }
+                            if($_SESSION['stockreporttype'] == 'hhkkgreport'){
+                                ?>
+                                    <h4>HHK Kg Reports</h4>
+                                <?php
+                            }
+                            if($_SESSION['stockreporttype'] == 'gfcloosereport'){
+                                ?>
+                                    <h4>GFC Loose Reports</h4>
+                                <?php
+                            }
+                            if($_SESSION['stockreporttype'] == 'gfckgreport'){
+                                ?>
+                                    <h4>GFC Kg Reports</h4>
+                                <?php
+                            }
+                        }
+                        ?>
                     </div>
-                    <div class="col-3">
+                    <div class="col-3 <?php if(empty($_SESSION['stockreporttype'])){echo 'd-none';} ?>">
                         <div class="input-group">
                             <select name="searchtype" id="" class="form-control d-inline">
                                 <option value="">Select Report Methods</option>
                                 <option value="mcreport">Mc Report</option>
                                 <option value="hhkloosereport">HHK Loose Report</option>
-                                <option value="hhkkgreport">HHK Kg Report</option>
-                                <option value="hhkcommondityreport">HHK Commondity Report</option>
-                                <option value="hhkmcreport">HHK Mc Report</option>
+                                <option value="hhkkgreport">HHK Balance Report</option>
                                 <option value="gfcloosereport">GFC Loose Report</option>
-                                <option value="gfckgreport">GFC Kg Report</option>
-                                <option value="gfccommondityreport">GFC Commondity Report</option>
-                                <option value="gfcmcreport">GFC Mc Report</option>
-                                <option value="tclloosereport">TCL Loose Report</option>
-                                <option value="tclkgreport">TCL Kg Report</option>
-                                <option value="tclcommondityreport">TCL Commondity Report</option>
-                                <option value="tclmcreport">TCL Mc Report</option>
+                                <option value="gfckgreport">GFC Balance Report</option>
                             </select>
                             <button type="submit" class="btn btn-success" name="search">Search</button>
                         </div>
@@ -77,7 +117,39 @@ $query = new Query();
             </div>
             <div class="card-bdoy p-3">
                 <?php 
-                    include 'stockreportpages.php';
+                    if(empty($_SESSION['stockreporttype'])){
+                        ?>
+                        <form action="" method="post">
+                        <div class="row" style="padding-top: 100px;">
+                            <div class="col-2">
+
+                            </div>
+                            <div class="col text-center">
+                                <button type="submit" class="btn btn-default border border-3 mt-2" style="padding: 50px !important; font-size: 15px; font-style:italic;" name="mcreport">HHK Loose Report</button>
+                            </div>
+                            <div class="col text-center">
+                                <button type="submit" class="btn btn-default border border-3 mt-2" style="padding: 50px !important; font-size: 15px; font-style:italic;" name="hhkloosereport">HHK Balance Report</button>
+                            </div>
+                            <div class="col-2">
+                                
+                            </div>
+                        </div>
+                        <div class="row" style=" padding-bottom: 170px; padding-top: 100px;">
+                            <div class="col text-center">
+                                <button type="submit" class="btn btn-default border border-3 mt-2" style="padding: 50px !important; font-size: 15px; font-style:italic;" name="hhkkgreport">GFC Loose Report</button>
+                            </div>
+                            <div class="col text-center">
+                                <button type="submit" class="btn btn-default border border-3 mt-2" style="padding: 50px !important; font-size: 15px; font-style:italic;" name="gfcloosereport">Mc Report</button>
+                            </div>
+                            <div class="col text-center">
+                                <button type="submit" class="btn btn-default border border-3 mt-2" style="padding: 50px !important; font-size: 15px; font-style:italic;" name="gfckgreport">GFC Balance Report</button>
+                            </div>
+                        </div>
+                        </form>
+                        <?php
+                    }else{
+                        include 'stockreportpages.php';
+                    }
                 ?>
             </div>
         </div>
