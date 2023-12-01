@@ -236,9 +236,9 @@ $query = new Query();
               $gfctotalmc = $gfctotalmcnotsub['total_mc'] - $gfctotalmcsubnum['total_mc'];
               ?>
               <!-- <tr style="background-color:#c1f5cf;"> -->
-              <tr>
-                <td style="font-weight: bold;"></td>
+              <tr class="text-center">
                 <td style="font-weight: bold;">Total</td>
+                <td style="font-weight: bold;"></td>
                 <td style="font-weight: bold;"></td>
                 <td style="font-weight: bold;"></td>
                 <td style="font-weight: bold;"></td>
