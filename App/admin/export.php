@@ -738,7 +738,158 @@ if($_GET['table_name'] == 'mcstockreport'){
   <?php
 }
 
-// exit();
+if($_GET['table_name'] == 'truckpackingstockinfo'){
+  header("Content-Type: application/xls");
+  header("Content-Disposition: attachment; filename=truckpackingstockexcelreport.xls");
+  header("Pragma: no-cache");
+  header("Expires: 0");
+
+  if (!empty($_GET['searchcommondity'])) {
+    $searchcommondity = $_GET['searchcommondity'];
+    ?>
+    <div class="actualinvoicetable hide">
+      <table class="table table-striped table-hover table-bordered" border="1">
+        <tr>
+          <th>No</th>
+          <th>Commondity</th>
+          <th>Size</th>
+          <th>Packing Kg Per Box</th>
+          <th>Mc</th>
+          <th>Total Net Weight</th>
+          <th>USD</th>
+          <th>Total Value USD</th>
+        </tr>
+        <?php
+        $sizecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT size) FROM truckactualinvoice WHERE invoice_no='$invoice_no'");
+        $sizecountstmt->execute();
+        $sizecountdatas = $sizecountstmt->fetchColumn();
+        $no1 = 1;
+        for ($i=0; $i < $sizecountdatas; $i++) {
+          $sizestmt = $pdo->prepare("SELECT DISTINCT size FROM truckactualinvoice WHERE invoice_no='$invoice_no'");
+          $sizestmt->execute();
+          $sizedata = $sizestmt->fetchall();
+          $size = $sizedata[$i]['size'];
+          $invoice_no = $_GET['invoice_no'];
+
+          $stmt = $pdo->prepare("SELECT * FROM truckactualinvoice WHERE size='$size' AND invoice_no='$invoice_no' AND  item_id='$searchcommondity'");
+          $stmt->execute();
+          $datas = $stmt->fetchall();
+
+          foreach ($datas as $packingstockinfodata) {
+            $item_id = $packingstockinfodata['item_id'];
+            $commonditydata = $query->select('item', $item_id, 'item_id');
+            $lastid = $packingstockinfodata['id'];
+            $size = $packingstockinfodata['size'];
+            $checklast = $pdo->prepare("SELECT * FROM truckactualinvoice WHERE id < $lastid AND item_id='$item_id' AND size='$size' AND invoice_no='$invoice_no'");
+            $checklast->execute();
+            $checklastavaliable = $checklast->fetch(PDO::FETCH_ASSOC);
+            $lastcommondity = $pdo->prepare("SELECT * FROM truckactualinvoice WHERE id < $lastid AND item_id='$item_id' AND invoice_no='$invoice_no'");
+            $lastcommondity->execute();
+            $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
+              ?>
+              <tr data-bs-toggle="modal" data-bs-target="#usdadd<?php echo $packingstockinfodata['id']; ?>">
+                <td><?php if(empty($lastcommondity)){ echo $no1;}; ?></td>
+                <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
+                <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['size'];} ?></td>
+                <td><?php echo $packingstockinfodata['kgperbox']; ?></td>
+                <td><?php echo $packingstockinfodata['mc']; ?></td>
+                <td><?php echo $packingstockinfodata['netweight']; ?></td>
+                <td><?php if($packingstockinfodata['usd'] != 0){ echo $packingstockinfodata['usd'];} ; ?></td>
+                <td><?php if($packingstockinfodata['total_usd'] != 0){ echo $packingstockinfodata['total_usd'];} ; ?></td>
+              </tr>
+            <?php
+            ?>
+            <div class="modal fade" id="usdadd<?php echo $packingstockinfodata['id']; ?>">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+                  <div class="modal-header bg-info text-light">
+                    <h1 class="modal-title fs-5">Update Price Of USD</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <form action="" method="post">
+                      <input type="hidden" name="updateid" value="<?php echo $packingstockinfodata['id']; ?>">
+                      <div class="modal-body">
+                        <label>FOD/USD</label>
+                        <input type="text" name="usd" class="form-control inpv2 mb-2 mt-2">
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success" name="usdadd">Update</button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <?php
+              $item_id = $packingstockinfodata['item_id'];
+              $size = $packingstockinfodata['size'];
+          }
+          $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' AND item_id='$item_id' AND size='$size'");
+          $totalmcstmt->execute();
+          $totalmcdata = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
+          $netweightstmt = $pdo->prepare("SELECT SUM(netweight) AS netweight FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no' AND item_id='$item_id' AND size='$size'");
+          $netweightstmt->execute();
+          $netweightdata = $netweightstmt->fetch(PDO::FETCH_ASSOC);
+          $totalusdstmt = $pdo->prepare("SELECT SUM(total_usd) AS total_usd FROM truckactualinvoice WHERE invoice_no='$invoice_no' AND item_id='$item_id' AND size='$size'");
+          $totalusdstmt->execute();
+          $totalusddata = $totalusdstmt->fetch(PDO::FETCH_ASSOC);
+          ?>
+          <tr style="font-weight:bold; <?php if(empty($totalmcdata['totalmc'])){ echo 'display:none;'; } ?>">
+            <td></td>
+            <td>Sub Total</td>
+            <td></td>
+            <td></td>
+            <td><?php echo $totalmcdata['totalmc']; ?></td>
+            <td><?php if(!empty($netweightdata['netweight'])){ echo $netweightdata['netweight']; }; ?></td>
+            <td></td>
+            <td><?php if($totalusddata['total_usd'] != 0){ echo $totalusddata['total_usd'];} ; ?></td>
+          </tr>
+          <?php
+          $no1++;
+        }
+        ?>
+        <?php
+        $item_id = $packingstockinfodata['item_id'];
+        $totalusdstmt = $pdo->prepare("SELECT SUM(total_usd) AS total_usd FROM truckactualinvoice WHERE invoice_no='$invoice_no'");
+        $totalusdstmt->execute();
+        $totalusddata = $totalusdstmt->fetch(PDO::FETCH_ASSOC);
+        $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM truckactualinvoice WHERE invoice_no='$invoice_no'");
+        $mcstmt->execute();
+        $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
+        $netweightstmt = $pdo->prepare("SELECT SUM(netweight) AS total_netweight FROM truckactualinvoice WHERE invoice_no='$invoice_no'");
+        $netweightstmt->execute();
+        $netweightdata = $netweightstmt->fetch(PDO::FETCH_ASSOC);
+        $totalusdstmt = $pdo->prepare("SELECT SUM(total_usd) AS total_usd FROM truckactualinvoice WHERE invoice_no='$invoice_no'");
+        $totalusdstmt->execute();
+        $totalusddata = $totalusdstmt->fetch(PDO::FETCH_ASSOC);
+        $foamboxstmt = $pdo->prepare("SELECT SUM(total_foambox_no) AS total_foambox_no FROM truckfoambox WHERE invoice_no='$invoice_no'");
+        $foamboxstmt->execute();
+        $foamboxdata = $foamboxstmt->fetch(PDO::FETCH_ASSOC);
+        ?>
+        <tr style="font-weight:bold !important;">
+          <td></td>
+          <td>Grand Total</td>
+          <td></td>
+          <td></td>
+          <td><?php echo $mcdata['total_mc']; ?></td>
+          <td><?php echo $netweightdata['total_netweight']; ?></td>
+          <td></td>
+          <td><?php echo $totalusddata['total_usd']; ?></td>
+        </tr>
+      </table>
+      <h5 style="text-transform:uppercase;">Total Foam Box - <?php if(!empty($foamboxdata['total_foambox_no'])){ echo $foamboxdata['total_foambox_no'] . " Box"; }; ?></h5>
+      <h5 style="text-transform:uppercase;">Total Net Weight - <?php if(!empty($netweightdata['total_netweight'])){ echo $netweightdata['total_netweight'] . " KGS"; }; ?></h5>
+      <h5 style="text-transform:uppercase;">Total Value USD - <?php if(!empty($totalusddata['total_usd'])){ echo $totalusddata['total_usd'] . " USD"; }; ?></h5>
+      <br><br>
+    </div>
+    <?php
+  }
+
+}
+
+exit();
 
 
  ?>
