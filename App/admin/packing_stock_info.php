@@ -118,7 +118,8 @@ $query = new Query();
             <span class=" text-light hide" id="itext" style="font-size:20px; font-weight:bold;">Actual Invoice</span>
             <a href="packing_stock.php" class="btn btn-secondary float-end me-2 btn-sm ms-2" id="back">Back</a>
             <button type="submit" class="btn btn-danger float-end btn-sm" id="actualinvoice" name="actualinvoicebtn">Actual Invoice</button>
-            <button type="submit" class="btn btn-primary float-end btn-sm hide" id="actualinvoiceback" name="actualinvoiceback">Packing Stock</button>
+            <button type="submit" class="btn btn-danger float-end btn-sm me-2" id="actualinvoiceback" name="actualinvoiceback">Back</button>
+            <a href="export.php?table_name=actualinvoice&infoid=<?php echo $_GET['infoid']; ?>" class="btn btn-sm me-2 btn-success float-end" id="export">Export</a>
             <button type="button" class="btn btn-success float-end me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#add" id="addpackingstockbtn">Add Packing Stock</button>
             <form action="" method="post">
               <button type="submit" name="searchcommonditybtn" class="btn btn-sm btn-dark float-end me-2">View</button>
@@ -646,7 +647,7 @@ $query = new Query();
                     <?php
                   }else{
                     ?>
-                    <table class="table table-striped table-hover table-bordered">
+                <table class="table table-striped table-hover table-bordered">
                    <tr>
                      <th>No</th>
                      <th>Commondity</th>
@@ -826,7 +827,7 @@ $query = new Query();
                        <td style="visibility:hidden;">--------------</td>
                        <td class="datas"><p><?php if(!empty($packingstockinfobankdata['account_type'])){echo $packingstockinfobankdata['account_type'];}; ?></p></td>
                      </tr>
-                     <tr> 
+                     <tr>
                        <td><p>Bank Name : </p></td>
                        <td class="inputs"><p><input type="text" name="bank_name" class="form-control inpv2" placeholder="Enter Bank Name" value="<?php if(!empty($packingstockinfobankdata)){echo $packingstockinfobankdata['bank_name'];} ?>"></p></td>
                        <td style="visibility:hidden;">--------------</td>
@@ -922,6 +923,7 @@ $query = new Query();
          echo '
          $("#actualinvoice").hide();
          $("#actualinvoiceback").show();
+         $("#export").show();
          $(".actualinvoicetable").show();
          $("#addpackingstockbtn").hide();
          $("#packingstocktable").hide();
@@ -938,6 +940,7 @@ $query = new Query();
          $("#packingstocktable").show();
          $("#itext").hide();
          $("#pltext").show();
+         $("#export").hide();
          $("#back").show();
          ';
        }

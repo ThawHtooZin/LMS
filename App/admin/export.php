@@ -241,6 +241,7 @@ if($_GET['table_name'] == 'general_ledger'){
 
   <?php
 }
+
 if($_GET['table_name'] == 'daterangecharges'){
   header("Content-Type: application/xls");
   header("Content-Disposition: attachment; filename=hhktotalcharges.xls");
@@ -593,8 +594,138 @@ if ($_GET['table_name'] == 'payable') {
   <?php
 }
 
-if ($_GET['table_name'] = 'truckpackingstockinfo') {
-  
+if ($_GET['table_name'] = 'actualinvoice') {
+  header("Content-Type: application/xls");
+  header("Content-Disposition: attachment; filename=actualinvoice.xls");
+  header("Pragma: no-cache");
+  header("Expires: 0");
+
+  $infoid = $_GET['infoid'];
+  $infostmt = $pdo->prepare("SELECT * FROM packingliststock WHERE id='$infoid'");
+  $infostmt->execute();
+  $infodata = $infostmt->fetch(PDO::FETCH_ASSOC);
+?>
+ <div class="row" style="font-weight: bold; display:flex !important;">
+   <div class="col-9">
+     <?php
+       $customer_id = $infodata['customer_id'];
+       $acnamedata = $query->select('acname', $customer_id, 'code_no');
+       $customerdata = $query->select('customers', $customer_id, 'customer_id');
+       echo $acnamedata['ac_name'];
+       ?><br><?php
+       echo $customerdata['customer_detail'];
+       ?><br><?php
+       echo $customerdata['customer_address'];
+       ?>
+   </div>
+   <div class="col-3">
+     Date : <?php echo date('d-m-Y', strtotime($infodata['date']));  ?>
+     <br>
+     Invoice No : <?php echo $infodata['invoiceno'];  ?>
+     <br>
+     CTNR No : <?php echo $infodata['containerno'];  ?>
+     <br>
+     VESSEL NAME : <?php echo $infodata['vessel_name']; ?>
+     <br>
+     VOY NAME : <?php echo $infodata['voyname']; ?>
+     <br>
+     FDA : <?php echo $infodata['fda']; ?>
+
+   </div>
+ </div>
+  <table border="1">
+     <tr>
+       <th>No</th>
+       <th>Commondity</th>
+       <th>Size</th>
+       <th>Packing Kg Per Box</th>
+       <th>Mc</th>
+       <th>Total Net Weight</th>
+       <th>FOD/USD</th>
+       <th>Total USD</th>
+     </tr>
+     <?php
+     $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM actualinvoice WHERE infoid='$infoid'");
+     $commonditycountstmt->execute();
+     $commonditycountdatas = $commonditycountstmt->fetchColumn();
+     $no = 1;
+     for ($i=0; $i < $commonditycountdatas; $i++) {
+       $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM actualinvoice WHERE infoid='$infoid'");
+       $commonditystmt->execute();
+       $commonditydata = $commonditystmt->fetchall();
+       $commondity_id = $commonditydata[$i]['commondity_id'];
+
+       $stmt = $pdo->prepare("SELECT * FROM actualinvoice WHERE commondity_id='$commondity_id' AND infoid='$infoid' ORDER BY size");
+       $stmt->execute();
+       $datas = $stmt->fetchall();
+
+       foreach ($datas as $packingstockinfodata) {
+
+         $item_id = $packingstockinfodata['commondity_id'];
+         $commonditydata = $query->select('item', $item_id, 'item_id');
+         $lastid = $packingstockinfodata['id'];
+         $size = $packingstockinfodata['size'];
+         $infoid = $packingstockinfodata['infoid'];
+         $checklast = $pdo->prepare("SELECT * FROM actualinvoice WHERE id < $lastid AND commondity_id='$item_id' AND size='$size' AND infoid='$infoid'");
+         $checklast->execute();
+         $checklastavaliable = $checklast->fetch(PDO::FETCH_ASSOC);
+         $lastcommondity = $pdo->prepare("SELECT * FROM actualinvoice WHERE id < $lastid AND commondity_id='$item_id' AND infoid='$infoid'");
+         $lastcommondity->execute();
+         $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
+
+           ?>
+           <tr>
+             <td><?php if(empty($lastcommondity)){ echo $no; } ?></td>
+             <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name'];}; ?></td>
+             <td><?php if(empty($checklastavaliable)){ echo $packingstockinfodata['size'];}; ?></td>
+             <td><?php echo $packingstockinfodata['packingkgperbox']; ?></td>
+             <td><?php echo $packingstockinfodata['mc']; ?></td>
+             <td><?php echo $packingstockinfodata['totalnetweight']; ?></td>
+             <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $packingstockinfodata['id']; ?>"><?php if($packingstockinfodata['usd'] != 0 ){ echo $packingstockinfodata['usd'];} ?></td>
+             <td <?php if(str_contains(strtolower($commonditydata['item_name']), 'bala')){ echo 'data-bs-toggle="modal"'; } ?> data-bs-target="#updatetotalusd<?php echo $packingstockinfodata['id']; ?>"><?php if($packingstockinfodata['total_usd'] != 0 ){ echo $packingstockinfodata['total_usd'];} ?></td>
+           </tr>
+         <?php
+       }
+       $item_id = $packingstockinfodata['commondity_id'];
+       $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM packingliststockinfo WHERE infoid='$infoid' AND commondity_id='$item_id'");
+       $totalmcstmt->execute();
+       $totalmcdata = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
+       $totalnetweightstmt = $pdo->prepare("SELECT SUM(totalnetweight) AS totalnetweight FROM packingliststockinfo WHERE infoid='$infoid' AND commondity_id='$item_id'");
+       $totalnetweightstmt->execute();
+       $totalnetweightdata = $totalnetweightstmt->fetch(PDO::FETCH_ASSOC);
+       ?>
+       <tr style="font-weight: bold !important;">
+         <td></td>
+         <td>Sub Total</td>
+         <td></td>
+         <td></td>
+         <td><?php echo $totalmcdata['totalmc']; ?></td>
+         <td><?php if(!empty($totalnetweightdata['totalnetweight'])){ echo $totalnetweightdata['totalnetweight']; }; ?></td>
+         <td></td>
+         <td></td>
+       </tr>
+       <?php
+       $no++;
+     }
+     ?>
+     <?php
+     $item_id = $packingstockinfodata['commondity_id'];
+     $totalusdstmt = $pdo->prepare("SELECT SUM(total_usd) AS total_usd FROM actualinvoice WHERE infoid='$infoid'");
+     $totalusdstmt->execute();
+     $totalusddata = $totalusdstmt->fetch(PDO::FETCH_ASSOC);
+     ?>
+     <tr>
+       <td></td>
+       <td style="font-weight:bold !important;">Grand Total</td>
+       <td></td>
+       <td></td>
+       <td></td>
+       <td></td>
+       <td></td>
+       <td><?php echo $totalusddata['total_usd']; ?></td>
+     </tr>
+   </table>
+ <?php
 }
 
 exit();

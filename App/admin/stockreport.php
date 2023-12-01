@@ -207,7 +207,8 @@ $query = new Query();
 
 
                ?>
-              <tr style="text-align:center !important;">
+               <tr style="text-align:center !important;">   
+              <!-- <tr style="text-align:center !important; <?php if($fetchalldata['balance_mc'] == 0 && empty($fetchallgfcdata['balance_mc'])){ echo "display:none;";} ?>"> -->
                 <td><?php if(empty($lastcommondity)){ echo $id;} ?></td>
                 <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name'];} ?></td>
                 <td><?php if(empty($lastcommondity)){ echo $country; } ?></td>
@@ -234,7 +235,7 @@ $query = new Query();
               $gfctotalmcsubnumstmt->execute();
               $gfctotalmcsubnum = $gfctotalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
               $gfctotalmc = $gfctotalmcnotsub['total_mc'] - $gfctotalmcsubnum['total_mc'];
-              
+
               ?>
               <!-- <tr style="background-color:#c1f5cf;"> -->
               <tr class="text-center">
