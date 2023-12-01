@@ -101,6 +101,17 @@ $query = new Query();
                 <button type="submit" class="btn btn-secondary float-end btn-sm me-2" id="foambox" name="foamboxbtn">Foam Box</button>
                 <button type="submit" class="btn btn-primary float-end btn-sm me-2" id="declare" name="declarebtn">Declare List</button>
                 <button type="submit" class="btn btn-danger float-end btn-sm hide" id="actualinvoiceback" name="actualinvoiceback">Back</button>
+                <?php
+                if(isset($_POST['searchcommonditybtn']) && !empty($_POST['searchcommondity'])){
+                  ?>
+                  <a href="export.php?table_name=truckpackingstockinfo&searchcommondity=<?= $_POST['searchcommondity']; ?>" class="btn btn-success float-end btn-sm <?php if(!empty($_SESSION['tabs']) && $_SESSION['tabs'] == 'actualinvoice'){ echo 'hide';} ?> me-2" id="back">Excel Report</a>
+                  <?php
+                }else{
+                  ?>
+                  <a href="export.php?table_name=truckpackingstockinfo&" class="btn btn-success float-end btn-sm <?php if(!empty($_SESSION['tabs']) && $_SESSION['tabs'] == 'actualinvoice'){}else{echo 'hide';} ?> me-2" id="actualinvoiceback">Excel Report</a>
+                  <?php
+                }
+                ?>
                 <button type="button" class="btn btn-success float-end me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#add" id="addpackingstockbtn">Add Packing Stock</button>
                 <form action="" method="post">
                   <button type="submit" name="searchcommonditybtn" class="btn btn-sm btn-dark float-end me-2">View</button>
