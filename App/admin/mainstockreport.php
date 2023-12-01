@@ -72,7 +72,7 @@ $query = new Query();
                 <form class="row" action="" method="post">
                     <div class="col-9">
                         <?php
-                        if(!empty($_SESSION)){
+                        if(empty($_SESSION['stockreporttype'])){
                             ?>
                                 <h4>Stock Reports</h4>
                             <?php
@@ -125,10 +125,10 @@ $query = new Query();
 
                             </div>
                             <div class="col text-center">
-                                <button type="submit" class="btn btn-default border border-3 mt-2" style="padding: 50px !important; font-size: 15px; font-style:italic;" name="mcreport">HHK Loose Report</button>
+                                <button type="submit" class="btn btn-default border border-3 mt-2" style="padding: 50px !important; font-size: 15px; font-style:italic;" name="hhkloosereport">HHK Loose Report</button>
                             </div>
                             <div class="col text-center">
-                                <button type="submit" class="btn btn-default border border-3 mt-2" style="padding: 50px !important; font-size: 15px; font-style:italic;" name="hhkloosereport">HHK Balance Report</button>
+                                <button type="submit" class="btn btn-default border border-3 mt-2" style="padding: 50px !important; font-size: 15px; font-style:italic;" name="hhkkgreport">HHK Balance Report</button>
                             </div>
                             <div class="col-2">
                                 
@@ -136,10 +136,10 @@ $query = new Query();
                         </div>
                         <div class="row" style=" padding-bottom: 170px; padding-top: 100px;">
                             <div class="col text-center">
-                                <button type="submit" class="btn btn-default border border-3 mt-2" style="padding: 50px !important; font-size: 15px; font-style:italic;" name="hhkkgreport">GFC Loose Report</button>
+                                <button type="submit" class="btn btn-default border border-3 mt-2" style="padding: 50px !important; font-size: 15px; font-style:italic;" name="gfcloosereport">GFC Loose Report</button>
                             </div>
                             <div class="col text-center">
-                                <button type="submit" class="btn btn-default border border-3 mt-2" style="padding: 50px !important; font-size: 15px; font-style:italic;" name="gfcloosereport">Mc Report</button>
+                                <button type="submit" class="btn btn-default border border-3 mt-2" style="padding: 50px !important; font-size: 15px; font-style:italic;" name="mcreport">Mc Report</button>
                             </div>
                             <div class="col text-center">
                                 <button type="submit" class="btn btn-default border border-3 mt-2" style="padding: 50px !important; font-size: 15px; font-style:italic;" name="gfckgreport">GFC Balance Report</button>
