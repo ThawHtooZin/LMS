@@ -769,8 +769,13 @@ $query = new Query();
                    }
                    ?>
                    <?php
-                   $item_id = $packingstockinfodata['commondity_id'];
+                   if(!empty($packingstockinfodata['commondity_id'])){
+                    $item_id = $packingstockinfodata['commondity_id'];
                    $totalusdstmt = $pdo->prepare("SELECT SUM(total_usd) AS total_usd FROM actualinvoice WHERE infoid='$infoid'");
+                   }else{
+                   $totalusdstmt = $pdo->prepare("SELECT SUM(total_usd) AS total_usd FROM actualinvoice WHERE infoid='$infoid'");
+                    
+                   }
                    $totalusdstmt->execute();
                    $totalusddata = $totalusdstmt->fetch(PDO::FETCH_ASSOC);
                    ?>

@@ -68,7 +68,7 @@ $query = new Query();
           <div class="card-header bg-success">
 
             <h4 style="font-weight:bold;" class="text-light d-inline">Mc Reports</h4>
-
+            <a href="export.php?table_name=mcstockreport" class="btn btn-primary btn-sm float-end ms-2">Excel Report</a>
             <button type="submit" name="commonditybtn" class="btn btn-info text-light btn-sm float-end ms-2">View</button>
             <select class="form-control w-25 d-inline float-end" style="height:26px; padding-left:10px; padding-top:2px;" name="commondity_id">
               <option value="">View Each Commondity</option>
