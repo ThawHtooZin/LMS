@@ -219,21 +219,22 @@ $query = new Query();
               </tr>
               <?php
               }
-              $hhktotalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$item_id' AND particular NOT LIKE '%to%'");
+              $hhktotalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE commondity_id='$item_id' AND particular LIKE '%from%'");
               $hhktotalmcstmt->execute();
               $hhktotalmcnotsub = $hhktotalmcstmt->fetch(PDO::FETCH_ASSOC);
-              $hhktotalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$item_id' AND particular LIKE '%to%'");
+              $hhktotalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE commondity_id='$item_id' AND particular LIKE '%to%'");
               $hhktotalmcsubnumstmt->execute();
               $hhktotalmcsubnum = $hhktotalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
               $hhktotalmc = $hhktotalmcnotsub['total_mc'] - $hhktotalmcsubnum['total_mc'];
 
-              $gfctotalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND country='$country' AND commondity_id='$item_id' AND particular LIKE '%to%'");
+              $gfctotalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE commondity_id='$item_id' AND particular LIKE '%to%'");
               $gfctotalmcstmt->execute();
               $gfctotalmcnotsub = $gfctotalmcstmt->fetch(PDO::FETCH_ASSOC);
-              $gfctotalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND country='$country' AND commondity_id='$item_id' AND particular NOT LIKE '%to%'");
+              $gfctotalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE commondity_id='$item_id' AND particular NOT LIKE '%to%'");
               $gfctotalmcsubnumstmt->execute();
               $gfctotalmcsubnum = $gfctotalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
               $gfctotalmc = $gfctotalmcnotsub['total_mc'] - $gfctotalmcsubnum['total_mc'];
+              
               ?>
               <!-- <tr style="background-color:#c1f5cf;"> -->
               <tr class="text-center">
