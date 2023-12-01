@@ -138,10 +138,16 @@ $query = new Query();
               </tr>
               <?php
               $id = 0;
+              if(isset($_POST['commonditybtn']) && !empty($_POST['commondity_id'])){
+                $searchcommondity = $_POST['commondity_id'];
+                $hhkmcstockcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE commondity_id='$searchcommondity' AND country='$country'");
+                $hhkmcstockcommonditystmt->execute();
+                $hhkmcstockcommonditydatas = $hhkmcstockcommonditystmt->rowCount();
+            }else{
                 $hhkmcstockcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country='$country'");
                 $hhkmcstockcommonditystmt->execute();
                 $hhkmcstockcommonditydatas = $hhkmcstockcommonditystmt->rowCount();
-
+            }
               for ($i=0; $i < $hhkmcstockcommonditydatas; $i++) {
                 $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country='$country'");
                 $commonditystmt->execute();
@@ -150,9 +156,12 @@ $query = new Query();
 
                 if(isset($_POST['commonditybtn']) && !empty($_POST['commondity_id'])){
                   $searchcommondity_id = $_POST['commondity_id'];
-                  $searchstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id='$searchcommondity_id' AND country='$country'");
+                  $searchstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id='$searchcommondity_id' AND country='$country' AND particular LIKE '%from%'");
                   $searchstmt->execute();
                   $datas = $searchstmt->fetchall();
+                  //
+                  // echo "<pre>";
+                  // print_r($datas);
                 }else{
                   $stmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id='$commondity_id' AND country='$country' AND particular NOT LIKE '%to%' ");
                   $stmt->execute();
@@ -163,13 +172,14 @@ $query = new Query();
                 foreach ($datas as $hhkdata) {
                   $id++;
                   $size = $hhkdata['size'];
-                  $item_id = $hhkdata['commondity_id']; 
+                  $item_id = $hhkdata['commondity_id'];
+                  $country = $hhkdata['country'];
                   $commonditydata = $query->select('item', $item_id, 'item_id');
 
                   $hhkcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE size='$size' AND commondity_id='$item_id'");
                   $hhkcommonditystmt->execute();
                   $hhkcommonditydatas = $hhkcommonditystmt->fetchall();
-                  
+
                     $kg = $hhkdata['kg'];
 
                     $fetchallstmt = $pdo->prepare("SELECT balance_mc FROM hhkmcstock WHERE size='$size' AND commondity_id='$item_id' AND kg='$kg' ORDER BY id DESC");
@@ -179,18 +189,29 @@ $query = new Query();
                     $fetchallgfcstmt = $pdo->prepare("SELECT balance_mc FROM gfcmcstock WHERE size='$size' AND commondity_id='$item_id' AND kg='$kg' ORDER BY id DESC");
                     $fetchallgfcstmt->execute();
                     $fetchallgfcdata = $fetchallgfcstmt->fetch(PDO::FETCH_ASSOC);
+
+                    $lastid = $hhkdata['id'];
+                    $checklast = $pdo->prepare("SELECT * FROM hhkmcstock WHERE id < $lastid AND commondity_id='$item_id' AND size='$size'");
+                    $checklast->execute();
+                    $checklastavaliable = $checklast->fetch(PDO::FETCH_ASSOC);
+                    $lastcommondity = $pdo->prepare("SELECT * FROM hhkmcstock WHERE id < $lastid AND commondity_id='$item_id' AND country='$country'");
+                    $lastcommondity->execute();
+                    $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
+
                 // $country = $hhkmcstockdata['country'];
                 // $size = $hhkmcstockdata['size'];
                 // $kg = $hhkmcstockdata['kg'];
                 // $gfcmcstockstmt = $pdo->prepare("SELECT balance_mc FROM gfcmcstock WHERE country='$country' AND commondity_id='$item_id' AND size='$size' AND kg='$kg' ORDER BY id DESC");
                 // $gfcmcstockstmt->execute();
                 // $gfcmcstockdata = $gfcmcstockstmt->fetch(PDO::FETCH_ASSOC);
+
+
                ?>
-              <tr>
-                <td><?php echo $id; ?></td>
-                <td><?php echo $commonditydata['item_name']; ?></td>
-                <td><?php echo $country; ?></td>
-                <td><?php echo $size; ?></td>
+              <tr style="text-align:center !important;">
+                <td><?php if(empty($lastcommondity)){ echo $id;} ?></td>
+                <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name'];} ?></td>
+                <td><?php if(empty($lastcommondity)){ echo $country; } ?></td>
+                <td><?php if(empty($checklastavaliable)){ echo $size; } ?></td>
                 <td><?php echo $kg; ?></td>
                 <td><?php if($fetchalldata['balance_mc'] != 0){ echo $fetchalldata['balance_mc'];}else{echo "-";}; ?></td>
                 <td><?php if(!empty($fetchallgfcdata['balance_mc'])){ echo $fetchallgfcdata['balance_mc'];}else{echo "-";};  ?></td>
