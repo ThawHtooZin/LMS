@@ -200,9 +200,9 @@ $query = new Query();
                                 $customerstmt = $pdo->prepare("SELECT * FROM customers");
                                 $customerstmt->execute();
                                 $customerdatas = $customerstmt->fetchall();
-                              foreach ($customerdatas as $customerdatas) {
+                              foreach ($customerdatas as $customerdata) {
                               ?>
-                              <option value="<?php echo $customerdatas['code_no']; ?>" <?php if($customerdatas['customer_id'] == $packingdata['customer_id']){ echo 'selected'; } ?>><?php echo $customerdatas['customer_name']; ?></option>
+                              <option value="<?php echo $customerdata['customer_id']; ?>" <?php if($customerdata['customer_id'] == $packingdata['customer_id']){ echo 'selected'; } ?>><?php echo $customerdata['customer_name']; ?></option>
                               <?php
                                 }
                               ?>
