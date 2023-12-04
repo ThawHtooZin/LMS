@@ -593,8 +593,6 @@ if ($_GET['table_name'] == 'payable') {
 
   <?php
 }
-
-<<<<<<< HEAD
 if ($_GET['table_name'] = 'actualinvoice') {
   header("Content-Type: application/xls");
   header("Content-Disposition: attachment; filename=actualinvoice.xls");
@@ -727,10 +725,6 @@ if ($_GET['table_name'] = 'actualinvoice') {
      </tr>
    </table>
  <?php
-=======
-// if ($_GET['table_name'] = 'truckpackingstockinfo') {
-  
-// }
 
 if($_GET['table_name'] == 'mcstockreport'){
   header("Content-Type: application/xls");
@@ -853,7 +847,7 @@ if($_GET['table_name'] == 'mcstockreport'){
     $gfctotalmcsubnumstmt->execute();
     $gfctotalmcsubnum = $gfctotalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
     $gfctotalmc = $gfctotalmcnotsub['total_mc'] - $gfctotalmcsubnum['total_mc'];
-    
+
     ?>
     <!-- <tr style="background-color:#c1f5cf;"> -->
     <tr class="text-center">
@@ -871,7 +865,7 @@ if($_GET['table_name'] == 'mcstockreport'){
       ?>
   </table>
   <?php
->>>>>>> 40cbf444a4a6a387a259e064a13396b5bc276eff
+
 }
 
 if($_GET['table_name'] == 'truckpackingstockinfo'){
