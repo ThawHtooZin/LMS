@@ -730,7 +730,7 @@ if ($_GET['table_name'] == 'actualinvoice') {
  <?php
 }
 // if ($_GET['table_name'] = 'truckpackingstockinfo') {
-  
+
 // }
 
 if($_GET['table_name'] == 'mcstockreport'){
@@ -854,7 +854,7 @@ if($_GET['table_name'] == 'mcstockreport'){
     $gfctotalmcsubnumstmt->execute();
     $gfctotalmcsubnum = $gfctotalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
     $gfctotalmc = $gfctotalmcnotsub['total_mc'] - $gfctotalmcsubnum['total_mc'];
-    
+
     ?>
     <!-- <tr style="background-color:#c1f5cf;"> -->
     <tr class="text-center">
