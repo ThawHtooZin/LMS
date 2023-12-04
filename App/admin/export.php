@@ -502,7 +502,6 @@ if($_GET['table_name'] == 'receivable'){
     foreach($receivabledatas as $receivabledata) :
       $ac_name = $query->select('acname', $receivabledata['ac_code'], 'code_no');
     ?>
-    <!-- <tr <?php// if($receivabledata['sr_no']){ ?>data-bs-toggle="modal" data-bs-target="#paymentmodal<?php// echo $receivabledata['id']; ?>"<?php //} ?>> -->
     <tr>
       <td><?php if($receivabledata['date'] != '0000-00-00'){ echo date('d-m-Y', strtotime($receivabledata['date'])); }; ?></td>
       <!-- <td><?php //if(!empty($receivabledata['invoice_amount'])){ if(!empty($ac_name['ac_name'])){ echo $ac_name['ac_name'];} } ?></td> -->
@@ -593,6 +592,7 @@ if ($_GET['table_name'] == 'payable') {
 
   <?php
 }
+
 if ($_GET['table_name'] = 'actualinvoice') {
   header("Content-Type: application/xls");
   header("Content-Disposition: attachment; filename=actualinvoice.xls");
@@ -605,8 +605,10 @@ if ($_GET['table_name'] = 'actualinvoice') {
   $infodata = $infostmt->fetch(PDO::FETCH_ASSOC);
 ?>
  <div class="row" style="font-weight: bold; display:flex !important;">
-   <div class="col-9">
-     <?php
+   <table>
+    <tr>
+      <td class="float-start" style="font-weight: bold;">
+      <?php
        $customer_id = $infodata['customer_id'];
        $acnamedata = $query->select('acname', $customer_id, 'code_no');
        $customerdata = $query->select('customers', $customer_id, 'customer_id');
@@ -616,9 +618,10 @@ if ($_GET['table_name'] = 'actualinvoice') {
        ?><br><?php
        echo $customerdata['customer_address'];
        ?>
-   </div>
-   <div class="col-3">
-     Date : <?php echo date('d-m-Y', strtotime($infodata['date']));  ?>
+      </td>
+      <td colspan="6"></td>
+      <td class="float-end" style="font-weight: bold;">
+        Date : <?php echo date('d-m-Y', strtotime($infodata['date']));  ?>
      <br>
      Invoice No : <?php echo $infodata['invoiceno'];  ?>
      <br>
@@ -628,9 +631,9 @@ if ($_GET['table_name'] = 'actualinvoice') {
      <br>
      VOY NAME : <?php echo $infodata['voyname']; ?>
      <br>
-     FDA : <?php echo $infodata['fda']; ?>
-
-   </div>
+     FDA : <?php echo $infodata['fda']; ?></td>
+    </tr>
+   </table>
  </div>
   <table border="1">
      <tr>
@@ -725,6 +728,10 @@ if ($_GET['table_name'] = 'actualinvoice') {
      </tr>
    </table>
  <?php
+}
+// if ($_GET['table_name'] = 'truckpackingstockinfo') {
+
+// }
 
 if($_GET['table_name'] == 'mcstockreport'){
   header("Content-Type: application/xls");
@@ -865,7 +872,6 @@ if($_GET['table_name'] == 'mcstockreport'){
       ?>
   </table>
   <?php
-
 }
 
 if($_GET['table_name'] == 'truckpackingstockinfo'){
