@@ -118,7 +118,13 @@ $query = new Query();
             <span class=" text-light hide" id="itext" style="font-size:20px; font-weight:bold;">Actual Invoice</span>
             <a href="packing_stock.php" class="btn btn-secondary float-end me-2 btn-sm ms-2" id="back">Back</a>
             <button type="submit" class="btn btn-danger float-end btn-sm" id="actualinvoice" name="actualinvoicebtn">Actual Invoice</button>
-            <button type="submit" class="btn btn-danger float-end btn-sm me-2" id="actualinvoiceback" name="actualinvoiceback">Back</button>
+            <?php
+            if (!empty($_SESSION['tabs'])) {
+              ?>
+              <button type="submit" class="btn btn-danger float-end btn-sm me-2" id="actualinvoiceback" name="actualinvoiceback">Back</button>
+              <?php
+            }
+             ?>
             <a href="export.php?table_name=actualinvoice&infoid=<?php echo $_GET['infoid']; ?>" class="btn btn-sm me-2 btn-success float-end" id="export">Export</a>
             <button type="button" class="btn btn-success float-end me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#add" id="addpackingstockbtn">Add Packing Stock</button>
             <form action="" method="post">
@@ -775,7 +781,7 @@ $query = new Query();
                    $totalusdstmt = $pdo->prepare("SELECT SUM(total_usd) AS total_usd FROM actualinvoice WHERE infoid='$infoid'");
                    }else{
                    $totalusdstmt = $pdo->prepare("SELECT SUM(total_usd) AS total_usd FROM actualinvoice WHERE infoid='$infoid'");
-                    
+
                    }
                    $totalusdstmt->execute();
                    $totalusddata = $totalusdstmt->fetch(PDO::FETCH_ASSOC);
