@@ -593,7 +593,7 @@ if ($_GET['table_name'] == 'payable') {
   <?php
 }
 
-if ($_GET['table_name'] = 'actualinvoice') {
+if ($_GET['table_name'] == 'actualinvoice') {
   header("Content-Type: application/xls");
   header("Content-Disposition: attachment; filename=actualinvoice.xls");
   header("Pragma: no-cache");
@@ -839,18 +839,18 @@ if($_GET['table_name'] == 'mcstockreport'){
     </tr>
     <?php
     }
-    $hhktotalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE commondity_id='$item_id' AND particular LIKE '%from%'");
+    $hhktotalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE commondity_id='$item_id' AND particular LIKE '%from%' AND country='$country'");
     $hhktotalmcstmt->execute();
     $hhktotalmcnotsub = $hhktotalmcstmt->fetch(PDO::FETCH_ASSOC);
-    $hhktotalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE commondity_id='$item_id' AND particular LIKE '%to%'");
+    $hhktotalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE commondity_id='$item_id' AND particular LIKE '%to%' AND country='$country'");
     $hhktotalmcsubnumstmt->execute();
     $hhktotalmcsubnum = $hhktotalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
     $hhktotalmc = $hhktotalmcnotsub['total_mc'] - $hhktotalmcsubnum['total_mc'];
 
-    $gfctotalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE commondity_id='$item_id' AND particular LIKE '%to%'");
+    $gfctotalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE commondity_id='$item_id' AND particular LIKE '%to%' AND country='$country'");
     $gfctotalmcstmt->execute();
     $gfctotalmcnotsub = $gfctotalmcstmt->fetch(PDO::FETCH_ASSOC);
-    $gfctotalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE commondity_id='$item_id' AND particular NOT LIKE '%to%'");
+    $gfctotalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE commondity_id='$item_id' AND particular NOT LIKE '%to%' AND country='$country'");
     $gfctotalmcsubnumstmt->execute();
     $gfctotalmcsubnum = $gfctotalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
     $gfctotalmc = $gfctotalmcnotsub['total_mc'] - $gfctotalmcsubnum['total_mc'];
