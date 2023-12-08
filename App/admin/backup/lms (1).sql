@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 29, 2023 at 06:55 AM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Generation Time: Dec 08, 2023 at 01:08 PM
+-- Server version: 10.4.24-MariaDB
+-- PHP Version: 8.0.17
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -29,9 +29,9 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `accounts` (
   `id` int(11) NOT NULL,
-  `username` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
+  `username` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `role` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -53,7 +53,7 @@ CREATE TABLE `acname` (
   `code_no` varchar(255) NOT NULL,
   `ac_type` int(11) NOT NULL,
   `ac_name` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `acname`
@@ -126,7 +126,9 @@ INSERT INTO `acname` (`id`, `code_no`, `ac_type`, `ac_name`) VALUES
 (221, '3300/SC1', 5, 'Border Trade Technak (SC Trader)'),
 (222, '3300/SC2', 5, 'Frozen Account (SC Trader)'),
 (223, '3300/SC3', 5, 'SC Apple Account (SC Trader)'),
-(224, '3300/SC4', 5, 'SC Fruit Account (SC Trader)');
+(224, '3300/SC4', 5, 'SC Fruit Account (SC Trader)'),
+(225, '4000/M10', 3, 'Market'),
+(226, '4000/K09', 3, 'Kyi Nue Kha');
 
 -- --------------------------------------------------------
 
@@ -145,20 +147,19 @@ CREATE TABLE `actualinvoice` (
   `total_usd` varchar(11) NOT NULL,
   `infoid` int(11) NOT NULL,
   `link_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `actualinvoice`
 --
 
 INSERT INTO `actualinvoice` (`id`, `commondity_id`, `size`, `packingkgperbox`, `mc`, `totalnetweight`, `usd`, `total_usd`, `infoid`, `link_id`) VALUES
-(1, '1023', '3up', '25', 14, '350', '1', '25', 1, 1),
-(2, '1023', '4up', '25', 15, '375', '2', '50', 1, 2),
-(3, '1023', '5up', '21', 14, '294', '', '', 2, 3),
-(4, '1023', '2up', '10', 10, '100', '', '', 3, 4),
-(5, '1023', '3up', '10', 10, '100', '', '', 3, 5),
-(6, '1023', '3up', '10', 10, '100', '', '', 3, 6),
-(7, '1023', '3up', '10', 10, '100', '', '', 3, 7);
+(8, '1023', '1up', '21', 23, '483', '', '', 1, 8),
+(9, '1023', '2up', '22', 23, '506', '', '', 1, 9),
+(10, '1033', 'j', '49', 3, '147', '2', '98', 4, 10),
+(11, '1015', '9up', '20', 5, '100', '1.95', '39', 5, 11),
+(13, '1010', '3up', '20', 5, '100', '2.9', '58', 7, 13),
+(14, '1015', '6up', '100', 10, '1000', '2', '40', 8, 14);
 
 -- --------------------------------------------------------
 
@@ -169,7 +170,7 @@ INSERT INTO `actualinvoice` (`id`, `commondity_id`, `size`, `packingkgperbox`, `
 CREATE TABLE `actype` (
   `acid` int(11) NOT NULL,
   `ac_type` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `actype`
@@ -199,14 +200,16 @@ CREATE TABLE `bankdetail` (
   `swift_code` varchar(200) NOT NULL,
   `bank_branch_address` varchar(200) NOT NULL,
   `branch_name` varchar(200) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `bankdetail`
 --
 
 INSERT INTO `bankdetail` (`id`, `infoid`, `company_name`, `company_address`, `usd`, `account_type`, `bank_name`, `swift_code`, `bank_branch_address`, `branch_name`) VALUES
-(1, 1, 'South Asian Foods', 'NY', '123456789', 'payment', 'YOMA', 'sss123', 'North Okkalapa', '');
+(1, 1, 'South Asian Foods', '111 North Bridge Road, #08-26A Peninsula Plaza, Singapore 179098', '123456789', 'payment', 'YOMA', 'sss123', 'North Okkalapa', ''),
+(2, 4, 'HMS GLOBAL PTE LTD', '111 North Bridge Road, #08-26A Peninsula Plaza, Singapore 179098', '2.00', 'USD Current  Account', 'United Overseas Bank Ltd (UOB) , Singapore', 'UOVBSGSG', '1 Coleman Street , #01-14 the Adelphi, Singapore 179803', ''),
+(3, 5, 'HMS GLOBAL PTE LTD', '111 North Bridge Road, #08-26A Peninsula Plaza, Singapore 179098', '2.00', 'USD Current  Account', 'United Overseas Bank Ltd (UOB) , Singapore', 'UOVBSGSG', '1 Coleman Street , #01-14 the Adelphi, Singapore 179803', '');
 
 -- --------------------------------------------------------
 
@@ -217,13 +220,13 @@ INSERT INTO `bankdetail` (`id`, `infoid`, `company_name`, `company_address`, `us
 CREATE TABLE `cashbook` (
   `id` int(11) NOT NULL,
   `date` date NOT NULL,
-  `sr_no` varchar(25) NOT NULL,
-  `ac_name` varchar(25) NOT NULL,
-  `particular` text NOT NULL,
+  `sr_no` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
+  `ac_name` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
+  `particular` text COLLATE utf8_unicode_ci NOT NULL,
   `debit` bigint(20) DEFAULT NULL,
   `credit` bigint(20) DEFAULT NULL,
   `balance` bigint(25) NOT NULL,
-  `voucher_no` varchar(25) NOT NULL
+  `voucher_no` varchar(25) COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -234,8 +237,8 @@ CREATE TABLE `cashbook` (
 
 CREATE TABLE `category` (
   `id` int(11) NOT NULL,
-  `category_id` varchar(22) NOT NULL,
-  `category_name` varchar(255) NOT NULL
+  `category_id` varchar(22) COLLATE utf8_unicode_ci NOT NULL,
+  `category_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -248,13 +251,13 @@ CREATE TABLE `coldstore` (
   `id` int(11) NOT NULL,
   `indate` date NOT NULL,
   `outdate` date NOT NULL,
-  `commondity_id` varchar(11) NOT NULL,
+  `commondity_id` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `mc` int(11) NOT NULL,
   `total_mc` int(11) NOT NULL,
-  `kg` varchar(12) NOT NULL,
-  `total_kg` varchar(11) NOT NULL,
+  `kg` varchar(12) COLLATE utf8_unicode_ci NOT NULL,
+  `total_kg` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `day` int(11) NOT NULL,
-  `rate` varchar(12) NOT NULL,
+  `rate` varchar(12) COLLATE utf8_unicode_ci NOT NULL,
   `charges` int(11) NOT NULL,
   `total_charges` bigint(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -270,7 +273,7 @@ CREATE TABLE `container` (
   `container_no` int(11) NOT NULL,
   `country` varchar(20) NOT NULL,
   `date` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -285,7 +288,7 @@ CREATE TABLE `currency` (
   `mmk_amount` bigint(25) NOT NULL,
   `usd_amount` bigint(25) NOT NULL,
   `voucher_no` varchar(36) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -294,10 +297,10 @@ CREATE TABLE `currency` (
 --
 
 CREATE TABLE `customers` (
-  `customer_id` varchar(100) NOT NULL,
-  `customer_name` varchar(255) NOT NULL,
-  `customer_detail` text NOT NULL,
-  `customer_address` text NOT NULL
+  `customer_id` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `customer_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `customer_detail` text COLLATE utf8_unicode_ci NOT NULL,
+  `customer_address` text COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -334,7 +337,7 @@ CREATE TABLE `form7stock` (
   `pcspervr` varchar(15) NOT NULL,
   `pcsperf7` int(11) NOT NULL,
   `link_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `form7stock`
@@ -348,7 +351,23 @@ INSERT INTO `form7stock` (`id`, `date`, `item_id`, `supplier_name`, `country`, `
 (5, '0000-00-00', '1023', '4000/A01', 'NY', 'frozen', '7up', '', '', '', 1, 2),
 (6, '0000-00-00', '1023', '4000/A01', 'NY', 'frozen', '8up', '', '', '', 7, 2),
 (7, '0000-00-00', '1023', '4000/A01', 'NY', 'frozen', '10up', '', '', '', 2, 2),
-(8, '0000-00-00', '1023', '4000/A01', 'NY', 'frozen', '12up', '', '', '', 4, 2);
+(8, '0000-00-00', '1023', '4000/A01', 'NY', 'frozen', '12up', '', '', '', 4, 2),
+(9, '2023-11-30', '1010', '4000/k01', 'NY', 'frozen', '5up', '200', '326.8', '', 10, 3),
+(10, '0000-00-00', '1010', '4000/k01', NULL, 'frozen', '6up', '', '', '', 4, 3),
+(15, '2023-11-30', '1017', '4000/S01', 'NY', 'frozen', '3up', '100', '163.4', '20', 13, 5),
+(16, '0000-00-00', '1017', '4000/S01', 'NY', 'frozen', '5up', '', '', '', 5, 5),
+(17, '0000-00-00', '1017', '4000/S01', 'NY', 'frozen', '7up', '', '', '', 2, 5),
+(18, '2023-11-28', '1010', '4000/A01', 'NY', 'frozen', '4up', '100', '163.4', '', 20, 0),
+(19, '2023-11-30', '1011', '4000/K01', 'NY', 'frozen', '5up', '200', '326.8', '20', 0, 6),
+(20, '0000-00-00', '1011', '4000/K01', 'NY', 'frozen', '6up', '', '', '', 5, 6),
+(22, '0000-00-00', '1011', '4000/K01', 'NY', 'frozen', '2up', '', '', '', 2, 6),
+(23, '2023-08-10', '1033', '4000/M10', 'LM', 'frozen', 'J', '19.86', '32.45124', '', 0, 7),
+(24, '2023-01-12', '1037', '4000/A03', 'DAKA', 'tcl', '4up', '100', '163.4', '', 10, 8),
+(25, '0000-00-00', '1037', '4000/A03', 'DAKA', 'tcl', '5up', '', '', '', 2, 8),
+(27, '2023-12-07', '1010', '4000/K02', 'NY', 'frozen', '4up', '100', '163.4', '', 20, 0),
+(28, '2023-12-07', '1015', '4000/K09', 'NY', 'frozen', '6up', '60', '98.04', '20', 20, 10),
+(29, '2023-12-07', '1029', '4000/K09', 'DAKA', 'tcl', '9up', '200', '326.8', '', 800, 11),
+(30, '2023-12-09', '1010', '4000/A01', 'Japan', 'frozen', '3up', '100', '163.4', '', 20, 12);
 
 -- --------------------------------------------------------
 
@@ -374,7 +393,7 @@ CREATE TABLE `form10stock` (
   `looseoutpcs` int(11) NOT NULL,
   `total_kg` varchar(11) NOT NULL,
   `percentage` varchar(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `form10stock`
@@ -388,7 +407,15 @@ INSERT INTO `form10stock` (`id`, `date`, `item_id`, `supplier_id`, `country`, `t
 (5, '2023-11-21', '1023', '4000/A01', 'NY', 'frozen', '7up', 1, 0, '', 0, '7.7', 1, '', 0, '7.7', ''),
 (6, '2023-11-21', '1023', '4000/A01', 'NY', 'frozen', '8up', 7, 2, '54', 6, '8.8', 1, '', 0, '62.8', ''),
 (7, '2023-11-21', '1023', '4000/A01', 'NY', 'frozen', '10up', 2, 1, '21', 2, '', 0, '', 0, '21', ''),
-(8, '2023-11-21', '1023', '4000/A01', 'NY', 'frozen', '12up', 4, 2, '49', 4, '', 0, '', 0, '49', '');
+(8, '2023-11-21', '1023', '4000/A01', 'NY', 'frozen', '12up', 4, 2, '49', 4, '', 0, '', 0, '49', ''),
+(9, '2023-11-28', '1010', '4000/A01', 'NY', 'frozen', '4up', 10, 5, '100', 10, '', 5, '', 5, '100', ''),
+(10, '2023-11-28', '1010', '4000/K01', 'NY', 'frozen', '4up', 88, 5, '100', 88, '', 5, '', 5, '100', ''),
+(11, '2023-08-11', '1033', '4000/M10', 'LM', 'frozen', 'j', 0, 3, '49', 0, '', 0, '15', 0, '34', ''),
+(12, '2023-12-01', '1037', '4000/A03', 'DAKA', 'tcl', '4up', 12, 2, '165', 12, '', 0, '', 0, '165', ''),
+(13, '2023-12-07', '1015', '4000/K09', 'NY', 'frozen', '6up', 20, 10, '100', 20, '', 0, '', 0, '100', ''),
+(14, '2023-12-10', '1023', '4000/A01', 'NY', 'tcl', '9up', 800, 30, '325', 800, '', 0, '', 0, '325', ''),
+(15, '2023-12-10', '1029', '4000/K09', 'DAKA', 'tcl', '9up', 800, 30, '325', 800, '', 0, '', 0, '325', ''),
+(16, '2023-09-12', '1010', '4000/A01', 'Japan', 'frozen', '3up', 0, 10, '100', 0, '', 0, '', 0, '100', '');
 
 -- --------------------------------------------------------
 
@@ -409,14 +436,24 @@ CREATE TABLE `general_ledger` (
   `container_no` varchar(25) NOT NULL,
   `bank_charges` float NOT NULL,
   `acid` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `general_ledger`
 --
 
 INSERT INTO `general_ledger` (`id`, `date`, `voucherno`, `ac_code`, `debit`, `credit`, `balance`, `narration`, `sr_no`, `container_no`, `bank_charges`, `acid`) VALUES
-(1, '2023-11-20', '12345', '4000/A01', 0, 566900, -566900, '', '', '', 0, 0);
+(1, '2023-11-20', '12345', '4000/A01', 0, 566900, -566900, '', '', '', 0, 0),
+(2, '2023-11-30', '3313542', '4000/k01', 0, 200000, -200000, '', '', '', 0, 0),
+(3, '2023-11-30', '326437437', '4000/A01', 0, 200000, -200000, '', '', '', 0, 0),
+(4, '2023-11-30', '244322', '4000/S01', 0, 100000, -100000, '', '', '', 0, 0),
+(5, '2023-11-30', '54846', '4000/K01', 0, 600000, -600000, '', '', '', 0, 0),
+(6, '2023-08-10', '8765432', '4000/M10', 0, 19860, -19860, '', '', '', 0, 0),
+(7, '2023-01-12', '2274', '4000/A03', 0, 200000, -200000, '', '', '', 0, 0),
+(8, '2023-12-07', '44435', '4000/K02', 0, 200000, -200000, '', '', '', 0, 0),
+(9, '2023-12-07', '7954', '4000/K09', 0, 200000, -200000, '', '', '', 0, 0),
+(10, '2023-12-07', '09347', '4000/K09', 0, 400000, -400000, '', '', '', 0, 0),
+(11, '2023-12-09', '3455', '4000/A01', 0, 100000, -100000, '', '', '', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -434,7 +471,7 @@ CREATE TABLE `gfcdryfishcoldstore` (
   `charges` bigint(15) NOT NULL,
   `total_charges` bigint(15) NOT NULL,
   `remark` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -451,7 +488,7 @@ CREATE TABLE `gfcdryfishlabour` (
   `charges` bigint(15) NOT NULL,
   `total_charges` bigint(15) NOT NULL,
   `remark` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -471,7 +508,7 @@ CREATE TABLE `gfcfishcoldstore` (
   `charges` bigint(13) NOT NULL,
   `total_charges` bigint(14) NOT NULL,
   `remark` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -488,7 +525,7 @@ CREATE TABLE `gfcfishlabour` (
   `charges` bigint(15) NOT NULL,
   `total_charges` bigint(15) NOT NULL,
   `remark` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -513,7 +550,7 @@ CREATE TABLE `gfcmcstock` (
   `looseout_kg` varchar(20) NOT NULL,
   `looseout_pcs` varchar(20) NOT NULL,
   `remark` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `gfcmcstock`
@@ -523,7 +560,18 @@ INSERT INTO `gfcmcstock` (`id`, `country`, `particular`, `date`, `commondity_id`
 (1, 'NY', 'HHK To GFC', '2023-11-23', '1023', '3up', '346', 14, 14, '', '', '', '', '', '', ''),
 (2, 'NY', 'Ship/123', '2023-11-25', '1023', '3up', '346', 14, 0, '', '', '', '', '', '', ''),
 (3, 'NY', 'HHK To GFC', '2023-11-23', '1023', '4up', '374.9', 15, 15, '', '', '', '', '', '', ''),
-(4, 'NY', 'Ship/', '2023-11-25', '1023', '4up', '374.9', 15, 0, '', '', '', '', '', '', '');
+(4, 'NY', 'Ship/', '2023-11-25', '1023', '4up', '374.9', 15, 0, '', '', '', '1/2', '20', '1', ''),
+(5, 'NY', 'HHK To GFC', '2023-12-01', '1023', '4up', '374.9', 1, 1, '', '', '', '', '', '', ''),
+(7, 'NY', 'HHK To GFC', '2023-12-01', '1033', '2up', '25', 20, 20, '', '', '', '', '', '', ''),
+(8, 'NY', 'HHK To GFC', '2023-12-01', '1033', '2up', '25', 80, 100, '', '', '', '', '', '', ''),
+(13, 'LM', 'HHK To GFC', '2023-11-09', '1033', 'j', '49', 1, 1, '', '', '', '', '', '', ''),
+(14, 'LM', 'HHK To GFC', '2023-11-09', '1033', 'j', '49', 2, 3, '', '', '', '', '', '', ''),
+(15, 'LM', 'Ship/', '2023-12-11', '1033', 'j', '49', 3, 0, '', '', '', '', '', '', ''),
+(16, 'NY', 'HHK To GFC', '2023-09-12', '1015', '6up', '100', 5, 5, '', '', '', '', '', '', ''),
+(17, 'NY', 'Ship/09797', '2023-12-10', '1015', '6up', '100', 5, 0, '', '', '', '', '', '', ''),
+(18, 'NY', 'HHK To GFC', '2023-12-08', '1015', '6up', '100', 4, 4, '', '', '', '', '', '', ''),
+(19, 'Japan', 'HHK To GFC', '2023-12-13', '1010', '3up', '100', 5, 5, '', '', '', '', '', '', ''),
+(20, 'Japan', 'Ship/', '2023-12-14', '1010', '3up', '100', 5, 0, '', '', '', '', '', '', '');
 
 -- --------------------------------------------------------
 
@@ -545,7 +593,7 @@ CREATE TABLE `gfctotal` (
   `payment_amount` bigint(15) NOT NULL,
   `balance_amount` bigint(15) NOT NULL,
   `remark` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -570,7 +618,7 @@ CREATE TABLE `hhkmcstock` (
   `looseout_kg` varchar(20) NOT NULL,
   `looseout_pcs` bigint(15) NOT NULL,
   `remark` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `hhkmcstock`
@@ -580,7 +628,22 @@ INSERT INTO `hhkmcstock` (`id`, `country`, `particular`, `date`, `commondity_id`
 (1, 'NY', 'From From-10', '2023-11-22', '1023', '3up', '346', 14, 14, '', '', 0, '', '', 0, ''),
 (2, 'NY', 'HHK To GFC', '2023-11-23', '1023', '3up', '346', 14, 0, '', '', 0, '', '', 0, ''),
 (3, 'NY', 'From From-10', '2023-11-22', '1023', '4up', '374.9', 16, 16, '', '', 0, '', '', 0, ''),
-(4, 'NY', 'HHK To GFC', '2023-11-23', '1023', '4up', '374.9', 15, 1, '', '', 0, '', '', 0, '');
+(4, 'NY', 'HHK To GFC', '2023-11-23', '1023', '4up', '374.9', 15, 1, '1/2', '20', 1, '', '', 0, ''),
+(5, 'NY', 'From From-10', '2023-11-23', '1023', '5up', '21', 20, 20, '', '', 0, '', '', 0, ''),
+(6, 'NY', 'From From-10', '2023-11-25', '1023', '5up', '25', 10, 10, '', '', 0, '', '', 0, ''),
+(7, 'NY', 'HHK To GFC', '2023-12-01', '1023', '4up', '374.9', 1, 0, '', '', 0, '', '', 0, ''),
+(14, 'NY', 'From From-10', '2023-12-01', '1033', '2up', '25', 100, 100, '', '', 0, '', '', 0, ''),
+(15, 'NY', 'From From-10', '2023-12-01', '1033', '3up', '20', 30, 30, '', '', 0, '', '', 0, ''),
+(16, 'NY', 'HHK To GFC', '2023-12-01', '1033', '2up', '25', 20, 80, '', '', 0, '', '', 0, ''),
+(17, 'NY', 'HHK To GFC', '2023-12-01', '1033', '2up', '25', 80, 0, '', '', 0, '', '', 0, ''),
+(25, 'LM', 'From From-10', '2023-11-08', '1033', 'j', '49', 3, 3, '', '', 0, '', '', 0, ''),
+(26, 'LM', 'HHK To GFC', '2023-11-09', '1033', 'j', '49', 1, 2, '', '', 0, '', '', 0, ''),
+(27, 'LM', 'HHK To GFC', '2023-11-09', '1033', 'j', '49', 2, 0, '', '', 0, '', '', 0, ''),
+(28, 'NY', 'From From-10', '2023-12-07', '1015', '6up', '100', 9, 9, '', '', 0, '', '', 0, ''),
+(29, 'NY', 'HHK To GFC', '2023-09-12', '1015', '6up', '100', 5, 4, '', '', 0, '', '', 0, ''),
+(30, 'NY', 'HHK To GFC', '2023-12-08', '1015', '6up', '100', 4, 0, '', '', 0, '', '', 0, ''),
+(31, 'Japan', 'From From-10', '2023-12-10', '1010', '3up', '100', 10, 10, '', '', 0, '', '', 0, ''),
+(32, 'Japan', 'HHK To GFC', '2023-12-13', '1010', '3up', '100', 5, 5, '', '', 0, '', '', 0, '');
 
 -- --------------------------------------------------------
 
@@ -599,7 +662,7 @@ CREATE TABLE `hhkstock` (
   `total_kg` varchar(11) NOT NULL,
   `balance` varchar(11) NOT NULL,
   `link_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -630,18 +693,19 @@ CREATE TABLE `invoice_costing` (
   `total_kg_price` varchar(11) NOT NULL,
   `infoid` int(11) NOT NULL,
   `link_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `invoice_costing`
 --
 
 INSERT INTO `invoice_costing` (`id`, `commondity_id`, `size`, `kg`, `priceperviss`, `priceperkg`, `yield`, `total_price`, `usd`, `packing_material`, `ocean_pacific`, `tax`, `agent`, `transport`, `total_usd`, `sellingpriceperkg`, `total_selling_price`, `profitorlossperkg`, `profit_amount`, `total_kg_price`, `infoid`, `link_id`) VALUES
-(1, '1023', '3up', '25', '1000', '611.9951040', '5.9', '577.8990595', '0.195593220', '0.03', '0.043', '0.02', '0.3', '0.2', '0.788593220', '1', '25', '0.21140678', '5.2851695', '19.71483050', 1, 1),
-(2, '1023', '4up', '25', '1000', '611.9951040', '5.9', '577.8990595', '0.195593220', '0.03', '0.043', '0.04', '0.3', '0.2', '0.808593220', '2', '50', '1.19140678', '29.7851695', '20.21483050', 1, 2),
-(3, '1023', '5up', '21', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 2, 3),
-(6, '1023', '3up', '10', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 3, 6),
-(7, '1023', '3up', '10', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 3, 7);
+(8, '1023', '1up', '21', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 1, 8),
+(9, '1023', '2up', '22', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 1, 9),
+(10, '1033', 'j', '49', '1100', '673.1946144', '4.5', '644.2053726', '0.214666666', '0.3', '0.04', '0.3', '0.3', '0.2', '1.354666666', '2', '98', '0.645333334', '31.62133336', '66.37866666', 4, 10),
+(11, '1015', '9up', '20', '1100', '673.1946144', '4.5', '644.2053726', '0.214666666', '0.3', '0.04', '0.3', '0.3', '0.2', '1.354666666', '1.95', '39', '0.595333334', '11.90666668', '27.09333333', 5, 11),
+(13, '1010', '3up', '20', '1000', '611.9951040', '-38.8', '618.1768727', '0.206', '0.25', '0.4', '0.3', '0.3', '0.2', '1.656', '2.9', '58', '1.244', '24.88', '33.12', 7, 13),
+(14, '1015', '6up', '100', '1000', '611.9951040', '4.5', '585.6412478', '0.195', '0.3', '0.4', '0.3', '0.3', '0.2', '1.695', '2', '200', '0.305', '30.5', '169.5', 8, 14);
 
 -- --------------------------------------------------------
 
@@ -651,7 +715,7 @@ INSERT INTO `invoice_costing` (`id`, `commondity_id`, `size`, `kg`, `pricepervis
 
 CREATE TABLE `item` (
   `item_id` int(11) NOT NULL,
-  `item_name` varchar(255) NOT NULL
+  `item_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -681,7 +745,7 @@ INSERT INTO `item` (`item_id`, `item_name`) VALUES
 (1020, 'Koral'),
 (1021, 'Lakka'),
 (1022, 'Lotia'),
-(1023, 'Mrigal'),
+(1023, 'Mrigal (G)'),
 (1024, 'Pangush'),
 (1025, 'Pujanut'),
 (1026, 'Puti'),
@@ -707,12 +771,12 @@ CREATE TABLE `labour` (
   `id` int(11) NOT NULL,
   `indate` date NOT NULL,
   `outdate` date NOT NULL,
-  `commondity_id` varchar(11) NOT NULL,
+  `commondity_id` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `mc` int(11) NOT NULL,
   `total_mc` int(11) NOT NULL,
-  `kg` varchar(11) NOT NULL,
-  `total_kg` varchar(11) NOT NULL,
-  `rate` varchar(11) NOT NULL,
+  `kg` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `total_kg` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `rate` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `charges` int(11) NOT NULL,
   `total_charges` bigint(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -727,13 +791,13 @@ CREATE TABLE `mslcoldstore` (
   `id` int(11) NOT NULL,
   `indate` date NOT NULL,
   `outdate` date NOT NULL,
-  `item_id` varchar(11) NOT NULL,
+  `item_id` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `mc` int(11) NOT NULL,
   `total_mc` int(11) NOT NULL,
-  `kg` varchar(12) NOT NULL,
-  `total_kg` varchar(11) NOT NULL,
+  `kg` varchar(12) COLLATE utf8_unicode_ci NOT NULL,
+  `total_kg` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `day` int(11) NOT NULL,
-  `rate` varchar(12) NOT NULL,
+  `rate` varchar(12) COLLATE utf8_unicode_ci NOT NULL,
   `charges` int(11) NOT NULL,
   `total_charges` bigint(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -748,12 +812,12 @@ CREATE TABLE `mslexportcharges` (
   `id` int(11) NOT NULL,
   `indate` date NOT NULL,
   `outdate` date NOT NULL,
-  `item_id` varchar(11) NOT NULL,
+  `item_id` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `mc` int(11) NOT NULL,
   `total_mc` int(11) NOT NULL,
-  `kg` varchar(15) NOT NULL,
-  `total_kg` varchar(11) NOT NULL,
-  `rate` varchar(15) NOT NULL,
+  `kg` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `total_kg` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `rate` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
   `charges` int(11) NOT NULL,
   `total_charges` bigint(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -768,12 +832,12 @@ CREATE TABLE `mslfreezing` (
   `id` int(11) NOT NULL,
   `indate` date NOT NULL,
   `outdate` date NOT NULL,
-  `item_id` varchar(11) NOT NULL,
+  `item_id` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `mc` int(11) NOT NULL,
   `total_mc` int(11) NOT NULL,
-  `kg` varchar(11) NOT NULL,
-  `total_kg` varchar(11) NOT NULL,
-  `rate` varchar(11) NOT NULL,
+  `kg` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `total_kg` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `rate` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `charges` int(11) NOT NULL,
   `total_charges` bigint(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -793,7 +857,7 @@ CREATE TABLE `mslrepacking` (
   `price` varchar(11) NOT NULL,
   `amount` varchar(11) NOT NULL,
   `total_charges` varchar(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -811,7 +875,7 @@ CREATE TABLE `mslstock` (
   `kg` varchar(11) NOT NULL,
   `total_kg` varchar(11) NOT NULL,
   `balance` varchar(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -834,7 +898,7 @@ CREATE TABLE `msl_total_charges` (
   `payment_amount` bigint(19) NOT NULL,
   `balance_amount` bigint(19) NOT NULL,
   `remark` bigint(19) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -852,7 +916,7 @@ CREATE TABLE `packingliststock` (
   `vessel_name` varchar(33) NOT NULL,
   `voyname` varchar(55) NOT NULL,
   `fda` varchar(56) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `packingliststock`
@@ -861,7 +925,12 @@ CREATE TABLE `packingliststock` (
 INSERT INTO `packingliststock` (`id`, `date`, `customer_id`, `country`, `invoiceno`, `containerno`, `vessel_name`, `voyname`, `fda`) VALUES
 (1, '2023-11-25', '3300/SAF', 'NY', '12345', '123', 'HEHE', 'ac0007', 'abcdefg'),
 (2, '2023-11-25', '3300/SAF', 'NY', '112244', 'KND', 'HEHE', 'YOYOYO', 'abcdefg'),
-(3, '2023-11-25', '3300/CAN', 'CAN', '12222', 'KND', 'HEHE', 'YOYOYO', 'abcdefg');
+(3, '2023-11-25', '3300/CAN', 'CAN', '12222', 'KND', 'HEHE', 'YOYOYO', 'abcdefg'),
+(4, '2023-12-01', '3300/SAF', 'NY', '975Btgt', 'Ac004', 'haha', 'hoho', '12345678'),
+(5, '2023-12-20', '3300/BRN', 'NY', '975B2', 'AJ733', 'peter', 'my name is peter', '463465454734'),
+(7, '2023-12-14', '3300/BRN', 'Japan', '111111', '21', 'PPPP', '[k[', '12345678'),
+(8, '2023-12-18', '3300/UTI', 'NY', 'LMCan-09/20', 'LJ734', 'peter', 'hoho', '234342'),
+(9, '2023-12-18', '3300/UTI', 'NY', 'LMCan-09/20', 'LJ734', 'peter', 'hoho', '234342');
 
 -- --------------------------------------------------------
 
@@ -880,18 +949,19 @@ CREATE TABLE `packingliststockinfo` (
   `usd` varchar(11) NOT NULL,
   `total_usd` varchar(11) NOT NULL,
   `infoid` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `packingliststockinfo`
 --
 
 INSERT INTO `packingliststockinfo` (`id`, `commondity_id`, `size`, `packingkgperbox`, `mc`, `totalnetweight`, `totalgrossweight`, `usd`, `total_usd`, `infoid`) VALUES
-(1, '1023', '3up', 25, 14, 350, '364', '', '', 1),
-(2, '1023', '4up', 25, 15, 375, '390', '', '', 1),
-(3, '1023', '5up', 21, 14, 294, '308', '', '', 2),
-(6, '1023', '3up', 10, 10, 100, '110', '', '', 3),
-(7, '1023', '3up', 10, 10, 100, '110', '', '', 3);
+(8, '1023', '1up', 21, 23, 483, '506', '', '', 1),
+(9, '1023', '2up', 22, 23, 506, '529', '', '', 1),
+(10, '1033', 'j', 49, 3, 147, '150', '', '', 4),
+(11, '1015', '9up', 20, 5, 100, '105', '', '', 5),
+(13, '1010', '3up', 20, 5, 100, '105', '', '', 7),
+(14, '1015', '6up', 100, 10, 1000, '1010', '', '', 8);
 
 -- --------------------------------------------------------
 
@@ -922,16 +992,19 @@ CREATE TABLE `packingmaterial` (
   `pcspermc` int(11) NOT NULL,
   `link_id` int(11) NOT NULL,
   `infoid` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `packingmaterial`
 --
 
 INSERT INTO `packingmaterial` (`id`, `commondity_id`, `fish_size`, `plastic`, `jcv`, `inner_box`, `sticker`, `mc_plastic`, `carton_box`, `tape`, `penon`, `p_sticker`, `plastic_rope`, `micellion`, `processing`, `total`, `perkgcost`, `plastic_size`, `pcsperlb`, `pcspermc`, `link_id`, `infoid`) VALUES
-(1, '1023', '5up', '12.13963963', '8.85', '', '19.25', '24.5', '72', 3, 16, 4, '4.571428571', 50, 350, 560, '0.19', '111', 111, 11, 3, 1),
-(4, '1023', '3up', '', '', '', '', '', '', 0, 0, 0, '', 0, 0, 0, '', '', 0, 0, 6, 3),
-(5, '1023', '3up', '', '', '', '', '', '', 0, 0, 0, '', 0, 0, 0, '', '', 0, 0, 7, 3);
+(6, '1023', '1up', '', '', '', '', '', '', 0, 0, 0, '', 0, 0, 0, '', '', 0, 0, 8, 1),
+(7, '1023', '2up', '', '', '', '', '', '', 0, 0, 0, '', 0, 0, 0, '', '', 0, 0, 9, 1),
+(8, '1033', 'j', '122.5', '9', '', '36.75', '24.5', '72', 3, 16, 4, '4.571428571', 50, 350, 688, '0.23', '21', 21, 21, 10, 4),
+(9, '1015', '9up', '61.25', '9', '', '194.25', '24.5', '72', 3, 16, 4, '4.571428571', 50, 350, 785, '0.26', '333', 222, 111, 11, 5),
+(11, '1010', '3up', '183.75', '9', '', '31.5', '24.5', '72', 3, 16, 4, '4.571428571', 50, 350, 744, '0.25', '124', 12, 18, 13, 7),
+(12, '1015', '6up', '1634.804804', '9', '', '7777', '24.5', '72', 3, 16, 4, '4.571428571', 50, 350, 9941, '3.31', '222', 333, 4444, 14, 8);
 
 -- --------------------------------------------------------
 
@@ -942,12 +1015,12 @@ INSERT INTO `packingmaterial` (`id`, `commondity_id`, `fish_size`, `plastic`, `j
 CREATE TABLE `payable` (
   `id` int(11) NOT NULL,
   `date` date NOT NULL,
-  `supplier_id` varchar(15) NOT NULL,
-  `purchase_voucher_no` varchar(25) NOT NULL,
+  `supplier_id` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `purchase_voucher_no` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
   `purchase_amount` bigint(19) NOT NULL,
   `paid_date` date NOT NULL,
-  `paid_voucher` varchar(25) NOT NULL,
-  `remark` varchar(255) NOT NULL,
+  `paid_voucher` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
+  `remark` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `paid_amount` bigint(25) NOT NULL,
   `balance` bigint(25) NOT NULL,
   `link_id` int(11) NOT NULL,
@@ -960,8 +1033,16 @@ CREATE TABLE `payable` (
 --
 
 INSERT INTO `payable` (`id`, `date`, `supplier_id`, `purchase_voucher_no`, `purchase_amount`, `paid_date`, `paid_voucher`, `remark`, `paid_amount`, `balance`, `link_id`, `closing_balance`, `report_date`) VALUES
-(1, '2023-11-20', '4000/A01', '12345', 209400, '0000-00-00', '', '', 0, 209400, 1, 0, '0000-00-00'),
-(2, '2023-11-20', '4000/A01', '12345', 357500, '0000-00-00', '', '', 0, 566900, 2, 0, '0000-00-00');
+(1, '2023-11-20', '4000/A01', '12345', 209400, '0000-00-00', '', '', 0, 209400, 1, 566900, '2023-12-01'),
+(2, '2023-11-20', '4000/A01', '12345', 357500, '0000-00-00', '', '', 0, 566900, 2, 0, '0000-00-00'),
+(3, '2023-11-30', '4000/k01', '3313542', 200000, '0000-00-00', '', '', 0, 200000, 3, 800000, '2023-12-01'),
+(5, '2023-11-30', '4000/S01', '244322', 100000, '0000-00-00', '', '', 0, 100000, 5, 100000, '2023-12-01'),
+(6, '2023-11-30', '4000/K01', '54846', 600000, '0000-00-00', '', '', 0, 800000, 6, 0, '0000-00-00'),
+(7, '2023-08-10', '4000/M10', '8765432', 19860, '0000-00-00', '', '', 0, 19860, 7, 19860, '2023-12-01'),
+(8, '2023-01-12', '4000/A03', '2274', 200000, '0000-00-00', '', '', 0, 200000, 8, 0, '0000-00-00'),
+(10, '2023-12-07', '4000/K09', '7954', 200000, '0000-00-00', '', '', 0, 200000, 10, 0, '0000-00-00'),
+(11, '2023-12-07', '4000/K09', '09347', 400000, '0000-00-00', '', '', 0, 600000, 11, 0, '0000-00-00'),
+(12, '2023-12-09', '4000/A01', '3455', 100000, '0000-00-00', '', '', 0, 666900, 12, 0, '0000-00-00');
 
 -- --------------------------------------------------------
 
@@ -973,14 +1054,14 @@ CREATE TABLE `permission` (
   `id` int(11) NOT NULL,
   `role_id` int(11) NOT NULL,
   `permission` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `permission`
 --
 
 INSERT INTO `permission` (`id`, `role_id`, `permission`) VALUES
-(1, 1, 'manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_acpayable,manage_accountreceivable,manage_transactionmanage_general_ledger,manage_customers,manage_supplier,manage_coldstoreitem,manage_item,manage_actype,manage_acname,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,sale_report,purchase_report,payable_report');
+(1, 1, 'manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_acpayable,manage_accountreceivable,manage_transactionmanage_general_ledger,manage_customers,manage_supplier,manage_coldstoreitem,manage_item,manage_actype,manage_acname,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,sale_report,purchase_report,payable_report,manage_mcreport,manage_tclmcstock');
 
 -- --------------------------------------------------------
 
@@ -992,12 +1073,12 @@ CREATE TABLE `processing` (
   `id` int(11) NOT NULL,
   `indate` date NOT NULL,
   `outdate` date NOT NULL,
-  `commondity_id` varchar(11) NOT NULL,
+  `commondity_id` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `mc` int(11) NOT NULL,
   `total_mc` int(11) NOT NULL,
-  `kg` varchar(15) NOT NULL,
-  `total_kg` varchar(11) NOT NULL,
-  `rate` varchar(15) NOT NULL,
+  `kg` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `total_kg` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `rate` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
   `charges` int(11) NOT NULL,
   `total_charges` bigint(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -1012,11 +1093,11 @@ CREATE TABLE `purchase` (
   `no` int(11) NOT NULL,
   `date` date NOT NULL,
   `voucher_no` int(11) NOT NULL,
-  `supplier_id` varchar(255) NOT NULL,
-  `tclfrozen` varchar(255) NOT NULL,
-  `commodity` varchar(255) NOT NULL,
-  `size` varchar(11) NOT NULL,
-  `viss` varchar(11) NOT NULL,
+  `supplier_id` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `tclfrozen` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `commodity` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `size` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `viss` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
   `pcs` int(11) NOT NULL,
   `price` int(11) NOT NULL,
   `amount` int(11) NOT NULL
@@ -1028,7 +1109,15 @@ CREATE TABLE `purchase` (
 
 INSERT INTO `purchase` (`no`, `date`, `voucher_no`, `supplier_id`, `tclfrozen`, `commodity`, `size`, `viss`, `pcs`, `price`, `amount`) VALUES
 (1, '2023-11-20', 12345, '4000/A01', 'frozen', '1023', '3up', '209.4', 0, 1000, 209400),
-(2, '2023-11-20', 12345, '4000/A01', 'frozen', '1023', '4up', '357.5', 0, 1000, 357500);
+(2, '2023-11-20', 12345, '4000/A01', 'frozen', '1023', '4up', '357.5', 0, 1000, 357500),
+(3, '2023-11-30', 3313542, '4000/k01', 'frozen', '1010', '5up', '200', 0, 1000, 200000),
+(5, '2023-11-30', 244322, '4000/S01', 'frozen', '1017', '3up', '100', 20, 1000, 100000),
+(6, '2023-11-30', 54846, '4000/K01', 'frozen', '1010', '5up', '200', 20, 3000, 600000),
+(7, '2023-08-10', 8765432, '4000/M10', 'frozen', '1033', 'J', '19.86', 0, 1000, 19860),
+(8, '2023-01-12', 2274, '4000/A03', 'tcl', '1037', '4up', '100', 0, 2000, 200000),
+(10, '2023-12-07', 7954, '4000/K09', 'frozen', '1015', '6up', '100', 20, 2000, 200000),
+(11, '2023-12-07', 9347, '4000/K09', 'tcl', '1029', '9up', '200', 0, 2000, 400000),
+(12, '2023-12-09', 3455, '4000/A01', 'frozen', '1010', '3up', '100', 0, 1000, 100000);
 
 -- --------------------------------------------------------
 
@@ -1048,7 +1137,7 @@ CREATE TABLE `receivable` (
   `particulars` varchar(255) NOT NULL,
   `paid_amount` int(11) NOT NULL,
   `balance` bigint(25) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -1068,7 +1157,7 @@ CREATE TABLE `repacking` (
   `rate` varchar(11) NOT NULL,
   `charges` varchar(11) NOT NULL,
   `total_charges` varchar(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -1083,7 +1172,7 @@ CREATE TABLE `repackingout` (
   `rate` varchar(11) NOT NULL,
   `charges` bigint(15) NOT NULL,
   `total_charges` bigint(15) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -1094,7 +1183,7 @@ CREATE TABLE `repackingout` (
 CREATE TABLE `role` (
   `role_id` int(11) NOT NULL,
   `role_name` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `role`
@@ -1111,10 +1200,10 @@ INSERT INTO `role` (`role_id`, `role_name`) VALUES
 
 CREATE TABLE `supplier` (
   `id` int(11) NOT NULL,
-  `supplier_id` varchar(255) NOT NULL,
-  `supplier_name` varchar(255) NOT NULL,
-  `supplier_phone` varchar(255) NOT NULL,
-  `supplier_address` varchar(255) NOT NULL
+  `supplier_id` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `supplier_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `supplier_phone` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `supplier_address` varchar(255) COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -1171,7 +1260,9 @@ INSERT INTO `supplier` (`id`, `supplier_id`, `supplier_name`, `supplier_phone`, 
 (47, '4000/M05', 'Carton Box (Myanmar HJ)', '', ''),
 (48, '4000/S11', 'Carton Box (Syan Pyae)', '', ''),
 (49, '4000/H03', 'Hlaing Htake Khaung', '', ''),
-(50, '4000/G01', 'GFC', '', '');
+(50, '4000/G01', 'GFC', '', ''),
+(51, '4000/M10', 'Market', '', ''),
+(52, '4000/K09', 'Kyi Nue Kha', '09234567858', 'djhf jf ');
 
 -- --------------------------------------------------------
 
@@ -1193,7 +1284,15 @@ CREATE TABLE `tclmcstock` (
   `loading_no` int(11) NOT NULL,
   `loading_mc` int(11) NOT NULL,
   `grandtotal_mc` bigint(77) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `tclmcstock`
+--
+
+INSERT INTO `tclmcstock` (`id`, `date`, `item_id`, `size`, `pcs`, `kg`, `opening_mc`, `form10mc`, `transfer_to_where`, `transfer_mc`, `loading_no`, `loading_mc`, `grandtotal_mc`) VALUES
+(3, '2023-12-12', '1037', '4up', 12, 165, 0, 2, 'HHK', 2, 0, 0, 0),
+(4, '2023-12-10', '1029', '9up', 800, 325, 0, 30, 'HHK', 10, 302, 20, 0);
 
 -- --------------------------------------------------------
 
@@ -1219,7 +1318,7 @@ CREATE TABLE `total_charges` (
   `balance_amount` bigint(19) NOT NULL,
   `remark` text NOT NULL,
   `link_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -1239,7 +1338,7 @@ CREATE TABLE `transaction` (
   `sr_no` varchar(25) NOT NULL,
   `container_no` varchar(25) NOT NULL,
   `bank_charges` float NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -1259,14 +1358,16 @@ CREATE TABLE `truckactualinvoice` (
   `total_usd` float NOT NULL,
   `invoice_no` varchar(15) NOT NULL,
   `link_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `truckactualinvoice`
 --
 
 INSERT INTO `truckactualinvoice` (`id`, `item_id`, `size`, `pcsperbox`, `kgperbox`, `mc`, `netweight`, `usd`, `total_usd`, `invoice_no`, `link_id`) VALUES
-(1, '1023', '3up', 100, 100, 10, 1000, 8, 800, 'MOP001', 1);
+(1, '1023', '3up', 100, 100, 10, 1000, 8, 800, 'MOP001', 1),
+(5, '1023', '2up', 100, 100, 20, 2000, 120, 12000, 'AS121', 5),
+(6, '1029', '6up', 20, 300, 10, 3000, 130, 39000, '6767', 6);
 
 -- --------------------------------------------------------
 
@@ -1284,14 +1385,16 @@ CREATE TABLE `truckdeclare` (
   `netweight` float NOT NULL,
   `invoice_no` varchar(15) NOT NULL,
   `link_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `truckdeclare`
 --
 
 INSERT INTO `truckdeclare` (`id`, `item_id`, `size`, `pcsperbox`, `kgperbox`, `mc`, `netweight`, `invoice_no`, `link_id`) VALUES
-(1, '1023', '3up', 100, 0, 10, 0, 'MOP001', 1);
+(1, '1023', '3up', 100, 0, 10, 0, 'MOP001', 1),
+(5, '1023', '2up', 100, 200, 20, 4000, 'AS121', 5),
+(6, '1029', '6up', 20, 250, 10, 2500, '6767', 6);
 
 -- --------------------------------------------------------
 
@@ -1311,14 +1414,16 @@ CREATE TABLE `truckfoambox` (
   `total_foambox_no` varchar(255) NOT NULL,
   `invoice_no` varchar(15) DEFAULT NULL,
   `link_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `truckfoambox`
 --
 
 INSERT INTO `truckfoambox` (`id`, `item_id`, `size`, `pcsperbox`, `kgperbox`, `mc`, `netweight`, `foambox_no`, `total_foambox_no`, `invoice_no`, `link_id`) VALUES
-(1, '1023', '3up', 100, 100, 10, 1000, '', '', 'MOP001', 1);
+(1, '1023', '3up', 100, 100, 10, 1000, '', '', 'MOP001', 1),
+(5, '1023', '2up', 100, 100, 20, 2000, '1,2,3,11,22,33,44,55', '8', 'AS121', 5),
+(6, '1029', '6up', 20, 300, 10, 3000, '1,2,3,4,5,6,7,8,9,10', '10', '6767', 6);
 
 -- --------------------------------------------------------
 
@@ -1331,14 +1436,16 @@ CREATE TABLE `truckpackingliststock` (
   `date` date NOT NULL,
   `invoice_no` varchar(11) NOT NULL,
   `truck_no` varchar(16) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `truckpackingliststock`
 --
 
 INSERT INTO `truckpackingliststock` (`id`, `date`, `invoice_no`, `truck_no`) VALUES
-(1, '2023-11-25', 'MOP001', '31');
+(1, '2023-11-25', 'MOP001', '31'),
+(3, '2023-12-14', 'AS121', '40'),
+(4, '2023-12-12', '6767', '5964');
 
 -- --------------------------------------------------------
 
@@ -1356,14 +1463,16 @@ CREATE TABLE `truckpackingliststockinfo` (
   `netweight` float NOT NULL,
   `totalgrossweight` float NOT NULL,
   `invoice_no` varchar(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `truckpackingliststockinfo`
 --
 
 INSERT INTO `truckpackingliststockinfo` (`id`, `item_id`, `size`, `pcsperbox`, `kgperbox`, `mc`, `netweight`, `totalgrossweight`, `invoice_no`) VALUES
-(1, '1023', '3up', 100, 100, 10, 1000, 600, 'MOP001');
+(1, '1023', '3up', 100, 100, 10, 1000, 600, 'MOP001'),
+(5, '1023', '2up', 100, 100, 20, 2000, 1200, 'AS121'),
+(6, '1029', '6up', 20, 300, 10, 3000, 600, '6767');
 
 -- --------------------------------------------------------
 
@@ -1385,7 +1494,15 @@ CREATE TABLE `truckpackingmaterial` (
   `form10kg` float NOT NULL,
   `costperkg` float NOT NULL,
   `invoice_no` varchar(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `truckpackingmaterial`
+--
+
+INSERT INTO `truckpackingmaterial` (`id`, `date`, `remark`, `ice`, `miscellous`, `tape`, `foam_box`, `plastic`, `total_charges`, `total_viss`, `form10kg`, `costperkg`, `invoice_no`) VALUES
+(2, '2023-12-10', 'Hilsa Marical', 25, 30, 23, 10, 22, 110, 0, 600, 0.183333, 'AS121'),
+(3, '2023-12-12', 'hello', 100, 50, 100, 200, 200, 650, 0, 200, 3.25, '6767');
 
 -- --------------------------------------------------------
 
@@ -1417,15 +1534,18 @@ CREATE TABLE `trucktotalcosting` (
   `selling_amount` float NOT NULL,
   `profit` float NOT NULL,
   `invoice_no` varchar(11) NOT NULL,
-  `link_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `link_id` int(11) NOT NULL,
+  `infoid` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `trucktotalcosting`
 --
 
-INSERT INTO `trucktotalcosting` (`id`, `date`, `item_id`, `size`, `total_kg`, `priceperviss`, `priceperkg`, `percentage`, `packing_charges`, `ygntomt_charges`, `mttotechnck_charges`, `labour_charges`, `packingandtransport`, `total`, `grand_total`, `rate`, `costing_usd`, `selling_rate`, `profitperkg`, `original_cost`, `selling_amount`, `profit`, `invoice_no`, `link_id`) VALUES
-(1, '0000-00-00', '1023', '3up', 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 0, 800, 800, 'MOP001', 1);
+INSERT INTO `trucktotalcosting` (`id`, `date`, `item_id`, `size`, `total_kg`, `priceperviss`, `priceperkg`, `percentage`, `packing_charges`, `ygntomt_charges`, `mttotechnck_charges`, `labour_charges`, `packingandtransport`, `total`, `grand_total`, `rate`, `costing_usd`, `selling_rate`, `profitperkg`, `original_cost`, `selling_amount`, `profit`, `invoice_no`, `link_id`, `infoid`) VALUES
+(1, '0000-00-00', '1023', '3up', 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 0, 800, 800, 'MOP001', 1, 0),
+(4, '0000-00-00', '1023', '2up', 100, 1100, 673.195, 686.933, 0, 100000, 150000, 100000, 350000, 300000, 300687, 3000, 100.229, 120, 19.771, 10022.9, 12000, 1977.1, 'AS121', 5, 3),
+(5, '0000-00-00', '1029', '6up', 300, 1000, 611.995, 624.485, 3, 20000, 250000, 100000, 370003, 350000, 350624, 3000, 116.875, 130, 13.125, 35062.5, 39000, 3937.5, '6767', 6, 4);
 
 -- --------------------------------------------------------
 
@@ -1440,7 +1560,7 @@ CREATE TABLE `userlogs` (
   `login_username` varchar(125) NOT NULL,
   `login_password` varchar(125) NOT NULL,
   `status` varchar(55) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `userlogs`
@@ -1449,7 +1569,22 @@ CREATE TABLE `userlogs` (
 INSERT INTO `userlogs` (`id`, `login_time`, `login_date`, `login_username`, `login_password`, `status`) VALUES
 (1, '01:09:54.000000', '2023-11-28', 'admin', 'admin', 'Login Success'),
 (2, '01:19:21.000000', '2023-11-28', 'admin', 'admin', 'Login Success'),
-(3, '11:14:10.000000', '2023-11-29', 'admin', 'admin', 'Login Success');
+(3, '11:14:10.000000', '2023-11-29', 'admin', 'admin', 'Login Success'),
+(4, '04:03:23.000000', '2023-11-29', 'admin', 'admin', 'Login Success'),
+(5, '12:15:20.000000', '2023-11-30', 'admin', 'admin', 'Login Success'),
+(6, '02:32:56.000000', '2023-11-30', 'admin', 'admin', 'Login Success'),
+(7, '10:00:44.000000', '2023-12-01', 'admin', 'admin', 'Login Success'),
+(8, '12:25:17.000000', '2023-12-01', 'admin', 'admin', 'Login Success'),
+(9, '12:31:49.000000', '2023-12-01', 'admin', 'admi ', 'Login Password Invalid'),
+(10, '12:32:32.000000', '2023-12-01', 'admin', 'admin', 'Login Success'),
+(11, '01:58:13.000000', '2023-12-01', 'admin', 'admin', 'Login Success'),
+(12, '04:22:12.000000', '2023-12-01', 'admin', 'adimin', 'Login Password Invalid'),
+(13, '04:22:24.000000', '2023-12-01', 'admin', 'admin', 'Login Success'),
+(14, '11:03:23.000000', '2023-12-04', 'admin', 'admin', 'Login Success'),
+(15, '12:41:20.000000', '2023-12-07', 'admin', 'admin', 'Login Success'),
+(16, '01:46:24.000000', '2023-12-07', 'admin', 'admin', 'Login Success'),
+(17, '04:04:56.000000', '2023-12-07', 'admin', 'admin', 'Login Success'),
+(18, '04:28:18.000000', '2023-12-08', 'admin', 'admin', 'Login Success');
 
 --
 -- Indexes for dumped tables
@@ -1793,13 +1928,13 @@ ALTER TABLE `accounts`
 -- AUTO_INCREMENT for table `acname`
 --
 ALTER TABLE `acname`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=225;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=227;
 
 --
 -- AUTO_INCREMENT for table `actualinvoice`
 --
 ALTER TABLE `actualinvoice`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `actype`
@@ -1811,7 +1946,7 @@ ALTER TABLE `actype`
 -- AUTO_INCREMENT for table `bankdetail`
 --
 ALTER TABLE `bankdetail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `cashbook`
@@ -1847,19 +1982,19 @@ ALTER TABLE `currency`
 -- AUTO_INCREMENT for table `form7stock`
 --
 ALTER TABLE `form7stock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `form10stock`
 --
 ALTER TABLE `form10stock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `general_ledger`
 --
 ALTER TABLE `general_ledger`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `gfcdryfishcoldstore`
@@ -1889,7 +2024,7 @@ ALTER TABLE `gfcfishlabour`
 -- AUTO_INCREMENT for table `gfcmcstock`
 --
 ALTER TABLE `gfcmcstock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `gfctotal`
@@ -1901,7 +2036,7 @@ ALTER TABLE `gfctotal`
 -- AUTO_INCREMENT for table `hhkmcstock`
 --
 ALTER TABLE `hhkmcstock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `hhkstock`
@@ -1913,7 +2048,7 @@ ALTER TABLE `hhkstock`
 -- AUTO_INCREMENT for table `invoice_costing`
 --
 ALTER TABLE `invoice_costing`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `item`
@@ -1967,25 +2102,25 @@ ALTER TABLE `msl_total_charges`
 -- AUTO_INCREMENT for table `packingliststock`
 --
 ALTER TABLE `packingliststock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `packingliststockinfo`
 --
 ALTER TABLE `packingliststockinfo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `packingmaterial`
 --
 ALTER TABLE `packingmaterial`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `payable`
 --
 ALTER TABLE `payable`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `permission`
@@ -2003,7 +2138,7 @@ ALTER TABLE `processing`
 -- AUTO_INCREMENT for table `purchase`
 --
 ALTER TABLE `purchase`
-  MODIFY `no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `receivable`
@@ -2033,13 +2168,13 @@ ALTER TABLE `role`
 -- AUTO_INCREMENT for table `supplier`
 --
 ALTER TABLE `supplier`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT for table `tclmcstock`
 --
 ALTER TABLE `tclmcstock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `total_charges`
@@ -2057,49 +2192,49 @@ ALTER TABLE `transaction`
 -- AUTO_INCREMENT for table `truckactualinvoice`
 --
 ALTER TABLE `truckactualinvoice`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `truckdeclare`
 --
 ALTER TABLE `truckdeclare`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `truckfoambox`
 --
 ALTER TABLE `truckfoambox`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `truckpackingliststock`
 --
 ALTER TABLE `truckpackingliststock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `truckpackingliststockinfo`
 --
 ALTER TABLE `truckpackingliststockinfo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `truckpackingmaterial`
 --
 ALTER TABLE `truckpackingmaterial`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `trucktotalcosting`
 --
 ALTER TABLE `trucktotalcosting`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `userlogs`
 --
 ALTER TABLE `userlogs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

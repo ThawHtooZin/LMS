@@ -94,7 +94,7 @@ $query = new Query();
                 $item_id = $tclmcdata['item_id'];
                ?>
               <tr>
-                <td><?php echo $tclmcdata['date']; ?></td>
+                <td><?php echo date("d-m-Y", strtotime($tclmcdata['date'])); ?></td>
                 <td><?php echo $commonditydata['item_name']; ?></td>
                 <td><?php echo $tclmcdata['size']; ?></td>
                 <td><?php echo $tclmcdata['pcs']; ?></td>

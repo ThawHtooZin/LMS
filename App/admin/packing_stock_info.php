@@ -119,13 +119,13 @@ $query = new Query();
             <a href="packing_stock.php" class="btn btn-secondary float-end me-2 btn-sm ms-2" id="back">Back</a>
             <button type="submit" class="btn btn-danger float-end btn-sm" id="actualinvoice" name="actualinvoicebtn">Actual Invoice</button>
             <?php
-            if (!empty($_SESSION['tabs'])) {
+            if (!empty($_SESSION['tabs']) && $_SESSION['tabs'] == 'actualinvoice') {
               ?>
               <button type="submit" class="btn btn-danger float-end btn-sm me-2" id="actualinvoiceback" name="actualinvoiceback">Back</button>
               <?php
             }
              ?>
-            <a href="export.php?table_name=actualinvoice&infoid=<?php echo $_GET['infoid']; ?>" class="btn btn-sm me-2 btn-success float-end" id="export">Export</a>
+            <a href="export.php?table_name=actualinvoice&infoid=<?php echo $_GET['infoid']; ?>" class="btn btn-sm me-2 btn-success float-end" id="actualinvoicexport">Export</a>
             <button type="button" class="btn btn-success float-end me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#add" id="addpackingstockbtn">Add Packing Stock</button>
             <form action="" method="post">
               <button type="submit" name="searchcommonditybtn" class="btn btn-sm btn-dark float-end me-2">View</button>
@@ -143,6 +143,13 @@ $query = new Query();
                   <?php
                 } ?>
               </select>
+              <?php
+              if (!empty($_SESSION['tabs']) && $_SESSION['tabs'] == 'packingliststock') {
+                ?>
+               <?php
+              }
+               ?>
+               <a href="export.php?table_name=actualpackinglist&infoid=<?php echo $_GET['infoid']; ?>" class="btn btn-sm me-2 btn-primary float-end" id="packingstockexport">Export</a>
             </form>
           </div>
         </form>
@@ -934,13 +941,14 @@ $query = new Query();
          echo '
          $("#actualinvoice").hide();
          $("#actualinvoiceback").show();
-         $("#export").show();
          $(".actualinvoicetable").show();
          $("#addpackingstockbtn").hide();
          $("#packingstocktable").hide();
          $("#itext").show();
          $("#pltext").hide();
          $("#back").hide();
+         $("#actualinvoicexport").show();
+         $("#packingstockexport").hide();
          ';
        }elseif($_SESSION['tabs'] == 'actualpackinglist'){
          echo '
@@ -951,7 +959,8 @@ $query = new Query();
          $("#packingstocktable").show();
          $("#itext").hide();
          $("#pltext").show();
-         $("#export").hide();
+         $("#actualinvoicexport").hide();
+         $("#packingstockexport").show();
          $("#back").show();
          ';
        }

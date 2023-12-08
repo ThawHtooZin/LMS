@@ -51,7 +51,7 @@ $query = new Query();
       $size = $_POST['size'];
       $item_id = $_POST['item_id'];
       $voucher_no = $_GET['invoice_no'];
-      
+
       $query->updatesellingrate($selling_rate, $id, $size, $item_id, $voucher_no);
     }
 
@@ -174,7 +174,7 @@ $query = new Query();
                             <div class="row">
                               <div class="col">
                                 <label>Packing Charges</label>
-                                <input type="number" name="packing_charges" class="form-control inpv2 mb-2">
+                                <input type="text" name="packing_charges" class="form-control inpv2 mb-2">
                               </div>
                               <div class="col">
                                 <label>YGN To Mt Charges</label>
