@@ -338,7 +338,7 @@ $query = new Query();
                   </div>
                   <?php
                     $blockid = $query->selectoncecontain('category', 'category_name', 'Block');
-                    
+
                    ?>
                   <script type="text/javascript">
                     var upcommondity<?= $id; ?> = $("#upcommondity<?= $id; ?>").val();
@@ -838,7 +838,7 @@ $query = new Query();
                         $updatestmt->execute();
                       }
                     }
-                  }                  
+                  }
 
                   ?>
                 <tr>
