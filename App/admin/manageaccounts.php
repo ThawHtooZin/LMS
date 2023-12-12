@@ -130,7 +130,7 @@ $query = new Query();
             <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
               Add New User
             </button>
-            <table class="mt-5 table table-bordered table-striped rounded">
+            <table class="mt-5 table table-bordered rounded">
               <tr>
                 <th>Account No</th>
                 <th>Username</th>

@@ -195,6 +195,15 @@ class Bootstrap
           font-size: 19px !important;
         }
 
+        table tr:has(th) {
+          background: green !important;
+        }
+        
+        th {
+          color: white !important;
+          border-right: 2px solid white !important;
+        }
+
         [data-bs-toggle] {
           cursor: pointer !important;
         }
@@ -202,6 +211,8 @@ class Bootstrap
         [data-bs-toggle]:hover {
           cursor: pointer !important;
         }
+
+        // Responsive
         @media screen and (min-width: 1300px){
           .contentcol{
             left: 14.5%;
