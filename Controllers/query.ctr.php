@@ -2233,7 +2233,7 @@ Class Query{
     if(!empty($repackingdata)) {
       $diff_mc = $in_mc - $out_mc;
       $diff_kg = $in_kg - $out_kg;
-      $charges = $rate * $in_kg;
+      $charges = $rate * $out_kg;
       $total_charges = $charges + $repackingdata['total_charges'];
 
       $repackingaddstmt = $pdo->prepare("INSERT INTO repacking(date,in_mc, in_kg, out_mc, out_kg, diff_mc, diff_kg, rate, charges, total_charges) VALUES('$date','$in_mc', '$in_kg', '$out_mc', '$out_kg', '$diff_mc', '$diff_kg', '$rate', '$charges', '$total_charges')");
@@ -2241,7 +2241,7 @@ Class Query{
     }else{
       $diff_mc = $in_mc - $out_mc;
       $diff_kg = $in_kg - $out_kg;
-      $charges = $rate * $in_kg;
+      $charges = $rate * $out_kg;
       $total_charges = $charges;
 
       $repackingaddstmt = $pdo->prepare("INSERT INTO repacking(date,in_mc, in_kg, out_mc, out_kg, diff_mc, diff_kg, rate, charges, total_charges) VALUES('$date','$in_mc', '$in_kg', '$out_mc', '$out_kg', '$diff_mc', '$diff_kg', '$rate', '$charges', '$total_charges')");
@@ -2764,14 +2764,14 @@ Class Query{
 
     $totalnetweight = $upkgperbox * $upmc;
     $totalgrossweight = $totalnetweight + $upmc;
-    
-    
+
+
     $updatepackingliststmt = $pdo->prepare("UPDATE packingliststockinfo SET commondity_id='$upitem_id', size='$upsize', packingkgperbox='$upkgperbox', mc='$upmc', totalnetweight='$totalnetweight', totalgrossweight='$totalgrossweight' WHERE id='$upid'");
     $updatepackingliststmt->execute();
-    
+
     $updatepackingliststmt = $pdo->prepare("UPDATE actualinvoice SET commondity_id='$upitem_id', size='$upsize', packingkgperbox='$upkgperbox', mc='$upmc', totalnetweight='$totalnetweight' WHERE link_id='$upid'");
     $updatepackingliststmt->execute();
-    
+
     $updatepackingliststmt = $pdo->prepare("UPDATE invoice_costing SET commondity_id='$upitem_id', size='$upsize', kg='$upkgperbox' WHERE link_id='$upid'");
     $updatepackingliststmt->execute();
 
