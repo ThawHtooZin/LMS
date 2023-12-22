@@ -2987,7 +2987,7 @@ Class Query{
     $adddeclare = $pdo->prepare("INSERT INTO truckdeclare(item_id, size, pcsperbox, mc, invoice_no, link_id) VALUES('$commondity', '$size', '$pcsperbox', '$mc', '$invoice_no', '$lastid')");
     $adddeclare->execute();
 
-    $adddeclare = $pdo->prepare("INSERT INTO trucktotalcosting(item_id, size, total_kg, invoice_no, link_id, infoid) VALUES('$commondity', '$size', '$kgperbox', '$invoice_no', '$lastid', '$infoid')");
+    $adddeclare = $pdo->prepare("INSERT INTO trucktotalcosting(item_id, size, total_kg, invoice_no, link_id, infoid) VALUES('$commondity', '$size', '$totalnetweight', '$invoice_no', '$lastid', '$infoid')");
     $adddeclare->execute();
   }
 
@@ -3020,7 +3020,7 @@ Class Query{
     $netweightstmt->execute();
     $netweight = $netweightstmt->fetch(PDO::FETCH_ASSOC);
 
-    $total_usd = intval($usd) * floatval($netweight['kgperbox']);
+    $total_usd = intval($usd) * floatval($netweight['netweight']);
     $updateusdstmt = $pdo->prepare("UPDATE truckactualinvoice SET usd='$usd', total_usd='$total_usd' WHERE id='$updateid'");
     $updateusdstmt->execute();
   }
@@ -3106,7 +3106,7 @@ Class Query{
     $addmaterialstmt->execute();
   }
 
-  function updatetotalcosting($priceperviss, $percentage, $packing_charges, $ygntomt, $mttotechnck, $labour_charges, $id, $invoice_no){
+  function updatetotalcosting($priceperviss, $percentage, $packing_charges, $mtorst, $ygntomt, $mttotechnck, $ygntost, $sttotechnck, $labour_charges, $id, $invoice_no){
     global $pdo;
     $priceperkg = floatval($priceperviss) / 1.634;
     $realpercentage = $priceperkg / $percentage;
@@ -3123,7 +3123,15 @@ Class Query{
     // $commondity = $commonditystmt->fetch(PDO::FETCH_ASSOC);
     // $ygntomt = $ygntomt / $totalcosting['total_kg'];
     // $mttotechnck = $mttotechnck / $totalcosting['total_kg'];
-    $packingandtransport = $packing_charges + $ygntomt + $mttotechnck + $labour_charges;
+    if (!empty($ygntomt) && !empty($mttotechnck)) {
+      $packingandtransport = $packing_charges + intval($ygntomt) + intval($mttotechnck) + $labour_charges;
+      $updatestmt = $pdo->prepare("UPDATE trucktotalcosting SET mtorst='$mtorst', ygntomtorst_charges='$ygntomt', mtorsttotechnck_charges='$mttotechnck', packingandtransport='$packingandtransport' WHERE id='$id'");
+      $updatestmt->execute();
+    }else{
+      $packingandtransport = $packing_charges + intval($ygntost) + intval($sttotechnck) + $labour_charges;
+      $updatestmt = $pdo->prepare("UPDATE trucktotalcosting SET mtorst='$mtorst', ygntomtorst_charges='$ygntost', mtorsttotechnck_charges='$sttotechnck', packingandtransport='$packingandtransport' WHERE id='$id'");
+      $updatestmt->execute();
+    }
     // if(str_contains($cal_percentage, '-')){
     //   $cal_percentage = explode("-", $cal_percentage);
     //   $cal_percentage = $cal_percentage[1];
@@ -3132,8 +3140,6 @@ Class Query{
     //   $packingandtransportsubtracted = $packingandtransport / $cal_percentage;
     // }
 
-    $updatestmt = $pdo->prepare("UPDATE trucktotalcosting SET ygntomt_charges='$ygntomt', mttotechnck_charges='$mttotechnck', packingandtransport='$packingandtransport' WHERE id='$id'");
-    $updatestmt->execute();
   }
 
   function updatesellingrate($selling_rate, $id, $size, $item_id, $invoice_no){
@@ -3165,13 +3171,13 @@ Class Query{
     $updatestmt->execute();
   }
 
-  function updatetotal($total, $dollar_rate, $id){
+  function updatetotal($total, $dollar_rate, $id, $item_id, $size, $invoice_no){
     global $pdo;
 
-    $datastmt = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE id='$id'");
+    $datastmt = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE item_id='$item_id' AND size='$size' AND invoice_no='$invoice_no' AND percentage != '0'");
     $datastmt->execute();
     $data = $datastmt->fetch(PDO::FETCH_ASSOC);
-
+    print_r($data['percentage']);
     $percentage = $data['percentage'];
     $grand_total = $percentage + $total;
     if($dollar_rate != 0 && $grand_total != 0){

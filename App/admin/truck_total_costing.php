@@ -28,22 +28,25 @@ $query = new Query();
       $priceperviss = $_POST['priceperviss'];
       $percentage = $_POST['percentage'];
       $packing_charges = $_POST['packing_charges'];
+      $mtorst = $_POST['mtorst'];
       $ygntomt = $_POST['ygntomt'];
       $mttotechnck = $_POST['mttotechnck'];
+      $ygntost = $_POST['ygntost'];
+      $sttotechnck = $_POST['sttotechnck'];
       $labour_charges = $_POST['labour_charges'];
       $id = $_POST['id'];
       $invoice_no = $_GET['invoice_no'];
-      $query->updatetotalcosting($priceperviss, $percentage, $packing_charges, $ygntomt, $mttotechnck, $labour_charges, $id, $invoice_no);
+      $query->updatetotalcosting($priceperviss, $percentage, $packing_charges, $mtorst, $ygntomt, $mttotechnck, $ygntost, $sttotechnck, $labour_charges, $id, $invoice_no);
     }
-
-    if(isset($_POST['sellingpriceupdatebtn'])){
-      $sellingpriceperkg = $_POST['sellingpriceperkg'];
-      $updateid = $_POST['sellingpriceupdateid'];
-      $commondity_id = $_POST['commondity_id'];
-      $size = $_POST['size'];
-
-      $query->updatesellingprice($sellingpriceperkg, $updateid, $commondity_id, $size);
-    }
+    //
+    // if(isset($_POST['sellingpriceupdatebtn'])){
+    //   $sellingpriceperkg = $_POST['sellingpriceperkg'];
+    //   $updateid = $_POST['sellingpriceupdateid'];
+    //   $commondity_id = $_POST['commondity_id'];
+    //   $size = $_POST['size'];
+    //
+    //   $query->updatesellingprice($sellingpriceperkg, $updateid, $commondity_id, $size);
+    // }
 
     if(isset($_POST['updatesellingrate'])){
       $selling_rate = $_POST['selling_rate'];
@@ -57,10 +60,13 @@ $query = new Query();
 
     if(isset($_POST['updatetotal'])){
       $id = $_POST['totalid'];
+      $invoice_no = $_GET['invoice_no'];
+      $item_id = $_POST['item_id'];
+      $size = $_POST['size'];
       $total = $_POST['total'];
       $dollar_rate = $_POST['dollar_rate'];
 
-      $query->updatetotal($total, $dollar_rate, $id);
+      $query->updatetotal($total, $dollar_rate, $id, $item_id, $size, $invoice_no);
     }
      ?>
     <div class="row">
@@ -109,14 +115,29 @@ $query = new Query();
                   <th style="padding-top:10px !important;">Price Per Kg</th>
                   <th style="padding-top:20px !important;">%</th>
                   <th style="padding-top:10px !important;">Packing Charges</th>
-                  <th style="padding-top:10px !important;">YGN To MT</th>
-                  <th style="padding-top:10px !important;">Mt To Technck</th>
-                  <th style="padding-top:10px !important;">Labour Charges</th>
-                  <th style="padding-top:10px !important;">Packing & Transport</th>
-                </tr>
-                <tr>
-
-                </tr>
+                  <?php
+                  $stmt = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE invoice_no='$invoice_no'");
+                  $stmt->execute();
+                  $datas = $stmt->fetch(PDO::FETCH_ASSOC);
+                  if (!empty($datas)) {
+                    if ($datas['mtorst'] === "To MT") {
+                      ?>
+                      <th style="padding-top:10px !important;">YGN To MT</th>
+                      <th style="padding-top:10px !important;">Mt To Technck</th>
+                      <?php
+                    }else{
+                      ?>
+                      <th style="padding-top:10px !important;">YGN To ST</th>
+                      <th style="padding-top:10px !important;">St To Technck</th>
+                      <?php
+                    }
+                  }
+                    ?>
+                    <th style="padding-top:10px !important;">Labour Charges</th>
+                    <th style="padding-top:10px !important;">Packing & Transport</th>
+                  </tr>
+                  <tr>
+                  </tr>
                 <?php
                 $stmt = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE invoice_no='$invoice_no' GROUP BY size,item_id ORDER BY id");
                 $stmt->execute();
@@ -146,8 +167,8 @@ $query = new Query();
                     <td><?php if($data['priceperkg'] != 0){echo $data['priceperkg'];}else{ echo "-";} ?></td>
                     <td><?php if($data['percentage'] != 0){echo $data['percentage'];}else{ echo "-";} ?></td>
                     <td><?php if($data['packing_charges'] != 0){echo $data['packing_charges'];}else{ echo "-";} ?></td>
-                    <td><?php if($data['ygntomt_charges'] != 0){echo $data['ygntomt_charges'];}else{ echo "-";} ?></td>
-                    <td><?php if($data['mttotechnck_charges'] != 0){echo $data['mttotechnck_charges'];}else{ echo "-";} ?></td>
+                    <td><?php if($data['ygntomtorst_charges'] != 0){echo $data['ygntomtorst_charges'];}else{ echo "-";} ?></td>
+                    <td><?php if($data['mtorsttotechnck_charges'] != 0){echo $data['mtorsttotechnck_charges'];}else{ echo "-";} ?></td>
                     <td><?php if($data['labour_charges'] != 0){echo $data['labour_charges'];}else{ echo "-";} ?></td>
                     <td><?php if($data['packingandtransport'] != 0){echo $data['packingandtransport'];}else{ echo "-";} ?></td>
                   </tr>
@@ -177,24 +198,43 @@ $query = new Query();
                                 <input type="text" name="packing_charges" class="form-control inpv2 mb-2">
                               </div>
                               <div class="col">
+                                <label>Send To ----</label>
+                                <select class="form-control inpv2" name="mtorst">
+                                  <option value="To MT">To MT</option>
+                                  <option value="To ST">To ST</option>
+                                </select>
+                              </div>
+                            </div>
+                            <div class="row" id="mt">
+                              <div class="col">
                                 <label>YGN To Mt Charges</label>
                                 <input type="number" name="ygntomt" class="form-control inpv2 mb-2">
                               </div>
-                            </div>
-                            <div class="row">
                               <div class="col">
                                 <label>Mt To Technck</label>
                                 <input type="number" name="mttotechnck" class="form-control inpv2 mb-2">
                               </div>
+                            </div>
+                            <div class="row" id="st">
+                              <div class="col">
+                                <label>YGN To ST Charges</label>
+                                <input type="number" name="ygntost" class="form-control inpv2 mb-2">
+                              </div>
+                              <div class="col">
+                                <label>St To Technck</label>
+                                <input type="number" name="sttotechnck" class="form-control inpv2 mb-2">
+                              </div>
+                            </div>
+                            <div class="row">
                               <div class="col">
                                 <label>Labour Charges</label>
                                 <input type="number" name="labour_charges" class="form-control inpv2 mb-2">
                               </div>
+                              <div class="col mt-4">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-success" name="updatetotalcosting">Update</button>
+                              </div>
                             </div>
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-success" name="updatetotalcosting">Update</button>
                           </div>
                         </form>
                       </div>
@@ -252,6 +292,8 @@ $query = new Query();
                             </div>
                             <form action="" method="post">
                               <input type="hidden" name="totalid" value="<?php echo $data['id']; ?>">
+                              <input type="hidden" name="item_id" value="<?php echo $data['item_id']; ?>">
+                              <input type="hidden" name="size" value="<?php echo $data['size']; ?>">
                               <div class="modal-body">
                                 <div class="row">
                                   <div class="col">
@@ -335,6 +377,23 @@ $query = new Query();
         </div>
       </div>
     </div>
+    <script type="text/javascript">
+    $(document).ready(()=>{
+      // alert("MT");
+      $("#selecttown").change(function(){
+        // var mtorst = $("#selecttown").val();
+        //   if(mtorst === 'To MT'){
+        //     // $(".processingratediv").hide();
+        //     // $(".processingchargesdiv").show();
+        //   }else{
+        //     alert("ST");
+        //     // $(".processingratediv").show();
+        //     // $(".processingchargesdiv").hide();
+        //   }
+        // });
+  });
+    });
+    </script>
     <?php
     $bootstrap->javascript();
     ?>

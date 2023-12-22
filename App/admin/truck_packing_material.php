@@ -77,7 +77,7 @@ $query = new Query();
                 <th rowspan="2" style="padding-top:30px;">Total Charges</th>
                 <th rowspan="2" style="padding-top:30px;">Total Viss</th>
                 <th rowspan="2" style="padding-top:30px;">Form10 Kg</th>
-                <th rowspan="2" style="padding-top:30px;">Total Per Kg</th>
+                <th rowspan="2" style="padding-top:30px;">Cost</th>
                 <th rowspan="2" style="padding-top:30px;">Remark</th>
               </tr>
               <tr>

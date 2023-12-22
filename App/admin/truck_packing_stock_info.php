@@ -78,6 +78,7 @@ $query = new Query();
 
           <div class="card-header bg-info">
             <?php
+            $invoice_no = $_GET['invoice_no'];
             if(!empty($_SESSION)){
               if(empty($_SESSION['tabs']) && $_SESSION['tabs'] != 'actualinvoice' && $_SESSION['tabs'] != 'actualpackinglist' && $_SESSION['tabs'] != 'foambox' && $_SESSION['tabs'] != 'declare'){
                 $_SESSION['tabs'] = 'default';
@@ -118,7 +119,7 @@ $query = new Query();
                   <select class="form-control float-end me-2 inpv2" style="width: 16%; height:28px; padding-top:3px;" name="searchcommondity">
                     <option value="">Commondity Search</option>
                     <?php
-                    $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM truckpackingliststockinfo");
+                    $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM truckpackingliststockinfo WHERE invoice_no='$invoice_no'");
                     $commonditystmt->execute();
                     $commonditydatas = $commonditystmt->fetchall();
 
@@ -134,7 +135,6 @@ $query = new Query();
         </form>
           <div class="card-body">
             <?php
-            $invoice_no = $_GET['invoice_no'];
 
             $infostmt = $pdo->prepare("SELECT * FROM truckpackingliststock WHERE invoice_no='$invoice_no'");
             $infostmt->execute();
@@ -165,6 +165,7 @@ $query = new Query();
                       <th>No</th>
                       <th>Commondity</th>
                       <th>Size</th>
+                      <th>Pcs Per Box</th>
                       <th>Packing Kg Per Box</th>
                       <th>Mc</th>
                       <th>Total Net Weight</th>
@@ -204,6 +205,8 @@ $query = new Query();
                           <td><?php if(empty($lastcommondity)){ echo $no;}; ?></td>
                           <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
                           <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['size'];} ?></td>
+                          <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['size'];} ?></td>
+                          <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['pcsperbox'];} ?></td>
                           <td><?php echo $packingstockinfodata['kgperbox']; ?></td>
                           <td><?php echo $packingstockinfodata['mc']; ?></td>
                           <td><?php echo $packingstockinfodata['netweight']; ?></td>
@@ -292,6 +295,7 @@ $query = new Query();
                           <td>Sub Total</td>
                           <td></td>
                           <td></td>
+                          <td></td>
                           <td><?php echo $totalmcdata['totalmc']; ?></td>
                           <td><?php if(!empty($netweightdata['netweight'])){ echo $netweightdata['netweight']; }; ?></td>
                           <td><?php if(!empty($totalgrssweightdata['totalgrossweight'])){ echo $totalgrssweightdata['totalgrossweight']; }; ?></td>
@@ -321,6 +325,7 @@ $query = new Query();
                        <td style="font-weight:bold !important;">Grand Total</td>
                        <td></td>
                        <td></td>
+                       <td></td>
                        <td style="font-weight:bold !important;"><?php echo $totalmcdata['totalmc']; ?></td>
                        <td style="font-weight:bold !important;"><?php if(!empty($netweightdata['netweight'])){ echo $netweightdata['netweight']; }; ?></td>
                        <td style="font-weight:bold !important;"><?php if(!empty($totalgrssweightdata['totalgrossweight'])){ echo $totalgrssweightdata['totalgrossweight']; }; ?></td>
@@ -340,6 +345,7 @@ $query = new Query();
                       <th>No</th>
                       <th>Commondity</th>
                       <th>Size</th>
+                      <th>Pcs Per Box</th>
                       <th>Packing Kg Per Box</th>
                       <th>Mc</th>
                       <th>Total Net Weight</th>
@@ -379,6 +385,7 @@ $query = new Query();
                           <td><?php if(empty($lastcommondity)){ echo $no;}; ?></td>
                           <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
                           <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['size'];} ?></td>
+                          <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['pcsperbox'];} ?></td>
                           <td><?php echo $packingstockinfodata['kgperbox']; ?></td>
                           <td><?php echo $packingstockinfodata['mc']; ?></td>
                           <td><?php echo $packingstockinfodata['netweight']; ?></td>
@@ -466,6 +473,7 @@ $query = new Query();
                         <td>Sub Total</td>
                         <td></td>
                         <td></td>
+                        <td></td>
                         <td><?php echo $totalmcdata['totalmc']; ?></td>
                         <td><?php if(!empty($netweightdata['netweight'])){ echo $netweightdata['netweight']; }; ?></td>
                         <td><?php if(!empty($totalgrssweightdata['totalgrossweight'])){ echo $totalgrssweightdata['totalgrossweight']; }; ?></td>
@@ -493,6 +501,7 @@ $query = new Query();
                      <tr>
                        <td></td>
                        <td style="font-weight:bold !important;">Grand Total</td>
+                       <td></td>
                        <td></td>
                        <td></td>
                        <td style="font-weight:bold !important;"><?php echo $totalmcdata['totalmc']; ?></td>
@@ -546,10 +555,11 @@ $query = new Query();
                          <th>No</th>
                          <th>Commondity</th>
                          <th>Size</th>
+                         <th>Pcs Per Box</th>
                          <th>Packing Kg Per Box</th>
                          <th>Mc</th>
                          <th>Total Net Weight</th>
-                         <th>USD</th>
+                         <th>Preice Per Kg (USD)</th>
                          <th>Total Value USD</th>
                        </tr>
                        <?php
@@ -584,6 +594,7 @@ $query = new Query();
                                <td><?php if(empty($lastcommondity)){ echo $no1;}; ?></td>
                                <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
                                <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['size'];} ?></td>
+                               <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['pcsperbox'];} ?></td>
                                <td><?php echo $packingstockinfodata['kgperbox']; ?></td>
                                <td><?php echo $packingstockinfodata['mc']; ?></td>
                                <td><?php echo $packingstockinfodata['netweight']; ?></td>
@@ -634,6 +645,7 @@ $query = new Query();
                            <td>Sub Total</td>
                            <td></td>
                            <td></td>
+                           <td></td>
                            <td><?php echo $totalmcdata['totalmc']; ?></td>
                            <td><?php if(!empty($netweightdata['netweight'])){ echo $netweightdata['netweight']; }; ?></td>
                            <td></td>
@@ -666,6 +678,7 @@ $query = new Query();
                          <td>Grand Total</td>
                          <td></td>
                          <td></td>
+                         <td></td>
                          <td><?php echo $mcdata['total_mc']; ?></td>
                          <td><?php echo $netweightdata['total_netweight']; ?></td>
                          <td></td>
@@ -686,10 +699,11 @@ $query = new Query();
                          <th>No</th>
                          <th>Commondity</th>
                          <th>Size</th>
+                         <th>Pcs Per Box</th>
                          <th>Packing Kg Per Box</th>
                          <th>Mc</th>
                          <th>Total Net Weight</th>
-                         <th>USD</th>
+                         <th>Preice Per Kg (USD)</th>
                          <th>Total Value USD</th>
                        </tr>
                        <?php
@@ -724,6 +738,7 @@ $query = new Query();
                                <td><?php if(empty($lastcommondity)){ echo $no1;}; ?></td>
                                <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
                                <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['size'];} ?></td>
+                               <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['pcsperbox'];} ?></td>
                                <td><?php echo $packingstockinfodata['kgperbox']; ?></td>
                                <td><?php echo $packingstockinfodata['mc']; ?></td>
                                <td><?php echo $packingstockinfodata['netweight']; ?></td>
@@ -773,6 +788,7 @@ $query = new Query();
                            <td>Sub Total</td>
                            <td></td>
                            <td></td>
+                           <td></td>
                            <td><?php echo $totalmcdata['totalmc']; ?></td>
                            <td><?php if(!empty($netweightdata['netweight'])){ echo $netweightdata['netweight']; }; ?></td>
                            <td></td>
@@ -803,6 +819,7 @@ $query = new Query();
                        <tr style="font-weight:bold !important;">
                          <td></td>
                          <td>Grand Total</td>
+                         <td></td>
                          <td></td>
                          <td></td>
                          <td><?php echo $mcdata['total_mc']; ?></td>
