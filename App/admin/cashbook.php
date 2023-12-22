@@ -243,8 +243,10 @@ $query = new Query();
               foreach ($cashdatas as $cashdata) {
                 $voucher_no = $cashdata['voucher_no'];
                 $ac_code = $cashdata['ac_name'];
-                $acselectstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$voucher_no' AND ac_code!='$ac_code'");
-                $acselectstmt->execute();
+                $acselectstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND ac_code!='$ac_code'");
+                $acselectstmt->execute([
+                  ':voucher_no' => $voucher_no
+                ]);
                 $acselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
                 $accode = $acselect['ac_code'];
                 if(str_contains($accode, '4000/')){
@@ -287,8 +289,10 @@ $query = new Query();
 
 
                   // Dollor Change
-                  $acselectstmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='$debitorcredit'");
-                  $acselectstmt->execute();
+                  $acselectstmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit'");
+                  $acselectstmt->execute([
+                    ':voucher_no' => $voucher_no
+                  ]);
                   $rateselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
 
                   if($cashdata['debit'] != 0){
@@ -340,8 +344,10 @@ $query = new Query();
                         $id = $cashdata['id'];
                         $updatedata = $query->select('cashbook', $id, 'id');
                         $voucher_no = $updatedata['voucher_no'];
-                        $acstmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no='$voucher_no'");
-                        $acstmt->execute();
+                        $acstmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no=:voucher_no");
+                        $acstmt->execute([
+                          ':voucher_no' => $voucher_no
+                        ]);
                         $acdata = $acstmt->fetch(PDO::FETCH_ASSOC);
                         $ac_code = $acdata['ac_code'];
                         $acnamedata = $query->select('acname', $ac_code, 'code_no');
@@ -429,8 +435,10 @@ $query = new Query();
                     }
 
                     // Dollor Change
-                    $acselectstmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='$debitorcredit'");
-                    $acselectstmt->execute();
+                    $acselectstmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit'");
+                    $acselectstmt->execute([
+                      ':voucher_no' => $voucher_no
+                    ]);
                     $rateselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
 
                     if($cashdata['debit'] != 0){
@@ -488,7 +496,7 @@ $query = new Query();
   <!-- Data Add Modal -->
   <div class="modal fade" id="addmodal" tabindex="-1" role="dialog" aria-hidden="true" style="margin-left:auto !important; margin-right: auto !important;">
     <div class="modal-dialog" role="document">
-      <div class="modal-content" style="width: 750px; !important; margin-top:70px !important;">
+      <div class="modal-content" style="width: 750px !important; margin-top:70px !important;">
         <div class="modal-header bg-primary text-light">
           <h5 class="modal-title" id="addmodellabel">Create New Data</h5>
           <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">

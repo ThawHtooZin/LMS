@@ -211,8 +211,10 @@ $query = new Query();
                 // acnamechange
                 $voucher_no = $gldata['voucherno'];
                 $ac_code = $gldata['ac_code'];
-                $acselectstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$voucher_no' AND ac_code!='$ac_code'");
-                $acselectstmt->execute();
+                $acselectstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND ac_code!='$ac_code'");
+                $acselectstmt->execute([
+                  ':voucher_no' => $voucher_no,
+                ]);
                 $acselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
                 if(!empty($acselect['ac_code'])){
                   $accode = $acselect['ac_code'];
@@ -270,8 +272,10 @@ $query = new Query();
                           $id = $gldata['id'];
                           $updatedata = $query->select('general_ledger', $id, 'id');
                           $voucher_no = $updatedata['voucherno'];
-                          $acstmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no='$voucher_no'");
-                          $acstmt->execute();
+                          $acstmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no=:voucher_no");
+                          $acstmt->execute([
+                            ':voucher_no' => $voucher_no
+                          ]);
                           $acdata = $acstmt->fetch(PDO::FETCH_ASSOC);
                           if(!empty($acdata)){
                             $ac_code = $acdata['ac_code'];

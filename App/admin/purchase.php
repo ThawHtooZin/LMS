@@ -88,6 +88,10 @@ $query = new Query();
               $price = $_POST['price'];
 
               $message = $query->addpurchase('purchase' , $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price);
+              $_SESSION['purchase_date'] = $date;
+              $_SESSION['purchase_voucher_no'] = $voucher_no;
+              $_SESSION['purchase_tclfrozen'] = $tclfrozen;
+              $_SESSION['purchase_supplier_name'] = $supplier_name;
             }
 
             if(isset($_POST['total'])){
@@ -468,11 +472,11 @@ $query = new Query();
             <div class="row">
               <div class="col">
                 <label style="font-weight: bold;">Date</label>
-                <input type="date" name="date" class="form-control inpv2">
+                <input type="date" name="date" class="form-control inpv2" value="<?php if(!empty($_SESSION['purchase_date'])){echo $_SESSION['purchase_date']; }; ?>">
               </div>
               <div class="col">
                 <label style="font-weight: bold;">Voucher No</label>
-                <input type="number" name="voucher_no" class="form-control inpv2 mb-2" value="">
+                <input type="number" name="voucher_no" class="form-control inpv2 mb-2" value="<?php if(!empty($_SESSION['purchase_voucher_no'])){echo $_SESSION['purchase_voucher_no']; }; ?>">
               </div>
             </div>
             <div class="row">
@@ -480,15 +484,15 @@ $query = new Query();
                 <label style="font-weight: bold;">TCL (or) Frozen</label>
                 <select class="form-control inpv2 mb-2" name="tclfrozen">
                   <option value="">Select</option>
-                  <option value="tcl">TCL</option>
-                  <option value="frozen">Frozen</option>
+                  <option value="tcl" <?php if(!empty($_SESSION['purchase_tclfrozen'])){if($_SESSION['purchase_tclfrozen'] == 'tcl'){echo "selected";}} ?>>TCL</option>
+                  <option value="frozen" <?php if(!empty($_SESSION['purchase_tclfrozen'])){if($_SESSION['purchase_tclfrozen'] == 'frozen'){echo "selected";}} ?>>Frozen</option>
                 </select>
               </div>
               <div class="col-6">
                 <label style="font-weight: bold;">Supplier A/C Code</label>
                 <div class="row">
                   <div class="col-6">
-                    <input type="text" id="addac_code" name="supplier_code_no" class="form-control inpv2 mb-1" style="padding-top: 2px; padding-bottom: 2px;">
+                    <input type="text" id="addac_code" name="supplier_code_no" class="form-control inpv2 mb-1" style="padding-top: 2px; padding-bottom: 2px;" value="<?php if(!empty($_SESSION['purchase_supplier_name'])){echo $_SESSION['purchase_supplier_name']; }; ?>">
                     </div>
                   <div class="col-6">
                     <div id='addac_name'>

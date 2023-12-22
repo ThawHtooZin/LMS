@@ -88,7 +88,9 @@ $query = new Query();
             ?>
             <?php
               $supplier_id = $_GET['supplier_id'];
-              $payabledatas = $query->search('payable', 'supplier_id', $supplier_id);
+              $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' GROUP BY purchase_voucher_no ORDER BY purchase_voucher_no DESC");
+              $payablestmt->execute();
+              $payabledatas = $payablestmt->fetchall();
             ?>
             <table class="mt-1 table table-bordered table-striped rounded">
               <tr>
@@ -105,19 +107,27 @@ $query = new Query();
               <?php
               // $idd = 0;
               foreach ($payabledatas as $payabledata) {
+                $purchase_voucher_no = $payabledata['purchase_voucher_no'];
+                $balanceamountstmt = $pdo->prepare("SELECT balance FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no='$purchase_voucher_no' ORDER BY id DESC");
+                $balanceamountstmt->execute();
+                $balanceamount = $balanceamountstmt->fetch(PDO::FETCH_ASSOC);
                 $supplier_name = $query->select('acname', $payabledata['supplier_id'], 'code_no');
                 $linkstmt = $pdo->prepare("SELECT link_id FROM payable WHERE ");
                 $link_id = $linkstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalpurchaseamountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS total_purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no='$purchase_voucher_no'");
+                $totalpurchaseamountstmt->execute();
+                $totalpurchaseamount = $totalpurchaseamountstmt->fetch(PDO::FETCH_ASSOC);
               ?>
-              <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $payabledata['id']; ?>">
+              <tr>
                 <td><?php if($payabledata['date'] != '0000-00-00'){echo date('d-m-Y', strtotime($payabledata['date'])); }; ?></td>
                 <td><?php echo $payabledata['purchase_voucher_no']; ?></td>
-                <td><?php if(!empty($payabledata['purchase_amount'])){ echo $payabledata['purchase_amount'];}; ?></td>
+                <td><?php if($totalpurchaseamount['total_purchase_amount'] != 0){ echo $totalpurchaseamount['total_purchase_amount']; }; ?></td>
                 <td><?php if($payabledata['paid_date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($payabledata['paid_date'])); }; ?></td>
                 <td><?php echo $payabledata['paid_voucher']; ?></td>
                 <td><?php echo $payabledata['remark']; ?></td>
                 <td><?php if(!empty($payabledata['paid_amount'])){ echo $payabledata['paid_amount'];}; ?></td>
-                <td><?php if(!empty($payabledata['balance'])){ echo $payabledata['balance'];}; ?></td>
+                <td><?php if(!empty($balanceamount['balance'])){ echo $balanceamount['balance']; } ?></td>
                 <td>
                   <a href="edittransaction.php?voucher_no=<?= $payabledata['paid_voucher']; ?>&file=payable" style="<?php if(empty($payabledata['paid_amount'])){ echo "display:none;"; } ?>">
                     <button type="submit" class="btn btn-warning btn-sm text-light" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">

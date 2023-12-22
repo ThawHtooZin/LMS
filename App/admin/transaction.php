@@ -183,8 +183,8 @@ $query = new Query();
       }else{
         $credit = 0;
       }
-
-      if($ac_code == 'ca-001'){
+      
+      if(!empty($_POST['sr_no']) && !empty($_POST['container_no'])){
         $sr_no = $_POST['sr_no'];
         $container_no = $_POST['container_no'];
       }else{
@@ -201,7 +201,7 @@ $query = new Query();
       $query->deletetransaction($id, $voucher_no);
     }
     if(isset($_POST['accept'])){
-      $date = date('Y-m-d');
+      $date = date('Y-m-d', strtotime('-1 day'));
       $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total FROM transaction WHERE date='$date'");
       $totaldebitstmt->execute();
       $totaldebitdata = $totaldebitstmt->fetch(PDO::FETCH_ASSOC);
@@ -310,7 +310,7 @@ $query = new Query();
                 <th>Credit</th>
               </tr>
               <?php
-              $date = date('Y-m-d');
+              $date = date('Y-m-d', strtotime('-1 day'));
               $stmt = $pdo->prepare("SELECT * FROM transaction WHERE date='$date'");
               $stmt->execute();
               $datas = $stmt->fetchall();
@@ -324,8 +324,10 @@ $query = new Query();
                   $dorc = 'credit';
                 }
                 $voucher_no = $data['voucher_no'];
-                $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='$dorc'");
-                $currencystmt->execute();
+                $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$dorc'");
+                $currencystmt->execute([
+                  ':voucher_no' => $voucher_no,
+                ]);
                 $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
 
                 ?>
