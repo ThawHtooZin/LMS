@@ -92,7 +92,9 @@ $query = new Query();
                 $datas = $query->selectcontain('acname', 'ac_type', $searchac_code);
 
               }else{
-                $datas = $query->selectall('acname');
+                $stmt = $pdo->prepare("SELECT * FROM acname order by ac_type");
+                $stmt->execute();
+                $datas = $stmt->fetchall();
               }
               $idd = 0;
               foreach ($datas as $data) {
