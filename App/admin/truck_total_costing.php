@@ -199,7 +199,7 @@ $query = new Query();
                               </div>
                               <div class="col">
                                 <label>Send To ----</label>
-                                <select class="form-control inpv2" name="mtorst">
+                                <select class="form-control inpv2" name="mtorst" id="selecttown">
                                   <option value="To MT">To MT</option>
                                   <option value="To ST">To ST</option>
                                 </select>
@@ -379,19 +379,18 @@ $query = new Query();
     </div>
     <script type="text/javascript">
     $(document).ready(()=>{
-      // alert("MT");
-      $("#selecttown").change(function(){
-        // var mtorst = $("#selecttown").val();
-        //   if(mtorst === 'To MT'){
-        //     // $(".processingratediv").hide();
-        //     // $(".processingchargesdiv").show();
-        //   }else{
-        //     alert("ST");
-        //     // $(".processingratediv").show();
-        //     // $(".processingchargesdiv").hide();
-        //   }
-        // });
-  });
+      $("select").change(function(){
+          var mtorst = $("#selecttown").val();
+            if(mtorst === 'To MT'){
+              $("#st").hide();
+              $("#mt").show();
+            }else{
+              $("#st").show();
+              $("#mt").hide();
+            }
+        });
+        $("#st").hide();
+        $("#mt").show();
     });
     </script>
     <?php

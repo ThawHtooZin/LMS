@@ -74,7 +74,7 @@ class Bootstrap
           margin: 0; /* Reset margin */
           /* Other style adjustments */
       }
-      
+
       [data-bs-toggle] {
         cursor: pointer !important;
       }
@@ -198,7 +198,7 @@ class Bootstrap
         table tr:has(th) {
           background: green !important;
         }
-        
+
         th {
           color: white !important;
           border-right: 2px solid white !important;
