@@ -815,7 +815,7 @@ $query = new Query();
                   $lastrowdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
 
                   if(!empty($lastrowdata)){
-                    if($hhkstockdata['indate'] == '0000-00-00'){
+                    if($hhkstockdata['outdate'] != '0000-00-00'){
                       if ($lastrowdata['total_mc'] - $hhkstockdata['mc'] != $hhkstockdata['total_mc']) {
                         $totalmc = $lastrowdata['total_mc'] - $hhkstockdata['mc'];
                         $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$totalmc' WHERE id='$nowid'");

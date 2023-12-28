@@ -931,10 +931,10 @@ Class Query{
     }
 
     // Add Stock
-    $stockstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+    $stockstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE commondity_id='$commondity_id' AND indate='$indate' ORDER BY id DESC");
     $stockstmt->execute();
     $stockdata = $stockstmt->fetch(PDO::FETCH_ASSOC);
-
+    print_r($stockdata);
     if(!empty($stockdata)){
       $smc = $mc;
       $skg = $kg;
@@ -965,7 +965,7 @@ Class Query{
     $coldstoredatas = $this->selectdesc('coldstore');
     $coldstoreid = $coldstoredatas[0]['id'];
 
-    $stockstmt = $pdo->prepare("INSERT INTO hhkstock(outdate, commondity_id, mc, total_mc, kg, total_kg, balance, link_id) VALUES('$outdate', '$commondity_id', '$smc', '$total_mc', '$skg', '$total_kg', '$balance', '$coldstoreid')");
+    $stockstmt = $pdo->prepare("INSERT INTO hhkstock(indate, outdate, commondity_id, mc, total_mc, kg, total_kg, balance, link_id) VALUES('$indate', '$outdate', '$commondity_id', '$smc', '$total_mc', '$skg', '$total_kg', '$balance', '$coldstoreid')");
     $stockstmt->execute();
     // echo "execute";
     $datastmt = $pdo->prepare("SELECT * FROM total_charges ORDER BY id DESC");
@@ -1137,7 +1137,7 @@ Class Query{
       $labourstmt = $pdo->prepare("UPDATE processing SET indate='$indate', outdate='$outdate',commondity_id='$commondity_id', mc='$mc', total_mc='$ptotal_mc', kg='$kg', total_kg='$ptotal_kg', rate='$processingrate', charges='$pcharges', total_charges='$totalprocessingcharges' WHERE id='$updateid'");
       $labourstmt->execute();
     }
-    $stockstmt = $pdo->prepare("UPDATE hhkstock SET mc='$mc', total_mc='$stotal_mc', kg='$kg', total_kg='$stotal_kg' WHERE link_id='$updateid'");
+    $stockstmt = $pdo->prepare("UPDATE hhkstock SET indate='$indate', mc='$mc', total_mc='$stotal_mc', kg='$kg', total_kg='$stotal_kg' WHERE link_id='$updateid'");
     $stockstmt->execute();
     $totalupdatestmt = $pdo->prepare("UPDATE total_charges SET commondity_id='$commondity_id', total_coldstore_charges='$total_coldstore_charges', total_labour_charges='$total_labour_charges', total_processing_charges='$total_processing_charges', total_charges='$total_charges_of_total' WHERE link_id='$updateid'");
     $totalupdatestmt->execute();
@@ -2272,8 +2272,8 @@ Class Query{
     $stockdata = $stockstmt->fetch(PDO::FETCH_ASSOC);
 
     if(!empty($stockdata)){
-      $total_mc = $mc + $stockdata['total_mc'];
-      $total_kg = $kg + $stockdata['total_kg'];
+      $total_mc = floatval($mc) + $stockdata['total_mc'];
+      $total_kg = floatval($kg) + $stockdata['total_kg'];
 
       $balance = $total_kg + $stockdata['balance'];
     }else{
