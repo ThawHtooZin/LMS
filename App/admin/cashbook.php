@@ -19,6 +19,17 @@ $query = new Query();
   $bootstrap->css();
   ?>
   <body>
+    <?php
+      if(isset($_POST['addbalance'])){
+        $balanceamount = $_POST['balanceamount'];
+        $query->cashbookaddbalance($balanceamount);
+      }
+      if(isset($_POST['updatebalance'])){
+        $id = $_POST['updatebalanceid'];
+        $balanceamount = $_POST['updatebalanceamount'];
+        $query->cashbookupdatebalance($id, $balanceamount);
+      }
+    ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
         <?php
@@ -45,13 +56,55 @@ $query = new Query();
               ?>
               <h5 class="d-inline">Manage Cash Book (MMK)</h5>
               <?php
+              if(isset($_POST['dbwsearch'])){
+                $startdate = $_POST['startdate'];
+                $enddate = $_POST['enddate'];
+                ?>
+                <a href="cashbookexport.php?forment=excel&filter=dbwsearch&startdate=<?= $startdate; ?>&enddate=<?= $enddate; ?>" class="btn btn-success float-end ms-2">Export to Excel</a>
+                <?php
+              }
+              if(isset($_POST['monthlysearch'])){
+                $month = $_POST['monthlysearch'];
+                $year = date('Y');
+                $searchmonth = $year . "-" . $month;
+                ?>
+                <a href="cashbookexport.php?forment=excel&filter=monthlysearch&month=<?= $searchmonth; ?>" class="btn btn-success float-end ms-2">Export to Excel</a>
+                <?php
+              }
+              if(!isset($_POST['dbwsearch']) && !isset($_POST['monthlysearch'])){
+                ?>
+                <a href="cashbookexport.php?forment=excel&filter=normal" class="btn btn-success float-end ms-2">Export to Excel</a>
+                <?php
+              }
+              ?>
+              <button class="btn btn-secondary float-end" data-bs-toggle="modal" data-bs-target="#addbalance"> Add Balance</button>
+              <div class="modal fade" id="addbalance">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content text-dark">
+                    <div class="modal-header bg-secondary">
+                      <h5 class="text-light">Add Balance</h5>
+                    </div>
+                    <form method="POST">
+                      <div class="modal-body">
+                        <h6>Balance</h6>
+                        <input type="number" name="balanceamount" class="form-control inpv2 mb-2 mt-2">
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" name="addbalance">Add Balance</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <?php
             }else{
               ?>
               <h5 class="d-inline">Manage Cash Book (USD)</h5>
               <?php
             }
              ?>
-            <div class="float-end">
+            <!-- <div class="float-end">
               <form action="" method="post">
                 <?php
                 $cashnames = $query->selectdis("cashbook", 'ac_name');
@@ -62,7 +115,11 @@ $query = new Query();
                     $btnid = "usd";
                   }
                   $acnamedata = $query->select('acname', $cashname['ac_name'], 'code_no');
-                  $acname = $acnamedata['ac_name'];
+                  if(!empty($acnamedata['ac_name'])){
+                    $acname = $acnamedata['ac_name'];
+                  }else{
+                    $acname = '';
+                  }
                   ?>
                   <button type="submit" class="btn btn-light btn-sm" name="<?= $btnid; ?>btn" id="<?= $btnid; ?>btn"><i><?= $acname; ?></i></button>
                   <?php
@@ -84,7 +141,7 @@ $query = new Query();
                   <?php
                 }
                ?>
-            </div>
+            </div> -->
           </form>
           </div>
           <div class="card-body">
@@ -113,22 +170,6 @@ $query = new Query();
             //
             //   $message = $query->addcashbookdata('cashbook', $date, $serial_no, $ac_name, $particular, $debit, $credit);
             // }
-            ?>
-            <?php
-            if(!empty($message)){
-              if(strpos($message, 'Successfully')){
-                $successmessage = $message;
-              }
-
-              if(strpos($message, 'Error')){
-                $errmessage = $message;
-              }
-
-              if(strpos($message, 'following')){
-                $errormessage = $message;
-              }
-            }
-
             ?>
             <?php
               if(!empty($errormessage)){
@@ -217,23 +258,11 @@ $query = new Query();
                 $cashstmt->execute();
                 $cashdatas = $cashstmt->fetchall();
               }elseif(isset($_POST['monthsearchbtn'])){
-                $month = $_POST['monthlysearch'];
-                $year = date('Y');
-                $search = $year . "-" . $month;
-                if (empty($_SESSION['cashbookcurrency']) || $_SESSION['cashbookcurrency'] == 'ks') {
-                  $stmt = $pdo->prepare("SELECT * FROM cashbook WHERE date LIKE '%$search%' AND ac_name='3600/001'");
-                }else{
-                  $stmt = $pdo->prepare("SELECT * FROM cashbook WHERE date LIKE '%$search%' AND ac_name='3600/002'");
-                }
+                $stmt = $pdo->prepare("SELECT * FROM cashbook WHERE date LIKE '%$search%'");
                 $stmt->execute();
                 $cashdatas = $stmt->fetchall();
               }else{
-                if (empty($_SESSION['cashbookcurrency']) || $_SESSION['cashbookcurrency'] == 'ks') {
-                  $stmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/001'");
-                }else{
-                  $stmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/002'");
-                }
-
+                $stmt = $pdo->prepare("SELECT * FROM cashbook"); 
                 $stmt->execute();
                 $cashdatas = $stmt->fetchAll();
               }
@@ -241,7 +270,8 @@ $query = new Query();
               <?php
               $idd = 1;
               foreach ($cashdatas as $cashdata) {
-                $voucher_no = $cashdata['voucher_no'];
+                if(!empty($cashdata['ac_name'])){
+                  $voucher_no = $cashdata['voucher_no'];
                 $ac_code = $cashdata['ac_name'];
                 $acselectstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND ac_code!='$ac_code'");
                 $acselectstmt->execute([
@@ -306,6 +336,9 @@ $query = new Query();
                   $balance = $cashdata['balance'] / $rateselect['dollar_rate'];
                   // Dollor Change
                 }
+                }else{
+                  $balance = $cashdata['balance'];
+                }
 
 
                 ?>
@@ -319,16 +352,53 @@ $query = new Query();
                   <td><?php if($cashdata['credit'] == 0){echo "";}else{echo round($credit, 2);}; ?></td>
                   <td><?php echo round($balance, 2); ?></td>
                   <td>
-                    <a href="edittransaction.php?voucher_no=<?= $cashdata['voucher_no']; ?>&file=cashbook">
-                      <button type="submit" class="btn btn-warning btn-sm text-light" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                          <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-                        </svg>
-                      </button>
-                    </a>
+                    <?php
+                      if(!empty($cashdata['ac_code'])){
+                        ?>
+                        <a href="edittransaction.php?voucher_no=<?= $cashdata['voucher_no']; ?>&file=cashbook">
+                          <button type="submit" class="btn btn-warning btn-sm text-light" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                              <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                              <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                            </svg>
+                          </button>
+                        </a>
+                        <?php
+                      }else{
+                        ?>
+                          <button type="button" class="btn btn-warning btn-sm text-light" data-bs-toggle="modal" data-bs-target="#updatebalance<?= $cashdata['id']; ?>"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                              <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                              <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                            </svg>
+                          </button>
+                        <?php
+                      }
+                    ?>
                   </td>
                 </tr>
               <!-- Data Update Modal -->
+              <div class="modal fade" id="updatebalance<?= $cashdata['id']; ?>">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header bg-warning">
+                      <h5 class="modal-title">Update Balance</h5>
+                    </div>
+                    <div class="modal-body">
+                      <!-- Your modal content goes here -->
+                      <form method="POST" action="">
+                        <input type="hidden" name="updatebalanceid" value="<?= $cashdata['id']; ?>">
+                        <div class="form-group">
+                          <label for="newBalance">New Balance:</label>
+                          <input type="number" class="form-control" name="updatebalanceamount">
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" name="updatebalance">Update</button>
+                      </form>
+                      </div>
+                  </div>
+                </div>
+              </div>
               <div class="modal fade" id="updatemodal<?php echo $cashdata['id']; ?>" tabindex="-1" role="dialog" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                   <div class="modal-content" style="width:600px !important;">
@@ -465,29 +535,6 @@ $query = new Query();
                   }
                   ?>
             </table>
-            <br>
-            <?php
-            if(isset($_POST['dbwsearch'])){
-              $startdate = $_POST['startdate'];
-              $enddate = $_POST['enddate'];
-              ?>
-              <a href="cashbookexport.php?forment=excel&filter=dbwsearch&startdate=<?= $startdate; ?>&enddate=<?= $enddate; ?>" class="btn btn-success">Export to Excel</a>
-              <?php
-            }
-            if(isset($_POST['monthlysearch'])){
-              $month = $_POST['monthlysearch'];
-              $year = date('Y');
-              $searchmonth = $year . "-" . $month;
-              ?>
-              <a href="cashbookexport.php?forment=excel&filter=monthlysearch&month=<?= $searchmonth; ?>" class="btn btn-success">Export to Excel</a>
-              <?php
-            }
-            if(!isset($_POST['dbwsearch']) && !isset($_POST['monthlysearch'])){
-              ?>
-              <a href="cashbookexport.php?forment=excel&filter=normal" class="btn btn-success">Export to Excel</a>
-              <?php
-            }
-             ?>
           </div>
         </div>
       </div>

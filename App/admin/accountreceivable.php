@@ -20,9 +20,16 @@ if(isset($_POST['addpaymentbtn'])){
 }
 
 if(isset($_POST['addbalance'])){
+  $ac_name = $_POST['ac_name'];
   $balance = $_POST['balance'];
 
-  $query->addbalance($balance);
+  $query->addaccountreceivablebalance($ac_name, $balance);
+}
+
+if(isset($_POST['updatebalance'])){
+  $ac_name = $_POST['ac_name'];
+  $balanceamount = $_POST['updatebalanceamount'];
+  $query->updateaccountreceivablebalance($ac_name, $balanceamount);
 }
 ?>
 <!DOCTYPE html>
@@ -139,23 +146,38 @@ if(isset($_POST['addbalance'])){
                  <td><?php if($receivabledata['paid_amount'] != 0){ echo $receivabledata['paid_amount'];} ?></td>
                  <td><?php echo $receivabledata['balance']; ?></td>
                  <td>
-                   <a href="edittransaction.php?voucher_no=<?= $receivabledata['payment_no']; ?>&sr_no=<?= $receivabledata['sr_no']; ?>&file=receivable">
+                   <?php
+                      if(!empty($receivabledata['sr_no'])){
+                        ?>
+                        <a href="edittransaction.php?voucher_no=<?= $receivabledata['payment_no']; ?>&sr_no=<?= $receivabledata['sr_no']; ?>&file=receivable">
                      <button type="submit" class="btn btn-warning btn-sm text-light" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
                          <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
                        </svg>
-                     </button>
-                   </a>
+                     </button>   
+                     </a>
+                        <?php
+                      }else{
+                        ?>
+                        <button class="btn btn-warning btn-sm text-light" data-bs-toggle="modal" data-bs-target="#updatebalance"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                          <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                        </svg>
+                      </button>
+                        <?php
+                      }
+
+                     ?>
                  </td>
                </tr>
                <!-- <div class="modal fade" id="paymentmodal<?php echo $receivabledata['id']; ?>">
-                 <div class="modal-dialog">
-                   <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
-                     <div class="modal-header bg-secondary text-light">
-                       <h1 class="modal-title fs-5">Add Payment</h1>
+                <div class="modal-dialog">
+                  <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                    <div class="modal-header bg-secondary text-light">
+                      <h1 class="modal-title fs-5">Add Payment</h1>
                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                      </div>
-                   <form action="" method="post">
+                     <form action="" method="post">
                      <input type="hidden" name="id" value="<?php echo $receivabledata['id']; ?>">
                      <div class="modal-body">
                        <div class="row">
@@ -189,13 +211,13 @@ if(isset($_POST['addbalance'])){
                </div> -->
                <?php
                $ac_code = $receivabledata['ac_code'];
-               endforeach;
-                ?>
+              endforeach;
+              ?>
 
-                <?php
+<?php
                   if(isset($_POST['search'])){
                     $total_invoice_amount = $query->selectallsumreceivable('receivable', 'invoice_amount', 'total_invoice_amount', $ac_code);
-
+                    
                     $total_paid_amount = $query->selectallsumreceivable('receivable', 'paid_amount', 'total_paid_amount', $ac_code);
 
 
@@ -215,8 +237,30 @@ if(isset($_POST['addbalance'])){
                     <?php
                   }
                   ?>
-
              </table>
+             <div class="modal fade" id="updatebalance">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header bg-warning">
+                      <h5 class="modal-title">Update Balance</h5>
+                    </div>
+                    <div class="modal-body">
+                      <!-- Your modal content goes here -->
+                      <form method="POST" action="">
+                        <input type="hidden" name="ac_name" value="<?= $receivabledata['ac_code']; ?>">
+                        <div class="form-group">
+                          <label for="newBalance" class="float-start">New Balance:</label>
+                          <input type="number" class="form-control" name="updatebalanceamount">
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" name="updatebalance">Update</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -231,6 +275,8 @@ if(isset($_POST['addbalance'])){
           </div>
         <form action="" method="post">
           <div class="modal-body">
+            <label>Account Name</label>
+            <input type="text" name="ac_name" class="form-control inpv2 mb-2">
             <label>Balance</label>
             <input type="number" name="balance" class="form-control inpv2 mb-2">
           </div>

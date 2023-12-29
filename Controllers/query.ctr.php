@@ -3958,12 +3958,6 @@ Class Query{
     }
   }
 
-  function addbalance($balance){
-    global $pdo;
-    $balancestmt = $pdo->prepare("INSERT INTO receivable(balance) VALUES('$balance')");
-    $balancestmt->execute();
-  }
-
   function searchgeneralledger($date_from, $date_to, $ac_code){
     global $pdo;
     if(!empty($ac_code) && !empty($date_from) && !empty($date_to)){
@@ -4265,6 +4259,57 @@ Class Query{
     $stmt = $pdo->prepare("UPDATE packingliststockinfo SET totalgrossweight='$totalgrossweightupdata' WHERE id='$upid'");
     $stmt->execute();
   }
+
+  // Balanace Additons
+
+  function cashbookaddbalance($balanceamount){
+    global $pdo;
+    $date = date('Y-m-d');
+
+    $stmt = $pdo->prepare("INSERT INTO `cashbook` (`date`, `balance`) VALUES ('$date', '$balanceamount')");
+    $stmt->execute();
+
+  }
+
+  function cashbookupdatebalance($id, $balanceamount){
+    global $pdo;
+    $date = date('Y-m-d');
+    $stmt = $pdo->prepare("UPDATE cashbook SET date='$date', balance='$balanceamount' WHERE id='$id'");
+    $stmt->execute();
+
+  }
+
+  function accountpayableaddbalance($balanceamount){
+    global $pdo;
+    $date = date('Y-m-d');
+
+    $stmt = $pdo->prepare("INSERT INTO `cashbook` (`date`, `balance`) VALUES ('$date', '$balanceamount')");
+    $stmt->execute();
+
+  }
+
+  function accountpayableupdatebalance($id, $balanceamount){
+    global $pdo;
+    $date = date('Y-m-d');
+    $stmt = $pdo->prepare("UPDATE cashbook SET date='$date', balance='$balanceamount' WHERE id='$id'");
+    $stmt->execute();
+
+  }
+
+  function addaccountreceivablebalance($ac_name, $balance){
+    global $pdo;
+    $balancestmt = $pdo->prepare("INSERT INTO receivable(ac_code, balance) VALUES('$ac_name','$balance')");
+    $balancestmt->execute();
+  }
+
+  function updateaccountreceivablebalance($ac_name, $balance){
+    global $pdo;
+    $balancestmt = $pdo->prepare("UPDATE receivable SET ac_code='$ac_name', balance='$balance'");
+    $balancestmt->execute();
+  }
+
+
+  // Balanace Additons
 
   // MORE SELECTS
 
