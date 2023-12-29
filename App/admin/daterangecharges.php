@@ -790,11 +790,11 @@ $query = new Query();
                   $commonditydata = $commonditystmt->fetchall();
                   $commondity_id = $commonditydata[$i]['commondity_id'];
 
-                $hhkstockstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE commondity_id='$commondity_id'");
+                $hhkstockstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE commondity_id='$commondity_id' ORDER BY indate");
                 $hhkstockstmt->execute();
                 $hhkstockdatas = $hhkstockstmt->fetchall();
+                
                 foreach ($hhkstockdatas as $hhkstockdata) {
-                  $idd++;
                   $item_id = $hhkstockdata['commondity_id'];
                   $commonditydata = $query->select('category', $item_id, 'category_id');
 
@@ -810,36 +810,26 @@ $query = new Query();
                   $outdatecheckstmt->execute();
                   $outdatecheckdata = $outdatecheckstmt->fetch(PDO::FETCH_ASSOC);
 
-                  $lastrowstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id<'$nowid' AND commondity_id='$commondity_id' ORDER BY id DESC");
-                  $lastrowstmt->execute();
-                  $lastrowdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
+                  
+                  if($idd != 0){
+                    $lastrowdata = $hhkstockdatas[$idd];
 
-                  if(!empty($lastrowdata)){
                     if($hhkstockdata['outdate'] != '0000-00-00'){
-                      if ($lastrowdata['total_mc'] - $hhkstockdata['mc'] != $hhkstockdata['total_mc']) {
-                        $totalmc = $lastrowdata['total_mc'] - $hhkstockdata['mc'];
-                        $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$totalmc' WHERE id='$nowid'");
+                      $total_mc = $lastrowdata['total_mc'] - $hhkstockdata['mc'];
+                      $id = $hhkstockdata['id'];
+                      $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$total_mc' WHERE id='$id'");
+                      $updatestmt->execute();
+                      if($total_mc != $hhkstockdata['total_mc']){
+                        $id = $hhkstockdata['id'];
+                        $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$total_mc' WHERE id='$id'");
                         $updatestmt->execute();
                       }
-                      if ($lastrowdata['total_kg'] - $hhkstockdata['kg'] != $hhkstockdata['total_kg']) {
-                        $totalkg = $lastrowdata['total_kg'] - $hhkstockdata['kg'];
-                        $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_kg='$totalkg' WHERE id='$nowid'");
-                        $updatestmt->execute();
-                      }
-                    }else{
-                      if ($lastrowdata['total_mc'] + $hhkstockdata['mc'] != $hhkstockdata['total_mc']) {
-                        $totalmc = $lastrowdata['total_mc'] + $hhkstockdata['mc'];
-                        $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$totalmc' WHERE id='$nowid'");
-                        $updatestmt->execute();
-                      }
-                      if ($lastrowdata['total_kg'] + $hhkstockdata['kg'] != $hhkstockdata['total_kg']) {
-                        $totalkg = $lastrowdata['total_kg'] + $hhkstockdata['kg'];
-                        $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_kg='$totalkg' WHERE id='$nowid'");
-                        $updatestmt->execute();
-                      }
+
                     }
+
                   }
 
+                  $idd++;
                   ?>
                 <tr>
                   <td><?php if($hhkstockdata['indate'] != "0000-00-00"){ echo date('d-m-Y', strtotime($hhkstockdata['indate'])); }; ?></td>
