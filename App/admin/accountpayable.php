@@ -63,7 +63,7 @@ $query = new Query();
               $paid_voucher = $_POST['paid_voucher'];
               $paid_amount = $_POST['paid_amount'];
 
-              $message = $query->addpayable('accountpayable',$supplier_id, $paid_date, $paid_voucher, $paid_amount);
+              $message = $query->addpayable('payable',$supplier_id, $paid_date, $paid_voucher, $paid_amount);
             }
             if(isset($_POST['search'])){
               $supplier_id = $_POST['supplier_id'];
@@ -81,7 +81,7 @@ $query = new Query();
             $numOfrecs = 2;
             $offset = ($pageno -1) * $numOfrecs;
             ?>
-            <form  action="accountpayable.php" method="post" class="d-inline">
+            <form  action="payable.php" method="post" class="d-inline">
               <span>Supplier Name:</span>
               <select class="form-control d-inline" name="supplier_id" style="width:15%;">
                 <?php
@@ -100,18 +100,18 @@ $query = new Query();
             <?php
               if(isset($_POST['search'])){
                 $supplier_id = $_POST['supplier_id'];
-                $payabledatas = $query->search('accountpayable', 'supplier_id', $supplier_id);
+                $payabledatas = $query->search('payable', 'supplier_id', $supplier_id);
               }elseif(!empty($_GET['pageno'])){
-                $stmt = $pdo->prepare("SELECT * FROM accountpayable ORDER BY id");
+                $stmt = $pdo->prepare("SELECT * FROM payable ORDER BY id");
                 $stmt->execute();
                 $rawResult = $stmt->fetchAll();
                 $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-                $stmt = $pdo->prepare("SELECT * FROM accountpayable ORDER BY id LIMIT $offset,$numOfrecs ");
+                $stmt = $pdo->prepare("SELECT * FROM payable ORDER BY id LIMIT $offset,$numOfrecs ");
                 $stmt->execute();
                 $customerdatas = $stmt->fetchAll();
               }else{
-                $payabledatas = $query->selectall('accountpayable');
+                $payabledatas = $query->selectall('payable');
               }
             ?>
             <table class="mt-5 table table-bordered table-striped rounded">
@@ -127,9 +127,9 @@ $query = new Query();
               <?php
               foreach ($payabledatas as $payabledata) {
 
-                $supplier = $query->select('accountpayable', $payabledata['supplier_id'] , 'supplier_id');
+                $supplier = $query->select('payable', $payabledata['supplier_id'] , 'supplier_id');
                 $supplier_name = $query->select('supplier', $supplier['supplier_id'], 'supplier_id');
-                $linkstmt = $pdo->prepare("SELECT link_id FROM accountpayable WHERE ");
+                $linkstmt = $pdo->prepare("SELECT link_id FROM payable WHERE ");
                 $link_id = $linkstmt->fetch(PDO::FETCH_ASSOC);
               ?>
               <tr>
@@ -191,9 +191,9 @@ $query = new Query();
 
               <?php
                 if(isset($_POST['search'])){
-                  $total_purchase_amount = $query->selectallsumpayable('accountpayable', 'purchase_amount', 'total_purchase_amount', $supplier_id);
+                  $total_purchase_amount = $query->selectallsumpayable('payable', 'purchase_amount', 'total_purchase_amount', $supplier_id);
 
-                  $total_paid_amount = $query->selectallsumpayable('accountpayable', 'paid_amount', 'total_paid_amount', $supplier_id);
+                  $total_paid_amount = $query->selectallsumpayable('payable', 'paid_amount', 'total_paid_amount', $supplier_id);
                   ?>
                   <tr>
                     <td></td>
@@ -233,7 +233,7 @@ $query = new Query();
             <span aria-hidden="true" class="h3">&times;</span>
           </button>
         </div>
-        <form action="accountpayable.php" method="post" autocomplete="off">
+        <form action="payable.php" method="post" autocomplete="off">
           <input type="hidden" name="supplier_id" value="<?php echo $supplier_id; ?>">
           <div class="modal-body">
             <label>Paid Date</label>

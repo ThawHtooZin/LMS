@@ -57,7 +57,8 @@ $query = new Query();
                 <th>Account Name</th>
                 <th>Description</th>
                 <th>Debit</th>
-                <th>Cerdit</th>
+                <th>Credit</th>
+                <th>Currency</th>
                 <th>Balance</th>
                 <th>Action</th>
               </tr>
@@ -155,6 +156,7 @@ $query = new Query();
                       <td><?php echo $gldata['narration']; ?></td>
                       <td><?php echo $gldata['debit']; ?></td>
                       <td><?php echo $gldata['credit']; ?></td>
+                      <td><?php echo $currencydata['debitorcredit'] ?></td>
                       <td><?php echo $gldata['balance']; ?></td>
                       <td>
                         <a href="edittransaction.php?voucher_no=<?= $gldata['voucherno']; ?>&file=general_ledger" style="<?php if(str_contains(strtolower($acname), 'purchase')){ echo "display:none;"; } ?>">
@@ -234,17 +236,28 @@ $query = new Query();
                   }
                 }
 
+                if($gldata['debit'] != 0){
+                  $debitorcredit = 'debit';
+                }else{
+                  $debitorcredit = 'credit';
+                }
+
+                $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='$debitorcredit'");
+                $currencystmt->execute();
+                $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
+
                 // acnamechange
 
                  ?>
-                <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $gldata['id']; ?>">
+                <tr>
                   <td><?php echo date('d/m/Y', strtotime($gldata['date'])); ?></td>
                   <td><?php echo $gldata['voucherno']; ?></td>
                   <td><?php echo $acname; ?></td>
                   <td><?php echo $gldata['narration']; ?></td>
-                  <td><?php echo $gldata['debit']; ?></td>
-                  <td><?php echo $gldata['credit']; ?></td>
-                  <td><?php echo $gldata['balance']; ?></td>
+                  <td><?php if($gldata['debit'] == 0){ echo "-"; }else{if($currencydata['dollar_rate'] == 0){echo $gldata['debit'];}else{ echo $gldata['debit'] / $currencydata['dollar_rate'];  };} ?></td>
+                  <td><?php if($gldata['credit'] == 0){ echo "-"; }else{if($currencydata['dollar_rate'] == 0){echo $gldata['credit'];}else{ echo $gldata['credit'] / $currencydata['dollar_rate'];  };} ?></td>
+                  <td><?php if($currencydata['dollar_rate'] == 0){ echo "MMK"; }else{ echo "USD"; } ?></td>
+                  <td><?php  if($currencydata['dollar_rate'] == 0){echo $gldata['balance'];}else{ echo $gldata['balance'] / $currencydata['dollar_rate'];  }; ?></td>
                   <td>
                     <a href="edittransaction.php?voucher_no=<?= $gldata['voucherno']; ?>&file=general_ledger" style="<?php if(str_contains(strtolower($acname), 'purchase')){ echo "display:none;"; } ?>">
                       <button type="submit" class="btn btn-warning btn-sm text-light" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -345,9 +358,10 @@ $query = new Query();
                  <td></td>
                  <td></td>
                  <td></td>
-                 <td><?= $totaldebit['total_debit']; ?></td>
-                 <td><?= $totalcredit['total_credit']; ?></td>
-                 <td><?= $totalbalance; ?></td>
+                 <td><?php if($totaldebit['total_debit'] == 0){ echo "-"; }else{ if($currencydata['dollar_rate'] == 0){echo $totaldebit['total_debit'];}else{ echo $totaldebit['total_debit'] / $currencydata['dollar_rate'];  }; }; ?></td>
+                 <td><?php if($totalcredit['total_credit'] == 0){ echo "-"; }else{ if($currencydata['dollar_rate'] == 0){echo $totalcredit['total_credit'];}else{ echo $totalcredit['total_credit'] / $currencydata['dollar_rate'];  }; }; ?></td>
+                 <td></td>
+                 <td><?php if($totalbalance == 0){echo "-"; }else{ if($currencydata['dollar_rate'] == 0){echo $totalbalance;}else{ echo $totalbalance / $currencydata['dollar_rate'];  };} ?></td>
                  <td></td>
                </tr>
               <?php } } ?>
