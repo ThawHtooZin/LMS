@@ -2923,11 +2923,11 @@ Class Query{
     $addstmt->execute();
   }
 
-  // function deleteform7($table, $idtodelete){
-  //   global $pdo;
-  //   $stmt = $pdo->prepare("DELETE FROM $table WHERE link_id='$idtodelete'");
-  //   $stmt->execute();
-  // }
+  function deleteform7($table, $idtodelete){
+    global $pdo;
+    $stmt = $pdo->prepare("DELETE FROM $table WHERE link_id='$idtodelete'");
+    $stmt->execute();
+  }
 
   function form7tcldelete($idtodelete){
     global $pdo;

@@ -173,10 +173,15 @@ $query = new Query();
                 <?php
                 }
 
-                $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stocktcl WHERE item_id='$commondity_id' AND date='$searchdate'");
+                $lastsearchdatestmt = $pdo->prepare("SELECT * FROM form10stocktcl WHERE date<'$searchdate' ORDER BY id DESC");
+                $lastsearchdatestmt->execute();
+                $lastsearchdate = $lastsearchdatestmt->fetch(PDO::FETCH_ASSOC);
+                echo $lastsearchdate = $lastsearchdate['date'];
+                echo "<br>";
+                $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stocktcl WHERE item_id='$commondity_id' AND date BETWEEN '$lastsearchdate' AND '$searchdate'");
                 $totalf7kgstmt->execute();
                 $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
-
+                echo $totalf7kgdata['total_kg'];
                 $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stocktcl WHERE item_id='$commondity_id' AND date='$searchdate'");
                 $totalkgstmt->execute();
                 $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
