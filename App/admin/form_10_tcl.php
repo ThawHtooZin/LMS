@@ -28,9 +28,9 @@ $query = new Query();
       $updateid = $_POST['upid'];
       $newdate = $_POST['update'];
       $upitem_id = $_POST['upitem_id'];
-      $upsupplier_id = $_POST['upsupplier_id'];
+    //   $upsupplier_id = $_POST['upsupplier_id'];
       $upcountry = $_POST['upcountry'];
-      $uptype = $_POST['uptype'];
+    //   $uptype = $_POST['uptype'];
       $upsize = $_POST['upsize'];
       $upmc = $_POST['upmc'];
       $upkg = $_POST['upkg'];
@@ -40,15 +40,15 @@ $query = new Query();
       $uplooseoutkg = $_POST['uploose_out_kg'];
       $uplooseoutpcs = $_POST['uploose_out_pcs'];
 
-      $query->updateform10($updateid, $newdate, $upitem_id, $upsupplier_id, $upcountry, $uptype, $upsize, $upmc, $upkg, $uppcs, $uplooseinkg, $uplooseinpcs, $uplooseoutkg, $uplooseoutpcs);
+      $query->updateform10tcl($updateid, $newdate, $upitem_id, $upcountry, $upsize, $upmc, $upkg, $uppcs, $uplooseinkg, $uplooseinpcs, $uplooseoutkg, $uplooseoutpcs);
     }
 
     if(isset($_POST['add'])){
       $date = $_POST['date'];
       $item_id = $_POST['item_id'];
-      $supplier_id = $_POST['supplier_id'];
+    //   $supplier_id = $_POST['supplier_id'];
       $country = $_POST['country'];
-      $type = $_POST['type'];
+    //   $type = $_POST['type'];
       $size = $_POST['size'];
       $mc = $_POST['mc'];
       $kg = $_POST['kg'];
@@ -58,7 +58,7 @@ $query = new Query();
       $looseoutkg = $_POST['loose_out_kg'];
       $looseoutpcs = $_POST['loose_out_pcs'];
 
-      $query->addform10($date, $item_id, $supplier_id, $country, $type, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs);
+      $query->addform10tcl($date, $item_id, $country, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs);
     }
 
      ?>
@@ -74,19 +74,13 @@ $query = new Query();
             <div class="card-header bg-warning text-secondary"  style="padding:-10px;">
               <form action="" method="post">
 
-                <b>Link Mark Limited (F-10)</b>
+                <b>Link Mark Limited (F-10) TCL</b>
               <button type="button" class="btn btn-success btn-sm float-end" data-bs-toggle="modal" data-bs-target="#addmodal">Add Form-10 Data</button>
-              <button type="submit" name="searchbtn2" class="btn btn-secondary btn-sm float-end me-2">View</button>
-              <select name="type" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 17% !important; height: 27px !important; padding-top: 1.5px !important;">
-                <option value="">Select Type</option>
-                <option value="frozen">Frozen</option>
-                <option value="tcl">TCL</option>
-              </select>
               <button type="submit" name="view" class="btn btn-secondary btn-sm float-end me-2">View</button>
               <select name="commondity" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
                 <option value="">Select Commondity</option>
                 <?php
-                $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
+                $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stocktcl");
                 $commonstmt->execute();
                 $commondatas = $commonstmt->fetchall();
                 foreach ($commondatas as $commondata) {
@@ -94,19 +88,6 @@ $query = new Query();
                   $item_name = $query->select('item', $itemid, 'item_id');
                   ?>
                   <option value="<?php echo $item_name['item_id']; ?>"><?php echo $item_name['item_name']; ?></option>
-                  <?php
-                }
-                 ?>
-              </select>
-              <select name="country" class="form-control inpv2 d-inline float-end me-2" style=" width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
-                <option value="">Select Country</option>
-                <?php
-                $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock");
-                $countrystmt->execute();
-                $countrydatas = $countrystmt->fetchall();
-                foreach ($countrydatas as $countrydata) {
-                  ?>
-                  <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
                   <?php
                 }
                  ?>
@@ -119,9 +100,8 @@ $query = new Query();
               <tr class="text-center">
                 <th rowspan="2" style="padding-top:25px;">Date</th>
                 <th rowspan="2" style="padding-top:25px;">Commondity</th>
-                <th rowspan="2" style="padding-top:25px;">Supplier</th>
-                <th rowspan="2" style="padding-top:25px;">Country</th>
-                <th rowspan="2" style="padding-top:25px;">Type</th>
+                <!-- <th rowspan="2" style="padding-top:25px;">Country</th> -->
+                <!-- <th rowspan="2" style="padding-top:25px;">Type</th> -->
                 <th rowspan="2" style="padding-top:25px;">Size</th>
                 <th colspan="4">Production</th>
                 <th colspan="2">Loose In</th>
@@ -154,11 +134,10 @@ $query = new Query();
                 <th>Kg</th>
               </tr>
               <?php
-              if(isset($_POST['view']) && !empty($_POST['commondity']) && !empty($_POST['country']) && !empty($_POST['searchdate'])){
+              if(isset($_POST['view']) && !empty($_POST['commondity']) && !empty($_POST['searchdate'])){
                 $commondity_id = $_POST['commondity'];
-                $country = $_POST['country'];
                 $searchdate = $_POST['searchdate'];
-                $stmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
+                $stmt = $pdo->prepare("SELECT * FROM form10stocktcl WHERE item_id='$commondity_id' AND date='$searchdate'");
                 $stmt->execute();
                 $datas = $stmt->fetchall();
                 foreach ($datas as $data) {
@@ -170,9 +149,8 @@ $query = new Query();
                 <tr>
                   <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
                   <td><?php echo $commonditydata['item_name']; ?></td>
-                   <td><?php echo $supplier_name['ac_name']; ?></td>
-                  <td><?php echo $data['country']; ?></td>
-                  <td><?php echo $data['type']; ?></td>
+                  <!-- <td><?php echo $data['country']; ?></td> -->
+                  <!-- <td><?php echo $data['type']; ?></td> -->
                   <td><?php echo $data['size']; ?></td>
                   <td><?php echo $data['pcsform10']; ?></td>
                   <td><?php echo $data['mc']; ?></td>
@@ -195,16 +173,11 @@ $query = new Query();
                 <?php
                 }
 
-                $supplieridstmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
-                $supplieridstmt->execute();
-                $supplierdata = $supplieridstmt->fetch(PDO::FETCH_ASSOC);
-                $supplier_id = $supplierdata['supplier_id'];
-
-                $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id'");
+                $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stocktcl WHERE item_id='$commondity_id' AND date='$searchdate'");
                 $totalf7kgstmt->execute();
                 $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
 
-                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
+                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stocktcl WHERE item_id='$commondity_id' AND date='$searchdate'");
                 $totalkgstmt->execute();
                 $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
                 $result1 = round($totalkgdata['total_kg'], 2) - round($totalf7kgdata['total_kg'], 2);
@@ -216,19 +189,19 @@ $query = new Query();
                 }
 
 
-                $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+                $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stocktcl WHERE item_id='$commondity_id' AND date='$searchdate'");
                 $form10pcsstmt->execute();
                 $form10pcsdata = $form10pcsstmt->fetch(PDO::FETCH_ASSOC);
 
-                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stocktcl WHERE item_id='$commondity_id' AND date='$searchdate'");
                 $totalkgstmt->execute();
                 $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
-
-                $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+                $totalkgdata['total_kg'];
+                $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM form10stocktcl WHERE item_id='$commondity_id'");
                 $mcstmt->execute();
                 $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
 
-                $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+                $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stocktcl WHERE item_id='$commondity_id'");
                 $kgstmt->execute();
                 $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
                 ?>
@@ -236,9 +209,7 @@ $query = new Query();
                 <td></td>
                 <td style="font-weight:bold;">Total</td>
                 <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                
                 <td style="font-weight:bold;"><?php echo round($form10pcsdata['total_form10_pcs'], 2); ?></td>
                 <td style="font-weight:bold;"><?php echo round($mcdata['total_mc'], 2); ?></td>
                 <td style="font-weight:bold;"><?php echo round($kgdata['kg'], 2); ?></td>
@@ -266,29 +237,24 @@ $query = new Query();
 
                 <?php
               }else{
-              if(isset($_POST['searchbtn2']) && !empty($_POST['type'])){
-                $type = $_POST['type'];
-                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM form10stock WHERE type='$type'");
-              }else{
-                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM form10stock");
-              }
+              $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM form10stocktcl");
               $commonditycountstmt->execute();
               $commonditycountdatas = $commonditycountstmt->fetchColumn();
               for ($i=0; $i < $commonditycountdatas; $i++) {
                 if(isset($_POST['searchbtn2']) && !empty($_POST['type'])){
-                  $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock WHERE type='$type'");
+                  $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stocktcl");
                 }else{
-                  $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
+                  $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stocktcl");
                 }
                 $commonditystmt->execute();
                 $commonditydata = $commonditystmt->fetchall();
                 $commondity_id = $commonditydata[$i]['item_id'];
               if(isset($_POST['searchbtn2']) && !empty($_POST['type'])){
-                $stmt = $pdo->prepare("SELECT * FROM form10stock WHERE type='$type' AND item_id='$commondity_id'");
+                $stmt = $pdo->prepare("SELECT * FROM form10stocktcl AND item_id='$commondity_id'");
                 $stmt->execute();
                 $datas = $stmt->fetchall();
               }else{
-                $stmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id'");
+                $stmt = $pdo->prepare("SELECT * FROM form10stocktcl WHERE item_id='$commondity_id'");
                 $stmt->execute();
                 $datas = $stmt->fetchall();
               }
@@ -301,9 +267,8 @@ $query = new Query();
               <tr>
                 <td><?php echo date('d-m-Y', strtotime($form10data['date'])); ?></td>
                 <td><?php echo $commonditydata['item_name']; ?></td>
-                <td><?php echo $supplier_name['ac_name']; ?></td>
-                <td><?php echo $form10data['country']; ?></td>
-                <td><?php echo $form10data['type']; ?></td>
+                <!-- <td><?php echo $form10data['country']; ?></td> -->
+                <!-- <td><?php echo $form10data['type']; ?></td> -->
                 <td><?php echo $form10data['size']; ?></td>
                 <td><?php echo $form10data['pcsform10']; ?></td>
                 <td><?php echo $form10data['mc']; ?></td>
@@ -351,41 +316,14 @@ $query = new Query();
                       <form action="" method="post">
                         <?php
                          $id = $form10data['id'];
-                         $updatedata = $query->select('form10stock', $id, 'id');
-                         $datas = $query->select('acname', $updatedata['supplier_id'], 'code_no');
-                         $ac_name = $datas['ac_name'];
+                         $updatedata = $query->select('form10stocktcl', $id, 'id');
+
                         ?>
                         <input type="hidden" name="upid" value="<?php echo $form10data['id']; ?>">
                       <div class="modal-body">
                         <label>Date</label>
                         <input type="date" name="update" class="form-control inpv2 mb-2" value="<?php echo $updatedata['date']; ?>">
-                        <div class="row">
-                          <div class="col">
-                            <label>Type</label>
-                            <select class="form-control inpv2 mb-2" name="uptype">
-                              <option>Select Type</option>
-                              <option value="frozen" <?php if($updatedata['type'] == 'frozen'){ echo "selected"; } ?>>frozen</option>
-                              <option value="tcl" <?php if($updatedata['type'] == 'tcl'){ echo "selected"; } ?>>tcl</option>
-                            </select>
-                          </div>
-                          <div class="col">
-                            <label>Supplier Name</label>
-                            <select name="upsupplier_id" class="form-control inpv2">
-                              <?php
-                              $supplier_id_stmt = $pdo->prepare("SELECT DISTINCT supplier_name FROM form7stock");
-                              $supplier_id_stmt->execute();
-                              $supplier_id_datas = $supplier_id_stmt->fetchall();
-                               foreach ($supplier_id_datas as $supplier_id_data) {
-                               $supplierid = $supplier_id_data['supplier_name'];
-                               $supplier_name = $query->select('acname', $supplierid, 'code_no');
-                                ?>
-                                <option value="<?php echo $supplier_name['code_no']; ?>" <?php if($updatedata['supplier_id'] == $supplier_name['code_no']){ echo "selected"; }; ?>><?php echo $supplier_name['ac_name']; ?></option>
-                                <?php
-                               }
-                               ?>
-                            </select>
-                          </div>
-                        </div>
+                        
                         <div class="row">
                         </div>
                         <div class="row">
@@ -393,7 +331,7 @@ $query = new Query();
                             <label>Commondity</label>
                             <select class="form-control inpv2 mb-2" name="upitem_id">
                               <?php
-                              $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
+                              $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stocktcl");
                               $form7commonditystmt->execute();
                               $form7commonditydatas = $form7commonditystmt->fetchall();
                               foreach ($form7commonditydatas as $form7commonditydata) {
@@ -481,46 +419,16 @@ $query = new Query();
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form action="form_10.php" method="post">
+            <form action="form_10_tcl.php" method="post">
             <div class="modal-body">
               <label>Date</label>
               <input type="date" name="date" class="form-control inpv2 mb-2">
               <div class="row">
                 <div class="col">
-                  <label>Type</label>
-                  <select class="form-control inpv2 mb-2" name="type">
-                    <option>Select Type</option>
-                    <option value="frozen">frozen</option>
-                    <option value="tcl">tcl</option>
-                  </select>
-                </div>
-                <div class="col">
-                  <label>Supplier Name</label>
-                  <select name="supplier_id" class="form-control inpv2">
-                    <?php
-                    $supplier_id_stmt = $pdo->prepare("SELECT DISTINCT supplier_name FROM form7stock");
-                    $supplier_id_stmt->execute();
-                    $supplier_id_datas = $supplier_id_stmt->fetchall();
-
-                    foreach ($supplier_id_datas as $supplier_id_data) {
-                      $supplierid = $supplier_id_data['supplier_name'];
-                      $supplier_name = $query->select('acname', $supplierid, 'code_no');
-                      ?>
-                      <option value="<?php echo $supplier_name['code_no']; ?>"><?php echo $supplier_name['ac_name']; ?></option>
-                      <?php
-                    }
-                     ?>
-                  </select>
-                </div>
-              </div>
-              <div class="row">
-              </div>
-              <div class="row">
-                <div class="col">
                   <label>Commondity</label>
                   <select class="form-control inpv2 mb-2" name="item_id">
                     <?php
-                    $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
+                    $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stocktcl");
                     $form7commonditystmt->execute();
                     $form7commonditydatas = $form7commonditystmt->fetchall();
                     foreach ($form7commonditydatas as $form7commonditydata) {

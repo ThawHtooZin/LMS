@@ -4129,6 +4129,15 @@ Class Query{
      $updateform10stmt->execute();
    }
 
+   function updateform10tcl($updateid, $newdate, $upitem_id, $upcountry, $upsize, $upmc, $upkg, $uppcs, $uplooseinkg, $uplooseinpcs, $uplooseoutkg, $uplooseoutpcs){
+    global $pdo;
+
+    $total_kg = (floatval($upkg) + floatval($uplooseinkg)) - floatval($uplooseoutkg);
+    $updateform10pcs = (intval($uppcs) + floatval($uplooseinpcs)) - floatval($uplooseoutpcs);
+    $updateform10stmt = $pdo->prepare("UPDATE form10stocktcl SET date='$newdate', item_id='$upitem_id', country='$upcountry', type='TCL', size='$upsize',pcsform10='$updateform10pcs', mc='$upmc', kg='$upkg', pcs='$uppcs', looseinkg='$uplooseinkg', looseinpcs='$uplooseinpcs', looseoutkg='$uplooseoutkg', looseoutpcs='$uplooseoutpcs', total_kg='$total_kg' WHERE id='$updateid'");
+    $updateform10stmt->execute();
+  }
+
    function addhhkremark($remark, $remarkid){
      global $pdo;
 
