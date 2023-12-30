@@ -48,6 +48,14 @@ $query = new Query();
 
     }
 
+    if(isset($_POST['balance_kgbtn'])){
+      $id = $_POST['balance_kgid'];
+      $balance_kg = $_POST['balance_kginp'];
+      $balance_mc = $_POST['balance_mcinp'];
+
+      $query->updatebalancekg($id, $balance_kg, $balance_mc);
+    }
+
     if(isset($_POST['updatetotalcharges'])){
       $id = $_POST['id'];
       $repacking_charges = $_POST['repacking_charges'];
@@ -776,6 +784,8 @@ $query = new Query();
                   <th style="text-align:center;">Mc</th>
                   <th style="text-align:center;">Total Mc</th>
                   <th style="text-align:center;">Kg</th>
+                  <th style="text-align:center;">Total Kg</th>
+                  <th style="text-align:center;">Balance Mc</th>
                   <th style="text-align:center;">Balance Kg</th>
                   <th>Action</th>
                 </tr>
@@ -841,7 +851,7 @@ $query = new Query();
                   }
 
                   ?>
-                <tr>
+                <tr style="<?php if($hhkstockdata['balance_mc'] == 0 && $hhkstockdata['balance_kg'] == 0){echo 'background-color: #ffa590 !important;';} ?>">
                   <td><?php if($hhkstockdata['indate'] != "0000-00-00"){ echo date('d-m-Y', strtotime($hhkstockdata['indate'])); }; ?></td>
                   <td><?php if($hhkstockdata['outdate'] != "0000-00-00"){ echo date('d-m-Y', strtotime($hhkstockdata['outdate'])); }; ?></td>
                   <td><?php echo $commonditydata['category_name']; ?></td>
@@ -849,6 +859,8 @@ $query = new Query();
                   <td style="text-align:right;"><?php echo $hhkstockdata['total_mc']; ?></td>
                   <td style="text-align:right;"><?php echo $hhkstockdata['kg']; ?></td>
                   <td style="text-align:right;"><?php echo $hhkstockdata['total_kg']; ?></td>
+                  <td style="text-align:right;" <?php if($outdatecheckdata['outdate'] == '0000-00-00'):?>data-bs-toggle="modal"<?php endif; ?> data-bs-target="#updatebalancekg<?= $hhkstockdata['id']; ?>"><?php echo $hhkstockdata['balance_mc']; ?></td>
+                  <td style="text-align:right;" <?php if($outdatecheckdata['outdate'] == '0000-00-00'):?>data-bs-toggle="modal"<?php endif; ?> data-bs-target="#updatebalancekg<?= $hhkstockdata['id']; ?>"><?php echo $hhkstockdata['balance_kg']; ?></td>
                   <td><?php if($outdatecheckdata['outdate'] == '0000-00-00'): ?>
                     <button type="button" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#stockupdatemodal<?= $hhkstockdata['id']; ?>">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -904,6 +916,32 @@ $query = new Query();
                           <button type="submit" class="btn btn-danger" name="deletestockbtn" style="<?php if(!empty($editcheckdata)){ echo 'display:none;'; } ?>">Delete</button>
                           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="<?php if(empty($editcheckdata)){ echo 'display:none;'; } ?>">Cancel</button>
                           <button type="submit" class="btn btn-success text-light" name="updatestockbtn">Update</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal fade" id="updatebalancekg<?= $hhkstockdata['id']; ?>">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header bg-warning text-light">
+                        <h5 class="modal-title">Edit Balance Kg</h5>
+                      </div>
+                      <div class="modal-body">
+                        <form method="post">
+                          <input type="hidden" name="balance_kgid" value="<?= $hhkstockdata['id']; ?>">
+                          <div class="form-group">
+                            <label for="balance_mc">Balance Mc:</label>
+                            <input type="text" class="form-control" id="balance_mc" name="balance_mcinp" value="<?= $hhkstockdata['balance_mc']; ?>">
+                          </div>
+                          <div class="form-group mt-4">
+                            <label for="balance_kg">Balance Kg:</label>
+                            <input type="text" class="form-control" id="balance_kg" name="balance_kginp" value="<?= $hhkstockdata['balance_kg']; ?>">
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="submit" class="btn btn-primary" name="balance_kgbtn">Update</button>
                         </div>
                       </form>
                     </div>

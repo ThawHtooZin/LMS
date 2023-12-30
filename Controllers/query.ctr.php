@@ -934,7 +934,7 @@ Class Query{
     $stockstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE commondity_id='$commondity_id' AND indate='$indate' ORDER BY id DESC");
     $stockstmt->execute();
     $stockdata = $stockstmt->fetch(PDO::FETCH_ASSOC);
-    print_r($stockdata);
+    
     if(!empty($stockdata)){
       $smc = $mc;
       $skg = $kg;
@@ -2283,7 +2283,7 @@ Class Query{
       $balance = $kg;
     }
 
-    $newstockstmt = $pdo->prepare("INSERT INTO hhkstock(indate, commondity_id, mc, total_mc, kg, total_kg, balance) VALUES('$indate', '$commondity_id', '$mc', '$total_mc', '$kg', '$total_kg', '$balance')");
+    $newstockstmt = $pdo->prepare("INSERT INTO hhkstock(indate, commondity_id, mc, total_mc, kg, total_kg, balance_kg, balance_mc, balance) VALUES('$indate', '$commondity_id', '$mc', '$total_mc', '$kg', '$total_kg', '$kg', '$mc', '$balance')");
     $newstockstmt->execute();
   }
 
@@ -3180,7 +3180,7 @@ Class Query{
     $datastmt = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE item_id='$item_id' AND size='$size' AND invoice_no='$invoice_no' AND percentage != '0'");
     $datastmt->execute();
     $data = $datastmt->fetch(PDO::FETCH_ASSOC);
-    print_r($data['percentage']);
+    
     $percentage = $data['percentage'];
     $grand_total = $percentage + $total;
     if($dollar_rate != 0 && $grand_total != 0){
@@ -4310,6 +4310,13 @@ Class Query{
 
 
   // Balanace Additons
+
+  function updatebalancekg($id, $balance_kg, $balance_mc){
+    global $pdo;
+
+    $stmt = $pdo->prepare("UPDATE hhkstock SET balance_kg='$balance_kg', balance_mc='$balance_mc' WHERE id='$id'");
+    $stmt->execute();
+  }
 
   // MORE SELECTS
 
