@@ -528,8 +528,14 @@ Class Query{
     $payablestmt->execute();
     $kg = floatval($viss) * 1.634;
     $link_id = $id;
-    $formstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', '$tclfrozen', '$size', '$viss', '$kg', '$pcs', '$link_id')");
-    $formstmt->execute();
+
+    if ($tclfrozen === "tcl") {   
+      $formstmt = $pdo->prepare("INSERT INTO form7stocktcl(date, item_id, supplier_name, country, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', 'DAKA',  'TCl', '$size', '$viss', '$kg', '$pcs', '$link_id')");
+      $formstmt->execute();
+    }else{
+      $formstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', 'Frozen', '$size', '$viss', '$kg', '$pcs', '$link_id')");
+      $formstmt->execute();
+    }
     if($stmt){
       echo '<script>swal("Success!", "Purchase Voucher Added Successfully", "success");</script>';
     }else{
@@ -2581,7 +2587,19 @@ Class Query{
 
   // MSL QUERIES
 
-  function updatecountry($country, $pcsperf7, $updateid){
+  function updatetclcountry($country, $pcsperf7, $updateid){
+    global $pdo;
+
+    if($country == ""){
+      $countryupdatestmt = $pdo->prepare("UPDATE form7stocktcl SET country= NULL, pcsperf7='$pcsperf7' WHERE id='$updateid'");
+      $countryupdatestmt->execute();
+    }else{
+      $countryupdatestmt = $pdo->prepare("UPDATE form7stocktcl SET country='$country', pcsperf7='$pcsperf7' WHERE id='$updateid'");
+      $countryupdatestmt->execute();
+    }
+  }
+
+  function updatefrozencountry($country, $pcsperf7, $updateid){
     global $pdo;
 
     if($country == ""){
@@ -2602,6 +2620,19 @@ Class Query{
     $total_kg = (floatval($kg) + floatval($looseinkg)) - floatval($looseoutkg);
     $addform10 = (intval($pcs) + floatval($looseinpcs)) - floatval($looseoutpcs);
     $addform10stmt = $pdo->prepare("INSERT INTO form10stock(date, item_id, supplier_id, country, type, size, pcsform10, mc, kg, pcs, looseinkg, looseinpcs, looseoutkg, looseoutpcs, total_kg) VALUES('$date', '$item_id', '$supplier_id', '$country', '$type', '$size', '$addform10', '$mc', '$kg', '$pcs', '$looseinkg', '$looseinpcs', '$looseoutkg', '$looseoutpcs', '$total_kg')");
+    $addform10stmt->execute();
+
+  }
+
+  function addform10tcl($date, $item_id, $country, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs){
+    global $pdo;
+
+    $form7stmt = $pdo->prepare("SELECT * FROM form7stock WHERE item_id='$item_id' AND size='$size'");
+    $form7stmt->execute();
+    $form7data = $form7stmt->fetch(PDO::FETCH_ASSOC);
+    $total_kg = (floatval($kg) + floatval($looseinkg)) - floatval($looseoutkg);
+    $addform10 = (intval($pcs) + floatval($looseinpcs)) - floatval($looseoutpcs);
+    $addform10stmt = $pdo->prepare("INSERT INTO form10stocktcl(date, item_id, country, type, size, pcsform10, mc, kg, pcs, looseinkg, looseinpcs, looseoutkg, looseoutpcs, total_kg) VALUES('$date', '$item_id', '$country', 'TCL', '$size', '$addform10', '$mc', '$kg', '$pcs', '$looseinkg', '$looseinpcs', '$looseoutkg', '$looseoutpcs', '$total_kg')");
     $addform10stmt->execute();
 
   }
@@ -2892,18 +2923,23 @@ Class Query{
     $addstmt->execute();
   }
 
-  function deleteform7($table, $idtodelete){
+  // function deleteform7($table, $idtodelete){
+  //   global $pdo;
+  //   $stmt = $pdo->prepare("DELETE FROM $table WHERE link_id='$idtodelete'");
+  //   $stmt->execute();
+  // }
+
+  function form7tcldelete($idtodelete){
     global $pdo;
-    $stmt = $pdo->prepare("DELETE FROM $table WHERE link_id='$idtodelete'");
+    $stmt = $pdo->prepare("DELETE FROM form7stocktcl WHERE id='$idtodelete'");
     $stmt->execute();
   }
 
-  function form7delete($idtodelete){
+  function form7frozendelete($idtodelete){
     global $pdo;
     $stmt = $pdo->prepare("DELETE FROM form7stock WHERE id='$idtodelete'");
     $stmt->execute();
   }
-
   function addtclmcstock($date, $item_id, $size, $pcs, $kg, $form10_mc){
     global $pdo;
 
