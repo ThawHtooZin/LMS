@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 30, 2023 at 06:44 AM
+-- Generation Time: Jan 02, 2024 at 06:21 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -408,6 +408,37 @@ INSERT INTO `form7stock` (`id`, `date`, `item_id`, `supplier_name`, `country`, `
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `form7stocktcl`
+--
+
+CREATE TABLE `form7stocktcl` (
+  `id` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `item_id` varchar(11) NOT NULL,
+  `supplier_name` varchar(255) NOT NULL,
+  `country` varchar(155) DEFAULT NULL,
+  `type` varchar(255) NOT NULL,
+  `size` varchar(11) NOT NULL,
+  `viss` varchar(11) NOT NULL,
+  `kg` varchar(15) NOT NULL,
+  `pcspervr` varchar(15) NOT NULL,
+  `pcsperf7` int(11) NOT NULL,
+  `link_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `form7stocktcl`
+--
+
+INSERT INTO `form7stocktcl` (`id`, `date`, `item_id`, `supplier_name`, `country`, `type`, `size`, `viss`, `kg`, `pcspervr`, `pcsperf7`, `link_id`) VALUES
+(1, '2024-01-02', '1031', '4000/T10', 'DAKA', 'TCl', '18/24', '1000', '1634', '', 0, 13),
+(2, '2024-01-02', '1031', '4000/T09', 'DAKA', 'TCl', '18/24', '741.50', '1211.611', '', 0, 14),
+(3, '2024-01-03', '1031', '4000/T07', 'DAKA', 'TCl', '2up', '3000', '4902', '', 0, 15),
+(4, '2024-01-03', '1031', '4000/T07', 'DAKA', 'TCl', '2up', '543.10', '887.4254', '', 0, 16);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `form10stock`
 --
 
@@ -456,6 +487,50 @@ INSERT INTO `form10stock` (`id`, `date`, `item_id`, `supplier_id`, `country`, `t
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `form10stocktcl`
+--
+
+CREATE TABLE `form10stocktcl` (
+  `id` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `item_id` varchar(11) NOT NULL,
+  `supplier_id` varchar(20) NOT NULL,
+  `country` varchar(11) NOT NULL,
+  `type` varchar(255) NOT NULL,
+  `size` varchar(11) NOT NULL,
+  `pcsform10` int(11) NOT NULL,
+  `mc` int(11) NOT NULL,
+  `kg` varchar(11) NOT NULL,
+  `pcs` int(11) NOT NULL,
+  `looseinkg` varchar(11) NOT NULL,
+  `looseinpcs` int(11) NOT NULL,
+  `looseoutkg` varchar(11) NOT NULL,
+  `looseoutpcs` int(11) NOT NULL,
+  `cc_pcs` int(11) DEFAULT NULL,
+  `cc_kg` float DEFAULT NULL,
+  `msl_pcs` int(11) DEFAULT NULL,
+  `msl_kg` float DEFAULT NULL,
+  `hhk_pcs` int(11) DEFAULT NULL,
+  `hhk_kg` float DEFAULT NULL,
+  `lanfish_pcs` int(11) DEFAULT NULL,
+  `lanfish_kg` float DEFAULT NULL,
+  `cutpiece_pcs` int(11) DEFAULT NULL,
+  `cutpiece_kg` float DEFAULT NULL,
+  `total_kg` varchar(11) NOT NULL,
+  `percentage` varchar(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `form10stocktcl`
+--
+
+INSERT INTO `form10stocktcl` (`id`, `date`, `item_id`, `supplier_id`, `country`, `type`, `size`, `pcsform10`, `mc`, `kg`, `pcs`, `looseinkg`, `looseinpcs`, `looseoutkg`, `looseoutpcs`, `cc_pcs`, `cc_kg`, `msl_pcs`, `msl_kg`, `hhk_pcs`, `hhk_kg`, `lanfish_pcs`, `lanfish_kg`, `cutpiece_pcs`, `cutpiece_kg`, `total_kg`, `percentage`) VALUES
+(12, '2024-01-03', '1031', '', 'DAKA', 'TCL', '18/24', 0, 57, '2755.0', 0, '', 0, '', 0, 0, 0, 0, 0, 0, 159.44, 0, 0, 0, 0, '2914.44', ''),
+(13, '2024-01-03', '1031', '', 'DAKA', 'TCL', '2up', 0, 104, '5032.0', 0, '', 0, '', 0, 0, 0, 0, 0, 0, 742.06, 0, 0, 0, 0, '5774.06', '');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `general_ledger`
 --
 
@@ -482,7 +557,11 @@ INSERT INTO `general_ledger` (`id`, `date`, `voucherno`, `ac_code`, `debit`, `cr
 (12, '2023-12-28', 'A0001', '4000/K02', 100000, 0, 100000, '', 'hehe', 'ac-321', 0, 3),
 (13, '2023-12-28', 'A0001', '3600/001', 0, 100000, -100000, '', '', '', 0, 5),
 (14, '2023-12-28', 'A0002', '3300/SAF', 350000, 0, 350000, 'asdfasdf', 'hehe', 'ac-321', 0, 5),
-(15, '2023-12-28', 'A0002', '5000/001', 0, 350000, -350000, 'asdfasdf', '', '', 0, 2);
+(15, '2023-12-28', 'A0002', '5000/001', 0, 350000, -350000, 'asdfasdf', '', '', 0, 2),
+(16, '2024-01-02', '121222', '4000/T10', 0, 12122000, -12122000, '', '', '', 0, 0),
+(17, '2024-01-02', '121223', '4000/T09', 0, 17054500, -17054500, '', '', '', 0, 0),
+(18, '2024-01-03', '121224', '4000/T07', 0, 90000000, -90000000, '', '', '', 0, 0),
+(19, '2024-01-03', '121225', '4000/T07', 0, 10862000, -10862000, '', '', '', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -1120,7 +1199,11 @@ CREATE TABLE `payable` (
 --
 
 INSERT INTO `payable` (`id`, `date`, `supplier_id`, `purchase_voucher_no`, `purchase_amount`, `paid_date`, `paid_voucher`, `remark`, `paid_amount`, `balance`, `link_id`, `closing_balance`, `report_date`) VALUES
-(13, '0000-00-00', '4000/K02', '', 0, '2023-12-28', 'A0001', '', 100000, 0, 0, 0, '0000-00-00');
+(13, '0000-00-00', '4000/K02', '', 0, '2023-12-28', 'A0001', '', 100000, 0, 0, 0, '0000-00-00'),
+(14, '2024-01-02', '4000/T10', '121222', 12122000, '0000-00-00', '', '', 0, 12122000, 13, 0, '0000-00-00'),
+(15, '2024-01-02', '4000/T09', '121223', 17054500, '0000-00-00', '', '', 0, 17054500, 14, 0, '0000-00-00'),
+(16, '2024-01-03', '4000/T07', '121224', 90000000, '0000-00-00', '', '', 0, 90000000, 15, 0, '0000-00-00'),
+(17, '2024-01-03', '4000/T07', '121225', 10862000, '0000-00-00', '', '', 0, 100862000, 16, 0, '0000-00-00');
 
 -- --------------------------------------------------------
 
@@ -1203,7 +1286,11 @@ INSERT INTO `purchase` (`no`, `date`, `voucher_no`, `supplier_id`, `tclfrozen`, 
 (8, '2023-01-12', 2274, '4000/A03', 'tcl', '1037', '4up', '100', 0, 2000, 200000),
 (10, '2023-12-07', 7954, '4000/K09', 'frozen', '1015', '6up', '100', 20, 2000, 200000),
 (11, '2023-12-07', 9347, '4000/K09', 'tcl', '1029', '9up', '200', 0, 2000, 400000),
-(12, '2023-12-09', 3455, '4000/A01', 'frozen', '1010', '3up', '100', 0, 1000, 100000);
+(12, '2023-12-09', 3455, '4000/A01', 'frozen', '1010', '3up', '100', 0, 1000, 100000),
+(13, '2024-01-02', 121222, '4000/T10', 'tcl', '1031', '18/24', '1000', 0, 12122, 12122000),
+(14, '2024-01-02', 121223, '4000/T09', 'tcl', '1031', '18/24', '741.50', 0, 23000, 17054500),
+(15, '2024-01-03', 121224, '4000/T07', 'tcl', '1031', '2up', '3000', 0, 30000, 90000000),
+(16, '2024-01-03', 121225, '4000/T07', 'tcl', '1031', '2up', '543.10', 0, 20000, 10862000);
 
 -- --------------------------------------------------------
 
@@ -1716,7 +1803,8 @@ INSERT INTO `userlogs` (`id`, `login_time`, `login_date`, `login_username`, `log
 (28, '05:58:12.000000', '2023-12-29', 'admin', 'admin', 'Login Success'),
 (29, '09:48:13.000000', '2023-12-29', 'admin', '', 'Logout Success'),
 (30, '10:55:27.000000', '2023-12-30', 'admin', 'admin', 'Login Success'),
-(31, '11:23:25.000000', '2023-12-30', 'admin', 'admin', 'Login Success');
+(31, '11:23:25.000000', '2023-12-30', 'admin', 'admin', 'Login Success'),
+(32, '10:34:41.000000', '2024-01-02', 'admin', 'admin', 'Login Success');
 
 --
 -- Indexes for dumped tables
@@ -1795,9 +1883,21 @@ ALTER TABLE `form7stock`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `form7stocktcl`
+--
+ALTER TABLE `form7stocktcl`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `form10stock`
 --
 ALTER TABLE `form10stock`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `form10stocktcl`
+--
+ALTER TABLE `form10stocktcl`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -2117,16 +2217,28 @@ ALTER TABLE `form7stock`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
+-- AUTO_INCREMENT for table `form7stocktcl`
+--
+ALTER TABLE `form7stocktcl`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT for table `form10stock`
 --
 ALTER TABLE `form10stock`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
+-- AUTO_INCREMENT for table `form10stocktcl`
+--
+ALTER TABLE `form10stocktcl`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
 -- AUTO_INCREMENT for table `general_ledger`
 --
 ALTER TABLE `general_ledger`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `gfcdryfishcoldstore`
@@ -2252,7 +2364,7 @@ ALTER TABLE `packingmaterial`
 -- AUTO_INCREMENT for table `payable`
 --
 ALTER TABLE `payable`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `permission`
@@ -2270,7 +2382,7 @@ ALTER TABLE `processing`
 -- AUTO_INCREMENT for table `purchase`
 --
 ALTER TABLE `purchase`
-  MODIFY `no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `receivable`
@@ -2366,7 +2478,7 @@ ALTER TABLE `trucktotalcosting`
 -- AUTO_INCREMENT for table `userlogs`
 --
 ALTER TABLE `userlogs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
