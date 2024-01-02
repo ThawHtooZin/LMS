@@ -57,8 +57,18 @@ $query = new Query();
       $looseinpcs = $_POST['loose_in_pcs'];
       $looseoutkg = $_POST['loose_out_kg'];
       $looseoutpcs = $_POST['loose_out_pcs'];
+      $cckg = $_POST['cc_kg'];
+      $ccpcs = $_POST['cc_pcs'];
+      $cutpiecekg = $_POST['cutpiece_kg'];
+      $cutpiecepcs = $_POST['cutpiece_pcs'];
+      $hhkkg = $_POST['hhk_kg'];
+      $hhkpcs = $_POST['hhk_pcs'];
+      $mslkg = $_POST['msl_kg'];
+      $mslpcs = $_POST['msl_pcs'];
+      $lanfishkg = $_POST['lanfish_kg'];
+      $lanfishpcs = $_POST['lanfish_pcs'];
 
-      $query->addform10tcl($date, $item_id, $country, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs);
+      $query->addform10tcl($date, $item_id, $country, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs, $cckg, $ccpcs, $cutpiecekg, $cutpiecepcs, $hhkkg, $hhkpcs, $mslkg, $mslpcs, $lanfishkg, $lanfishpcs);
     }
 
      ?>
@@ -106,6 +116,11 @@ $query = new Query();
                 <th colspan="4">Production</th>
                 <th colspan="2">Loose In</th>
                 <th colspan="2">Loose Out</th>
+                <th colspan="2">CC Balance</th>
+                <th colspan="2">လမ်းငါး</th>
+                <th colspan="2">Cut Piece</th>
+                <th colspan="2">HHK</th>
+                <th colspan="2">MSL</th>
                 <th>Total</th>
                 <?php
                 if (!isset($_POST['view'])) {
@@ -126,6 +141,16 @@ $query = new Query();
                 <th>PCS/Form-10</th>
                 <th>MC</th>
                 <th>KG</th>
+                <th>Pcs</th>
+                <th>Kg</th>
+                <th>Pcs</th>
+                <th>Kg</th>
+                <th>Pcs</th>
+                <th>Kg</th>
+                <th>Pcs</th>
+                <th>Kg</th>
+                <th>Pcs</th>
+                <th>Kg</th>
                 <th>Pcs</th>
                 <th>Kg</th>
                 <th>Pcs</th>
@@ -160,6 +185,16 @@ $query = new Query();
                   <td><?php echo $data['looseinpcs']; ?></td>
                   <td><?php echo $data['looseoutkg']; ?></td>
                   <td><?php echo $data['looseoutpcs']; ?></td>
+                  <td><?php echo $data['cc_kg']; ?></td>
+                  <td><?php echo $data['cc_pcs']; ?></td>
+                  <td><?php echo $data['lanfish_kg']; ?></td>
+                  <td><?php echo $data['lanfish_pcs']; ?></td>
+                  <td><?php echo $data['cutpiece_kg']; ?></td>
+                  <td><?php echo $data['cutpiece_pcs']; ?></td>
+                  <td><?php echo $data['hhk_kg']; ?></td>
+                  <td><?php echo $data['hhk_pcs']; ?></td>
+                  <td><?php echo $data['msl_kg']; ?></td>
+                  <td><?php echo $data['msl_pcs']; ?></td>
                   <?php
                   if (!isset($_POST['view'])) {
                     ?>
@@ -176,12 +211,16 @@ $query = new Query();
                 $lastsearchdatestmt = $pdo->prepare("SELECT * FROM form10stocktcl WHERE date<'$searchdate' ORDER BY id DESC");
                 $lastsearchdatestmt->execute();
                 $lastsearchdate = $lastsearchdatestmt->fetch(PDO::FETCH_ASSOC);
-                echo $lastsearchdate = $lastsearchdate['date'];
-                echo "<br>";
+                print_r($lastsearchdate);
+                if(!empty($lastsearchdate['date'])){
+                  $lastsearchdate = $lastsearchdate['date'];
+                }else{
+                  $lastsearchdate = 0000-00-00;
+                }
                 $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stocktcl WHERE item_id='$commondity_id' AND date BETWEEN '$lastsearchdate' AND '$searchdate'");
                 $totalf7kgstmt->execute();
                 $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
-                echo $totalf7kgdata['total_kg'];
+                // echo $totalf7kgdata['total_kg'];
                 $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stocktcl WHERE item_id='$commondity_id' AND date='$searchdate'");
                 $totalkgstmt->execute();
                 $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
@@ -218,6 +257,16 @@ $query = new Query();
                 <td style="font-weight:bold;"><?php echo round($form10pcsdata['total_form10_pcs'], 2); ?></td>
                 <td style="font-weight:bold;"><?php echo round($mcdata['total_mc'], 2); ?></td>
                 <td style="font-weight:bold;"><?php echo round($kgdata['kg'], 2); ?></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -283,6 +332,16 @@ $query = new Query();
                 <td><?php echo $form10data['looseinpcs']; ?></td>
                 <td><?php echo $form10data['looseoutkg']; ?></td>
                 <td><?php echo $form10data['looseoutpcs']; ?></td>
+                <td><?php echo $form10data['cc_kg']; ?></td>
+                <td><?php echo $form10data['cc_pcs']; ?></td>
+                <td><?php echo $form10data['lanfish_kg']; ?></td>
+                <td><?php echo $form10data['lanfish_pcs']; ?></td>
+                <td><?php echo $form10data['cutpiece_kg']; ?></td>
+                <td><?php echo $form10data['cutpiece_pcs']; ?></td>
+                <td><?php echo $form10data['hhk_kg']; ?></td>
+                <td><?php echo $form10data['hhk_pcs']; ?></td>
+                <td><?php echo $form10data['msl_kg']; ?></td>
+                <td><?php echo $form10data['msl_pcs']; ?></td>
                 <td><?php echo round($form10data['total_kg'], 2); ?></td>
                 <?php
                 if (!isset($_POST['view'])) {
@@ -312,9 +371,9 @@ $query = new Query();
               ?>
               <div class="modal fade" id="updatemodal<?= $form10data['id']; ?>" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
-                  <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                  <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
                     <div class="modal-header bg-warning text-light">
-                      <h1 class="modal-title fs-5">Add Form 10 Data</h1>
+                      <h1 class="modal-title fs-5">Update Form 10 Data</h1>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -418,9 +477,9 @@ $query = new Query();
     </div>
     <div class="modal fade" id="addmodal">
       <div class="modal-dialog" role="document">
-        <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+        <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
           <div class="modal-header bg-warning text-light">
-            <h1 class="modal-title fs-5">Add Form 10 Data</h1>
+            <h1 class="modal-title fs-5"> Add Form 10 Data</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -471,31 +530,111 @@ $query = new Query();
                   <input type="text" name="pcs" class="form-control inpv2 mb-2">
                 </div>
               </div>
+              <!-- Loose -->
               <div class="row">
-                <div class="col">
-                  <label>Loose In Kg</label>
-                  <input type="text" name="loose_in_kg" class="form-control inpv2 mb-2">
+                <div class="col-6">
+                  <div class="row">
+                    <div class="col">
+                      <label>Loose Out Kg</label>
+                      <input type="text" name="loose_out_kg" class="form-control inpv2 mb-2">
+                    </div>
+                    <div class="col">
+                      <label>Loose Out Pcs</label>
+                      <input type="number" name="loose_out_pcs" class="form-control inpv2 mb-2">
+                    </div>
+                  </div>
                 </div>
-                <div class="col">
-                  <label>Loose In Pcs</label>
-                  <input type="number" name="loose_in_pcs" class="form-control inpv2 mb-2">
+                <div class="col-6">
+                  <div class="row">
+                    <div class="col">
+                      <label>Loose In Kg</label>
+                      <input type="text" name="loose_in_kg" class="form-control inpv2 mb-2">
+                    </div>
+                    <div class="col">
+                      <label>Loose In Pcs</label>
+                      <input type="number" name="loose_in_pcs" class="form-control inpv2 mb-2">
+                    </div>
+                  </div>
                 </div>
               </div>
+              <!-- Loose -->
+              <!-- CC & Cut Piece -->
               <div class="row">
-                <div class="col">
-                  <label>Loose Out Kg</label>
-                  <input type="text" name="loose_out_kg" class="form-control inpv2 mb-2">
+                <div class="col-6">
+                  <div class="row">
+                    <div class="col">
+                      <label>CC_balance Kg</label>
+                      <input type="text" name="cc_kg" class="form-control inpv2 mb-2">
+                    </div>
+                    <div class="col">
+                      <label>CC_balance Pcs</label>
+                      <input type="number" name="cc_pcs" class="form-control inpv2 mb-2">
+                    </div>
+                  </div>
                 </div>
-                <div class="col">
-                  <label>Loose Out Pcs</label>
-                  <input type="number" name="loose_out_pcs" class="form-control inpv2 mb-2">
+                <div class="col-6">
+                  <div class="row">
+                    <div class="col">
+                      <label>Cut Piece Kg</label>
+                      <input type="text" name="cutpiece_kg" class="form-control inpv2 mb-2">
+                    </div>
+                    <div class="col">
+                      <label>Cut Piece Pcs</label>
+                      <input type="number" name="cutpiece_pcs" class="form-control inpv2 mb-2">
+                    </div>
+                  </div>
                 </div>
               </div>
+              <!-- CC & Cut Piece -->
+              <!-- Transfer -->
+              <div class="row">
+                <div class="col-6">
+                  <div class="row">
+                    <div class="col">
+                      <label>HHK Kg</label>
+                      <input type="text" name="hhk_kg" class="form-control inpv2 mb-2">
+                    </div>
+                    <div class="col">
+                      <label>HKK Pcs</label>
+                      <input type="number" name="hhk_pcs" class="form-control inpv2 mb-2">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="row">
+                    <div class="col">
+                      <label>MSL Kg</label>
+                      <input type="text" name="msl_kg" class="form-control inpv2 mb-2">
+                    </div>
+                    <div class="col">
+                      <label>MSL Pcs</label>
+                      <input type="number" name="msl_pcs" class="form-control inpv2 mb-2">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Transfer -->
+              <!-- Lan Fish -->
+              <div class="row">
+                <div class="col-6">
+                  <div class="row">
+                    <div class="col">
+                      <label>လမ်းငါး Kg</label>
+                      <input type="text" name="lanfish_kg" class="form-control inpv2 mb-2">
+                    </div>
+                    <div class="col">
+                      <label>လမ်းငါး Pcs</label>
+                      <input type="number" name="lanfish_pcs" class="form-control inpv2 mb-2">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6 mt-4">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-success" name="add">Add</button>
+                </div>
+              </div>
+              <!-- Lan Fish -->
             </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-success" name="add">Add</button>
           </div>
         </form>
         </div>

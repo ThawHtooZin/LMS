@@ -2624,15 +2624,12 @@ Class Query{
 
   }
 
-  function addform10tcl($date, $item_id, $country, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs){
+  function addform10tcl($date, $item_id, $country, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs, $cckg, $ccpcs, $cutpiecekg, $cutpiecepcs, $hhkkg, $hhkpcs, $mslkg, $mslpcs, $lanfishkg, $lanfishpcs){
     global $pdo;
 
-    $form7stmt = $pdo->prepare("SELECT * FROM form7stock WHERE item_id='$item_id' AND size='$size'");
-    $form7stmt->execute();
-    $form7data = $form7stmt->fetch(PDO::FETCH_ASSOC);
-    $total_kg = (floatval($kg) + floatval($looseinkg)) - floatval($looseoutkg);
-    $addform10 = (intval($pcs) + floatval($looseinpcs)) - floatval($looseoutpcs);
-    $addform10stmt = $pdo->prepare("INSERT INTO form10stocktcl(date, item_id, country, type, size, pcsform10, mc, kg, pcs, looseinkg, looseinpcs, looseoutkg, looseoutpcs, total_kg) VALUES('$date', '$item_id', '$country', 'TCL', '$size', '$addform10', '$mc', '$kg', '$pcs', '$looseinkg', '$looseinpcs', '$looseoutkg', '$looseoutpcs', '$total_kg')");
+    $total_kg = (floatval($kg) + floatval($looseinkg) + floatval($cckg) + floatval($cutpiecekg) + floatval($hhkkg) + floatval($mslkg) + floatval($lanfishkg)) - floatval($looseoutkg);
+    $addform10 = (intval($pcs) + floatval($looseinpcs) + floatval($ccpcs) + floatval($cutpiecepcs) + floatval($hhkpcs) + floatval($mslpcs) + floatval($lanfishpcs)) - floatval($looseoutpcs);
+    $addform10stmt = $pdo->prepare("INSERT INTO form10stocktcl(date, item_id, country, type, size, pcsform10, mc, kg, pcs, looseinkg, looseinpcs, looseoutkg, looseoutpcs, cc_kg, cc_pcs, cutpiece_kg, cutpiece_pcs, hhk_kg, hhk_pcs, msl_kg, msl_pcs, lanfish_kg, lanfish_pcs, total_kg) VALUES('$date', '$item_id', '$country', 'TCL', '$size', '$addform10', '$mc', '$kg', '$pcs', '$looseinkg', '$looseinpcs', '$looseoutkg', '$looseoutpcs','$cckg','$ccpcs', '$cutpiecekg', '$cutpiecepcs', '$hhkkg','$hhkpcs','$mslkg','$mslpcs','$lanfishkg','$lanfishpcs', '$total_kg')");
     $addform10stmt->execute();
 
   }
