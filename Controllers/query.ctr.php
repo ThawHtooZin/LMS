@@ -939,11 +939,6 @@ Class Query{
     $stockstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE commondity_id='$commondity_id' AND indate='$indate' ORDER BY id DESC");
     $stockstmt->execute();
     $stockdata = $stockstmt->fetch(PDO::FETCH_ASSOC);
-<<<<<<< HEAD
-    
-=======
-
->>>>>>> d4fdf6b9ff63a9469dfd5d7304aa7a31dba1958d
     if(!empty($stockdata)){
       $smc = $mc;
       $skg = $kg;
