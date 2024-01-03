@@ -165,7 +165,6 @@ $query = new Query();
             <h4 class="d-inline">HHK Date Range Cold Store Charges</h4>
             <button type="submit" class="btn btn-success float-end addnewstock" data-bs-toggle="modal" data-bs-target="#newstock">Add New Stock</button>
             <button type="submit" class="btn btn-success float-end addnewcharges" data-bs-toggle="modal" data-bs-target="#newcharges">Add New Charges</button>
-            <button type="submit" class="btn btn-success float-end addprocessingcharges" data-bs-toggle="modal" data-bs-target="#newprocessing">Add Processing Charges</button>
             <button type="submit" class="btn btn-success float-end hide addrepackingcharges" data-bs-toggle="modal" data-bs-target="#repackingcharges">Add Repacking Charges</button>
             <button type="submit" class="btn btn-dark text-light float-end hide addtotalcharges ms-2" data-bs-toggle="modal" data-bs-target="#addpayment">Add Payment</button>
             <a href="export.php?table_name=daterangecharges" class="btn btn-success text-light export float-end">Export to Excel</a>
@@ -1024,8 +1023,12 @@ $query = new Query();
                 <label style="font-weight: bold;">Labour Rate</label>
                 <input type="text" name="labourrate" class="form-control inpv2">
               </div>
-            <div class="col">
-            </div>
+              <div class="col">
+                <div class="processingratediv">
+                  <label style="font-weight: bold;">Processing Rate</label>
+                  <input type="text" name="processingrate" class="form-control inpv2">
+                </div>
+              </div>
           </div>
           </div>
           <div class="modal-footer">
@@ -1037,75 +1040,6 @@ $query = new Query();
       </div>
     </div>
     <!-- Add Modal -->
-
-    <!-- Add Processing Modal -->
-    <div class="modal fade" id="newprocessing" aria-labelledby="newprocessing">
-      <div class="modal-dialog">
-        <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
-          <div class="modal-header bg-secondary text-light">
-            <h1 class="modal-title fs-5">New Processing Charges</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <form action="daterangecharges.php" method="post">
-          <div class="modal-body">
-            <div class="row" style="margin-bottom: 10px !important;">
-              <div class="col">
-                <label style="font-weight: bold;">In Date</label>
-                <input type="date" name="proindate" class="form-control inpv2">
-              </div>
-              <div class="col">
-                <label style="font-weight: bold;">Out Date</label>
-                <input type="date" name="prooutdate" class="form-control inpv2">
-              </div>
-            </div>
-            <div class="row" style="margin-bottom: 10px !important;">
-              <div class="col">
-                <label>Commondity</label>
-                <select class="form-control inpv2" name="procommondity_id" id="commondity">
-                  <?php
-                  $commonditydatas = $query->selectdis('hhkstock', 'commondity_id');
-                  foreach ($commonditydatas as $commonditydata) {
-                    $item_id = $commonditydata['commondity_id'];
-                    $item = $query->select('category', $item_id, 'category_id');
-                    ?>
-                    <option value="<?php echo $item['category_id']; ?>"><?php echo $item['category_name']; ?></option>
-                    <?php
-                    }
-                   ?>
-                </select>
-              </div>
-              <div class="col">
-                <label style="font-weight: bold;">Mc</label>
-                <input type="number" name="promc" class="form-control inpv2">
-              </div>
-            </div>
-            <div class="row" style="margin-bottom: 10px !important;">
-              <div class="col">
-                <label style="font-weight: bold;">Kg</label>
-                <input type="text" name="prokg" class="form-control inpv2">
-              </div>
-              <div class="col">
-                <div class="processingchargesdiv hide">
-                  <label style="font-weight: bold;">Processing Charges</label>
-                  <input type="number" name="processingcharges" class="form-control inpv2">
-                </div>
-                <div class="processingratediv">
-                  <label style="font-weight: bold;">Processing Rate</label>
-                  <input type="text" name="processingrate" class="form-control inpv2">
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-success" name="add">Add</button>
-          </div>
-        </form>
-        </div>
-      </div>
-    </div>
-    <!-- Add Processing Modal -->
-
     <!-- Add Payment -->
     <div class="modal fade" id="addpayment">
       <div class="modal-dialog">
@@ -1284,7 +1218,6 @@ $query = new Query();
       document.querySelector(".export").classList.remove("hide");
       document.querySelector(".addtotalcharges").classList.remove("hide");
       document.querySelector(".addnewcharges").classList.add("hide");
-      document.querySelector(".addprocessingcharges").classList.add("hide");
       document.querySelector(".addrepackingcharges").classList.add('hide');
       document.querySelector(".addnewstock").classList.add("hide");
       document.querySelector(".totallink").classList.add('color');
@@ -1299,7 +1232,6 @@ $query = new Query();
       document.querySelector(".repackingcharges").classList.add('hide');
     }
     function showcoldstore(){
-      document.querySelector(".addprocessingcharges").classList.add("hide");
       document.querySelector(".export").classList.add("hide");
       document.querySelector(".addtotalcharges").classList.add("hide");
       document.querySelector(".addnewcharges").classList.remove("hide");
@@ -1317,7 +1249,6 @@ $query = new Query();
       document.querySelector(".repackingcharges").classList.add('hide');
     }
     function showlabour(){
-      document.querySelector(".addprocessingcharges").classList.add("hide");
       document.querySelector(".export").classList.add("hide");
       document.querySelector(".addtotalcharges").classList.add("hide");
       document.querySelector(".addnewcharges").classList.remove("hide");
@@ -1335,10 +1266,9 @@ $query = new Query();
       document.querySelector(".repackingcharges").classList.add('hide');
     }
     function showprocessing(){
-      document.querySelector(".addprocessingcharges").classList.remove("hide");
       document.querySelector(".export").classList.add("hide");
       document.querySelector(".addtotalcharges").classList.add("hide");
-      document.querySelector(".addnewcharges").classList.add("hide");
+      document.querySelector(".addnewcharges").classList.remove("hide");
       document.querySelector(".addrepackingcharges").classList.add('hide');
       document.querySelector(".addnewstock").classList.add("hide");
       document.querySelector(".coldstorelink").classList.remove('color');
@@ -1353,7 +1283,6 @@ $query = new Query();
       document.querySelector(".repackingcharges").classList.add('hide');
     }
     function showrepacking(){
-      document.querySelector(".addprocessingcharges").classList.add("hide");
       document.querySelector(".export").classList.add("hide");
       document.querySelector(".addtotalcharges").classList.add("hide");
       document.querySelector(".addnewcharges").classList.add("hide");
@@ -1371,7 +1300,6 @@ $query = new Query();
       document.querySelector(".repackingcharges").classList.remove('hide');
     }
     function showstock(){
-      document.querySelector(".addprocessingcharges").classList.add("hide");
       document.querySelector(".export").classList.add("hide");
       document.querySelector(".addtotalcharges").classList.add("hide");
       document.querySelector(".addnewcharges").classList.add("hide");
