@@ -34,6 +34,8 @@ $query = new Query();
           <div class="card-header bg-info">
 
             <b class="text-light">User Logs</b>
+
+            <a href=""></a>
           </div>
           <div class="card-body">
             <table class="table table-hover table-bordered">

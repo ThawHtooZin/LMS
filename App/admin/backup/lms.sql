@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 02, 2024 at 06:21 AM
+-- Generation Time: Jan 03, 2024 at 03:47 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -40,7 +40,12 @@ CREATE TABLE `accounts` (
 --
 
 INSERT INTO `accounts` (`id`, `username`, `password`, `email`, `role`) VALUES
-(1, 'admin', 'admin', 'admin@gmail.com', 1);
+(1, 'admin', 'admin', 'admin@gmail.com', 1),
+(2, 'Ma Sandar Aung', '12341234', 'sandaraung@gmail.com', 1),
+(3, 'Ma Soe Soe Khaing', 'stockstock', 'masoesoekhaing@gmail.com', 2),
+(4, 'Lwin Mi Khaing', 'shippment', 'lwinmikhaing@gmail.com', 1),
+(5, 'Thin Zar Kyaw', 'thinzarkyaw', 'thinzarkyaw@gmail.com', 4),
+(6, 'Lin Lin Naing', 'coldstore', 'linlinnaing@gmail.com', 5);
 
 -- --------------------------------------------------------
 
@@ -285,8 +290,7 @@ CREATE TABLE `coldstore` (
 --
 
 INSERT INTO `coldstore` (`id`, `indate`, `outdate`, `commondity_id`, `mc`, `total_mc`, `kg`, `total_kg`, `day`, `rate`, `charges`, `total_charges`) VALUES
-(23, '2023-12-02', '2023-12-03', '1', 250, 250, '2250', '2250', 2, '3', 13500, 13500),
-(24, '2023-12-03', '2023-12-05', '1', 60, 310, '540', '2790', 3, '3', 4860, 18360);
+(29, '2024-01-02', '2024-01-04', '1', 250, 250, '2250', '2250', 3, '4', 27000, 27000);
 
 -- --------------------------------------------------------
 
@@ -811,13 +815,11 @@ CREATE TABLE `hhkstock` (
 --
 
 INSERT INTO `hhkstock` (`id`, `indate`, `outdate`, `commondity_id`, `mc`, `total_mc`, `kg`, `total_kg`, `balance`, `balance_kg`, `balance_mc`, `link_id`) VALUES
-(46, '2023-12-01', '0000-00-00', '1', 100, 100, '900', '900', '900', '0', 0, 0),
-(47, '2023-12-02', '0000-00-00', '1', 200, 300, '1800', '2700', '3600', '0', 0, 0),
-(48, '2023-12-03', '0000-00-00', '1', 50, 350, '450', '3150', '6750', '360', 40, 0),
-(49, '2023-12-02', '2023-12-03', '1', 250, 100, '2250', '900', '3150', '', NULL, 23),
-(50, '2023-12-04', '0000-00-00', '1', 50, 150, '450', '1350', '4500', '450', 50, 0),
-(51, '2023-12-03', '2023-12-05', '1', 60, 90, '540', '810', '4140', '', NULL, 24),
-(52, '2023-12-05', '0000-00-00', '1', 100, 190, '900', '1710', '5850', '900', 100, 0);
+(57, '2024-01-01', '0000-00-00', '1', 100, 100, '900', '900', '900', '0', 0, 0),
+(58, '2024-01-02', '0000-00-00', '1', 200, 300, '1800', '2700', '3600', '450', 50, 0),
+(59, '2024-01-03', '0000-00-00', '1', 50, 350, '450', '3150', '6750', '450', 50, 0),
+(60, '2024-01-02', '2024-01-04', '1', 250, 100, '2250', '900', '3150', '', NULL, 29),
+(61, '2024-01-02', '0000-00-00', '3', 100, 100, '900', '900', '900', '900', 100, 0);
 
 -- --------------------------------------------------------
 
@@ -942,8 +944,7 @@ CREATE TABLE `labour` (
 --
 
 INSERT INTO `labour` (`id`, `indate`, `outdate`, `commondity_id`, `mc`, `total_mc`, `kg`, `total_kg`, `rate`, `charges`, `total_charges`) VALUES
-(23, '2023-12-02', '2023-12-03', '1', 250, 250, '2250', '2250', '4', 9000, 9000),
-(24, '2023-12-03', '2023-12-05', '1', 60, 310, '540', '2790', '4', 2160, 11160);
+(29, '2024-01-02', '2024-01-04', '1', 250, 250, '2250', '2250', '5', 11250, 11250);
 
 -- --------------------------------------------------------
 
@@ -1222,7 +1223,11 @@ CREATE TABLE `permission` (
 --
 
 INSERT INTO `permission` (`id`, `role_id`, `permission`) VALUES
-(1, 1, 'manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_acpayable,manage_accountreceivable,manage_transactionmanage_general_ledger,manage_customers,manage_supplier,manage_coldstoreitem,manage_item,manage_actype,manage_acname,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,sale_report,purchase_report,payable_report,manage_mcreport,manage_tclmcstock');
+(1, 1, 'manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_acpayable,manage_accountreceivable,manage_transactionmanage_general_ledger,manage_customers,manage_supplier,manage_coldstoreitem,manage_item,manage_actype,manage_acname,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,sale_report,purchase_report,payable_report,manage_mcreport,manage_tclmcstock'),
+(2, 2, ',manage_item,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_mcreport,manage_tclmcstock'),
+(3, 3, ',manage_coldstoreitem,manage_coldstorecharges,manage_shippmentexport,manage_truckexport'),
+(4, 4, ',manage_item,manage_form7,manage_form10,manage_truckexport,manage_mcreport,manage_tclmcstock'),
+(5, 5, ',manage_coldstoreitem,manage_coldstorecharges');
 
 -- --------------------------------------------------------
 
@@ -1243,14 +1248,6 @@ CREATE TABLE `processing` (
   `charges` int(11) NOT NULL,
   `total_charges` bigint(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
---
--- Dumping data for table `processing`
---
-
-INSERT INTO `processing` (`id`, `indate`, `outdate`, `commondity_id`, `mc`, `total_mc`, `kg`, `total_kg`, `rate`, `charges`, `total_charges`) VALUES
-(23, '2023-12-02', '2023-12-03', '1', 250, 250, '2250', '2250', '370', 832500, 832500),
-(24, '2023-12-03', '2023-12-05', '1', 60, 310, '540', '2790', '370', 199800, 1032300);
 
 -- --------------------------------------------------------
 
@@ -1370,7 +1367,11 @@ CREATE TABLE `role` (
 --
 
 INSERT INTO `role` (`role_id`, `role_name`) VALUES
-(1, 'admin');
+(1, 'Admin'),
+(2, 'Stock'),
+(3, 'Shippment'),
+(4, 'TCL'),
+(5, 'Coldstore');
 
 -- --------------------------------------------------------
 
@@ -1505,8 +1506,7 @@ CREATE TABLE `total_charges` (
 --
 
 INSERT INTO `total_charges` (`id`, `date`, `commondity_id`, `total_coldstore_charges`, `total_labour_charges`, `total_processing_charges`, `repacking_charges`, `ice_charges`, `ot_charges`, `extra_charges`, `total_charges`, `grand_total_charges`, `payment_date`, `payment_amount`, `balance_amount`, `remark`, `link_id`) VALUES
-(25, '2023-12-03', 1, 13500, 9000, 832500, 0, 0, 0, 0, 855000, 855000, '0000-00-00', 0, 855000, '', 23),
-(26, '2023-12-05', 1, 4860, 2160, 199800, 0, 0, 0, 0, 206820, 1061820, '0000-00-00', 0, 1061820, '', 24);
+(31, '2024-01-04', 1, 27000, 11250, 0, 0, 0, 0, 0, 38250, 38250, '0000-00-00', 0, 38250, '', 29);
 
 -- --------------------------------------------------------
 
@@ -1804,7 +1804,36 @@ INSERT INTO `userlogs` (`id`, `login_time`, `login_date`, `login_username`, `log
 (29, '09:48:13.000000', '2023-12-29', 'admin', '', 'Logout Success'),
 (30, '10:55:27.000000', '2023-12-30', 'admin', 'admin', 'Login Success'),
 (31, '11:23:25.000000', '2023-12-30', 'admin', 'admin', 'Login Success'),
-(32, '10:34:41.000000', '2024-01-02', 'admin', 'admin', 'Login Success');
+(32, '10:34:41.000000', '2024-01-02', 'admin', 'admin', 'Login Success'),
+(33, '05:32:01.000000', '2024-01-02', 'admin', 'admin', 'Login Success'),
+(34, '07:46:59.000000', '2024-01-03', 'admin', 'admin', 'Login Success'),
+(35, '08:06:22.000000', '2024-01-03', 'admin', '', 'Logout Success'),
+(36, '08:06:27.000000', '2024-01-03', 'Ma Soe Soe Khaing	', 'stockstock', 'Login Failed'),
+(37, '08:06:42.000000', '2024-01-03', 'Ma Soe Soe Khaing', 'stockstock', 'Login Success'),
+(38, '08:06:57.000000', '2024-01-03', 'Ma Soe Soe Khaing', '', 'Logout Success'),
+(39, '08:07:14.000000', '2024-01-03', 'Ma Sandar Aung', 'sandaraung', 'Login Password Invalid'),
+(40, '08:07:17.000000', '2024-01-03', 'admin', 'admin', 'Login Success'),
+(41, '08:07:24.000000', '2024-01-03', 'admin', '', 'Logout Success'),
+(42, '08:07:29.000000', '2024-01-03', 'Ma Sandar Aung', '12341234', 'Login Success'),
+(43, '08:09:57.000000', '2024-01-03', 'Ma Sandar Aung', '', 'Logout Success'),
+(44, '08:10:06.000000', '2024-01-03', 'Lwin Mi Khaing', 'shippment', 'Login Success'),
+(45, '08:10:20.000000', '2024-01-03', 'Lwin Mi Khaing', '', 'Logout Success'),
+(46, '08:10:27.000000', '2024-01-03', 'Lwin Mi Khaing', 'shippment', 'Login Success'),
+(47, '08:10:45.000000', '2024-01-03', 'Lwin Mi Khaing', '', 'Logout Success'),
+(48, '08:10:56.000000', '2024-01-03', 'Ma Sandar Aung', 'sandaraung', 'Login Password Invalid'),
+(49, '08:11:06.000000', '2024-01-03', 'Ma Sandar Aung', '12341234', 'Login Success'),
+(50, '08:13:04.000000', '2024-01-03', 'Ma Sandar Aung', '', 'Logout Success'),
+(51, '08:13:09.000000', '2024-01-03', 'Thin Zar Kyaw', 'thinzarkyaw', 'Login Success'),
+(52, '08:13:20.000000', '2024-01-03', 'Thin Zar Kyaw', '', 'Logout Success'),
+(53, '08:13:27.000000', '2024-01-03', 'Ma Sandar Aung', '12341234', 'Login Success'),
+(54, '08:13:50.000000', '2024-01-03', 'Ma Sandar Aung', '', 'Logout Success'),
+(55, '08:14:00.000000', '2024-01-03', 'Thin Zar Kyaw', 'thinzarkyaw', 'Login Success'),
+(56, '08:14:10.000000', '2024-01-03', 'Thin Zar Kyaw', '', 'Logout Success'),
+(57, '08:14:18.000000', '2024-01-03', 'Ma Sandar Aung', '12341234', 'Login Success'),
+(58, '08:14:28.000000', '2024-01-03', 'Ma Sandar Aung', '', 'Logout Success'),
+(59, '08:14:33.000000', '2024-01-03', 'Thin Zar Kyaw', 'thinzarkyaw', 'Login Success'),
+(60, '08:14:38.000000', '2024-01-03', 'Thin Zar Kyaw', '', 'Logout Success'),
+(61, '08:14:42.000000', '2024-01-03', 'Ma Sandar Aung', '12341234', 'Login Success');
 
 --
 -- Indexes for dumped tables
@@ -2154,7 +2183,7 @@ ALTER TABLE `userlogs`
 -- AUTO_INCREMENT for table `accounts`
 --
 ALTER TABLE `accounts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `acname`
@@ -2196,7 +2225,7 @@ ALTER TABLE `category`
 -- AUTO_INCREMENT for table `coldstore`
 --
 ALTER TABLE `coldstore`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `container`
@@ -2286,7 +2315,7 @@ ALTER TABLE `hhkmcstock`
 -- AUTO_INCREMENT for table `hhkstock`
 --
 ALTER TABLE `hhkstock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT for table `invoice_costing`
@@ -2304,7 +2333,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT for table `labour`
 --
 ALTER TABLE `labour`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `mslcoldstore`
@@ -2370,7 +2399,7 @@ ALTER TABLE `payable`
 -- AUTO_INCREMENT for table `permission`
 --
 ALTER TABLE `permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `processing`
@@ -2406,7 +2435,7 @@ ALTER TABLE `repackingout`
 -- AUTO_INCREMENT for table `role`
 --
 ALTER TABLE `role`
-  MODIFY `role_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `role_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `supplier`
@@ -2424,7 +2453,7 @@ ALTER TABLE `tclmcstock`
 -- AUTO_INCREMENT for table `total_charges`
 --
 ALTER TABLE `total_charges`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `transaction`
@@ -2478,7 +2507,7 @@ ALTER TABLE `trucktotalcosting`
 -- AUTO_INCREMENT for table `userlogs`
 --
 ALTER TABLE `userlogs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -23,6 +23,15 @@ $query = new Query();
   <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
   <body>
     <?php
+    if(!empty($_SESSION['changepermission']))
+    {
+      if($_SESSION['changepermission'] == 'finished'){
+        echo "<script>swal('Success!', 'The User Permission is been saved!', 'success');</script>";
+        $_SESSION['changepermission'] = '';
+      }
+    }
+    ?>
+    <?php
       if(isset($_POST['addrolebtn'])){
         $role_name = $_POST['role_name'];
         $query->addrole($role_name);

@@ -435,7 +435,7 @@ $permissions = $permission['permission'];
       </li>
       <?php
       }
-      if(str_contains($permissions, 'manage_packingmaterial') == 1 || str_contains($permissions, 'manage_shippmentexport') == 1){
+      if(str_contains($permissions, 'manage_truckexport') == 1 || str_contains($permissions, 'manage_shippmentexport') == 1){
        ?>
       <li class=" p-1" style=" font-weight:bold; border-bottom: 1px solid rgb(255,255,255,0.2); " >
         <a href="#" class="nav-link text-white report" id="sidebarlink" data-bs-toggle="collapse" data-bs-target="#logestic-collapse" aria-expanded="false">

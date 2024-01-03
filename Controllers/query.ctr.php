@@ -529,7 +529,7 @@ Class Query{
     $kg = floatval($viss) * 1.634;
     $link_id = $id;
 
-    if ($tclfrozen === "tcl") {   
+    if ($tclfrozen === "tcl") {
       $formstmt = $pdo->prepare("INSERT INTO form7stocktcl(date, item_id, supplier_name, country, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', 'DAKA',  'TCl', '$size', '$viss', '$kg', '$pcs', '$link_id')");
       $formstmt->execute();
     }else{
@@ -844,103 +844,103 @@ Class Query{
     }
 
     // Processing ADD
-    $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
-    $processingstmt->execute();
-    $processing = $processingstmt->fetch(PDO::FETCH_ASSOC);
-    if(!empty($processing)){
-      if(str_contains(strtolower($comname), 'iqf')){
-        $processingemptystmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
-        $processingemptystmt->execute();
-        $processingemptydata = $processingemptystmt->fetch(PDO::FETCH_ASSOC);
-        if (!empty($processingemptydata)) {
-          $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
-          $processingstmt->execute();
-          $processingdata = $processingstmt->fetch(PDO::FETCH_ASSOC);
-
-          $ptotal_mc = intval($processingdata['total_mc']) + intval($mc);
-          $ptotal_kg = intval($processingdata['total_kg']) + intval($kg);
-          $pcharges = intval($processingrate) * intval($kg);
-          $totalprocessingcharges = intval($processingdata['total_charges']) + intval($pcharges);
-        }else{
-          $ptotal_mc = intval($mc);
-          $ptotal_kg = intval($kg);
-          $pcharges = intval($processingrate) * intval($kg);
-          $totalprocessingcharges = intval($pcharges);
-        }
-      }elseif(str_contains(strtolower($comname), 'block')){
-        // echo "Yes";
-        $processingemptystmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
-        $processingemptystmt->execute();
-        $processingemptydata = $processingemptystmt->fetch(PDO::FETCH_ASSOC);
-        if (!empty($processingemptydata)) {
-          $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
-          $processingstmt->execute();
-          $processingdata = $processingstmt->fetch(PDO::FETCH_ASSOC);
-
-          $ptotal_mc = intval($processingdata['total_mc']) + intval($mc);
-        }else{
-          $ptotal_mc = intval($mc);
-          $ptotal_kg = intval($kg);
-          $totalprocessingcharges = intval($pcharges);
-        }
-      }elseif(str_contains(strtolower($comname), 'pujanut')){
-        $processingemptystmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
-        $processingemptystmt->execute();
-        $processingemptydata = $processingemptystmt->fetch(PDO::FETCH_ASSOC);
-        if (!empty($processingemptydata)) {
-          $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
-          $processingstmt->execute();
-          $processingdata = $processingstmt->fetch(PDO::FETCH_ASSOC);
-
-          $ptotal_mc = intval($processingdata['total_mc']) + intval($mc);
-          $ptotal_kg = intval($processingdata['total_kg']) + intval($kg);
-          $pcharges = intval($processingrate) * intval($kg);
-          $totalprocessingcharges = intval($processingdata['total_charges']) + intval($pcharges);
-        }else{
-          $ptotal_mc = intval($mc);
-          $ptotal_kg = intval($kg);
-          $pcharges = intval($processingrate) * intval($kg);
-          $totalprocessingcharges = intval($pcharges);
-        }
-      }else{
-        $processingemptystmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
-        $processingemptystmt->execute();
-        $processingemptydata = $processingemptystmt->fetch(PDO::FETCH_ASSOC);
-        if (!empty($processingemptydata)) {
-          $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
-          $processingstmt->execute();
-          $processingdata = $processingstmt->fetch(PDO::FETCH_ASSOC);
-
-          $ptotal_mc = intval($processingdata['total_mc']) + intval($mc);
-          $ptotal_kg = intval($processingdata['total_kg']) + intval($kg);
-          $pcharges = intval($processingrate) * intval($kg);
-          $totalprocessingcharges = intval($processingdata['total_charges']) + intval($pcharges);
-        }else{
-          $ptotal_mc = intval($mc);
-          $ptotal_kg = intval($kg);
-          $pcharges = intval($processingrate) * intval($kg);
-          $totalprocessingcharges = intval($pcharges);
-        }
-      }
-    }else{
-      if(str_contains(strtolower($comname), 'block')){
-        $ptotal_mc = intval($mc);
-        $ptotal_kg = intval($kg);
-        $pcharges = floatval($pcharges);
-        $totalprocessingcharges = intval($pcharges);
-      }else{
-        $ptotal_mc = intval($mc);
-        $ptotal_kg = intval($kg);
-        $pcharges = intval($processingrate) * intval($kg);
-        $totalprocessingcharges = intval($pcharges);
-      }
-    }
+    // $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+    // $processingstmt->execute();
+    // $processing = $processingstmt->fetch(PDO::FETCH_ASSOC);
+    // if(!empty($processing)){
+    //   if(str_contains(strtolower($comname), 'iqf')){
+    //     $processingemptystmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+    //     $processingemptystmt->execute();
+    //     $processingemptydata = $processingemptystmt->fetch(PDO::FETCH_ASSOC);
+    //     if (!empty($processingemptydata)) {
+    //       $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+    //       $processingstmt->execute();
+    //       $processingdata = $processingstmt->fetch(PDO::FETCH_ASSOC);
+    //
+    //       $ptotal_mc = intval($processingdata['total_mc']) + intval($mc);
+    //       $ptotal_kg = intval($processingdata['total_kg']) + intval($kg);
+    //       $pcharges = intval($processingrate) * intval($kg);
+    //       $totalprocessingcharges = intval($processingdata['total_charges']) + intval($pcharges);
+    //     }else{
+    //       $ptotal_mc = intval($mc);
+    //       $ptotal_kg = intval($kg);
+    //       $pcharges = intval($processingrate) * intval($kg);
+    //       $totalprocessingcharges = intval($pcharges);
+    //     }
+    //   }elseif(str_contains(strtolower($comname), 'block')){
+    //     // echo "Yes";
+    //     $processingemptystmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+    //     $processingemptystmt->execute();
+    //     $processingemptydata = $processingemptystmt->fetch(PDO::FETCH_ASSOC);
+    //     if (!empty($processingemptydata)) {
+    //       $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+    //       $processingstmt->execute();
+    //       $processingdata = $processingstmt->fetch(PDO::FETCH_ASSOC);
+    //
+    //       $ptotal_mc = intval($processingdata['total_mc']) + intval($mc);
+    //     }else{
+    //       $ptotal_mc = intval($mc);
+    //       $ptotal_kg = intval($kg);
+    //       $totalprocessingcharges = intval($pcharges);
+    //     }
+    //   }elseif(str_contains(strtolower($comname), 'pujanut')){
+    //     $processingemptystmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+    //     $processingemptystmt->execute();
+    //     $processingemptydata = $processingemptystmt->fetch(PDO::FETCH_ASSOC);
+    //     if (!empty($processingemptydata)) {
+    //       $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+    //       $processingstmt->execute();
+    //       $processingdata = $processingstmt->fetch(PDO::FETCH_ASSOC);
+    //
+    //       $ptotal_mc = intval($processingdata['total_mc']) + intval($mc);
+    //       $ptotal_kg = intval($processingdata['total_kg']) + intval($kg);
+    //       $pcharges = intval($processingrate) * intval($kg);
+    //       $totalprocessingcharges = intval($processingdata['total_charges']) + intval($pcharges);
+    //     }else{
+    //       $ptotal_mc = intval($mc);
+    //       $ptotal_kg = intval($kg);
+    //       $pcharges = intval($processingrate) * intval($kg);
+    //       $totalprocessingcharges = intval($pcharges);
+    //     }
+    //   }else{
+    //     $processingemptystmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+    //     $processingemptystmt->execute();
+    //     $processingemptydata = $processingemptystmt->fetch(PDO::FETCH_ASSOC);
+    //     if (!empty($processingemptydata)) {
+    //       $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+    //       $processingstmt->execute();
+    //       $processingdata = $processingstmt->fetch(PDO::FETCH_ASSOC);
+    //
+    //       $ptotal_mc = intval($processingdata['total_mc']) + intval($mc);
+    //       $ptotal_kg = intval($processingdata['total_kg']) + intval($kg);
+    //       $pcharges = intval($processingrate) * intval($kg);
+    //       $totalprocessingcharges = intval($processingdata['total_charges']) + intval($pcharges);
+    //     }else{
+    //       $ptotal_mc = intval($mc);
+    //       $ptotal_kg = intval($kg);
+    //       $pcharges = intval($processingrate) * intval($kg);
+    //       $totalprocessingcharges = intval($pcharges);
+    //     }
+    //   }
+    // }else{
+    //   if(str_contains(strtolower($comname), 'block')){
+    //     $ptotal_mc = intval($mc);
+    //     $ptotal_kg = intval($kg);
+    //     $pcharges = floatval($pcharges);
+    //     $totalprocessingcharges = intval($pcharges);
+    //   }else{
+    //     $ptotal_mc = intval($mc);
+    //     $ptotal_kg = intval($kg);
+    //     $pcharges = intval($processingrate) * intval($kg);
+    //     $totalprocessingcharges = intval($pcharges);
+    //   }
+    // }
 
     // Add Stock
     $stockstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE commondity_id='$commondity_id' AND indate='$indate' ORDER BY id DESC");
     $stockstmt->execute();
     $stockdata = $stockstmt->fetch(PDO::FETCH_ASSOC);
-    print_r($stockdata);
+    // print_r($stockdata);
     if(!empty($stockdata)){
       $smc = $mc;
       $skg = $kg;
@@ -961,13 +961,13 @@ Class Query{
     $labourstmt->execute();
     $item_id = $commondity_id;
     $commonditydata = $this->select('category', $item_id, 'category_id');
-    if (str_contains(strtolower($commonditydata['category_name']), 'block')) {
-      $processingstmt = $pdo->prepare("INSERT INTO processing(indate, outdate, commondity_id, mc, total_mc) VALUES('$indate','$outdate','$commondity_id', '$mc','$ptotal_mc')");
-      $processingstmt->execute();
-    }else{
-      $processingstmt = $pdo->prepare("INSERT INTO processing(indate, outdate, commondity_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$commondity_id', '$mc','$ptotal_mc','$kg','$ptotal_kg','$processingrate','$pcharges','$totalprocessingcharges')");
-      $processingstmt->execute();
-    }
+    // if (str_contains(strtolower($commonditydata['category_name']), 'block')) {
+    //   $processingstmt = $pdo->prepare("INSERT INTO processing(indate, outdate, commondity_id, mc, total_mc) VALUES('$indate','$outdate','$commondity_id', '$mc','$ptotal_mc')");
+    //   $processingstmt->execute();
+    // }else{
+    //   $processingstmt = $pdo->prepare("INSERT INTO processing(indate, outdate, commondity_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$commondity_id', '$mc','$ptotal_mc','$kg','$ptotal_kg','$processingrate','$pcharges','$totalprocessingcharges')");
+    //   $processingstmt->execute();
+    // }
     $coldstoredatas = $this->selectdesc('coldstore');
     $coldstoreid = $coldstoredatas[0]['id'];
 
@@ -985,10 +985,10 @@ Class Query{
     $totallabourstmt = $pdo->prepare("SELECT * FROM labour  ORDER BY id DESC");
     $totallabourstmt->execute();
     $totallabourdata = $totallabourstmt->fetch(PDO::FETCH_ASSOC);
-
-    $totalprocessingstmt = $pdo->prepare("SELECT * FROM processing ORDER BY id DESC");
-    $totalprocessingstmt->execute();
-    $totalprocessingdata = $totalprocessingstmt->fetch(PDO::FETCH_ASSOC);
+    //
+    // $totalprocessingstmt = $pdo->prepare("SELECT * FROM processing ORDER BY id DESC");
+    // $totalprocessingstmt->execute();
+    // $totalprocessingdata = $totalprocessingstmt->fetch(PDO::FETCH_ASSOC);
 
     $totalchargesstmt = $pdo->prepare("SELECT * FROM total_charges ORDER BY id DESC");
     $totalchargesstmt->execute();
@@ -997,21 +997,31 @@ Class Query{
     if(!empty($totalchargesdata)){
       $total_coldstore_charges = $totalcoldstoredata['charges'];
       $total_labour_charges = $totallabourdata['charges'];
-      $total_processing_charges = $totalprocessingdata['charges'];
-      $total_charges = $totalcoldstoredata['charges'] + $totallabourdata['charges'] + $totalprocessingdata['charges'];
+      // $total_processing_charges = $totalprocessingdata['charges'];
+      $total_charges = $totalcoldstoredata['charges'] + $totallabourdata['charges'];
+      // $total_charges = $totalcoldstoredata['charges'] + $totallabourdata['charges'] + $totalprocessingdata['charges'];
       $grand_total_charges = $totalchargesdata['balance_amount'] + $total_charges;
       $balance_amount = intval($grand_total_charges);
     }else{
       $total_coldstore_charges = $totalcoldstoredata['charges'];
       $total_labour_charges = $totallabourdata['charges'];
-      $total_processing_charges = $totalprocessingdata['charges'];
-      $total_charges = $totalcoldstoredata['charges'] + $totallabourdata['charges'] + $totalprocessingdata['charges'];
+      // $total_processing_charges = $totalprocessingdata['charges'];
+      // $total_charges = $totalcoldstoredata['charges'] + $totallabourdata['charges'] + $totalprocessingdata['charges'];
+      $total_charges = $totalcoldstoredata['charges'] + $totallabourdata['charges'];
       $grand_total_charges = $total_charges;
       $balance_amount = $grand_total_charges;
     }
     // echo $total_processing_charges;
-    $stmt = $pdo->prepare("INSERT INTO total_charges(date, commondity_id, total_coldstore_charges, total_labour_charges, total_processing_charges, total_charges, grand_total_charges, balance_amount, link_id) VALUES('$outdate', '$commondity_id','$total_coldstore_charges', '$total_labour_charges', '$total_processing_charges', '$total_charges', '$grand_total_charges', '$balance_amount', '$coldstoreid')");
+    $stmt = $pdo->prepare("INSERT INTO total_charges(date, commondity_id, total_coldstore_charges, total_labour_charges, total_charges, grand_total_charges, balance_amount, link_id) VALUES('$outdate', '$commondity_id','$total_coldstore_charges', '$total_labour_charges', '$total_charges', '$grand_total_charges', '$balance_amount', '$coldstoreid')");
     $stmt->execute();
+
+    // if (str_contains(strtolower($commonditydata['category_name']), 'block')) {
+    //   $processingstmt = $pdo->prepare("INSERT INTO processing(indate, outdate, commondity_id, mc, total_mc) VALUES('$indate','$outdate','$commondity_id', '$mc','$ptotal_mc')");
+    //   $processingstmt->execute();
+    // }else{
+    //   $processingstmt = $pdo->prepare("INSERT INTO processing(indate, outdate, commondity_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$commondity_id', '$mc','$ptotal_mc','$kg','$ptotal_kg','$processingrate','$pcharges','$totalprocessingcharges')");
+    //   $processingstmt->execute();
+    // }
   }
 
   function updatecoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $updateid){
@@ -2893,6 +2903,8 @@ Class Query{
       $permission->execute();
     }
 
+    $_SESSION['changepermission'] = 'finished';
+    echo "<script>window.location.href='managerole.php';</script>";
   }
 
   function addsize($id, $size){
@@ -3213,7 +3225,7 @@ Class Query{
     $datastmt = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE item_id='$item_id' AND size='$size' AND invoice_no='$invoice_no' AND percentage != '0'");
     $datastmt->execute();
     $data = $datastmt->fetch(PDO::FETCH_ASSOC);
-    
+
     $percentage = $data['percentage'];
     $grand_total = $percentage + $total;
     if($dollar_rate != 0 && $grand_total != 0){
@@ -3334,7 +3346,7 @@ Class Query{
       $mmkcredit = $credit;
     }
     $transactionstmt = $pdo->prepare("INSERT INTO transaction(date, voucher_no, ac_code, description, debit, credit, currency, sr_no, container_no,bank_charges) VALUES('$date', :voucher_no, '$ac_code', :description, '$mmkdebit', '$mmkcredit', '$currency', '$sr_no', '$container_no', '$bank_charges')");
-    
+
     $transactionstmt->execute(
       [
         ':voucher_no' => $voucher_no,
