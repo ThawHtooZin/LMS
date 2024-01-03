@@ -135,7 +135,7 @@ $query = new Query();
         <form action="" method="post">
           <div class="modal-body">
             <label>Loading No</label>
-            <input type="number" name="loading_no" class="form-control inpv2 mb-3 mt-1">
+            <input type="text" name="loading_no" class="form-control inpv2 mb-3 mt-1">
             <label>Loading Mc</label>
             <input type="number" name="loading_mc" class="form-control inpv2 mb-3 mt-1">
           </div>

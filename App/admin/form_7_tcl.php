@@ -68,7 +68,22 @@ $query = new Query();
               <b class="h5">Link Mark Limited (F-7) TCL</b>
               <!-- <button type="button" class="btn btn-success btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#addmodal">Add Data</button> -->
               <button type="submit" name="searchbtn" class="btn btn-secondary btn-sm float-end">View</button>
-              <select name="commondity_id" class="form-control inpv2 w-25 d-inline float-end me-2" style="height:30px !important; padding:0px 5px;">
+              <select name="searchsize" class="form-control inpv2 d-inline float-end me-2" style="width:200px !important; height:30px !important; padding:0px 5px;">
+                <option value="">Select Size</option>
+                <?php
+                $commonstmt = $pdo->prepare("SELECT DISTINCT size FROM form7stocktcl");
+                $commonstmt->execute();
+                $commondatas = $commonstmt->fetchAll();
+
+                foreach ($commondatas as $commondata) {
+                  $size = $commondata['size'];
+                  ?>
+                  <option value="<?php echo $size; ?>"><?php echo $size; ?></option>
+                  <?php
+                }
+                ?>
+              </select>
+              <select name="commondity_id" class="form-control inpv2 d-inline float-end me-2" style="width:200px !important; height:30px !important; padding:0px 5px;">
                 <option value="">Select Commondity</option>
                 <?php
                 $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stocktcl");
@@ -84,12 +99,7 @@ $query = new Query();
                 }
                  ?>
               </select>
-              <!-- <button type="submit" name="searchbtn2" class="btn btn-secondary btn-sm float-end me-2">View</button>
-              <select name="type" class="form-control inpv2 w-25 d-inline float-end me-2" style="height:30px !important; padding:0px 5px;">
-                <option value="">Select Type</option>
-                <option value="frozen">Frozen</option>
-                <option value="tcl">TCL</option>
-              </select> -->
+              <input type="date" name="searchdate" value="" class="form-control inpv2 d-inline float-end me-2" style="width:200px !important;">
             </div>
           </form>
           <div class="card-body">
@@ -108,19 +118,22 @@ $query = new Query();
                 <th>Action</th>
               </tr>
               <?php
-              if (isset($_POST['searchbtn']) && !empty($_POST['commondity_id'])) {
+              if (isset($_POST['searchbtn']) && !empty($_POST['commondity_id']) && !empty($_POST['searchdate']) && !empty($_POST['searchsize'])) {
+
                 $commondity_id = $_POST['commondity_id'];
-                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT country) FROM form7stocktcl WHERE item_id='$commondity_id'");
+                $searchdate = $_POST['searchdate'];
+                $searchsize = $_POST['searchsize'];
+                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT country) FROM form7stocktcl WHERE item_id='$commondity_id' AND date='$searchdate' AND size='$searchsize'");
                 $commonditycountstmt->execute();
                 $commonditycountdatas = $commonditycountstmt->fetchColumn();
                 for ($i=0; $i < $commonditycountdatas; $i++) {
 
-                  $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form7stocktcl WHERE item_id='$commondity_id'");
+                  $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form7stocktcl WHERE item_id='$commondity_id' AND date='$searchdate' AND size='$searchsize'");
                   $countrystmt->execute();
                   $countrydata = $countrystmt->fetchall();
                   $country = $countrydata[$i]['country'];
 
-                  $stmt = $pdo->prepare("SELECT * FROM form7stocktcl WHERE country='$country' AND item_id='$commondity_id'");
+                  $stmt = $pdo->prepare("SELECT * FROM form7stocktcl WHERE country='$country' AND item_id='$commondity_id' AND date='$searchdate' AND size='$searchsize'");
                   $stmt->execute();
                   $datas = $stmt->fetchall();
 
@@ -151,56 +164,21 @@ $query = new Query();
                       </form>
                     </td>
                   </tr>
-                  <div class="modal fade" id="updatemodal<?php echo $form7data['id']; ?>">
-                    <div class="modal-dialog" role="document">
-                      <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
-                        <div class="modal-header bg-warning text-light">
-                          <h1 class="modal-title fs-5">Update Data</h1>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                          <form action="form_7_tcl.php" method="post">
-                            <input type="hidden" name="id" value="<?php echo $form7data['id']; ?>">
-                            <div class="modal-body">
-                              <?php
-                              $idd = $form7data['id'];
-                              $updata = $query->select('form7stocktcl', $idd, 'id');
-                              ?>
-                              <div class="row">
-                                <div class="col">
-                                  <label>Country</label>
-                                  <input type="text" name="country" class="form-control inpv2 mt-1" value="<?php echo $updata['country']; ?>">
-                                </div>
-                                <div class="col">
-                                  <label>Pcs Per F7</label>
-                                  <input type="text" name="pcsperf7" class="form-control inpv2 mt-1" value="<?php echo $updata['pcsperf7']; ?>">
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-warning" name="updatecountry">Update</button>
-                          </div>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
                   <?php
                   $date = $form7data['date'];
                   $item_id = $form7data['item_id'];
-                  $country = $form7data['country'];
+                  $size = $form7data['size'];
                 }
-                $totalvissstmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM form7stocktcl WHERE item_id='$item_id' AND country='$country'");
+                $totalvissstmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM form7stocktcl WHERE item_id='$item_id' AND date='$date' AND size='$size'");
                 $totalvissstmt->execute();
                 $totalvissdata = $totalvissstmt->fetch(PDO::FETCH_ASSOC);
-                $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stocktcl WHERE item_id='$item_id' AND country='$country'");
+                $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stocktcl WHERE item_id='$item_id' AND date='$date' AND size='$size'");
                 $totalkgstmt->execute();
                 $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
-                $totalpcsstmt = $pdo->prepare("SELECT SUM(pcspervr) AS total_pcs FROM form7stocktcl WHERE item_id='$item_id' AND country='$country'");
+                $totalpcsstmt = $pdo->prepare("SELECT SUM(pcspervr) AS total_pcs FROM form7stocktcl WHERE item_id='$item_id' AND date='$date' AND size='$size'");
                 $totalpcsstmt->execute();
                 $totalpcsdata = $totalpcsstmt->fetch(PDO::FETCH_ASSOC);
-                $totalpcsf7stmt = $pdo->prepare("SELECT SUM(pcsperf7) AS total_pcsf7 FROM form7stocktcl WHERE item_id='$item_id' AND country='$country'");
+                $totalpcsf7stmt = $pdo->prepare("SELECT SUM(pcsperf7) AS total_pcsf7 FROM form7stocktcl WHERE item_id='$item_id' AND date='$date' AND size='$size'");
                 $totalpcsf7stmt->execute();
                 $totalpcsf7data = $totalpcsf7stmt->fetch(PDO::FETCH_ASSOC);
                 ?>
