@@ -66,8 +66,23 @@ $query = new Query();
           <form action="form_7_tcl.php" method="post">
             <div class="card-header bg-info text-light pb-3">
               <b class="h5">Link Mark Limited (F-7) TCL</b>
-              <!-- <button type="button" class="btn btn-success btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#addmodal">Add Data</button> -->
               <button type="submit" name="searchbtn" class="btn btn-secondary btn-sm float-end">View</button>
+              <select name="commondity_id" class="form-control inpv2 w-25 d-inline float-end me-2" style="height:30px !important; padding:0px 5px;">
+                <option value="">Select Size</option>
+                <?php
+                $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stocktcl");
+                $commonstmt->execute();
+                $commondatas = $commonstmt->fetchAll();
+
+                foreach ($commondatas as $commondata) {
+                  $item_id = $commondata['item_id'];
+                  $commonditydata = $query->select('item', $item_id, 'item_id');
+                  ?>
+                  <option value="<?php echo $commondata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                  <?php
+                }
+                ?>
+              </select>
               <select name="commondity_id" class="form-control inpv2 w-25 d-inline float-end me-2" style="height:30px !important; padding:0px 5px;">
                 <option value="">Select Commondity</option>
                 <?php
@@ -84,6 +99,7 @@ $query = new Query();
                 }
                  ?>
               </select>
+              <input type="date" name="searchdate" value="" class="form-control inpv2 w-25 d-inline float-end me-2">
               <!-- <button type="submit" name="searchbtn2" class="btn btn-secondary btn-sm float-end me-2">View</button>
               <select name="type" class="form-control inpv2 w-25 d-inline float-end me-2" style="height:30px !important; padding:0px 5px;">
                 <option value="">Select Type</option>

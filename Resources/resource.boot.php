@@ -212,7 +212,7 @@ class Bootstrap
           cursor: pointer !important;
         }
 
-        // Responsive
+        
         @media screen and (min-width: 1300px){
           .contentcol{
             left: 14.5%;
