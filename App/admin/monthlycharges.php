@@ -40,8 +40,9 @@ $query = new Query();
       $kg = $_POST['kg'];
       $coldstorerate = $_POST['coldstorerate'];
       $labourrate = $_POST['labourrate'];
-      $damagekg = $_POST['damagekg'];
-      $query->addfishcharges($date, $ite, $mc, $kg, $coldstorerate, $labourrate, $damagekg);
+      $inkg = $_POST['inkg'];
+      $outkg = $_POST['outkg'];
+      $query->addfishcharges($date, $ite, $mc, $kg, $coldstorerate, $labourrate, $inkg, $outkg);
     }
 
     if(isset($_POST['adddryfishcharges'])){
@@ -50,8 +51,8 @@ $query = new Query();
       $kg = $_POST['kg'];
       $drycoldstorerate = $_POST['drycoldstorerate'];
       $labourrate = $_POST['labourrate'];
-      $damagekg = $_POST['damagekg'];
-      $query->adddryfishcharges($date, $ite, $kg, $drycoldstorerate, $labourrate, $damagekg);
+      $outkg = $_POST['outkg'];
+      $query->adddryfishcharges($date, $ite, $kg, $drycoldstorerate, $labourrate, $outkg);
     }
 
     if(isset($_POST['addrepackingoutbtn'])){

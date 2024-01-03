@@ -1267,7 +1267,7 @@ Class Query{
     $updatestmt->execute();
   }
 
-  function addfishcharges($date, $ite, $mc, $kg, $coldstorerate, $labourrate, $damagekg){
+  function addfishcharges($date, $ite, $mc, $kg, $coldstorerate, $labourrate, $inkg, $outkg){
     global $pdo;
 
     if($ite == 'import'){
@@ -1364,17 +1364,36 @@ Class Query{
             $total_kg = floatval($fishcoldstore['total_kg']) - floatval($kg);
           }
         }else{
-          if($ite == 'import'){
-            $total_mc = intval($fishcoldstore['total_mc']) + intval($mc);
-            $total_kg = floatval($fishcoldstore['total_kg']) + floatval($kg);
-          }
-          if($ite == 'export'){
-            $total_mc = intval($fishcoldstore['total_mc']) - intval($mc);
-            $total_kg = floatval($fishcoldstore['total_kg']) - floatval($kg);
-          }
-          if($ite == 'takeout'){
-            $total_mc = intval($fishcoldstore['total_mc']) - intval($mc);
-            $total_kg = floatval($fishcoldstore['total_kg']) - floatval($kg);
+          $samedatestmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore ORDER BY id DESC");
+          $samedatestmt->execute();
+          $samedatedata = $samedatestmt->fetch(PDO::FETCH_ASSOC);
+
+          if($samedatedata['date'] == $date){
+            if($ite == 'import'){
+              $total_mc = intval($samedatedata['total_mc']) + intval($mc);
+              $total_kg = floatval($samedatedata['total_kg']) + floatval($kg);
+            }
+            if($ite == 'export'){
+              $total_mc = intval($samedatedata['total_mc']) - intval($mc);
+              $total_kg = floatval($samedatedata['total_kg']) - floatval($kg);
+            }
+            if($ite == 'takeout'){
+              $total_mc = intval($samedatedata['total_mc']) - intval($mc);
+              $total_kg = floatval($samedatedata['total_kg']) - floatval($kg);
+            }
+          }else{
+            if($ite == 'import'){
+              $total_mc = intval($fishcoldstore['total_mc']) + intval($mc);
+              $total_kg = floatval($fishcoldstore['total_kg']) + floatval($kg);
+            }
+            if($ite == 'export'){
+              $total_mc = intval($fishcoldstore['total_mc']) - intval($mc);
+              $total_kg = floatval($fishcoldstore['total_kg']) - floatval($kg);
+            }
+            if($ite == 'takeout'){
+              $total_mc = intval($fishcoldstore['total_mc']) - intval($mc);
+              $total_kg = floatval($fishcoldstore['total_kg']) - floatval($kg);
+            }
           }
         }
       }else{
@@ -1385,12 +1404,20 @@ Class Query{
 
       $coldstorestmt = $pdo->prepare("INSERT INTO gfcfishcoldstore(date, ite, mc, total_mc, kg, total_kg, rate) VALUES('$date', '$ite', '$mc', '$total_mc', '$kg', '$total_kg', '$coldstorerate')");
       $coldstorestmt->execute();
-      if(!empty($damagekg)){
+      if(!empty($outkg)){
         $fishcoldstorestmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore ORDER BY id DESC");
         $fishcoldstorestmt->execute();
         $fishcoldstore2 = $fishcoldstorestmt->fetch(PDO::FETCH_ASSOC);
-        $total_kg_damage = floatval($fishcoldstore2['total_kg']) - floatval($damagekg);
-        $coldstorestmt = $pdo->prepare("INSERT INTO gfcfishcoldstore(date, ite, total_mc, kg, total_kg, rate) VALUES('$date', '$ite', '$total_mc', '$damagekg', '$total_kg_damage', '$coldstorerate')");
+        $total_kg_out = floatval($fishcoldstore2['total_kg']) - floatval($outkg);
+        $coldstorestmt = $pdo->prepare("INSERT INTO gfcfishcoldstore(date, ite, total_mc, kg, total_kg, rate) VALUES('$date', '$ite', '$total_mc', '$outkg', '$total_kg_out', '$coldstorerate')");
+        $coldstorestmt->execute();
+      }
+      if(!empty($inkg)){
+        $fishcoldstorestmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore ORDER BY id DESC");
+        $fishcoldstorestmt->execute();
+        $fishcoldstore2 = $fishcoldstorestmt->fetch(PDO::FETCH_ASSOC);
+        $total_kg_out = floatval($fishcoldstore2['total_kg']) + floatval($inkg);
+        $coldstorestmt = $pdo->prepare("INSERT INTO gfcfishcoldstore(date, ite, total_mc, kg, total_kg, rate) VALUES('$date', '$ite', '$total_mc', '$inkg', '$total_kg_out', '$coldstorerate')");
         $coldstorestmt->execute();
       }
       $nowid = $this->selectdesc('gfcfishcoldstore');
@@ -1762,7 +1789,7 @@ Class Query{
 
   }
 
-  function adddryfishcharges($date, $ite, $kg, $drycoldstorerate, $labourrate, $damagekg){
+  function adddryfishcharges($date, $ite, $kg, $drycoldstorerate, $labourrate, $outkg){
     global $pdo;
 
     if($ite == 'balance'){
@@ -1805,12 +1832,12 @@ Class Query{
 
       $coldstorestmt = $pdo->prepare("INSERT INTO gfcdryfishcoldstore(date, ite, kg, total_kg, rate) VALUES('$date', '$ite', '$kg', '$total_kg', '$drycoldstorerate')");
       $coldstorestmt->execute();
-      if(!empty($damagekg)){
+      if(!empty($outkg)){
         $dryfishcoldstorestmt = $pdo->prepare("SELECT * FROM gfcdryfishcoldstore ORDER BY id DESC");
         $dryfishcoldstorestmt->execute();
         $dryfishcoldstore2 = $dryfishcoldstorestmt->fetch(PDO::FETCH_ASSOC);
-        $total_kg_damage = floatval($dryfishcoldstore2['total_kg']) - floatval($damagekg);
-        $coldstorestmt = $pdo->prepare("INSERT INTO gfcdryfishcoldstore(date, ite, kg, total_kg, rate) VALUES('$date', '$ite', '$damagekg', '$total_kg_damage', '$drycoldstorerate')");
+        $total_kg_out = floatval($dryfishcoldstore2['total_kg']) - floatval($outkg);
+        $coldstorestmt = $pdo->prepare("INSERT INTO gfcdryfishcoldstore(date, ite, kg, total_kg, rate) VALUES('$date', '$ite', '$outkg', '$total_kg_out', '$drycoldstorerate')");
         $coldstorestmt->execute();
       }
 
