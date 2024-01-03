@@ -44,14 +44,18 @@
         </div>
         <div class="row">
           <div class="col">
-            <label>Damage Kg</label>
-            <input type="text" name="damagekg" class="form-control inpv2">
+          <label>Repacking In Kg</label>
+            <input type="text" name="inkg" class="form-control inpv2">
           </div>
-          <div class="col mt-4">
-            <button type="button" name="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
-            <button type="submit" name="addfishcharges" class="btn btn-success">Add</button>
+          <div class="col">
+            <label>Repacking Out Kg</label>
+            <input type="text" name="outkg" class="form-control inpv2">
           </div>
         </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" name="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
+        <button type="submit" name="addfishcharges" class="btn btn-success">Add</button>
       </div>
     </form>
     </div>

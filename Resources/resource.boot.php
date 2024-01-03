@@ -212,6 +212,10 @@ class Bootstrap
           cursor: pointer !important;
         }
 
+<<<<<<< HEAD
+=======
+        
+>>>>>>> b9a612ab1dd75c5f84d3a3d37523f350bcdf68ac
         @media screen and (min-width: 1300px){
           .contentcol{
             left: 14.5%;

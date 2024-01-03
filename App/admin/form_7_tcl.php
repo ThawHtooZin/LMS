@@ -66,7 +66,6 @@ $query = new Query();
           <form action="form_7_tcl.php" method="post">
             <div class="card-header bg-info text-light pb-3">
               <b class="h5">Link Mark Limited (F-7) TCL</b>
-              <!-- <button type="button" class="btn btn-success btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#addmodal">Add Data</button> -->
               <button type="submit" name="searchbtn" class="btn btn-secondary btn-sm float-end">View</button>
               <select name="searchsize" class="form-control inpv2 d-inline float-end me-2" style="width:200px !important; height:30px !important; padding:0px 5px;">
                 <option value="">Select Size</option>

@@ -40,10 +40,19 @@ $query = new Query();
       $mccheckstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE commondity_id='$commondity_id' ORDER BY id DESC");
       $mccheckstmt->execute();
       $mccheck = $mccheckstmt->fetch(PDO::FETCH_ASSOC);
-      if($mccheck['total_mc'] >= $mc){
-        $query->addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $pcharges);
+      if (!empty($mc)) {
+        if($mccheck['total_mc'] >= $mc){
+          $query->addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $pcharges);
+        }else{
+          echo "<script>swal('Sorry!', 'Mc not enough, Please check the stock and try again', 'warning');</script>";
+        }
       }else{
-        echo "<script>swal('Sorry!', 'Mc not enough, Please check the stock and try again', 'warning');</script>";
+        $mc = 0;
+        if($mccheck['total_mc'] >= $mc){
+          $query->addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $pcharges);
+        }else{
+          echo "<script>swal('Sorry!', 'Mc not enough, Please check the stock and try again', 'warning');</script>";
+        }
       }
 
     }
@@ -1014,16 +1023,12 @@ $query = new Query();
                 <label style="font-weight: bold;">Labour Rate</label>
                 <input type="text" name="labourrate" class="form-control inpv2">
               </div>
-            <div class="col">
-              <div class="processingratediv">
-                <label style="font-weight: bold;">Processing Rate</label>
-                <input type="text" name="processingrate" class="form-control inpv2">
+              <div class="col">
+                <div class="processingratediv">
+                  <label style="font-weight: bold;">Processing Rate</label>
+                  <input type="text" name="processingrate" class="form-control inpv2">
+                </div>
               </div>
-              <!-- <div class="processingchargesdiv hide">
-                <label style="font-weight: bold;">Processing Charges</label>
-                <input type="number" name="processingcharges" class="form-control inpv2">
-              </div> -->
-            </div>
           </div>
           </div>
           <div class="modal-footer">
