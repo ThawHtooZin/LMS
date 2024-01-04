@@ -98,21 +98,23 @@ $query = new Query();
                 <span class=" text-light" id="pltext" style="font-size:20px; font-weight:bold;">Actual Packing List</span>
                 <span class=" text-light hide" id="itext" style="font-size:20px; font-weight:bold;">Actual Invoice</span>
                 <a href="truck_packing_stock.php" class="btn btn-danger float-end ms-2 btn-sm" id="back">Back</a>
+
+                <a href="export.php?table_name=truckactualpackinglist&invoice_no=<?= $_GET['invoice_no']; ?>&infoid=<?= $_GET['infoid']; ?>" class="btn btn-success float-end btn-sm <?php if(!empty($_SESSION['tabs']) && $_SESSION['tabs'] == 'actualpackinglist'){}else{echo 'hide';} ?> ms-2">Excel Report</a>
+                
                 <button type="submit" class="btn btn-warning float-end btn-sm" id="actualinvoice" name="actualinvoicebtn">Actual Invoice</button>
                 <button type="submit" class="btn btn-secondary float-end btn-sm me-2" id="foambox" name="foamboxbtn">Foam Box</button>
+
                 <button type="submit" class="btn btn-primary float-end btn-sm me-2" id="declare" name="declarebtn">Declare List</button>
+
                 <button type="submit" class="btn btn-danger float-end btn-sm hide" id="actualinvoiceback" name="actualinvoiceback">Back</button>
-                <?php
-                if(isset($_POST['searchcommonditybtn']) && !empty($_POST['searchcommondity'])){
-                  ?>
-                  <a href="export.php?table_name=truckpackingstockinfo&searchcommondity=<?= $_POST['searchcommondity']; ?>" class="btn btn-success float-end btn-sm <?php if(!empty($_SESSION['tabs']) && $_SESSION['tabs'] == 'actualinvoice'){ echo 'hide';} ?> me-2" id="back">Excel Report</a>
-                  <?php
-                }else{
-                  ?>
-                  <a href="export.php?table_name=truckpackingstockinfo&" class="btn btn-success float-end btn-sm <?php if(!empty($_SESSION['tabs']) && $_SESSION['tabs'] == 'actualinvoice'){}else{echo 'hide';} ?> me-2" id="actualinvoiceback">Excel Report</a>
-                  <?php
-                }
-                ?>
+
+                
+                <a href="export.php?table_name=actualtruckinvoice&invoice_no=<?= $_GET['invoice_no']; ?>" class="btn btn-success float-end btn-sm <?php if(!empty($_SESSION['tabs']) && $_SESSION['tabs'] == 'actualinvoice'){}else{echo 'hide';} ?> me-2" id="actualinvoiceback">Excel Report</a>
+
+                <a href="export.php?table_name=declarepacking&invoice_no=<?= $_GET['invoice_no']; ?>" class="btn btn-success float-end btn-sm <?php if(!empty($_SESSION['tabs']) && $_SESSION['tabs'] == 'declare'){}else{echo 'hide';} ?> me-2">Excel Report</a>
+                
+                <a href="export.php?table_name=foambox&invoice_no=<?= $_GET['invoice_no']; ?>" class="btn btn-success float-end btn-sm <?php if(!empty($_SESSION['tabs']) && $_SESSION['tabs'] == 'foambox'){}else{echo 'hide';} ?> me-2" id="foambox">Excel Report</a>
+                
                 <button type="button" class="btn btn-success float-end me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#add" id="addpackingstockbtn">Add Packing Stock</button>
                 <form action="" method="post">
                   <button type="submit" name="searchcommonditybtn" class="btn btn-sm btn-dark float-end me-2">View</button>
@@ -218,64 +220,6 @@ $query = new Query();
                               </svg></button>
                           </td>
                         </tr>
-                        <!-- <div class="modal fade" id="actualpackinglisteditmodal<?= $packingstockinfodata['id']; ?>">
-                          <div class="modal-dialog">
-                            <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
-                              <div class="modal-header bg-secondary text-light">
-                                <h1 class="modal-title fs-5">Edit Packing List</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                              </div>
-                            <form action="" method="post">
-                              <input type="hidden" name="upid" value="<?= $packingstockinfodata['id']; ?>">
-                              <div class="modal-body">
-                                <div class="row">
-                                  <div class="col">
-                                    <label>Commondity</label>
-                                    <select class="form-control inpv2 mb-2" name="upitem_id">
-                                      <?php
-                                      $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
-                                      $form7commonditystmt->execute();
-                                      $form7commonditydatas = $form7commonditystmt->fetchall();
-                                      foreach ($form7commonditydatas as $form7commonditydata) {
-                                        $item_id = $form7commonditydata['item_id'];
-                                        $commonditydata = $query->select('item', $item_id, 'item_id');
-                                        ?>
-                                        <option value="<?php echo $commonditydata['item_id']; ?>" <?php if($packingstockinfodata['item_id'] == $commonditydata['item_id']){ echo 'selected';} ?>><?php echo $commonditydata['item_name']; ?></option>
-                                        <?php
-                                      }
-                                      ?>
-                                    </select>
-                                  </div>
-                                  <div class="col">
-                                    <label>Size</label>
-                                    <input type="text" name="upsize" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['size']; ?>">
-                                  </div>
-                                </div>
-                                <div class="row">
-                                  <div class="col">
-                                    <label>Pcs Per Box</label>
-                                    <input type="number" name="uppcsperbox" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['pcsperbox']; ?>">
-                                  </div>
-                                  <div class="col">
-                                    <label>Kg Per Box</label>
-                                    <input type="text" name="upkgperbox" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['kgperbox']; ?>">
-                                  </div>
-                                </div>
-                                <div class="row">
-                                  <div class="col">
-                                    <label>Mc</label>
-                                    <input type="number" name="upmc" class="form-control inpv2 mb-2" value="<?= $packingstockinfodata['mc']; ?>">
-                                  </div>
-                                  <div class="col mt-4">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-warning text-light" name="updatepackinglist">Edit</button>
-                                  </div>
-                                </div>
-                              </div>
-                            </form>
-                            </div>
-                          </div>
-                        </div> -->
                         <?php
                         $item_id = $packingstockinfodata['item_id'];
                         $size = $packingstockinfodata['size'];
