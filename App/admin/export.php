@@ -1651,6 +1651,182 @@ $infodata = $infostmt->fetch(PDO::FETCH_ASSOC);
 <?php
 }
 
+  if ($_GET['table_name'] == 'form_10_tcl') {
+    $commondity_id = $_GET['searchcommondity'];
+    $searchdate = $_GET['searchdate'];
+    header("Content-Type: application/xls");
+    header("Content-Disposition: attachment; filename=%file{$searchdate}.xls");
+    header("Pragma: no-cache");
+    header("Expires: 0");
+      ?>
+      <table class="table table-hover table-striped table-bordered" border="1">
+        <tr class="text-center">
+          <th rowspan="2" style="padding-top:25px;">Receiving Date</th>
+          <th rowspan="2" style="padding-top:25px;">Commondity</th>
+          <!-- <th rowspan="2" style="padding-top:25px;">Country</th> -->
+          <!-- <th rowspan="2" style="padding-top:25px;">Type</th> -->
+          <th rowspan="2" style="padding-top:25px;">Size</th>
+          <th rowspan="2" style="padding-top:25px;">Raw Viss</th>
+          <th rowspan="2" style="padding-top:25px;">Pcs</th>
+          <th rowspan="2" style="padding-top:25px;">Kg</th>
+          <th colspan="4">Form 10</th>
+          <th colspan="2">Loose In</th>
+          <th colspan="2">Loose Out</th>
+          <th colspan="2">CC Balance</th>
+          <th colspan="2">လမ်းငါး</th>
+          <th colspan="2">Cut Piece</th>
+          <th colspan="2">HHK</th>
+          <th colspan="2">MSL</th>
+          <th>Total</th>
+          <th rowspan="2" style="padding-top:25px;">%</th>
+        </tr>
+        <tr class="text-center">
+          <th>Size</th>
+          <th>MC</th>
+          <th>KG</th>
+          <th>Pcs</th>
+          <th>Kg</th>
+          <th>Pcs</th>
+          <th>Kg</th>
+          <th>Pcs</th>
+          <th>Kg</th>
+          <th>Pcs</th>
+          <th>Kg</th>
+          <th>Pcs</th>
+          <th>Kg</th>
+          <th>Pcs</th>
+          <th>Kg</th>
+          <th>Pcs</th>
+          <th>Kg</th>
+          <th>Pcs</th>
+          <th>Kg</th>
+        </tr>
+        <?php
+          $stmt = $pdo->prepare("SELECT * FROM form10stocktcl WHERE item_id='$commondity_id' AND date='$searchdate'");
+          $stmt->execute();
+          $datas = $stmt->fetchall();
+          foreach ($datas as $data) {
+            $item_id = $data['item_id'];
+            $size = $data['size'];
+            $commonditydata = $query->select('item', $item_id, 'item_id');
+            $supplierid = $data['supplier_id'];
+            $supplier_name = $query->select('acname', $supplierid, 'code_no');
+
+            $raw_viss_tmt = $pdo->prepare("SELECT SUM(viss) AS raw_viss FROM form7stocktcl WHERE item_id='$item_id' AND size='$size'");
+            $raw_viss_tmt->execute();
+            $raw_viss_datas = $raw_viss_tmt->fetch(PDO::FETCH_ASSOC);
+
+            $raw_kg_stmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stocktcl WHERE item_id='$item_id' AND size='$size'");
+            $raw_kg_stmt->execute();
+            $raw_kg_datas = $raw_kg_stmt->fetch(PDO::FETCH_ASSOC);
+          ?>
+          <tr>
+            <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
+            <td><?php echo $commonditydata['item_name']; ?></td>
+            <td><?php echo $data['size']; ?></td>
+            <td><?php echo $raw_viss_datas['raw_viss']; ?></td>
+            <td><?php echo $data['size']; ?></td>
+            <td><?php echo round($raw_kg_datas['total_kg'], 2); ?></td>
+            <td><?php echo $data['size']; ?></td>
+            <td><?php echo $data['mc']; ?></td>
+            <td><?php echo $data['kg']; ?></td>
+            <td><?php echo $data['pcs']; ?></td>
+            <td><?php echo $data['looseinkg']; ?></td>
+            <td><?php echo $data['looseinpcs']; ?></td>
+            <td><?php echo $data['looseoutkg']; ?></td>
+            <td><?php echo $data['looseoutpcs']; ?></td>
+            <td><?php echo $data['cc_kg']; ?></td>
+            <td><?php echo $data['cc_pcs']; ?></td>
+            <td><?php echo $data['lanfish_kg']; ?></td>
+            <td><?php echo $data['lanfish_pcs']; ?></td>
+            <td><?php echo $data['cutpiece_kg']; ?></td>
+            <td><?php echo $data['cutpiece_pcs']; ?></td>
+            <td><?php echo $data['hhk_kg']; ?></td>
+            <td><?php echo $data['hhk_pcs']; ?></td>
+            <td><?php echo $data['msl_kg']; ?></td>
+            <td><?php echo $data['msl_pcs']; ?></td>
+            <td><?php echo round($data['total_kg'], 2); ?></td>
+            <td></td>
+          </tr>
+          <?php
+          }
+
+          $lastsearchdatestmt = $pdo->prepare("SELECT * FROM form10stocktcl WHERE date<'$searchdate' ORDER BY id DESC");
+          $lastsearchdatestmt->execute();
+          $lastsearchdate = $lastsearchdatestmt->fetch(PDO::FETCH_ASSOC);
+          print_r($lastsearchdate);
+          if(!empty($lastsearchdate['date'])){
+            $lastsearchdate = $lastsearchdate['date'];
+          }else{
+            $lastsearchdate = 0000-00-00;
+          }
+          $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stocktcl WHERE item_id='$commondity_id' AND date BETWEEN '$lastsearchdate' AND '$searchdate'");
+          $totalf7kgstmt->execute();
+          $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
+
+          $totalf7vissstmt = $pdo->prepare("SELECT SUM(viss) AS raw_viss FROM form7stocktcl WHERE item_id='$commondity_id' AND date BETWEEN '$lastsearchdate' AND '$searchdate'");
+          $totalf7vissstmt->execute();
+          $totalf7vissdata = $totalf7vissstmt->fetch(PDO::FETCH_ASSOC);
+          // echo $totalf7kgdata['total_kg'];
+          $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stocktcl WHERE item_id='$commondity_id' AND date='$searchdate'");
+          $totalkgstmt->execute();
+          $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+          $result1 = round($totalkgdata['total_kg'], 2) - round($totalf7kgdata['total_kg'], 2);
+          if(round($totalf7kgdata['total_kg']) == 0){
+            $percentage = "";
+          }else{
+            $result2 = $result1 / round($totalf7kgdata['total_kg'], 2);
+            $percentage = $result2 * 100;
+          }
+
+
+          $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stocktcl WHERE item_id='$commondity_id' AND date='$searchdate'");
+          $form10pcsstmt->execute();
+          $form10pcsdata = $form10pcsstmt->fetch(PDO::FETCH_ASSOC);
+
+          $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stocktcl WHERE item_id='$commondity_id' AND date='$searchdate'");
+          $totalkgstmt->execute();
+          $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+          $totalkgdata['total_kg'];
+          $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM form10stocktcl WHERE item_id='$commondity_id'");
+          $mcstmt->execute();
+          $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
+
+          $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stocktcl WHERE item_id='$commondity_id'");
+          $kgstmt->execute();
+          $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
+          ?>
+          <tr>
+          <td style="font-weight:bold;">Total</td>
+          <td></td>
+          <td></td>
+          <td><?php echo round($totalf7vissdata['raw_viss'], 2); ?></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td style="font-weight:bold;"><?php echo round($mcdata['total_mc'], 2); ?></td>
+          <td style="font-weight:bold;"><?php echo round($kgdata['kg'], 2); ?></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td style="font-weight:bold;"><?php echo round($totalkgdata['total_kg'], 2); ?></td>
+            <td style="font-weight:bold; <?php if(strpos(round($percentage, 2), '-') !== false){echo 'color:red;';} ?>"><?php echo round($percentage, 2). "%"; ?></td>
+          </tr>
+      </table>
+      <?php
+  }
 exit();
 
 

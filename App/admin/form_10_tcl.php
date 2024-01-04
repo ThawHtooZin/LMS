@@ -85,7 +85,12 @@ $query = new Query();
               <form action="" method="post">
 
                 <b>Link Mark Limited (F-10) TCL</b>
-              <button type="button" class="btn btn-success btn-sm float-end" data-bs-toggle="modal" data-bs-target="#addmodal">Add Form-10 Data</button>
+              <?php if (!isset($_POST['view'])): ?>
+                <button type="button" class="btn btn-success btn-sm float-end" data-bs-toggle="modal" data-bs-target="#addmodal">Add Form-10 Data</button>
+              <?php endif; ?>
+              <?php if (isset($_POST['view'])): ?>
+                <a href="export.php?table_name=form_10_tcl&searchdate=<?= $_POST['searchdate']; ?>&searchcommondity=<?= $_POST['commondity']; ?>" name="export" class="btn btn-primary btn-sm float-end me-2">Export Excel</a>
+              <?php endif; ?>
               <button type="submit" name="view" class="btn btn-secondary btn-sm float-end me-2">View</button>
               <select name="commondity" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
                 <option value="">Select Commondity</option>
@@ -253,7 +258,7 @@ $query = new Query();
                 <td></td>
                 <td style="font-weight:bold;">Total</td>
                 <td></td>
-                
+
                 <td style="font-weight:bold;"><?php echo round($form10pcsdata['total_form10_pcs'], 2); ?></td>
                 <td style="font-weight:bold;"><?php echo round($mcdata['total_mc'], 2); ?></td>
                 <td style="font-weight:bold;"><?php echo round($kgdata['kg'], 2); ?></td>
@@ -387,7 +392,7 @@ $query = new Query();
                       <div class="modal-body">
                         <label>Date</label>
                         <input type="date" name="update" class="form-control inpv2 mb-2" value="<?php echo $updatedata['date']; ?>">
-                        
+
                         <div class="row">
                         </div>
                         <div class="row">
