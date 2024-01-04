@@ -574,7 +574,7 @@ if ($_GET['table_name'] == 'payable') {
       $supplierdata = $query->select('acname', $supplier_id, 'code_no');
 
     ?>
-    <tr style="<?php if($balance['balance'] == 0){ echo "display:none;";} ?>">
+    <tr style="<?php if($balance == 0){ echo "display:none;";} ?>">
       <td><?= $id; ?></td>
       <td><?= $supplierdata['ac_name']; ?></td>
       <td <?php if(empty($openingamount['balance'])){ echo "data-bs-toggle='modal' data-bs-target='#addbalancemodal'";} ?>><?php if(!empty($openingamount['balance'])){ echo $openingamount['balance']; } ?></td>
@@ -1010,7 +1010,7 @@ if($_GET['table_name'] == 'mcstockreport'){
 
 if($_GET['table_name'] == 'actualtruckinvoice'){
   header("Content-Type: application/xls");
-  header("Content-Disposition: attachment; filename=actualtruckinvoicereport.xls");
+  header("Content-Disposition: attachment; filename=actialinvoicetruck.xls");
   header("Pragma: no-cache");
   header("Expires: 0");
 
@@ -1023,6 +1023,15 @@ if($_GET['table_name'] == 'actualtruckinvoice'){
     $infostmt->execute();
     $infodata = $infostmt->fetch(PDO::FETCH_ASSOC);
     ?>
+      <table>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td colspan="2"><h3>Actual Invoice</h3> </td>
+        </tr>
+      </table>
       <table>
         <tr>
           <td></td>
@@ -1125,7 +1134,7 @@ if($_GET['table_name'] == 'actualtruckinvoice'){
             $totalusdstmt->execute();
             $totalusddata = $totalusdstmt->fetch(PDO::FETCH_ASSOC);
             ?>
-            <tr style="font-weight:bold; background-color:#D3D3D3;">
+            <tr style="font-weight:bold; background-color: lightgray;">
               <td></td>
               <td>Sub Total</td>
               <td></td>
@@ -1158,7 +1167,7 @@ if($_GET['table_name'] == 'actualtruckinvoice'){
           $foamboxstmt->execute();
           $foamboxdata = $foamboxstmt->fetch(PDO::FETCH_ASSOC);
           ?>
-          <tr style="font-weight:bold !important; background-color:#D3D3D3;">
+          <tr style="font-weight:bold !important; background-color: lightgray;">
             <td></td>
             <td>Grand Total</td>
             <td></td>
@@ -1193,6 +1202,15 @@ $infostmt = $pdo->prepare("SELECT * FROM truckpackingliststock WHERE invoice_no=
 $infostmt->execute();
 $infodata = $infostmt->fetch(PDO::FETCH_ASSOC);
 ?>
+  <table>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td colspan="2"><h3>Foam Box</h3></td>
+    </tr>
+  </table>
   <table>
     <tr>
       <td></td>
@@ -1290,7 +1308,7 @@ $infodata = $infostmt->fetch(PDO::FETCH_ASSOC);
                  $totalkgperboxstmt->execute();
                  $totalkgperboxdata = $totalkgperboxstmt->fetch(PDO::FETCH_ASSOC);
                  ?>
-                 <tr style="font-weight:bold; <?php if(empty($totalkgperboxdata['total_kgperbox'])){echo 'display:none;';} ?>">
+                 <tr style="font-weight:bold; background-color: lightgray; <?php if(empty($totalkgperboxdata['total_kgperbox'])){echo 'display:none;';} ?>">
                  <td></td>
                  <td>Sub Total</td>
                  <td></td>
@@ -1319,7 +1337,7 @@ $infodata = $infostmt->fetch(PDO::FETCH_ASSOC);
                   $foamboxstmt->execute();
                   $foamboxdata = $foamboxstmt->fetch(PDO::FETCH_ASSOC);
                    ?>
-                  <tr style="font-weight:bold !important; background-color:#D3D3D3;">
+                  <tr style="font-weight:bold !important; background-color: lightgray;">
                     <td></td>
                     <td>Grand Total</td>
                     <td></td>
@@ -1350,6 +1368,15 @@ $infostmt = $pdo->prepare("SELECT * FROM truckpackingliststock WHERE invoice_no=
 $infostmt->execute();
 $infodata = $infostmt->fetch(PDO::FETCH_ASSOC);
 ?>
+  <table>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td colspan="2"><h3>Declare Packing List</h3></td>
+    </tr>
+  </table>
   <table>
     <tr>
       <td></td>
@@ -1442,7 +1469,7 @@ $infodata = $infostmt->fetch(PDO::FETCH_ASSOC);
                  $totalkgperboxstmt->execute();
                  $totalkgperboxdata = $totalkgperboxstmt->fetch(PDO::FETCH_ASSOC);
                  ?>
-                 <tr style="font-weight:bold;">
+                 <tr style="font-weight:bold;background-color: lightgray;">
                  <td></td>
                  <td>Sub Total</td>
                  <td></td>
@@ -1470,7 +1497,7 @@ $infodata = $infostmt->fetch(PDO::FETCH_ASSOC);
                   $foamboxstmt->execute();
                   $foamboxdata = $foamboxstmt->fetch(PDO::FETCH_ASSOC);
                    ?>
-                  <tr style="font-weight:bold !important;">
+                  <tr style="font-weight:bold !important;background-color: lightgray;">
                     <td></td>
                     <td>Grand Total</td>
                     <td></td>
@@ -1499,6 +1526,15 @@ $infostmt = $pdo->prepare("SELECT * FROM truckpackingliststock WHERE invoice_no=
 $infostmt->execute();
 $infodata = $infostmt->fetch(PDO::FETCH_ASSOC);
 ?>
+  <table>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td colspan="2"><h3>Actual Packing List</h3> </td>
+    </tr>
+  </table>
   <table>
     <tr>
       <td></td>
@@ -1602,7 +1638,7 @@ $infodata = $infostmt->fetch(PDO::FETCH_ASSOC);
                         $totalgrssweightstmt->execute();
                         $totalgrssweightdata = $totalgrssweightstmt->fetch(PDO::FETCH_ASSOC);
                         ?>
-                        <tr style="font-weight:bold;">
+                        <tr style="font-weight:bold;background-color: lightgray;">
                         <td></td>
                         <td>Sub Total</td>
                         <td></td>
@@ -1632,7 +1668,7 @@ $infodata = $infostmt->fetch(PDO::FETCH_ASSOC);
                      $foamboxstmt->execute();
                      $foamboxdata = $foamboxstmt->fetch(PDO::FETCH_ASSOC);
                       ?>
-                     <tr>
+                     <tr style="background-color: lightgray;">
                        <td></td>
                        <td style="font-weight:bold !important;">Grand Total</td>
                        <td></td>
@@ -1827,6 +1863,230 @@ $infodata = $infostmt->fetch(PDO::FETCH_ASSOC);
       </table>
       <?php
   }
+
+if($_GET['table_name'] == 'trucktotalcosting'){
+  header("Content-Type: application/xls");
+  header("Content-Disposition: attachment; filename=trucktotalcosting.xls");
+  header("Pragma: no-cache");
+  header("Expires: 0");
+  $invoice_no = $_GET['invoice_no'];
+?>
+  <table>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td colspan="2"><h3>Total Cosing</h3></td>
+    </tr>
+  </table>
+  <?php
+        $invoice_no = $_GET['invoice_no'];
+
+        $invoice_nostmt = $pdo->prepare("SELECT * FROM truckpackingliststock WHERE invoice_no='$invoice_no'");
+        $invoice_nostmt->execute();
+        $invoice_nodata = $invoice_nostmt->fetch(PDO::FETCH_ASSOC);
+        ?>
+        
+        <table>
+          <tr>
+            <td colspan="14"></td>
+            <td colspan="2">
+              Date : <?php echo date('d-m-Y', strtotime($invoice_nodata['date']));  ?>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="14"></td>
+            <td colspan="2">
+              Invoice No : <?php echo $invoice_nodata['invoice_no'];  ?>
+            </td>
+          </tr>
+        </table>
+          <br>
+        <div class="total_charges">
+          <table class="table table-striped table-hover table-bordered text-center" border>
+            <tr>
+              <!-- <th rowspan="2" style="padding-top:40px;">Date</th> -->
+              <th style="padding-top:10px !important;">Commondity</th>
+              <th style="padding-top:10px !important;">Size</th>
+              <th style="padding-top:10px !important;">Export total_kg</th>
+              <th style="padding-top:10px !important;">Price Per Viss</th>
+              <th style="padding-top:10px !important;">Price Per Kg</th>
+              <th style="padding-top:20px !important;">%</th>
+              <th style="padding-top:10px !important;">Packing Charges</th>
+              <th style="padding: 13px !important;">Grand Total</th>
+              <th style="padding: 13px !important;">Dollar Rate</th>
+              <th style="padding: 13px !important;">Costing USD</th>
+              <th style="padding: 13px !important;">Selling Rate</th>
+              <th style="padding: 13px !important;">Profit Per Kg</th>
+              <?php
+              $stmt = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE invoice_no='$invoice_no'");
+              $stmt->execute();
+              $datas = $stmt->fetch(PDO::FETCH_ASSOC);
+              if (!empty($datas)) {
+                if ($datas['mtorst'] === "To MT") {
+                  ?>
+                  <th style="padding-top:10px !important;">YGN To MT</th>
+                  <th style="padding-top:10px !important;">Mt To Technck</th>
+                  <?php
+                }else{
+                  ?>
+                  <th style="padding-top:10px !important;">YGN To ST</th>
+                  <th style="padding-top:10px !important;">St To Technck</th>
+                  <?php
+                }
+              }
+                ?>
+                <th style="padding-top:10px !important;">Labour Charges</th>
+                <th style="padding-top:10px !important;">Packing & Transport</th>
+              </tr>
+            <?php
+            $stmt = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE invoice_no='$invoice_no' GROUP BY size,item_id ORDER BY id");
+            $stmt->execute();
+            $datas = $stmt->fetchall();
+            foreach ($datas as $data) {
+              $item_id = $data['item_id'];
+              $commonditydata = $query->select('item', $item_id, 'item_id');
+              $size = $data['size'];
+              $lastid = $data['id'];
+              $invoice_no = $_GET['invoice_no'];
+              $ttlkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM trucktotalcosting WHERE size='$size' AND item_id='$item_id' AND invoice_no='$invoice_no'");
+              $ttlkgstmt->execute();
+              $ttlkgdata = $ttlkgstmt->fetch(PDO::FETCH_ASSOC);
+              $checklast = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE id < $lastid AND invoice_no='$invoice_no' AND item_id='$item_id' AND size='$size'");
+              $checklast->execute();
+              $checklastavaliable = $checklast->fetch(PDO::FETCH_ASSOC);
+              $lastcommondity = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE id < $lastid AND invoice_no='$invoice_no' AND item_id='$item_id'");
+              $lastcommondity->execute();
+              $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
+              ?>
+              <tr data-bs-toggle='modal' data-bs-target="#updatetotalcosting<?php echo $data['id']; ?>">
+                <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
+                <td><?php if(empty($checklastavaliable)){echo $data['size'];} ?></td>
+                <td><?php if($ttlkgdata['total_kg'] != 0){echo $ttlkgdata['total_kg'];}else{ echo "-";} ?></td>
+                <td><?php if($data['priceperviss'] != 0){echo $data['priceperviss'];}else{ echo "-";} ?></td>
+                <td><?php if($data['priceperkg'] != 0){echo $data['priceperkg'];}else{ echo "-";} ?></td>
+                <td><?php if($data['percentage'] != 0){echo $data['percentage'];}else{ echo "-";} ?></td>
+                <td><?php if($data['packing_charges'] != 0){echo $data['packing_charges'];}else{ echo "-";} ?></td>
+                <td><?php if($data['ygntomtorst_charges'] != 0){echo $data['ygntomtorst_charges'];}else{ echo "-";} ?></td>
+                <td><?php if($data['mtorsttotechnck_charges'] != 0){echo $data['mtorsttotechnck_charges'];}else{ echo "-";} ?></td>
+                <td><?php if($data['labour_charges'] != 0){echo $data['labour_charges'];}else{ echo "-";} ?></td>
+                <td><?php if($data['packingandtransport'] != 0){echo $data['packingandtransport'];}else{ echo "-";} ?></td>
+                <td><?php if($data['grand_total'] != 0){ echo $data['grand_total']; }else{ echo '-';} ?></td>
+                <td><?php if($data['rate'] != 0){ echo $data['rate']; }else{ echo '-';} ?></td>
+                <td><?php if(round($data['costing_usd'], 2) != 0){ echo round($data['costing_usd'], 2); }else{ echo '-';} ?></td>
+                <td><?php if($data['selling_rate'] != 0){ echo $data['selling_rate']; }else{ echo '-';} ?></td>
+                <td><?php if($data['profitperkg'] != 0){ echo round($data['profitperkg'], 2); }else{ echo '-';} ?></td>
+              </tr>
+              <?php
+            }
+              ?>
+          </table>
+        </div>
+  <?php
+}
+
+if($_GET['table_name'] == 'truckpackingmaterial'){
+  header("Content-Type: application/xls");
+  header("Content-Disposition: attachment; filename=truckpackingmaterial.xls");
+  header("Pragma: no-cache");
+  header("Expires: 0");
+  $invoice_no = $_GET['invoice_no'];
+?>
+  <table>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td colspan="2"><h3>Truck Packing Material Charges</h3></td>
+      <!-- <td colspan="2"><h3>Costing</h3></td> -->
+    </tr>
+  </table>
+  <?php
+        $invoice_no = $_GET['invoice_no'];
+
+        $invoice_nostmt = $pdo->prepare("SELECT * FROM truckpackingliststock WHERE invoice_no='$invoice_no'");
+        $invoice_nostmt->execute();
+        $invoice_nodata = $invoice_nostmt->fetch(PDO::FETCH_ASSOC);
+        ?>
+        
+        <table>
+          <tr>
+            <td colspan="11"></td>
+            <td colspan="2">
+              Date : <?php echo date('d-m-Y', strtotime($invoice_nodata['date']));  ?>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="11"></td>
+            <td colspan="2">
+              Invoice No : <?php echo $invoice_nodata['invoice_no'];  ?>
+            </td>
+          </tr>
+        </table>
+        <table class="table table-striped table-hover table-bordered mt-2 text-center" border>
+              <tr>
+                <th rowspan="2" style="padding-top:30px;">No</th>
+                <th rowspan="2" style="padding-top:30px; padding-left: 40px; padding-right:40px;">Date</th>
+                <th colspan="2">Other</th>
+                <th colspan="3">Packing Material</th>
+                <th rowspan="2" style="padding-top:30px;">Total Charges</th>
+                <th rowspan="2" style="padding-top:30px;">Total Viss</th>
+                <th rowspan="2" style="padding-top:30px;">Form10 Kg</th>
+                <th rowspan="2" style="padding-top:30px;">Cost</th>
+                <th rowspan="2" style="padding-top:30px;">Remark</th>
+              </tr>
+              <tr>
+                <th>Ice</th>
+                <th>Miscellous</th>
+                <th>Tape</th>
+                <th>Foam Box</th>
+                <th>Plastic</th>
+              </tr>
+              <?php
+              $stmt = $pdo->prepare("SELECT * FROM truckpackingmaterial WHERE invoice_no='$invoice_no'");
+              $stmt->execute();
+              $datas = $stmt->fetchall();
+              $i = 1;
+              foreach ($datas as $data) {
+               ?>
+              <tr>
+                <td><?php echo $i; ?></td>
+                <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
+                <td><?php echo $data['ice']; ?></td>
+                <td><?php echo $data['miscellous']; ?></td>
+                <td><?php echo $data['tape']; ?></td>
+                <td><?php echo $data['foam_box']; ?></td>
+                <td><?php echo $data['plastic']; ?></td>
+                <td><?php echo $data['total_charges']; ?></td>
+                <td><?php echo $data['total_viss']; ?></td>
+                <td><?php echo $data['form10kg']; ?></td>
+                <td></td>
+                <td><?php echo $data['remark']; ?></td>
+              </tr>
+              <tr style="font-weight:bold;">
+                <td></td>
+                <td>Cost Per Kg</td>
+                <td><?php echo round($data['ice'] / $data['form10kg'], 2); ?></td>
+                <td><?php echo round($data['miscellous'] / $data['form10kg'], 2); ?></td>
+                <td><?php echo round($data['tape'] / $data['form10kg'], 2); ?></td>
+                <td><?php echo round($data['foam_box'] / $data['form10kg'], 2); ?></td>
+                <td><?php echo round($data['plastic'] / $data['form10kg'], 2); ?></td>
+                <td></td>
+                <td></td>
+                <td><?php echo $data['form10kg']; ?></td>
+                <td><?php echo $data['costperkg']; ?></td>
+                <td></td>
+              </tr>
+              <?php
+              $i++;
+              }
+               ?>
+            </table>
+  <?php
+}
+
 exit();
 
 

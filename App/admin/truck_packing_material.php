@@ -52,6 +52,7 @@ $query = new Query();
 
             <b class="text-light">Truck Packing Material Charges</b>
             <a href="truck_packing_stock.php" class="btn btn-danger btn-sm ms-2 float-end">Back</a>
+            <a href="export.php?table_name=truckpackingmaterial&invoice_no=<?= $_GET['invoice_no']; ?>" class="btn btn-primary float-end btn-sm ms-2">Export</a>
             <button type="button" name="button" data-bs-toggle="modal" data-bs-target="#addmodal" class="btn btn-info btn-sm float-end text-light">Add</button>
           </div>
           <div class="card-body">
