@@ -1262,7 +1262,6 @@ if($_GET['table_name'] == 'truckpackingstockinfo'){
           $lastsearchdatestmt = $pdo->prepare("SELECT * FROM form10stocktcl WHERE date<'$searchdate' ORDER BY id DESC");
           $lastsearchdatestmt->execute();
           $lastsearchdate = $lastsearchdatestmt->fetch(PDO::FETCH_ASSOC);
-          print_r($lastsearchdate);
           if(!empty($lastsearchdate['date'])){
             $lastsearchdate = $lastsearchdate['date'];
           }else{
@@ -1334,6 +1333,193 @@ if($_GET['table_name'] == 'truckpackingstockinfo'){
           </tr>
       </table>
       <?php
+  }
+
+  if ($_GET['table_name'] == "tclmcstock" && !empty($_GET['date'])) {
+       $date = $_GET['date'];
+      header("Content-Type: application/xls");
+      header("Content-Disposition: attachment; filename=tclmcstock{$date}.xls");
+      header("Pragma: no-cache");
+      header("Expires: 0");
+      $headerstmt = $pdo->prepare("SELECT * FROM tclmcstock WHERE date='$date'");
+      $headerstmt->execute();
+      $headerdata = $headerstmt->fetch(PDO::FETCH_ASSOC);
+      ?>
+      <table class="table table-hover table-bordered table-striped" border="1">
+        <tr>
+          <th>Date</th>
+          <th>Fish Name</th>
+          <th>Size</th>
+          <th>Pcs</th>
+          <th>Kg</th>
+          <th>Opening Mc</th>
+          <th>Form-10 Mc</th>
+          <th>Transfer to <?php echo $headerdata['transfer_to_where']; ?></th>
+          <th>loading <?php if($headerdata['loading_no'] != 0){ echo $headerdata['loading_no']; }; ?></th>
+          <th>Grand Total Mc</th>
+        </tr>
+      <?php
+      $stmt = $pdo->prepare("SELECT * FROM tclmcstock WHERE date='$date'");
+      $stmt->execute();
+      $datas = $stmt->fetchall();
+      foreach ($datas as $tclmcdata) {
+        $lastid = $tclmcdata['id'];
+        $item_id = $tclmcdata['item_id'];
+        $commonditydata = $query->select('item', $item_id, 'item_id');
+        $size = $tclmcdata['size'];
+        $kg = $tclmcdata['kg'];
+        $item_id = $tclmcdata['item_id'];
+
+        $checklast = $pdo->prepare("SELECT * FROM tclmcstock WHERE id < $lastid AND item_id='$item_id' AND size='$size' AND date='$date'");
+        $checklast->execute();
+        $checklastavaliable = $checklast->fetch(PDO::FETCH_ASSOC);
+        $lastcommondity = $pdo->prepare("SELECT * FROM tclmcstock WHERE id < $lastid AND item_id='$item_id' AND date='$date'");
+        $lastcommondity->execute();
+        $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
+        ?>
+        <tr>
+        <td style="text-align:right;"><?php if(empty($lastcommondity)){ echo date("d-m-Y", strtotime($tclmcdata['date'])); } ?></td>
+        <td style="text-align:right;"><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; } ?></td>
+        <td style="text-align:right;"><?php if(empty($checklastavaliable)){ echo $tclmcdata['size']; } ?></td>
+        <td style="text-align:right;"><?php echo $tclmcdata['pcs']; ?></td>
+        <td style="text-align:right;"><?php echo $tclmcdata['kg']; ?></td>
+        <td style="text-align:right;"><?php if($tclmcdata['opening_mc'] != 0){ echo $tclmcdata['opening_mc']; }else{ echo "-";} ?></td>
+        <td style="text-align:right;"><?php echo $tclmcdata['form10mc']; ?></td>
+        <td style="text-align:right;"><?php if($tclmcdata['transfer_mc'] != 0){ echo $tclmcdata['transfer_mc']; }else{ echo "-";} ?></td>
+        <td style="text-align:right;"><?php if($tclmcdata['loading_mc'] != 0){ echo $tclmcdata['loading_mc']; }else{ echo "-";} ?></td>
+        <td style="text-align:right;"><?php if($tclmcdata['grandtotal_mc'] != 0){ echo $tclmcdata['grandtotal_mc']; }else{ echo "-";} ?></td>
+        </tr>
+        <?php
+      }
+      ?>
+      <?php
+        $openingmctotalstmt = $pdo->prepare("SELECT SUM(opening_mc) AS openingmc FROM tclmcstock WHERE date='$date'");
+        $openingmctotalstmt->execute();
+        $openingmctotaldatas = $openingmctotalstmt->fetch(PDO::FETCH_ASSOC);
+
+        $form10mctotalstmt = $pdo->prepare("SELECT SUM(form10mc) AS totalform10mc FROM tclmcstock WHERE date='$date'");
+        $form10mctotalstmt->execute();
+        $form10mctotaldatas = $form10mctotalstmt->fetch(PDO::FETCH_ASSOC);
+
+        $transfermctotalstmt = $pdo->prepare("SELECT SUM(transfer_mc) AS transfermc FROM tclmcstock WHERE date='$date'");
+        $transfermctotalstmt->execute();
+        $transfermctotaldatas = $transfermctotalstmt->fetch(PDO::FETCH_ASSOC);
+
+        $loadingmctotalstmt = $pdo->prepare("SELECT SUM(loading_mc) AS loadingmc FROM tclmcstock WHERE date='$date'");
+        $loadingmctotalstmt->execute();
+        $loadingmctotaldatas = $loadingmctotalstmt->fetch(PDO::FETCH_ASSOC);
+
+        $grandtotalmctotalstmt = $pdo->prepare("SELECT SUM(grandtotal_mc) AS grandtotalmc FROM tclmcstock WHERE date='$date'");
+        $grandtotalmctotalstmt->execute();
+        $grandtotalmctotaldatas = $grandtotalmctotalstmt->fetch(PDO::FETCH_ASSOC);
+       ?>
+      <tr>
+        <td style="font-weight:bold; text-align:center;" colspan="5">Grand Total</td>
+        <td style="font-weight:bold; text-align:right;"><?php if($openingmctotaldatas['openingmc'] != 0){ echo $openingmctotaldatas['openingmc']; }else{ echo "-";} ?></td>
+        <td style="font-weight:bold; text-align:right;"><?php if($form10mctotaldatas['totalform10mc'] != 0){ echo $form10mctotaldatas['totalform10mc']; }else{ echo "-";} ?></td>
+        <td style="font-weight:bold; text-align:right;"><?php if($transfermctotaldatas['transfermc'] != 0){ echo $transfermctotaldatas['transfermc']; }else{ echo "-";} ?></td>
+        <td style="font-weight:bold; text-align:right;"><?php if($loadingmctotaldatas['loadingmc'] != 0){ echo $loadingmctotaldatas['loadingmc']; }else{ echo "-";} ?></td>
+        <td style="font-weight:bold; text-align:right;"><?php if($grandtotalmctotaldatas['grandtotalmc'] != 0){ echo $grandtotalmctotaldatas['grandtotalmc']; }else{ echo "-";} ?></td>
+      </tr>
+
+      </table>
+      <?php
+  }else{
+    header("Content-Type: application/xls");
+    header("Content-Disposition: attachment; filename=tclmcstock.xls");
+    header("Pragma: no-cache");
+    header("Expires: 0");
+    $datestmt = $pdo->prepare("SELECT DISTINCT (date) FROM tclmcstock");
+    $datestmt->execute();
+    $datedatas = $datestmt->fetchall();
+
+    foreach ($datedatas as $datedata) {
+      $date = $datedata['date'];
+
+    $headerstmt = $pdo->prepare("SELECT * FROM tclmcstock WHERE date='$date'");
+    $headerstmt->execute();
+    $headerdata = $headerstmt->fetch(PDO::FETCH_ASSOC);
+    ?>
+    <table class="table table-hover table-bordered table-striped" border="1">
+      <tr>
+        <th>Date</th>
+        <th>Fish Name</th>
+        <th>Size</th>
+        <th>Pcs</th>
+        <th>Kg</th>
+        <th>Opening Mc</th>
+        <th>Form-10 Mc</th>
+        <th>Transfer to <?php echo $headerdata['transfer_to_where']; ?></th>
+        <th>loading <?php if($headerdata['loading_no'] != 0){ echo $headerdata['loading_no']; }; ?></th>
+        <th>Grand Total Mc</th>
+      </tr>
+    <?php
+    $stmt = $pdo->prepare("SELECT * FROM tclmcstock WHERE date='$date'");
+    $stmt->execute();
+    $datas = $stmt->fetchall();
+    foreach ($datas as $tclmcdata) {
+      $lastid = $tclmcdata['id'];
+      $item_id = $tclmcdata['item_id'];
+      $commonditydata = $query->select('item', $item_id, 'item_id');
+      $size = $tclmcdata['size'];
+      $kg = $tclmcdata['kg'];
+      $item_id = $tclmcdata['item_id'];
+
+      $checklast = $pdo->prepare("SELECT * FROM tclmcstock WHERE id < $lastid AND item_id='$item_id' AND size='$size' AND date='$date'");
+      $checklast->execute();
+      $checklastavaliable = $checklast->fetch(PDO::FETCH_ASSOC);
+      $lastcommondity = $pdo->prepare("SELECT * FROM tclmcstock WHERE id < $lastid AND item_id='$item_id' AND date='$date'");
+      $lastcommondity->execute();
+      $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
+      ?>
+      <tr>
+      <td style="text-align:right;"><?php if(empty($lastcommondity)){ echo date("d-m-Y", strtotime($tclmcdata['date'])); } ?></td>
+      <td style="text-align:right;"><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; } ?></td>
+      <td style="text-align:right;"><?php if(empty($checklastavaliable)){ echo $tclmcdata['size']; } ?></td>
+      <td style="text-align:right;"><?php echo $tclmcdata['pcs']; ?></td>
+      <td style="text-align:right;"><?php echo $tclmcdata['kg']; ?></td>
+      <td style="text-align:right;"><?php if($tclmcdata['opening_mc'] != 0){ echo $tclmcdata['opening_mc']; }else{ echo "-";} ?></td>
+      <td style="text-align:right;"><?php echo $tclmcdata['form10mc']; ?></td>
+      <td style="text-align:right;"><?php if($tclmcdata['transfer_mc'] != 0){ echo $tclmcdata['transfer_mc']; }else{ echo "-";} ?></td>
+      <td style="text-align:right;"><?php if($tclmcdata['loading_mc'] != 0){ echo $tclmcdata['loading_mc']; }else{ echo "-";} ?></td>
+      <td style="text-align:right;"><?php if($tclmcdata['grandtotal_mc'] != 0){ echo $tclmcdata['grandtotal_mc']; }else{ echo "-";} ?></td>
+      </tr>
+      <?php
+    }
+    ?>
+    <?php
+      $openingmctotalstmt = $pdo->prepare("SELECT SUM(opening_mc) AS openingmc FROM tclmcstock WHERE date='$date'");
+      $openingmctotalstmt->execute();
+      $openingmctotaldatas = $openingmctotalstmt->fetch(PDO::FETCH_ASSOC);
+
+      $form10mctotalstmt = $pdo->prepare("SELECT SUM(form10mc) AS totalform10mc FROM tclmcstock WHERE date='$date'");
+      $form10mctotalstmt->execute();
+      $form10mctotaldatas = $form10mctotalstmt->fetch(PDO::FETCH_ASSOC);
+
+      $transfermctotalstmt = $pdo->prepare("SELECT SUM(transfer_mc) AS transfermc FROM tclmcstock WHERE date='$date'");
+      $transfermctotalstmt->execute();
+      $transfermctotaldatas = $transfermctotalstmt->fetch(PDO::FETCH_ASSOC);
+
+      $loadingmctotalstmt = $pdo->prepare("SELECT SUM(loading_mc) AS loadingmc FROM tclmcstock WHERE date='$date'");
+      $loadingmctotalstmt->execute();
+      $loadingmctotaldatas = $loadingmctotalstmt->fetch(PDO::FETCH_ASSOC);
+
+      $grandtotalmctotalstmt = $pdo->prepare("SELECT SUM(grandtotal_mc) AS grandtotalmc FROM tclmcstock WHERE date='$date'");
+      $grandtotalmctotalstmt->execute();
+      $grandtotalmctotaldatas = $grandtotalmctotalstmt->fetch(PDO::FETCH_ASSOC);
+     ?>
+    <tr>
+      <td style="font-weight:bold; text-align:center;" colspan="5">Grand Total</td>
+      <td style="font-weight:bold; text-align:right;"><?php if($openingmctotaldatas['openingmc'] != 0){ echo $openingmctotaldatas['openingmc']; }else{ echo "-";} ?></td>
+      <td style="font-weight:bold; text-align:right;"><?php if($form10mctotaldatas['totalform10mc'] != 0){ echo $form10mctotaldatas['totalform10mc']; }else{ echo "-";} ?></td>
+      <td style="font-weight:bold; text-align:right;"><?php if($transfermctotaldatas['transfermc'] != 0){ echo $transfermctotaldatas['transfermc']; }else{ echo "-";} ?></td>
+      <td style="font-weight:bold; text-align:right;"><?php if($loadingmctotaldatas['loadingmc'] != 0){ echo $loadingmctotaldatas['loadingmc']; }else{ echo "-";} ?></td>
+      <td style="font-weight:bold; text-align:right;"><?php if($grandtotalmctotaldatas['grandtotalmc'] != 0){ echo $grandtotalmctotaldatas['grandtotalmc']; }else{ echo "-";} ?></td>
+    </tr>
+
+    </table>
+    <?php
+  }
   }
 exit();
 
