@@ -82,6 +82,8 @@ $query = new Query();
             <div class="card-header bg-secondary">
 
               <span class=" text-light" id="tctext" style="font-size:20px; font-weight:bold;">Total Costing</span>
+
+              <a href="export.php?table_name=trucktotalcosting&invoice_no=<?= $_GET['invoice_no']; ?>" class="btn btn-success float-end btn-sm ms-2">Export</a>
               <a href="#profit" class="btn btn-info text-light float-end btn-sm">Profit</a>
               <button type="submit" class="btn btn-info text-light float-end btn-sm hide" id="totalcostingbtn" name="totalcostingbtn">Total Costing</button>
               <a href="truck_packing_stock.php" class="btn btn-danger float-end me-2 btn-sm" id="back">Back</a>
