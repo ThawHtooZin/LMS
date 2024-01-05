@@ -111,7 +111,7 @@ $query = new Query();
                 
                 <a href="export.php?table_name=actualtruckinvoice&invoice_no=<?= $_GET['invoice_no']; ?>" class="btn btn-success float-end btn-sm <?php if(!empty($_SESSION['tabs']) && $_SESSION['tabs'] == 'actualinvoice'){}else{echo 'hide';} ?> me-2" id="actualinvoiceback">Excel Report</a>
 
-                <a href="export.php?table_name=declarepacking&invoice_no=<?= $_GET['invoice_no']; ?>&infoid=<?=  ?>" class="btn btn-success float-end btn-sm <?php if(!empty($_SESSION['tabs']) && $_SESSION['tabs'] == 'declare'){}else{echo 'hide';} ?> me-2">Excel Report</a>
+                <a href="export.php?table_name=declarepacking&invoice_no=<?= $_GET['invoice_no']; ?>&infoid=<?= $_GET['infoid']; ?>" class="btn btn-success float-end btn-sm <?php if(!empty($_SESSION['tabs']) && $_SESSION['tabs'] == 'declare'){}else{echo 'hide';} ?> me-2">Excel Report</a>
                 
                 <a href="export.php?table_name=foambox&invoice_no=<?= $_GET['invoice_no']; ?>" class="btn btn-success float-end btn-sm <?php if(!empty($_SESSION['tabs']) && $_SESSION['tabs'] == 'foambox'){}else{echo 'hide';} ?> me-2" id="foambox">Excel Report</a>
                 
