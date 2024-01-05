@@ -55,7 +55,7 @@ $query = new Query();
               <a href="export.php?table_name=tclmcstock&date=<?= $_POST['date']; ?>" name="search" class="btn btn-secondary float-end me-2">Export Excel</a>
             <?php endif; ?>
             <input type="date" name="date" value="" class="form-control inpv2 d-inline float-end w-25 me-2">
-            <?php if (empty($_POST['date']) && !isset($_POST['search'])): ?>
+            <?php if (empty($_POST['date']) || !isset($_POST['search'])): ?>
               <a href="export.php?table_name=tclmcstock" name="search" class="btn btn-secondary float-end me-2">Export Excel</a>
             <?php endif; ?>
           </form>
@@ -77,8 +77,8 @@ $query = new Query();
                   <th>Kg</th>
                   <th>Opening Mc</th>
                   <th>Form-10 Mc</th>
-                  <th>Transfer to <?php echo $headerdata['transfer_to_where']; ?></th>
-                  <th>loading <?php if($headerdata['loading_no'] != 0){ echo $headerdata['loading_no']; }; ?></th>
+                  <th>Transfer to <?php if(!empty($headerdata)){ echo $headerdata['transfer_to_where']; } ?></th>
+                  <th>loading <?php if(!empty($headerdata)){ if($headerdata['loading_no'] != 0){ echo $headerdata['loading_no']; } } ?></th>
                   <th>Grand Total Mc</th>
                 </tr>
               <?php
