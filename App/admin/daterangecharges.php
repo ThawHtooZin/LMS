@@ -1026,7 +1026,9 @@ $query = new Query();
               <div class="col">
                 <div class="processingratediv">
                   <label style="font-weight: bold;">Processing Rate</label>
-                  <input type="text" name="processingrate" class="form-control inpv2">
+                  <div id="processingrate">
+                    <input type="text" name="processingrate" class="form-control inpv2">
+                  </div>
                 </div>
               </div>
           </div>
@@ -1178,6 +1180,10 @@ $query = new Query();
         $blockid = $blockiddata['category_id'];
         ?>
         $("#commondity").change(function(){
+          commondityid = $("#commondity").val();
+          $("#processingrate").load('chargescommondity.php', {
+            commondityid : commondityid,
+          });
           var commondity = $("#commondity").val();
           if(commondity === '<?php echo $blockid; ?>'){
             $(".processingratediv").hide();
@@ -1187,6 +1193,10 @@ $query = new Query();
             $(".processingchargesdiv").hide();
           }
         });
+        commondityid = $("#commondity").val();
+          $("#processingrate").load('changecommondity.php', {
+            commondityid : commondityid,
+          });
         if(commondity === '<?php echo $blockid; ?>'){
           $(".processingratediv").hide();
           $(".processingchargesdiv").show();

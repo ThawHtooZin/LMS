@@ -251,9 +251,9 @@ Class Query{
     $stmt->execute();
   }
 
-  function addcategory($table, $item_id, $item_name){
+  function addcategory($table, $item_id, $item_name, $rate){
     global $pdo;
-    $stmt = $pdo->prepare("INSERT INTO $table(category_id, category_name) VALUES('$item_id', '$item_name');");
+    $stmt = $pdo->prepare("INSERT INTO $table(category_id, category_name, rate) VALUES('$item_id', '$item_name', '$rate');");
     $stmt->execute();
     if($stmt){
       return $successmessage = "Category Added Successfully";
@@ -262,9 +262,9 @@ Class Query{
     }
   }
 
-  function updatecategory($table, $category_id, $category_name, $updateid){
+  function updatecategory($table, $category_id, $category_name,$rate, $updateid){
     global $pdo;
-    $stmt = $pdo->prepare("UPDATE $table SET category_id='$category_id', category_name='$category_name' WHERE id='$updateid'");
+    $stmt = $pdo->prepare("UPDATE $table SET category_id='$category_id', category_name='$category_name', rate='$rate' WHERE id='$updateid'");
     $stmt->execute();
     if($stmt){
       return $successmessage = "Category Update Successfully";

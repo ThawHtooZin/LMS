@@ -42,19 +42,20 @@ $query = new Query();
               $message = $query->deletecategory('category', $deleteid);
             }
             if(isset($_POST['updatebutton'])){
+              $rate = $_POST['rate'];
               $category_name = $_POST['category_name'];
               $id = $_POST['id'];
               $updateid = $_POST['updateid'];
 
-              $message = $query->updatecategory('category', $id, $category_name, $updateid);
+              $message = $query->updatecategory('category', $id, $category_name, $rate, $updateid);
             }
             ?>
             <?php
             if(isset($_POST['addbutton'])){
               $item_id = $_POST['item_id'];
               $item_name = $_POST['item_name'];
-
-              $message = $query->addcategory('category', $item_id, $item_name);
+              $rate = $_POST['rate'];
+              $message = $query->addcategory('category', $item_id, $item_name, $rate);
             }
             ?>
             <?php
@@ -114,6 +115,7 @@ $query = new Query();
               <tr>
                 <th>Item Id</th>
                 <th>Item Name</th>
+                <th>Processing Rate</th>
                 <th>Action</th>
               </tr>
               <?php
@@ -131,6 +133,7 @@ $query = new Query();
               <tr>
                 <td><?php echo $categorydata['category_id']; ?></td>
                 <td><?php echo $categorydata['category_name']; ?></td>
+                <td><?php echo $categorydata['rate']; ?></td>
                 <td>
                   <input type="hidden" name="updateid" value="<?php echo $categorydata['id']; ?>">
                   <button type="submit" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $categorydata['id']; ?>">
@@ -168,6 +171,8 @@ $query = new Query();
                         <input type="text" name="id" class="form-control" placeholder="Category Id" value="<?php echo $updatedata['category_id']; ?>">
                         <label>Category Name</label>
                         <input type="text" name="category_name" class="form-control" placeholder="Category Name" value="<?php echo $updatedata['category_name']; ?>">
+                        <label>Rate</label>
+                        <input type="text" name="rate" class="form-control" placeholder="Rate" value="<?php echo $updatedata['rate']; ?>">
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -218,6 +223,8 @@ $query = new Query();
             <input type="text" name="item_id" class="form-control" placeholder="Item Id">
             <label>Item Name</label>
             <input type="text" name="item_name" class="form-control" placeholder="Item Name">
+            <label>Rate</label>
+            <input type="text" name="rate" class="form-control" placeholder="Rate">
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
