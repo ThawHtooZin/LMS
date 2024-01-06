@@ -22,12 +22,23 @@ $query = new Query();
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
   <body>
+    <?php
+    
+    if(isset($_POST['backuponetable'])){
+      $tablename = $_POST['tablename'];
+      ?>
+        <script>window.location.href='backup/Tablebackup/backupeachtable.php?tablename=<?= $tablename ?>';</script>
+      <?php
+    }
+    
+    ?>
     <script type="text/javascript">
     <?php
     if(!empty($_GET['status']) && $_GET['status'] == 'success'){
       ?>
       swal('Success!', 'Successfully Backuped the database', 'success');
       <?php
+
     }
     ?>
     </script>
@@ -62,8 +73,14 @@ $query = new Query();
                 </div>
               </div>
             </div>
+
+            <div class="container mt-5 text-center">
+              <h3>Backup Each Table</h3>
+              <button type="button" class="btn btn-success" data-bs-target="#backuponetable" data-bs-toggle="modal">Back Up One Table</button>
+            </div>
+            
             <!-- Card -->
-            <div class="modal fade" id="backupmodal">
+            <!-- <div class="modal fade" id="backupmodal">
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header bg-success text-light">
@@ -80,9 +97,39 @@ $query = new Query();
                     </div>
                   </form>
                 </div>
+              </div> -->
+              <div class="modal fade" id="backuponetable">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header bg-success text-light">
+                    <h5 class="modal-title">Choose The Which Table to Backup</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <form action="" method="post">
+                    <div class="modal-body">
+                      <label>Tables</label>
+                      <select name="tablename" class="form-control" style="text-transform: capitalize;">
+                      <?php
+                        $stmt = $pdo->prepare("SHOW TABLES");
+                        $stmt->execute();
+                        $tablesdatas = $stmt->fetchall();
+
+                        foreach($tablesdatas as $tablesdata){
+                          ?>
+                            <option value="<?= $tablesdata['Tables_in_lms']; ?>"><?= $tablesdata['Tables_in_lms']; ?></option>
+                          <?php
+                        }
+                      ?>
+                      </select>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="submit" class="btn btn-success" name="backuponetable">Confirm</button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
-            <!-- Card -->
           </div>
         </div>
       </div>
