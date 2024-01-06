@@ -114,7 +114,7 @@ $query = new Query();
                 <th>Kg</th>
                 <th>Pcs per Vr</th>
                 <th>Pcs per F-7</th>
-                <th>Action</th>
+                <!-- <th>Action</th> -->
               </tr>
               <?php
               if (isset($_POST['searchbtn']) && !empty($_POST['commondity_id']) && !empty($_POST['searchdate']) && !empty($_POST['searchsize'])) {
@@ -154,14 +154,14 @@ $query = new Query();
                     <td><?php if(!empty($form7data['kg'])){echo round($form7data['kg'], 2);}; ?></td>
                     <td><?php echo $form7data['pcspervr']; ?></td>
                     <td><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
-                    <td>
+                    <!-- <td>
                       <form action="form_7_tcl.php" method="post">
                         <input type="hidden" name="deleteid" value="<?php echo $form7data['id']; ?>">
                         <button type="submit" name="deleteform7" class="btn btn-danger btn-sm">
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
                         </button>
                       </form>
-                    </td>
+                    </td> -->
                   </tr>
                   <?php
                   $date = $form7data['date'];
@@ -192,7 +192,7 @@ $query = new Query();
                   <td><?php echo round($totalkgdata['total_kg'], 2); ?></td>
                   <td><?php if(!empty($totalpcsdata['total_pcs'])){ echo $totalpcsdata['total_pcs']; }; ?></td>
                   <td><?php if(!empty($totalpcsf7data['total_pcsf7'])){ echo $totalpcsf7data['total_pcsf7']; }; ?></td>
-                  <td></td>
+                  <!-- <td></td> -->
                 </tr>
                 <?php
               }
@@ -229,14 +229,14 @@ $query = new Query();
                   <td><?php if(!empty($form7data['kg'])){echo round($form7data['kg'], 2);}; ?></td>
                   <td><?php echo $form7data['pcspervr']; ?></td>
                   <td><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
-                  <td>
+                  <!-- <td>
                     <form action="form_7_tcl.php" method="post">
                       <input type="hidden" name="deleteid" value="<?php echo $form7data['id']; ?>">
                       <button type="submit" name="deleteform7" class="btn btn-danger btn-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
                       </button>
                     </form>
-                  </td>
+                  </td> -->
                 </tr>
                 <div class="modal fade" id="updatemodal<?php echo $form7data['id']; ?>">
                   <div class="modal-dialog" role="document">
@@ -337,14 +337,14 @@ $query = new Query();
                      <td><?php if(!empty($form7data['kg'])){echo round($form7data['kg'], 2);}; ?></td>
                      <td><?php echo $form7data['pcspervr']; ?></td>
                      <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
-                     <td>
+                     <!-- <td>
                        <form action="form_7_tcl.php" method="post">
                          <input type="hidden" name="deleteid" value="<?php echo $form7data['id']; ?>">
                          <button type="submit" name="deleteform7" class="btn btn-danger btn-sm">
                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
                          </button>
                        </form>
-                     </td>
+                     </td> -->
                    </tr>
                   <div class="modal fade" id="updatemodal<?php echo $form7data['id']; ?>">
                     <div class="modal-dialog" role="document">

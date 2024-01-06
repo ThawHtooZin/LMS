@@ -58,9 +58,20 @@ $query = new Query();
             <?php
             if(isset($_POST['deletebutton'])){
               $deleteid = $_POST['deleteid'];
+              
+              $data = $query->select('purchase', $deleteid, 'no');
+              if(!empty($data['tclfrozen'])){
+                $tclorfrozen = $data['tclfrozen'];
+              }else{
+                $tclorfrozen = '';
+              }
               $query->deletepurchase('purchase', $deleteid);
               $query->deletepayable('payable', $deleteid);
-              $query->deleteform7('form7stock', $deleteid);
+              if($tclorfrozen == 'tcl'){
+                $query->deleteform7('form7stocktcl', $deleteid);
+              }else{
+                $query->deleteform7('form7stock', $deleteid);
+              }
             }
             if(isset($_POST['updatebutton'])){
               $date = $_POST['date'];
@@ -74,7 +85,7 @@ $query = new Query();
               $price = $_POST['price'];
               $no = $_POST['updateid'];
 
-              $message = $query->updatepurchase('purchase', $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price, $no);
+              $message = $query->updatepurchase('purchase', $date, $voucher_no, $supplier_name, $tclfrozen, $commodity, $size, $viss, $pcs, $price, $no);
             }
             if(isset($_POST['addbutton'])){
               $date = $_POST['date'];
@@ -87,7 +98,7 @@ $query = new Query();
               $pcs = $_POST['pcs'];
               $price = $_POST['price'];
 
-              $message = $query->addpurchase('purchase' , $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price);
+              $query->addpurchase('purchase' , $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price);
               $_SESSION['purchase_date'] = $date;
               $_SESSION['purchase_voucher_no'] = $voucher_no;
               $_SESSION['purchase_tclfrozen'] = $tclfrozen;
@@ -287,7 +298,8 @@ $query = new Query();
                         <div class="row">
                           <div class="col">
                             <label style="font-weight: bold;">TCL (or) Frozen</label>
-                            <select class="form-control inpv2 mb-2" name="tclfrozen">
+                            <input type="hidden" name="tclfrozen" value="<?= $updatedata['tclfrozen'] ?>">
+                            <select class="form-control inpv2 mb-2" disabled>
                               <option value="">Select</option>
                               <option value="tcl" <?php if($updatedata['tclfrozen'] == 'tcl'){ echo 'selected'; } ?>>TCL</option>
                               <option value="frozen" <?php if($updatedata['tclfrozen'] == 'frozen'){ echo 'selected'; } ?>>Frozen</option>

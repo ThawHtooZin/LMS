@@ -7,6 +7,7 @@
     $stmt->execute();
     $rate = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    echo '<input type="text" name="processingrate" class="form-control inpv2" id="processingrate" value="'. $rate['rate'] .'">';
+    echo '<input type="text" disabled class="form-control inpv2" value="'. $rate['rate'] .'">';
+    echo '<input type="hidden" name="processingrate" value="'. $rate['rate']  .'">';
 
 ?>

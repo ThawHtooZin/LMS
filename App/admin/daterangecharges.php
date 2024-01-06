@@ -339,7 +339,8 @@ $query = new Query();
                             <div class="col">
                               <div class="upprocessingratediv<?= $id; ?>">
                                 <label style="font-weight: bold;">Processing Rate</label>
-                                <input type="text" name="upprocessingrate" class="form-control inpv2" value="<?php echo $processingdataup['rate'];  ?>">
+                                <input type="hidden" name="upprocessingrate" value="<?php echo $processingdataup['rate'];  ?>">
+                                <input type="text" disabled class="form-control inpv2" value="<?php echo $processingdataup['rate'];  ?>">
                               </div>
                             </div>
                             </div>
@@ -1026,8 +1027,9 @@ $query = new Query();
               <div class="col">
                 <div class="processingratediv">
                   <label style="font-weight: bold;">Processing Rate</label>
+                  <input type="hidden" name="upprocessingrate" value="<?php echo $processingdataup['rate'];  ?>">
                   <div id="processingrate">
-                    <input type="text" name="processingrate" class="form-control inpv2">
+                    <input type="text" name="processingrate"  disabled class="form-control inpv2">
                   </div>
                 </div>
               </div>
@@ -1179,7 +1181,7 @@ $query = new Query();
         $blockiddata = $blockidstmt->fetch(PDO::FETCH_ASSOC);
         $blockid = $blockiddata['category_id'];
         ?>
-        $("#commondity").change(function(){
+        $("#commondity").click(function(){
           commondityid = $("#commondity").val();
           $("#processingrate").load('chargescommondity.php', {
             commondityid : commondityid,

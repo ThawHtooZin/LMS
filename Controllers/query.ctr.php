@@ -573,14 +573,25 @@ Class Query{
 
   }
 
-  function updatepurchase($table, $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price, $no){
+  function updatepurchase($table, $date, $voucher_no, $supplier_name, $tclfrozen, $commodity, $size, $viss, $pcs, $price, $no){
     global $pdo;
     $amount = $price * floatval($viss);
-    $stmt = $pdo->prepare("UPDATE $table SET date='$date', voucher_no='$voucher_no', tclfrozen='$tclfrozen', supplier_id='$supplier_name', commodity='$commodity', size='$size', viss='$viss', pcs='$pcs', price='$price', amount='$amount' WHERE no='$no'");
+    $stmt = $pdo->prepare("UPDATE $table SET date='$date', voucher_no='$voucher_no', supplier_id='$supplier_name', commodity='$commodity', size='$size', viss='$viss', pcs='$pcs', price='$price', amount='$amount' WHERE no='$no'");
     $stmt->execute();
 
     $stmt = $pdo->prepare("UPDATE payable SET date='$date', purchase_voucher_no='$voucher_no', supplier_id='$supplier_name', purchase_amount='$amount' WHERE link_id='$no'");
     $stmt->execute();
+    
+    $kg = floatval($viss) * 1.634;
+
+    if($tclfrozen == 'tcl'){
+      $stmt = $pdo->prepare("UPDATE form7stocktcl SET date='$date', supplier_name='$supplier_name', item_id='$commodity', size='$size', viss='$viss', kg='$kg' WHERE link_id='$no'");
+      $stmt->execute();
+    }else{
+      $stmt = $pdo->prepare("UPDATE form7stock SET date='$date', supplier_name='$supplier_name', item_id='$commodity', size='$size', viss='$viss', kg='$kg' WHERE link_id='$no'");
+      $stmt->execute();
+    }
+    
     if($stmt){
       return $successmessage = "Purchase Voucher Update Successfully";
     }else{
@@ -1004,24 +1015,16 @@ Class Query{
       $balance_amount = intval($grand_total_charges);
     }else{
       $total_coldstore_charges = $totalcoldstoredata['charges'];
-      // $total_labour_charges = $totallabourdata['charges'];
+      $total_labour_charges = $totallabourdata['charges'];
       $total_processing_charges = $totalprocessingdata['charges'];
       $total_charges = $totalcoldstoredata['charges'] + $totallabourdata['charges'] + $totalprocessingdata['charges'];
-      $total_charges = $totalcoldstoredata['charges'] + $totallabourdata['charges'];
+      // $total_charges = $totalcoldstoredata['charges'] + $totallabourdata['charges'];
       $grand_total_charges = $total_charges;
       $balance_amount = $grand_total_charges;
     }
     // echo $total_processing_charges;
     $stmt = $pdo->prepare("INSERT INTO total_charges(date, commondity_id, total_coldstore_charges, total_labour_charges, total_processing_charges, total_charges, grand_total_charges, balance_amount, link_id) VALUES('$outdate', '$commondity_id','$total_coldstore_charges', '$total_labour_charges', '$total_processing_charges', '$total_charges', '$grand_total_charges', '$balance_amount', '$coldstoreid')");
     $stmt->execute();
-
-    if (str_contains(strtolower($commonditydata['category_name']), 'block')) {
-      $processingstmt = $pdo->prepare("INSERT INTO processing(indate, outdate, commondity_id, mc, total_mc) VALUES('$indate','$outdate','$commondity_id', '$mc','$ptotal_mc')");
-      $processingstmt->execute();
-    }else{
-      $processingstmt = $pdo->prepare("INSERT INTO processing(indate, outdate, commondity_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$commondity_id', '$mc','$ptotal_mc','$kg','$ptotal_kg','$processingrate','$pcharges','$totalprocessingcharges')");
-      $processingstmt->execute();
-    }
   }
 
   function updatecoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $updateid){
