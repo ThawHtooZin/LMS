@@ -10,7 +10,7 @@ $db = 'lms';
 $tableToBackup = $_GET['tablename'];
 
 // Create a backup file with a timestamp
-$backupFile = 'backup_' . date('Y-m-d_H-i-s') . '_' . $tableToBackup . '.sql';
+$backupFile = 'backup_'. $tableToBackup . 'table' . date('Y-m-d_H-i-s') . '_.sql';
 
 // Connect to MySQL
 $mysqli = new mysqli($host, $user, $pass, $db);
@@ -47,6 +47,6 @@ if (!empty($rows)) {
 fclose($fileHandle);
 $mysqli->close();
 
-header('location: ../../../backupandrestore.php');
+header('location: ../../backupandrestore.php');
 
 ?>
