@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 30, 2023 at 06:44 AM
+-- Generation Time: Jan 03, 2024 at 03:47 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -40,7 +40,12 @@ CREATE TABLE `accounts` (
 --
 
 INSERT INTO `accounts` (`id`, `username`, `password`, `email`, `role`) VALUES
-(1, 'admin', 'admin', 'admin@gmail.com', 1);
+(1, 'admin', 'admin', 'admin@gmail.com', 1),
+(2, 'Ma Sandar Aung', '12341234', 'sandaraung@gmail.com', 1),
+(3, 'Ma Soe Soe Khaing', 'stockstock', 'masoesoekhaing@gmail.com', 2),
+(4, 'Lwin Mi Khaing', 'shippment', 'lwinmikhaing@gmail.com', 1),
+(5, 'Thin Zar Kyaw', 'thinzarkyaw', 'thinzarkyaw@gmail.com', 4),
+(6, 'Lin Lin Naing', 'coldstore', 'linlinnaing@gmail.com', 5);
 
 -- --------------------------------------------------------
 
@@ -285,8 +290,7 @@ CREATE TABLE `coldstore` (
 --
 
 INSERT INTO `coldstore` (`id`, `indate`, `outdate`, `commondity_id`, `mc`, `total_mc`, `kg`, `total_kg`, `day`, `rate`, `charges`, `total_charges`) VALUES
-(23, '2023-12-02', '2023-12-03', '1', 250, 250, '2250', '2250', 2, '3', 13500, 13500),
-(24, '2023-12-03', '2023-12-05', '1', 60, 310, '540', '2790', 3, '3', 4860, 18360);
+(29, '2024-01-02', '2024-01-04', '1', 250, 250, '2250', '2250', 3, '4', 27000, 27000);
 
 -- --------------------------------------------------------
 
@@ -408,6 +412,37 @@ INSERT INTO `form7stock` (`id`, `date`, `item_id`, `supplier_name`, `country`, `
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `form7stocktcl`
+--
+
+CREATE TABLE `form7stocktcl` (
+  `id` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `item_id` varchar(11) NOT NULL,
+  `supplier_name` varchar(255) NOT NULL,
+  `country` varchar(155) DEFAULT NULL,
+  `type` varchar(255) NOT NULL,
+  `size` varchar(11) NOT NULL,
+  `viss` varchar(11) NOT NULL,
+  `kg` varchar(15) NOT NULL,
+  `pcspervr` varchar(15) NOT NULL,
+  `pcsperf7` int(11) NOT NULL,
+  `link_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `form7stocktcl`
+--
+
+INSERT INTO `form7stocktcl` (`id`, `date`, `item_id`, `supplier_name`, `country`, `type`, `size`, `viss`, `kg`, `pcspervr`, `pcsperf7`, `link_id`) VALUES
+(1, '2024-01-02', '1031', '4000/T10', 'DAKA', 'TCl', '18/24', '1000', '1634', '', 0, 13),
+(2, '2024-01-02', '1031', '4000/T09', 'DAKA', 'TCl', '18/24', '741.50', '1211.611', '', 0, 14),
+(3, '2024-01-03', '1031', '4000/T07', 'DAKA', 'TCl', '2up', '3000', '4902', '', 0, 15),
+(4, '2024-01-03', '1031', '4000/T07', 'DAKA', 'TCl', '2up', '543.10', '887.4254', '', 0, 16);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `form10stock`
 --
 
@@ -456,6 +491,50 @@ INSERT INTO `form10stock` (`id`, `date`, `item_id`, `supplier_id`, `country`, `t
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `form10stocktcl`
+--
+
+CREATE TABLE `form10stocktcl` (
+  `id` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `item_id` varchar(11) NOT NULL,
+  `supplier_id` varchar(20) NOT NULL,
+  `country` varchar(11) NOT NULL,
+  `type` varchar(255) NOT NULL,
+  `size` varchar(11) NOT NULL,
+  `pcsform10` int(11) NOT NULL,
+  `mc` int(11) NOT NULL,
+  `kg` varchar(11) NOT NULL,
+  `pcs` int(11) NOT NULL,
+  `looseinkg` varchar(11) NOT NULL,
+  `looseinpcs` int(11) NOT NULL,
+  `looseoutkg` varchar(11) NOT NULL,
+  `looseoutpcs` int(11) NOT NULL,
+  `cc_pcs` int(11) DEFAULT NULL,
+  `cc_kg` float DEFAULT NULL,
+  `msl_pcs` int(11) DEFAULT NULL,
+  `msl_kg` float DEFAULT NULL,
+  `hhk_pcs` int(11) DEFAULT NULL,
+  `hhk_kg` float DEFAULT NULL,
+  `lanfish_pcs` int(11) DEFAULT NULL,
+  `lanfish_kg` float DEFAULT NULL,
+  `cutpiece_pcs` int(11) DEFAULT NULL,
+  `cutpiece_kg` float DEFAULT NULL,
+  `total_kg` varchar(11) NOT NULL,
+  `percentage` varchar(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `form10stocktcl`
+--
+
+INSERT INTO `form10stocktcl` (`id`, `date`, `item_id`, `supplier_id`, `country`, `type`, `size`, `pcsform10`, `mc`, `kg`, `pcs`, `looseinkg`, `looseinpcs`, `looseoutkg`, `looseoutpcs`, `cc_pcs`, `cc_kg`, `msl_pcs`, `msl_kg`, `hhk_pcs`, `hhk_kg`, `lanfish_pcs`, `lanfish_kg`, `cutpiece_pcs`, `cutpiece_kg`, `total_kg`, `percentage`) VALUES
+(12, '2024-01-03', '1031', '', 'DAKA', 'TCL', '18/24', 0, 57, '2755.0', 0, '', 0, '', 0, 0, 0, 0, 0, 0, 159.44, 0, 0, 0, 0, '2914.44', ''),
+(13, '2024-01-03', '1031', '', 'DAKA', 'TCL', '2up', 0, 104, '5032.0', 0, '', 0, '', 0, 0, 0, 0, 0, 0, 742.06, 0, 0, 0, 0, '5774.06', '');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `general_ledger`
 --
 
@@ -482,7 +561,11 @@ INSERT INTO `general_ledger` (`id`, `date`, `voucherno`, `ac_code`, `debit`, `cr
 (12, '2023-12-28', 'A0001', '4000/K02', 100000, 0, 100000, '', 'hehe', 'ac-321', 0, 3),
 (13, '2023-12-28', 'A0001', '3600/001', 0, 100000, -100000, '', '', '', 0, 5),
 (14, '2023-12-28', 'A0002', '3300/SAF', 350000, 0, 350000, 'asdfasdf', 'hehe', 'ac-321', 0, 5),
-(15, '2023-12-28', 'A0002', '5000/001', 0, 350000, -350000, 'asdfasdf', '', '', 0, 2);
+(15, '2023-12-28', 'A0002', '5000/001', 0, 350000, -350000, 'asdfasdf', '', '', 0, 2),
+(16, '2024-01-02', '121222', '4000/T10', 0, 12122000, -12122000, '', '', '', 0, 0),
+(17, '2024-01-02', '121223', '4000/T09', 0, 17054500, -17054500, '', '', '', 0, 0),
+(18, '2024-01-03', '121224', '4000/T07', 0, 90000000, -90000000, '', '', '', 0, 0),
+(19, '2024-01-03', '121225', '4000/T07', 0, 10862000, -10862000, '', '', '', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -732,13 +815,11 @@ CREATE TABLE `hhkstock` (
 --
 
 INSERT INTO `hhkstock` (`id`, `indate`, `outdate`, `commondity_id`, `mc`, `total_mc`, `kg`, `total_kg`, `balance`, `balance_kg`, `balance_mc`, `link_id`) VALUES
-(46, '2023-12-01', '0000-00-00', '1', 100, 100, '900', '900', '900', '0', 0, 0),
-(47, '2023-12-02', '0000-00-00', '1', 200, 300, '1800', '2700', '3600', '0', 0, 0),
-(48, '2023-12-03', '0000-00-00', '1', 50, 350, '450', '3150', '6750', '360', 40, 0),
-(49, '2023-12-02', '2023-12-03', '1', 250, 100, '2250', '900', '3150', '', NULL, 23),
-(50, '2023-12-04', '0000-00-00', '1', 50, 150, '450', '1350', '4500', '450', 50, 0),
-(51, '2023-12-03', '2023-12-05', '1', 60, 90, '540', '810', '4140', '', NULL, 24),
-(52, '2023-12-05', '0000-00-00', '1', 100, 190, '900', '1710', '5850', '900', 100, 0);
+(57, '2024-01-01', '0000-00-00', '1', 100, 100, '900', '900', '900', '0', 0, 0),
+(58, '2024-01-02', '0000-00-00', '1', 200, 300, '1800', '2700', '3600', '450', 50, 0),
+(59, '2024-01-03', '0000-00-00', '1', 50, 350, '450', '3150', '6750', '450', 50, 0),
+(60, '2024-01-02', '2024-01-04', '1', 250, 100, '2250', '900', '3150', '', NULL, 29),
+(61, '2024-01-02', '0000-00-00', '3', 100, 100, '900', '900', '900', '900', 100, 0);
 
 -- --------------------------------------------------------
 
@@ -863,8 +944,7 @@ CREATE TABLE `labour` (
 --
 
 INSERT INTO `labour` (`id`, `indate`, `outdate`, `commondity_id`, `mc`, `total_mc`, `kg`, `total_kg`, `rate`, `charges`, `total_charges`) VALUES
-(23, '2023-12-02', '2023-12-03', '1', 250, 250, '2250', '2250', '4', 9000, 9000),
-(24, '2023-12-03', '2023-12-05', '1', 60, 310, '540', '2790', '4', 2160, 11160);
+(29, '2024-01-02', '2024-01-04', '1', 250, 250, '2250', '2250', '5', 11250, 11250);
 
 -- --------------------------------------------------------
 
@@ -1120,7 +1200,11 @@ CREATE TABLE `payable` (
 --
 
 INSERT INTO `payable` (`id`, `date`, `supplier_id`, `purchase_voucher_no`, `purchase_amount`, `paid_date`, `paid_voucher`, `remark`, `paid_amount`, `balance`, `link_id`, `closing_balance`, `report_date`) VALUES
-(13, '0000-00-00', '4000/K02', '', 0, '2023-12-28', 'A0001', '', 100000, 0, 0, 0, '0000-00-00');
+(13, '0000-00-00', '4000/K02', '', 0, '2023-12-28', 'A0001', '', 100000, 0, 0, 0, '0000-00-00'),
+(14, '2024-01-02', '4000/T10', '121222', 12122000, '0000-00-00', '', '', 0, 12122000, 13, 0, '0000-00-00'),
+(15, '2024-01-02', '4000/T09', '121223', 17054500, '0000-00-00', '', '', 0, 17054500, 14, 0, '0000-00-00'),
+(16, '2024-01-03', '4000/T07', '121224', 90000000, '0000-00-00', '', '', 0, 90000000, 15, 0, '0000-00-00'),
+(17, '2024-01-03', '4000/T07', '121225', 10862000, '0000-00-00', '', '', 0, 100862000, 16, 0, '0000-00-00');
 
 -- --------------------------------------------------------
 
@@ -1139,7 +1223,11 @@ CREATE TABLE `permission` (
 --
 
 INSERT INTO `permission` (`id`, `role_id`, `permission`) VALUES
-(1, 1, 'manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_acpayable,manage_accountreceivable,manage_transactionmanage_general_ledger,manage_customers,manage_supplier,manage_coldstoreitem,manage_item,manage_actype,manage_acname,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,sale_report,purchase_report,payable_report,manage_mcreport,manage_tclmcstock');
+(1, 1, 'manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_acpayable,manage_accountreceivable,manage_transactionmanage_general_ledger,manage_customers,manage_supplier,manage_coldstoreitem,manage_item,manage_actype,manage_acname,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,sale_report,purchase_report,payable_report,manage_mcreport,manage_tclmcstock'),
+(2, 2, ',manage_item,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_mcreport,manage_tclmcstock'),
+(3, 3, ',manage_coldstoreitem,manage_coldstorecharges,manage_shippmentexport,manage_truckexport'),
+(4, 4, ',manage_item,manage_form7,manage_form10,manage_truckexport,manage_mcreport,manage_tclmcstock'),
+(5, 5, ',manage_coldstoreitem,manage_coldstorecharges');
 
 -- --------------------------------------------------------
 
@@ -1160,14 +1248,6 @@ CREATE TABLE `processing` (
   `charges` int(11) NOT NULL,
   `total_charges` bigint(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
---
--- Dumping data for table `processing`
---
-
-INSERT INTO `processing` (`id`, `indate`, `outdate`, `commondity_id`, `mc`, `total_mc`, `kg`, `total_kg`, `rate`, `charges`, `total_charges`) VALUES
-(23, '2023-12-02', '2023-12-03', '1', 250, 250, '2250', '2250', '370', 832500, 832500),
-(24, '2023-12-03', '2023-12-05', '1', 60, 310, '540', '2790', '370', 199800, 1032300);
 
 -- --------------------------------------------------------
 
@@ -1203,7 +1283,11 @@ INSERT INTO `purchase` (`no`, `date`, `voucher_no`, `supplier_id`, `tclfrozen`, 
 (8, '2023-01-12', 2274, '4000/A03', 'tcl', '1037', '4up', '100', 0, 2000, 200000),
 (10, '2023-12-07', 7954, '4000/K09', 'frozen', '1015', '6up', '100', 20, 2000, 200000),
 (11, '2023-12-07', 9347, '4000/K09', 'tcl', '1029', '9up', '200', 0, 2000, 400000),
-(12, '2023-12-09', 3455, '4000/A01', 'frozen', '1010', '3up', '100', 0, 1000, 100000);
+(12, '2023-12-09', 3455, '4000/A01', 'frozen', '1010', '3up', '100', 0, 1000, 100000),
+(13, '2024-01-02', 121222, '4000/T10', 'tcl', '1031', '18/24', '1000', 0, 12122, 12122000),
+(14, '2024-01-02', 121223, '4000/T09', 'tcl', '1031', '18/24', '741.50', 0, 23000, 17054500),
+(15, '2024-01-03', 121224, '4000/T07', 'tcl', '1031', '2up', '3000', 0, 30000, 90000000),
+(16, '2024-01-03', 121225, '4000/T07', 'tcl', '1031', '2up', '543.10', 0, 20000, 10862000);
 
 -- --------------------------------------------------------
 
@@ -1283,7 +1367,11 @@ CREATE TABLE `role` (
 --
 
 INSERT INTO `role` (`role_id`, `role_name`) VALUES
-(1, 'admin');
+(1, 'Admin'),
+(2, 'Stock'),
+(3, 'Shippment'),
+(4, 'TCL'),
+(5, 'Coldstore');
 
 -- --------------------------------------------------------
 
@@ -1418,8 +1506,7 @@ CREATE TABLE `total_charges` (
 --
 
 INSERT INTO `total_charges` (`id`, `date`, `commondity_id`, `total_coldstore_charges`, `total_labour_charges`, `total_processing_charges`, `repacking_charges`, `ice_charges`, `ot_charges`, `extra_charges`, `total_charges`, `grand_total_charges`, `payment_date`, `payment_amount`, `balance_amount`, `remark`, `link_id`) VALUES
-(25, '2023-12-03', 1, 13500, 9000, 832500, 0, 0, 0, 0, 855000, 855000, '0000-00-00', 0, 855000, '', 23),
-(26, '2023-12-05', 1, 4860, 2160, 199800, 0, 0, 0, 0, 206820, 1061820, '0000-00-00', 0, 1061820, '', 24);
+(31, '2024-01-04', 1, 27000, 11250, 0, 0, 0, 0, 0, 38250, 38250, '0000-00-00', 0, 38250, '', 29);
 
 -- --------------------------------------------------------
 
@@ -1716,7 +1803,37 @@ INSERT INTO `userlogs` (`id`, `login_time`, `login_date`, `login_username`, `log
 (28, '05:58:12.000000', '2023-12-29', 'admin', 'admin', 'Login Success'),
 (29, '09:48:13.000000', '2023-12-29', 'admin', '', 'Logout Success'),
 (30, '10:55:27.000000', '2023-12-30', 'admin', 'admin', 'Login Success'),
-(31, '11:23:25.000000', '2023-12-30', 'admin', 'admin', 'Login Success');
+(31, '11:23:25.000000', '2023-12-30', 'admin', 'admin', 'Login Success'),
+(32, '10:34:41.000000', '2024-01-02', 'admin', 'admin', 'Login Success'),
+(33, '05:32:01.000000', '2024-01-02', 'admin', 'admin', 'Login Success'),
+(34, '07:46:59.000000', '2024-01-03', 'admin', 'admin', 'Login Success'),
+(35, '08:06:22.000000', '2024-01-03', 'admin', '', 'Logout Success'),
+(36, '08:06:27.000000', '2024-01-03', 'Ma Soe Soe Khaing	', 'stockstock', 'Login Failed'),
+(37, '08:06:42.000000', '2024-01-03', 'Ma Soe Soe Khaing', 'stockstock', 'Login Success'),
+(38, '08:06:57.000000', '2024-01-03', 'Ma Soe Soe Khaing', '', 'Logout Success'),
+(39, '08:07:14.000000', '2024-01-03', 'Ma Sandar Aung', 'sandaraung', 'Login Password Invalid'),
+(40, '08:07:17.000000', '2024-01-03', 'admin', 'admin', 'Login Success'),
+(41, '08:07:24.000000', '2024-01-03', 'admin', '', 'Logout Success'),
+(42, '08:07:29.000000', '2024-01-03', 'Ma Sandar Aung', '12341234', 'Login Success'),
+(43, '08:09:57.000000', '2024-01-03', 'Ma Sandar Aung', '', 'Logout Success'),
+(44, '08:10:06.000000', '2024-01-03', 'Lwin Mi Khaing', 'shippment', 'Login Success'),
+(45, '08:10:20.000000', '2024-01-03', 'Lwin Mi Khaing', '', 'Logout Success'),
+(46, '08:10:27.000000', '2024-01-03', 'Lwin Mi Khaing', 'shippment', 'Login Success'),
+(47, '08:10:45.000000', '2024-01-03', 'Lwin Mi Khaing', '', 'Logout Success'),
+(48, '08:10:56.000000', '2024-01-03', 'Ma Sandar Aung', 'sandaraung', 'Login Password Invalid'),
+(49, '08:11:06.000000', '2024-01-03', 'Ma Sandar Aung', '12341234', 'Login Success'),
+(50, '08:13:04.000000', '2024-01-03', 'Ma Sandar Aung', '', 'Logout Success'),
+(51, '08:13:09.000000', '2024-01-03', 'Thin Zar Kyaw', 'thinzarkyaw', 'Login Success'),
+(52, '08:13:20.000000', '2024-01-03', 'Thin Zar Kyaw', '', 'Logout Success'),
+(53, '08:13:27.000000', '2024-01-03', 'Ma Sandar Aung', '12341234', 'Login Success'),
+(54, '08:13:50.000000', '2024-01-03', 'Ma Sandar Aung', '', 'Logout Success'),
+(55, '08:14:00.000000', '2024-01-03', 'Thin Zar Kyaw', 'thinzarkyaw', 'Login Success'),
+(56, '08:14:10.000000', '2024-01-03', 'Thin Zar Kyaw', '', 'Logout Success'),
+(57, '08:14:18.000000', '2024-01-03', 'Ma Sandar Aung', '12341234', 'Login Success'),
+(58, '08:14:28.000000', '2024-01-03', 'Ma Sandar Aung', '', 'Logout Success'),
+(59, '08:14:33.000000', '2024-01-03', 'Thin Zar Kyaw', 'thinzarkyaw', 'Login Success'),
+(60, '08:14:38.000000', '2024-01-03', 'Thin Zar Kyaw', '', 'Logout Success'),
+(61, '08:14:42.000000', '2024-01-03', 'Ma Sandar Aung', '12341234', 'Login Success');
 
 --
 -- Indexes for dumped tables
@@ -1795,9 +1912,21 @@ ALTER TABLE `form7stock`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `form7stocktcl`
+--
+ALTER TABLE `form7stocktcl`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `form10stock`
 --
 ALTER TABLE `form10stock`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `form10stocktcl`
+--
+ALTER TABLE `form10stocktcl`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -2054,7 +2183,7 @@ ALTER TABLE `userlogs`
 -- AUTO_INCREMENT for table `accounts`
 --
 ALTER TABLE `accounts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `acname`
@@ -2096,7 +2225,7 @@ ALTER TABLE `category`
 -- AUTO_INCREMENT for table `coldstore`
 --
 ALTER TABLE `coldstore`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `container`
@@ -2117,16 +2246,28 @@ ALTER TABLE `form7stock`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
+-- AUTO_INCREMENT for table `form7stocktcl`
+--
+ALTER TABLE `form7stocktcl`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT for table `form10stock`
 --
 ALTER TABLE `form10stock`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
+-- AUTO_INCREMENT for table `form10stocktcl`
+--
+ALTER TABLE `form10stocktcl`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
 -- AUTO_INCREMENT for table `general_ledger`
 --
 ALTER TABLE `general_ledger`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `gfcdryfishcoldstore`
@@ -2174,7 +2315,7 @@ ALTER TABLE `hhkmcstock`
 -- AUTO_INCREMENT for table `hhkstock`
 --
 ALTER TABLE `hhkstock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT for table `invoice_costing`
@@ -2192,7 +2333,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT for table `labour`
 --
 ALTER TABLE `labour`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `mslcoldstore`
@@ -2252,13 +2393,13 @@ ALTER TABLE `packingmaterial`
 -- AUTO_INCREMENT for table `payable`
 --
 ALTER TABLE `payable`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `permission`
 --
 ALTER TABLE `permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `processing`
@@ -2270,7 +2411,7 @@ ALTER TABLE `processing`
 -- AUTO_INCREMENT for table `purchase`
 --
 ALTER TABLE `purchase`
-  MODIFY `no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `receivable`
@@ -2294,7 +2435,7 @@ ALTER TABLE `repackingout`
 -- AUTO_INCREMENT for table `role`
 --
 ALTER TABLE `role`
-  MODIFY `role_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `role_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `supplier`
@@ -2312,7 +2453,7 @@ ALTER TABLE `tclmcstock`
 -- AUTO_INCREMENT for table `total_charges`
 --
 ALTER TABLE `total_charges`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `transaction`
@@ -2366,7 +2507,7 @@ ALTER TABLE `trucktotalcosting`
 -- AUTO_INCREMENT for table `userlogs`
 --
 ALTER TABLE `userlogs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
