@@ -58,7 +58,7 @@ $query = new Query();
             <?php
             if(isset($_POST['deletebutton'])){
               $deleteid = $_POST['deleteid'];
-              
+
               $data = $query->select('purchase', $deleteid, 'no');
               if(!empty($data['tclfrozen'])){
                 $tclorfrozen = $data['tclfrozen'];

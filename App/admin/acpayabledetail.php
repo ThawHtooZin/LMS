@@ -88,7 +88,7 @@ $query = new Query();
             ?>
             <?php
               $supplier_id = $_GET['supplier_id'];
-              $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' GROUP BY purchase_voucher_no ORDER BY purchase_voucher_no DESC");
+              $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' GROUP BY purchase_voucher_no ORDER BY date");
               $payablestmt->execute();
               $payabledatas = $payablestmt->fetchall();
             ?>

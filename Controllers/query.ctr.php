@@ -579,9 +579,15 @@ Class Query{
     $stmt = $pdo->prepare("UPDATE $table SET date='$date', voucher_no='$voucher_no', supplier_id='$supplier_name', commodity='$commodity', size='$size', viss='$viss', pcs='$pcs', price='$price', amount='$amount' WHERE no='$no'");
     $stmt->execute();
 
+    // $payablebalancestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_name', link_id<'$no' ORDER BY id DESC");
+    // $payablebalancestmt->execute();
+    // $payablebalancedata = $payablebalancestmt->fetch(PDO::FETCH_ASSOC);
+    //
+    // print_r($payablebalancedata['balance']);
+    // exit
     $stmt = $pdo->prepare("UPDATE payable SET date='$date', purchase_voucher_no='$voucher_no', supplier_id='$supplier_name', purchase_amount='$amount' WHERE link_id='$no'");
     $stmt->execute();
-    
+
     $kg = floatval($viss) * 1.634;
 
     if($tclfrozen == 'tcl'){
@@ -591,7 +597,7 @@ Class Query{
       $stmt = $pdo->prepare("UPDATE form7stock SET date='$date', supplier_name='$supplier_name', item_id='$commodity', size='$size', viss='$viss', kg='$kg' WHERE link_id='$no'");
       $stmt->execute();
     }
-    
+
     if($stmt){
       return $successmessage = "Purchase Voucher Update Successfully";
     }else{
@@ -867,7 +873,7 @@ Class Query{
           $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
           $processingstmt->execute();
           $processingdata = $processingstmt->fetch(PDO::FETCH_ASSOC);
-    
+
           $ptotal_mc = intval($processingdata['total_mc']) + intval($mc);
           $ptotal_kg = intval($processingdata['total_kg']) + intval($kg);
           $pcharges = intval($processingrate) * intval($kg);
@@ -887,7 +893,7 @@ Class Query{
           $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
           $processingstmt->execute();
           $processingdata = $processingstmt->fetch(PDO::FETCH_ASSOC);
-    
+
           $ptotal_mc = intval($processingdata['total_mc']) + intval($mc);
         }else{
           $ptotal_mc = intval($mc);
@@ -902,7 +908,7 @@ Class Query{
           $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
           $processingstmt->execute();
           $processingdata = $processingstmt->fetch(PDO::FETCH_ASSOC);
-    
+
           $ptotal_mc = intval($processingdata['total_mc']) + intval($mc);
           $ptotal_kg = intval($processingdata['total_kg']) + intval($kg);
           $pcharges = intval($processingrate) * intval($kg);
@@ -921,7 +927,7 @@ Class Query{
           $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
           $processingstmt->execute();
           $processingdata = $processingstmt->fetch(PDO::FETCH_ASSOC);
-    
+
           $ptotal_mc = intval($processingdata['total_mc']) + intval($mc);
           $ptotal_kg = intval($processingdata['total_kg']) + intval($kg);
           $pcharges = intval($processingrate) * intval($kg);
@@ -996,7 +1002,7 @@ Class Query{
     $totallabourstmt = $pdo->prepare("SELECT * FROM labour  ORDER BY id DESC");
     $totallabourstmt->execute();
     $totallabourdata = $totallabourstmt->fetch(PDO::FETCH_ASSOC);
-    
+
     $totalprocessingstmt = $pdo->prepare("SELECT * FROM processing ORDER BY id DESC");
     $totalprocessingstmt->execute();
     $totalprocessingdata = $totalprocessingstmt->fetch(PDO::FETCH_ASSOC);
