@@ -88,7 +88,7 @@ $query = new Query();
             ?>
             <?php
               $supplier_id = $_GET['supplier_id'];
-              $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' GROUP BY purchase_voucher_no ORDER BY date");
+              $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' GROUP BY purchase_voucher_no");
               $payablestmt->execute();
               $payabledatas = $payablestmt->fetchall();
             ?>
@@ -112,12 +112,31 @@ $query = new Query();
                 $balanceamountstmt->execute();
                 $balanceamount = $balanceamountstmt->fetch(PDO::FETCH_ASSOC);
                 $supplier_name = $query->select('acname', $payabledata['supplier_id'], 'code_no');
-                $linkstmt = $pdo->prepare("SELECT link_id FROM payable WHERE ");
+                $linkstmt = $pdo->prepare("SELECT link_id FROM payable");
                 $link_id = $linkstmt->fetch(PDO::FETCH_ASSOC);
 
                 $totalpurchaseamountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS total_purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no='$purchase_voucher_no'");
                 $totalpurchaseamountstmt->execute();
                 $totalpurchaseamount = $totalpurchaseamountstmt->fetch(PDO::FETCH_ASSOC);
+
+                $nowid = $payabledata['id'];
+                $lastrowstmt = $pdo->prepare("SELECT * FROM payable WHERE id<$nowid ORDER BY id DESC");
+                $lastrowstmt->execute();
+                $lastrowdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
+                if(!empty($lastrowdata)){
+                  if($lastrowdata['balance'] + $payabledata['purchase_amount'] != $payabledata['balance']){
+                    $balance = $lastrowdata['balance'] + $payabledata['purchase_amount'];
+                    $stmt = $pdo->prepare("UPDATE payable SET balance = '$balance' WHERE id = '$nowid'");
+                    $stmt->execute();
+                  }
+                }else{
+                  if($payabledata['purchase_amount'] != $payabledata['balance']){
+                    echo $nowid;
+                    $balance = $payabledata['purchase_amount'];
+                    $stmt = $pdo->prepare("UPDATE payable SET balance = '$balance' WHERE id = '$nowid'");
+                    $stmt->execute();
+                  }
+                }
               ?>
               <tr>
                 <td><?php if($payabledata['date'] != '0000-00-00'){echo date('d-m-Y', strtotime($payabledata['date'])); }; ?></td>
