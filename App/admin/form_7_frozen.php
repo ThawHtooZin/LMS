@@ -84,12 +84,6 @@ $query = new Query();
                 }
                  ?>
               </select>
-              <!-- <button type="submit" name="searchbtn2" class="btn btn-secondary btn-sm float-end me-2">View</button>
-              <select name="type" class="form-control inpv2 w-25 d-inline float-end me-2" style="height:30px !important; padding:0px 5px;">
-                <option value="">Select Type</option>
-                <option value="frozen">Frozen</option>
-                <option value="tcl">TCL</option>
-              </select> -->
             </div>
           </form>
           <div class="card-body">

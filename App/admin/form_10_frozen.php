@@ -59,6 +59,11 @@ $query = new Query();
       $looseoutpcs = $_POST['loose_out_pcs'];
 
       $query->addform10($date, $item_id, $supplier_id, $country, $type, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs);
+
+      $_SESSION['date'] = $date;
+      $_SESSION['supplier_id'] = $supplier_id;
+      $_SESSION['country'] = $country;
+      $_SESSION['item_id'] = $item_id;
     }
 
      ?>
@@ -76,12 +81,6 @@ $query = new Query();
 
                 <b>Link Mark Limited (F-10) Frozen</b>
               <button type="button" class="btn btn-success btn-sm float-end" data-bs-toggle="modal" data-bs-target="#addmodal">Add Form-10 Data</button>
-              <button type="submit" name="searchbtn2" class="btn btn-secondary btn-sm float-end me-2">View</button>
-              <select name="type" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 17% !important; height: 27px !important; padding-top: 1.5px !important;">
-                <option value="">Select Type</option>
-                <option value="frozen">Frozen</option>
-                <option value="tcl">TCL</option>
-              </select>
               <button type="submit" name="view" class="btn btn-secondary btn-sm float-end me-2">View</button>
               <select name="commondity" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
                 <option value="">Select Commondity</option>
@@ -111,6 +110,12 @@ $query = new Query();
                 }
                  ?>
               </select>
+              <?php
+                if(isset($_POST['view']) && !empty($_POST['commondity']) && !empty($_POST['country']) && !empty($_POST['searchdate'])){
+                ?>
+                <a href="export.php?table_name=form10frozen&searchdate=<?php echo $_POST['searchdate'] ?>&country=<?php echo $_POST['country'] ?>&commondity=<?php echo $_POST['commondity'] ?>" type="" class="btn btn-primary btn-sm">Export Excel</a>
+                <?php
+              } ?>
               <input type="date"  name="searchdate" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
             </form>
             </div>
@@ -481,17 +486,15 @@ $query = new Query();
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form action="form_10.php" method="post">
+            <form action="form_10_frozen.php" method="post">
             <div class="modal-body">
               <label>Date</label>
-              <input type="date" name="date" class="form-control inpv2 mb-2">
+              <input type="date" name="date" class="form-control inpv2 mb-2" value="<?php if(!empty($_SESSION['date'])){ echo $_SESSION['date']; } ?>">
               <div class="row">
                 <div class="col">
                   <label>Type</label>
                   <select class="form-control inpv2 mb-2" name="type">
-                    <option>Select Type</option>
-                    <option value="frozen">frozen</option>
-                    <option value="tcl">tcl</option>
+                    <option value="frozen">Frozen</option>
                   </select>
                 </div>
                 <div class="col">
@@ -506,7 +509,7 @@ $query = new Query();
                       $supplierid = $supplier_id_data['supplier_name'];
                       $supplier_name = $query->select('acname', $supplierid, 'code_no');
                       ?>
-                      <option value="<?php echo $supplier_name['code_no']; ?>"><?php echo $supplier_name['ac_name']; ?></option>
+                      <option value="<?php echo $supplier_name['code_no']; ?>" <?php if(!empty($_SESSION['supplier_id'])){ if($_SESSION['supplier_id'] == $supplier_name['code_no']){ echo "selected"; } } ?>><?php echo $supplier_name['ac_name']; ?></option>
                       <?php
                     }
                      ?>
@@ -527,7 +530,7 @@ $query = new Query();
                       $item_id = $form7commonditydata['item_id'];
                       $commonditydata = $query->select('item', $item_id, 'item_id');
                       ?>
-                      <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                      <option value="<?php echo $commonditydata['item_id']; ?>" <?php if(!empty($_SESSION['item_id'])){ if($_SESSION['item_id'] == $commonditydata['item_id']){ echo "selected"; } } ?>><?php echo $commonditydata['item_name']; ?></option>
                       <?php
                     }
                     ?>
@@ -535,7 +538,7 @@ $query = new Query();
                 </div>
                 <div class="col">
                   <label>Country</label>
-                  <input type="text" name="country" class="form-control inpv2 mb-2">
+                  <input type="text" name="country" class="form-control inpv2 mb-2" value="<?php if(!empty($_SESSION['country'])){ echo $_SESSION['country']; } ?>">
                 </div>
               </div>
               <div class="row">

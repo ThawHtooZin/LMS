@@ -2274,6 +2274,172 @@ if($_GET['table_name'] == 'truckpackingmaterial'){
             </table>
   <?php
 }
+
+if ($_GET['table_name'] == "form10frozen") {
+  $commondity_id = $_GET['commondity'];
+  $country = $_GET['country'];
+  $searchdate = $_GET['searchdate'];
+  header("Content-Type: application/xls");
+  header("Content-Disposition: attachment; filename=percentage{$searchdate}.xls");
+  header("Pragma: no-cache");
+  header("Expires: 0");
+  ?>
+  <table>
+    <tr>
+      <th width="800px">
+        <span style="font-weight:bold;">HHK Percentage</span>
+      </th>
+      <th></th>
+      <th>
+        <span style="font-weight:bold;"><?php echo date('d-m-Y', strtotime($_GET['searchdate'])); ?></span>
+      </th>
+    </tr>
+  </table>
+  <table class="table table-hover table-striped table-bordered" border="1">
+    <tr class="text-center">
+      <th rowspan="2">Date</th>
+      <th rowspan="2">Fish Name</th>
+      <th rowspan="2">Supplier Name</th>
+      <th rowspan="2">Country</th>
+      <th rowspan="2">Size</th>
+      <th colspan="4">Raw</th>
+      <th rowspan="2">Date</th>
+      <th colspan="4">Production</th>
+      <th colspan="2">Loose In</th>
+      <th colspan="2">Loose Out</th>
+      <th>Total</th>
+      <th rowspan="2">%</th>
+    </tr>
+    <tr class="text-center">
+      <th>Viss</th>
+      <th>Kg</th>
+      <th>Pcs/vr</th>
+      <th>Pcs/f-7</th>
+      <th>PCS/Form-10</th>
+      <th>MC</th>
+      <th>KG</th>
+      <th>Pcs</th>
+      <th>Kg</th>
+      <th>Pcs</th>
+      <th>Kg</th>
+      <th>Pcs</th>
+      <th>Kg</th>
+    </tr>
+    <?php
+      $stmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
+      $stmt->execute();
+      $datas = $stmt->fetchall();
+      foreach ($datas as $data) {
+        $item_id = $data['item_id'];
+        $lastid = $data['id'];
+        $country = $data['country'];
+        $size = $data['size'];
+        $date = $data['date'];
+        $commonditydata = $query->select('item', $item_id, 'item_id');
+        $supplierid = $data['supplier_id'];
+        $supplier_name = $query->select('acname', $supplierid, 'code_no');
+
+        $form7datastmt = $pdo->prepare("SELECT * FROM form7stock WHERE item_id='$item_id' AND country='$country' AND size='$size' AND supplier_name='$supplierid' AND date<'$date'");
+        $form7datastmt->execute();
+        $form7datas = $form7datastmt->fetch(PDO::FETCH_ASSOC);
+        $itemid = $form7datas['item_id'];
+        $supplierid = $form7datas['supplier_name'];
+        $commonditydata2 = $query->select('item', $itemid, 'item_id');
+        $supplier_name2 = $query->select('acname', $supplierid, 'code_no');
+
+        $checklast = $pdo->prepare("SELECT * FROM form10stock WHERE id < $lastid AND item_id='$item_id' AND size='$size'");
+        $checklast->execute();
+        $checklastavaliable = $checklast->fetch(PDO::FETCH_ASSOC);
+        $lastcommondity = $pdo->prepare("SELECT * FROM form10stock WHERE id < $lastid AND item_id='$item_id'");
+        $lastcommondity->execute();
+        $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
+
+        $checklast2 = $pdo->prepare("SELECT * FROM form7stock WHERE id < $lastid AND item_id='$item_id' AND size='$size'");
+        $checklast2->execute();
+        $checklastavaliable2 = $checklast2->fetch(PDO::FETCH_ASSOC);
+        $lastcommondity2 = $pdo->prepare("SELECT * FROM form7stock WHERE id < $lastid AND item_id='$item_id'");
+        $lastcommondity2->execute();
+        $lastcommondity2 = $lastcommondity2->fetch(PDO::FETCH_ASSOC);
+      ?>
+      <tr>
+        <td><?php if(empty($lastcommondity)){if($form7datas['date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($form7datas['date'])); }} ?></td>
+        <td><?php if(empty($lastcommondity)){  echo $commonditydata2['item_name']; } ?></td>
+        <td><?php if(empty($lastcommondity)){ echo $supplier_name2['ac_name']; } ?></td>
+        <td><?php if(empty($lastcommondity)){ echo $form7datas['country']; } ?></td>
+        <td><?php echo $form7datas['size']; ?></td>
+        <td><?php echo $form7datas['viss']; ?></td>
+        <td><?php echo $form7datas['kg']; ?></td>
+        <td><?php echo $form7datas['pcspervr']; ?></td>
+        <td><?php echo $form7datas['pcsperf7']; ?></td>
+        <td><?php if(empty($lastcommondity)){ echo $data['date']; } ?></td>
+        <td><?php echo $data['pcsform10']; ?></td>
+        <td><?php echo $data['mc']; ?></td>
+        <td><?php echo $data['kg']; ?></td>
+        <td><?php echo $data['pcs']; ?></td>
+        <td><?php echo $data['looseinkg']; ?></td>
+        <td><?php echo $data['looseinpcs']; ?></td>
+        <td><?php echo $data['looseoutkg']; ?></td>
+        <td><?php echo $data['looseoutpcs']; ?></td>
+        <td><?php echo round($data['total_kg'], 2); ?></td>
+        <td></td>
+      </tr>
+      <?php
+      }
+
+      $supplieridstmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
+      $supplieridstmt->execute();
+      $supplierdata = $supplieridstmt->fetch(PDO::FETCH_ASSOC);
+      $supplier_id = $supplierdata['supplier_id'];
+
+      $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id'");
+      $totalf7kgstmt->execute();
+      $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
+
+      $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
+      $totalkgstmt->execute();
+      $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+      $result1 = round($totalkgdata['total_kg'], 2) - round($totalf7kgdata['total_kg'], 2);
+      if(round($totalf7kgdata['total_kg']) == 0){
+        $percentage = "";
+      }else{
+        $result2 = $result1 / round($totalf7kgdata['total_kg'], 2);
+        $percentage = $result2 * 100;
+      }
+
+
+      $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+      $form10pcsstmt->execute();
+      $form10pcsdata = $form10pcsstmt->fetch(PDO::FETCH_ASSOC);
+
+      $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+      $totalkgstmt->execute();
+      $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+
+      $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+      $mcstmt->execute();
+      $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
+
+      $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+      $kgstmt->execute();
+      $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
+      ?>
+      <tr>
+      <td style="font-weight:bold; text-align:center;" colspan="9">Total</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td style="font-weight:bold;"><?php echo round($form10pcsdata['total_form10_pcs'], 2); ?></td>
+      <td style="font-weight:bold;"><?php echo round($mcdata['total_mc'], 2); ?></td>
+      <td style="font-weight:bold;"><?php echo round($kgdata['kg'], 2); ?></td>
+      <td></td>
+      <td style="font-weight:bold;"><?php echo round($totalkgdata['total_kg'], 2); ?></td>
+      <td style="font-weight:bold; <?php if(strpos(round($percentage, 2), '-') !== false){echo 'color:red;';} ?>"><?php echo round($percentage, 2). "%"; ?></td>
+      </tr>
+  </table>
+    <?php
+}
 exit();
 
 
