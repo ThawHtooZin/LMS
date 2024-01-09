@@ -110,13 +110,13 @@ $query = new Query();
                 }
                  ?>
               </select>
+              <input type="date"  name="searchdate" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
               <?php
-                if(isset($_POST['view']) && !empty($_POST['commondity']) && !empty($_POST['country']) && !empty($_POST['searchdate'])){
+              if(isset($_POST['view']) && !empty($_POST['commondity']) && !empty($_POST['country']) && !empty($_POST['searchdate'])){
                 ?>
-                <a href="export.php?table_name=form10frozen&searchdate=<?php echo $_POST['searchdate'] ?>&country=<?php echo $_POST['country'] ?>&commondity=<?php echo $_POST['commondity'] ?>" type="" class="btn btn-primary btn-sm">Export Excel</a>
+                <a href="export.php?table_name=form10frozen&searchdate=<?php echo $_POST['searchdate'] ?>&country=<?php echo $_POST['country'] ?>&commondity=<?php echo $_POST['commondity'] ?>" type="" class="btn btn-primary btn-sm me-2 float-end">Export Excel</a>
                 <?php
               } ?>
-              <input type="date"  name="searchdate" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
             </form>
             </div>
           <div class="card-body">

@@ -146,6 +146,81 @@ $query = new Query();
               }
                ?>
             </table>
+            <div class="modal fade" id="add">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                  <div class="modal-header bg-secondary text-light">
+                    <h1 class="modal-title fs-5">Add Data</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                <form action="hhkmcstock.php" method="post">
+                  <div class="modal-body">
+                    <div class="row">
+                      <div class="col">
+                        <label>Date</label>
+                        <input type="date" name="date" class="form-control inpv2 mb-2">
+                        <label>Commondity</label>
+                        <select class="form-control inpv2 mb-2" name="commondity_id">
+                          <?php
+                          $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
+                          $form7commonditystmt->execute();
+                          $form7commonditydatas = $form7commonditystmt->fetchall();
+                          foreach ($form7commonditydatas as $form7commonditydata) {
+                            $item_id = $form7commonditydata['item_id'];
+                            $commonditydata = $query->select('item', $item_id, 'item_id');
+                            ?>
+                            <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                            <?php
+                          }
+                          ?>
+                        </select>
+                      </div>
+                      <div class="col">
+                        <label>Particular</label>
+                        <textarea name="particular" rows="4" class="form-control inpv2 mb-2">From From-10</textarea>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col">
+                        <label>Country</label>
+                        <select class="form-control inpv2 mb-2" name="country">
+
+                          <?php
+                          $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
+                          $countrystmt->execute();
+                          $countrydatas = $countrystmt->fetchall();
+                          foreach ($countrydatas as $countrydata) {
+                            ?>
+                            <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
+                            <?php
+                          }
+                          ?>
+                        </select>
+                      </div>
+                      <div class="col">
+                        <label>Size</label>
+                        <input type="text" name="size" class="form-control inpv2 mb-2">
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col">
+                        <label>Kg</label>
+                        <input type="text" name="kg" class="form-control inpv2 mb-2">
+                      </div>
+                      <div class="col">
+                        <label>Mc</label>
+                        <input type="number" name="mc" class="form-control inpv2 mb-2">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success" name="addbtn">Add</button>
+                  </div>
+                </form>
+                </div>
+              </div>
+            </div>
             <?php
             }
              ?>

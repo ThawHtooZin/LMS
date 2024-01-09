@@ -2890,17 +2890,22 @@ Class Query{
     $transfermcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transfersize', '$transferkg', '$transfermc', '$balance_mc')");
     $transfermcstmt->execute();
 
+    $linkstmt = $pdo->prepare("SELECT * FROM hhkmcstock ORDER BY id DESC");
+    $linkstmt->execute();
+    $linkdata = $linkstmt->fetch(PDO::FETCH_ASSOC);
+    $linkid = $linkdata['id'];
+
     $gfcmcstmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE kg='$transferkg' AND size='$transfersize' AND commondity_id='$transfercommondity_id' AND country='$transfercountry' ORDER BY id DESC");
     $gfcmcstmt->execute();
     $gfcmcdata = $gfcmcstmt->fetch(PDO::FETCH_ASSOC);
 
     if(!empty($gfcmcdata)){
       $balance_mc_for_gfc = $gfcmcdata['balance_mc'] + $transfermc;
-      $transfertogfcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transfersize', '$transferkg', '$transfermc', '$balance_mc_for_gfc')");
+      $transfertogfcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc, link_id) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transfersize', '$transferkg', '$transfermc', '$balance_mc_for_gfc', '$linkid')");
       $transfertogfcstmt->execute();
     }else{
       $balance_mc_for_gfc = $transfermc;
-      $transfertogfcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transfersize', '$transferkg', '$transfermc', '$balance_mc_for_gfc')");
+      $transfertogfcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc, link_id) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transfersize', '$transferkg', '$transfermc', '$balance_mc_for_gfc', '$linkid')");
       $transfertogfcstmt->execute();
     }
 
@@ -4408,6 +4413,87 @@ Class Query{
     $stmt->execute();
   }
 
+
+  function updatehhkmcstock($newdate, $newparticular, $newcommondity_id, $newsize, $newkg, $newmc, $newcountry, $updateid){
+    global $pdo;
+    $olddatastmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id='$newcommondity_id' AND country='$newcountry' AND size='$newsize' AND id<'$updateid' ORDER BY id DESC");
+    $olddatastmt->execute();
+    $olddatas = $olddatastmt->fetch(PDO::FETCH_ASSOC);
+
+    if(!empty($olddatas)){
+      if (str_contains($newparticular, "from")) {
+        $balance_mc = $olddatas['balance_mc'] + $newmc;
+      }else{
+        $balance_mc = $olddatas['balance_mc'] - $newmc;
+        $gfcolddatastmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id='$newcommondity_id' AND country='$newcountry' AND size='$newsize' AND id<'$updateid' ORDER BY id DESC");
+        $gfcolddatastmt->execute();
+        $gfcolddatas = $gfcolddatastmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!empty($gfcolddatas)) {
+          if (str_contains($newparticular, "from")) {
+            $gfcbalance_mc = $gfcolddatas['balance_mc'] + $newmc;
+          }else{
+            $gfcbalance_mc = $gfcolddatas['balance_mc'] + $newmc;
+          }
+        }else{
+          $gfcbalance_mc = $newmc;
+        }
+        $stmt = $pdo->prepare("UPDATE gfcmcstock SET date='$newdate', particular='$newparticular', commondity_id='$newcommondity_id', size='$newsize', kg='$newkg', mc='$newmc', balance_mc='$gfcbalance_mc' WHERE link_id='$updateid'");
+        $stmt->execute();
+
+        // $countdatastmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id='$newcommondity_id' AND country='$newcountry' AND size='$newsize' AND id>'$updateid' ORDER BY id");
+        // $countdatastmt->execute();
+        // $countdatas = $countdatastmt->fetchall();
+        // foreach ($countdatas as $countdata) {
+        //   $id = $countdata['id'];
+        //   $particular = $countdata['particular'];
+        //   $mc = $countdata['mc'];
+        //   $stmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id='$newcommondity_id' AND country='$newcountry' AND size='$newsize' AND id < '$id' ORDER BY id DESC");
+        //   $stmt->execute();
+        //   $data = $stmt->fetch(PDO::FETCH_ASSOC);
+        //     if (str_contains($particular, "To")) {
+        //       $upbalance_mc = $data['balance_mc'] - $countdata['mc'];
+        //     }elseif(str_contains($particular, "From")){
+        //       $upbalance_mc = $data['balance_mc'] + $countdata['mc'];
+        //     }
+        //   $stmt = $pdo->prepare("UPDATE hhkmcstock SET balance_mc='$upbalance_mc' WHERE id='$id'");
+        //   $stmt->execute();
+        // }
+
+    }
+    }else{
+        $balance_mc = $newmc;
+  }
+  $balancecheckstmt = $pdo->prepare("SELECT SUM(mc) AS totalmc FROM hhkmcstock WHERE commondity_id='$newcommondity_id' AND country='$newcountry' AND size='$newsize' AND id>'$updateid' AND particular LIKE '%to%'");
+  $balancecheckstmt->execute();
+  $balancechecks = $balancecheckstmt->fetch(PDO::FETCH_ASSOC);
+  if ($balancechecks['totalmc'] > $balance_mc) {
+    echo "<script>swal('Error!', 'Sorry, the mc that you edited is more than transfer mc', 'warning');</script>";
+  }else{
+    $stmt = $pdo->prepare("UPDATE hhkmcstock SET date='$newdate', particular='$newparticular', commondity_id='$newcommondity_id', size='$newsize', kg='$newkg', mc='$newmc', balance_mc='$balance_mc' WHERE id='$updateid'");
+    $stmt->execute();
+  }
+
+
+    $countdatastmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id='$newcommondity_id' AND country='$newcountry' AND size='$newsize' AND id>'$updateid' ORDER BY id");
+    $countdatastmt->execute();
+    $countdatas = $countdatastmt->fetchall();
+    foreach ($countdatas as $countdata) {
+      $id = $countdata['id'];
+      $particular = $countdata['particular'];
+      $mc = $countdata['mc'];
+      $stmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id='$newcommondity_id' AND country='$newcountry' AND size='$newsize' AND id < '$id' ORDER BY id DESC");
+      $stmt->execute();
+      $data = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (str_contains($particular, "To")) {
+          $upbalance_mc = $data['balance_mc'] - $countdata['mc'];
+        }elseif(str_contains($particular, "From")){
+          $upbalance_mc = $data['balance_mc'] + $countdata['mc'];
+        }
+      $stmt = $pdo->prepare("UPDATE hhkmcstock SET balance_mc='$upbalance_mc' WHERE id='$id'");
+      $stmt->execute();
+    }
+  }
   // MORE SELECTS
 
   function selectsum($table, $id, $selectwhat){
