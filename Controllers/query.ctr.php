@@ -598,9 +598,10 @@ Class Query{
     }
 
     if($stmt){
-      return $successmessage = "Purchase Voucher Update Successfully";
+      echo '<script>swal("Success!", "Updated Successfully!", "success");</script>';
     }else{
-      return $errmessage = "Error accors when updating Purchase Voucher";
+      return $errmessage = "";
+      echo '<script>swal("Warning!", "Error accors when updating Purchase Voucher", "warning");</script>';
     }
   }
 
