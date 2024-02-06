@@ -578,7 +578,6 @@ Class Query{
     $amount = $price * floatval($viss);
     $stmt = $pdo->prepare("UPDATE $table SET date='$date', voucher_no='$voucher_no', supplier_id='$supplier_name', commodity='$commodity', size='$size', viss='$viss', pcs='$pcs', price='$price', amount='$amount' WHERE no='$no'");
     $stmt->execute();
-
     // $payablebalancestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_name', link_id<'$no' ORDER BY id DESC");
     // $payablebalancestmt->execute();
     // $payablebalancedata = $payablebalancestmt->fetch(PDO::FETCH_ASSOC);
@@ -591,10 +590,10 @@ Class Query{
     $kg = floatval($viss) * 1.634;
 
     if($tclfrozen == 'tcl'){
-      $stmt = $pdo->prepare("UPDATE form7stocktcl SET date='$date', supplier_name='$supplier_name', item_id='$commodity', size='$size', viss='$viss', kg='$kg' WHERE link_id='$no'");
+      $stmt = $pdo->prepare("UPDATE form7stocktcl SET date='$date', supplier_name='$supplier_name', item_id='$commodity', size='$size', viss='$viss', kg='$kg', pcspervr='$pcs' WHERE link_id='$no'");
       $stmt->execute();
     }else{
-      $stmt = $pdo->prepare("UPDATE form7stock SET date='$date', supplier_name='$supplier_name', item_id='$commodity', size='$size', viss='$viss', kg='$kg' WHERE link_id='$no'");
+      $stmt = $pdo->prepare("UPDATE form7stock SET date='$date', supplier_name='$supplier_name', item_id='$commodity', size='$size', viss='$viss', kg='$kg', pcspervr='$pcs' WHERE link_id='$no'");
       $stmt->execute();
     }
 

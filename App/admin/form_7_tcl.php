@@ -332,7 +332,7 @@ $query = new Query();
                      <td><?php echo $supplierdata['ac_name']; ?></td>
                      <td><?php echo $form7data['type']; ?></td>
                      <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php echo $form7data['country']; ?></td>
-                     <td data-bs-toggle="modal" data-bs-target="#addsizemodal<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php echo $form7data['size']; ?></td>
+                     <td data-bs-target="#addsizemodal<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php echo $form7data['size']; ?></td>
                      <td data-bs-toggle="modal" data-bs-target="#adjustvissandcountry<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php echo $form7data['viss']; ?></td>
                      <td><?php if(!empty($form7data['kg'])){echo round($form7data['kg'], 2);}; ?></td>
                      <td><?php echo $form7data['pcspervr']; ?></td>
