@@ -183,7 +183,7 @@ $query = new Query();
       }else{
         $credit = 0;
       }
-      
+
       if(!empty($_POST['sr_no']) && !empty($_POST['container_no'])){
         $sr_no = $_POST['sr_no'];
         $container_no = $_POST['container_no'];
@@ -214,7 +214,7 @@ $query = new Query();
       }else{
         $date = date('Y-m-d', strtotime('-1 day'));
         $query->accepttransaction($date);
-        // echo "<script>swal('Success', 'Accepted Successfully.', 'success');</script>";
+        echo "<script>swal('Success', 'Accepted Successfully.', 'success');</script>";
       }
     }
      ?>
