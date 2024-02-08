@@ -212,8 +212,12 @@ $query = new Query();
       if($totaldebitdata['total'] != $totalcreditdata['total']){
         echo "<script>swal('Dosen\'t Match', 'Debit Credit Dosen\'t Match, Please Check again', 'warning');</script>";
       }else{
-        $date = date('Y-m-d', strtotime('-1 day'));
-        $query->accepttransaction($date);
+        $datestmt = $pdo->prepare("SELECT * FROM transaction GROUP BY `date`");
+        $datestmt->execute();
+        $datesdatas = $datestmt->fetchall();
+        foreach ($datesdatas as $datesdata) {
+          $query->accepttransaction($datesdata['date']);
+        }
         // echo "<script>swal('Success', 'Accepted Successfully.', 'success');</script>";
       }
     }
