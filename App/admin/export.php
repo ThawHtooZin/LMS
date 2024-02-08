@@ -2395,6 +2395,10 @@ if ($_GET['table_name'] == "form10frozen") {
       $totalf7kgstmt->execute();
       $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
 
+      $totalform7pcs = $pdo->prepare("SELECT SUM(pcsperf7) AS totalform7pcs FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id'");
+      $totalform7pcs->execute();
+      $totalform7data = $totalform7pcs->fetch(PDO::FETCH_ASSOC);
+
       $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
       $totalkgstmt->execute();
       $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
@@ -2424,15 +2428,16 @@ if ($_GET['table_name'] == "form10frozen") {
       $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
       ?>
       <tr>
-      <td style="font-weight:bold; text-align:center;" colspan="9">Total</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
+      <td style="font-weight:bold; text-align:center;" colspan="8">Total</td>
+      <td style="font-weight:bold;"><?php echo round($totalform7data['totalform7pcs'], 2); ?></td>
       <td></td>
       <td style="font-weight:bold;"><?php echo round($form10pcsdata['total_form10_pcs'], 2); ?></td>
       <td style="font-weight:bold;"><?php echo round($mcdata['total_mc'], 2); ?></td>
       <td style="font-weight:bold;"><?php echo round($kgdata['kg'], 2); ?></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
       <td></td>
       <td style="font-weight:bold;"><?php echo round($totalkgdata['total_kg'], 2); ?></td>
       <td style="font-weight:bold; <?php if(strpos(round($percentage, 2), '-') !== false){echo 'color:red;';} ?>"><?php echo round($percentage, 2). "%"; ?></td>

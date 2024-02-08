@@ -99,8 +99,8 @@ $query = new Query();
                 <th rowspan="2" style="padding-top: 22px;">Commondity</th>
                 <th rowspan="2" style="padding-top: 22px;">Country</th>
                 <th rowspan="2" style="padding-top: 22px;">Size</th>
-                <th rowspan="2" style="padding-top: 22px;">Kg</th>
                 <th rowspan="2" style="padding-top: 22px;">Mc</th>
+                <th rowspan="2" style="padding-top: 22px;">Kg</th>
                 <th rowspan="2" class="text-center" style="padding-top: 15px !important;">Balance <br>Mc</th>
                 <th colspan="3" style="text-align: center;">Loose In</th>
                 <th colspan="3" style="text-align: center;">Loose Out</th>
@@ -138,8 +138,8 @@ $query = new Query();
                 <td><?php echo $commonditydata['item_name']; ?></td>
                 <td><?php echo $sizeinfodata['country'];?></td>
                 <td><?php echo $sizeinfodata['size'];?></td>
-                <td><?php echo $sizeinfodata['kg'];?></td>
                 <td><?php echo $sizeinfodata['mc']; ?></td>
+                <td><?php echo $sizeinfodata['kg'];?></td>
                 <td><?php echo $sizeinfodata['balance_mc']; ?></td>
                 <td data-bs-toggle="modal" data-bs-target="#loosemodal<?= $sizeinfodata['id']; ?>"><?php echo $sizeinfodata['loosein_size']; ?></td>
                 <td data-bs-toggle="modal" data-bs-target="#loosemodal<?= $sizeinfodata['id']; ?>"><?php echo $sizeinfodata['loosein_kg']; ?></td>

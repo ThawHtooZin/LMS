@@ -44,7 +44,7 @@ $query = new Query();
       $transfermc = $_POST['transfermc'];
       $transfercountry = $_POST['transfercountry'];
 
-      $transfercheckstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE size='$transfersize' AND country='$transfercountry' AND commondity_id='$transfercommondity_id' ORDER BY id DESC");
+      $transfercheckstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE size='$transfersize' AND country='$transfercountry' AND commondity_id='$transfercommondity_id' AND  particular LIKE '%From%'");
       $transfercheckstmt->execute();
       $transfercheck = $transfercheckstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -92,24 +92,24 @@ $query = new Query();
             <form class="d-inline" action="hhkmcstock.php" method="post">
             <button type="submit" class="btn btn-primary float-end me-2" name="searchcommonditybtn">View</button>
             <?php
-            $commonditystmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country = :country");
+            $commonditystmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country = :country GROUP BY commondity_id");
             $commonditystmt->bindParam(':country', $_SESSION['tabs']);
             $commonditystmt->execute();
             $searchcommon = $commonditystmt->fetchall();
             ?>
             <select class="inpv2 form-control w-25 d-inline me-2 float-end" name="search">
-              <?php foreach ($searchcommon as $commondity_id): ?>
+              <?php foreach ($searchcommon as $commondity_id):
+                $item_id = $commondity_id['commondity_id'];
+                $commonditydata = $query->select('item', $item_id, 'item_id');
+               ?>
                 <?php if (!empty($commondity_id['country'])): ?>
-                  <option value="<?php echo $commondity_id['commondity_id'];?>"><?php echo $commondity_id['commondity_id'];?></option>
+                  <option value="<?php echo $commonditydata['item_id'];?>"><?php echo $commonditydata['item_name'];?></option>
                 <?php else: ?>
                   <option value=""></option>
                 <?php endif; ?>
               <?php endforeach; ?>
             </select>
           </form>
-            <?php
-            echo $_SESSION['tabs'];
-             ?>
           </div>
           <div class="card-body">
             <?php
@@ -146,7 +146,7 @@ $query = new Query();
               $country = $countrydata['country'];
               if (isset($_POST['searchcommonditybtn']) && !empty($_POST['search'])) {
                 $searchcommondity = $_POST['search'];
-                $searchcommonditystmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country = :country AND commondity_id='$searchcommondity'");
+                $searchcommonditystmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country = :country AND commondity_id='$searchcommondity' GROUP BY commondity_id,size");
                 $searchcommonditystmt->bindParam(':country', $_SESSION['tabs']);
                 $searchcommonditystmt->execute();
                 $datas = $searchcommonditystmt->fetchall();
