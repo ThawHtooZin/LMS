@@ -202,10 +202,10 @@ $query = new Query();
     }
     if(isset($_POST['accept'])){
       $date = date('Y-m-d', strtotime('-1 day'));
-      $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total FROM transaction WHERE date='$date'");
+      $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total FROM transaction");
       $totaldebitstmt->execute();
       $totaldebitdata = $totaldebitstmt->fetch(PDO::FETCH_ASSOC);
-      $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total FROM transaction WHERE date='$date'");
+      $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total FROM transaction");
       $totalcreditstmt->execute();
       $totalcreditdata = $totalcreditstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -252,7 +252,14 @@ $query = new Query();
                 </div>
                 <div class="col">
                   <label>A/C Code</label>
-                  <input type="text" id="addac_code" name="addac_code" class="form-control inpv2 mb-1" value="<?php if(!empty($_SESSION['addac_code'])){echo $_SESSION['addac_code']; } ?>" style="padding-top: 2px; padding-bottom: 2px;">
+                  <div class="d-flex">
+                    <input type="text" id="addac_code" name="addac_code" class="form-control inpv2 mb-1" value="<?php if(!empty($_SESSION['addac_code'])){echo $_SESSION['addac_code']; } ?>" style="padding-top: 2px; padding-bottom: 2px; width:90%;">
+                    <a href="acname.php" target="_blank" style="width: 10%; color:black; text-align: center; margin-left: 8px; border: 1px solid black; border-radius: 5px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                      <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                    </svg>
+                  </a>
+                  </div>
                 </div>
                 <div class="col">
                   <label>A/C Name</label>
@@ -310,8 +317,7 @@ $query = new Query();
                 <th>Credit</th>
               </tr>
               <?php
-              $date = date('Y-m-d', strtotime('-1 day'));
-              $stmt = $pdo->prepare("SELECT * FROM transaction WHERE date='$date'");
+              $stmt = $pdo->prepare("SELECT * FROM transaction");
               $stmt->execute();
               $datas = $stmt->fetchall();
               $no = 0;
@@ -367,7 +373,12 @@ $query = new Query();
                           </div>
                           <div class="col">
                             <label>A/C Code</label>
-                            <input type="text" name="ac_code" id="upac_code<?php echo $data['id']; ?>" class="form-control inpv2 mb-1" value="<?php echo $updata['ac_code']; ?>" style="padding-top: 2px; padding-bottom: 2px;">
+                            <input type="text" name="ac_code" id="upac_code<?php echo $data['id']; ?>" class="form-control inpv2 mb-1" value="<?php echo $updata['ac_code']; ?>" style="padding-top: 2px; padding-bottom: 2px; width: 90%;">
+                            <a href="acname.php" target="_blank" style="width: 10%; color:black; text-align: center; margin-left: 8px; border: 1px solid black; border-radius: 5px;">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                              </svg>
+                            </a>
                           </div>
                           <div class="col">
                             <label>A/C Name</label>
@@ -491,10 +502,10 @@ $query = new Query();
                   </script>
                 <?php
               }
-              $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total FROM transaction WHERE date='$date'");
+              $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total FROM transaction");
               $totaldebitstmt->execute();
               $totaldebitdata = $totaldebitstmt->fetch(PDO::FETCH_ASSOC);
-              $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total FROM transaction WHERE date='$date'");
+              $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total FROM transaction");
               $totalcreditstmt->execute();
               $totalcreditdata = $totalcreditstmt->fetch(PDO::FETCH_ASSOC);
                ?>

@@ -331,17 +331,19 @@ $query = new Query();
                           }
 
                           if(strtolower($fishcoldstoredata['ite']) == 'takeout'){
-                            $chargeslastrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$nowid' ORDER BY id DESC");
-                            $chargeslastrowstmt->execute();
-                            $chargeslastrowdata = $chargeslastrowstmt->fetch(PDO::FETCH_ASSOC);
-                            if(!empty($chargeslastrowdata)){
-                              $coldstorecharges2 = $chargeslastrowdata['total_kg'] * $fishcoldstoredata['rate'];
-                            }else{
-                              $coldstorecharges2 = $fishcoldstoredata['total_kg'] * $fishcoldstoredata['rate'];
+                            if( 1 == 1){
+                              $chargeslastrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$nowid' ORDER BY id DESC");
+                              $chargeslastrowstmt->execute();
+                              $chargeslastrowdata = $chargeslastrowstmt->fetch(PDO::FETCH_ASSOC);
+                              if(!empty($chargeslastrowdata)){
+                                $coldstorecharges2 = $chargeslastrowdata['total_kg'] * $fishcoldstoredata['rate'];
+                              }else{
+                                $coldstorecharges2 = $fishcoldstoredata['total_kg'] * $fishcoldstoredata['rate'];
+                              }
+                              $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET charges='$coldstorecharges2' WHERE id='$nowid' AND
+                                ite='takeout' && charges!='0'");
+                                $updatestmt->execute();
                             }
-                            $updatestmt = $pdo->prepare("UPDATE gfcfishcoldstore SET charges='$coldstorecharges2' WHERE id='$nowid' AND
-                              ite='takeout' && charges!='0'");
-                              $updatestmt->execute();
                           }elseif($fishcoldstoredata['ite'] == 'export'){
                             $chargeslastrowstmt = $pdo->prepare("SELECT * FROM gfcfishcoldstore WHERE id<'$nowid' ORDER BY id DESC");
                             $chargeslastrowstmt->execute();
@@ -380,8 +382,6 @@ $query = new Query();
                         $updatestmt->execute();
                       }
                     }
-                  }else{
-
                   }
 
                  ?>

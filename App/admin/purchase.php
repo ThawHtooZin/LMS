@@ -308,12 +308,19 @@ $query = new Query();
                           <div class="col-6">
                             <label style="font-weight: bold;">Supplier A/C Code</label>
                             <div class="row">
-                              <div class="col-6">
+                              <div style="width: 40%;">
                                 <input type="text" name="upsupplier_code_no" id="upac_code<?php echo $data['id']; ?>" class="form-control inpv2 mb-1" value="<?php echo $updatedata['supplier_id']; ?>" style="padding-top: 2px; padding-bottom: 2px;">
+                              </div>
+                              <div style="width: 10%;">
+                                <a href="supplier.php" target="_blank" style="width: 10%; padding: 2.5px; color:black; text-align: center;">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                                  </svg>
+                                </a>
                               </div>
                               <div class="col-6">
                                 <div id='ac_name'>
-                                  <input type="text" name="ac_name" disabled class="form-control inpv2 mb-1" value="<?php if($ac_name != ''){echo $ac_name;} ?>" style="padding-top: 2px; padding-bottom: 2px;">
+                                  <input type="text" name="ac_name" disabled class="form-control inpv2 mb-1" value="<?php if($ac_name != ''){echo $ac_name;} ?>" style="padding-top: 2px; padding-bottom: 2px; width:90% !important;">
                                 </div>
                               </div>
                             </div>
@@ -503,9 +510,16 @@ $query = new Query();
               <div class="col-6">
                 <label style="font-weight: bold;">Supplier A/C Code</label>
                 <div class="row">
-                  <div class="col-6">
+                  <div style="width: 40%;">
                     <input type="text" id="addac_code" name="supplier_code_no" class="form-control inpv2 mb-1" style="padding-top: 2px; padding-bottom: 2px;" value="<?php if(!empty($_SESSION['purchase_supplier_name'])){echo $_SESSION['purchase_supplier_name']; }; ?>">
                     </div>
+                  <div style="width: 10%;">
+                    <a href="supplier.php" target="_blank" style="width: 10%; padding: 2.5px; color:black; text-align: center;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                      </svg>
+                    </a>
+                  </div>
                   <div class="col-6">
                     <div id='addac_name'>
                       <input type="text" name="addac_name" disabled class="form-control inpv2 mb-1" style="padding-top: 2px; padding-bottom: 2px;">

@@ -59,16 +59,16 @@ $query = new Query();
           <div class="card-header bg-info text-light">
             <b style="font-size:18px;">Manage A/C Name</b>
             <form class="d-inline" action="" method="post">
-              <select class="chzn-select" name="searchac_code" style="width:15%;" data-placeholder="Supplier Name">
+              <select class="chzn-select" name="searchac_code" style="width:20%;" data-placeholder="Supplier Name">
                 <?php
-                $actypestmt = $pdo->prepare("SELECT DISTINCT ac_type FROM acname");
+                $actypestmt = $pdo->prepare("SELECT * FROM acname GROUP BY code_no");
                 $actypestmt->execute();
                 $actypes = $actypestmt->fetchall();
 
                 foreach ($actypes as $actype) {
-                  $ac_name = $query->select('actype', $actype['ac_type'], 'acid');
+                  $ac_name = $query->select('acname', $actype['code_no'], 'code_no');
                   ?>
-                  <option value="<?php echo $ac_name['acid']; ?>"><?php echo $ac_name['ac_type']; ?></option>
+                  <option value="<?php echo $actype['code_no']; ?>"><?php echo $actype['code_no']; ?>-<?php echo $ac_name['ac_name']; ?></option>
                   <?php
                 }
                 ?>
@@ -89,7 +89,7 @@ $query = new Query();
               if(isset($_POST['searchbtn'])){
                 $searchac_code = $_POST['searchac_code'];
 
-                $datas = $query->selectcontain('acname', 'ac_type', $searchac_code);
+                $datas = $query->selectcontain('acname', 'code_no', $searchac_code);
 
               }else{
                 $stmt = $pdo->prepare("SELECT * FROM acname order by ac_type");
