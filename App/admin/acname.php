@@ -60,6 +60,7 @@ $query = new Query();
             <b style="font-size:18px;">Manage A/C Name</b>
             <form class="d-inline" action="" method="post">
               <select class="chzn-select" name="searchac_code" style="width:20%;" data-placeholder="Supplier Name">
+              <option value="">Select A/C Name</option>
                 <?php
                 $actypestmt = $pdo->prepare("SELECT * FROM acname GROUP BY code_no");
                 $actypestmt->execute();
