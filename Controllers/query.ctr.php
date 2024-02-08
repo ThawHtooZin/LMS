@@ -578,24 +578,34 @@ Class Query{
     $amount = $price * floatval($viss);
     $stmt = $pdo->prepare("UPDATE $table SET date='$date', voucher_no='$voucher_no', supplier_id='$supplier_name', commodity='$commodity', size='$size', viss='$viss', pcs='$pcs', price='$price', amount='$amount' WHERE no='$no'");
     $stmt->execute();
+<<<<<<< HEAD
 
+=======
+    // $payablebalancestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_name', link_id<'$no' ORDER BY id DESC");
+    // $payablebalancestmt->execute();
+    // $payablebalancedata = $payablebalancestmt->fetch(PDO::FETCH_ASSOC);
+    //
+    // print_r($payablebalancedata['balance']);
+    // exit
+>>>>>>> 6aa86c41c5c5d44e75751b985b24720502e04ea3
     $stmt = $pdo->prepare("UPDATE payable SET date='$date', purchase_voucher_no='$voucher_no', supplier_id='$supplier_name', purchase_amount='$amount' WHERE link_id='$no'");
     $stmt->execute();
 
     $kg = floatval($viss) * 1.634;
 
     if($tclfrozen == 'tcl'){
-      $stmt = $pdo->prepare("UPDATE form7stocktcl SET date='$date', supplier_name='$supplier_name', item_id='$commodity', size='$size', viss='$viss', kg='$kg' WHERE link_id='$no'");
+      $stmt = $pdo->prepare("UPDATE form7stocktcl SET date='$date', supplier_name='$supplier_name', item_id='$commodity', size='$size', viss='$viss', kg='$kg', pcspervr='$pcs' WHERE link_id='$no'");
       $stmt->execute();
     }else{
-      $stmt = $pdo->prepare("UPDATE form7stock SET date='$date', supplier_name='$supplier_name', item_id='$commodity', size='$size', viss='$viss', kg='$kg' WHERE link_id='$no'");
+      $stmt = $pdo->prepare("UPDATE form7stock SET date='$date', supplier_name='$supplier_name', item_id='$commodity', size='$size', viss='$viss', kg='$kg', pcspervr='$pcs' WHERE link_id='$no'");
       $stmt->execute();
     }
 
     if($stmt){
-      return $successmessage = "Purchase Voucher Update Successfully";
+      echo '<script>swal("Success!", "Updated Successfully!", "success");</script>';
     }else{
-      return $errmessage = "Error accors when updating Purchase Voucher";
+      return $errmessage = "";
+      echo '<script>swal("Warning!", "Error accors when updating Purchase Voucher", "warning");</script>';
     }
   }
 

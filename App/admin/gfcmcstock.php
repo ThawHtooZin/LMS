@@ -54,6 +54,17 @@ $query = new Query();
         echo '<script>swal("Sorry!", "Not Enough Mc!", "warning");</script>';
       }
     }
+
+    $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
+    $countrystmt->execute();
+    $countrydatas = $countrystmt->fetchall();
+
+    foreach ($countrydatas as $countrydata) {
+      $btnname = $countrydata['country'] . "btn";
+      if(isset($_POST[$btnname])){
+        $_SESSION['tabs'] = $countrydata['country'];
+      }
+    }
      ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
@@ -67,7 +78,28 @@ $query = new Query();
           <div class="card-header bg-info">
 
             <h5 style="font-weight:bold;" class="text-light d-inline">GFC MC STOCK</h5>
-            <button type="button" class="btn btn-danger float-end ms-2" data-bs-toggle="modal" data-bs-target="#export">Export Mc</button>
+            <button type="button" class="btn btn-danger float-end" data-bs-toggle="modal" data-bs-target="#export">Export Mc</button>
+            <form class="d-inline" action="gfcmcstock.php" method="post">
+            <button type="submit" class="btn btn-primary float-end me-2" name="searchcommonditybtn">View</button>
+            <?php
+            $commonditystmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE country = :country GROUP BY commondity_id");
+            $commonditystmt->bindParam(':country', $_SESSION['tabs']);
+            $commonditystmt->execute();
+            $searchcommon = $commonditystmt->fetchall();
+            ?>
+            <select class="inpv2 form-control w-25 d-inline me-2 float-end" name="search">
+              <?php foreach ($searchcommon as $commondity_id):
+                $item_id = $commondity_id['commondity_id'];
+                $commonditydata = $query->select('item', $item_id, 'item_id');
+               ?>
+                <?php if (!empty($commondity_id)): ?>
+                  <option value="<?php echo $commonditydata['item_id'];?>"><?php echo $commonditydata['item_name'];?></option>
+                <?php else: ?>
+                  <option value=""></option>
+                <?php endif; ?>
+              <?php endforeach; ?>
+            </select>
+          </form>
           </div>
           <div class="card-body">
             <?php
@@ -103,9 +135,17 @@ $query = new Query();
               </tr>
               <?php
               $country = $countrydata['country'];
-              $stmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE country='$country' GROUP BY commondity_id,size");
-              $stmt->execute();
-              $datas = $stmt->fetchall();
+              if (isset($_POST['searchcommonditybtn']) && !empty($_POST['search'])) {
+                $searchcommondity = $_POST['search'];
+                $searchcommonditystmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE country = :country AND commondity_id='$searchcommondity' GROUP BY commondity_id,size");
+                $searchcommonditystmt->bindParam(':country', $_SESSION['tabs']);
+                $searchcommonditystmt->execute();
+                $datas = $searchcommonditystmt->fetchall();
+              }else{
+                $stmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE country='$country' GROUP BY commondity_id,size");
+                $stmt->execute();
+                $datas = $stmt->fetchall();
+              }
               foreach ($datas as $gfcstockdata) {
                 $item_id = $gfcstockdata['commondity_id'];
                 $commonditydata = $query->select('item', $item_id, 'item_id');
