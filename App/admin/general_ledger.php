@@ -242,8 +242,10 @@ $query = new Query();
                   $debitorcredit = 'credit';
                 }
 
-                $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='$debitorcredit'");
-                $currencystmt->execute();
+                $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit'");
+                $currencystmt->execute(
+                  array(':voucher_no' => $voucher_no )
+                );
                 $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
 
                 // acnamechange
