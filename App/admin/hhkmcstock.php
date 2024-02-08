@@ -44,7 +44,7 @@ $query = new Query();
       $transfermc = $_POST['transfermc'];
       $transfercountry = $_POST['transfercountry'];
 
-      $transfercheckstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE size='$transfersize' AND country='$transfercountry' AND commondity_id='$transfercommondity_id' ORDER BY id DESC");
+      $transfercheckstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE size='$transfersize' AND country='$transfercountry' AND commondity_id='$transfercommondity_id' AND  particular LIKE '%From%'");
       $transfercheckstmt->execute();
       $transfercheck = $transfercheckstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -78,6 +78,10 @@ $query = new Query();
             <h5 style="font-weight:bold;" class="text-light d-inline">HHK MC STOCK</h5>
             <button type="button" class="btn btn-danger float-end ms-2" data-bs-toggle="modal" data-bs-target="#transfer">Transfer Mc</button>
             <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#add">Add Mc Data</button>
+            <button type="button" class="btn btn-primary float-end me-2 ms-2">View</button>
+            <select class="form-control inpv2 w-25 d-inline float-end" name="searchcommondity">
+
+            </select>
           </div>
           <div class="card-body">
             <?php

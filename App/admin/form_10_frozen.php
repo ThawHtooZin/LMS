@@ -221,6 +221,7 @@ $query = new Query();
                 }
 
 
+
                 $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
                 $form10pcsstmt->execute();
                 $form10pcsdata = $form10pcsstmt->fetch(PDO::FETCH_ASSOC);
