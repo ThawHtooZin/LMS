@@ -28,7 +28,11 @@ $query = new Query();
       $actype = $_POST['ac_type'];
       $acname = $_POST['ac_name'];
 
-      $query->addacname($code_no, $actype, $acname);
+      if(!str_contains($code_no, '4000/')){
+        $query->addacname($code_no, $actype, $acname);
+      }else{
+        echo "<script>swal('Warning!', 'Please create supplier in the Supplier page!', 'warning');</script>";
+      }
     }
 
     if(isset($_POST['updatebutton'])){
@@ -59,7 +63,22 @@ $query = new Query();
           <div class="card-header bg-info text-light">
             <b style="font-size:18px;">Manage A/C Name</b>
             <form class="d-inline" action="" method="post">
-              <select class="chzn-select" name="searchac_code" style="width:20%;" data-placeholder="Supplier Name">
+              <select class="chzn-select" name="searchac_code1" style="width:20%;" data-placeholder="Supplier Name">
+              <option value="">Select A/C Id</option>
+                <?php
+                $actypestmt = $pdo->prepare("SELECT * FROM acname GROUP BY code_no");
+                $actypestmt->execute();
+                $actypes = $actypestmt->fetchall();
+
+                foreach ($actypes as $actype) {
+                  $ac_name = $query->select('acname', $actype['code_no'], 'code_no');
+                  ?>
+                  <option value="<?php echo $actype['code_no']; ?>"><?php echo $actype['code_no']; ?></option>
+                  <?php
+                }
+                ?>
+              </select>
+              <select class="chzn-select" name="searchac_code2" style="width:20%;" data-placeholder="Supplier Name">
               <option value="">Select A/C Name</option>
                 <?php
                 $actypestmt = $pdo->prepare("SELECT * FROM acname GROUP BY code_no");
@@ -69,7 +88,7 @@ $query = new Query();
                 foreach ($actypes as $actype) {
                   $ac_name = $query->select('acname', $actype['code_no'], 'code_no');
                   ?>
-                  <option value="<?php echo $actype['code_no']; ?>"><?php echo $actype['code_no']; ?>-<?php echo $ac_name['ac_name']; ?></option>
+                  <option value="<?php echo $actype['code_no']; ?>"><?php echo $ac_name['ac_name']; ?></option>
                   <?php
                 }
                 ?>
@@ -88,8 +107,18 @@ $query = new Query();
               </tr>
               <?php
               if(isset($_POST['searchbtn'])){
-                $searchac_code = $_POST['searchac_code'];
+                $searchac_code1 = $_POST['searchac_code1'];
+                $searchac_code2 = $_POST['searchac_code2'];
+                if(empty($searchac_code1)){
+                  $searchac_code = $searchac_code2;
+                }
+                if(empty($searchac_code2)){
+                  $searchac_code = $searchac_code1;
+                }
 
+                if(!empty($searchac_code2) && !empty($searchac_code1)){
+                  $searchac_code = '';
+                }
                 $datas = $query->selectcontain('acname', 'code_no', $searchac_code);
 
               }else{
