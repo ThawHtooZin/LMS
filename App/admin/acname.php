@@ -93,9 +93,17 @@ $query = new Query();
                 }
                 ?>
               </select>
-              <button type="submit" name="searchbtn" class="btn btn-success btn-sm">Search</button>
+               <button type="submit" name="searchbtn" class="btn btn-success btn-sm">Search</button>
             </form>
             <button type="button" class="btn btn-secondary btn-sm float-end text-light" data-bs-toggle="modal" data-bs-target="#addmodal">Add A/C Name</button>
+            <?php
+            if (!empty($_GET['fromtransaction'])) {
+              ?>
+              <a href="transaction.php" class="btn btn-danger btn-sm float-end me-2">Back</a>
+
+              <?php
+            }
+             ?>
           </div>
           <div class="card-body">
             <table class="table table-bodrder table-hover table-striped">
