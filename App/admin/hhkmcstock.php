@@ -63,7 +63,7 @@ $query = new Query();
       }
     }
 
-    $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
+    $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM hhkmcstock WHERE country IS NOT NULL");
     $countrystmt->execute();
     $countrydatas = $countrystmt->fetchall();
     foreach ($countrydatas as $countrydata) {
@@ -73,6 +73,32 @@ $query = new Query();
       }
     }
 
+     ?>
+     <script>
+      $(document).ready(()=>{
+        $('#commondityid2').hide();
+        $('#particular').on('keyup', ()=>{
+          var particular = $('#particular').val();
+          if(particular.includes('balance') || particular.includes('Balance')){
+            $('#commondityid2').show();
+            $('#commondityid1').hide();
+            $('#country2').show();
+            $('#country1').hide();
+          }else{
+            $('#commondityid2').hide();
+            $('#commondityid1').show();
+            $('#country2').hide();
+            $('#country1').show();
+          }
+        });
+        // $('#commondityid2').hide();
+        // $('#country2').hide();
+      });
+     </script>
+     <?php
+     $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM hhkmcstock WHERE country IS NOT NULL");
+     $countrystmt->execute();
+     $countrydatas = $countrystmt->fetchall();
      ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
@@ -88,7 +114,17 @@ $query = new Query();
 
             <h5 style="font-weight:bold;" class="text-light d-inline">HHK MC STOCK</h5>
             <button type="button" class="btn btn-danger float-end ms-2" data-bs-toggle="modal" data-bs-target="#transfer">Transfer Mc</button>
-            <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#add">Add Mc Data</button>
+            <?php
+              if(!empty($countrydatas)){
+                ?>
+                  <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#add">Add Mc Data</button>
+                <?php
+              }else{
+                ?>
+                  <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#add2">Add Mc Data</button>
+                <?php
+              }
+            ?>
             <form class="d-inline" action="hhkmcstock.php" method="post">
             <button type="submit" class="btn btn-primary float-end me-2" name="searchcommonditybtn">View</button>
             <?php
@@ -113,12 +149,10 @@ $query = new Query();
           </div>
           <div class="card-body">
             <?php
+            echo $_SESSION['tabs'];
              ?>
             <form action="" method="post" class="text-center">
               <?php
-              $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
-              $countrystmt->execute();
-              $countrydatas = $countrystmt->fetchall();
               foreach ($countrydatas as $countrydata) {
                 $btnname = $countrydata['country'] . "btn";
                 if(isset($_POST[$btnname])){
@@ -134,7 +168,7 @@ $query = new Query();
             <?php
             foreach ($countrydatas as $countrydata) {
              ?>
-            <table class="table table-hover table-bordered table-striped hide" id="<?php echo $countrydata['country']; ?>table">
+            <table class="table table-hover table-bordered table-striped" id="<?php echo $countrydata['country']; ?>table">
               <tr>
                 <th>Commondity</th>
                 <th>Country</th>
@@ -200,9 +234,23 @@ $query = new Query();
                         <label>Date</label>
                         <input type="date" name="date" class="form-control inpv2 mb-2">
                         <label>Commondity</label>
-                        <select class="form-control inpv2 mb-2" name="commondity_id">
+                        <select class="form-control inpv2 mb-2" name="commondity_id" id="commondityid1">
                           <?php
                           $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
+                          $form7commonditystmt->execute();
+                          $form7commonditydatas = $form7commonditystmt->fetchall();
+                          foreach ($form7commonditydatas as $form7commonditydata) {
+                            $item_id = $form7commonditydata['item_id'];
+                            $commonditydata = $query->select('item', $item_id, 'item_id');
+                            ?>
+                            <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                            <?php
+                          }
+                          ?>
+                        </select>
+                        <select class="form-control inpv2 mb-2" name="commondity_id" id="commondityid2">
+                          <?php
+                          $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM item");
                           $form7commonditystmt->execute();
                           $form7commonditydatas = $form7commonditystmt->fetchall();
                           foreach ($form7commonditydatas as $form7commonditydata) {
@@ -217,13 +265,14 @@ $query = new Query();
                       </div>
                       <div class="col">
                         <label>Particular</label>
-                        <textarea name="particular" rows="4" class="form-control inpv2 mb-2">From From-10</textarea>
+                        <textarea name="particular" rows="4" class="form-control inpv2 mb-2" id="particular">From From-10</textarea>
                       </div>
                     </div>
                     <div class="row">
                       <div class="col">
                         <label>Country</label>
-                        <select class="form-control inpv2 mb-2" name="country">
+                        <select class="form-control inpv2 mb-2" name="country" id="country1">
+                        <select class="form-control inpv2 mb-2" name="country" id="country2">
 
                           <?php
                           $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
@@ -268,7 +317,7 @@ $query = new Query();
         </div>
       </div>
     </div>
-    <div class="modal fade" id="add">
+    <div class="modal fade" id="add2">
       <div class="modal-dialog" role="document">
         <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
           <div class="modal-header bg-secondary text-light">
@@ -282,9 +331,23 @@ $query = new Query();
                 <label>Date</label>
                 <input type="date" name="date" class="form-control inpv2 mb-2">
                 <label>Commondity</label>
-                <select class="form-control inpv2 mb-2" name="commondity_id">
+                <select class="form-control inpv2 mb-2" name="commondity_id" id="commondityid1">
                   <?php
                   $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
+                  $form7commonditystmt->execute();
+                  $form7commonditydatas = $form7commonditystmt->fetchall();
+                  foreach ($form7commonditydatas as $form7commonditydata) {
+                    $item_id = $form7commonditydata['item_id'];
+                    $commonditydata = $query->select('item', $item_id, 'item_id');
+                    ?>
+                    <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                    <?php
+                  }
+                  ?>
+                </select>
+                <select class="form-control inpv2 mb-2" name="commondity_id" id="commondityid2">
+                  <?php
+                  $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM item");
                   $form7commonditystmt->execute();
                   $form7commonditydatas = $form7commonditystmt->fetchall();
                   foreach ($form7commonditydatas as $form7commonditydata) {
@@ -299,14 +362,13 @@ $query = new Query();
               </div>
               <div class="col">
                 <label>Particular</label>
-                <textarea name="particular" rows="4" class="form-control inpv2 mb-2">From From-10</textarea>
+                <textarea name="particular" rows="4" class="form-control inpv2 mb-2" id="particular">From From-10</textarea>
               </div>
             </div>
             <div class="row">
               <div class="col">
                 <label>Country</label>
-                <select class="form-control inpv2 mb-2" name="country">
-
+                <select class="form-control inpv2 mb-2" name="country" id="country1">
                   <?php
                   $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
                   $countrystmt->execute();
@@ -318,6 +380,7 @@ $query = new Query();
                   }
                   ?>
                 </select>
+                <input type="text" name="country" id="country2" class="form-control inpv2">
               </div>
               <div class="col">
                 <label>Size</label>
@@ -420,7 +483,7 @@ $query = new Query();
     </div>
 
     <script type="text/javascript">
-    <?php
+      <?php
       foreach ($countrydatas as $countrydata) {
         if($_SESSION['tabs'] == $countrydata['country']){
           echo "show" . $countrydata['country'] . "();";

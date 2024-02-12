@@ -4408,6 +4408,23 @@ Class Query{
     $stmt->execute();
   }
 
+  function addtotalremark($remarkid, $remark) {
+    global $pdo;
+    
+    $stmt = $pdo->prepare("UPDATE gfctotal SET remark='$remark' WHERE id='$remarkid'");
+    $stmt->execute();
+  }
+
+  function waterkg($waterkgid, $waterkg) {
+    global $pdo;
+
+    $data = $this->select('form7stock', $waterkgid, 'id');
+    
+    $kg = ($data['viss'] * 1.634) - $waterkg;
+    $stmt = $pdo->prepare("UPDATE form7stock SET water_kg='$waterkg', kg='$kg' WHERE id='$waterkgid'");
+    $stmt->execute();
+  }
+
   // MORE SELECTS
 
   function selectsum($table, $id, $selectwhat){

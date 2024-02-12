@@ -146,6 +146,14 @@ $query = new Query();
       $deletedate = $_POST['deletedatedryfish'];
       $query->deletedryfish($deletedate);
     }
+
+    // Remark of Total
+    if(isset($_POST['addremark'])){
+      $remarkid = $_POST['remarkid'];
+      $remark = $_POST['remark'];
+
+      $query->addtotalremark($remarkid, $remark);
+    }
      ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
@@ -1000,6 +1008,7 @@ $query = new Query();
                   <th style="font-size:13px;" class="text-center">Payment Date</th>
                   <th style="font-size:13px;" class="text-center">Payment Amount</th>
                   <th style="font-size:13px;" class="text-center">Balance Amount</th>
+                  <th style="font-size:13px;" class="text-center">Remark</th>
                 </tr>
                 <?php
                 $totaldatas = $query->selectall('gfctotal');
@@ -1019,6 +1028,7 @@ $query = new Query();
                     <td style="font-size:13px;"><?php if($totaldata['payment_date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($totaldata['payment_date'])); }; ?></td>
                     <td style="font-size:13px;"><?php if($totaldata['payment_amount'] != "0"){ echo $totaldata['payment_amount']; }; ?></td>
                     <td style="font-size:13px;"><?php echo $totaldata['balance_amount']; ?></td>
+                    <td style="font-size:13px;" data-bs-toggle="modal" data-bs-target="#totalremarkmodel<?php echo $totaldata['id']; ?>"><?php echo $totaldata['remark']; ?></td>
                   </tr>
                 <?php
                 include 'updatemodals.php';

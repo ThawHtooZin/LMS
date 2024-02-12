@@ -53,6 +53,13 @@ $query = new Query();
       $deleteid = $_POST['deleteid'];
       $query->form7frozendelete($deleteid);
     }
+
+    if(isset($_POST['waterkgupdate'])){
+      $waterkgid = $_POST['waterkgid'];
+      $waterkg = $_POST['waterkg'];
+
+      $query->waterkg($waterkgid, $waterkg);
+    }
      ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
@@ -96,7 +103,9 @@ $query = new Query();
                 <th>Country</th>
                 <th>Size</th>
                 <th>Viss</th>
+                <th>Decreased Kg</th>
                 <th>Kg</th>
+                <th>Water Kg</th>
                 <th>Pcs per Vr</th>
                 <th>Pcs per F-7</th>
                 <th>Action</th>
@@ -134,6 +143,8 @@ $query = new Query();
                     <td><?php echo $form7data['size']; ?></td>
                     <td><?php echo $form7data['viss']; ?></td>
                     <td><?php if(!empty($form7data['kg'])){echo round($form7data['kg'], 2);}; ?></td>
+                    <td><?php echo $form7data['viss'] * 1.634; ?></td>
+                    <td data-bs-toggle="modal" data-bs-target="#waterkgmodal<?php echo $form7data['id']; ?>"><?php echo $form7data['water_kg']; ?></td>
                     <td><?php echo $form7data['pcspervr']; ?></td>
                     <td><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
                     <td>
@@ -244,6 +255,8 @@ $query = new Query();
                   <td><?php echo $form7data['size']; ?></td>
                   <td><?php echo $form7data['viss']; ?></td>
                   <td><?php if(!empty($form7data['kg'])){echo round($form7data['kg'], 2);}; ?></td>
+                  <td><?php echo $form7data['viss'] * 1.634; ?></td>
+                    <td data-bs-toggle="modal" data-bs-target="#waterkgmodal<?php echo $form7data['id']; ?>"><?php echo $form7data['water_kg']; ?></td>
                   <td><?php echo $form7data['pcspervr']; ?></td>
                   <td><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
                   <td>
@@ -352,6 +365,8 @@ $query = new Query();
                      <td data-bs-toggle="modal" data-bs-target="#addsizemodal<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php echo $form7data['size']; ?></td>
                      <td data-bs-toggle="modal" data-bs-target="#adjustvissandcountry<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php echo $form7data['viss']; ?></td>
                      <td><?php if(!empty($form7data['kg'])){echo round($form7data['kg'], 2);}; ?></td>
+                     <td><?php echo $form7data['viss'] * 1.634; ?></td>
+                    <td data-bs-toggle="modal" data-bs-target="#waterkgmodal<?php echo $form7data['id']; ?>"><?php echo $form7data['water_kg']; ?></td>
                      <td><?php echo $form7data['pcspervr']; ?></td>
                      <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
                      <td>
@@ -363,6 +378,33 @@ $query = new Query();
                        </form>
                      </td>
                    </tr>
+                   <div class="modal fade" id="waterkgmodal<?php echo $form7data['id']; ?>">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                        <div class="modal-header bg-warning text-light">
+                          <h1 class="modal-title fs-5">Add Or Update Water Kg</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <form action="form_7_frozen.php" method="post">
+                            <input type="hidden" name="waterkgid" value="<?php echo $form7data['id']; ?>">
+                            <div class="modal-body">
+                              <?php
+                              $idd = $form7data['id'];
+                              $updata = $query->select('form7stock', $idd, 'id');
+                              ?>
+                              <label>Water Kg</label>
+                              <input type="text" name="waterkg" class="form-control inpv2 mt-1" value="<?php echo $form7data['water_kg']; ?>">
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-warning" name="waterkgupdate">Add or Update</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
                   <div class="modal fade" id="updatemodal<?php echo $form7data['id']; ?>">
                     <div class="modal-dialog" role="document">
                       <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
