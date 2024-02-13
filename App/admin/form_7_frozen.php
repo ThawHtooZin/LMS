@@ -144,7 +144,7 @@ $query = new Query();
                     <td><?php echo $form7data['viss']; ?></td>
                     <td><?php if(!empty($form7data['kg'])){echo round($form7data['kg'], 2);}; ?></td>
                     <td><?php echo $form7data['viss'] * 1.634; ?></td>
-                    <td data-bs-toggle="modal" data-bs-target="#waterkgmodal<?php echo $form7data['id']; ?>"><?php echo $form7data['water_kg']; ?></td>
+                    <td data-bs-toggle="modal" data-bs-target="#waterkgmodal<?php echo $form7data['id']; ?>"><?php if(!empty($form7data['water_kg'])){ echo $form7data['water_kg'];} ?></td>
                     <td><?php echo $form7data['pcspervr']; ?></td>
                     <td><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
                     <td>
@@ -256,7 +256,7 @@ $query = new Query();
                   <td><?php echo $form7data['viss']; ?></td>
                   <td><?php if(!empty($form7data['kg'])){echo round($form7data['kg'], 2);}; ?></td>
                   <td><?php echo $form7data['viss'] * 1.634; ?></td>
-                    <td data-bs-toggle="modal" data-bs-target="#waterkgmodal<?php echo $form7data['id']; ?>"><?php echo $form7data['water_kg']; ?></td>
+                    <td data-bs-toggle="modal" data-bs-target="#waterkgmodal<?php echo $form7data['id']; ?>"><?php if(!empty($form7data['water_kg'])){ echo $form7data['water_kg'];} ?></td>
                   <td><?php echo $form7data['pcspervr']; ?></td>
                   <td><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
                   <td>
@@ -366,7 +366,7 @@ $query = new Query();
                      <td data-bs-toggle="modal" data-bs-target="#adjustvissandcountry<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php echo $form7data['viss']; ?></td>
                      <td><?php if(!empty($form7data['kg'])){echo round($form7data['kg'], 2);}; ?></td>
                      <td><?php echo $form7data['viss'] * 1.634; ?></td>
-                    <td data-bs-toggle="modal" data-bs-target="#waterkgmodal<?php echo $form7data['id']; ?>"><?php echo $form7data['water_kg']; ?></td>
+                    <td data-bs-toggle="modal" data-bs-target="#waterkgmodal<?php echo $form7data['id']; ?>"><?php if(!empty($form7data['water_kg'])){ echo $form7data['water_kg'];} ?></td>
                      <td><?php echo $form7data['pcspervr']; ?></td>
                      <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
                      <td>
@@ -394,7 +394,7 @@ $query = new Query();
                               $updata = $query->select('form7stock', $idd, 'id');
                               ?>
                               <label>Water Kg</label>
-                              <input type="text" name="waterkg" class="form-control inpv2 mt-1" value="<?php echo $form7data['water_kg']; ?>">
+                              <input type="text" name="waterkg" class="form-control inpv2 mt-1" value="<?php if(!empty($form7data['water_kg'])){ echo $form7data['water_kg'];} ?>">
                             </div>
                           </div>
                           <div class="modal-footer">
