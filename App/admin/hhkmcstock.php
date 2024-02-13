@@ -52,18 +52,18 @@ $query = new Query();
       $validcheckstmt->execute();
       $validcheck = $validcheckstmt->fetch(PDO::FETCH_ASSOC);
 
-      if(!empty($validcheck)){
-        if($transfercheck['balance_mc'] >= $transfermc){
-          echo $query->transfermcstock($transferdate, $transferparticular, $transfercountry, $transfercommondity_id, $transfersize, $transferkg, $transfermc);
-        }else{
-          echo '<script>swal("Sorry!", "Not Enough Mc!", "warning");</script>';
-        }
-      }else{
-      echo '<script>swal("Sorry!", "Not Valid data for transfering!", "warning");</script>';
-      }
+      // if(!empty($validcheck)){
+      //   if($transfercheck['balance_mc'] >= $transfermc){
+      //   }else{
+      //     echo '<script>swal("Sorry!", "Not Enough Mc!", "warning");</script>';
+      //   }
+      // }else{
+      //   echo '<script>swal("Sorry!", "Not Valid data for transfering!", "warning");</script>';
+      // }
+      $query->transfermcstock($transferdate, $transferparticular, $transfercountry, $transfercommondity_id, $transfersize, $transferkg, $transfermc);
     }
 
-    $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM hhkmcstock WHERE country IS NOT NULL");
+    $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
     $countrystmt->execute();
     $countrydatas = $countrystmt->fetchall();
     foreach ($countrydatas as $countrydata) {
@@ -168,7 +168,7 @@ $query = new Query();
             <?php
             foreach ($countrydatas as $countrydata) {
              ?>
-            <table class="table table-hover table-bordered table-striped" id="<?php echo $countrydata['country']; ?>table">
+            <table class="table table-hover table-bordered table-striped hide" id="<?php echo $countrydata['country']; ?>table">
               <tr>
                 <th>Commondity</th>
                 <th>Country</th>
