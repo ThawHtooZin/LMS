@@ -309,7 +309,7 @@ $query = new Query();
                             <label style="font-weight: bold;">Supplier A/C Code</label>
                             <div class="row">
                               <div style="width: 40%;">
-                                <input type="text" name="upsupplier_code_no" id="upac_code<?php echo $data['id']; ?>" class="form-control inpv2 mb-1" value="<?php echo $updatedata['supplier_id']; ?>" style="padding-top: 2px; padding-bottom: 2px;">
+                                <input type="text" name="upsupplier_code_no" id="upac_code<?php echo $purchasedata['no']; ?>" class="form-control inpv2 mb-1" value="<?php echo $updatedata['supplier_id']; ?>" style="padding-top: 2px; padding-bottom: 2px;">
                               </div>
                               <div style="width: 10%;">
                                 <a href="supplier.php" target="_blank" style="width: 10%; padding: 2.5px; color:black; text-align: center;">
