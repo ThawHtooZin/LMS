@@ -228,7 +228,7 @@ $query = new Query();
               $countrystmt->execute();
               $countrydatas = $countrystmt->fetchall();
 
-              
+
             ?>
             <div class="modal fade" id="add">
               <div class="modal-dialog" role="document">

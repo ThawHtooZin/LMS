@@ -55,7 +55,7 @@ $query = new Query();
       }
     }
 
-    $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
+    $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM gfcmcstock WHERE country IS NOT NULL");
     $countrystmt->execute();
     $countrydatas = $countrystmt->fetchall();
 
@@ -106,7 +106,7 @@ $query = new Query();
              ?>
             <form action="" method="post" class="text-center">
               <?php
-              $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
+              $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM gfcmcstock WHERE country IS NOT NULL");
               $countrystmt->execute();
               $countrydatas = $countrystmt->fetchall();
 
