@@ -26,6 +26,15 @@ $query = new Query();
     if(isset($_POST['print'])){
       $query->payablereport();
     }
+    if (isset($_POST['addbalance'])) {
+      $date = $_POST['date'];
+      $supplier_id = $_POST['supplier_name'];
+      $description = $_POST['description'];
+      $amount = $_POST['amount'];
+
+      $query->addbalancepayable($date, $supplier_id, $description, $amount);
+
+    }
      ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
@@ -42,6 +51,10 @@ $query = new Query();
             <form action="" method="post" class="d-inline">
               <button type="submit" name="print" class="btn btn-success float-end btn-sm d-inline" onclick="window.open('print/payablereportprint.php');">Print</button>
             </form>
+            <button type="button" class="btn btn-secondary float-end btn-sm me-2" data-bs-toggle="modal"
+                data-bs-target="#addbalancemodal">
+                Add Balance
+            </button>
           </div>
           <div class="card-body">
             <b>Payable for Supplier</b>
@@ -71,7 +84,7 @@ $query = new Query();
                 $payabledata = $payablestmt->fetch(PDO::FETCH_ASSOC);
 
                 $idofrow = $payabledata['id'];
-                $openingamountstmt = $pdo->prepare("SELECT balance FROM payable WHERE supplier_id='$supplier_id' AND id < '$idofrow' AND report_date!='0000-00-00' ORDER BY id DESC");
+                $openingamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id'");
                 $openingamountstmt->execute();
                 $openingamount = $openingamountstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -84,8 +97,8 @@ $query = new Query();
                 $paidamt = $paidamtstmt->fetch(PDO::FETCH_ASSOC);
 
                 $id++;
-                if (!empty($openingamount['balance'])) {
-                  $openingamt = $openingamount['balance'];
+                if (!empty($openingamount['closing_balance'])) {
+                  $openingamt = $openingamount['closing_balance'];
                 }else{
                   $openingamt = 0;
                 }
@@ -98,7 +111,8 @@ $query = new Query();
               <tr style="<?php if($balance['balance'] == 0){ echo "display:none;";} ?>">
                 <td><?= $id; ?></td>
                 <td><?= $supplierdata['ac_name']; ?></td>
-                <td <?php if(empty($openingamount['balance'])){ echo "data-bs-toggle='modal' data-bs-target='#addbalancemodal'";} ?>><?php if(!empty($openingamount['balance'])){ echo $openingamount['balance']; } ?></td>
+                <!-- <td<?php if(empty($openingamount['closing_balance'])){ echo "data-bs-toggle='modal' data-bs-target='#addbalancemodal'";} ?>><?php if(!empty($openingamount['closing_balance'])){ echo $openingamount['closing_balance']; } ?></td> -->
+                <td><?= $payabledata['closing_balance']; ?></td>
                 <td><?= $purchaseamt['purchase_amount']; ?></td>
                 <td><?= $paidamt['paid_amount']; ?></td>
                 <td><?= $balance; ?></td>
@@ -114,9 +128,59 @@ $query = new Query();
         </div>
       </div>
     </div>
+    <div class="modal fade" id="addbalancemodal">
+      <div class="modal-dialog">
+        <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+          <div class="modal-header bg-secondary text-light">
+            <h1 class="modal-title fs-5">Add Balance</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+        <form action="acpayable.php" method="post">
+          <div class="modal-body">
+            <div class="row">
+              <div class="col">
+                <label>Date</label>
+                <input type="date" name="date" class="form-control inpv2 mb-2">
+              </div>
+              <div class="col">
+                <label>Supplier Name</label>
+                <select class="form-control inpv2" name="supplier_name">
+                  <?php
+                  $supplierdatasfs = $query->selectall('supplier');
+                    foreach ($supplierdatasfs as $supplierdatafs) {
+                      ?>
+                      <option value="<?php echo $supplierdatafs['supplier_id']; ?>"><?php echo $supplierdatafs['supplier_name']; ?></option>
+                        <?php
+                      }
+                      ?>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-6">
+                <label>Description</label>
+                <textarea name="description" rows="4" cols="80" class="form-control inpv2"></textarea>
+              </div>
+              <div class="col-6">
+                <div class="col">
+                  <label>Opening Amount</label>
+                  <input type="text" name="amount" class="form-control inpv2">
+                </div>
+                <div class="col mt-4">
+                  <button type="button" name="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
+                  <button type="submit" name="addbalance" class="btn btn-success">Add</button>
+                </div>
+              </div>
+            </div>
+            </div>
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
     <!-- Opening Amount Modal -->
 
-      
+
 
     <?php
     $bootstrap->javascript();

@@ -431,21 +431,21 @@ Class Query{
     $stmt = $pdo->prepare("INSERT INTO $table(supplier_id, supplier_name, supplier_phone, supplier_address) VALUES('$supplier_id', '$supplier_name', '$supplier_phone', '$supplier_address');");
 
 
-    $acstmt = $pdo->prepare("SELECT acid FROM actype WHERE ac_type='Current Liability'");
+    $acstmt = $pdo->prepare("SELECT acid FROM actype WHERE ac_type='Current Liabilities'");
     $acstmt->execute();
     $actype = $acstmt->fetch(PDO::FETCH_ASSOC);
 
     if(!empty($actype)){
-      $acstmt = $pdo->prepare("SELECT acid FROM actype WHERE ac_type='Current Liability'");
+      $acstmt = $pdo->prepare("SELECT acid FROM actype WHERE ac_type='Current Liabilities'");
       $acstmt->execute();
       $actype = $acstmt->fetch(PDO::FETCH_ASSOC);
       $actype = $actype['acid'];
     }else{
-      $actypestmt = $pdo->prepare("INSERT INTO actype(ac_type) VALUES('Current Liability')");
+      $actypestmt = $pdo->prepare("INSERT INTO actype(ac_type) VALUES('Current Liabilities')");
       if(empty($accheck)){
         $actypestmt->execute();
       }
-      $acstmt = $pdo->prepare("SELECT acid FROM actype WHERE ac_type='Current Liability'");
+      $acstmt = $pdo->prepare("SELECT acid FROM actype WHERE ac_type='Current Liabilities'");
       if(empty($accheck)){
         $acstmt->execute();
       }
@@ -4417,7 +4417,7 @@ Class Query{
 
   function addtotalremark($remarkid, $remark) {
     global $pdo;
-    
+
     $stmt = $pdo->prepare("UPDATE gfctotal SET remark='$remark' WHERE id='$remarkid'");
     $stmt->execute();
   }
@@ -4426,12 +4426,18 @@ Class Query{
     global $pdo;
 
     $data = $this->select('form7stock', $waterkgid, 'id');
-    
+
     $kg = ($data['viss'] * 1.634) - $waterkg;
     $stmt = $pdo->prepare("UPDATE form7stock SET water_kg='$waterkg', kg='$kg' WHERE id='$waterkgid'");
     $stmt->execute();
   }
 
+  function addbalancepayable($date, $supplier_id, $description, $amount){
+      global $pdo;
+
+      $balancestmt = $pdo->prepare("INSERT INTO payable(date, supplier_id, remark, closing_balance)  VALUES('$date', '$supplier_id', '$description', '$amount')");
+      $balancestmt->execute();
+    }
   // MORE SELECTS
 
   function selectsum($table, $id, $selectwhat){
