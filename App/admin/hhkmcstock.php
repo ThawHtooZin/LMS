@@ -220,6 +220,16 @@ $query = new Query();
                   }
                ?>
             </table>
+            <?php
+              $form7commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock");
+              $form7commonditystmt->execute();
+              $form7commonditydatas = $form7commonditystmt->fetchall();
+              $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM hhkmcstock WHERE country IS NOT NULL");
+              $countrystmt->execute();
+              $countrydatas = $countrystmt->fetchall();
+
+              
+            ?>
             <div class="modal fade" id="add">
               <div class="modal-dialog" role="document">
                 <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
@@ -236,29 +246,27 @@ $query = new Query();
                         <label>Commondity</label>
                         <select class="form-control inpv2 mb-2" name="commondity_id" id="commondityid1">
                           <?php
-                          $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
-                          $form7commonditystmt->execute();
-                          $form7commonditydatas = $form7commonditystmt->fetchall();
-                          foreach ($form7commonditydatas as $form7commonditydata) {
-                            $item_id = $form7commonditydata['item_id'];
-                            $commonditydata = $query->select('item', $item_id, 'item_id');
-                            ?>
-                            <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
-                            <?php
+                          if(!empty($form7commonditydatas)){
+                            foreach ($form7commonditydatas as $form7commonditydata) {
+                              $item_id = $form7commonditydata['item_id'];
+                              $commonditydata = $query->select('item', $item_id, 'item_id');
+                              ?>
+                              <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                              <?php
+                            }
                           }
                           ?>
                         </select>
                         <select class="form-control inpv2 mb-2" name="commondity_id" id="commondityid2">
                           <?php
-                          $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM item");
-                          $form7commonditystmt->execute();
-                          $form7commonditydatas = $form7commonditystmt->fetchall();
-                          foreach ($form7commonditydatas as $form7commonditydata) {
-                            $item_id = $form7commonditydata['item_id'];
-                            $commonditydata = $query->select('item', $item_id, 'item_id');
-                            ?>
-                            <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
-                            <?php
+                          if(!empty($form7commonditydatas)){
+                            foreach ($form7commonditydatas as $form7commonditydata) {
+                              $item_id = $form7commonditydata['item_id'];
+                              $commonditydata = $query->select('item', $item_id, 'item_id');
+                              ?>
+                              <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                              <?php
+                            }
                           }
                           ?>
                         </select>
@@ -275,13 +283,12 @@ $query = new Query();
                         <select class="form-control inpv2 mb-2" name="country" id="country2">
 
                           <?php
-                          $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
-                          $countrystmt->execute();
-                          $countrydatas = $countrystmt->fetchall();
-                          foreach ($countrydatas as $countrydata) {
-                            ?>
-                            <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
-                            <?php
+                          if(!empty($countrydatas)){
+                            foreach ($countrydatas as $countrydata) {
+                              ?>
+                              <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
+                              <?php
+                            }
                           }
                           ?>
                         </select>
@@ -312,6 +319,12 @@ $query = new Query();
             </div>
             <?php
             }
+            $form7commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock");
+              $form7commonditystmt->execute();
+              $form7commonditydatas = $form7commonditystmt->fetchall();
+              $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM hhkmcstock WHERE country IS NOT NULL");
+              $countrystmt->execute();
+              $countrydatas = $countrystmt->fetchall();
              ?>
           </div>
         </div>
@@ -333,29 +346,27 @@ $query = new Query();
                 <label>Commondity</label>
                 <select class="form-control inpv2 mb-2" name="commondity_id" id="commondityid1">
                   <?php
-                  $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
-                  $form7commonditystmt->execute();
-                  $form7commonditydatas = $form7commonditystmt->fetchall();
-                  foreach ($form7commonditydatas as $form7commonditydata) {
-                    $item_id = $form7commonditydata['item_id'];
-                    $commonditydata = $query->select('item', $item_id, 'item_id');
-                    ?>
-                    <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
-                    <?php
+                  if(!empty($form7commonditydatas)){
+                    foreach ($form7commonditydatas as $form7commonditydata) {
+                      $item_id = $form7commonditydata['item_id'];
+                      $commonditydata = $query->select('item', $item_id, 'item_id');
+                      ?>
+                      <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                      <?php
+                    }
                   }
                   ?>
                 </select>
                 <select class="form-control inpv2 mb-2" name="commondity_id" id="commondityid2">
                   <?php
-                  $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM item");
-                  $form7commonditystmt->execute();
-                  $form7commonditydatas = $form7commonditystmt->fetchall();
-                  foreach ($form7commonditydatas as $form7commonditydata) {
-                    $item_id = $form7commonditydata['item_id'];
-                    $commonditydata = $query->select('item', $item_id, 'item_id');
-                    ?>
-                    <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
-                    <?php
+                  if(!empty($form7commonditydatas)){
+                    foreach ($form7commonditydatas as $form7commonditydata) {
+                      $item_id = $form7commonditydata['item_id'];
+                      $commonditydata = $query->select('item', $item_id, 'item_id');
+                      ?>
+                      <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                      <?php
+                    }
                   }
                   ?>
                 </select>
@@ -370,9 +381,6 @@ $query = new Query();
                 <label>Country</label>
                 <select class="form-control inpv2 mb-2" name="country" id="country1">
                   <?php
-                  $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
-                  $countrystmt->execute();
-                  $countrydatas = $countrystmt->fetchall();
                   foreach ($countrydatas as $countrydata) {
                     ?>
                     <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
@@ -422,15 +430,14 @@ $query = new Query();
                 <label>Commondity</label>
                 <select class="form-control inpv2 mb-2" name="transfercommondity_id">
                   <?php
-                  $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
-                  $form7commonditystmt->execute();
-                  $form7commonditydatas = $form7commonditystmt->fetchall();
-                  foreach ($form7commonditydatas as $form7commonditydata) {
-                    $item_id = $form7commonditydata['item_id'];
-                    $commonditydata = $query->select('item', $item_id, 'item_id');
-                    ?>
-                    <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
-                    <?php
+                  if(!empty($form7commonditydatas)){
+                    foreach ($form7commonditydatas as $form7commonditydata) {
+                      $item_id = $form7commonditydata['item_id'];
+                      $commonditydata = $query->select('item', $item_id, 'item_id');
+                      ?>
+                      <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                      <?php
+                    }
                   }
                   ?>
                 </select>
@@ -446,13 +453,12 @@ $query = new Query();
                 <select class="form-control inpv2 mb-2" name="transfercountry">
 
                   <?php
-                  $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
-                  $countrystmt->execute();
-                  $countrydatas = $countrystmt->fetchall();
-                  foreach ($countrydatas as $countrydata) {
-                    ?>
-                    <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
-                    <?php
+                  if(!empty($countrydatas)){
+                    foreach ($countrydatas as $countrydata) {
+                      ?>
+                      <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
+                      <?php
+                    }
                   }
                   ?>
                 </select>

@@ -116,6 +116,8 @@ $query = new Query();
     </div>
     <!-- Opening Amount Modal -->
 
+      
+
     <?php
     $bootstrap->javascript();
     ?>

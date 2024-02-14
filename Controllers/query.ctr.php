@@ -659,6 +659,13 @@ Class Query{
 
   // HHK QUERIES
 
+    function updatehhkmcstock($newdate, $newparticular, $newcommondity_id, $newsize, $newkg, $newmc, $newcountry, $updateid){
+      global $pdo;
+
+      $stmt = $pdo->prepare("UPDATE hhkmcstock SET date='$newdate', particular='$newparticular', commondity_id='$newcommondity_id', size='$newsize', kg='$newkg', mc='$newmc', country='$newcountry' WHERE id='$updateid' ");
+      $stmt->execute();
+    }
+
     function addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $pcharges){
     global $pdo;
     $datastmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='$commondity_id' ORDER BY id DESC");
