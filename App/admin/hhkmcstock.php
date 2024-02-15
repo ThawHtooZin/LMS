@@ -91,8 +91,8 @@ $query = new Query();
             $('#country1').show();
           }
         });
-        // $('#commondityid2').hide();
-        // $('#country2').hide();
+        $('#commondityid2').hide();
+        $('#country2').hide();
       });
      </script>
      <?php
