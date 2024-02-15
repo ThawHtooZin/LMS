@@ -3743,8 +3743,9 @@ Class Query{
       }
       $payabledatastmt->execute();
       $cashbooksearchdata = $payabledatastmt->fetch(PDO::FETCH_ASSOC);
+      print_r($cashbooksearchdata);
       if(!empty($cashbooksearchdata['balance'])){
-          $balance = $cashbooksearchdata['balance'];
+          echo $balance = $cashbooksearchdata['balance'];
       }else{
         $balance = 0;
       }

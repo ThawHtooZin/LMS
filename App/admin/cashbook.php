@@ -262,7 +262,7 @@ $query = new Query();
                 $stmt->execute();
                 $cashdatas = $stmt->fetchall();
               }else{
-                $stmt = $pdo->prepare("SELECT * FROM cashbook"); 
+                $stmt = $pdo->prepare("SELECT * FROM cashbook");
                 $stmt->execute();
                 $cashdatas = $stmt->fetchAll();
               }
@@ -270,72 +270,76 @@ $query = new Query();
               <?php
               $idd = 1;
               foreach ($cashdatas as $cashdata) {
-                if(!empty($cashdata['ac_name'])){
-                  $voucher_no = $cashdata['voucher_no'];
-                $ac_code = $cashdata['ac_name'];
-                $acselectstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND ac_code!='$ac_code'");
-                $acselectstmt->execute([
-                  ':voucher_no' => $voucher_no
-                ]);
-                $acselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
-                $accode = $acselect['ac_code'];
-                if(str_contains($accode, '4000/')){
-                  $acname = 'Supplier';
-                }else {
-                  $acnamedata = $query->select('acname', $accode, 'code_no');
-                  $acname = $acnamedata['ac_name'];
-                }
-                if (empty($_SESSION['cashbookcurrency']) || $_SESSION['cashbookcurrency'] == 'ks') {
-                  $debit = $cashdata['debit'];
-                  $credit = $cashdata['credit'];
-                  // $balance = $cashdata['balance'];
-
-                  // balancecalculate
-                  $rowid = $cashdata['id'];
-                  $lastrowstmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='$ac_code' AND id<'$rowid' ORDER BY id DESC");
-                  $lastrowstmt->execute();
-                  $lastrowdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
-                  if(!empty($lastrowdata)){
-                    $balance = ($debit + $lastrowdata['balance']) - $credit;
-                  }else{
-                    $balance = ($debit + 0) - $credit;
-                  }
-                  // balancecalculate
-
-                  // balanceupdate
-                  if($cashdata['balance'] != $balance){
-                    $balanceupdatestmt = $pdo->prepare("UPDATE cashbook SET balance='$balance' WHERE id='$rowid'");
-                    $balanceupdatestmt->execute();
-                  }else{
-                    $balance = $cashdata['balance'];
-                  }
-                  // balanceupdate
-                }else{
-                  if($acselect['debit'] != 0){
-                    $debitorcredit = 'debit';
-                  }else{
-                    $debitorcredit = 'credit';
-                  }
-
-
-                  // Dollor Change
-                  $acselectstmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit'");
+                if(!empty($cashdata['voucher_no'])){
+                  if(!empty($cashdata['ac_name'])){
+                    $voucher_no = $cashdata['voucher_no'];
+                  $ac_code = $cashdata['ac_name'];
+                  $acselectstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND ac_code!='$ac_code'");
                   $acselectstmt->execute([
                     ':voucher_no' => $voucher_no
                   ]);
-                  $rateselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
-
-                  if($cashdata['debit'] != 0){
-                    $debit = $cashdata['debit'] / $rateselect['dollar_rate'];
-                  }else{
-                    $credit = $cashdata['credit'] / $rateselect['dollar_rate'];
+                  $acselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
+                  $accode = $acselect['ac_code'];
+                  if(str_contains($accode, '4000/')){
+                    $acname = 'Supplier';
+                  }else {
+                    $acnamedata = $query->select('acname', $accode, 'code_no');
+                    $acname = $acnamedata['ac_name'];
                   }
+                  if (empty($_SESSION['cashbookcurrency']) || $_SESSION['cashbookcurrency'] == 'ks') {
+                    $debit = $cashdata['debit'];
+                    $credit = $cashdata['credit'];
+                    // $balance = $cashdata['balance'];
+
+                    // balancecalculate
+                    $rowid = $cashdata['id'];
+                    $lastrowstmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='$ac_code' AND id<'$rowid' ORDER BY id DESC");
+                    $lastrowstmt->execute();
+                    $lastrowdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
+                    if(!empty($lastrowdata)){
+                      $balance = ($debit + $lastrowdata['balance']) - $credit;
+                    }else{
+                      $balance = ($debit + 0) - $credit;
+                    }
+                    // balancecalculate
+
+                    // balanceupdate
+                    if($cashdata['balance'] != $balance){
+                      $balanceupdatestmt = $pdo->prepare("UPDATE cashbook SET balance='$balance' WHERE id='$rowid'");
+                      $balanceupdatestmt->execute();
+                    }else{
+                      $balance = $cashdata['balance'];
+                    }
+                    // balanceupdate
+                  }else{
+                    if($acselect['debit'] != 0){
+                      $debitorcredit = 'debit';
+                    }else{
+                      $debitorcredit = 'credit';
+                    }
+
+
+                    // Dollor Change
+                    $acselectstmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit'");
+                    $acselectstmt->execute([
+                      ':voucher_no' => $voucher_no
+                    ]);
+                    $rateselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
+
+                    if($cashdata['debit'] != 0){
+                      $debit = $cashdata['debit'] / $rateselect['dollar_rate'];
+                    }else{
+                      $credit = $cashdata['credit'] / $rateselect['dollar_rate'];
+                    }
 
 
 
-                  $balance = $cashdata['balance'] / $rateselect['dollar_rate'];
-                  // Dollor Change
-                }
+                    $balance = $cashdata['balance'] / $rateselect['dollar_rate'];
+                    // Dollor Change
+                  }
+                  }else{
+                    $balance = $cashdata['balance'];
+                  }
                 }else{
                   $balance = $cashdata['balance'];
                 }
