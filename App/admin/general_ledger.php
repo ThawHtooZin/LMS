@@ -360,10 +360,10 @@ $query = new Query();
                  <td></td>
                  <td></td>
                  <td></td>
-                 <td><?php if($totaldebit['total_debit'] == 0){ echo "-"; }else{ if($currencydata['dollar_rate'] == 0){echo $totaldebit['total_debit'];}else{ echo $totaldebit['total_debit'] / $currencydata['dollar_rate'];  }; }; ?></td>
-                 <td><?php if($totalcredit['total_credit'] == 0){ echo "-"; }else{ if($currencydata['dollar_rate'] == 0){echo $totalcredit['total_credit'];}else{ echo $totalcredit['total_credit'] / $currencydata['dollar_rate'];  }; }; ?></td>
+                 <td><?php if($totaldebit['total_debit'] == 0){ echo "-"; }else{ if(!empty($currencydata['dollar_rate']) == 0){echo $totaldebit['total_debit'];}else{ echo $totaldebit['total_debit'] / $currencydata['dollar_rate'];  }; }; ?></td>
+                 <td><?php if($totalcredit['total_credit'] == 0){ echo "-"; }else{ if(!empty($currencydata['dollar_rate']) == 0){echo $totalcredit['total_credit'];}else{ echo $totalcredit['total_credit'] / $currencydata['dollar_rate'];  }; }; ?></td>
                  <td></td>
-                 <td><?php if($totalbalance == 0){echo "-"; }else{ if($currencydata['dollar_rate'] == 0){echo $totalbalance;}else{ echo $totalbalance / $currencydata['dollar_rate'];  };} ?></td>
+                 <td><?php if($totalbalance == 0){echo "-"; }else{ if(!empty($currencydata['dollar_rate']) == 0){echo $totalbalance;}else{ echo $totalbalance / $currencydata['dollar_rate'];  };} ?></td>
                  <td></td>
                </tr>
               <?php } } ?>
