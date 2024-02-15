@@ -148,9 +148,6 @@ $query = new Query();
           </form>
           </div>
           <div class="card-body">
-            <?php
-            echo $_SESSION['tabs'];
-             ?>
             <form action="" method="post" class="text-center">
               <?php
               foreach ($countrydatas as $countrydata) {
