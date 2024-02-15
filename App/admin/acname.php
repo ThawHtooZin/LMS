@@ -130,7 +130,7 @@ $query = new Query();
                 $datas = $query->selectcontain('acname', 'code_no', $searchac_code);
 
               }else{
-                $stmt = $pdo->prepare("SELECT * FROM acname order by ac_type");
+                $stmt = $pdo->prepare("SELECT * FROM acname order by code_no");
                 $stmt->execute();
                 $datas = $stmt->fetchall();
               }
