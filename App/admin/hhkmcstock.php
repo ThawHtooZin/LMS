@@ -74,7 +74,7 @@ $query = new Query();
     }
 
      ?>
-     <script>
+<script>
       $(document).ready(()=>{
         $('#commondityid2').hide();
         $('#particular').on('keyup', ()=>{
@@ -221,14 +221,14 @@ $query = new Query();
                ?>
             </table>
             <?php
-              $form7commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock");
+              
+              $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
               $form7commonditystmt->execute();
               $form7commonditydatas = $form7commonditystmt->fetchall();
-              $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM hhkmcstock WHERE country IS NOT NULL");
+              $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
               $countrystmt->execute();
               $countrydatas = $countrystmt->fetchall();
-
-
+              
             ?>
             <div class="modal fade" id="add">
               <div class="modal-dialog" role="document">
@@ -259,15 +259,16 @@ $query = new Query();
                         </select>
                         <select class="form-control inpv2 mb-2" name="commondity_id" id="commondityid2">
                           <?php
-                          if(!empty($form7commonditydatas)){
-                            foreach ($form7commonditydatas as $form7commonditydata) {
-                              $item_id = $form7commonditydata['item_id'];
+                            $commonditydatastmt = $pdo->prepare("SELECT * FROM item");
+                            $commonditydatastmt->execute();
+                            $commonditydatas = $commonditydatastmt->fetchAll();
+                            foreach ($commonditydatas as $commonditydata) {
+                              $item_id = $commonditydata['item_id'];
                               $commonditydata = $query->select('item', $item_id, 'item_id');
                               ?>
                               <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
                               <?php
                             }
-                          }
                           ?>
                         </select>
                       </div>
@@ -280,8 +281,6 @@ $query = new Query();
                       <div class="col">
                         <label>Country</label>
                         <select class="form-control inpv2 mb-2" name="country" id="country1">
-                        <select class="form-control inpv2 mb-2" name="country" id="country2">
-
                           <?php
                           if(!empty($countrydatas)){
                             foreach ($countrydatas as $countrydata) {
@@ -292,6 +291,7 @@ $query = new Query();
                           }
                           ?>
                         </select>
+                        <input type="text" name="country" id="country2" class="hide form-control inpv2">
                       </div>
                       <div class="col">
                         <label>Size</label>
@@ -348,7 +348,7 @@ $query = new Query();
                   <?php
                   if(!empty($form7commonditydatas)){
                     foreach ($form7commonditydatas as $form7commonditydata) {
-                      $item_id = $form7commonditydata['item_id'];
+                      $item_id = $form7commonditydata['commondity_id'];
                       $commonditydata = $query->select('item', $item_id, 'item_id');
                       ?>
                       <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
@@ -361,7 +361,7 @@ $query = new Query();
                   <?php
                   if(!empty($form7commonditydatas)){
                     foreach ($form7commonditydatas as $form7commonditydata) {
-                      $item_id = $form7commonditydata['item_id'];
+                      $item_id = $form7commonditydata['commondity_id'];
                       $commonditydata = $query->select('item', $item_id, 'item_id');
                       ?>
                       <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
@@ -432,7 +432,7 @@ $query = new Query();
                   <?php
                   if(!empty($form7commonditydatas)){
                     foreach ($form7commonditydatas as $form7commonditydata) {
-                      $item_id = $form7commonditydata['item_id'];
+                      $item_id = $form7commonditydata['commondity_id'];
                       $commonditydata = $query->select('item', $item_id, 'item_id');
                       ?>
                       <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
@@ -507,6 +507,7 @@ $query = new Query();
       }
      ?>
     </script>
+         
     <?php
     $bootstrap->javascript();
     ?>
