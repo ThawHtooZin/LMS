@@ -173,9 +173,10 @@ $query = new Query();
                         ?>
                         <input type="hidden" name="updateid" value="<?php echo $data['id']; ?>">
                         <div class="row">
+                        <input type="hidden" name="code_no" value="<?php echo $updatedata['code_no']; ?>">
                           <div class="col">
                             <label>Code No</label>
-                            <input type="text" name="code_no" class="form-control inpv2 mb-2" value="<?php echo $updatedata['code_no']; ?>">
+                            <input type="text" disabled  class="form-control inpv2 mb-2" value="<?php echo $updatedata['code_no']; ?>">
                           </div>
                           <div class="col">
                             <label>A/C Type</label>

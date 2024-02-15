@@ -3349,7 +3349,7 @@ Class Query{
   function updateacname($code_no, $actype, $acname, $id){
     global $pdo;
 
-    $accheckstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no='$code_no'");
+    $accheckstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no='$code_no' AND id!='$id'");
     $accheckstmt->execute();
     $accheck = $accheckstmt->fetchAll();
 
