@@ -3770,18 +3770,10 @@ Class Query{
       }
       $balance = ($balance + $debit) - $credit;
       $cashbookstmt = $pdo->prepare("INSERT INTO cashbook(date, ac_name, particular, debit, credit, balance, voucher_no) VALUES('$date', '$ac_name', :description, '$debit', '$credit', '$balance', :voucher_no)");
-
-      $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no");
-      $checkcbstmt->execute([
-        ':voucher_no' => $voucher_no
-      ]);
-      $checkcb = $checkcbstmt->fetchall();
-      if(empty($checkcb)){
         $cashbookstmt->execute([
           ':voucher_no' => $voucher_no,
           ':description' => $description
         ]);
-      }
     }
   }
 
