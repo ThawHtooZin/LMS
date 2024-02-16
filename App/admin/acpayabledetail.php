@@ -111,7 +111,7 @@ $query = new Query();
                 $totalpurchaseamountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS total_purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no='$purchase_voucher_no'");
                 $totalpurchaseamountstmt->execute();
                 $totalpurchaseamount = $totalpurchaseamountstmt->fetch(PDO::FETCH_ASSOC);
-                
+
                 if($payabledata['purchase_voucher_no'] == ''){
                   $balanceamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id'");
                   $balanceamountstmt->execute();
@@ -127,7 +127,7 @@ $query = new Query();
                     $balanceamountstmt = $pdo->prepare("SELECT balance FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no='$purchase_voucher_no' ORDER BY id DESC");
                     $balanceamountstmt->execute();
                     $balanceamount = $balanceamountstmt->fetch(PDO::FETCH_ASSOC);
-                    echo $balanceamount['closing_balance'] = $balanceamount['balance'];
+                    $balanceamount['closing_balance'] = $balanceamount['balance'];
                   }
                 }
 
@@ -199,7 +199,7 @@ $query = new Query();
                   $balanceamountstmt = $pdo->prepare("SELECT SUM(closing_balance) AS closing_balance FROM payable WHERE supplier_id='$supplier_id'");
                   $balanceamountstmt->execute();
                   $balanceamount = $balanceamountstmt->fetch(PDO::FETCH_ASSOC);
-                  
+
 
                   ?>
                   <tr style="font-weight: bold;">
