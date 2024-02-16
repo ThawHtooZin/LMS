@@ -48,9 +48,10 @@ $query = new Query();
       $transfercheckstmt->execute();
       $transfercheck = $transfercheckstmt->fetch(PDO::FETCH_ASSOC);
 
-      $validcheckstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE kg='$transferkg' AND size='$transfersize' AND country='$transfercountry' AND commondity_id='$transfercommondity_id' ORDER BY id DESC");
-      $validcheckstmt->execute();
-      $validcheck = $validcheckstmt->fetch(PDO::FETCH_ASSOC);
+      $query->transfermcstock($transferdate, $transferparticular, $transfercountry, $transfercommondity_id, $transfersize, $transferkg, $transfermc);
+      // $validcheckstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE kg='$transferkg' AND size='$transfersize' AND country='$transfercountry' AND commondity_id='$transfercommondity_id' ORDER BY id DESC");
+      // $validcheckstmt->execute();
+      // $validcheck = $validcheckstmt->fetch(PDO::FETCH_ASSOC);
 
       // if(!empty($validcheck)){
       //   if($transfercheck['balance_mc'] >= $transfermc){
@@ -60,7 +61,6 @@ $query = new Query();
       // }else{
       //   echo '<script>swal("Sorry!", "Not Valid data for transfering!", "warning");</script>';
       // }
-      $query->transfermcstock($transferdate, $transferparticular, $transfercountry, $transfercommondity_id, $transfersize, $transferkg, $transfermc);
     }
 
     $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
@@ -218,14 +218,14 @@ $query = new Query();
                ?>
             </table>
             <?php
-              
+
               $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
               $form7commonditystmt->execute();
               $form7commonditydatas = $form7commonditystmt->fetchall();
               $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
               $countrystmt->execute();
               $countrydatas = $countrystmt->fetchall();
-              
+
             ?>
             <div class="modal fade" id="add">
               <div class="modal-dialog" role="document">
@@ -505,7 +505,7 @@ $query = new Query();
       }
      ?>
     </script>
-         
+
     <?php
     $bootstrap->javascript();
     ?>

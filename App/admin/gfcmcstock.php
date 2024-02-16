@@ -32,7 +32,7 @@ $query = new Query();
       $mc = $_POST['mc'];
       $country = $_POST['country'];
 
-      $query->addmcstock($date, $particular, $country, $commondity_id, $size, $kg, $mc);
+      $query->addgfcmcstock($date, $particular, $country, $commondity_id, $size, $kg, $mc);
     }
 
     if(isset($_POST['exportbtn'])){
@@ -48,11 +48,7 @@ $query = new Query();
       $exportcheckstmt->execute();
       $exportcheck = $exportcheckstmt->fetch(PDO::FETCH_ASSOC);
 
-      if($exportcheck['balance_mc'] >= $exportmc){
-        echo $query->exportmcstock($exportdate, $exportparticular, $exportcountry, $exportcommondity_id, $exportsize, $exportkg, $exportmc);
-      }else{
-        echo '<script>swal("Sorry!", "Not Enough Mc!", "warning");</script>';
-      }
+      $query->exportmcstock($exportdate, $exportparticular, $exportcountry, $exportcommondity_id, $exportsize, $exportkg, $exportmc);
     }
 
     $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM gfcmcstock WHERE country IS NOT NULL");
@@ -78,7 +74,8 @@ $query = new Query();
           <div class="card-header bg-info">
 
             <h5 style="font-weight:bold;" class="text-light d-inline">GFC MC STOCK</h5>
-            <button type="button" class="btn btn-danger float-end" data-bs-toggle="modal" data-bs-target="#export">Export Mc</button>
+            <button type="button" class="btn btn-danger float-end ms-2" data-bs-toggle="modal" data-bs-target="#export">Export Mc</button>
+            <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#add2">Add Balance</button>
             <form class="d-inline" action="gfcmcstock.php" method="post">
             <button type="submit" class="btn btn-primary float-end me-2" name="searchcommonditybtn">View</button>
             <?php
@@ -161,9 +158,13 @@ $query = new Query();
                 $totalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular!='HHK to GFC'");
                 $totalmcsubnumstmt->execute();
                 $totalmcsubnum = $totalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
-                $totalmc = $totalmcnotsub['total_mc'] - $totalmcsubnum['total_mc'];
+                if($gfcstockdata['particular'] == 'balance' || $gfcstockdata['particular'] == 'Balance' && $totalmcnotsub['total_mc'] != 0){
+                  $totalmc = $totalmcsubnum['total_mc'];
+                }else{
+                  $totalmc = $totalmcnotsub['total_mc'] - $totalmcsubnum['total_mc'];
+                }
                ?>
-              <tr>
+              <tr style="<?php if($totalmc > 200){echo 'background-color:rgba(0, 255, 0, 0.4) !important;';} ?>">
                 <td><?php echo $commonditydata['item_name']; ?></td>
                 <td><?php echo $countrydata['country']; ?></td>
                 <td><?php echo $gfcstockdata['size']; ?></td>
@@ -177,23 +178,33 @@ $query = new Query();
               }
                ?>
             </table>
-            <script type="text/javascript">
             <?php
-                if($_SESSION['tabs'] == $countrydata['country']){
-                  echo "show" . $countrydata['country'] . "();";
-                  if($_SESSION['tabs'] == $countrydata['country']){
-                  echo ' function show' . $countrydata['country'] .'(){';
-                    // foreach ($countrydatas as $countrydata) {
-                    //   echo 'document.querySelector("#'.$countrydata['country'].'table").classList.add(\'hide\');';
-                    //   echo 'document.querySelector(".'.$countrydata['country'].'link").classList.remove(\'color\');';
-                    // }
-                    echo 'document.querySelector("#'.$_SESSION['tabs'].'table").classList.remove(\'hide\');';
-                    echo 'document.querySelector(".'.$_SESSION['tabs'].'link").classList.add(\'color\');';
-                    echo '}';
-                  }
-                }
-             ?>
-            </script>
+
+              $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
+              $form7commonditystmt->execute();
+              $form7commonditydatas = $form7commonditystmt->fetchall();
+              $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form7stock WHERE country IS NOT NULL");
+              $countrystmt->execute();
+              $countrydatas = $countrystmt->fetchall();
+
+            ?>
+                <script type="text/javascript">
+                <?php
+                    if($_SESSION['tabs'] == $countrydata['country']){
+                      echo "show" . $countrydata['country'] . "();";
+                      if($_SESSION['tabs'] == $countrydata['country']){
+                      echo ' function show' . $countrydata['country'] .'(){';
+                        // foreach ($countrydatas as $countrydata) {
+                        //   echo 'document.querySelector("#'.$countrydata['country'].'table").classList.add(\'hide\');';
+                        //   echo 'document.querySelector(".'.$countrydata['country'].'link").classList.remove(\'color\');';
+                        // }
+                        echo 'document.querySelector("#'.$_SESSION['tabs'].'table").classList.remove(\'hide\');';
+                        echo 'document.querySelector(".'.$_SESSION['tabs'].'link").classList.add(\'color\');';
+                        echo '}';
+                      }
+                    }
+                 ?>
+                </script>
             <?php
             }
              ?>
@@ -201,6 +212,71 @@ $query = new Query();
         </div>
       </div>
     </div>
+
+    <div class="modal fade" id="add2">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+          <div class="modal-header bg-secondary text-light">
+            <h1 class="modal-title fs-5">Add Data</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+        <form action="gfcmcstock.php" method="post">
+          <div class="modal-body">
+            <div class="row">
+              <div class="col">
+                <label>Date</label>
+                <input type="date" name="date" class="form-control inpv2 mb-2">
+                <label>Commondity</label>
+                <select class="form-control inpv2 mb-2" name="commondity_id">
+                          <?php
+                            $commonditydatastmt = $pdo->prepare("SELECT * FROM item");
+                            $commonditydatastmt->execute();
+                            $commonditydatas = $commonditydatastmt->fetchAll();
+                            foreach ($commonditydatas as $commonditydata) {
+                              $item_id = $commonditydata['item_id'];
+                              $commonditydata = $query->select('item', $item_id, 'item_id');
+                              ?>
+                              <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                              <?php
+                            }
+                          ?>
+                        </select>
+              </div>
+              <div class="col">
+                <label>Particular</label>
+                <textarea name="particular" rows="4" class="form-control inpv2 mb-2" id="particular">Balance</textarea>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>Country</label>
+                <input type="text" name="country" class="form-control inpv2">
+              </div>
+              <div class="col">
+                <label>Size</label>
+                <input type="text" name="size" class="form-control inpv2 mb-2">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>Kg</label>
+                <input type="text" name="kg" class="form-control inpv2 mb-2">
+              </div>
+              <div class="col">
+                <label>Mc</label>
+                <input type="number" name="mc" class="form-control inpv2 mb-2">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-success" name="addbtn">Add</button>
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
+
     <div class="modal fade" id="export">
       <div class="modal-dialog" role="document">
         <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
@@ -217,11 +293,11 @@ $query = new Query();
                 <label>Commondity</label>
                 <select class="form-control inpv2 mb-2" name="exportcommondity_id">
                   <?php
-                  $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
+                  $form7commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM gfcmcstock");
                   $form7commonditystmt->execute();
                   $form7commonditydatas = $form7commonditystmt->fetchall();
                   foreach ($form7commonditydatas as $form7commonditydata) {
-                    $item_id = $form7commonditydata['item_id'];
+                    $item_id = $form7commonditydata['commondity_id'];
                     $commonditydata = $query->select('item', $item_id, 'item_id');
                     ?>
                     <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
@@ -241,7 +317,7 @@ $query = new Query();
                 <select class="form-control inpv2 mb-2" name="exportcountry">
 
                   <?php
-                  $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form7stock WHERE country IS NOT NULL");
+                  $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM gfcmcstock WHERE country IS NOT NULL");
                   $countrystmt->execute();
                   $countrydatas = $countrystmt->fetchall();
                   foreach ($countrydatas as $countrydata) {

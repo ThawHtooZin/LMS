@@ -177,7 +177,7 @@ $query = new Query();
                         </div>
                       </div>
                       <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cloose</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary" name="editlooseinoutbtn">Save</button>
                       </div>
                     </form>
@@ -197,7 +197,7 @@ $query = new Query();
                         <textarea name="remarkedit" rows="3" cols="80" class="form-control inpv2"><?= $sizeinfodata['remark']; ?></textarea>
                       </div>
                       <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cloose</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary" name="remarkeditbtn">Save</button>
                       </div>
                     </form>
