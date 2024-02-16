@@ -3678,10 +3678,10 @@ Class Query{
         $payablesearchdata = $payabledatastmt->fetch(PDO::FETCH_ASSOC);
         if(!empty($payablesearchdata)){
             $balance = $payablesearchdata['balance'] - $paid_amount;
-            $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '999999999', '$date', :voucher_no, '$description', '$paid_amount', '$balance')");
+            $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '999999', $date', :voucher_no, '$description', '$paid_amount', '$balance')");
         }else{
           $balance = 0;
-          $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '999999999', '$date', :voucher_no, '$description', '$paid_amount', '$balance')");
+          $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '999999', '$date', :voucher_no, '$description', '$paid_amount', '$balance')");
         }
       }else{
         $addamt = $payabledata['credit'];
@@ -3770,10 +3770,23 @@ Class Query{
       }
       $balance = ($balance + $debit) - $credit;
       $cashbookstmt = $pdo->prepare("INSERT INTO cashbook(date, ac_name, particular, debit, credit, balance, voucher_no) VALUES('$date', '$ac_name', :description, '$debit', '$credit', '$balance', :voucher_no)");
+
+      $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no AND ac_name=:ac_name");
+      $checkcbstmt->execute([
+        ':voucher_no' => $voucher_no,
+        ':ac_name' => $ac_name
+      ]);
+      $checkcb = $checkcbstmt->fetchall();
+      echo "<pre>";
+      print_r($checkcb);
+      if(empty($checkcb)){
         $cashbookstmt->execute([
           ':voucher_no' => $voucher_no,
           ':description' => $description
         ]);
+      }elseif($checkcb['ac_name'] == $ac_name && $checkcb['$voucher_no'] == $voucher_no){
+        echo "BOOHOO";
+      }
     }
   }
 
