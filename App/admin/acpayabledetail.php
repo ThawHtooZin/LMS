@@ -135,7 +135,7 @@ $query = new Query();
               ?>
               <tr>
                 <td><?php if($payabledata['date'] != '0000-00-00'){echo date('d-m-Y', strtotime($payabledata['date'])); }; ?></td>
-                <td><?php echo $payabledata['purchase_voucher_no']; ?></td>
+                <td><?php if($payabledata['purchase_voucher_no'] == 	999999999){}else{echo $payabledata['purchase_voucher_no'];} ?></td>
                 <td><?php if($totalpurchaseamount['total_purchase_amount'] != 0){ echo $totalpurchaseamount['total_purchase_amount']; }; ?></td>
                 <td><?php if($payabledata['paid_date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($payabledata['paid_date'])); }; ?></td>
                 <td><?php echo $payabledata['paid_voucher']; ?></td>
