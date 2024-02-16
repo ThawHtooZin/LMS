@@ -4436,7 +4436,7 @@ Class Query{
   function addbalancepayable($date, $supplier_id, $description, $amount){
       global $pdo;
 
-      $balancestmt = $pdo->prepare("INSERT INTO payable(date, supplier_id, remark, closing_balance)  VALUES('$date', '$supplier_id', '$description', '$amount')");
+      $balancestmt = $pdo->prepare("INSERT INTO payable(date, supplier_id, remark, balance, closing_balance)  VALUES('$date', '$supplier_id', '$description', '$amount', '$amount')");
       $balancestmt->execute();
     }
   // MORE SELECTS

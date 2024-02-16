@@ -105,7 +105,7 @@ $query = new Query();
                 <th>Action</th>
               </tr>
               <?php
-              // $idd = 0;
+              $idd = 0;
               foreach ($payabledatas as $payabledata) {
                 $purchase_voucher_no = $payabledata['purchase_voucher_no'];
                 $totalpurchaseamountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS total_purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no='$purchase_voucher_no'");
@@ -118,21 +118,20 @@ $query = new Query();
                   $balanceamount = $balanceamountstmt->fetch(PDO::FETCH_ASSOC);
                   $totalpurchaseamount['total_purchase_amount'] = 0;
                 }else{
-                  $rowcount = $payablestmt->rowcount();
-                  if($rowcount >= 1){
+                  if($idd <= 1){
                     $balanceamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id' AND closing_balance != 0 ORDER BY id DESC");
                     $balanceamountstmt->execute();
                     $balanceamount = $balanceamountstmt->fetch(PDO::FETCH_ASSOC);
                     $balanceamount['closing_balance'] = $totalpurchaseamount['total_purchase_amount'] + $balanceamount['closing_balance'];
                   }else{
-                    $balanceamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id' AND closing_balance != 0 ORDER BY id DESC");
+                    $balanceamountstmt = $pdo->prepare("SELECT balance FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no='$purchase_voucher_no' ORDER BY id DESC");
                     $balanceamountstmt->execute();
                     $balanceamount = $balanceamountstmt->fetch(PDO::FETCH_ASSOC);
-                    $balanceamount['closing_balance'] = $totalpurchaseamount['total_purchase_amount'] + $balanceamount['closing_balance'];
+                    echo $balanceamount['closing_balance'] = $balanceamount['balance'];
                   }
                 }
 
-
+                $idd++;
               ?>
               <tr>
                 <td><?php if($payabledata['date'] != '0000-00-00'){echo date('d-m-Y', strtotime($payabledata['date'])); }; ?></td>
