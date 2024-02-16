@@ -3678,10 +3678,10 @@ Class Query{
         $payablesearchdata = $payabledatastmt->fetch(PDO::FETCH_ASSOC);
         if(!empty($payablesearchdata)){
             $balance = $payablesearchdata['balance'] - $paid_amount;
-            $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '$date', :voucher_no, '$description', '$paid_amount', '$balance')");
+            $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '999999', $date', :voucher_no, '$description', '$paid_amount', '$balance')");
         }else{
           $balance = 0;
-          $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '$date', :voucher_no, '$description', '$paid_amount', '$balance')");
+          $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '999999', '$date', :voucher_no, '$description', '$paid_amount', '$balance')");
         }
       }else{
         $addamt = $payabledata['credit'];
@@ -3763,9 +3763,8 @@ Class Query{
       }
       $payabledatastmt->execute();
       $cashbooksearchdata = $payabledatastmt->fetch(PDO::FETCH_ASSOC);
-      print_r($cashbooksearchdata);
       if(!empty($cashbooksearchdata['balance'])){
-          echo $balance = $cashbooksearchdata['balance'];
+          $balance = $cashbooksearchdata['balance'];
       }else{
         $balance = 0;
       }
@@ -4456,7 +4455,7 @@ Class Query{
   function addbalancepayable($date, $supplier_id, $description, $amount){
       global $pdo;
 
-      $balancestmt = $pdo->prepare("INSERT INTO payable(date, supplier_id, remark, closing_balance)  VALUES('$date', '$supplier_id', '$description', '$amount')");
+      $balancestmt = $pdo->prepare("INSERT INTO payable(date, supplier_id, remark, balance, closing_balance)  VALUES('$date', '$supplier_id', '$description', '$amount', '$amount')");
       $balancestmt->execute();
     }
   // MORE SELECTS
