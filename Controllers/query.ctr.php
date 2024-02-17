@@ -4425,7 +4425,8 @@ Class Query{
 
   function addaccountreceivablebalance($ac_name, $balance){
     global $pdo;
-    $balancestmt = $pdo->prepare("INSERT INTO receivable(ac_code, balance) VALUES('$ac_name','$balance')");
+    $date = date('Y-m-d');
+    $balancestmt = $pdo->prepare("INSERT INTO receivable(date, ac_code, balance) VALUES('$date', '$ac_name','$balance')");
     $balancestmt->execute();
   }
 
