@@ -4423,16 +4423,16 @@ Class Query{
 
   }
 
-  function addaccountreceivablebalance($ac_name, $balance){
+  function addaccountreceivablebalance($date, $ac_name, $balance){
     global $pdo;
-    $date = date('Y-m-d');
+
     $balancestmt = $pdo->prepare("INSERT INTO receivable(date, ac_code, balance) VALUES('$date', '$ac_name','$balance')");
     $balancestmt->execute();
   }
 
-  function updateaccountreceivablebalance($ac_name, $balance){
+  function updateaccountreceivablebalance($id, $dateupdate, $ac_nameupdate, $balanceamount){
     global $pdo;
-    $balancestmt = $pdo->prepare("UPDATE receivable SET ac_code='$ac_name', balance='$balance'");
+    $balancestmt = $pdo->prepare("UPDATE receivable SET date='$dateupdate', ac_code='$ac_nameupdate', balance='$balanceamount' WHERE id='$id'");
     $balancestmt->execute();
   }
 
