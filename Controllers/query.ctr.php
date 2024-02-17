@@ -4430,9 +4430,9 @@ Class Query{
     $balancestmt->execute();
   }
 
-  function updateaccountreceivablebalance($ac_name, $balance){
+  function updateaccountreceivablebalance($dateupdate, $ac_nameupdate, $balanceamount){
     global $pdo;
-    $balancestmt = $pdo->prepare("UPDATE receivable SET ac_code='$ac_name', balance='$balance'");
+    $balancestmt = $pdo->prepare("UPDATE receivable SET date='$dateupdate', ac_code='$ac_nameupdate', balance='$balanceamount'");
     $balancestmt->execute();
   }
 

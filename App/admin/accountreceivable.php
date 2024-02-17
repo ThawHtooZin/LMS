@@ -28,9 +28,10 @@ if(isset($_POST['addbalance'])){
 }
 
 if(isset($_POST['updatebalance'])){
-  $ac_name = $_POST['ac_name'];
+  $ac_name = $_POST['ac_nameupdate'];
+  $dateupdate = $_POST['dateupdate'];
   $balanceamount = $_POST['updatebalanceamount'];
-  $query->updateaccountreceivablebalance($ac_name, $balanceamount);
+  $query->updateaccountreceivablebalance($dateupdate, $ac_nameupdate, $balanceamount);
 }
 ?>
 <!DOCTYPE html>
@@ -249,10 +250,26 @@ if(isset($_POST['updatebalance'])){
                       <!-- Your modal content goes here -->
                       <form method="POST" action="">
                         <input type="hidden" name="ac_name" value="<?= $receivabledata['ac_code']; ?>">
-                        <div class="form-group">
+                          <label>Date</label>
+                          <input type="date" name="dateupdate" class="form-control inpv2 mb-2 float-start">
+                          <label>Account Name</label>
+                          <select name="ac_nameupdate" class="form-control inpv2 mb-2 float-start">
+                            <?php
+                            
+                            $stmt = $pdo->prepare("SELECT * FROM customers");
+                            $stmt->execute();
+                            $acnamedatas = $stmt->fetchall();
+                            foreach($acnamedatas as $acnamedata)
+                            {
+                              ?>
+                                <option value="<?= $acnamedata['customer_id']; ?>"><?= $acnamedata['customer_name']; ?></option>
+                              <?php
+                            }
+                                
+                            ?>
+                          </select>
                           <label for="newBalance" class="float-start">New Balance:</label>
                           <input type="number" class="form-control" name="updatebalanceamount">
-                        </div>
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
