@@ -28,7 +28,7 @@ if(isset($_POST['addbalance'])){
 }
 
 if(isset($_POST['updatebalance'])){
-  $ac_name = $_POST['ac_nameupdate'];
+  $ac_nameupdate = $_POST['ac_nameupdate'];
   $dateupdate = $_POST['dateupdate'];
   $balanceamount = $_POST['updatebalanceamount'];
   $query->updateaccountreceivablebalance($dateupdate, $ac_nameupdate, $balanceamount);
@@ -250,10 +250,10 @@ if(isset($_POST['updatebalance'])){
                       <!-- Your modal content goes here -->
                       <form method="POST" action="">
                         <input type="hidden" name="ac_name" value="<?= $receivabledata['ac_code']; ?>">
-                          <label>Date</label>
-                          <input type="date" name="dateupdate" class="form-control inpv2 mb-2 float-start">
-                          <label>Account Name</label>
-                          <select name="ac_nameupdate" class="form-control inpv2 mb-2 float-start">
+                          <label class="float-start">Date</label>
+                          <input type="date" name="dateupdate" class="form-control inpv2 mb-2" value="<?= $receivabledata['date']; ?>">
+                          <label class="float-start">Account Name</label>
+                          <select name="ac_nameupdate" class="form-control inpv2 mb-2">
                             <?php
                             
                             $stmt = $pdo->prepare("SELECT * FROM customers");
@@ -262,14 +262,14 @@ if(isset($_POST['updatebalance'])){
                             foreach($acnamedatas as $acnamedata)
                             {
                               ?>
-                                <option value="<?= $acnamedata['customer_id']; ?>"><?= $acnamedata['customer_name']; ?></option>
+                                <option value="<?= $acnamedata['customer_id']; ?>" <?php if($acnamedata['customer_id'] == $receivabledata['ac_code'] ){ echo "selected"; } ?>><?= $acnamedata['customer_name']; ?></option>
                               <?php
                             }
                                 
                             ?>
                           </select>
-                          <label for="newBalance" class="float-start">New Balance:</label>
-                          <input type="number" class="form-control" name="updatebalanceamount">
+                          <label for="newBalance" class="float-start">Balance</label>
+                          <input type="number" class="form-control" name="updatebalanceamount" value="<?= $receivabledata['balance']; ?>">
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
