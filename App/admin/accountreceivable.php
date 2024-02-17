@@ -22,8 +22,9 @@ if(isset($_POST['addpaymentbtn'])){
 if(isset($_POST['addbalance'])){
   $ac_name = $_POST['ac_name'];
   $balance = $_POST['balance'];
+  $date = $_POST['date'];
 
-  $query->addaccountreceivablebalance($ac_name, $balance);
+  $query->addaccountreceivablebalance($date, $ac_name, $balance);
 }
 
 if(isset($_POST['updatebalance'])){
@@ -275,6 +276,8 @@ if(isset($_POST['updatebalance'])){
           </div>
         <form action="" method="post">
           <div class="modal-body">
+            <label>Date</label>
+            <input type="date" name="date" class="form-control inpv2 mb-2">
             <label>Account Name</label>
             <select name="ac_name" class="form-control inpv2 mb-2">
               <?php
