@@ -3719,13 +3719,15 @@ Class Query{
       $ac_name = $cashbookdata['ac_code'];
       $sr_no = $cashbookdata['sr_no'];
       $voucher_no = $cashbookdata['voucher_no'];
-      $crossacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no='$voucher_no' AND ac_code NOT LIKE '3600%'");
-      $crossacnamestmt->execute();
+      $crossacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no=:voucher_no AND ac_code NOT LIKE '3600%'");
+      $crossacnamestmt->execute(
+        array(':voucher_no' => $voucher_no)
+      );
       $crossac_name = $crossacnamestmt->fetchall();
       $crossacnamerowcount = $crossacnamestmt->rowcount();
       for($i = 0; $i < $crossacnamerowcount; $i++){
         $crossacname = $crossac_name[$i]['ac_code'];
-        
+
         $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no");
         $currencystmt->execute([
           ':voucher_no' => $voucher_no
@@ -3761,7 +3763,7 @@ Class Query{
         // $selectacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE id='$id'");
         // $selectacnamestmt->execute();
         // $selectacname = $selectacnamestmt->fetch(PDO::FETCH_ASSOC);
-        
+
         if($cashbookdata['ac_code'] == '3600/001'){
           $payabledatastmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='3600/001' ORDER BY id DESC");
         }else{
@@ -3789,7 +3791,7 @@ Class Query{
           ]);
         }
       }
-    
+
   }
   }
 
