@@ -280,12 +280,6 @@ $query = new Query();
                   ]);
                   $acselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
                   $accode = $acselect['ac_code'];
-                  if(str_contains($accode, '4000/')){
-                    $acname = 'Supplier';
-                  }else {
-                    $acnamedata = $query->select('acname', $accode, 'code_no');
-                    $acname = $acnamedata['ac_name'];
-                  }
                   if (empty($_SESSION['cashbookcurrency']) || $_SESSION['cashbookcurrency'] == 'ks') {
                     $debit = $cashdata['debit'];
                     $credit = $cashdata['credit'];
@@ -344,13 +338,17 @@ $query = new Query();
                   $balance = $cashdata['balance'];
                 }
 
+                $crossac_nameid = $cashdata['crossac_name'];
+                $crossacnamestmt = $pdo->prepare("SELECT * FROM acname WHERE code_no='$crossac_nameid'");
+                $crossacnamestmt->execute();
+                $crossacnamedata = $crossacnamestmt->fetch(PDO::FETCH_ASSOC);
 
                 ?>
                 <tr>
                   <td><?php echo $idd; ?></td>
                   <td><?php echo date('d-m-Y', strtotime($cashdata['date'])); ?></td>
                   <td><?php echo $cashdata['voucher_no']; ?></td>
-                  <td><?php echo $acname; ?></td>
+                  <td><?php echo $crossacnamedata['ac_name']; ?></td>
                   <td><?php echo $cashdata['particular']; ?></td>
                   <td><?php if($cashdata['debit'] == 0){echo "";}else{echo round($debit, 2);}; ?></td>
                   <td><?php if($cashdata['credit'] == 0){echo "";}else{echo round($credit, 2);}; ?></td>

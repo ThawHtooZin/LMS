@@ -276,13 +276,27 @@ if(isset($_POST['updatebalance'])){
         <form action="" method="post">
           <div class="modal-body">
             <label>Account Name</label>
-            <input type="text" name="ac_name" class="form-control inpv2 mb-2">
+            <select name="ac_name" class="form-control inpv2 mb-2">
+              <?php
+              
+              $stmt = $pdo->prepare("SELECT * FROM customers");
+              $stmt->execute();
+              $acnamedatas = $stmt->fetchall();
+              foreach($acnamedatas as $acnamedata)
+              {
+                ?>
+                  <option value="<?= $acnamedata['customer_id']; ?>"><?= $acnamedata['customer_name']; ?></option>
+                <?php
+              }
+                  
+              ?>
+            </select>
             <label>Balance</label>
             <input type="number" name="balance" class="form-control inpv2 mb-2">
           </div>
           <div class="modal-footer">
             <button type="button" name="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
-            <button type="submit" name="addbalance" class="btn btn-success">Update</button>
+            <button type="submit" name="addbalance" class="btn btn-success">Add</button>
           </div>
         </form>
         </div>
