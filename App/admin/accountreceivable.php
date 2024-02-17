@@ -28,10 +28,11 @@ if(isset($_POST['addbalance'])){
 }
 
 if(isset($_POST['updatebalance'])){
+  echo $id = $_POST['id'];
   $ac_nameupdate = $_POST['ac_nameupdate'];
   $dateupdate = $_POST['dateupdate'];
   $balanceamount = $_POST['updatebalanceamount'];
-  $query->updateaccountreceivablebalance($dateupdate, $ac_nameupdate, $balanceamount);
+  $query->updateaccountreceivablebalance($id, $dateupdate, $ac_nameupdate, $balanceamount);
 }
 ?>
 <!DOCTYPE html>
@@ -249,7 +250,7 @@ if(isset($_POST['updatebalance'])){
                     <div class="modal-body">
                       <!-- Your modal content goes here -->
                       <form method="POST" action="">
-                        <input type="hidden" name="ac_name" value="<?= $receivabledata['ac_code']; ?>">
+                        <input type="hidden" name="id" value="<?= $receivabledata['id']; ?>">
                           <label class="float-start">Date</label>
                           <input type="date" name="dateupdate" class="form-control inpv2 mb-2" value="<?= $receivabledata['date']; ?>">
                           <label class="float-start">Account Name</label>
@@ -265,7 +266,6 @@ if(isset($_POST['updatebalance'])){
                                 <option value="<?= $acnamedata['customer_id']; ?>" <?php if($acnamedata['customer_id'] == $receivabledata['ac_code'] ){ echo "selected"; } ?>><?= $acnamedata['customer_name']; ?></option>
                               <?php
                             }
-                                
                             ?>
                           </select>
                           <label for="newBalance" class="float-start">Balance</label>
