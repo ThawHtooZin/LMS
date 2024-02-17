@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 16, 2024 at 04:47 AM
+-- Generation Time: Feb 16, 2024 at 02:01 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -82,8 +82,15 @@ INSERT INTO `general_ledger` (`id`, `date`, `voucherno`, `ac_code`, `debit`, `cr
 (97, '2024-02-01', 'Dr Feb\'24/007', '3600/001', 0, 89928700, -90167100, 'Bejon Loan take from LM 2020ED Balance $25176*3572ks(Best Brand)', '', '', 0, 35),
 (98, '2024-02-01', 'Dr Feb\'24/008', '9100/008', 377000, 0, 377000, 'DHL charges for Italy Document sent', '', '', 0, 39),
 (99, '2024-02-01', 'Dr Feb\'24/008', '3600/001', 0, 377000, -90544100, 'DHL charges for Italy Document sent', '', '', 0, 35),
-(100, '2024-02-01', 'Dr Feb\'24/009', '4000/K06', 100000, 0, -465400, 'Paid to Ka Yin Lay Vr No-11337', '', '', 0, 40),
-(101, '2024-02-01', 'Dr Feb\'24/009', '3600/001', 0, 100000, -90644100, 'Paid to Ka Yin Lay Vr No-11337', '', '', 0, 35);
+(104, '2024-02-01', 'Dr Feb\'24/009', '4000/K06', 100000, 0, -465400, 'Paid to KA Yin Lay for Vr-11337', '', '', 0, 40),
+(105, '2024-02-01', 'Dr Feb\'24/009', '3600/001', 0, 100000, -90644100, 'Paid to KA Yin Lay for Vr-11337', '', '', 0, 35),
+(106, '2024-02-01', 'Dr Feb\'24/010', '9100/009', 1500, 0, 1500, 'Wave Money charges for Ka Yin Lay Money sent', '', '', 0, 39),
+(107, '2024-02-01', 'Dr Feb\'24/010', '3600/001', 0, 1500, -90645600, 'Wave Money charges for Ka Yin Lay Money sent', '', '', 0, 35),
+(108, '2024-02-01', 'Dr Feb\'24/011', '9100/001', 17754000, 0, 17754000, 'All people Salary Payment for Jan/24', '', '', 0, 39),
+(109, '2024-02-01', 'Dr Feb\'24/011', '3600/001', 0, 17754000, -108399600, 'All people Salary Payment for Jan/24', '', '', 0, 35),
+(110, '2024-02-01', 'Dr Feb\'24/011', '9100/010', 17351000, 0, 17351000, 'All people Annual Bonus Paid for Jan/24', '', '', 0, 39),
+(111, '2024-02-01', 'Dr Feb\'24/012', '9100/011', 3000000, 0, 3000000, 'Donation for Bangladesh Embassy', '', '', 0, 39),
+(112, '2024-02-01', 'Dr Feb\'24/012', '3600/001', 0, 3000000, -111399600, 'Donation for Bangladesh Embassy', '', '', 0, 35);
 
 --
 -- Indexes for dumped tables
@@ -103,7 +110,7 @@ ALTER TABLE `general_ledger`
 -- AUTO_INCREMENT for table `general_ledger`
 --
 ALTER TABLE `general_ledger`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=113;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

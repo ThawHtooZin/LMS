@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 16, 2024 at 04:53 AM
+-- Generation Time: Feb 16, 2024 at 02:01 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -168,7 +168,7 @@ INSERT INTO `payable` (`id`, `date`, `supplier_id`, `purchase_voucher_no`, `purc
 (190, '2024-02-11', '4000/T07', '11373', 1083600, '0000-00-00', '', '', 0, 13442980, 138, 0, '0000-00-00'),
 (191, '2024-02-11', '4000/T07', '11373', 1335600, '0000-00-00', '', '', 0, 14778580, 139, 0, '0000-00-00'),
 (192, '2024-02-12', '4000/T07', '11374', 1163350, '0000-00-00', '', '', 0, 15941930, 140, 0, '0000-00-00'),
-(193, '0000-00-00', '4000/K06', '', 0, '2024-02-01', 'Dr Feb\'24/009', 'Paid to Ka Yin Lay Vr No-11337', 100000, 465400, 0, 0, '0000-00-00');
+(195, '0000-00-00', '4000/K06', '999999999', 0, '2024-02-01', 'Dr Feb\'24/009', 'Paid to Ka Yin Lay for Vr No-11337', 100000, 465400, 0, 0, '0000-00-00');
 
 --
 -- Indexes for dumped tables
@@ -188,7 +188,7 @@ ALTER TABLE `payable`
 -- AUTO_INCREMENT for table `payable`
 --
 ALTER TABLE `payable`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=194;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=196;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

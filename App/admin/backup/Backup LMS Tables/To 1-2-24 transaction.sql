@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 16, 2024 at 04:47 AM
+-- Generation Time: Feb 16, 2024 at 02:01 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -62,8 +62,16 @@ INSERT INTO `transaction` (`id`, `date`, `voucher_no`, `ac_code`, `description`,
 (69, '2024-02-01', 'Dr Feb\'24/007', '3600/001', 'Bejon Loan take from LM 2020ED Balance $25176*3572ks(Best Brand)', 0, 89928700, 'mmk', '', '', 0),
 (70, '2024-02-01', 'Dr Feb\'24/008', '9100/008', 'DHL charges for Italy Document sent', 377000, 0, 'mmk', '', '', 0),
 (71, '2024-02-01', 'Dr Feb\'24/008', '3600/001', 'DHL charges for Italy Document sent', 0, 377000, 'mmk', '', '', 0),
-(72, '2024-02-01', 'Dr Feb\'24/009', '4000/K06', 'Paid to Ka Yin Lay Vr No-11337', 100000, 0, 'mmk', '', '', 0),
-(73, '2024-02-01', 'Dr Feb\'24/009', '3600/001', 'Paid to Ka Yin Lay Vr No-11337', 0, 100000, 'mmk', '', '', 0);
+(76, '2024-02-01', 'Dr Feb\'24/009', '4000/K06', 'Paid to Ka Yin Lay for Vr No-11337', 100000, 0, 'mmk', '', '', 0),
+(77, '2024-02-01', 'Dr Feb\'24/009', '3600/001', 'Paid to Ka Yin Lay for Vr No-11337', 0, 100000, 'mmk', '', '', 0),
+(78, '2024-02-01', 'Dr Feb\'24/010', '9100/009', 'Wave Money charges for Ka Yin Lay Money sent', 1500, 0, 'mmk', '', '', 0),
+(79, '2024-02-01', 'Dr Feb\'24/010', '3600/001', 'Wave Money charges for Ka Yin Lay Money sent', 0, 1500, 'mmk', '', '', 0),
+(80, '2024-02-01', 'Dr Feb\'24/011', '9100/001', 'All people Salary Payment for Jan/24', 17754000, 0, 'mmk', '', '', 0),
+(81, '2024-02-01', 'Dr Feb\'24/011', '3600/001', 'All people Salary Payment for Jan/24', 0, 17754000, 'mmk', '', '', 0),
+(82, '2024-02-01', 'Dr Feb\'24/011', '9100/010', 'All people Annual Bonus Paid for Jan/24', 17351000, 0, 'mmk', '', '', 0),
+(83, '2024-02-01', 'Dr Feb\'24/011', '3600/001', 'All people Annual Bonus Paid for Jan/24', 0, 17351000, 'mmk', '', '', 0),
+(84, '2024-02-01', 'Dr Feb\'24/012', '9100/011', 'Donation for Bangladesh Embassy', 3000000, 0, 'mmk', '', '', 0),
+(85, '2024-02-01', 'Dr Feb\'24/012', '3600/001', 'Donation for Bangladesh Embassy', 0, 3000000, 'mmk', '', '', 0);
 
 --
 -- Indexes for dumped tables
@@ -83,7 +91,7 @@ ALTER TABLE `transaction`
 -- AUTO_INCREMENT for table `transaction`
 --
 ALTER TABLE `transaction`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

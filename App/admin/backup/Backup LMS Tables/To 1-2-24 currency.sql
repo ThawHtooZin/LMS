@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 16, 2024 at 04:53 AM
+-- Generation Time: Feb 16, 2024 at 02:01 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -57,8 +57,16 @@ INSERT INTO `currency` (`id`, `dollar_rate`, `debitorcredit`, `mmk_amount`, `usd
 (69, 0, 'credit', 89928700, 0, 'Dr Feb\'24/007'),
 (70, 0, 'debit', 377000, 0, 'Dr Feb\'24/008'),
 (71, 0, 'credit', 377000, 0, 'Dr Feb\'24/008'),
-(72, 0, 'debit', 100000, 0, 'Dr Feb\'24/009'),
-(73, 0, 'credit', 100000, 0, 'Dr Feb\'24/009');
+(76, 0, 'debit', 100000, 0, 'Dr Feb\'24/009'),
+(77, 0, 'credit', 100000, 0, 'Dr Feb\'24/009'),
+(78, 0, 'debit', 1500, 0, 'Dr Feb\'24/010'),
+(79, 0, 'credit', 1500, 0, 'Dr Feb\'24/010'),
+(80, 0, 'debit', 17754000, 0, 'Dr Feb\'24/011'),
+(81, 0, 'credit', 17754000, 0, 'Dr Feb\'24/011'),
+(82, 0, 'debit', 17351000, 0, 'Dr Feb\'24/011'),
+(83, 0, 'credit', 17351000, 0, 'Dr Feb\'24/011'),
+(84, 0, 'debit', 3000000, 0, 'Dr Feb\'24/012'),
+(85, 0, 'credit', 3000000, 0, 'Dr Feb\'24/012');
 
 --
 -- Indexes for dumped tables
@@ -78,7 +86,7 @@ ALTER TABLE `currency`
 -- AUTO_INCREMENT for table `currency`
 --
 ALTER TABLE `currency`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
