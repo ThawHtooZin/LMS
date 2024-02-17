@@ -3678,10 +3678,10 @@ Class Query{
         $payablesearchdata = $payabledatastmt->fetch(PDO::FETCH_ASSOC);
         if(!empty($payablesearchdata)){
             $balance = $payablesearchdata['balance'] - $paid_amount;
-            $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '999999', $date', :voucher_no, '$description', '$paid_amount', '$balance')");
+            $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '$date', :voucher_no, '$description', '$paid_amount', '$balance')");
         }else{
           $balance = 0;
-          $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '999999', '$date', :voucher_no, '$description', '$paid_amount', '$balance')");
+          $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '$date', :voucher_no, '$description', '$paid_amount', '$balance')");
         }
       }else{
         $addamt = $payabledata['credit'];
@@ -3719,75 +3719,78 @@ Class Query{
       $ac_name = $cashbookdata['ac_code'];
       $sr_no = $cashbookdata['sr_no'];
       $voucher_no = $cashbookdata['voucher_no'];
-      $id = $cashbookdata['id'];
-      $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no");
-      $currencystmt->execute([
-        ':voucher_no' => $voucher_no
-      ]);
-      $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
-      if(!empty($cashbookdata['bank_charges'])){
-        $predebit = $currencydata['dollar_rate'] * $cashbookdata['bank_charges'];
-        $debit = $cashbookdata['debit'] - $predebit;
-      }else{
-        $debit = $cashbookdata['debit'];
-      }
-      $credit = $cashbookdata['credit'];
-      $description = $cashbookdata['description'];
-      // $selectacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no='$voucher_no' AND id!='$id'");
-      // $selectacnamestmt->execute();
-      // $selectacname = $selectacnamestmt->fetch(PDO::FETCH_ASSOC);
-      // $ac_code = $selectacname['ac_code'];
-      //
-      //
-      // if(str_contains($ac_code, '4000')){
-      //   $ac_code = 'Supplier';
-      //    echo "sup";
-      // }
-      // if(str_contains($ac_code, '3300')){
-      //    echo "cus";
-      //   $ac_code = $selectacname['ac_code'];
-      // }
-      // if(str_contains($ac_code, '9100')){
-      //    echo "expanse";
-      //   $ac_code = $selectacname['ac_code'];
-      // }
-      //
-      // $selectacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE id='$id'");
-      // $selectacnamestmt->execute();
-      // $selectacname = $selectacnamestmt->fetch(PDO::FETCH_ASSOC);
-
-      if($cashbookdata['ac_code'] == '3600/001'){
-        $payabledatastmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='3600/001' ORDER BY id DESC");
-      }else{
-        $payabledatastmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='3600/002' ORDER BY id DESC");
-      }
-      $payabledatastmt->execute();
-      $cashbooksearchdata = $payabledatastmt->fetch(PDO::FETCH_ASSOC);
-      if(!empty($cashbooksearchdata['balance'])){
-          $balance = $cashbooksearchdata['balance'];
-      }else{
-        $balance = 0;
-      }
-      $balance = ($balance + $debit) - $credit;
-      $cashbookstmt = $pdo->prepare("INSERT INTO cashbook(date, ac_name, particular, debit, credit, balance, voucher_no) VALUES('$date', '$ac_name', :description, '$debit', '$credit', '$balance', :voucher_no)");
-
-      $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no AND ac_name=:ac_name");
-      $checkcbstmt->execute([
-        ':voucher_no' => $voucher_no,
-        ':ac_name' => $ac_name
-      ]);
-      $checkcb = $checkcbstmt->fetchall();
-      echo "<pre>";
-      print_r($checkcb);
-      if(empty($checkcb)){
-        $cashbookstmt->execute([
-          ':voucher_no' => $voucher_no,
-          ':description' => $description
+      $crossacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no='$voucher_no' AND ac_code NOT LIKE '3600%'");
+      $crossacnamestmt->execute();
+      $crossac_name = $crossacnamestmt->fetchall();
+      $crossacnamerowcount = $crossacnamestmt->rowcount();
+      for($i = 0; $i < $crossacnamerowcount; $i++){
+        $crossacname = $crossac_name[$i]['ac_code'];
+        
+        $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no");
+        $currencystmt->execute([
+          ':voucher_no' => $voucher_no
         ]);
-      }elseif($checkcb['ac_name'] == $ac_name && $checkcb['$voucher_no'] == $voucher_no){
-        echo "BOOHOO";
+        $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
+        if(!empty($cashbookdata['bank_charges'])){
+          $predebit = $currencydata['dollar_rate'] * $cashbookdata['bank_charges'];
+          $debit = $cashbookdata['debit'] - $predebit;
+        }else{
+          $debit = $cashbookdata['debit'];
+        }
+        $credit = $cashbookdata['credit'];
+        $description = $cashbookdata['description'];
+        // $selectacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no='$voucher_no' AND id!='$id'");
+        // $selectacnamestmt->execute();
+        // $selectacname = $selectacnamestmt->fetch(PDO::FETCH_ASSOC);
+        // $ac_code = $selectacname['ac_code'];
+        //
+        //
+        // if(str_contains($ac_code, '4000')){
+        //   $ac_code = 'Supplier';
+        //    echo "sup";
+        // }
+        // if(str_contains($ac_code, '3300')){
+        //    echo "cus";
+        //   $ac_code = $selectacname['ac_code'];
+        // }
+        // if(str_contains($ac_code, '9100')){
+        //    echo "expanse";
+        //   $ac_code = $selectacname['ac_code'];
+        // }
+        //
+        // $selectacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE id='$id'");
+        // $selectacnamestmt->execute();
+        // $selectacname = $selectacnamestmt->fetch(PDO::FETCH_ASSOC);
+        
+        if($cashbookdata['ac_code'] == '3600/001'){
+          $payabledatastmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='3600/001' ORDER BY id DESC");
+        }else{
+          $payabledatastmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='3600/002' ORDER BY id DESC");
+        }
+        $payabledatastmt->execute();
+        $cashbooksearchdata = $payabledatastmt->fetch(PDO::FETCH_ASSOC);
+        if(!empty($cashbooksearchdata['balance'])){
+            $balance = $cashbooksearchdata['balance'];
+          }else{
+          $balance = 0;
+        }
+        $balance = ($balance + $debit) - $credit;
+        $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no AND crossac_name=:ac_name");
+        $checkcbstmt->execute([
+          ':voucher_no' => $voucher_no,
+          ':ac_name' => $crossacname
+        ]);
+        $checkcb = $checkcbstmt->fetchall();
+        if(empty($checkcb)){
+          $cashbookstmt = $pdo->prepare("INSERT INTO cashbook(date, ac_name, particular, debit, credit, balance, voucher_no, crossac_name) VALUES('$date', '$ac_name', :description, '$debit', '$credit', '$balance', :voucher_no, '$crossacname')");
+          $cashbookstmt->execute([
+            ':voucher_no' => $voucher_no,
+            ':description' => $description
+          ]);
+        }
       }
-    }
+    
+  }
   }
 
   // DELETE ACCEPT
@@ -4460,7 +4463,7 @@ Class Query{
   function addbalancepayable($date, $supplier_id, $description, $amount){
       global $pdo;
 
-      $balancestmt = $pdo->prepare("INSERT INTO payable(date, supplier_id, remark, balance, closing_balance)  VALUES('$date', '$supplier_id', '$description', '$amount', '$amount')");
+      $balancestmt = $pdo->prepare("INSERT INTO payable(date, supplier_id, remark, closing_balance)  VALUES('$date', '$supplier_id', '$description', '$amount')");
       $balancestmt->execute();
     }
   // MORE SELECTS

@@ -201,7 +201,6 @@ $query = new Query();
       $query->deletetransaction($id, $voucher_no);
     }
     if(isset($_POST['accept'])){
-      $date = date('Y-m-d', strtotime('-1 day'));
       $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total FROM transaction");
       $totaldebitstmt->execute();
       $totaldebitdata = $totaldebitstmt->fetch(PDO::FETCH_ASSOC);

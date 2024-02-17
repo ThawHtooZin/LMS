@@ -384,7 +384,7 @@ $query = new Query();
                 <div class="modal-dialog" role="document">
                   <div class="modal-content">
                     <div class="modal-header bg-warning">
-                      <h5 class="modal-title">Update Balance</h5>
+                      <h5 class="modal-title text-light">Update Balance</h5>
                     </div>
                     <div class="modal-body">
                       <!-- Your modal content goes here -->
@@ -396,7 +396,7 @@ $query = new Query();
                         </div>
                       </div>
                       <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary" name="updatebalance">Update</button>
                       </form>
                       </div>
