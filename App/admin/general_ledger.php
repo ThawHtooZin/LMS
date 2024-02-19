@@ -256,10 +256,12 @@ $query = new Query();
                   <td><?php echo $gldata['voucherno']; ?></td>
                   <td><?php echo $acname; ?></td>
                   <td><?php echo $gldata['narration']; ?></td>
-                  <td><?php if($gldata['debit'] == 0){ echo "-"; }else{if(!empty($currencydata['dollar_rate']) == 0){echo $gldata['debit'];}else{ echo $gldata['debit'] / !empty($currencydata['dollar_rate']);  };} ?></td>
-                  <td><?php if($gldata['credit'] == 0){ echo "-"; }else{if(!empty($currencydata['dollar_rate']) == 0){echo $gldata['credit'];}else{ echo $gldata['credit'] / !empty($currencydata['dollar_rate']);  };} ?></td>
+                  <td><?php if($gldata['debit'] == 0){ echo "-"; }else{if(!empty($currencydata['dollar_rate']) == 0){echo $gldata['debit'];}else{ echo $gldata['debit'] / $currencydata['dollar_rate'];  };} ?></td>
+                  <td><?php if($gldata['credit'] == 0){ echo "-"; }else{if(!empty($currencydata['dollar_rate']) == 0){echo $gldata['credit'];}else{ echo $gldata['credit'] / $currencydata['dollar_rate'];  };} ?></td>
+                  <!-- <td><?php echo $gldata['debit']; ?></td>
+                  <td><?php echo $gldata['credit']; ?></td> -->
                   <td><?php if(!empty($currencydata['dollar_rate']) == 0){ echo "MMK"; }else{ echo "USD"; } ?></td>
-                  <td><?php if(!empty($currencydata['dollar_rate']) == 0){echo $gldata['balance'];}else{ echo $gldata['balance'] / !empty($currencydata['dollar_rate']);  }; ?></td>
+                  <td><?php if(!empty($currencydata['dollar_rate']) == 0){echo $gldata['balance'];}else{ echo $gldata['balance'] / $currencydata['dollar_rate'];  }; ?></td>
                   <td>
                     <a href="edittransaction.php?voucher_no=<?= $gldata['voucherno']; ?>&file=general_ledger" style="<?php if(str_contains(strtolower($acname), 'purchase')){ echo "display:none;"; } ?>">
                       <button type="submit" class="btn btn-warning btn-sm text-light" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -360,10 +362,10 @@ $query = new Query();
                  <td></td>
                  <td></td>
                  <td></td>
-                 <td><?php if($totaldebit['total_debit'] == 0){ echo "-"; }else{ if(!empty(!empty($currencydata['dollar_rate'])) == 0){echo $totaldebit['total_debit'];}else{ echo $totaldebit['total_debit'] / !empty($currencydata['dollar_rate']);  }; }; ?></td>
-                 <td><?php if($totalcredit['total_credit'] == 0){ echo "-"; }else{ if(!empty(!empty($currencydata['dollar_rate'])) == 0){echo $totalcredit['total_credit'];}else{ echo $totalcredit['total_credit'] / !empty($currencydata['dollar_rate']);  }; }; ?></td>
+                 <td><?php if($totaldebit['total_debit'] == 0){ echo "-"; }else{ if(!empty(!empty($currencydata['dollar_rate'])) == 0){echo $totaldebit['total_debit'];}else{ echo $totaldebit['total_debit'] / $currencydata['dollar_rate'];  }; }; ?></td>
+                 <td><?php if($totalcredit['total_credit'] == 0){ echo "-"; }else{ if(!empty(!empty($currencydata['dollar_rate'])) == 0){echo $totalcredit['total_credit'];}else{ echo $totalcredit['total_credit'] / $currencydata['dollar_rate'];  }; }; ?></td>
                  <td></td>
-                 <td><?php if($totalbalance == 0){echo "-"; }else{ if(!empty(!empty($currencydata['dollar_rate'])) == 0){echo $totalbalance;}else{ echo $totalbalance / !empty($currencydata['dollar_rate']);  };} ?></td>
+                 <td><?php if($totalbalance == 0){echo "-"; }else{ if(!empty(!empty($currencydata['dollar_rate'])) == 0){echo $totalbalance;}else{ echo $totalbalance / $currencydata['dollar_rate'];  };} ?></td>
                  <td></td>
                </tr>
               <?php } } ?>

@@ -157,7 +157,7 @@ if(isset($_POST['updatebalance'])){
                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
                          <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
                        </svg>
-                     </button>   
+                     </button>
                      </a>
                         <?php
                       }else{
@@ -220,7 +220,7 @@ if(isset($_POST['updatebalance'])){
 <?php
                   if(isset($_POST['search'])){
                     $total_invoice_amount = $query->selectallsumreceivable('receivable', 'invoice_amount', 'total_invoice_amount', $ac_code);
-                    
+
                     $total_paid_amount = $query->selectallsumreceivable('receivable', 'paid_amount', 'total_paid_amount', $ac_code);
 
 
@@ -256,7 +256,7 @@ if(isset($_POST['updatebalance'])){
                           <label class="float-start">Account Name</label>
                           <select name="ac_nameupdate" class="form-control inpv2 mb-2">
                             <?php
-                            
+
                             $stmt = $pdo->prepare("SELECT * FROM customers");
                             $stmt->execute();
                             $acnamedatas = $stmt->fetchall();
@@ -269,7 +269,7 @@ if(isset($_POST['updatebalance'])){
                             ?>
                           </select>
                           <label for="newBalance" class="float-start">Balance</label>
-                          <input type="number" class="form-control" name="updatebalanceamount" value="<?= $receivabledata['balance']; ?>">
+                          <input type="text" class="form-control" name="updatebalanceamount" value="<?= $receivabledata['balance']; ?>">
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -298,7 +298,7 @@ if(isset($_POST['updatebalance'])){
             <label>Account Name</label>
             <select name="ac_name" class="form-control inpv2 mb-2">
               <?php
-              
+
               $stmt = $pdo->prepare("SELECT * FROM customers");
               $stmt->execute();
               $acnamedatas = $stmt->fetchall();
@@ -308,11 +308,11 @@ if(isset($_POST['updatebalance'])){
                   <option value="<?= $acnamedata['customer_id']; ?>"><?= $acnamedata['customer_name']; ?></option>
                 <?php
               }
-                  
+
               ?>
             </select>
             <label>Balance</label>
-            <input type="number" name="balance" class="form-control inpv2 mb-2">
+            <input type="text" name="balance" class="form-control inpv2 mb-2">
           </div>
           <div class="modal-footer">
             <button type="button" name="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>

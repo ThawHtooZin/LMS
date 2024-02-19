@@ -3612,13 +3612,19 @@ Class Query{
           ':voucher_no' => $voucher_no,
         ]);
         $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
-        $receivestmt = $pdo->prepare("SELECT * FROM receivable ORDER BY id DESC");
+        $receivestmt = $pdo->prepare("SELECT * FROM receivable WHERE ac_code='$ac_code' ORDER BY id DESC");
         $receivestmt->execute();
         $receivedata = $receivestmt->fetch(PDO::FETCH_ASSOC);
         $invoice_amount = $currencydata['usd_amount'];
         $sr_no = $receivabledata['sr_no'];
         $container_no = $receivabledata['container_no'];
-        $balance = $currencydata['usd_amount'];
+
+          if (!empty($receivedata['balance'])) {
+            $balance = $receivedata['balance'] + $invoice_amount;
+          }else{
+            $balance = $invoice_amount;
+          }
+
         $receivestmt = $pdo->prepare("INSERT INTO receivable(date, ac_code, sr_no, container_no, invoice_amount, balance) VALUES('$date', '$ac_code', '$sr_no', '$container_no', '$invoice_amount', '$balance')");
         $checkresrstmt = $pdo->prepare("SELECT * FROM receivable WHERE sr_no='$sr_no'");
         $checkresrstmt->execute();
@@ -3639,6 +3645,7 @@ Class Query{
         $paid_amount = $currencydata['usd_amount'];
         if(!empty($receivedata['invoice_amount'])){
           $invoice_amount = $receivedata['invoice_amount'];
+
           if (!empty($receivedata['balance'])) {
             $balance = $invoice_amount - floatval($currencydata['usd_amount']);
           }else{
