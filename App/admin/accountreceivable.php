@@ -23,16 +23,18 @@ if(isset($_POST['addbalance'])){
   $ac_name = $_POST['ac_name'];
   $balance = $_POST['balance'];
   $date = $_POST['date'];
+  $description = $_POST['description'];
 
-  $query->addaccountreceivablebalance($date, $ac_name, $balance);
+  $query->addaccountreceivablebalance($date, $ac_name, $balance, $description);
 }
 
 if(isset($_POST['updatebalance'])){
-  echo $id = $_POST['id'];
+  $id = $_POST['id'];
   $ac_nameupdate = $_POST['ac_nameupdate'];
   $dateupdate = $_POST['dateupdate'];
   $balanceamount = $_POST['updatebalanceamount'];
-  $query->updateaccountreceivablebalance($id, $dateupdate, $ac_nameupdate, $balanceamount);
+  $description = $_POST['updatedescription'];
+  $query->updateaccountreceivablebalance($id, $dateupdate, $ac_nameupdate, $balanceamount, $description);
 }
 ?>
 <!DOCTYPE html>
@@ -245,7 +247,7 @@ if(isset($_POST['updatebalance'])){
                 <div class="modal-dialog" role="document">
                   <div class="modal-content">
                     <div class="modal-header bg-warning">
-                      <h5 class="modal-title">Update Balance</h5>
+                      <h5 class="modal-title">Update Opening Amount</h5>
                     </div>
                     <div class="modal-body">
                       <!-- Your modal content goes here -->
@@ -268,12 +270,20 @@ if(isset($_POST['updatebalance'])){
                             }
                             ?>
                           </select>
-                          <label for="newBalance" class="float-start">Balance</label>
-                          <input type="text" class="form-control" name="updatebalanceamount" value="<?= $receivabledata['balance']; ?>">
+                          <div class="row">
+                            <div class="col">
+                              <label for="description" class="float-start">Description</label>
+                              <textarea name="updatedescription" id="description" rows="4" class="form-control inpv2"><?= $receivabledata['particulars']; ?></textarea>
+                            </div>
+                            <div class="col">
+                              <label for="newBalance" class="float-start">Balance</label>
+                              <input type="text" class="form-control inpv2" name="updatebalanceamount" value="<?= $receivabledata['balance']; ?>">
+                              <button type="button" class="btn btn-secondary mt-4 float-start me-1" data-dismiss="modal">Close</button>
+                              <button type="submit" class="btn btn-primary mt-4 float-start" name="updatebalance">Update</button>
+                            </div>
+                          </div>
                       </div>
                       <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary" name="updatebalance">Update</button>
                       </form>
                     </div>
                   </div>
@@ -288,7 +298,7 @@ if(isset($_POST['updatebalance'])){
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header bg-secondary text-light">
-            <h1 class="modal-title fs-5">Add Balance</h1>
+            <h1 class="modal-title fs-5">Add Opening Amount</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
         <form action="" method="post">
@@ -311,12 +321,20 @@ if(isset($_POST['updatebalance'])){
 
               ?>
             </select>
-            <label>Balance</label>
-            <input type="text" name="balance" class="form-control inpv2 mb-2">
+            <div class="row">
+              <div class="col">
+                <label>Description</label>
+                <textarea name="description" id="description" rows="4" class="form-control inpv2"></textarea>
+              </div>
+              <div class="col">
+                <label>Balance</label>
+                <input type="text" name="balance" class="form-control inpv2 mb-2">
+                <button type="button" name="button" class="btn btn-secondary mt-4" data-bs-toggle="modal">Cancel</button>
+                <button type="submit" name="addbalance" class="btn btn-success mt-4">Add</button>
+              </div>
+            </div>
           </div>
           <div class="modal-footer">
-            <button type="button" name="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
-            <button type="submit" name="addbalance" class="btn btn-success">Add</button>
           </div>
         </form>
         </div>

@@ -348,7 +348,7 @@ $query = new Query();
                   <td><?php echo $idd; ?></td>
                   <td><?php echo date('d-m-Y', strtotime($cashdata['date'])); ?></td>
                   <td><?php echo $cashdata['voucher_no']; ?></td>
-                  <td><?php echo $crossacnamedata['ac_name']; ?></td>
+                  <td><?php if(!empty($crossacnamedata['ac_name'])){ echo $crossacnamedata['ac_name'];}; ?></td>
                   <td><?php echo $cashdata['particular']; ?></td>
                   <td><?php if($cashdata['debit'] == 0){echo "";}else{echo round($debit, 2);}; ?></td>
                   <td><?php if($cashdata['credit'] == 0){echo "";}else{echo round($credit, 2);}; ?></td>

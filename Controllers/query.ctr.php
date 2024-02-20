@@ -547,7 +547,10 @@ Class Query{
     $vouchercheckstmt->execute();
     $vouchercheck = $vouchercheckstmt->fetch(PDO::FETCH_ASSOC);
     if(empty($vouchercheck)){
-      $balance = 0 - $amount;
+      $balancecheckstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code LIKE '4000%' ORDER BY id DESC");
+      $balancecheckstmt->execute();
+      $balancecheck = $balancecheckstmt->fetch(PDO::FETCH_ASSOC);
+      $balance = $amount + $balancecheck['balance'];
       $glstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, credit, balance) VALUES('$date', '$voucher_no', '$supplier_name', '$amount', '$balance')");
       $glstmt->execute();
     }else{
@@ -4403,6 +4406,9 @@ Class Query{
     $stmt = $pdo->prepare("INSERT INTO `cashbook` (`date`, `balance`) VALUES ('$date', '$balanceamount')");
     $stmt->execute();
 
+    // $stmt = $pdo->prepare("INSERT INTO general_ledger(`date`, `ac_name`, `particular`, `balance`) VALUES ('$date', '', '$balanceamount')");
+    // $stmt->execute();
+
   }
 
   function cashbookupdatebalance($id, $balanceamount){
@@ -4430,16 +4436,26 @@ Class Query{
 
   }
 
-  function addaccountreceivablebalance($date, $ac_name, $balance){
+  function addaccountreceivablebalance($date, $ac_name, $balance, $description){
     global $pdo;
 
-    $balancestmt = $pdo->prepare("INSERT INTO receivable(date, ac_code, balance) VALUES('$date', '$ac_name','$balance')");
+    $balancestmt = $pdo->prepare("INSERT INTO receivable(date, ac_code, particulars, balance) VALUES('$date', '$ac_name', '$description', '$balance')");
     $balancestmt->execute();
+
+    $balancestmt = $pdo->prepare("INSERT INTO general_ledger(date, ac_code, balance, narration, voucherno) VALUES('$date', '$ac_name', '$balance', '$description', '$description')");
+    $balancestmt->execute();
+
+    $balancestmt = $pdo->prepare("INSERT INTO currency(dollar_rate, debitorcredit, usd_amount, voucher_no) VALUES(2100, 'balance', '$balance', :description)");
+    $balancestmt->execute(
+      [
+        ':description' => $description,
+    ]);
+
   }
 
-  function updateaccountreceivablebalance($id, $dateupdate, $ac_nameupdate, $balanceamount){
+  function updateaccountreceivablebalance($id, $dateupdate, $ac_nameupdate, $balanceamount, $description){
     global $pdo;
-    $balancestmt = $pdo->prepare("UPDATE receivable SET date='$dateupdate', ac_code='$ac_nameupdate', balance='$balanceamount' WHERE id='$id'");
+    $balancestmt = $pdo->prepare("UPDATE receivable SET date='$dateupdate', ac_code='$ac_nameupdate', balance='$balanceamount', particulars='$description' WHERE id='$id'");
     $balancestmt->execute();
   }
 
@@ -4475,6 +4491,9 @@ Class Query{
 
       $balancestmt = $pdo->prepare("INSERT INTO payable(date, supplier_id, remark, closing_balance)  VALUES('$date', '$supplier_id', '$description', '$amount')");
       $balancestmt->execute();
+
+      $glstmt = $pdo->prepare("INSERT INTO general_ledger(date, ac_code, narration ,balance) VALUES('$date', '$supplier_id', '$description', '$amount')");
+      $glstmt->execute();
     }
   // MORE SELECTS
 

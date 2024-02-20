@@ -229,26 +229,32 @@ $query = new Query();
                   }
                 }else{
                   if(str_contains($accode, '4000/')){
-                    $acname = 'Purchase';
+                    if(str_contains($gldata['narration'], "balance") || str_contains($gldata['narration'], "Balance")){
+                      $acname = '';
+                    }else{
+                      $acname = 'Purchase';
+                    }
                   }else {
                     $acnamedata = $query->select('acname', $accode, 'code_no');
                     $acname = $acnamedata['ac_name'];
                   }
                 }
 
-                if($gldata['debit'] != 0){
+                if($gldata['debit'] == 0 && $gldata['credit'] == 0){
+                  $debitorcredit = 'balance';
+                }elseif($gldata['debit'] != 0){
                   $debitorcredit = 'debit';
                 }else{
                   $debitorcredit = 'credit';
                 }
-
+                // echo $voucher_no;
                 $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit'");
                 $currencystmt->execute(
                   array(':voucher_no' => $voucher_no )
                 );
                 $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
-
-                // acnamechange
+                // echo "<pre>";
+                // print_r($currencydata);
 
                  ?>
                 <tr>
@@ -258,9 +264,7 @@ $query = new Query();
                   <td><?php echo $gldata['narration']; ?></td>
                   <td><?php if($gldata['debit'] == 0){ echo "-"; }else{if(!empty($currencydata['dollar_rate']) == 0){echo $gldata['debit'];}else{ echo $gldata['debit'] / $currencydata['dollar_rate'];  };} ?></td>
                   <td><?php if($gldata['credit'] == 0){ echo "-"; }else{if(!empty($currencydata['dollar_rate']) == 0){echo $gldata['credit'];}else{ echo $gldata['credit'] / $currencydata['dollar_rate'];  };} ?></td>
-                  <!-- <td><?php echo $gldata['debit']; ?></td>
-                  <td><?php echo $gldata['credit']; ?></td> -->
-                  <td><?php if(!empty($currencydata['dollar_rate']) == 0){ echo "MMK"; }else{ echo "USD"; } ?></td>
+                  <td><?php if(!empty($currencydata['dollar_rate']) == 0){ echo "MMK"; }else{ echo "USD"; }?> </td>
                   <td><?php if(!empty($currencydata['dollar_rate']) == 0){echo $gldata['balance'];}else{ echo $gldata['balance'] / $currencydata['dollar_rate'];  }; ?></td>
                   <td>
                     <a href="edittransaction.php?voucher_no=<?= $gldata['voucherno']; ?>&file=general_ledger" style="<?php if(str_contains(strtolower($acname), 'purchase')){ echo "display:none;"; } ?>">
