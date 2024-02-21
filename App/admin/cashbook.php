@@ -22,7 +22,9 @@ $query = new Query();
     <?php
       if(isset($_POST['addbalance'])){
         $balanceamount = $_POST['balanceamount'];
-        $query->cashbookaddbalance($balanceamount);
+        $ac_code = $_POST['balanceac'];
+        $particular = $_POST['balanceparticular'];
+        $query->cashbookaddbalance($balanceamount, $ac_code, $particular);
       }
       if(isset($_POST['updatebalance'])){
         $id = $_POST['updatebalanceid'];
@@ -88,6 +90,21 @@ $query = new Query();
                       <div class="modal-body">
                         <h6>Balance</h6>
                         <input type="number" name="balanceamount" class="form-control inpv2 mb-2 mt-2">
+                        <h6>AC Code</h6>
+                        <select name="balanceac" class="form-control inpv2">
+                          <?php
+                            $acstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no LIKE '3600%'");
+                            $acstmt->execute();
+                            $acdatas = $acstmt->fetchAll();
+                            foreach($acdatas as $acdata){
+                              ?>
+                                <option value="<?= $acdata['code_no']; ?>"><?= $acdata['ac_name']; ?></option>
+                              <?php
+                            }
+                          ?>
+                        </select>
+                        <h6>Particular</h6>
+                        <input type="text" name="balanceparticular" class="form-control inpv2">
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

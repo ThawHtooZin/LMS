@@ -4399,15 +4399,15 @@ Class Query{
 
   // Balanace Additons
 
-  function cashbookaddbalance($balanceamount){
+  function cashbookaddbalance($balanceamount, $ac_code, $particular){
     global $pdo;
     $date = date('Y-m-d');
 
     $stmt = $pdo->prepare("INSERT INTO `cashbook` (`date`, `balance`) VALUES ('$date', '$balanceamount')");
     $stmt->execute();
 
-    // $stmt = $pdo->prepare("INSERT INTO general_ledger(`date`, `ac_name`, `particular`, `balance`) VALUES ('$date', '', '$balanceamount')");
-    // $stmt->execute();
+    $stmt = $pdo->prepare("INSERT INTO general_ledger(`date`, `ac_code`, `narration`, `balance`) VALUES ('$date', '$ac_code', '$particular', '$balanceamount')");
+    $stmt->execute();
 
   }
 
