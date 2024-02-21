@@ -24,12 +24,16 @@ $query = new Query();
         $balanceamount = $_POST['balanceamount'];
         $ac_code = $_POST['balanceac'];
         $particular = $_POST['balanceparticular'];
-        $query->cashbookaddbalance($balanceamount, $ac_code, $particular);
+        $date = $_POST['balancedate'];
+        $query->cashbookaddbalance($date, $balanceamount, $ac_code, $particular);
       }
       if(isset($_POST['updatebalance'])){
         $id = $_POST['updatebalanceid'];
         $balanceamount = $_POST['updatebalanceamount'];
-        $query->cashbookupdatebalance($id, $balanceamount);
+        $ac_code = $_POST['updatebalanceaccode'];
+        $particular = $_POST['updatebalanceparticular'];
+        $date = $_POST['updatebalancedate'];
+        $query->cashbookupdatebalance($id, $balanceamount, $ac_code, $particular, $date);
       }
     ?>
     <div class="row">
@@ -84,11 +88,13 @@ $query = new Query();
                 <div class="modal-dialog" role="document">
                   <div class="modal-content text-dark">
                     <div class="modal-header bg-secondary">
-                      <h5 class="text-light">Add Balance</h5>
+                      <h5 class="text-light">Add Opening Amount</h5>
                     </div>
                     <form method="POST">
                       <div class="modal-body">
-                        <h6>Balance</h6>
+                        <h6>Date</h6>
+                        <input type="date" name="balancedate" class="form-control inpv2 mb-2 mt-2">
+                        <h6>Opening Amount</h6>
                         <input type="number" name="balanceamount" class="form-control inpv2 mb-2 mt-2">
                         <h6>AC Code</h6>
                         <select name="balanceac" class="form-control inpv2">
@@ -108,7 +114,7 @@ $query = new Query();
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary" name="addbalance">Add Balance</button>
+                        <button type="submit" class="btn btn-primary" name="addbalance">Add Opening Amount</button>
                       </div>
                     </form>
                   </div>
@@ -399,15 +405,32 @@ $query = new Query();
                 <div class="modal-dialog" role="document">
                   <div class="modal-content">
                     <div class="modal-header bg-warning">
-                      <h5 class="modal-title text-light">Update Balance</h5>
+                      <h5 class="modal-title text-light">Update Opening Amount</h5>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body"> 
                       <!-- Your modal content goes here -->
                       <form method="POST" action="">
                         <input type="hidden" name="updatebalanceid" value="<?= $cashdata['id']; ?>">
                         <div class="form-group">
-                          <label for="newBalance">New Balance:</label>
-                          <input type="number" class="form-control" name="updatebalanceamount">
+                          <h6>Date</h6>
+                          <input type="date" name="updatebalancedate" class="form-control inpv2 mb-2 mt-2" value="<?= $cashdata['date']; ?>">
+                          <label for="newBalance">Opening Amount</label>
+                          <input type="number" class="form-control inpv2" name="updatebalanceamount" value="<?= $cashdata['balance']; ?>">
+                          <h6>AC Code</h6>
+                          <select name="updatebalanceaccode" class="form-control inpv2">
+                            <?php
+                              $acstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no LIKE '3600%'");
+                              $acstmt->execute();
+                              $acdatas = $acstmt->fetchAll();
+                              foreach($acdatas as $acdata){
+                                ?>
+                                  <option value="<?= $acdata['code_no']; ?>" <?php if($acdata['ac_name'] == $cashdata['ac_name']){ echo "selected";} ?>><?= $acdata['ac_name']; ?></option>
+                                <?php
+                              }
+                            ?>
+                          </select>
+                          <h6>Particular</h6>
+                          <input type="text" name="updatebalanceparticular" class="form-control inpv2" value="<?= $cashdata['particular']; ?>">
                         </div>
                       </div>
                       <div class="modal-footer">
