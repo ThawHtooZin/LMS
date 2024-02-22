@@ -53,6 +53,8 @@ $query = new Query();
           <div class="card-header bg-warning text-light"  style="padding:-10px;">
 
             <b>Manage Purchase</b>
+
+            <a href="export.php?table_name=purchase" class="btn btn-sm btn-success float-end">Export to excel</a>
           </div>
           <div class="card-body" style="margin-top:-8px !important;">
             <?php

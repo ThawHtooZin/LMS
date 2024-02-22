@@ -550,7 +550,7 @@ if ($_GET['table_name'] == 'payable') {
       $payabledata = $payablestmt->fetch(PDO::FETCH_ASSOC);
 
       $idofrow = $payabledata['id'];
-      $openingamountstmt = $pdo->prepare("SELECT balance FROM payable WHERE supplier_id='$supplier_id' AND id < '$idofrow' AND report_date!='0000-00-00' ORDER BY id DESC");
+      $openingamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id'");
       $openingamountstmt->execute();
       $openingamount = $openingamountstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -563,8 +563,8 @@ if ($_GET['table_name'] == 'payable') {
       $paidamt = $paidamtstmt->fetch(PDO::FETCH_ASSOC);
 
       $id++;
-      if (!empty($openingamount['balance'])) {
-        $openingamt = $openingamount['balance'];
+      if (!empty($openingamount['closing_balance'])) {
+        $openingamt = $openingamount['closing_balance'];
       }else{
         $openingamt = 0;
       }
@@ -577,7 +577,8 @@ if ($_GET['table_name'] == 'payable') {
     <tr style="<?php if($balance == 0){ echo "display:none;";} ?>">
       <td><?= $id; ?></td>
       <td><?= $supplierdata['ac_name']; ?></td>
-      <td <?php if(empty($openingamount['balance'])){ echo "data-bs-toggle='modal' data-bs-target='#addbalancemodal'";} ?>><?php if(!empty($openingamount['balance'])){ echo $openingamount['balance']; } ?></td>
+      <!-- <td<?php if(empty($openingamount['closing_balance'])){ echo "data-bs-toggle='modal' data-bs-target='#addbalancemodal'";} ?>><?php if(!empty($openingamount['closing_balance'])){ echo $openingamount['closing_balance']; } ?></td> -->
+      <td><?= $payabledata['closing_balance']; ?></td>
       <td><?= $purchaseamt['purchase_amount']; ?></td>
       <td><?= $paidamt['paid_amount']; ?></td>
       <td><?= $balance; ?></td>
@@ -2444,6 +2445,73 @@ if ($_GET['table_name'] == "form10frozen") {
       </tr>
   </table>
     <?php
+}
+
+if ($_GET['table_name'] == "purchase") {
+  header("Content-Type: application/xls");
+  header("Content-Disposition: attachment; filename=purchase.xls");
+  header("Pragma: no-cache");
+  header("Expires: 0");
+
+  ?>
+  <table class="mt-1 table table-bordered table-striped rounded table-hover" border="1">
+              <tr>
+                <th>No.</th>
+                <th>Date</th>
+                <th>Voucher No</th>
+                <th>Type</th>
+                <th>Supplier Name</th>
+                <th>Commodity</th>
+                <th>Size</th>
+                <th>Viss</th>
+                <th>Kg</th>
+                <th>Pcs</th>
+                <th>Price</th>
+                <th>Amount</th>
+              </tr>
+              <?php
+              if(isset($_POST['total'])){
+                $supplier_id = $_POST['supplier_id'];
+                $total_amount = $query->selectsum('purchase', $supplier_id, 'supplier_id');
+              }elseif(isset($_POST['commoditybtn'])){
+                $item_id = $_POST['item_id'];
+                $total_amount = $query->selectsum('purchase', $item_id, 'commodity');
+              }else{
+                $stmt = $pdo->prepare("SELECT * FROM purchase");
+                $stmt->execute();
+                $purchasedatas = $stmt->fetchAll();
+              }
+              $idd = 0;
+              foreach ($purchasedatas as $purchasedata) {
+                $idd++;
+                $supplierid = $purchasedata['supplier_id'];
+                $supplier_name = $query->select('supplier', $supplierid, 'supplier_id');
+                $itemid = $purchasedata['commodity'];
+                $item_name = $query->select('item', $itemid, 'item_id');
+              ?>
+              <input type="hidden" name="updateid" value="<?php echo $purchasedata['no']; ?>">
+
+              <tr>
+                <td><?php echo $idd; ?></td>
+                <td><?php echo date('d-m-Y', strtotime($purchasedata['date'])); ?></td>
+                <td><?php echo $purchasedata['voucher_no']; ?></td>
+                <td><?php echo $purchasedata['tclfrozen']; ?></td>
+                <td><?php echo $supplier_name['supplier_name']; ?></td>
+                <td><?php echo $item_name['item_name']; ?></td>
+                <td><?php echo $purchasedata['size']; ?></td>
+                <td><?php echo $purchasedata['viss']; ?></td>
+                <td><?php echo floatval($purchasedata['viss']) * 1.634; ?></td>
+                <td><?php echo $purchasedata['pcs']; ?></td>
+                <td><?php echo $purchasedata['price']; ?></td>
+                <td><?php echo $purchasedata['amount']; ?></td>
+              </tr>
+              <?php
+              };
+              ?>
+            </table>
+  <?php
+  
+
 }
 exit();
 

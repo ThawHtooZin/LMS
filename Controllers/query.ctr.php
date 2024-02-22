@@ -4451,7 +4451,7 @@ Class Query{
     $balancestmt = $pdo->prepare("INSERT INTO general_ledger(date, ac_code, balance, narration, voucherno) VALUES('$date', '$ac_name', '$balance', '$description', '$description')");
     $balancestmt->execute();
 
-    $balancestmt = $pdo->prepare("INSERT INTO currency(dollar_rate, debitorcredit, usd_amount, voucher_no) VALUES(2100, 'balance', '$balance', :description)");
+    $balancestmt = $pdo->prepare("INSERT INTO currency(dollar_rate, debitorcredit, usd_amount, voucher_no) VALUES(1, 'balance', '$balance', :description)");
     $balancestmt->execute(
       [
         ':description' => $description,

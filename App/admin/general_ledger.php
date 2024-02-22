@@ -255,7 +255,6 @@ $query = new Query();
                 $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
                 // echo "<pre>";
                 // print_r($currencydata);
-
                  ?>
                 <tr>
                   <td><?php echo date('d/m/Y', strtotime($gldata['date'])); ?></td>
@@ -351,6 +350,7 @@ $query = new Query();
               <?php
 
               $ac_code = $gldata['ac_code'];
+              $transactionid = $gldata['transactionid'];
               $acname = $query->select('acname', $ac_code, 'code_no');
               $debitstmt = $pdo->prepare("SELECT SUM(debit) AS total_debit FROM general_ledger WHERE ac_code='$ac_code'");
               $debitstmt->execute();
@@ -359,10 +359,9 @@ $query = new Query();
               $creditstmt->execute();
               $totalcredit = $creditstmt->fetch(PDO::FETCH_ASSOC);
               if(str_contains($ac_code, '3600/')){
-                $balancestmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$ac_code' AND narration LIKE 'Opening%' OR narration LIKE 'Balance%' ORDER BY id DESC");
+                $balancestmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code LIKE '3600/%' AND narration LIKE 'Balance%' ORDER BY id DESC");
                 $balancestmt->execute();
                 $balancedata = $balancestmt->fetch(PDO::FETCH_ASSOC);
-
                 if(!empty($balancedata)){
                   $balance = $balancedata['balance'];
                 }else{
@@ -370,7 +369,14 @@ $query = new Query();
                 }
                 $totalbalance = ($balance + $totaldebit['total_debit']) - $totalcredit['total_credit'];
               }else{
-                $totalbalance = $totaldebit['total_debit'] - $totalcredit['total_credit'];
+                $balancestmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$ac_code' AND transactionid < '$transactionid'");
+                $balancestmt->execute();
+                $balancedata = $balancestmt->fetch(PDO::FETCH_ASSOC);
+
+                if(empty($balancedata)){
+                  $balancedata['balance'] = 0;
+                }
+                $totalbalance = ($balancedata['balance'] + $totaldebit['total_debit']) - $totalcredit['total_credit'];
               }
 
                ?>
