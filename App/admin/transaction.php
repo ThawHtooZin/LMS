@@ -298,7 +298,7 @@ $query = new Query();
                  <textarea name="adddescriptionbank" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(!empty($_SESSION['descriptionbank'])){echo $_SESSION['descriptionbank']; } ?></textarea>
                </div>
                <div id="bankcharges" class="hide" style="width: 16.66666667%">
-                 <input type="number" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="bank_charges" placeholder="Bank Charges">
+                 <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="bank_charges" placeholder="Bank Charges">
                </div>
               <div class="col-3">
                 <label>Currency</label>

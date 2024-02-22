@@ -254,13 +254,19 @@ $query = new Query();
                 <th>Credit</th>
               </tr>
               <?php
+              $searchvoucher_no = $_GET['voucher_no'];
               if($searchvoucher_no != ''){
-                $stmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$searchvoucher_no'");
+                $stmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:searchvoucher_no");
+                $stmt->execute(
+                  array(':searchvoucher_no' => $searchvoucher_no)
+                );
               }else{
                 $searchsr_no = $_GET['sr_no'];
-                $stmt = $pdo->prepare("SELECT * FROM transaction WHERE sr_no='$searchsr_no'");
+                $stmt = $pdo->prepare("SELECT * FROM transaction WHERE sr_no=:sr_name");
+                $stmt->execute(
+                  array(':sr_name' => $searchsr_no)
+                );
               }
-              $stmt->execute();
               $datas = $stmt->fetchall();
               $no = 0;
               foreach ($datas as $data) {
@@ -272,8 +278,10 @@ $query = new Query();
                   $dorc = 'credit';
                 }
                 $voucher_no = $data['voucher_no'];
-                $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='$dorc'");
-                $currencystmt->execute();
+                $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$dorc'");
+                $currencystmt->execute(
+                  array(':voucher_no' => $voucher_no )
+                );
                 $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
 
                 ?>
@@ -437,11 +445,15 @@ $query = new Query();
                   </script>
                 <?php
               }
-              $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total FROM transaction WHERE voucher_no='$searchvoucher_no'");
-              $totaldebitstmt->execute();
+              $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total FROM transaction WHERE voucher_no=:searchvoucher_no");
+              $totaldebitstmt->execute(
+                array(':searchvoucher_no' => $searchvoucher_no)
+              );
               $totaldebitdata = $totaldebitstmt->fetch(PDO::FETCH_ASSOC);
-              $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total FROM transaction WHERE voucher_no='$searchvoucher_no'");
-              $totalcreditstmt->execute();
+              $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total FROM transaction WHERE voucher_no=:searchvoucher_no");
+              $totalcreditstmt->execute(
+                array(':searchvoucher_no' => $searchvoucher_no)
+              );
               $totalcreditdata = $totalcreditstmt->fetch(PDO::FETCH_ASSOC);
                ?>
                <tr style="font-weight:bold;">

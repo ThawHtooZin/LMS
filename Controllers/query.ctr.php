@@ -3401,11 +3401,11 @@ Class Query{
 
     if($currency == 'usd'){
       if($bank_charges == 0){
-        $mmkdebit = intval($rate) * intval($debit);
-        $mmkcredit = intval($rate) * intval($credit);
+        $mmkdebit = floatval($rate) * floatval($debit);
+        $mmkcredit = floatval($rate) * floatval($credit);
       }else{
-        $mmkdebit = intval($rate) * intval($debit);
-        $mmkcredit = intval($rate) * intval($credit);
+        $mmkdebit = floatval($rate) * floatval($debit);
+        $mmkcredit = floatval($rate) * floatval($credit);
       }
     }elseif($currency == 'mmk'){
       $mmkdebit = $debit;
@@ -3424,7 +3424,7 @@ Class Query{
       $debitorcredit = 'debit';
 
       if($currency == 'usd'){
-        $mmk_amount = intval($rate) * intval($debit);
+        $mmk_amount = floatval($rate) * floatval($debit);
         $usd_amount = $debit;
       }elseif($currency == 'mmk'){
         $mmk_amount = $debit;
@@ -3433,7 +3433,7 @@ Class Query{
     }elseif(!empty($credit)){
       $debitorcredit = 'credit';
       if($currency == 'usd'){
-        $mmk_amount = intval($rate) * intval($credit);
+        $mmk_amount = floatval($rate) * floatval($credit);
         $usd_amount = $credit;
       }elseif($currency == 'mmk'){
         $mmk_amount = $credit;
@@ -4451,12 +4451,11 @@ Class Query{
     $balancestmt = $pdo->prepare("INSERT INTO general_ledger(date, ac_code, balance, narration, voucherno) VALUES('$date', '$ac_name', '$balance', '$description', '$description')");
     $balancestmt->execute();
 
-    $balancestmt = $pdo->prepare("INSERT INTO currency(dollar_rate, debitorcredit, usd_amount, voucher_no) VALUES(2100, 'balance', '$balance', :description)");
+    $balancestmt = $pdo->prepare("INSERT INTO currency(dollar_rate, debitorcredit, usd_amount, voucher_no) VALUES(1, 'balance', '$balance', :description)");
     $balancestmt->execute(
       [
         ':description' => $description,
     ]);
-
   }
 
   function updateaccountreceivablebalance($id, $dateupdate, $ac_nameupdate, $balanceamount, $description){
