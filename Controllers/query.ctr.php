@@ -3693,7 +3693,7 @@ Class Query{
         $closingbalancestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no = '' ORDER BY id DESC");
         $closingbalancestmt->execute();
         $closingbalance = $closingbalancestmt->fetch(PDO::FETCH_ASSOC);
-        $randnom = rand(1000000000, 999999999);
+        $randnom = rand(10, 999999999);
         // COUNT HAVE ERROR IN THE FUTURE IF THE RANDOM NUMBER IS DUPLICATING IN THE SAME VOUCHER ROW
         if(!empty($payablesearchdata)){
           if(empty($closingbalance['closing_balance'])){
