@@ -88,7 +88,7 @@ $query = new Query();
             ?>
             <?php
               $supplier_id = $_GET['supplier_id'];
-              $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' GROUP BY purchase_voucher_no");
+              $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' GROUP BY purchase_voucher_no ORDER BY id"); 
               $payablestmt->execute();
               $payabledatas = $payablestmt->fetchall();
             ?>
@@ -111,19 +111,44 @@ $query = new Query();
                 $totalpurchaseamountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS total_purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no='$purchase_voucher_no'");
                 $totalpurchaseamountstmt->execute();
                 $totalpurchaseamount = $totalpurchaseamountstmt->fetch(PDO::FETCH_ASSOC);
-
                 if($payabledata['purchase_voucher_no'] == ''){
                   $balanceamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id'");
                   $balanceamountstmt->execute();
                   $balanceamount = $balanceamountstmt->fetch(PDO::FETCH_ASSOC);
                   $totalpurchaseamount['total_purchase_amount'] = 0;
                 }else{
-                  if($idd <= 1){
+                  $paidamount = $payabledata['paid_amount'];
+                  if($payabledata['paid_amount'] != '0'){
+                    $nowid = $payabledata['id'];
+                    $purchase_voucher_no = $payabledata['purchase_voucher_no'];
+                    $balanceamountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS total_purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no!='$purchase_voucher_no' AND id<'$nowid' ");
+                    $balanceamountstmt->execute();
+                    $balanceamountdata = $balanceamountstmt->fetch(PDO::FETCH_ASSOC);
+
                     $closingbalanceamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id' AND closing_balance != 0 ORDER BY id DESC");
                     $closingbalanceamountstmt->execute();
                     $closingbalanceamount = $closingbalanceamountstmt->fetch(PDO::FETCH_ASSOC);
-                    echo 'asdfasdf';
-                    $thebalanceamount = $totalpurchaseamount['total_purchase_amount'] + $closingbalanceamount['closing_balance'];
+                    // echo $payabledata['paid_voucher'];
+                    // echo "<Br>";
+                    // echo $balanceamountdata['total_purchase_amount'];
+                    // echo "<Br>";
+                    // echo $closingbalanceamount['closing_balance'];
+                    // echo "<Br>";
+                    // echo $totalpurchaseamount['total_purchase_amount'];
+                    // echo "<Br>";
+                    // echo $paidamount;
+                    // echo "<Br>";
+                    // echo "<Br>";
+                    // echo "<Br>";
+                    
+                    $thebalanceamount = ($balanceamountdata['total_purchase_amount'] + $closingbalanceamount['closing_balance'] + $totalpurchaseamount['total_purchase_amount']) - $paidamount;
+                  }else{
+                    if($idd <= 1){
+                    $closingbalanceamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id' AND closing_balance != 0 ORDER BY id DESC");
+                    $closingbalanceamountstmt->execute();
+                    $closingbalanceamount = $closingbalanceamountstmt->fetch(PDO::FETCH_ASSOC);
+                    $thebalanceamount = $totalpurchaseamount['total_purchase_amount'] + $closingbalanceamount['closing_balance'] - $paidamount;
+                    
                   }else{
                     $nowid = $payabledata['id'];
                     $purchase_voucher_no = $payabledata['purchase_voucher_no'];
@@ -135,7 +160,8 @@ $query = new Query();
                     $closingbalanceamountstmt->execute();
                     $closingbalanceamount = $closingbalanceamountstmt->fetch(PDO::FETCH_ASSOC);
 
-                    $thebalanceamount = $balanceamountdata['total_purchase_amount'] + $closingbalanceamount['closing_balance'] + $totalpurchaseamount['total_purchase_amount'];
+                    $thebalanceamount = $balanceamountdata['total_purchase_amount'] + $closingbalanceamount['closing_balance'] + $totalpurchaseamount['total_purchase_amount'] - $paidamount;
+                  }
                   }
                 }
 
@@ -143,7 +169,7 @@ $query = new Query();
               ?>
               <tr>
                 <td><?php if($payabledata['date'] != '0000-00-00'){echo date('d-m-Y', strtotime($payabledata['date'])); }; ?></td>
-                <td><?php if($payabledata['purchase_voucher_no'] == 	999999999){}else{echo $payabledata['purchase_voucher_no'];} ?></td>
+                <td><?php if($payabledata['paid_voucher'] == ''){echo $payabledata['purchase_voucher_no'];} ?></td>
                 <td><?php if($totalpurchaseamount['total_purchase_amount'] != 0){ echo $totalpurchaseamount['total_purchase_amount']; }; ?></td>
                 <td><?php if($payabledata['paid_date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($payabledata['paid_date'])); }; ?></td>
                 <td><?php echo $payabledata['paid_voucher']; ?></td>

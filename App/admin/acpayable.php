@@ -189,7 +189,7 @@ $query = new Query();
                     $supplierdata = $query->select('acname', $supplier_id, 'code_no');
 
                   ?>
-                  <tr style="<?php if($balance['balance'] == 0){ echo "display:none;";} ?>">
+                  <tr style="<?php if($balance == 0){ echo "display:none;";} ?>">
                     <td><?= $id; ?></td>
                     <td><?= $supplierdata['ac_name']; ?></td>
                     <!-- <td<?php if(empty($openingamount['closing_balance'])){ echo "data-bs-toggle='modal' data-bs-target='#addbalancemodal'";} ?>><?php if(!empty($openingamount['closing_balance'])){ echo $openingamount['closing_balance']; } ?></td> -->

@@ -3691,12 +3691,14 @@ Class Query{
         $closingbalancestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no = '' ORDER BY id DESC");
         $closingbalancestmt->execute();
         $closingbalance = $closingbalancestmt->fetch(PDO::FETCH_ASSOC);
+        $randnom = rand(9);
+        // COUNT HAVE ERROR IN THE FUTURE IF THE RANDOM NUMBER IS DUPLICATING IN THE SAME VOUCHER ROW
         if(!empty($payablesearchdata)){
             $balance = $closingbalance['closing_balance'] + $payablesearchdata['balance'] - $paid_amount;
-            $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '999999999', '$date', :voucher_no, '$description', '$paid_amount', '$balance')");
+            $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '$randnom', '$date', :voucher_no, '$description', '$paid_amount', '$balance')");
         }else{
           $balance = 0;
-          $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '999999999', '$date', :voucher_no, '$description', '$paid_amount', '$balance')");
+          $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '$randnom', '$date', :voucher_no, '$description', '$paid_amount', '$balance')");
         }
       }else{
         $addamt = $payabledata['credit'];
