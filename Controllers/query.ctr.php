@@ -3688,8 +3688,8 @@ Class Query{
         $payabledatastmt->execute();
         $payablesearchdata = $payabledatastmt->fetch(PDO::FETCH_ASSOC);
 
-        
-        
+
+
         $closingbalancestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no = '' ORDER BY id DESC");
         $closingbalancestmt->execute();
         $closingbalance = $closingbalancestmt->fetch(PDO::FETCH_ASSOC);

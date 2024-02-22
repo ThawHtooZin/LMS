@@ -357,7 +357,7 @@ $query = new Query();
               $creditstmt->execute();
               $totalcredit = $creditstmt->fetch(PDO::FETCH_ASSOC);
               if(str_contains($ac_code, '3600/')){
-                $balancestmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code LIKE '3600/%' AND narration LIKE 'Balance%' ORDER BY id DESC");
+                $balancestmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code LIKE '3600/%' AND narration LIKE 'Opening%' ORDER BY id DESC");
                 $balancestmt->execute();
                 $balancedata = $balancestmt->fetch(PDO::FETCH_ASSOC);
                 if(!empty($balancedata)){
