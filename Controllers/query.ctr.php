@@ -3401,11 +3401,11 @@ Class Query{
 
     if($currency == 'usd'){
       if($bank_charges == 0){
-        $mmkdebit = floatval($rate) * floatval($debit);
-        $mmkcredit = floatval($rate) * floatval($credit);
+        $mmkdebit = intval($rate) * intval($debit);
+        $mmkcredit = intval($rate) * intval($credit);
       }else{
-        $mmkdebit = floatval($rate) * floatval($debit);
-        $mmkcredit = floatval($rate) * floatval($credit);
+        $mmkdebit = intval($rate) * intval($debit);
+        $mmkcredit = intval($rate) * intval($credit);
       }
     }elseif($currency == 'mmk'){
       $mmkdebit = $debit;
@@ -3424,7 +3424,7 @@ Class Query{
       $debitorcredit = 'debit';
 
       if($currency == 'usd'){
-        $mmk_amount = floatval($rate) * floatval($debit);
+        $mmk_amount = intval($rate) * intval($debit);
         $usd_amount = $debit;
       }elseif($currency == 'mmk'){
         $mmk_amount = $debit;
@@ -3433,7 +3433,7 @@ Class Query{
     }elseif(!empty($credit)){
       $debitorcredit = 'credit';
       if($currency == 'usd'){
-        $mmk_amount = floatval($rate) * floatval($credit);
+        $mmk_amount = intval($rate) * intval($credit);
         $usd_amount = $credit;
       }elseif($currency == 'mmk'){
         $mmk_amount = $credit;
@@ -3687,8 +3687,12 @@ Class Query{
         $payabledatastmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' ORDER BY id DESC");
         $payabledatastmt->execute();
         $payablesearchdata = $payabledatastmt->fetch(PDO::FETCH_ASSOC);
+        
+        $closingbalancestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no = '' ORDER BY id DESC");
+        $closingbalancestmt->execute();
+        $closingbalance = $closingbalancestmt->fetch(PDO::FETCH_ASSOC);
         if(!empty($payablesearchdata)){
-            $balance = $payablesearchdata['balance'] - $paid_amount;
+            $balance = $closingbalance['closing_balance'] + $payablesearchdata['balance'] - $paid_amount;
             $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '999999999', '$date', :voucher_no, '$description', '$paid_amount', '$balance')");
         }else{
           $balance = 0;
@@ -4456,6 +4460,7 @@ Class Query{
       [
         ':description' => $description,
     ]);
+
   }
 
   function updateaccountreceivablebalance($id, $dateupdate, $ac_nameupdate, $balanceamount, $description){

@@ -119,15 +119,23 @@ $query = new Query();
                   $totalpurchaseamount['total_purchase_amount'] = 0;
                 }else{
                   if($idd <= 1){
-                    $balanceamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id' AND closing_balance != 0 ORDER BY id DESC");
-                    $balanceamountstmt->execute();
-                    $balanceamount = $balanceamountstmt->fetch(PDO::FETCH_ASSOC);
-                    $balanceamount['closing_balance'] = $totalpurchaseamount['total_purchase_amount'] + $balanceamount['closing_balance'];
+                    $closingbalanceamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id' AND closing_balance != 0 ORDER BY id DESC");
+                    $closingbalanceamountstmt->execute();
+                    $closingbalanceamount = $closingbalanceamountstmt->fetch(PDO::FETCH_ASSOC);
+                    echo 'asdfasdf';
+                    $thebalanceamount = $totalpurchaseamount['total_purchase_amount'] + $closingbalanceamount['closing_balance'];
                   }else{
-                    $balanceamountstmt = $pdo->prepare("SELECT balance FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no='$purchase_voucher_no' ORDER BY id DESC");
+                    $nowid = $payabledata['id'];
+                    $purchase_voucher_no = $payabledata['purchase_voucher_no'];
+                    $balanceamountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS total_purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no!='$purchase_voucher_no' AND id<'$nowid' ");
                     $balanceamountstmt->execute();
-                    $balanceamount = $balanceamountstmt->fetch(PDO::FETCH_ASSOC);
-                    $balanceamount['closing_balance'] = $balanceamount['balance'];
+                    $balanceamountdata = $balanceamountstmt->fetch(PDO::FETCH_ASSOC);
+
+                    $closingbalanceamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id' AND closing_balance != 0 ORDER BY id DESC");
+                    $closingbalanceamountstmt->execute();
+                    $closingbalanceamount = $closingbalanceamountstmt->fetch(PDO::FETCH_ASSOC);
+
+                    $thebalanceamount = $balanceamountdata['total_purchase_amount'] + $closingbalanceamount['closing_balance'] + $totalpurchaseamount['total_purchase_amount'];
                   }
                 }
 
@@ -141,7 +149,7 @@ $query = new Query();
                 <td><?php echo $payabledata['paid_voucher']; ?></td>
                 <td><?php echo $payabledata['remark']; ?></td>
                 <td><?php if(!empty($payabledata['paid_amount'])){ echo $payabledata['paid_amount'];}; ?></td>
-                <td><?php if(!empty($balanceamount['closing_balance'])){ echo $balanceamount['closing_balance']; } ?></td>
+                <td><?php if(!empty($thebalanceamount)){ echo $thebalanceamount; }else{ echo $balanceamount['closing_balance'];} ?></td>
                 <td>
                   <a href="edittransaction.php?voucher_no=<?= $payabledata['paid_voucher']; ?>&file=payable" style="<?php if(empty($payabledata['paid_amount'])){ echo "display:none;"; } ?>">
                     <button type="submit" class="btn btn-warning btn-sm text-light" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
