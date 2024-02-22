@@ -3535,6 +3535,7 @@ Class Query{
     $transactionstmt->execute();
     $transactiondatas = $transactionstmt->fetchall();
     foreach ($transactiondatas as $transactiondata) {
+      $transactionid = $transactiondata['id'];
       $ac_code = $transactiondata['ac_code'];
       $voucher_no = $transactiondata['voucher_no'];
       $description = $transactiondata['description'];
@@ -3583,11 +3584,11 @@ Class Query{
         $balance = $debit - $credit;
       }
 
-      $generalledgerstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, balance, narration,sr_no, container_no, bank_charges, acid) VALUES('$date',:voucher_no,'$ac_code', '$debit', '$credit', '$balance', :description, '$sr_no', '$container_no', '$bank_charges', '$acid')");
+      $generalledgerstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, balance, narration,sr_no, container_no, bank_charges, acid, transactionid) VALUES('$date',:voucher_no,'$ac_code', '$debit', '$credit', '$balance', :description, '$sr_no', '$container_no', '$bank_charges', '$acid', '$transactionid')");
 
-      $checkglstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE voucherno=:voucher_no AND ac_code='$ac_code'");
+      $checkglstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE transactionid=:transactionid AND ac_code='$ac_code'");
       $checkglstmt->execute([
-        ':voucher_no' => $voucher_no
+        ':transactionid' => $transactionid
       ]);
       $checkgl = $checkglstmt->fetchall();
       if(empty($checkgl)){
@@ -4399,23 +4400,28 @@ Class Query{
 
   // Balanace Additons
 
-  function cashbookaddbalance($balanceamount){
+  function cashbookaddbalance($date, $balanceamount, $ac_code, $particular){
     global $pdo;
-    $date = date('Y-m-d');
 
-    $stmt = $pdo->prepare("INSERT INTO `cashbook` (`date`, `balance`) VALUES ('$date', '$balanceamount')");
-    $stmt->execute();
+    $stmt = $pdo->prepare("INSERT INTO `cashbook` (`date`, `balance`, `ac_name`, `particular`) VALUES ('$date', '$balanceamount', '$ac_code', :particular)");
+    $stmt->execute([
+      ':particular' => $particular
+    ]);
 
-    // $stmt = $pdo->prepare("INSERT INTO general_ledger(`date`, `ac_name`, `particular`, `balance`) VALUES ('$date', '', '$balanceamount')");
-    // $stmt->execute();
+    $stmt = $pdo->prepare("INSERT INTO general_ledger(`date`, `ac_code`, `narration`, `balance`) VALUES ('$date', '$ac_code', :particular, '$balanceamount')");
+    $stmt->execute([
+      ':particular' => $particular
+    ]);
 
   }
 
-  function cashbookupdatebalance($id, $balanceamount){
+  function cashbookupdatebalance($id, $balanceamount, $ac_code, $particular, $date){
     global $pdo;
-    $date = date('Y-m-d');
-    $stmt = $pdo->prepare("UPDATE cashbook SET date='$date', balance='$balanceamount' WHERE id='$id'");
-    $stmt->execute();
+
+    $stmt = $pdo->prepare("UPDATE cashbook SET date='$date', balance='$balanceamount', ac_name='$ac_code', particular=:particular WHERE id='$id'");
+    $stmt->execute([
+      ':particular' => $particular
+    ]);
 
   }
 

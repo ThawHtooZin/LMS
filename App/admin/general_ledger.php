@@ -358,7 +358,20 @@ $query = new Query();
               $creditstmt = $pdo->prepare("SELECT SUM(credit) AS total_credit FROM general_ledger WHERE ac_code='$ac_code'");
               $creditstmt->execute();
               $totalcredit = $creditstmt->fetch(PDO::FETCH_ASSOC);
-              $totalbalance = $totaldebit['total_debit'] - $totalcredit['total_credit'];
+              if(str_contains($ac_code, '3600/')){
+                $balancestmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$ac_code' AND narration LIKE 'Opening%' OR narration LIKE 'Balance%' ORDER BY id DESC");
+                $balancestmt->execute();
+                $balancedata = $balancestmt->fetch(PDO::FETCH_ASSOC);
+
+                if(!empty($balancedata)){
+                  $balance = $balancedata['balance'];
+                }else{
+                  $balance = 0;
+                }
+                $totalbalance = ($balance + $totaldebit['total_debit']) - $totalcredit['total_credit'];
+              }else{
+                $totalbalance = $totaldebit['total_debit'] - $totalcredit['total_credit'];
+              }
 
                ?>
                <tr style="font-weight:bold;">
