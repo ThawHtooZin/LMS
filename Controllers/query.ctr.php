@@ -3811,7 +3811,7 @@ Class Query{
         ]);
         $checkcb = $checkcbstmt->fetchall();
         if(empty($checkcb)){
-          $cashbookstmt = $pdo->prepare("INSERT INTO cashbook(date, ac_name, particular, debit, credit, balance, voucher_no, crossac_name, transactionid) VALUES('$date', '$ac_name', :description, '$debit', '$credit', '$balance', :voucher_no, '$crossacname', '$transactionid)");
+          $cashbookstmt = $pdo->prepare("INSERT INTO cashbook(date, ac_name, particular, debit, credit, balance, voucher_no, crossac_name, transactionid) VALUES('$date', '$ac_name', :description, '$debit', '$credit', '$balance', :voucher_no, '$crossacname', '$transactionid')");
           $cashbookstmt->execute([
             ':voucher_no' => $voucher_no,
             ':description' => $description
