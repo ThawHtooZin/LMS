@@ -3803,7 +3803,7 @@ Class Query{
           $balance = 0;
         }
         $balance = ($balance + $debit) - $credit;
-        $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no AND crossac_name=:ac_name AND transactionid='$transactionid'");
+        $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no AND crossac_name=:ac_name OR transactionid='$transactionid'");
         $checkcbstmt->execute([
           ':voucher_no' => $voucher_no,
           ':ac_name' => $crossacname

@@ -8,6 +8,15 @@ $auth = new auth();
 $auth->checkadmin();
 $bootstrap = new Bootstrap();
 $query = new Query();
+
+include '../../vendor/autoload.php';
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
+if(isset($_REQUEST['excelimportbtn'])){
+
+}
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -134,7 +143,7 @@ $query = new Query();
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                      <button type="submit" class="btn btn-success" name="backuponetable">Confirm</button>
+                      <button type="submit" class="btn btn-success" name="excelimportbtn">Confirm</button>
                     </div>
                   </form>
                 </div>
