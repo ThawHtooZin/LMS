@@ -3803,7 +3803,11 @@ Class Query{
           $balance = 0;
         }
         $balance = ($balance + $debit) - $credit;
-        $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no AND crossac_name=:ac_name OR transactionid='$transactionid'");
+        if(str_contains($ac_name, '3300/')){
+          $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no AND crossac_name=:ac_name OR transactionid='$transactionid'");
+        }else{
+          $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no AND crossac_name=:ac_name AND transactionid='$transactionid'");
+        }
         $checkcbstmt->execute([
           ':voucher_no' => $voucher_no,
           ':ac_name' => $crossacname
