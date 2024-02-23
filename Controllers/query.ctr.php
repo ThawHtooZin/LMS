@@ -3424,7 +3424,7 @@ Class Query{
       $debitorcredit = 'debit';
 
       if($currency == 'usd'){
-        $mmk_amount = intval($rate) * intval($debit);
+        $mmk_amount = floatval($rate) * floatval($debit);
         $usd_amount = $debit;
       }elseif($currency == 'mmk'){
         $mmk_amount = $debit;
@@ -3433,7 +3433,7 @@ Class Query{
     }elseif(!empty($credit)){
       $debitorcredit = 'credit';
       if($currency == 'usd'){
-        $mmk_amount = intval($rate) * intval($credit);
+        $mmk_amount = floatval($rate) * floatval($credit);
         $usd_amount = $credit;
       }elseif($currency == 'mmk'){
         $mmk_amount = $credit;
@@ -3615,17 +3615,20 @@ Class Query{
       $description = $receivabledata['description'];
       if($receivabledata['debit'] != 0){
         $debitorcredit = 'debit';
-        $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit'");
+        $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit' AND transactionid='$transactionid'");
         $currencystmt->execute([
           ':voucher_no' => $voucher_no,
         ]);
         $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
-        print "<br>";
-        print_r($currencydata['usd_amount']);
+        print_r($currencydata);
+        if (!empty($currencydata)) {
+          $invoice_amount = $currencydata['usd_amount'];
+        }else{
+          $invoice_amount = 0;
+        }
         $receivestmt = $pdo->prepare("SELECT * FROM receivable WHERE ac_code='$ac_code' ORDER BY id DESC");
         $receivestmt->execute();
         $receivedata = $receivestmt->fetch(PDO::FETCH_ASSOC);
-        $invoice_amount = $currencydata['usd_amount'];
         $sr_no = $receivabledata['sr_no'];
         $container_no = $receivabledata['container_no'];
 
@@ -3635,7 +3638,7 @@ Class Query{
             $balance = $invoice_amount;
           }
 
-        $receivestmt = $pdo->prepare("INSERT INTO receivable(date, ac_code, sr_no, container_no, invoice_amount, balance) VALUES('$date', '$ac_code', '$sr_no', '$container_no', '$invoice_amount', '$balance')");
+        $receivestmt = $pdo->prepare("INSERT INTO receivable(date, ac_code, sr_no, container_no, invoice_amount, balance, transactionid) VALUES('$date', '$ac_code', '$sr_no', '$container_no', '$invoice_amount', '$balance', '$transactionid')");
         $checkresrstmt = $pdo->prepare("SELECT * FROM receivable WHERE sr_no='$sr_no'");
         $checkresrstmt->execute();
         $checkresr = $checkresrstmt->fetchall();
@@ -3644,11 +3647,12 @@ Class Query{
         }
       }elseif($receivabledata['credit'] != 0){
         $debitorcredit = 'credit';
-        $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit'");
+        $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit' AND transactionid='$transactionid'");
         $currencystmt->execute([
           ':voucher_no' => $voucher_no
         ]);
         $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
+        print_r($currencydata);
         $receivestmt = $pdo->prepare("SELECT * FROM receivable WHERE ac_code='$ac_code' ORDER BY id DESC");
         $receivestmt->execute();
         $receivedata = $receivestmt->fetch(PDO::FETCH_ASSOC);
