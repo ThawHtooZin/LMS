@@ -3741,7 +3741,7 @@ Class Query{
     $stmt->execute();
     $cashbookdatas = $stmt->fetchall();
     foreach ($cashbookdatas as $cashbookdata) {
-      $transactionid = $cashbookdata['transactionid'];
+      $transactionid = $cashbookdata['id'];
       $ac_name = $cashbookdata['ac_code'];
       $sr_no = $cashbookdata['sr_no'];
       $voucher_no = $cashbookdata['voucher_no'];
