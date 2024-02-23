@@ -3606,7 +3606,7 @@ Class Query{
     $stmt->execute();
     $receivabledatas = $stmt->fetchall();
     foreach ($receivabledatas as $receivabledata) {
-      $transactionid = $receivabledatas['id'];
+      $transactionid = $receivabledata['id'];
       $ac_code = $receivabledata['ac_code'];
       $voucher_no = $receivabledata['voucher_no'];
       $description = $receivabledata['description'];
@@ -3679,7 +3679,6 @@ Class Query{
     $stmt->execute();
     $payabledatas = $stmt->fetchall();
     foreach ($payabledatas as $payabledata) {
-      $transactionid = $cashbookdata['transactionid'];
       $supplier_id = $payabledata['ac_code'];
       $voucher_no = $payabledata['voucher_no'];
       if($payabledata['debit'] != 0){
