@@ -3606,6 +3606,7 @@ Class Query{
     $stmt->execute();
     $receivabledatas = $stmt->fetchall();
     foreach ($receivabledatas as $receivabledata) {
+      $transactionid = $receivabledatas['id'];
       $ac_code = $receivabledata['ac_code'];
       $voucher_no = $receivabledata['voucher_no'];
       $description = $receivabledata['description'];
@@ -3659,10 +3660,10 @@ Class Query{
           $invoice_amount = 0;
           $balance = $invoice_amount - $paid_amount;
         }
-        $receiveinsertstmt = $pdo->prepare("INSERT INTO receivable(ac_code, paid_date, payment_no, particulars, paid_amount, balance) VALUES('$ac_code', '$date', :voucher_no, '$description', '$paid_amount', '$balance')");
-        $checkrestmt = $pdo->prepare("SELECT * FROM receivable WHERE payment_no=:voucher_no");
+        $receiveinsertstmt = $pdo->prepare("INSERT INTO receivable(ac_code, paid_date, payment_no, particulars, paid_amount, balance, transactionid) VALUES('$ac_code', '$date', :voucher_no, '$description', '$paid_amount', '$balance', '$transactionid')");
+        $checkrestmt = $pdo->prepare("SELECT * FROM receivable WHERE transactionid=:transactionid");
         $checkrestmt->execute([
-          ':voucher_no' => $voucher_no
+          ':transactionid' => $transactionid
         ]);
         $checkre = $checkrestmt->fetchall();
         if(empty($checkre)){
@@ -3678,6 +3679,7 @@ Class Query{
     $stmt->execute();
     $payabledatas = $stmt->fetchall();
     foreach ($payabledatas as $payabledata) {
+      $transactionid = $cashbookdata['transactionid'];
       $supplier_id = $payabledata['ac_code'];
       $voucher_no = $payabledata['voucher_no'];
       if($payabledata['debit'] != 0){
@@ -3740,6 +3742,7 @@ Class Query{
     $stmt->execute();
     $cashbookdatas = $stmt->fetchall();
     foreach ($cashbookdatas as $cashbookdata) {
+      $transactionid = $cashbookdata['transactionid'];
       $ac_name = $cashbookdata['ac_code'];
       $sr_no = $cashbookdata['sr_no'];
       $voucher_no = $cashbookdata['voucher_no'];
@@ -3801,14 +3804,14 @@ Class Query{
           $balance = 0;
         }
         $balance = ($balance + $debit) - $credit;
-        $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no AND crossac_name=:ac_name");
+        $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no AND crossac_name=:ac_name AND transactionid='$transactionid'");
         $checkcbstmt->execute([
           ':voucher_no' => $voucher_no,
           ':ac_name' => $crossacname
         ]);
         $checkcb = $checkcbstmt->fetchall();
         if(empty($checkcb)){
-          $cashbookstmt = $pdo->prepare("INSERT INTO cashbook(date, ac_name, particular, debit, credit, balance, voucher_no, crossac_name) VALUES('$date', '$ac_name', :description, '$debit', '$credit', '$balance', :voucher_no, '$crossacname')");
+          $cashbookstmt = $pdo->prepare("INSERT INTO cashbook(date, ac_name, particular, debit, credit, balance, voucher_no, crossac_name, transactionid) VALUES('$date', '$ac_name', :description, '$debit', '$credit', '$balance', :voucher_no, '$crossacname', '$transactionid)");
           $cashbookstmt->execute([
             ':voucher_no' => $voucher_no,
             ':description' => $description
