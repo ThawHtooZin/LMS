@@ -3689,8 +3689,8 @@ Class Query{
         $payabledatastmt->execute();
         $payablesearchdata = $payabledatastmt->fetch(PDO::FETCH_ASSOC);
 
-        
-        
+
+
         $closingbalancestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no = '' ORDER BY id DESC");
         $closingbalancestmt->execute();
         $closingbalance = $closingbalancestmt->fetch(PDO::FETCH_ASSOC);
@@ -3810,7 +3810,7 @@ Class Query{
         ]);
         $checkcb = $checkcbstmt->fetchall();
         if(empty($checkcb)){
-          $cashbookstmt = $pdo->prepare("INSERT INTO cashbook(date, ac_name, particular, debit, credit, balance, voucher_no, crossac_name, transactionid) VALUES('$date', '$ac_name', :description, '$debit', '$credit', '$balance', :voucher_no, '$crossacname', '$transactionid)");
+          $cashbookstmt = $pdo->prepare("INSERT INTO cashbook(date, ac_name, particular, debit, credit, balance, voucher_no, crossac_name, transactionid) VALUES('$date', '$ac_name', :description, '$debit', '$credit', '$balance', :voucher_no, '$crossacname', '$transactionid')");
           $cashbookstmt->execute([
             ':voucher_no' => $voucher_no,
             ':description' => $description
