@@ -3441,8 +3441,11 @@ Class Query{
       }
     }
 
-
-    $currencystmt = $pdo->prepare("INSERT INTO currency(dollar_rate, debitorcredit, mmk_amount, usd_amount, voucher_no) VALUES('$rate', '$debitorcredit', '$mmk_amount', '$usd_amount', :voucher_no)");
+    $idstmt = $pdo->prepare("SELECT * FROM transaction ORDER BY id DESC");
+    $idstmt->execute();
+    $iddata = $idstmt->fetch(PDO::FETCH_ASSOC);
+    $transactionid = $iddata['id'];
+    $currencystmt = $pdo->prepare("INSERT INTO currency(dollar_rate, debitorcredit, mmk_amount, usd_amount, voucher_no, transactionid) VALUES('$rate', '$debitorcredit', '$mmk_amount', '$usd_amount', :voucher_no, '$transactionid')");
     $currencystmt->execute([
       ':voucher_no' => $voucher_no,
     ]);
@@ -3617,6 +3620,8 @@ Class Query{
           ':voucher_no' => $voucher_no,
         ]);
         $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
+        print "<br>";
+        print_r($currencydata['usd_amount']);
         $receivestmt = $pdo->prepare("SELECT * FROM receivable WHERE ac_code='$ac_code' ORDER BY id DESC");
         $receivestmt->execute();
         $receivedata = $receivestmt->fetch(PDO::FETCH_ASSOC);
@@ -3803,10 +3808,10 @@ Class Query{
           $balance = 0;
         }
         $balance = ($balance + $debit) - $credit;
-        if(str_contains($ac_name, '3300/')){
-          $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no AND crossac_name=:ac_name OR transactionid='$transactionid'");
-        }else{
+        if(str_contains($crossacname, '3300/')){
           $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no AND crossac_name=:ac_name AND transactionid='$transactionid'");
+        }else{
+          $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no AND crossac_name=:ac_name OR transactionid='$transactionid'");
         }
         $checkcbstmt->execute([
           ':voucher_no' => $voucher_no,
