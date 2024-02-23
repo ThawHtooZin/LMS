@@ -148,8 +148,12 @@ $query = new Query();
                     $totalpaidamount = $totalpaidamountstmt->fetch(PDO::FETCH_ASSOC);
                     $total_paid_amount = $totalpaidamount['total_paid_amount'];
                     $total_paid_amount = $total_paid_amount + $payabledata['paid_amount'];
-                    
-                    $thebalanceamount = $totalpurchaseamount['total_purchase_amount'] + $closingbalanceamount['closing_balance'] - $total_paid_amount;
+
+                    if(!empty($closingbalanceamount['closing_balance'])){
+                      $thebalanceamount = $totalpurchaseamount['total_purchase_amount'] + $closingbalanceamount['closing_balance'] - $total_paid_amount;
+                    }else{
+                      $thebalanceamount = $totalpurchaseamount['total_purchase_amount'] - $total_paid_amount;
+                    }
                     
                   }else{
                     $nowid = $payabledata['id'];
