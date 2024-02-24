@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 24, 2024 at 06:21 AM
+-- Generation Time: Feb 24, 2024 at 08:41 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -291,8 +291,8 @@ INSERT INTO `cashbook` (`id`, `date`, `sr_no`, `ac_name`, `particular`, `debit`,
 (1248, '2024-02-02', '', '3600/001', 'Water Bill and services for WH (Dec/23) (78000+2000)', 0, 80000, 52823583, 'Dr-Feb 24/035', '9100/013', 154),
 (1249, '2024-02-02', '', '3600/001', 'Paid to Sticker 5 colour for penam-sticker+other', 0, 1697000, 51126583, 'Dr-Feb 24/036', '6100/006', 156),
 (1250, '2024-02-02', '', '3600/001', 'Taxi Charges for WH to Daw Nan house go for (Htet Paing Aye)', 0, 6000, 51120583, 'Dr-Feb 24/037', '9100/002', 158),
-(1266, '2024-02-01', '', '3600/001', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', 78650250, 0, 129770833, 'Cr-Feb 24/001', '3300/002', 184),
-(1267, '2024-02-01', '', '3600/001', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', 130486800, 0, 260257633, 'Cr-Feb 24/001', '3300/002', 186);
+(1270, '2024-02-01', '', '3600/001', 'USA Money Received from UAB ($74925) 50%34762.5-10=$37452.5*2100ks $37462.5', 78650250, 0, 129770833, 'Cr-Feb 24/001', '3300/002', 188),
+(1271, '2024-02-01', '', '3600/001', 'USA Money Received from UAB ($74925) 50%34762.5-10=$37452.5*2100ks $37462.5', 130369500, 0, 260140333, 'Cr-Feb 24/001', '3300/002', 190);
 
 -- --------------------------------------------------------
 
@@ -474,10 +474,10 @@ INSERT INTO `currency` (`id`, `dollar_rate`, `debitorcredit`, `mmk_amount`, `usd
 (164, 1, 'balance', '0', '-34007.64', 'Closing Balance Adv; Received From 01/2024', 0),
 (165, 1, 'balance', '0', '46969.36', 'Closing Balance from Italy -01/2024', 0),
 (166, 1, 'balance', '0', '-33410', 'Closing Balance Adv;from KOLKATA', 0),
-(196, 2100, 'debit', '78650250', '37452.5', 'Cr-Feb 24/001', 184),
-(197, 2100, 'credit', '78650250', '37452.5', 'Cr-Feb 24/001', 185),
-(198, 3480, 'debit', '130665300', '37547.5', 'Cr-Feb 24/001', 186),
-(199, 3480, 'credit', '130665300', '37547.5', 'Cr-Feb 24/001', 187);
+(200, 2100, 'debit', '78650250', '37452.5', 'Cr-Feb 24/001', 188),
+(201, 3480, 'credit', '130665300', '37547.5', 'Cr-Feb 24/001', 189),
+(202, 3480, 'debit', '130665300', '37547.5', 'Cr-Feb 24/001', 190),
+(203, 3480, 'credit', '130665300', '37547.5', 'Cr-Feb 24/001', 191);
 
 -- --------------------------------------------------------
 
@@ -820,10 +820,10 @@ INSERT INTO `general_ledger` (`id`, `date`, `voucherno`, `ac_code`, `debit`, `cr
 (944, '2024-02-02', 'Dr-Feb 24/036', '3600/001', '0', '1697000', '51126583', 'Paid to Sticker 5 colour for penam-sticker+other', '', '', 0, 35, 156),
 (945, '2024-02-02', 'Dr-Feb 24/037', '9100/002', '6000', '0', '103500', 'Taxi Charges for WH to Daw Nan house go for (Htet Paing Aye)', '', '', 0, 39, 157),
 (946, '2024-02-02', 'Dr-Feb 24/037', '3600/001', '0', '6000', '51120583', 'Taxi Charges for WH to Daw Nan house go for (Htet Paing Aye)', '', '', 0, 35, 158),
-(994, '2024-02-01', 'Cr-Feb 24/001', '3600/001', '78650250', '0', '129770833', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '', '', 0, 35, 184),
-(995, '2024-02-01', 'Cr-Feb 24/001', '3300/002', '0', '78650250', '-77607315.19', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '', '', 0, 35, 185),
-(996, '2024-02-01', 'Cr-Feb 24/001', '3600/001', '130486800', '0', '260257633', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '', '', 85, 35, 186),
-(997, '2024-02-01', 'Cr-Feb 24/001', '3300/002', '0', '130665300', '-208272615.19', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '', '', 0, 35, 187);
+(1006, '2024-02-01', 'Cr-Feb 24/001', '3600/001', '78650250', '0', '129770833', 'USA Money Received from UAB ($74925) 50%34762.5-10=$37452.5*2100ks $37462.5', '', '', 0, 35, 188),
+(1007, '2024-02-01', 'Cr-Feb 24/001', '3300/002', '0', '78650250', '-77607315.19', 'USA Money Received from UAB ($74925) 50%34762.5-10=$37452.5*2100ks $37462.5', '', '', 0, 35, 189),
+(1008, '2024-02-01', 'Cr-Feb 24/001', '3600/001', '130369500', '0', '260140333', 'USA Money Received from UAB ($74925) 50%34762.5-10=$37452.5*2100ks $37462.5', '', '', 85, 35, 190),
+(1009, '2024-02-01', 'Cr-Feb 24/001', '3300/002', '0', '130665300', '-208272615.19', 'USA Money Received from UAB ($74925) 50%34762.5-10=$37452.5*2100ks $37462.5', '', '', 0, 35, 191);
 
 -- --------------------------------------------------------
 
@@ -1648,8 +1648,8 @@ INSERT INTO `receivable` (`id`, `date`, `ac_code`, `sr_no`, `container_no`, `inv
 (70, '2023-12-15', '3300/002', 'SAF-25/2023', ':OERU-4219167', '66774.05', '0000-00-00', '', '', '0', '846016.92', 0),
 (71, '2023-12-21', '3300/002', 'SAF-26/2023', ':TTNU-8059533', '91268.45', '0000-00-00', '', '', '0', '937285.37', 0),
 (72, '2023-12-28', '3300/002', 'SAF-27/2023', ':SEGU-9662141', '105649.44', '0000-00-00', '', '', '0', '1042934.81', 0),
-(115, '0000-00-00', '3300/002', '', '', '', '2024-02-01', 'Cr-Feb 24/001', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '37452.5', '1005482.31', 185),
-(116, '0000-00-00', '3300/002', '', '', '', '2024-02-01', 'Cr-Feb 24/001', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '37547.5', '967934.81', 187);
+(118, '0000-00-00', '3300/002', '', '', '', '2024-02-01', 'Cr-Feb 24/001', 'USA Money Received from UAB ($74925) 50%34762.5-10=$37452.5*2100ks $37462.5', '37452.5', '1005482.31', 189),
+(119, '0000-00-00', '3300/002', '', '', '', '2024-02-01', 'Cr-Feb 24/001', 'USA Money Received from UAB ($74925) 50%34762.5-10=$37452.5*2100ks $37462.5', '37547.5', '967934.81', 191);
 
 -- --------------------------------------------------------
 
@@ -1959,10 +1959,10 @@ INSERT INTO `transaction` (`id`, `date`, `voucher_no`, `ac_code`, `description`,
 (156, '2024-02-02', 'Dr-Feb 24/036', '3600/001', 'Paid to Sticker 5 colour for penam-sticker+other', '0', '1697000', 'mmk', '', '', 0),
 (157, '2024-02-02', 'Dr-Feb 24/037', '9100/002', 'Taxi Charges for WH to Daw Nan house go for (Htet Paing Aye)', '6000', '0', 'mmk', '', '', 0),
 (158, '2024-02-02', 'Dr-Feb 24/037', '3600/001', 'Taxi Charges for WH to Daw Nan house go for (Htet Paing Aye)', '0', '6000', 'mmk', '', '', 0),
-(184, '2024-02-01', 'Cr-Feb 24/001', '3600/001', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '78650250', '0', 'usd', '', '', 0),
-(185, '2024-02-01', 'Cr-Feb 24/001', '3300/002', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '0', '78650250', 'usd', '', '', 0),
-(186, '2024-02-01', 'Cr-Feb 24/001', '3600/001', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '130665300', '0', 'usd', '', '', 85),
-(187, '2024-02-01', 'Cr-Feb 24/001', '3300/002', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '0', '130665300', 'usd', '', '', 0);
+(188, '2024-02-01', 'Cr-Feb 24/001', '3600/001', 'USA Money Received from UAB ($74925) 50%34762.5-10=$37452.5*2100ks $37462.5', '78650250', '0', 'usd', '', '', 0),
+(189, '2024-02-01', 'Cr-Feb 24/001', '3300/002', 'USA Money Received from UAB ($74925) 50%34762.5-10=$37452.5*2100ks $37462.5', '0', '78650250', 'usd', '', '', 0),
+(190, '2024-02-01', 'Cr-Feb 24/001', '3600/001', 'USA Money Received from UAB ($74925) 50%34762.5-10=$37452.5*2100ks $37462.5', '130665300', '0', 'usd', '', '', 85),
+(191, '2024-02-01', 'Cr-Feb 24/001', '3300/002', 'USA Money Received from UAB ($74925) 50%34762.5-10=$37452.5*2100ks $37462.5', '0', '130665300', 'usd', '', '', 0);
 
 -- --------------------------------------------------------
 
@@ -2363,7 +2363,8 @@ INSERT INTO `userlogs` (`id`, `login_time`, `login_date`, `login_username`, `log
 (166, '05:22:18.000000', '2024-02-22', 'admin', 'admin', 'Login Success'),
 (167, '06:06:53.000000', '2024-02-22', 'admin', 'admin', 'Login Success'),
 (168, '07:36:06.000000', '2024-02-22', 'admin', 'admin', 'Login Success'),
-(169, '09:45:56.000000', '2024-02-24', 'admin', 'admin', 'Login Success');
+(169, '09:45:56.000000', '2024-02-24', 'admin', 'admin', 'Login Success'),
+(170, '01:42:39.000000', '2024-02-24', 'admin', 'admin', 'Login Success');
 
 --
 -- Indexes for dumped tables
@@ -2743,7 +2744,7 @@ ALTER TABLE `bankdetail`
 -- AUTO_INCREMENT for table `cashbook`
 --
 ALTER TABLE `cashbook`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1268;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1272;
 
 --
 -- AUTO_INCREMENT for table `category`
@@ -2767,7 +2768,7 @@ ALTER TABLE `container`
 -- AUTO_INCREMENT for table `currency`
 --
 ALTER TABLE `currency`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=200;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=204;
 
 --
 -- AUTO_INCREMENT for table `form7stock`
@@ -2797,7 +2798,7 @@ ALTER TABLE `form10stocktcl`
 -- AUTO_INCREMENT for table `general_ledger`
 --
 ALTER TABLE `general_ledger`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=998;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1010;
 
 --
 -- AUTO_INCREMENT for table `gfcdryfishcoldstore`
@@ -2947,7 +2948,7 @@ ALTER TABLE `purchase`
 -- AUTO_INCREMENT for table `receivable`
 --
 ALTER TABLE `receivable`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=117;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=120;
 
 --
 -- AUTO_INCREMENT for table `repacking`
@@ -2989,7 +2990,7 @@ ALTER TABLE `total_charges`
 -- AUTO_INCREMENT for table `transaction`
 --
 ALTER TABLE `transaction`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=188;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=192;
 
 --
 -- AUTO_INCREMENT for table `truckactualinvoice`
@@ -3037,7 +3038,7 @@ ALTER TABLE `trucktotalcosting`
 -- AUTO_INCREMENT for table `userlogs`
 --
 ALTER TABLE `userlogs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=170;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=171;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
