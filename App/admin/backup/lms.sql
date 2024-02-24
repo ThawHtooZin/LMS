@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 23, 2024 at 10:41 AM
+-- Generation Time: Feb 24, 2024 at 06:21 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -253,44 +253,46 @@ CREATE TABLE `cashbook` (
 
 INSERT INTO `cashbook` (`id`, `date`, `sr_no`, `ac_name`, `particular`, `debit`, `credit`, `balance`, `voucher_no`, `crossac_name`, `transactionid`) VALUES
 (479, '2024-01-31', '', '3600/001', 'Opining Balance of Jan\'24', 0, 0, 213847883, NULL, NULL, 0),
-(518, '2024-02-01', '', '3600/001', 'Water 6 pk purchase for WH', 0, 5400, 213842483, 'Dr-Feb 24/001', '9100/003', 0),
-(519, '2024-02-01', '', '3600/001', 'Sir Phone Bill and Monthly/ Phone 6 pcs Bill/ Sir-6000 (Sir,Daw Nan,Lai-15000) (Office,Sandar,Mar)', 0, 39000, 213803483, 'Dr-Feb 24/002', '9100/004', 0),
-(520, '2024-02-01', '', '3600/001', 'Medicine and Taxi for sir', 0, 14000, 213789483, 'Dr Feb\'24/003', '9100/005', 0),
-(521, '2024-02-01', '', '3600/001', 'Car Diesel for 5L-2848 (30.1.24-10000)(30.1.24-70000)', 0, 80000, 213709483, 'Dr Feb\'24/004', '9100/006', 0),
-(522, '2024-02-01', '', '3600/001', 'Car Diesel for 6J-3015 (31.1.24-50000)', 0, 50000, 213659483, 'Dr Feb\'24/005', '9100/006', 0),
-(523, '2024-02-01', '', '3600/001', 'Material and Taxi Charges for PK Machine', 0, 50000, 213609483, 'Dr Feb\'24/006', '9100/007', 0),
-(524, '2024-02-01', '', '3600/001', 'Bejon Loan take from LM 2020ED Balance $25176*3572ks(Best Brand)', 0, 89928700, 123680783, 'Dr Feb\'24/007', '3300/001', 0),
-(525, '2024-02-01', '', '3600/001', 'DHL charges for Italy Document sent', 0, 377000, 123303783, 'Dr Feb\'24/008', '9100/008', 0),
-(526, '2024-02-01', '', '3600/001', 'Paid to Ka Yin Lay for Vr No-11337', 0, 100000, 123203783, 'Dr Feb\'24/009', '4000/K06', 0),
-(527, '2024-02-01', '', '3600/001', 'Wave Money charges for Ka Yin Lay Money sent', 0, 1500, 123202283, 'Dr Feb\'24/010', '9100/009', 0),
-(528, '2024-02-01', '', '3600/001', 'All people Salary Payment for Jan/24', 0, 17754000, 105448283, 'Dr Feb\'24/011', '9100/001', 0),
-(529, '2024-02-01', '', '3600/001', 'All people Salary Payment for Jan/24', 0, 17351000, 88097283, 'Dr Feb\'24/011', '9100/010', 0),
-(530, '2024-02-01', '', '3600/001', 'Donation for Bangladesh Embassy', 0, 3000000, 85097283, 'Dr Feb\'24/012', '9100/011', 0),
-(581, '2024-02-02', '', '3600/001', 'Taxi charges for Ocean Pacfic to WH', 0, 15000, 85082283, 'Dr Feb\'24/013', '9100/002', 0),
-(582, '2024-02-02', '', '3600/001', 'Carton Box purchase for Ocean Pacfic pk', 0, 52500, 85029783, 'Dr Feb\'24/014', '6100/003', 0),
-(583, '2024-02-02', '', '3600/001', 'Labour Charges and Taxi Charges for (Rohu)', 0, 289000, 84740783, 'Dr Feb\'24/015', '6100/001', 0),
-(584, '2024-02-02', '', '3600/001', 'Ice 10 pcs purchase for HHK (D-Puti,Rohu,Ayer)', 0, 90000, 84650783, 'Dr Feb\'24/016', '6100/002', 0),
-(585, '2024-02-02', '', '3600/001', 'JCV Rope purchase for HHK pk pcs*85000', 0, 170000, 84480783, 'Dr Feb\'24/017', '6100/003', 0),
-(586, '2024-02-02', '', '3600/001', 'Taxi Charges for HHK to WH and WH to GFC', 0, 43000, 84437783, 'Dr Feb\'24/018', '9100/002', 0),
-(587, '2024-02-02', '', '3600/001', 'WH to HHK Fish carry car charges', 0, 130000, 84307783, 'Dr Feb\'24/019', '6100/004', 0),
-(588, '2024-02-02', '', '3600/001', 'Workers 31 pcs Dinner for (OT) (Rohu)', 0, 62000, 84245783, 'Dr Feb\'24/020', '9100/012', 0),
-(589, '2024-02-02', '', '3600/001', 'Material purchase and service charges for WH (Boy Tiolet)', 0, 85000, 84160783, 'Dr Feb\'24/021', '9100/007', 0),
-(590, '2024-02-02', '', '3600/001', 'Fruit purchase for Sir', 0, 7000, 84153783, 'Dr Feb\'24/022', '9100/012', 0),
-(591, '2024-02-02', '', '3600/001', 'Penam and other purchase for WH', 0, 814500, 83339283, 'Dr Feb\'24/023', '6100/003', 0),
-(592, '2024-02-02', '', '3600/001', 'Ice 4 pcs and car pk for D-Puti', 0, 42000, 83297283, 'Dr Feb\'24/024', '6100/002', 0),
-(593, '2024-02-02', '', '3600/001', 'Paid to Mg Mg Soe for Vr No-11152,11185', 0, 4000000, 79297283, 'Dr Feb\'24/025', '4000/M06', 0),
-(594, '2024-02-02', '', '3600/001', 'Paid to Mg Mg Nyunt for Vr-11183,11192', 0, 5000000, 74297283, 'Dr-Feb\'24/026', '4000/M03', 0),
-(595, '2024-02-02', '', '3600/001', 'Paid to BLC (PYM) for Vr No-11221', 0, 3400000, 70897283, 'Dr-Feb 24/027', '4000/B02', 0),
-(596, '2024-02-02', '', '3600/001', 'Paid to Than Than Myint for Vr No-107788 (10810-2696450)', 0, 5000000, 65897283, 'Dr-Feb 24/028', '4000/T08', 0),
-(597, '2024-02-02', '', '3600/001', 'Paid to  Ye Yint for Vr No-11115,11133', 0, 5000000, 60897283, 'Dr-Feb 24/029', '4000/Y01', 0),
-(598, '2024-02-02', '', '3600/001', 'Paid to Htet Aung Lin for Vr No-10877', 0, 444200, 60453083, 'Dr-Feb 24/030', '4000/H01', 0),
-(599, '2024-02-02', '', '3600/001', 'Paid to Phone Naing for Vr No-11249,11268', 0, 3500000, 56953083, 'Dr-Feb 24/031', '4000/P01', 0),
-(600, '2024-02-02', '', '3600/001', 'Paid to Thein Htay for Vr No-11269', 0, 4000000, 52953083, 'Dr-Feb 24/032', '4000/T02', 0),
-(601, '2024-02-02', '', '3600/001', 'Taxi Charges For Office 5 pcs Payment Day (6:30) PM', 0, 39500, 52913583, 'Dr Feb\'24/033', '9100/002', 0),
-(602, '2024-02-02', '', '3600/001', 'Meal Allowance for Office 5pcs Payment Day', 0, 10000, 52903583, 'Dr-Feb 24/034', '9100/012', 0),
-(603, '2024-02-02', '', '3600/001', 'Water Bill and services for WH (Dec/23) (78000+2000)', 0, 80000, 52823583, 'Dr-Feb 24/035', '9100/013', 0),
-(604, '2024-02-02', '', '3600/001', 'Paid to Sticker 5 colour for penam-sticker+other', 0, 1697000, 51126583, 'Dr-Feb 24/036', '6100/006', 0),
-(605, '2024-02-02', '', '3600/001', 'Taxi Charges for WH to Daw Nan house go for (Htet Paing Aye)', 0, 6000, 51120583, 'Dr-Feb 24/037', '9100/002', 0);
+(1213, '2024-02-01', '', '3600/001', 'Water 6 pk purchase for WH', 0, 5400, 213842483, 'Dr-Feb 24/001', '9100/003', 55),
+(1214, '2024-02-01', '', '3600/001', 'Sir Phone Bill and Monthly/ Phone 6 pcs Bill/ Sir-6000 (Sir,Daw Nan,Lai-15000) (Office,Sandar,Mar)', 0, 39000, 213803483, 'Dr-Feb 24/002', '9100/004', 59),
+(1215, '2024-02-01', '', '3600/001', 'Medicine and Taxi for sir', 0, 14000, 213789483, 'Dr Feb\'24/003', '9100/005', 61),
+(1216, '2024-02-01', '', '3600/001', 'Car Diesel for 5L-2848 (30.1.24-10000)(30.1.24-70000)', 0, 80000, 213709483, 'Dr Feb\'24/004', '9100/006', 63),
+(1217, '2024-02-01', '', '3600/001', 'Car Diesel for 6J-3015 (31.1.24-50000)', 0, 50000, 213659483, 'Dr Feb\'24/005', '9100/006', 65),
+(1218, '2024-02-01', '', '3600/001', 'Material and Taxi Charges for PK Machine', 0, 50000, 213609483, 'Dr Feb\'24/006', '9100/007', 67),
+(1219, '2024-02-01', '', '3600/001', 'Bejon Loan take from LM 2020ED Balance $25176*3572ks(Best Brand)', 0, 89928700, 123680783, 'Dr Feb\'24/007', '3300/001', 69),
+(1220, '2024-02-01', '', '3600/001', 'DHL charges for Italy Document sent', 0, 377000, 123303783, 'Dr Feb\'24/008', '9100/008', 71),
+(1221, '2024-02-01', '', '3600/001', 'Paid to Ka Yin Lay for Vr No-11337', 0, 100000, 123203783, 'Dr Feb\'24/009', '4000/K06', 77),
+(1222, '2024-02-01', '', '3600/001', 'Wave Money charges for Ka Yin Lay Money sent', 0, 1500, 123202283, 'Dr Feb\'24/010', '9100/009', 79),
+(1223, '2024-02-01', '', '3600/001', 'All people Salary Payment for Jan/24', 0, 17754000, 105448283, 'Dr Feb\'24/011', '9100/001', 81),
+(1224, '2024-02-01', '', '3600/001', 'All people Annual Bonus Paid for Jan/24', 0, 17351000, 88097283, 'Dr Feb\'24/011', '9100/010', 83),
+(1225, '2024-02-01', '', '3600/001', 'Donation for Bangladesh Embassy', 0, 3000000, 85097283, 'Dr Feb\'24/012', '9100/011', 85),
+(1226, '2024-02-02', '', '3600/001', 'Taxi charges for Ocean Pacfic to WH', 0, 15000, 85082283, 'Dr Feb\'24/013', '9100/002', 87),
+(1227, '2024-02-02', '', '3600/001', 'Carton Box purchase for Ocean Pacfic pk', 0, 52500, 85029783, 'Dr Feb\'24/014', '6100/003', 89),
+(1228, '2024-02-02', '', '3600/001', 'Labour Charges and Taxi Charges for (Rohu)', 0, 289000, 84740783, 'Dr Feb\'24/015', '6100/001', 91),
+(1229, '2024-02-02', '', '3600/001', 'Ice 10 pcs purchase for HHK (D-Puti,Rohu,Ayer)', 0, 90000, 84650783, 'Dr Feb\'24/016', '6100/002', 93),
+(1230, '2024-02-02', '', '3600/001', 'JCV Rope purchase for HHK pk pcs*85000', 0, 170000, 84480783, 'Dr Feb\'24/017', '6100/003', 95),
+(1231, '2024-02-02', '', '3600/001', 'Taxi Charges for HHK to WH and WH to GFC', 0, 43000, 84437783, 'Dr Feb\'24/018', '9100/002', 97),
+(1232, '2024-02-02', '', '3600/001', 'WH to HHK Fish carry car charges', 0, 130000, 84307783, 'Dr Feb\'24/019', '6100/004', 99),
+(1233, '2024-02-02', '', '3600/001', 'Workers 31 pcs Dinner for (OT) (Rohu)', 0, 62000, 84245783, 'Dr Feb\'24/020', '9100/012', 101),
+(1234, '2024-02-02', '', '3600/001', 'Material purchase and service charges for WH (Boy Tiolet)', 0, 85000, 84160783, 'Dr Feb\'24/021', '9100/007', 103),
+(1235, '2024-02-02', '', '3600/001', 'Fruit purchase for Sir', 0, 7000, 84153783, 'Dr Feb\'24/022', '9100/012', 105),
+(1236, '2024-02-02', '', '3600/001', 'Penam and other purchase for WH', 0, 814500, 83339283, 'Dr Feb\'24/023', '6100/003', 107),
+(1237, '2024-02-02', '', '3600/001', 'Ice 4 pcs and car pk for D-Puti', 0, 42000, 83297283, 'Dr Feb\'24/024', '6100/002', 109),
+(1238, '2024-02-02', '', '3600/001', 'Paid to Mg Mg Soe for Vr No-11152,11185', 0, 4000000, 79297283, 'Dr Feb\'24/025', '4000/M06', 111),
+(1239, '2024-02-02', '', '3600/001', 'Paid to Mg Mg Nyunt for Vr-11183,11192', 0, 5000000, 74297283, 'Dr-Feb\'24/026', '4000/M03', 116),
+(1240, '2024-02-02', '', '3600/001', 'Paid to BLC (PYM) for Vr No-11221', 0, 3400000, 70897283, 'Dr-Feb 24/027', '4000/B02', 118),
+(1241, '2024-02-02', '', '3600/001', 'Paid to Than Than Myint for Vr No-107788 (10810-2696450)', 0, 5000000, 65897283, 'Dr-Feb 24/028', '4000/T08', 120),
+(1242, '2024-02-02', '', '3600/001', 'Paid to  Ye Yint for Vr No-11115,11133', 0, 5000000, 60897283, 'Dr-Feb 24/029', '4000/Y01', 123),
+(1243, '2024-02-02', '', '3600/001', 'Paid to Htet Aung Lin for Vr No-10877', 0, 444200, 60453083, 'Dr-Feb 24/030', '4000/H01', 128),
+(1244, '2024-02-02', '', '3600/001', 'Paid to Phone Naing for Vr No-11249,11268', 0, 3500000, 56953083, 'Dr-Feb 24/031', '4000/P01', 135),
+(1245, '2024-02-02', '', '3600/001', 'Paid to Thein Htay for Vr No-11269', 0, 4000000, 52953083, 'Dr-Feb 24/032', '4000/T02', 138),
+(1246, '2024-02-02', '', '3600/001', 'Taxi Charges For Office 5 pcs Payment Day (6:30) PM', 0, 39500, 52913583, 'Dr Feb\'24/033', '9100/002', 150),
+(1247, '2024-02-02', '', '3600/001', 'Meal Allowance for Office 5pcs Payment Day', 0, 10000, 52903583, 'Dr-Feb 24/034', '9100/012', 152),
+(1248, '2024-02-02', '', '3600/001', 'Water Bill and services for WH (Dec/23) (78000+2000)', 0, 80000, 52823583, 'Dr-Feb 24/035', '9100/013', 154),
+(1249, '2024-02-02', '', '3600/001', 'Paid to Sticker 5 colour for penam-sticker+other', 0, 1697000, 51126583, 'Dr-Feb 24/036', '6100/006', 156),
+(1250, '2024-02-02', '', '3600/001', 'Taxi Charges for WH to Daw Nan house go for (Htet Paing Aye)', 0, 6000, 51120583, 'Dr-Feb 24/037', '9100/002', 158),
+(1266, '2024-02-01', '', '3600/001', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', 78650250, 0, 129770833, 'Cr-Feb 24/001', '3300/002', 184),
+(1267, '2024-02-01', '', '3600/001', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', 130486800, 0, 260257633, 'Cr-Feb 24/001', '3300/002', 186);
 
 -- --------------------------------------------------------
 
@@ -362,117 +364,120 @@ CREATE TABLE `currency` (
   `debitorcredit` varchar(255) NOT NULL,
   `mmk_amount` text NOT NULL,
   `usd_amount` text NOT NULL,
-  `voucher_no` varchar(255) NOT NULL
+  `voucher_no` varchar(255) NOT NULL,
+  `transactionid` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `currency`
 --
 
-INSERT INTO `currency` (`id`, `dollar_rate`, `debitorcredit`, `mmk_amount`, `usd_amount`, `voucher_no`) VALUES
-(54, 0, 'debit', '5400', '0', 'Dr-Feb 24/001'),
-(55, 0, 'credit', '5400', '0', 'Dr-Feb 24/001'),
-(58, 0, 'debit', '39000', '0', 'Dr-Feb 24/002'),
-(59, 0, 'credit', '39000', '0', 'Dr-Feb 24/002'),
-(60, 0, 'debit', '14000', '0', 'Dr Feb\'24/003'),
-(61, 0, 'credit', '14000', '0', 'Dr Feb\'24/003'),
-(62, 0, 'debit', '80000', '0', 'Dr Feb\'24/004'),
-(63, 0, 'credit', '80000', '0', 'Dr Feb\'24/004'),
-(64, 0, 'debit', '50000', '0', 'Dr Feb\'24/005'),
-(65, 0, 'credit', '50000', '0', 'Dr Feb\'24/005'),
-(66, 0, 'debit', '50000', '0', 'Dr Feb\'24/006'),
-(67, 0, 'credit', '50000', '0', 'Dr Feb\'24/006'),
-(68, 0, 'debit', '89928700', '0', 'Dr Feb\'24/007'),
-(69, 0, 'credit', '89928700', '0', 'Dr Feb\'24/007'),
-(70, 0, 'debit', '377000', '0', 'Dr Feb\'24/008'),
-(71, 0, 'credit', '377000', '0', 'Dr Feb\'24/008'),
-(76, 0, 'debit', '100000', '0', 'Dr Feb\'24/009'),
-(77, 0, 'credit', '100000', '0', 'Dr Feb\'24/009'),
-(78, 0, 'debit', '1500', '0', 'Dr Feb\'24/010'),
-(79, 0, 'credit', '1500', '0', 'Dr Feb\'24/010'),
-(80, 0, 'debit', '17754000', '0', 'Dr Feb\'24/011'),
-(81, 0, 'credit', '17754000', '0', 'Dr Feb\'24/011'),
-(82, 0, 'debit', '17351000', '0', 'Dr Feb\'24/011'),
-(83, 0, 'credit', '17351000', '0', 'Dr Feb\'24/011'),
-(84, 0, 'debit', '3000000', '0', 'Dr Feb\'24/012'),
-(85, 0, 'credit', '3000000', '0', 'Dr Feb\'24/012'),
-(86, 0, 'debit', '15000', '0', 'Dr Feb\'24/013'),
-(87, 0, 'credit', '15000', '0', 'Dr Feb\'24/013'),
-(88, 0, 'debit', '52500', '0', 'Dr Feb\'24/014'),
-(89, 0, 'credit', '52500', '0', 'Dr Feb\'24/014'),
-(90, 0, 'debit', '289000', '0', 'Dr Feb\'24/014'),
-(91, 0, 'credit', '289000', '0', 'Dr Feb\'24/014'),
-(92, 0, 'debit', '90000', '0', 'Dr Feb\'24/016'),
-(93, 0, 'credit', '90000', '0', 'Dr Feb\'24/016'),
-(94, 0, 'debit', '170000', '0', 'Dr Feb\'24/017'),
-(95, 0, 'credit', '170000', '0', 'Dr Feb\'24/017'),
-(96, 0, 'debit', '43000', '0', 'Dr Feb\'24/018'),
-(97, 0, 'credit', '43000', '0', 'Dr Feb\'24/018'),
-(98, 0, 'debit', '130000', '0', 'Dr Feb\'24/019'),
-(99, 0, 'credit', '130000', '0', 'Dr Feb\'24/019'),
-(100, 0, 'debit', '62000', '0', 'Dr Feb\'24/020'),
-(101, 0, 'credit', '62000', '0', 'Dr Feb\'24/020'),
-(102, 0, 'debit', '85000', '0', 'Dr Feb\'24/021'),
-(103, 0, 'credit', '85000', '0', 'Dr Feb\'24/021'),
-(104, 0, 'debit', '7000', '0', 'Dr Feb\'24/022'),
-(105, 0, 'credit', '7000', '0', 'Dr Feb\'24/022'),
-(106, 0, 'debit', '814500', '0', 'Dr Feb\'24/023'),
-(107, 0, 'credit', '814500', '0', 'Dr Feb\'24/023'),
-(108, 0, 'debit', '42000', '0', 'Dr Feb\'24/024'),
-(109, 0, 'credit', '42000', '0', 'Dr Feb\'24/024'),
-(110, 0, 'debit', '4000000', '0', 'Dr Feb\'24/025'),
-(111, 0, 'credit', '4000000', '0', 'Dr Feb\'24/025'),
-(112, 0, '', '0', '0', ''),
-(115, 0, 'debit', '5000000', '0', 'Dr-Feb\'24/026'),
-(116, 0, 'credit', '5000000', '0', 'Dr-Feb\'24/026'),
-(117, 0, 'debit', '3400000', '0', 'Dr-Fed 24/027'),
-(118, 0, 'credit', '3400000', '0', 'Dr-Fed 24/027'),
-(119, 0, 'debit', '5000000', '0', 'Dr-Fed 24/028'),
-(120, 0, 'credit', '5000000', '0', 'Dr-Feb 24/028'),
-(121, 0, '', '0', '0', 'Dr-Feb 24/028'),
-(122, 0, 'debit', '5000000', '0', 'Dr-Feb 24/029'),
-(123, 0, 'credit', '5000000', '0', 'Dr-Feb 24/029'),
-(124, 1, 'debit', '151492', '151492.37', 'SAF-001'),
-(125, 1, 'credit', '151492', '151492.37', 'SAF-001'),
-(126, 0, 'debit', '444200', '0', 'Dr-Feb 24/030'),
-(127, 1, 'debit', '116818', '116818.20', 'SAF-002'),
-(128, 0, 'credit', '444200', '0', 'Dr-Feb 24/030'),
-(129, 1, 'credit', '116818', '116818.20', 'SAF-002'),
-(130, 0, 'debit', '3500000', '0', 'Dr-Feb 24/031'),
-(131, 0, '', '0', '0', 'Dr-Feb 24/031'),
-(132, 1, 'debit', '87343', '87343.73', 'SAF-003'),
-(133, 1, 'credit', '87343', '87343.73', 'SAF-003'),
-(134, 1, 'debit', '92746', '92746.57', 'SAF-004'),
-(135, 0, 'credit', '3500000', '0', 'Dr-Feb 24/031'),
-(136, 1, 'credit', '92746', '92746.57', 'SAF-004'),
-(137, 0, 'debit', '4000000', '0', 'Dr-Feb 24/032'),
-(138, 0, 'credit', '4000000', '0', 'Dr-Feb 24/032'),
-(139, 1, 'debit', '98874', '98874.20', 'SAF-005'),
-(140, 1, 'credit', '98874', '98874.20', 'SAF-005'),
-(141, 1, 'debit', '95217', '95217.11', 'SAF-006'),
-(142, 1, 'credit', '95217', '95217.11', 'SAF-006'),
-(143, 1, 'debit', '66774', '66774.05', 'SAF-007'),
-(144, 1, 'credit', '66774', '66774.05', 'SAF-007'),
-(145, 1, 'debit', '91268', '91268.45', 'SAF-008'),
-(146, 1, 'credit', '91268', '91268.45', 'SAF-008'),
-(147, 1, 'debit', '105649', '105649.44', 'SAF-009'),
-(148, 1, 'credit', '105649', '105649.44', 'SAF-009'),
-(149, 0, 'debit', '39500', '0', 'Dr Feb\'24/033'),
-(150, 0, 'credit', '39500', '0', 'Dr Feb\'24/033'),
-(151, 0, 'debit', '10000', '0', 'Dr-Feb 24/034'),
-(152, 0, 'credit', '10000', '0', 'Dr-Feb 24/034'),
-(153, 0, 'debit', '80000', '0', 'Dr-Feb 24/035'),
-(154, 0, 'credit', '80000', '0', 'Dr-Feb 24/035'),
-(155, 0, 'debit', '1697000', '0', 'Dr-Feb 24/036'),
-(156, 0, 'credit', '1697000', '0', 'Dr-Feb 24/036'),
-(157, 0, 'debit', '6000', '0', 'Dr-Feb 24/037'),
-(158, 0, 'credit', '6000', '0', 'Dr-Feb 24/037'),
-(162, 1, 'balance', '0', '136750.69', 'Closing Balance From SAF-18/2023'),
-(164, 1, 'balance', '0', '-34007.64', 'Closing Balance Adv; Received From 01/2024'),
-(165, 1, 'balance', '0', '46969.36', 'Closing Balance from Italy -01/2024'),
-(166, 1, 'balance', '0', '-33410', 'Closing Balance Adv;from KOLKATA'),
-(171, 2100, 'debit', '78649200', '37452.5', 'Cr-Feb 24/001'),
-(172, 2100, 'credit', '78649200', '37452.5', 'Cr-Feb 24/001');
+INSERT INTO `currency` (`id`, `dollar_rate`, `debitorcredit`, `mmk_amount`, `usd_amount`, `voucher_no`, `transactionid`) VALUES
+(54, 0, 'debit', '5400', '0', 'Dr-Feb 24/001', 0),
+(55, 0, 'credit', '5400', '0', 'Dr-Feb 24/001', 0),
+(58, 0, 'debit', '39000', '0', 'Dr-Feb 24/002', 0),
+(59, 0, 'credit', '39000', '0', 'Dr-Feb 24/002', 0),
+(60, 0, 'debit', '14000', '0', 'Dr Feb\'24/003', 0),
+(61, 0, 'credit', '14000', '0', 'Dr Feb\'24/003', 0),
+(62, 0, 'debit', '80000', '0', 'Dr Feb\'24/004', 0),
+(63, 0, 'credit', '80000', '0', 'Dr Feb\'24/004', 0),
+(64, 0, 'debit', '50000', '0', 'Dr Feb\'24/005', 0),
+(65, 0, 'credit', '50000', '0', 'Dr Feb\'24/005', 0),
+(66, 0, 'debit', '50000', '0', 'Dr Feb\'24/006', 0),
+(67, 0, 'credit', '50000', '0', 'Dr Feb\'24/006', 0),
+(68, 0, 'debit', '89928700', '0', 'Dr Feb\'24/007', 0),
+(69, 0, 'credit', '89928700', '0', 'Dr Feb\'24/007', 0),
+(70, 0, 'debit', '377000', '0', 'Dr Feb\'24/008', 0),
+(71, 0, 'credit', '377000', '0', 'Dr Feb\'24/008', 0),
+(76, 0, 'debit', '100000', '0', 'Dr Feb\'24/009', 0),
+(77, 0, 'credit', '100000', '0', 'Dr Feb\'24/009', 0),
+(78, 0, 'debit', '1500', '0', 'Dr Feb\'24/010', 0),
+(79, 0, 'credit', '1500', '0', 'Dr Feb\'24/010', 0),
+(80, 0, 'debit', '17754000', '0', 'Dr Feb\'24/011', 0),
+(81, 0, 'credit', '17754000', '0', 'Dr Feb\'24/011', 0),
+(82, 0, 'debit', '17351000', '0', 'Dr Feb\'24/011', 0),
+(83, 0, 'credit', '17351000', '0', 'Dr Feb\'24/011', 0),
+(84, 0, 'debit', '3000000', '0', 'Dr Feb\'24/012', 0),
+(85, 0, 'credit', '3000000', '0', 'Dr Feb\'24/012', 0),
+(86, 0, 'debit', '15000', '0', 'Dr Feb\'24/013', 0),
+(87, 0, 'credit', '15000', '0', 'Dr Feb\'24/013', 0),
+(88, 0, 'debit', '52500', '0', 'Dr Feb\'24/014', 0),
+(89, 0, 'credit', '52500', '0', 'Dr Feb\'24/014', 0),
+(90, 0, 'debit', '289000', '0', 'Dr Feb\'24/014', 0),
+(91, 0, 'credit', '289000', '0', 'Dr Feb\'24/014', 0),
+(92, 0, 'debit', '90000', '0', 'Dr Feb\'24/016', 0),
+(93, 0, 'credit', '90000', '0', 'Dr Feb\'24/016', 0),
+(94, 0, 'debit', '170000', '0', 'Dr Feb\'24/017', 0),
+(95, 0, 'credit', '170000', '0', 'Dr Feb\'24/017', 0),
+(96, 0, 'debit', '43000', '0', 'Dr Feb\'24/018', 0),
+(97, 0, 'credit', '43000', '0', 'Dr Feb\'24/018', 0),
+(98, 0, 'debit', '130000', '0', 'Dr Feb\'24/019', 0),
+(99, 0, 'credit', '130000', '0', 'Dr Feb\'24/019', 0),
+(100, 0, 'debit', '62000', '0', 'Dr Feb\'24/020', 0),
+(101, 0, 'credit', '62000', '0', 'Dr Feb\'24/020', 0),
+(102, 0, 'debit', '85000', '0', 'Dr Feb\'24/021', 0),
+(103, 0, 'credit', '85000', '0', 'Dr Feb\'24/021', 0),
+(104, 0, 'debit', '7000', '0', 'Dr Feb\'24/022', 0),
+(105, 0, 'credit', '7000', '0', 'Dr Feb\'24/022', 0),
+(106, 0, 'debit', '814500', '0', 'Dr Feb\'24/023', 0),
+(107, 0, 'credit', '814500', '0', 'Dr Feb\'24/023', 0),
+(108, 0, 'debit', '42000', '0', 'Dr Feb\'24/024', 0),
+(109, 0, 'credit', '42000', '0', 'Dr Feb\'24/024', 0),
+(110, 0, 'debit', '4000000', '0', 'Dr Feb\'24/025', 0),
+(111, 0, 'credit', '4000000', '0', 'Dr Feb\'24/025', 0),
+(112, 0, '', '0', '0', '', 0),
+(115, 0, 'debit', '5000000', '0', 'Dr-Feb\'24/026', 0),
+(116, 0, 'credit', '5000000', '0', 'Dr-Feb\'24/026', 0),
+(117, 0, 'debit', '3400000', '0', 'Dr-Fed 24/027', 0),
+(118, 0, 'credit', '3400000', '0', 'Dr-Fed 24/027', 0),
+(119, 0, 'debit', '5000000', '0', 'Dr-Fed 24/028', 0),
+(120, 0, 'credit', '5000000', '0', 'Dr-Feb 24/028', 0),
+(121, 0, '', '0', '0', 'Dr-Feb 24/028', 0),
+(122, 0, 'debit', '5000000', '0', 'Dr-Feb 24/029', 0),
+(123, 0, 'credit', '5000000', '0', 'Dr-Feb 24/029', 0),
+(124, 1, 'debit', '151492', '151492.37', 'SAF-001', 0),
+(125, 1, 'credit', '151492', '151492.37', 'SAF-001', 0),
+(126, 0, 'debit', '444200', '0', 'Dr-Feb 24/030', 0),
+(127, 1, 'debit', '116818', '116818.20', 'SAF-002', 0),
+(128, 0, 'credit', '444200', '0', 'Dr-Feb 24/030', 0),
+(129, 1, 'credit', '116818', '116818.20', 'SAF-002', 0),
+(130, 0, 'debit', '3500000', '0', 'Dr-Feb 24/031', 0),
+(131, 0, '', '0', '0', 'Dr-Feb 24/031', 0),
+(132, 1, 'debit', '87343', '87343.73', 'SAF-003', 0),
+(133, 1, 'credit', '87343', '87343.73', 'SAF-003', 0),
+(134, 1, 'debit', '92746', '92746.57', 'SAF-004', 0),
+(135, 0, 'credit', '3500000', '0', 'Dr-Feb 24/031', 0),
+(136, 1, 'credit', '92746', '92746.57', 'SAF-004', 0),
+(137, 0, 'debit', '4000000', '0', 'Dr-Feb 24/032', 0),
+(138, 0, 'credit', '4000000', '0', 'Dr-Feb 24/032', 0),
+(139, 1, 'debit', '98874', '98874.20', 'SAF-005', 0),
+(140, 1, 'credit', '98874', '98874.20', 'SAF-005', 0),
+(141, 1, 'debit', '95217', '95217.11', 'SAF-006', 0),
+(142, 1, 'credit', '95217', '95217.11', 'SAF-006', 0),
+(143, 1, 'debit', '66774', '66774.05', 'SAF-007', 0),
+(144, 1, 'credit', '66774', '66774.05', 'SAF-007', 0),
+(145, 1, 'debit', '91268', '91268.45', 'SAF-008', 0),
+(146, 1, 'credit', '91268', '91268.45', 'SAF-008', 0),
+(147, 1, 'debit', '105649', '105649.44', 'SAF-009', 0),
+(148, 1, 'credit', '105649', '105649.44', 'SAF-009', 0),
+(149, 0, 'debit', '39500', '0', 'Dr Feb\'24/033', 0),
+(150, 0, 'credit', '39500', '0', 'Dr Feb\'24/033', 0),
+(151, 0, 'debit', '10000', '0', 'Dr-Feb 24/034', 0),
+(152, 0, 'credit', '10000', '0', 'Dr-Feb 24/034', 0),
+(153, 0, 'debit', '80000', '0', 'Dr-Feb 24/035', 0),
+(154, 0, 'credit', '80000', '0', 'Dr-Feb 24/035', 0),
+(155, 0, 'debit', '1697000', '0', 'Dr-Feb 24/036', 0),
+(156, 0, 'credit', '1697000', '0', 'Dr-Feb 24/036', 0),
+(157, 0, 'debit', '6000', '0', 'Dr-Feb 24/037', 0),
+(158, 0, 'credit', '6000', '0', 'Dr-Feb 24/037', 0),
+(162, 1, 'balance', '0', '136750.69', 'Closing Balance From SAF-18/2023', 0),
+(164, 1, 'balance', '0', '-34007.64', 'Closing Balance Adv; Received From 01/2024', 0),
+(165, 1, 'balance', '0', '46969.36', 'Closing Balance from Italy -01/2024', 0),
+(166, 1, 'balance', '0', '-33410', 'Closing Balance Adv;from KOLKATA', 0),
+(196, 2100, 'debit', '78650250', '37452.5', 'Cr-Feb 24/001', 184),
+(197, 2100, 'credit', '78650250', '37452.5', 'Cr-Feb 24/001', 185),
+(198, 3480, 'debit', '130665300', '37547.5', 'Cr-Feb 24/001', 186),
+(199, 3480, 'credit', '130665300', '37547.5', 'Cr-Feb 24/001', 187);
 
 -- --------------------------------------------------------
 
@@ -814,7 +819,11 @@ INSERT INTO `general_ledger` (`id`, `date`, `voucherno`, `ac_code`, `debit`, `cr
 (943, '2024-02-02', 'Dr-Feb 24/036', '6100/006', '1697000', '0', '1697000', 'Paid to Sticker 5 colour for penam-sticker+other', '', '', 0, 37, 155),
 (944, '2024-02-02', 'Dr-Feb 24/036', '3600/001', '0', '1697000', '51126583', 'Paid to Sticker 5 colour for penam-sticker+other', '', '', 0, 35, 156),
 (945, '2024-02-02', 'Dr-Feb 24/037', '9100/002', '6000', '0', '103500', 'Taxi Charges for WH to Daw Nan house go for (Htet Paing Aye)', '', '', 0, 39, 157),
-(946, '2024-02-02', 'Dr-Feb 24/037', '3600/001', '0', '6000', '51120583', 'Taxi Charges for WH to Daw Nan house go for (Htet Paing Aye)', '', '', 0, 35, 158);
+(946, '2024-02-02', 'Dr-Feb 24/037', '3600/001', '0', '6000', '51120583', 'Taxi Charges for WH to Daw Nan house go for (Htet Paing Aye)', '', '', 0, 35, 158),
+(994, '2024-02-01', 'Cr-Feb 24/001', '3600/001', '78650250', '0', '129770833', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '', '', 0, 35, 184),
+(995, '2024-02-01', 'Cr-Feb 24/001', '3300/002', '0', '78650250', '-77607315.19', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '', '', 0, 35, 185),
+(996, '2024-02-01', 'Cr-Feb 24/001', '3600/001', '130486800', '0', '260257633', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '', '', 85, 35, 186),
+(997, '2024-02-01', 'Cr-Feb 24/001', '3300/002', '0', '130665300', '-208272615.19', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '', '', 0, 35, 187);
 
 -- --------------------------------------------------------
 
@@ -1638,7 +1647,9 @@ INSERT INTO `receivable` (`id`, `date`, `ac_code`, `sr_no`, `container_no`, `inv
 (69, '2023-11-23', '3300/002', 'SAF-24/2023', ':CXRU-1440458', '95217.11', '0000-00-00', '', '', '0', '779242.87', 0),
 (70, '2023-12-15', '3300/002', 'SAF-25/2023', ':OERU-4219167', '66774.05', '0000-00-00', '', '', '0', '846016.92', 0),
 (71, '2023-12-21', '3300/002', 'SAF-26/2023', ':TTNU-8059533', '91268.45', '0000-00-00', '', '', '0', '937285.37', 0),
-(72, '2023-12-28', '3300/002', 'SAF-27/2023', ':SEGU-9662141', '105649.44', '0000-00-00', '', '', '0', '1042934.81', 0);
+(72, '2023-12-28', '3300/002', 'SAF-27/2023', ':SEGU-9662141', '105649.44', '0000-00-00', '', '', '0', '1042934.81', 0),
+(115, '0000-00-00', '3300/002', '', '', '', '2024-02-01', 'Cr-Feb 24/001', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '37452.5', '1005482.31', 185),
+(116, '0000-00-00', '3300/002', '', '', '', '2024-02-01', 'Cr-Feb 24/001', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '37547.5', '967934.81', 187);
 
 -- --------------------------------------------------------
 
@@ -1948,8 +1959,10 @@ INSERT INTO `transaction` (`id`, `date`, `voucher_no`, `ac_code`, `description`,
 (156, '2024-02-02', 'Dr-Feb 24/036', '3600/001', 'Paid to Sticker 5 colour for penam-sticker+other', '0', '1697000', 'mmk', '', '', 0),
 (157, '2024-02-02', 'Dr-Feb 24/037', '9100/002', 'Taxi Charges for WH to Daw Nan house go for (Htet Paing Aye)', '6000', '0', 'mmk', '', '', 0),
 (158, '2024-02-02', 'Dr-Feb 24/037', '3600/001', 'Taxi Charges for WH to Daw Nan house go for (Htet Paing Aye)', '0', '6000', 'mmk', '', '', 0),
-(159, '2024-02-01', 'Cr-Feb 24/001', '3600/001', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '78649200', '0', 'usd', '', '', 0),
-(160, '2024-02-01', 'Cr-Feb 24/001', '3300/002', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '0', '78649200', 'usd', '', '', 0);
+(184, '2024-02-01', 'Cr-Feb 24/001', '3600/001', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '78650250', '0', 'usd', '', '', 0),
+(185, '2024-02-01', 'Cr-Feb 24/001', '3300/002', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '0', '78650250', 'usd', '', '', 0),
+(186, '2024-02-01', 'Cr-Feb 24/001', '3600/001', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '130665300', '0', 'usd', '', '', 85),
+(187, '2024-02-01', 'Cr-Feb 24/001', '3300/002', 'USA Money Received from UAB ($74925) 50%37462.5-10=$37452.5*2100ks $3746', '0', '130665300', 'usd', '', '', 0);
 
 -- --------------------------------------------------------
 
@@ -2349,7 +2362,8 @@ INSERT INTO `userlogs` (`id`, `login_time`, `login_date`, `login_username`, `log
 (165, '01:32:20.000000', '2024-02-22', 'admin', 'admin', 'Login Success'),
 (166, '05:22:18.000000', '2024-02-22', 'admin', 'admin', 'Login Success'),
 (167, '06:06:53.000000', '2024-02-22', 'admin', 'admin', 'Login Success'),
-(168, '07:36:06.000000', '2024-02-22', 'admin', 'admin', 'Login Success');
+(168, '07:36:06.000000', '2024-02-22', 'admin', 'admin', 'Login Success'),
+(169, '09:45:56.000000', '2024-02-24', 'admin', 'admin', 'Login Success');
 
 --
 -- Indexes for dumped tables
@@ -2729,7 +2743,7 @@ ALTER TABLE `bankdetail`
 -- AUTO_INCREMENT for table `cashbook`
 --
 ALTER TABLE `cashbook`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=607;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1268;
 
 --
 -- AUTO_INCREMENT for table `category`
@@ -2753,7 +2767,7 @@ ALTER TABLE `container`
 -- AUTO_INCREMENT for table `currency`
 --
 ALTER TABLE `currency`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=173;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=200;
 
 --
 -- AUTO_INCREMENT for table `form7stock`
@@ -2783,7 +2797,7 @@ ALTER TABLE `form10stocktcl`
 -- AUTO_INCREMENT for table `general_ledger`
 --
 ALTER TABLE `general_ledger`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=949;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=998;
 
 --
 -- AUTO_INCREMENT for table `gfcdryfishcoldstore`
@@ -2909,7 +2923,7 @@ ALTER TABLE `packingmaterial`
 -- AUTO_INCREMENT for table `payable`
 --
 ALTER TABLE `payable`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=205;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=206;
 
 --
 -- AUTO_INCREMENT for table `permission`
@@ -2933,7 +2947,7 @@ ALTER TABLE `purchase`
 -- AUTO_INCREMENT for table `receivable`
 --
 ALTER TABLE `receivable`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=117;
 
 --
 -- AUTO_INCREMENT for table `repacking`
@@ -2975,7 +2989,7 @@ ALTER TABLE `total_charges`
 -- AUTO_INCREMENT for table `transaction`
 --
 ALTER TABLE `transaction`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=161;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=188;
 
 --
 -- AUTO_INCREMENT for table `truckactualinvoice`
@@ -3023,7 +3037,7 @@ ALTER TABLE `trucktotalcosting`
 -- AUTO_INCREMENT for table `userlogs`
 --
 ALTER TABLE `userlogs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=169;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=170;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
