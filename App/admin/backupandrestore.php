@@ -9,14 +9,7 @@ $auth->checkadmin();
 $bootstrap = new Bootstrap();
 $query = new Query();
 
-include '../../vendor/autoload.php';
 
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
-if(isset($_REQUEST['excelimportbtn'])){
-
-}
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -103,14 +96,28 @@ if(isset($_REQUEST['excelimportbtn'])){
                     <h5 class="modal-title">Import Excel File (CSV)</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
-                  <form action="" method="post" enctype="multipart/form-data">
+                  <form action="excelimport.php" method="post" enctype="multipart/form-data">
                     <div class="modal-body">
+                      <label>Choose Table</label>
+                      <select name="importtable" class="form-control" style="text-transform: capitalize;">
+                      <?php
+                        $stmt = $pdo->prepare("SHOW TABLES");
+                        $stmt->execute();
+                        $tablesdatas = $stmt->fetchall();
+
+                        foreach($tablesdatas as $tablesdata){
+                          ?>
+                            <option value="<?= $tablesdata['Tables_in_lms']; ?>"><?= $tablesdata['Tables_in_lms']; ?></option>
+                          <?php
+                        }
+                      ?>
+                      </select>
                       <label>Import</label>
                       <input type="file" name="excelfile" class="form-control">
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                      <button type="submit" class="btn btn-success" name="backuponetable">Confirm</button>
+                      <button type="submit" class="btn btn-success" name="excelimportbtn">Confirm</button>
                     </div>
                   </form>
                 </div>
@@ -143,7 +150,7 @@ if(isset($_REQUEST['excelimportbtn'])){
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                      <button type="submit" class="btn btn-success" name="excelimportbtn">Confirm</button>
+                      <button type="submit" class="btn btn-success" name="backuponetable">Confirm</button>
                     </div>
                   </form>
                 </div>
