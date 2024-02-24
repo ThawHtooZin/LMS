@@ -3652,7 +3652,7 @@ Class Query{
           ':voucher_no' => $voucher_no
         ]);
         $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
-        $receivestmt = $pdo->prepare("SELECT * FROM receivable WHERE ac_code='$ac_code' and transactionid<'$transactionid' ORDER BY transactionid DESC");
+        $receivestmt = $pdo->prepare("SELECT * FROM receivable WHERE ac_code='$ac_code' and transactionid<'$transactionid' ORDER BY id DESC");
         $receivestmt->execute();
         $receivedata = $receivestmt->fetch(PDO::FETCH_ASSOC);
         if(!empty($currencydata['usd_amount'])){

@@ -259,10 +259,10 @@ $query = new Query();
                   <td><?php echo $gldata['voucherno']; ?></td>
                   <td><?php echo $acname; ?></td>
                   <td><?php echo $gldata['narration']; ?></td>
-                  <td><?php if($gldata['debit'] == 0){ echo "-"; }else{if(!empty($currencydata['dollar_rate']) == 0){echo $gldata['debit'];}else{ echo $gldata['debit'] / $currencydata['dollar_rate'];  };} ?></td>
-                  <td><?php if($gldata['credit'] == 0){ echo "-"; }else{if(!empty($currencydata['dollar_rate']) == 0){echo $gldata['credit'];}else{ echo $gldata['credit'] / $currencydata['dollar_rate'];  };} ?></td>
+                  <td><?php if($gldata['debit'] == 0){ echo "-"; }else{if(!empty($currencydata['dollar_rate']) == 0){echo round($gldata['debit'], 2);}else{ echo round($gldata['debit'] / $currencydata['dollar_rate'], 2);  };} ?></td>
+                  <td><?php if($gldata['credit'] == 0){ echo "-"; }else{if(!empty($currencydata['dollar_rate']) == 0){echo round($gldata['credit'], 2);}else{ echo round($gldata['credit'] / $currencydata['dollar_rate'], 2);  };} ?></td>
                   <td><?php if(!empty($currencydata['dollar_rate']) && $currencydata['dollar_rate'] != 0){ echo "USD"; }else{ echo "MMK"; }?> </td>
-                  <td><?php if(!empty($currencydata['dollar_rate']) == 0){echo $gldata['balance'];}else{ echo $gldata['balance'] / $currencydata['dollar_rate'];  }; ?></td>
+                  <td><?php if(!empty($currencydata['dollar_rate']) == 0){echo round($gldata['balance'], 2);}else{ echo round($gldata['balance'] / $currencydata['dollar_rate'], 2);  }; ?></td>
                   <td>
                     <a href="edittransaction.php?voucher_no=<?= $gldata['voucherno']; ?>&file=general_ledger" style="<?php if(str_contains(strtolower($acname), 'purchase')){ echo "display:none;"; } ?>">
                       <button type="submit" class="btn btn-warning btn-sm text-light" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
