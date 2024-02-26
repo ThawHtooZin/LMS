@@ -7,6 +7,7 @@
     ],
     "require": {
         "box/spout": "^3.3",
-        "respect/validation": "^2.2"
+        "respect/validation": "^2.2",
+        "phpoffice/phpspreadsheet": "^2.0"
     }
 }

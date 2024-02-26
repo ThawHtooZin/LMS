@@ -8,6 +8,8 @@ $auth = new auth();
 $auth->checkadmin();
 $bootstrap = new Bootstrap();
 $query = new Query();
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -74,31 +76,55 @@ $query = new Query();
               </div>
             </div>
 
-            <div class="container mt-5 text-center">
-              <h3>Backup Each Table</h3>
-              <button type="button" class="btn btn-success" data-bs-target="#backuponetable" data-bs-toggle="modal">Back Up One Table</button>
+            <div class="row">
+              <div class="col">
+                <div class="container mt-5 text-center">
+                  <button type="button" class="btn btn-success" data-bs-target="#backuponetable" data-bs-toggle="modal">Backup Each Table</button>
+                </div>
+              </div>
+              <div class="col">
+                <div class="container mt-5 text-center">
+                  <button type="button" class="btn btn-success" data-bs-target="#importfromexcel" data-bs-toggle="modal">Import Data From Excel</button>
+                </div>
+              </div>
             </div>
-            
-            <!-- Card -->
-            <!-- <div class="modal fade" id="backupmodal">
+
+            <div class="modal fade" id="importfromexcel">
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header bg-success text-light">
-                    <h5 class="modal-title">Choose The Backup Location</h5>
+                    <h5 class="modal-title">Import Excel File (CSV)</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
-                  <form action="" method="post">
+                  <form action="excelimport.php" method="post" enctype="multipart/form-data">
                     <div class="modal-body">
-                      <input type="file" name="location" class="form-control">
+                      <label>Choose Table</label>
+                      <select name="importtable" class="form-control" style="text-transform: capitalize;">
+                      <?php
+                        $stmt = $pdo->prepare("SHOW TABLES");
+                        $stmt->execute();
+                        $tablesdatas = $stmt->fetchall();
+
+                        foreach($tablesdatas as $tablesdata){
+                          ?>
+                            <option value="<?= $tablesdata['Tables_in_lms']; ?>"><?= $tablesdata['Tables_in_lms']; ?></option>
+                          <?php
+                        }
+                      ?>
+                      </select>
+                      <label>Import</label>
+                      <input type="file" name="excelfile" class="form-control">
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                      <button type="submit" class="btn btn-success" name="confirm">Confirm</button>
+                      <button type="submit" class="btn btn-success" name="excelimportbtn">Confirm</button>
                     </div>
                   </form>
                 </div>
-              </div> -->
-              <div class="modal fade" id="backuponetable">
+              </div>
+            </div>
+
+            <div class="modal fade" id="backuponetable">
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header bg-success text-light">
@@ -130,6 +156,7 @@ $query = new Query();
                 </div>
               </div>
             </div>
+            
           </div>
         </div>
       </div>

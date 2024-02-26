@@ -247,8 +247,13 @@ $query = new Query();
                 }else{
                   $debitorcredit = 'credit';
                 }
+                $transactionid = $gldata['id'];
                 // echo $voucher_no;
-                $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit'");
+                if(str_contains($gldata['ac_code'], '3300/')){
+                  $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit'");
+                }else{
+                  $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit' AND transactionid='$transactionid'");
+                }
                 $currencystmt->execute(
                   array(':voucher_no' => $voucher_no )
                 );
@@ -259,10 +264,10 @@ $query = new Query();
                   <td><?php echo $gldata['voucherno']; ?></td>
                   <td><?php echo $acname; ?></td>
                   <td><?php echo $gldata['narration']; ?></td>
-                  <td><?php if($gldata['debit'] == 0){ echo "-"; }else{if(!empty($currencydata['dollar_rate']) == 0){echo $gldata['debit'];}else{ echo $gldata['debit'] / $currencydata['dollar_rate'];  };} ?></td>
-                  <td><?php if($gldata['credit'] == 0){ echo "-"; }else{if(!empty($currencydata['dollar_rate']) == 0){echo $gldata['credit'];}else{ echo $gldata['credit'] / $currencydata['dollar_rate'];  };} ?></td>
+                  <td><?php if($gldata['debit'] == 0){ echo "-"; }else{if(!empty($currencydata['dollar_rate']) == 0){echo round($gldata['debit'], 2);}else{ if(str_contains($gldata['ac_code'], '3300/')){ echo round($gldata['debit'] * $currencydata['dollar_rate'], 2); }else{echo round($gldata['debit'] / $currencydata['dollar_rate'], 2);};  };} ?></td>
+                  <td><?php if($gldata['credit'] == 0){ echo "-"; }else{if(!empty($currencydata['dollar_rate']) == 0){echo round($gldata['credit'], 2);}else{ echo round($gldata['credit'] / $currencydata['dollar_rate'], 2);  };} ?></td>
                   <td><?php if(!empty($currencydata['dollar_rate']) && $currencydata['dollar_rate'] != 0){ echo "USD"; }else{ echo "MMK"; }?> </td>
-                  <td><?php if(!empty($currencydata['dollar_rate']) == 0){echo $gldata['balance'];}else{ echo $gldata['balance'] / $currencydata['dollar_rate'];  }; ?></td>
+                  <td><?php if(!empty($currencydata['dollar_rate']) == 0){echo round($gldata['balance'], 2);}else{ echo round($gldata['balance'] / $currencydata['dollar_rate'], 2);  }; ?></td>
                   <td>
                     <a href="edittransaction.php?voucher_no=<?= $gldata['voucherno']; ?>&file=general_ledger" style="<?php if(str_contains(strtolower($acname), 'purchase')){ echo "display:none;"; } ?>">
                       <button type="submit" class="btn btn-warning btn-sm text-light" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -357,7 +362,7 @@ $query = new Query();
               $creditstmt->execute();
               $totalcredit = $creditstmt->fetch(PDO::FETCH_ASSOC);
               if(str_contains($ac_code, '3600/')){
-                $balancestmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code LIKE '3600/%' AND narration LIKE 'Balance%' ORDER BY id DESC");
+                $balancestmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code LIKE '3600/%' AND narration LIKE 'Opening%' ORDER BY id DESC");
                 $balancestmt->execute();
                 $balancedata = $balancestmt->fetch(PDO::FETCH_ASSOC);
                 if(!empty($balancedata)){
@@ -383,10 +388,10 @@ $query = new Query();
                  <td></td>
                  <td></td>
                  <td></td>
-                 <td><?php if($totaldebit['total_debit'] == 0){ echo "-"; }else{ if(!empty(!empty($currencydata['dollar_rate'])) == 0){echo $totaldebit['total_debit'];}else{ echo $totaldebit['total_debit'] / $currencydata['dollar_rate'];  }; }; ?></td>
-                 <td><?php if($totalcredit['total_credit'] == 0){ echo "-"; }else{ if(!empty(!empty($currencydata['dollar_rate'])) == 0){echo $totalcredit['total_credit'];}else{ echo $totalcredit['total_credit'] / $currencydata['dollar_rate'];  }; }; ?></td>
+                 <td><?php if($totaldebit['total_debit'] == 0){ echo "-"; }else{ if(!empty(!empty($currencydata['dollar_rate'])) == 0){echo round($totaldebit['total_debit'], 2);}else{ echo round($totaldebit['total_debit'] / $currencydata['dollar_rate'], 2);  }; }; ?></td>
+                 <td><?php if($totalcredit['total_credit'] == 0){ echo "-"; }else{ if(!empty(!empty($currencydata['dollar_rate'])) == 0){echo round($totalcredit['total_credit'], 2);}else{ echo round($totalcredit['total_credit'] / $currencydata['dollar_rate'], 2);  }; }; ?></td>
                  <td></td>
-                 <td><?php if($totalbalance == 0){echo "-"; }else{ if(!empty(!empty($currencydata['dollar_rate'])) == 0){echo $totalbalance;}else{ echo $totalbalance / $currencydata['dollar_rate'];  };} ?></td>
+                 <td><?php if($totalbalance == 0){echo "-"; }else{ if(!empty(!empty($currencydata['dollar_rate'])) == 0){echo round($totalbalance, 2);}else{ echo round($totalbalance / $currencydata['dollar_rate'], 2);  };} ?></td>
                  <td></td>
                </tr>
               <?php } } ?>
