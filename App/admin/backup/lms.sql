@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 24, 2024 at 08:41 AM
+-- Generation Time: Feb 26, 2024 at 05:08 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -477,7 +477,21 @@ INSERT INTO `currency` (`id`, `dollar_rate`, `debitorcredit`, `mmk_amount`, `usd
 (200, 2100, 'debit', '78650250', '37452.5', 'Cr-Feb 24/001', 188),
 (201, 3480, 'credit', '130665300', '37547.5', 'Cr-Feb 24/001', 189),
 (202, 3480, 'debit', '130665300', '37547.5', 'Cr-Feb 24/001', 190),
-(203, 3480, 'credit', '130665300', '37547.5', 'Cr-Feb 24/001', 191);
+(203, 3480, 'credit', '130665300', '37547.5', 'Cr-Feb 24/001', 191),
+(204, 0, 'debit', '4000000', '0', 'Dr Feb\'24/038', 192),
+(205, 0, 'credit', '4000000', '0', 'Dr Feb\'24/038', 193),
+(206, 0, 'debit', '4000000', '0', 'Dr Feb\'24/039', 194),
+(207, 0, 'credit', '4000000', '0', 'Dr Feb\'24/039', 195),
+(208, 0, 'debit', '7000000', '0', 'Dr Feb\'24/040', 196),
+(209, 0, 'credit', '7000000', '0', 'Dr Feb\'24/040', 197),
+(210, 0, 'debit', '100000', '0', 'Dr Feb\'24/041', 198),
+(211, 0, 'credit', '100000', '0', 'Dr Feb\'24/041', 199),
+(212, 0, 'debit', '10000', '0', 'Dr Feb\'24/042', 200),
+(213, 0, 'credit', '10000', '0', 'Dr Feb\'24/042', 201),
+(214, 0, 'debit', '8000', '0', 'Dr Feb\'24/043', 202),
+(215, 0, 'credit', '8000', '0', 'Dr Feb\'24/043', 203),
+(216, 0, 'debit', '2112000', '0', 'Dr Feb\'24/044', 204),
+(217, 0, 'credit', '2112000', '0', 'Dr Feb\'24/044', 205);
 
 -- --------------------------------------------------------
 
@@ -1962,7 +1976,21 @@ INSERT INTO `transaction` (`id`, `date`, `voucher_no`, `ac_code`, `description`,
 (188, '2024-02-01', 'Cr-Feb 24/001', '3600/001', 'USA Money Received from UAB ($74925) 50%34762.5-10=$37452.5*2100ks $37462.5', '78650250', '0', 'usd', '', '', 0),
 (189, '2024-02-01', 'Cr-Feb 24/001', '3300/002', 'USA Money Received from UAB ($74925) 50%34762.5-10=$37452.5*2100ks $37462.5', '0', '78650250', 'usd', '', '', 0),
 (190, '2024-02-01', 'Cr-Feb 24/001', '3600/001', 'USA Money Received from UAB ($74925) 50%34762.5-10=$37452.5*2100ks $37462.5', '130665300', '0', 'usd', '', '', 85),
-(191, '2024-02-01', 'Cr-Feb 24/001', '3300/002', 'USA Money Received from UAB ($74925) 50%34762.5-10=$37452.5*2100ks $37462.5', '0', '130665300', 'usd', '', '', 0);
+(191, '2024-02-01', 'Cr-Feb 24/001', '3300/002', 'USA Money Received from UAB ($74925) 50%34762.5-10=$37452.5*2100ks $37462.5', '0', '130665300', 'usd', '', '', 0),
+(192, '2024-02-03', 'Dr Feb\'24/038', '4000/M01', 'Paid to M.A for Vr No-10586', '4000000', '0', 'mmk', '', '', 0),
+(193, '2024-02-03', 'Dr Feb\'24/038', '3600/001', 'Paid to M.A for Vr No-10586', '0', '4000000', 'mmk', '', '', 0),
+(194, '2024-02-03', 'Dr Feb\'24/039', '4000/S08', 'Paid to Soe Naing for Vr No- 10534,10542', '4000000', '0', 'mmk', '', '', 0),
+(195, '2024-02-03', 'Dr Feb\'24/039', '3600/001', 'Paid to Soe Naing for Vr No- 10534,10542', '0', '4000000', 'mmk', '', '', 0),
+(196, '2024-02-03', 'Dr Feb\'24/040', '4000/K07', 'Paid to Khin Mg Myint for Vr No-11189', '7000000', '0', 'mmk', '', '', 0),
+(197, '2024-02-03', 'Dr Feb\'24/040', '3600/001', 'Paid to Khin Mg Myint for Vr No-11189', '0', '7000000', 'mmk', '', '', 0),
+(198, '2024-02-03', 'Dr Feb\'24/041', '9100/006', 'Car Diesel for 6J-3015 (1.2) -50000/ (3.2)-50000', '100000', '0', 'mmk', '', '', 0),
+(199, '2024-02-03', 'Dr Feb\'24/041', '3600/001', 'Car Diesel for 6J-3015 (1.2) -50000/ (3.2)-50000', '0', '100000', 'mmk', '', '', 0),
+(200, '2024-02-03', 'Dr Feb\'24/042', '9100/014', 'Engin Oil purchase for 6J-3015', '10000', '0', 'mmk', '', '', 0),
+(201, '2024-02-03', 'Dr Feb\'24/042', '3600/001', 'Engin Oil purchase for 6J-3015', '0', '10000', 'mmk', '', '', 0),
+(202, '2024-02-03', 'Dr Feb\'24/043', '9100/014', 'Car police catch for 6J-3015 (2.2) (3.2)', '8000', '0', 'mmk', '', '', 0),
+(203, '2024-02-03', 'Dr Feb\'24/043', '3600/001', 'Car police catch for 6J-3015 (2.2) (3.2)', '0', '8000', 'mmk', '', '', 0),
+(204, '2024-02-03', 'Dr Feb\'24/044', '6100/003', 'Paid to plastic (G/F) for Vr No-(31.1.24)(30.1.24)(30.1.24)', '2112000', '0', 'mmk', '', '', 0),
+(205, '2024-02-03', 'Dr Feb\'24/044', '3600/001', 'Paid to plastic (G/F) for Vr No-(31.1.24)(30.1.24)(30.1.24)', '0', '2112000', 'mmk', '', '', 0);
 
 -- --------------------------------------------------------
 
@@ -2364,7 +2392,8 @@ INSERT INTO `userlogs` (`id`, `login_time`, `login_date`, `login_username`, `log
 (167, '06:06:53.000000', '2024-02-22', 'admin', 'admin', 'Login Success'),
 (168, '07:36:06.000000', '2024-02-22', 'admin', 'admin', 'Login Success'),
 (169, '09:45:56.000000', '2024-02-24', 'admin', 'admin', 'Login Success'),
-(170, '01:42:39.000000', '2024-02-24', 'admin', 'admin', 'Login Success');
+(170, '01:42:39.000000', '2024-02-24', 'admin', 'admin', 'Login Success'),
+(171, '10:09:29.000000', '2024-02-26', 'admin', 'admin', 'Login Success');
 
 --
 -- Indexes for dumped tables
@@ -2768,7 +2797,7 @@ ALTER TABLE `container`
 -- AUTO_INCREMENT for table `currency`
 --
 ALTER TABLE `currency`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=204;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=218;
 
 --
 -- AUTO_INCREMENT for table `form7stock`
@@ -2990,7 +3019,7 @@ ALTER TABLE `total_charges`
 -- AUTO_INCREMENT for table `transaction`
 --
 ALTER TABLE `transaction`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=192;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=206;
 
 --
 -- AUTO_INCREMENT for table `truckactualinvoice`
@@ -3038,7 +3067,7 @@ ALTER TABLE `trucktotalcosting`
 -- AUTO_INCREMENT for table `userlogs`
 --
 ALTER TABLE `userlogs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=171;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=172;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
