@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 26, 2024 at 06:33 AM
+-- Generation Time: Feb 27, 2024 at 06:08 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -162,7 +162,8 @@ INSERT INTO `acname` (`id`, `code_no`, `ac_type`, `ac_name`) VALUES
 (329, '9100/015', 39, 'Gift & Present Expense'),
 (330, '3300/004', 35, 'ITALY'),
 (331, '3300/005', 35, 'Western Trader (Kolkata)'),
-(332, '4000/B02', 40, 'BLC(PYM)');
+(332, '4000/B02', 40, 'BLC(PYM)'),
+(333, '9100/016', 39, 'Printing and Stationery Expense A/C');
 
 -- --------------------------------------------------------
 
@@ -315,7 +316,19 @@ INSERT INTO `cashbook` (`id`, `date`, `sr_no`, `ac_name`, `particular`, `debit`,
 (1291, '2024-02-03', '', '3600/001', 'Ice 3pcs purchase for ( Ocean - Rohn )', 0, 30000, 222191033, 'Dr-Feb 24/057', '6100/002', 231),
 (1292, '2024-02-03', '', '3600/001', 'Labour Charges for (Rohn)', 0, 10000, 222181033, 'Dr-Feb 24/058', '6100/001', 233),
 (1293, '2024-02-03', '', '3600/001', 'Sir present purchase for ( Cambodia go ) wallet and bags (Yangoods)\r\n\r\n', 0, 519600, 221661433, 'Dr-Feb 24/059', '9100/015', 235),
-(1294, '2024-02-03', '', '3600/001', 'Meal Allowance for Sir +2 pcs', 0, 95850, 221565583, 'Dr-Feb 24/060', '9100/012', 237);
+(1294, '2024-02-03', '', '3600/001', 'Meal Allowance for Sir +2 pcs', 0, 95850, 221565583, 'Dr-Feb 24/060', '9100/012', 237),
+(1295, '2024-02-05', '', '3600/001', 'Water 2 pk purchase for WH', 0, 1800, 221563783, 'Dr-Feb 24/061', '9100/003', 239),
+(1296, '2024-02-05', '', '3600/001', 'Car Diesel for 6J-3015 (4.2)-50000/ (5.2)-50000', 0, 100000, 221463783, 'Dr-Feb 24/062', '9100/006', 241),
+(1297, '2024-02-05', '', '3600/001', 'Car police catch for 6J-3015 (Market)', 0, 5000, 221458783, 'Dr-Feb 24/063', '9100/014', 243),
+(1298, '2024-02-05', '', '3600/001', 'Taxi Charges for HHK to WH (pk)', 0, 17000, 221441783, 'Dr-Feb 24/064', '9100/002', 245),
+(1299, '2024-02-05', '', '3600/001', 'Material purchase for WH', 0, 31500, 221410283, 'Dr-Feb 24/065', '9100/007', 247),
+(1300, '2024-02-05', '', '3600/001', 'Photo paper and A4 purchase for WH', 0, 107500, 221302783, 'Dr-Feb 24/066', '9100/016', 249),
+(1301, '2024-02-05', '', '3600/001', 'Battery 2 pcs charging charges and carry charges for (office)', 0, 15000, 221287783, 'Dr-Feb 24/067', '9100/007', 251),
+(1302, '2024-02-05', '', '3600/001', 'Taxi charges for Ocean Pacific go workers', 0, 24000, 221263783, 'Dr-Feb 24/068', '9100/002', 253),
+(1303, '2024-02-05', '', '3600/001', 'Paid to Moe Kyaw for Vr No-11332, 11339, Cheque No-052402', 0, 12503950, 208759833, 'Dr-Feb 24/069', '4000/M07', 255),
+(1304, '2024-02-06', '', '3600/001', 'Canda Money $40862.68 from UAB 50% $20431.34-10=20421.34*2100ks $20431.34*3370ks $20431.34*105ks', 42884814, 0, 251644647, 'Cr-Feb 24/003', '3300/003', 256),
+(1305, '2024-02-06', '', '3600/001', 'Canda Money $40862.68 from UAB 50% $20431.34-10=20421.34*2100ks $20431.34*3370ks $20431.34*105ks', 70998907, 0, 322643554, 'Cr-Feb 24/003', '3300/003', 258),
+(1306, '2024-02-06', '', '3600/001', '$23462.5 in UAB Bank', 49250250, 0, 371893804, 'Cr-Feb 24/004', '3300/004', 260);
 
 -- --------------------------------------------------------
 
@@ -546,7 +559,31 @@ INSERT INTO `currency` (`id`, `dollar_rate`, `debitorcredit`, `mmk_amount`, `usd
 (252, 0, 'debit', '519600', '0', 'Dr-Feb 24/059', 234),
 (253, 0, 'credit', '519600', '0', 'Dr-Feb 24/059', 235),
 (254, 0, 'debit', '95850', '0', 'Dr-Feb 24/060', 236),
-(255, 0, 'credit', '95850', '0', 'Dr-Feb 24/060', 237);
+(255, 0, 'credit', '95850', '0', 'Dr-Feb 24/060', 237),
+(257, 0, 'debit', '1800', '0', 'Dr-Feb 24/061', 238),
+(258, 0, 'credit', '1800', '0', 'Dr-Feb 24/061', 239),
+(259, 0, 'debit', '100000', '0', 'Dr-Feb 24/062', 240),
+(260, 0, 'credit', '100000', '0', 'Dr-Feb 24/062', 241),
+(261, 0, 'debit', '5000', '0', 'Dr-Feb 24/063', 242),
+(262, 0, 'credit', '5000', '0', 'Dr-Feb 24/063', 243),
+(263, 0, 'debit', '17000', '0', 'Dr-Feb 24/064', 244),
+(264, 0, 'credit', '17000', '0', 'Dr-Feb 24/064', 245),
+(265, 0, 'debit', '31500', '0', 'Dr-Feb 24/065', 246),
+(266, 0, 'credit', '31500', '0', 'Dr-Feb 24/065', 247),
+(267, 0, 'debit', '107500', '0', 'Dr-Feb 24/066', 248),
+(268, 0, 'credit', '107500', '0', 'Dr-Feb 24/066', 249),
+(269, 0, 'debit', '15000', '0', 'Dr-Feb 24/067', 250),
+(270, 0, 'credit', '15000', '0', 'Dr-Feb 24/067', 251),
+(271, 0, 'debit', '24000', '0', 'Dr-Feb 24/068', 252),
+(272, 0, 'credit', '24000', '0', 'Dr-Feb 24/068', 253),
+(273, 0, 'debit', '12503950', '0', 'Dr-Feb 24/069', 254),
+(274, 0, 'credit', '12503950', '0', 'Dr-Feb 24/069', 255),
+(275, 2100, 'debit', '42884814', '20421.34', 'Cr-Feb 24/003', 256),
+(276, 2100, 'credit', '42884814', '20421.34', 'Cr-Feb 24/003', 257),
+(277, 3475, 'debit', '71033656.5', '20441.34', 'Cr-Feb 24/003', 258),
+(278, 3475, 'credit', '71033656.5', '20441.34', 'Cr-Feb 24/003', 259),
+(279, 2100, 'debit', '49250250', '23452.5', 'Cr-Feb 24/004', 260),
+(280, 2100, 'credit', '49250250', '23452.5', 'Cr-Feb 24/004', 261);
 
 -- --------------------------------------------------------
 
@@ -938,7 +975,33 @@ INSERT INTO `general_ledger` (`id`, `date`, `voucherno`, `ac_code`, `debit`, `cr
 (1052, '2024-02-03', 'Dr-Feb 24/059', '9100/015', '519600', '0', '519600', 'Sir present purchase for ( Cambodia go ) wallet and bags (Yangoods)\r\n\r\n', '', '', 0, 39, 234),
 (1053, '2024-02-03', 'Dr-Feb 24/059', '3600/001', '0', '519600', '221661433', 'Sir present purchase for ( Cambodia go ) wallet and bags (Yangoods)\r\n\r\n', '', '', 0, 35, 235),
 (1054, '2024-02-03', 'Dr-Feb 24/060', '9100/012', '95850', '0', '174850', 'Meal Allowance for Sir +2 pcs', '', '', 0, 39, 236),
-(1055, '2024-02-03', 'Dr-Feb 24/060', '3600/001', '0', '95850', '221565583', 'Meal Allowance for Sir +2 pcs', '', '', 0, 35, 237);
+(1055, '2024-02-03', 'Dr-Feb 24/060', '3600/001', '0', '95850', '221565583', 'Meal Allowance for Sir +2 pcs', '', '', 0, 35, 237),
+(1056, '2024-02-05', 'Dr-Feb 24/061', '9100/003', '1800', '0', '9000', 'Water 2 pk purchase for WH', '', '', 0, 39, 238),
+(1057, '2024-02-05', 'Dr-Feb 24/061', '3600/001', '0', '1800', '221563783', 'Water 2 pk purchase for WH', '', '', 0, 35, 239),
+(1058, '2024-02-05', 'Dr-Feb 24/062', '9100/006', '100000', '0', '330000', 'Car Diesel for 6J-3015 (4.2)-50000/ (5.2)-50000', '', '', 0, 39, 240),
+(1059, '2024-02-05', 'Dr-Feb 24/062', '3600/001', '0', '100000', '221463783', 'Car Diesel for 6J-3015 (4.2)-50000/ (5.2)-50000', '', '', 0, 35, 241),
+(1060, '2024-02-05', 'Dr-Feb 24/063', '9100/014', '5000', '0', '23000', 'Car police catch for 6J-3015 (Market)', '', '', 0, 39, 242),
+(1061, '2024-02-05', 'Dr-Feb 24/063', '3600/001', '0', '5000', '221458783', 'Car police catch for 6J-3015 (Market)', '', '', 0, 35, 243),
+(1062, '2024-02-05', 'Dr-Feb 24/064', '9100/002', '17000', '0', '154500', 'Taxi Charges for HHK to WH (pk)', '', '', 0, 39, 244),
+(1063, '2024-02-05', 'Dr-Feb 24/064', '3600/001', '0', '17000', '221441783', 'Taxi Charges for HHK to WH (pk)', '', '', 0, 35, 245),
+(1064, '2024-02-05', 'Dr-Feb 24/065', '9100/007', '31500', '0', '166500', 'Material purchase for WH', '', '', 0, 39, 246),
+(1065, '2024-02-05', 'Dr-Feb 24/065', '3600/001', '0', '31500', '221410283', 'Material purchase for WH', '', '', 0, 35, 247),
+(1066, '2024-02-05', 'Dr-Feb 24/066', '9100/016', '107500', '0', '107500', 'Photo paper and A4 purchase for WH', '', '', 0, 39, 248),
+(1067, '2024-02-05', 'Dr-Feb 24/066', '3600/001', '0', '107500', '221302783', 'Photo paper and A4 purchase for WH', '', '', 0, 35, 249),
+(1068, '2024-02-05', 'Dr-Feb 24/067', '9100/007', '15000', '0', '181500', 'Battery 2 pcs charging charges and carry charges for (office)', '', '', 0, 39, 250),
+(1069, '2024-02-05', 'Dr-Feb 24/067', '3600/001', '0', '15000', '221287783', 'Battery 2 pcs charging charges and carry charges for (office)', '', '', 0, 35, 251),
+(1070, '2024-02-05', 'Dr-Feb 24/068', '9100/002', '24000', '0', '178500', 'Taxi charges for Ocean Pacific go workers', '', '', 0, 39, 252),
+(1071, '2024-02-05', 'Dr-Feb 24/068', '3600/001', '0', '24000', '221263783', 'Taxi charges for Ocean Pacific go workers', '', '', 0, 35, 253),
+(1072, '2024-02-05', 'Dr-Feb 24/069', '4000/M07', '12503950', '0', '12503950', 'Paid to Moe Kyaw for Vr No-11332, 11339, Cheque No-052402', '', '', 0, 40, 254),
+(1073, '2024-02-05', 'Dr-Feb 24/069', '3600/001', '0', '12503950', '208759833', 'Paid to Moe Kyaw for Vr No-11332, 11339, Cheque No-052402', '', '', 0, 35, 255),
+(1074, '2024-02-06', 'Cr-Feb 24/003', '3600/001', '42884814', '0', '251644647', 'Canda Money $40862.68 from UAB 50% $20431.34-10=20421.34*2100ks $20431.34*3370ks $20431.34*105ks', '', '', 0, 35, 256),
+(1075, '2024-02-06', 'Cr-Feb 24/003', '3300/003', '0', '42884814', '-42918821.64', 'Canda Money $40862.68 from UAB 50% $20431.34-10=20421.34*2100ks $20431.34*3370ks $20431.34*105ks', '', '', 0, 35, 257),
+(1076, '2024-02-06', 'Cr-Feb 24/003', '3600/001', '70998906.5', '0', '322643553.5', 'Canda Money $40862.68 from UAB 50% $20431.34-10=20421.34*2100ks $20431.34*3370ks $20431.34*105ks', '', '', 10, 35, 258),
+(1077, '2024-02-06', 'Cr-Feb 24/003', '3300/003', '0', '71033656.5', '-113952478.14', 'Canda Money $40862.68 from UAB 50% $20431.34-10=20421.34*2100ks $20431.34*3370ks $20431.34*105ks', '', '', 0, 35, 259),
+(1078, '2024-02-06', 'Cr-Feb 24/004', '3600/001', '49250250', '0', '371893803.5', '$23462.5 in UAB Bank', '', '', 0, 35, 260),
+(1079, '2024-02-06', 'Cr-Feb 24/004', '3300/004', '0', '49250250', '-49203280.64', '$23462.5 in UAB Bank', '', '', 0, 35, 261),
+(1080, '2024-02-06', 'Cr-Feb 24/004', '3600/002', '23462.5', '0', '23462.5', '$23462.5 in UAB Bank', '', '', 0, 35, 262),
+(1081, '2024-02-06', 'Cr-Feb 24/004', '3300/004', '0', '23462.5', '-49226743.14', '$23462.5 in UAB Bank', '', '', 0, 35, 263);
 
 -- --------------------------------------------------------
 
@@ -1576,7 +1639,8 @@ INSERT INTO `payable` (`id`, `date`, `supplier_id`, `purchase_voucher_no`, `purc
 (204, '0000-00-00', '4000/T02', '999999999', 0, '2024-02-02', 'Dr-Feb 24/032', 'Paid to Thein Htay for Vr No-11269', 4000000, 18280150, 0, 0, '0000-00-00'),
 (206, '0000-00-00', '4000/M01', '688664275', 0, '2024-02-03', 'Dr-Feb 24/038', 'Paid to MA for Vr No-10586', 4000000, 5370700, 0, 0, '0000-00-00'),
 (207, '0000-00-00', '4000/S08', '180194221', 0, '2024-02-03', 'Dr-Feb 24/039', 'Paid to Soe Naing for Vr No-10534,10542', 4000000, 23026300, 0, 0, '0000-00-00'),
-(208, '0000-00-00', '4000/K07', '610542484', 0, '2024-02-03', 'Dr-Feb 24/040', 'Paid to Khin Mg Myint for Vr N0-11189', 7000000, 76504000, 0, 0, '0000-00-00');
+(208, '0000-00-00', '4000/K07', '610542484', 0, '2024-02-03', 'Dr-Feb 24/040', 'Paid to Khin Mg Myint for Vr N0-11189', 7000000, 76504000, 0, 0, '0000-00-00'),
+(209, '0000-00-00', '4000/M07', '683765926', 0, '2024-02-05', 'Dr-Feb 24/069', 'Paid to Moe Kyaw for Vr No-11332, 11339, Cheque No-052402', 12503950, 4000000, 0, 0, '0000-00-00');
 
 -- --------------------------------------------------------
 
@@ -1767,7 +1831,11 @@ INSERT INTO `receivable` (`id`, `date`, `ac_code`, `sr_no`, `container_no`, `inv
 (71, '2023-12-21', '3300/002', 'SAF-26/2023', ':TTNU-8059533', '91268.45', '0000-00-00', '', '', '0', '937285.37', 0),
 (72, '2023-12-28', '3300/002', 'SAF-27/2023', ':SEGU-9662141', '105649.44', '0000-00-00', '', '', '0', '1042934.81', 0),
 (118, '0000-00-00', '3300/002', '', '', '', '2024-02-01', 'Cr-Feb 24/001', 'USA Money Received from UAB ($74925) 50%34762.5-10=$37452.5*2100ks $37462.5', '37452.5', '1005482.31', 189),
-(119, '0000-00-00', '3300/002', '', '', '', '2024-02-01', 'Cr-Feb 24/001', 'USA Money Received from UAB ($74925) 50%34762.5-10=$37452.5*2100ks $37462.5', '37547.5', '967934.81', 191);
+(119, '0000-00-00', '3300/002', '', '', '', '2024-02-01', 'Cr-Feb 24/001', 'USA Money Received from UAB ($74925) 50%34762.5-10=$37452.5*2100ks $37462.5', '37547.5', '967934.81', 191),
+(120, '0000-00-00', '3300/003', '', '', '', '2024-02-06', 'Cr-Feb 24/003', 'Canda Money $40862.68 from UAB 50% $20431.34-10=20421.34*2100ks $20431.34*3370ks $20431.34*105ks', '20421.34', '-54428.98', 257),
+(121, '0000-00-00', '3300/003', '', '', '', '2024-02-06', 'Cr-Feb 24/003', 'Canda Money $40862.68 from UAB 50% $20431.34-10=20421.34*2100ks $20431.34*3370ks $20431.34*105ks', '20441.34', '-74870.32', 259),
+(122, '0000-00-00', '3300/004', '', '', '', '2024-02-06', 'Cr-Feb 24/004', '$23462.5 in UAB Bank', '23452.5', '23516.86', 261),
+(123, '0000-00-00', '3300/004', '', '', '', '2024-02-06', 'Cr-Feb 24/004', '$23462.5 in UAB Bank', '23462.5', '54.360000000001', 263);
 
 -- --------------------------------------------------------
 
@@ -2126,7 +2194,31 @@ INSERT INTO `transaction` (`id`, `date`, `voucher_no`, `ac_code`, `description`,
 (234, '2024-02-03', 'Dr-Feb 24/059', '9100/015', 'Sir present purchase for ( Cambodia go ) wallet and bags (Yangoods)\r\n\r\n', '519600', '0', 'mmk', '', '', 0),
 (235, '2024-02-03', 'Dr-Feb 24/059', '3600/001', 'Sir present purchase for ( Cambodia go ) wallet and bags (Yangoods)\r\n\r\n', '0', '519600', 'mmk', '', '', 0),
 (236, '2024-02-03', 'Dr-Feb 24/060', '9100/012', 'Meal Allowance for Sir +2 pcs', '95850', '0', 'mmk', '', '', 0),
-(237, '2024-02-03', 'Dr-Feb 24/060', '3600/001', 'Meal Allowance for Sir +2 pcs', '0', '95850', 'mmk', '', '', 0);
+(237, '2024-02-03', 'Dr-Feb 24/060', '3600/001', 'Meal Allowance for Sir +2 pcs', '0', '95850', 'mmk', '', '', 0),
+(238, '2024-02-05', 'Dr-Feb 24/061', '9100/003', 'Water 2 pk purchase for WH', '1800', '0', 'mmk', '', '', 0),
+(239, '2024-02-05', 'Dr-Feb 24/061', '3600/001', 'Water 2 pk purchase for WH', '0', '1800', 'mmk', '', '', 0),
+(240, '2024-02-05', 'Dr-Feb 24/062', '9100/006', 'Car Diesel for 6J-3015 (4.2)-50000/ (5.2)-50000', '100000', '0', 'mmk', '', '', 0),
+(241, '2024-02-05', 'Dr-Feb 24/062', '3600/001', 'Car Diesel for 6J-3015 (4.2)-50000/ (5.2)-50000', '0', '100000', 'mmk', '', '', 0),
+(242, '2024-02-05', 'Dr-Feb 24/063', '9100/014', 'Car police catch for 6J-3015 (Market)', '5000', '0', 'mmk', '', '', 0),
+(243, '2024-02-05', 'Dr-Feb 24/063', '3600/001', 'Car police catch for 6J-3015 (Market)', '0', '5000', 'mmk', '', '', 0),
+(244, '2024-02-05', 'Dr-Feb 24/064', '9100/002', 'Taxi Charges for HHK to WH (pk)', '17000', '0', 'mmk', '', '', 0),
+(245, '2024-02-05', 'Dr-Feb 24/064', '3600/001', 'Taxi Charges for HHK to WH (pk)', '0', '17000', 'mmk', '', '', 0),
+(246, '2024-02-05', 'Dr-Feb 24/065', '9100/007', 'Material purchase for WH', '31500', '0', 'mmk', '', '', 0),
+(247, '2024-02-05', 'Dr-Feb 24/065', '3600/001', 'Material purchase for WH', '0', '31500', 'mmk', '', '', 0),
+(248, '2024-02-05', 'Dr-Feb 24/066', '9100/016', 'Photo paper and A4 purchase for WH', '107500', '0', 'mmk', '', '', 0),
+(249, '2024-02-05', 'Dr-Feb 24/066', '3600/001', 'Photo paper and A4 purchase for WH', '0', '107500', 'mmk', '', '', 0),
+(250, '2024-02-05', 'Dr-Feb 24/067', '9100/007', 'Battery 2 pcs charging charges and carry charges for (office)', '15000', '0', 'mmk', '', '', 0),
+(251, '2024-02-05', 'Dr-Feb 24/067', '3600/001', 'Battery 2 pcs charging charges and carry charges for (office)', '0', '15000', 'mmk', '', '', 0),
+(252, '2024-02-05', 'Dr-Feb 24/068', '9100/002', 'Taxi charges for Ocean Pacific go workers', '24000', '0', 'mmk', '', '', 0),
+(253, '2024-02-05', 'Dr-Feb 24/068', '3600/001', 'Taxi charges for Ocean Pacific go workers', '0', '24000', 'mmk', '', '', 0),
+(254, '2024-02-05', 'Dr-Feb 24/069', '4000/M07', 'Paid to Moe Kyaw for Vr No-11332, 11339, Cheque No-052402', '12503950', '0', 'mmk', '', '', 0),
+(255, '2024-02-05', 'Dr-Feb 24/069', '3600/001', 'Paid to Moe Kyaw for Vr No-11332, 11339, Cheque No-052402', '0', '12503950', 'mmk', '', '', 0),
+(256, '2024-02-06', 'Cr-Feb 24/003', '3600/001', 'Canda Money $40862.68 from UAB 50% $20431.34-10=20421.34*2100ks $20431.34*3370ks $20431.34*105ks', '42884814', '0', 'usd', '', '', 0),
+(257, '2024-02-06', 'Cr-Feb 24/003', '3300/003', 'Canda Money $40862.68 from UAB 50% $20431.34-10=20421.34*2100ks $20431.34*3370ks $20431.34*105ks', '0', '42884814', 'usd', '', '', 0),
+(258, '2024-02-06', 'Cr-Feb 24/003', '3600/001', 'Canda Money $40862.68 from UAB 50% $20431.34-10=20421.34*2100ks $20431.34*3370ks $20431.34*105ks', '71033656.5', '0', 'usd', '', '', 10),
+(259, '2024-02-06', 'Cr-Feb 24/003', '3300/003', 'Canda Money $40862.68 from UAB 50% $20431.34-10=20421.34*2100ks $20431.34*3370ks $20431.34*105ks', '0', '71033656.5', 'usd', '', '', 0),
+(260, '2024-02-06', 'Cr-Feb 24/004', '3600/001', '$23462.5 in UAB Bank', '49250250', '0', 'usd', '', '', 0),
+(261, '2024-02-06', 'Cr-Feb 24/004', '3300/004', '$23462.5 in UAB Bank', '0', '49250250', 'usd', '', '', 0);
 
 -- --------------------------------------------------------
 
@@ -2529,7 +2621,9 @@ INSERT INTO `userlogs` (`id`, `login_time`, `login_date`, `login_username`, `log
 (168, '07:36:06.000000', '2024-02-22', 'admin', 'admin', 'Login Success'),
 (169, '09:45:56.000000', '2024-02-24', 'admin', 'admin', 'Login Success'),
 (170, '01:42:39.000000', '2024-02-24', 'admin', 'admin', 'Login Success'),
-(171, '10:09:29.000000', '2024-02-26', 'admin', 'admin', 'Login Success');
+(171, '10:09:29.000000', '2024-02-26', 'admin', 'admin', 'Login Success'),
+(172, '01:50:09.000000', '2024-02-26', 'admin', 'admin', 'Login Success'),
+(173, '09:40:51.000000', '2024-02-27', 'admin', 'admin', 'Login Success');
 
 --
 -- Indexes for dumped tables
@@ -2885,7 +2979,7 @@ ALTER TABLE `accounts`
 -- AUTO_INCREMENT for table `acname`
 --
 ALTER TABLE `acname`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=333;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=334;
 
 --
 -- AUTO_INCREMENT for table `actualinvoice`
@@ -2909,7 +3003,7 @@ ALTER TABLE `bankdetail`
 -- AUTO_INCREMENT for table `cashbook`
 --
 ALTER TABLE `cashbook`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1295;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1308;
 
 --
 -- AUTO_INCREMENT for table `category`
@@ -2933,7 +3027,7 @@ ALTER TABLE `container`
 -- AUTO_INCREMENT for table `currency`
 --
 ALTER TABLE `currency`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=257;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=283;
 
 --
 -- AUTO_INCREMENT for table `form7stock`
@@ -2963,7 +3057,7 @@ ALTER TABLE `form10stocktcl`
 -- AUTO_INCREMENT for table `general_ledger`
 --
 ALTER TABLE `general_ledger`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1056;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1082;
 
 --
 -- AUTO_INCREMENT for table `gfcdryfishcoldstore`
@@ -3089,7 +3183,7 @@ ALTER TABLE `packingmaterial`
 -- AUTO_INCREMENT for table `payable`
 --
 ALTER TABLE `payable`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=209;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=210;
 
 --
 -- AUTO_INCREMENT for table `permission`
@@ -3113,7 +3207,7 @@ ALTER TABLE `purchase`
 -- AUTO_INCREMENT for table `receivable`
 --
 ALTER TABLE `receivable`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=120;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=124;
 
 --
 -- AUTO_INCREMENT for table `repacking`
@@ -3155,7 +3249,7 @@ ALTER TABLE `total_charges`
 -- AUTO_INCREMENT for table `transaction`
 --
 ALTER TABLE `transaction`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=238;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=264;
 
 --
 -- AUTO_INCREMENT for table `truckactualinvoice`
@@ -3203,7 +3297,7 @@ ALTER TABLE `trucktotalcosting`
 -- AUTO_INCREMENT for table `userlogs`
 --
 ALTER TABLE `userlogs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=172;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=174;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

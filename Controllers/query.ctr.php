@@ -3520,13 +3520,8 @@ Class Query{
         $usd_amount = 0;
       }
     }
-
-
-    $currencystmt = $pdo->prepare("UPDATE currency SET dollar_rate='$rate', debitorcredit='$debitorcredit', mmk_amount='$mmk_amount', usd_amount='$usd_amount', voucher_no=:voucher_no WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit'");
-    $currencystmt->execute([
-      ':voucher_no' => $voucher_no
-    ]);
-
+    $currencystmt = $pdo->prepare("UPDATE currency SET dollar_rate='$rate', debitorcredit='$debitorcredit', mmk_amount='$mmk_amount', usd_amount='$usd_amount', voucher_no='$voucher_no' WHERE transactionid='$id'");
+    $currencystmt->execute();
   }
 
   function accepttransaction($date){

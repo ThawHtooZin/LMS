@@ -127,7 +127,7 @@ $query = new Query();
               <?php
             }
              ?>
-            <!-- <div class="float-end">
+            <div class="float-end">
               <form action="" method="post">
                 <?php
                 $cashnames = $query->selectdis("cashbook", 'ac_name');
@@ -164,7 +164,7 @@ $query = new Query();
                   <?php
                 }
                ?>
-            </div> -->
+            </div>
           </form>
           </div>
           <div class="card-body">
@@ -407,7 +407,7 @@ $query = new Query();
                     <div class="modal-header bg-warning">
                       <h5 class="modal-title text-light">Update Opening Amount</h5>
                     </div>
-                    <div class="modal-body"> 
+                    <div class="modal-body">
                       <!-- Your modal content goes here -->
                       <form method="POST" action="">
                         <input type="hidden" name="updatebalanceid" value="<?= $cashdata['id']; ?>">
