@@ -83,7 +83,7 @@ $query = new Query();
               }
             }
               ?>
-              
+
               <?php
               if(isset($_POST['dbwsearch'])){
                 $startdate = $_POST['startdate'];
@@ -357,7 +357,8 @@ $query = new Query();
 
 
                     // Dollor Change
-                    $acselectstmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit'");
+                    $transactionid = $cashdata['transactionid'];
+                    $acselectstmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit' AND transactionid='$transactionid'");
                     $acselectstmt->execute([
                       ':voucher_no' => $voucher_no
                     ]);
@@ -371,8 +372,10 @@ $query = new Query();
                       }
                     }else{
                       if($cashdata['debit'] != 0){
-                        $debit = $cashdata['debit'];
+                        echo $debit = $cashdata['debit'];
+
                       }else{
+                        echo "";
                         $credit = $cashdata['credit'];
                       }
                     }
@@ -437,7 +440,7 @@ $query = new Query();
                     <div class="modal-header bg-warning">
                       <h5 class="modal-title text-light">Update Opening Amount</h5>
                     </div>
-                    <div class="modal-body"> 
+                    <div class="modal-body">
                       <!-- Your modal content goes here -->
                       <form method="POST" action="">
                         <input type="hidden" name="updatebalanceid" value="<?= $cashdata['id']; ?>">
@@ -564,14 +567,15 @@ $query = new Query();
                     </tr>
                     <?php
                   }elseif(empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'usd'){
+                    // echo $ac_name;
                     $total_debit = $query->selectallsumcheck('cashbook', 'debit', 'total_debit', 'ac_name', $ac_name);
                     $total_credit = $query->selectallsumcheck('cashbook', 'credit', 'total_credit', 'ac_name', $ac_name);
-
-                   
-
+                    // print_r($total_debit);
 
 
-                    
+
+
+
                     // Dollor Change
                     ?>
                     <tr style="font-weight: bold;">

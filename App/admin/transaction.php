@@ -215,6 +215,8 @@ $query = new Query();
         $datestmt->execute();
         $datesdatas = $datestmt->fetchall();
         foreach ($datesdatas as $datesdata) {
+          // echo "<br>";
+          // echo $datesdata['date'];
           $query->accepttransaction($datesdata['date']);
         }
         // echo "<script>swal('Success', 'Accepted Successfully.', 'success');</script>";
