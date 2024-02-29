@@ -83,6 +83,9 @@ if(isset($_REQUEST['excelimportbtn'])){
                     ':price' => $price,
                     ':amount' => $amount,
                 ]);
+                if($stmt){
+                  echo'<script>window.location.href="backupandrestore.php"</script>';
+                }
                 }
 
             }
