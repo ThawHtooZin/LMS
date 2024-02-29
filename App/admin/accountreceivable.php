@@ -149,7 +149,7 @@ if(isset($_POST['updatebalance'])){
                  <td><?php echo $receivabledata['payment_no']; ?></td>
                  <td><?php echo $receivabledata['particulars']; ?></td>
                  <td><?php if($receivabledata['paid_amount'] != 0){ echo $receivabledata['paid_amount'];} ?></td>
-                 <td><?php echo $receivabledata['balance']; ?></td>
+                 <td><?php echo round($receivabledata['balance'], 2); ?></td>
                  <td>
                    <?php
                       if(!empty($receivabledata['sr_no'])){

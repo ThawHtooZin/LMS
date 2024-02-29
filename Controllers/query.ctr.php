@@ -3520,13 +3520,8 @@ Class Query{
         $usd_amount = 0;
       }
     }
-
-
-    $currencystmt = $pdo->prepare("UPDATE currency SET dollar_rate='$rate', debitorcredit='$debitorcredit', mmk_amount='$mmk_amount', usd_amount='$usd_amount', voucher_no=:voucher_no WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit'");
-    $currencystmt->execute([
-      ':voucher_no' => $voucher_no
-    ]);
-
+    $currencystmt = $pdo->prepare("UPDATE currency SET dollar_rate='$rate', debitorcredit='$debitorcredit', mmk_amount='$mmk_amount', usd_amount='$usd_amount', voucher_no='$voucher_no' WHERE transactionid='$id'");
+    $currencystmt->execute();
   }
 
   function accepttransaction($date){
@@ -3552,7 +3547,7 @@ Class Query{
           $bankchargesstmt = $pdo->prepare("SELECT bank_charges FROM transaction WHERE ac_code='3300%'");
           $bankchargesstmt->execute();
           $bankchargesdata = $bankchargesstmt->fetch(PDO::FETCH_ASSOC);
-          $dollarratestmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='debit'");
+          $dollarratestmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='debit' AND transactionid='$transactionid'");
           $dollarratestmt->execute([
             ':voucher_no' => $voucher_no
           ]);
@@ -3666,7 +3661,7 @@ Class Query{
           if (!empty($receivedata['balance'])) {
             $balance = $balance - floatval($paid_amount);
           }else{
-            $balance = 0; 
+            $balance = 0;
           }
         }else{
           $invoice_amount = 0;
@@ -3766,14 +3761,14 @@ Class Query{
       for($i = 0; $i < $crossacnamerowcount; $i++){
         $crossacname = $crossac_name[$i]['ac_code'];
 
-        $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no");
+        $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND transactionid='$transactionid'");
         $currencystmt->execute([
           ':voucher_no' => $voucher_no
         ]);
         $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
         if(!empty($cashbookdata['bank_charges'])){
           $predebit = $currencydata['dollar_rate'] * $cashbookdata['bank_charges'];
-          $debit = $cashbookdata['debit'] - $predebit;
+           $debit = $cashbookdata['debit'] - $predebit;
         }else{
           $debit = $cashbookdata['debit'];
         }

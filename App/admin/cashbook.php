@@ -437,7 +437,7 @@ $query = new Query();
                     <div class="modal-header bg-warning">
                       <h5 class="modal-title text-light">Update Opening Amount</h5>
                     </div>
-                    <div class="modal-body"> 
+                    <div class="modal-body">
                       <!-- Your modal content goes here -->
                       <form method="POST" action="">
                         <input type="hidden" name="updatebalanceid" value="<?= $cashdata['id']; ?>">
