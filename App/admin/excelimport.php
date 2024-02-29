@@ -50,6 +50,35 @@ if(isset($_REQUEST['excelimportbtn'])){
                 ]);
             }
           }
+
+          if($_POST['importtable'] == 'purchase'){
+            foreach($data as $row){
+                $date = $row[0];
+                $voucher_no = $row[1];
+                $supplier_id = $row[2];
+                $tclfrozen = $row[3];
+                $commondity = $row[4];
+                $size = $row[5];
+                $viss = $row[6];
+                $pcs = $row[7];
+                $price = $row[8];
+                $amount = $row[9];
+
+                $stmt = $pdo->prepare("INSERT INTO purcahse(date,voucher_no,supplier_id,tclfrozen,commondity,size,viss,pcs,price,amount) VALUES(date,voucher_no,supplier_id,tclfrozen,commondity,size,viss,pcs,price,amount)");
+                $stmt->execute([
+                    ':date' => $date,
+                    ':voucher_no' => $voucher_no,
+                    ':supplier_id' => $supplier_id,
+                    ':tclfrozen' => $tclfrozen,
+                    ':commondity' => $commondity,
+                    ':size' => $size,
+                    ':viss' => $viss,
+                    ':pcs' => $pcs,
+                    ':price' => $price,
+                    ':amount' => $amount,
+                ]);
+            }
+          }
         }
-    }
+  }
 }
