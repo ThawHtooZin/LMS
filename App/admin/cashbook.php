@@ -437,7 +437,7 @@ $query = new Query();
                     <div class="modal-header bg-warning">
                       <h5 class="modal-title text-light">Update Opening Amount</h5>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body"> 
                       <!-- Your modal content goes here -->
                       <form method="POST" action="">
                         <input type="hidden" name="updatebalanceid" value="<?= $cashdata['id']; ?>">
@@ -566,43 +566,12 @@ $query = new Query();
                   }elseif(empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'usd'){
                     $total_debit = $query->selectallsumcheck('cashbook', 'debit', 'total_debit', 'ac_name', $ac_name);
                     $total_credit = $query->selectallsumcheck('cashbook', 'credit', 'total_credit', 'ac_name', $ac_name);
-                    $balancestmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='$ac_name' ORDER BY id DESC");
-                    $balancestmt->execute();
-                    $balance = $balancestmt->fetch(PDO::FETCH_ASSOC);
 
-                    if($acselect['debit'] != 0){
-                      $debitorcredit = 'debit';
-                    }else{
-                      $debitorcredit = 'credit';
-                    }
-
-                    // Dollor Change
-                    $acselectstmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit'");
-                    $acselectstmt->execute([
-                      ':voucher_no' => $voucher_no
-                    ]);
-                    $rateselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
-                    if(!empty($rateselect['dollar_rate'])){
-                      if($cashdata['debit'] != 0){
-                        $debit = $cashdata['debit'] / $rateselect['dollar_rate'];
-                      }else{
-                        $credit = $cashdata['credit'] / $rateselect['dollar_rate'];
-                      }
-                    }else{
-                      if($cashdata['debit'] != 0){
-                        $debit = $cashdata['debit'];
-                      }else{
-                        $credit = $cashdata['credit'];
-                      }
-                    }
+                   
 
 
 
-                    if(!empty($rateselect['dollar_rate'])){
-                      $balance = $cashdata['balance'];
-                    }else{
-                      $balance = 0;
-                    }
+                    
                     // Dollor Change
                     ?>
                     <tr style="font-weight: bold;">
@@ -611,9 +580,9 @@ $query = new Query();
                       <td></td>
                       <td></td>
                       <td></td>
-                      <td><?php if(!empty($debit)){ echo $debit;} ?></td>
-                      <td><?php if(!empty($credit)){ echo $credit;} ?></td>
-                      <td><?php echo $balance; ?></td>
+                      <td><?php if(!empty($total_debit['total_debit'])){ echo $total_debit['total_debit'];} ?></td>
+                      <td><?php if(!empty($total_credit['total_credit'])){ echo $total_credit['total_credit'];} ?></td>
+                      <td><?php echo $total_debit['total_debit'] - $total_credit['total_credit']; ?></td>
                       <td></td>
                     </tr>
                     <?php
