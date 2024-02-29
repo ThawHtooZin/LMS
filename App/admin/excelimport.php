@@ -94,7 +94,7 @@ if(isset($_REQUEST['excelimportbtn'])){
                 $no = $row[0];
                 $date = date('Y-m-d', strtotime($row[1]));
                 $voucher_no = $row[2];
-                $supplier_id = $row[3];
+                $supplier_name = $row[3];
                 $tclfrozen = $row[4];
                 $commondity = $row[5];
                 $size = $row[6];
@@ -111,7 +111,7 @@ if(isset($_REQUEST['excelimportbtn'])){
                 $stmt->execute([
                     ':date' => $date,
                     ':voucher_no' => $voucher_no,
-                    ':supplier_id' => $supplier_id,
+                    ':supplier_id' => $supplier_name,
                     ':tclfrozen' => $tclfrozen,
                     ':commondity' => $commondity,
                     ':size' => $size,
@@ -120,37 +120,38 @@ if(isset($_REQUEST['excelimportbtn'])){
                     ':price' => $price,
                     ':amount' => $amount,
                 ]);
+                $balstmt = $pdo->prepare("SELECT balance FROM payable WHERE supplier_id = '$supplier_name' ORDER BY id DESC");
+                $balstmt->execute();
+                $baldata = $balstmt->fetch(PDO::FETCH_ASSOC);
+                if(!empty($baldata['balance'])){
+                  $balance = $baldata['balance'];
+                }else{
+                  $balance = 0;
+                }
+                if($balance != 1){
+                   $total_balance = $balance + $amount;
+                }else{
+                  $total_balance = $balance;
+                }
+                $idstmt = $pdo->prepare("SELECT * FROM purchase ORDER BY no DESC");
+                $idstmt->execute();
+                $iddata = $idstmt->fetch(PDO::FETCH_ASSOC);
+                $id = $iddata['no'];
+                $payablestmt = $pdo->prepare("INSERT INTO payable(date, supplier_id, purchase_voucher_no, purchase_amount, balance, link_id) VALUES('$date', '$supplier_name', '$voucher_no', '$amount', '$total_balance', '$id')");
+                $payablestmt->execute();
+                $kg = floatval($viss) * 1.634;
+                $link_id = $id;
+            
+                if ($tclfrozen === "tcl") {
+                  $formstmt = $pdo->prepare("INSERT INTO form7stocktcl(date, item_id, supplier_name, country, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commondity', '$supplier_name', 'DAKA',  'TCl', '$size', '$viss', '$kg', '$pcs', '$link_id')");
+                  $formstmt->execute();
+                }else{
+                  $formstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commondity', '$supplier_name', 'Frozen', '$size', '$viss', '$kg', '$pcs', '$link_id')");
+                  $formstmt->execute();
                 }
 
-            }
-          }
+                }
 
-          if($_POST['importtable'] == 'form7stock'){
-            foreach($data as $row){
-                $date = $row[0];
-                $item_id = $row[1];
-                $supplier_name = $row[2];
-                $country = NULL;
-                $type = $row[3];
-                $size = $row[4];
-                $viss = $row[5];
-                $kg = $row[6] * 1.634;
-                $pcspervr = $row[6];
-                $pcsperf7 = 0;
-
-                $stmt = $pdo->prepare("INSERT INTO form7stock(date,item_id,supplier_name,country,type,size,viss,kg,pcspervr,pcsperf7) VALUES(:date,:item_id,:supplier_name,:country,:type,:size,:viss,:kg,:pcspervr,:pcsperf7)");
-                $stmt->execute([
-                    ':date' => $date,
-                    ':item_id' => $item_id,
-                    ':supplier_name' => $supplier_name,
-                    ':country' => $country,
-                    ':type' => $type,
-                    ':size' => $size,
-                    ':viss' => $viss,
-                    ':kg' => $kg,
-                    ':pcspervr' => $pcspervr,
-                    ':pcsperf7' => $pcsperf7,
-                ]);
             }
           }
         }
