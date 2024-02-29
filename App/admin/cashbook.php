@@ -35,6 +35,13 @@ $query = new Query();
         $date = $_POST['updatebalancedate'];
         $query->cashbookupdatebalance($id, $balanceamount, $ac_code, $particular, $date);
       }
+
+      if(isset($_POST['usdbtn'])){
+        $_SESSION['cashbooktype'] = 'usd';
+      }
+      if(isset($_POST['ksbtn'])){
+        $_SESSION['cashbooktype'] = 'ks';
+      }
     ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
@@ -44,23 +51,39 @@ $query = new Query();
       </div>
       <div class="contentcol" id="content">
         <?php require 'navbar.php'; ?>
+        <form action="" method="POST">
         <div class="card">
           <div class="card-header bg-info text-light"  style="padding:-10px;">
             <?php
-            if(isset($_POST['usdbtn'])){
-              $_SESSION['cashbookcurrency'] = 'usd';
-            }
-            if(isset($_POST['ksbtn'])){
-              $_SESSION['cashbookcurrency'] = 'ks';
-            }
-            if(empty($_SESSION['cashbookcurrency'])){
-              $_SESSION['cashbookcurrency'] = 'ks';
-            }
-            ?>
-            <?php
-            if (empty($_SESSION['cashbookcurrency']) || $_SESSION['cashbookcurrency'] == 'ks') {
+            if(empty($_SESSION['cashbooktype'])){
               ?>
-              <h5 class="d-inline">Manage Cash Book (MMK)</h5>
+                <h5 class="d-inline">Manage Cash Book (MMK)</h5>
+
+                <button type="submit" name="usdbtn" class="btn btn-light text-dark float-end ms-2">
+                  Main Cash (USD)
+                </button>
+              <?php
+            }else{
+              if($_SESSION['cashbooktype'] == 'usd'){
+                ?>
+                <h5 class="d-inline">Manage Cash Book (USD)</h5>
+
+                <button type="submit" name="ksbtn" class="btn btn-light text-dark float-end ms-2">
+                  Main Cash (MMK)
+                </button>
+              <?php
+              }else{
+                ?>
+                <h5 class="d-inline">Manage Cash Book (MMK)</h5>
+
+                <button type="submit" name="usdbtn" class="btn btn-light text-dark float-end ms-2">
+                  Main Cash (USD)
+                </button>
+              <?php
+              }
+            }
+              ?>
+              
               <?php
               if(isset($_POST['dbwsearch'])){
                 $startdate = $_POST['startdate'];
@@ -84,49 +107,6 @@ $query = new Query();
               }
               ?>
               <button class="btn btn-secondary float-end" data-bs-toggle="modal" data-bs-target="#addbalance"> Add Balance</button>
-              <div class="modal fade" id="addbalance">
-                <div class="modal-dialog" role="document">
-                  <div class="modal-content text-dark">
-                    <div class="modal-header bg-secondary">
-                      <h5 class="text-light">Add Opening Amount</h5>
-                    </div>
-                    <form method="POST">
-                      <div class="modal-body">
-                        <h6>Date</h6>
-                        <input type="date" name="balancedate" class="form-control inpv2 mb-2 mt-2">
-                        <h6>Opening Amount</h6>
-                        <input type="number" name="balanceamount" class="form-control inpv2 mb-2 mt-2">
-                        <h6>AC Code</h6>
-                        <select name="balanceac" class="form-control inpv2">
-                          <?php
-                            $acstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no LIKE '3600%'");
-                            $acstmt->execute();
-                            $acdatas = $acstmt->fetchAll();
-                            foreach($acdatas as $acdata){
-                              ?>
-                                <option value="<?= $acdata['code_no']; ?>"><?= $acdata['ac_name']; ?></option>
-                              <?php
-                            }
-                          ?>
-                        </select>
-                        <h6>Particular</h6>
-                        <input type="text" name="balanceparticular" class="form-control inpv2">
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary" name="addbalance">Add Opening Amount</button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-              <?php
-            }else{
-              ?>
-              <h5 class="d-inline">Manage Cash Book (USD)</h5>
-              <?php
-            }
-             ?>
             <!-- <div class="float-end">
               <form action="" method="post">
                 <?php
@@ -165,8 +145,44 @@ $query = new Query();
                 }
                ?>
             </div> -->
-          </form>
           </div>
+          </form>
+          <div class="modal fade" id="addbalance">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content text-dark">
+                    <div class="modal-header bg-secondary">
+                      <h5 class="text-light">Add Opening Amount</h5>
+                    </div>
+                    <form method="POST">
+                      <div class="modal-body">
+                        <h6>Date</h6>
+                        <input type="date" name="balancedate" class="form-control inpv2 mb-2 mt-2">
+                        <h6>Opening Amount</h6>
+                        <input type="number" name="balanceamount" class="form-control inpv2 mb-2 mt-2">
+                        <h6>AC Code</h6>
+                        <select name="balanceac" class="form-control inpv2">
+                          <?php
+                            $acstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no LIKE '3600%'");
+                            $acstmt->execute();
+                            $acdatas = $acstmt->fetchAll();
+                            foreach($acdatas as $acdata){
+                              ?>
+                                <option value="<?= $acdata['code_no']; ?>"><?= $acdata['ac_name']; ?></option>
+                              <?php
+                            }
+                          ?>
+                        </select>
+                        <h6>Particular</h6>
+                        <input type="text" name="balanceparticular" class="form-control inpv2">
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" name="addbalance">Add Opening Amount</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
           <div class="card-body">
             <?php
             // if(isset($_POST['deletebutton'])){
@@ -272,7 +288,7 @@ $query = new Query();
                 $startdate = $_POST['startdate'];
                 $enddate = $_POST['enddate'];
                 // $cashdatas = $query->selectdbw('cashbook', $startdate, $enddate);
-                if (empty($_SESSION['cashbookcurrency']) || $_SESSION['cashbookcurrency'] == 'ks') {
+                if (empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'ks') {
                   $cashstmt = $pdo->prepare("SELECT * FROM cashbook WHERE `date` BETWEEN '$startdate' AND '$enddate' AND ac_name='3600/001'");
                 }else{
                   $cashstmt = $pdo->prepare("SELECT * FROM cashbook WHERE `date` BETWEEN '$startdate' AND '$enddate' AND ac_name='3600/002'");
@@ -285,7 +301,11 @@ $query = new Query();
                 $stmt->execute();
                 $cashdatas = $stmt->fetchall();
               }else{
-                $stmt = $pdo->prepare("SELECT * FROM cashbook");
+                if (empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'ks') {
+                  $stmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/001'");
+                }else{
+                  $stmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/002'");
+                }
                 $stmt->execute();
                 $cashdatas = $stmt->fetchAll();
               }
@@ -303,7 +323,7 @@ $query = new Query();
                   ]);
                   $acselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
                   $accode = $acselect['ac_code'];
-                  if (empty($_SESSION['cashbookcurrency']) || $_SESSION['cashbookcurrency'] == 'ks') {
+                  if (empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'ks') {
                     $debit = $cashdata['debit'];
                     $credit = $cashdata['credit'];
                     // $balance = $cashdata['balance'];
@@ -343,15 +363,25 @@ $query = new Query();
                     ]);
                     $rateselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
 
-                    if($cashdata['debit'] != 0){
-                      $debit = $cashdata['debit'] / $rateselect['dollar_rate'];
+                    if(!empty($rateselect['dollar_rate'])){
+                      if($cashdata['debit'] != 0){
+                        $debit = $cashdata['debit'] / $rateselect['dollar_rate'];
+                      }else{
+                        $credit = $cashdata['credit'] / $rateselect['dollar_rate'];
+                      }
                     }else{
-                      $credit = $cashdata['credit'] / $rateselect['dollar_rate'];
+                      if($cashdata['debit'] != 0){
+                        $debit = $cashdata['debit'];
+                      }else{
+                        $credit = $cashdata['credit'];
+                      }
                     }
 
 
 
-                    $balance = $cashdata['balance'] / $rateselect['dollar_rate'];
+                    if(!empty($rateselect['dollar_rate'])){
+                      $balance = $cashdata['balance'];
+                    }
                     // Dollor Change
                   }
                   }else{
@@ -514,7 +544,7 @@ $query = new Query();
               }else{
                 $ac_name = '';
               }
-                  if(!empty($_SESSION['cashbookcurrency']) && $_SESSION['cashbookcurrency'] != 'usd'){
+                  if(!empty($_SESSION['cashbooktype']) && $_SESSION['cashbooktype'] != 'usd'){
                     $total_debit = $query->selectallsumcheck('cashbook', 'debit', 'total_debit', 'ac_name', $ac_name);
                     $total_credit = $query->selectallsumcheck('cashbook', 'credit', 'total_credit', 'ac_name', $ac_name);
                     $balancestmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='$ac_name' ORDER BY id DESC");
@@ -533,7 +563,7 @@ $query = new Query();
                       <td></td>
                     </tr>
                     <?php
-                  }elseif(empty($_SESSION['cashbookcurrency']) || $_SESSION['cashbookcurrency'] == 'usd'){
+                  }elseif(empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'usd'){
                     $total_debit = $query->selectallsumcheck('cashbook', 'debit', 'total_debit', 'ac_name', $ac_name);
                     $total_credit = $query->selectallsumcheck('cashbook', 'credit', 'total_credit', 'ac_name', $ac_name);
                     $balancestmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='$ac_name' ORDER BY id DESC");
@@ -552,14 +582,27 @@ $query = new Query();
                       ':voucher_no' => $voucher_no
                     ]);
                     $rateselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
-
-                    if($cashdata['debit'] != 0){
-                      $debit = $cashdata['debit'] / $rateselect['dollar_rate'];
+                    if(!empty($rateselect['dollar_rate'])){
+                      if($cashdata['debit'] != 0){
+                        $debit = $cashdata['debit'] / $rateselect['dollar_rate'];
+                      }else{
+                        $credit = $cashdata['credit'] / $rateselect['dollar_rate'];
+                      }
                     }else{
-                      $credit = $cashdata['credit'] / $rateselect['dollar_rate'];
+                      if($cashdata['debit'] != 0){
+                        $debit = $cashdata['debit'];
+                      }else{
+                        $credit = $cashdata['credit'];
+                      }
                     }
 
-                    $balance = $cashdata['balance'] / $rateselect['dollar_rate'];
+
+
+                    if(!empty($rateselect['dollar_rate'])){
+                      $balance = $cashdata['balance'];
+                    }else{
+                      $balance = 0;
+                    }
                     // Dollor Change
                     ?>
                     <tr style="font-weight: bold;">
@@ -638,8 +681,8 @@ $query = new Query();
   <script type="text/javascript">
     $(document).ready(function(){
       <?php
-      if(!empty($_SESSION['cashbookcurrency'])){
-        if($_SESSION['cashbookcurrency'] == 'usd'){
+      if(!empty($_SESSION['cashbooktype'])){
+        if($_SESSION['cashbooktype'] == 'usd'){
           ?>
           $('#usdbtn').hide();
           $('#ksbtn').show();
