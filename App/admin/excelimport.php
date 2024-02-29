@@ -64,7 +64,7 @@ if(isset($_REQUEST['excelimportbtn'])){
                 $price = $row[8];
                 $amount = $row[9];
 
-                $stmt = $pdo->prepare("INSERT INTO purcahse(date,voucher_no,supplier_id,tclfrozen,commondity,size,viss,pcs,price,amount) VALUES(:date,:voucher_no,:supplier_id,:tclfrozen,:commondity,:size,:viss,:pcs,:price,:amount)");
+                $stmt = $pdo->prepare("INSERT INTO purchase(date,voucher_no,supplier_id,tclfrozen,commondity,size,viss,pcs,price,amount) VALUES(:date,:voucher_no,:supplier_id,:tclfrozen,:commondity,:size,:viss,:pcs,:price,:amount)");
                 $stmt->execute([
                     ':date' => $date,
                     ':voucher_no' => $voucher_no,
