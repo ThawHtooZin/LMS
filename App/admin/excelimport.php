@@ -24,7 +24,7 @@ if(isset($_REQUEST['excelimportbtn'])){
           $data = $obj->getActiveSheet()->toArray();
           if($_POST['importtable'] == 'transaction'){
             foreach($data as $row){
-                $date = $row[0];
+              $date = date('Y-m-d', strtotime($row[0]));
                 $voucher_no = $row[1];
                 $ac_code = $row[2];
                 $description = $row[3];
@@ -34,6 +34,11 @@ if(isset($_REQUEST['excelimportbtn'])){
                 $sr_no = $row[7];
                 $container_no = $row[8];
                 $bank_charges = $row[9];
+                if(!empty($row[10])){
+                  $rate = $row[10];
+                }else{
+                  $rate = 1;
+                }
 
                 $stmt = $pdo->prepare("INSERT INTO transaction(date, voucher_no,ac_code,description,debit,credit,currency,sr_no,container_no,bank_charges) VALUES(:date, :voucher_no,:ac_code,:description,:debit,:credit,:currency,:sr_no,:container_no,:bank_charges)");
                 $stmt->execute([
@@ -48,6 +53,38 @@ if(isset($_REQUEST['excelimportbtn'])){
                     ':container_no' => $container_no,
                     ':bank_charges' => $bank_charges,
                 ]);
+
+
+
+                if(!empty($debit)){
+                  $debitorcredit = 'debit';
+            
+                  if($currency == 'usd'){
+                    $mmk_amount = floatval($rate) * floatval($debit);
+                    $usd_amount = $debit;
+                  }elseif($currency == 'mmk'){
+                    $mmk_amount = $debit;
+                    $usd_amount = 0;
+                  }
+                }elseif(!empty($credit)){
+                  $debitorcredit = 'credit';
+                  if($currency == 'usd'){
+                    $mmk_amount = floatval($rate) * floatval($credit);
+                    $usd_amount = $credit;
+                  }elseif($currency == 'mmk'){
+                    $mmk_amount = $credit;
+                    $usd_amount = 0;
+                  }
+                }
+
+                $idstmt = $pdo->prepare("SELECT * FROM transaction ORDER BY id DESC");
+                $idstmt->execute();
+                $iddata = $idstmt->fetch(PDO::FETCH_ASSOC);
+                $transactionid = $iddata['id'];
+                $currencystmt = $pdo->prepare("INSERT INTO currency(dollar_rate, debitorcredit, mmk_amount, usd_amount, voucher_no, transactionid) VALUES('$rate', '$debitorcredit', '$mmk_amount', '$usd_amount', :voucher_no, '$transactionid')");
+                $currencystmt->execute([
+                  ':voucher_no' => $voucher_no,
+                ]);
             }
           }
 
@@ -57,7 +94,7 @@ if(isset($_REQUEST['excelimportbtn'])){
                 $no = $row[0];
                 $date = date('Y-m-d', strtotime($row[1]));
                 $voucher_no = $row[2];
-                $supplier_id = $row[3];
+                $supplier_name = $row[3];
                 $tclfrozen = $row[4];
                 $commondity = $row[5];
                 $size = $row[6];
@@ -74,7 +111,7 @@ if(isset($_REQUEST['excelimportbtn'])){
                 $stmt->execute([
                     ':date' => $date,
                     ':voucher_no' => $voucher_no,
-                    ':supplier_id' => $supplier_id,
+                    ':supplier_id' => $supplier_name,
                     ':tclfrozen' => $tclfrozen,
                     ':commondity' => $commondity,
                     ':size' => $size,
@@ -83,9 +120,36 @@ if(isset($_REQUEST['excelimportbtn'])){
                     ':price' => $price,
                     ':amount' => $amount,
                 ]);
-                if($stmt){
-                  echo'<script>window.location.href="backupandrestore.php"</script>';
+                $balstmt = $pdo->prepare("SELECT balance FROM payable WHERE supplier_id = '$supplier_name' ORDER BY id DESC");
+                $balstmt->execute();
+                $baldata = $balstmt->fetch(PDO::FETCH_ASSOC);
+                if(!empty($baldata['balance'])){
+                  $balance = $baldata['balance'];
+                }else{
+                  $balance = 0;
                 }
+                if($balance != 1){
+                   $total_balance = $balance + $amount;
+                }else{
+                  $total_balance = $balance;
+                }
+                $idstmt = $pdo->prepare("SELECT * FROM purchase ORDER BY no DESC");
+                $idstmt->execute();
+                $iddata = $idstmt->fetch(PDO::FETCH_ASSOC);
+                $id = $iddata['no'];
+                $payablestmt = $pdo->prepare("INSERT INTO payable(date, supplier_id, purchase_voucher_no, purchase_amount, balance, link_id) VALUES('$date', '$supplier_name', '$voucher_no', '$amount', '$total_balance', '$id')");
+                $payablestmt->execute();
+                $kg = floatval($viss) * 1.634;
+                $link_id = $id;
+            
+                if ($tclfrozen === "tcl") {
+                  $formstmt = $pdo->prepare("INSERT INTO form7stocktcl(date, item_id, supplier_name, country, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commondity', '$supplier_name', 'DAKA',  'TCl', '$size', '$viss', '$kg', '$pcs', '$link_id')");
+                  $formstmt->execute();
+                }else{
+                  $formstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commondity', '$supplier_name', 'Frozen', '$size', '$viss', '$kg', '$pcs', '$link_id')");
+                  $formstmt->execute();
+                }
+
                 }
 
             }
