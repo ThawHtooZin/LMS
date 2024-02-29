@@ -53,18 +53,24 @@ if(isset($_REQUEST['excelimportbtn'])){
 
           if($_POST['importtable'] == 'purchase'){
             foreach($data as $row){
-                $date = $row[0];
-                $voucher_no = $row[1];
-                $supplier_id = $row[2];
-                $tclfrozen = $row[3];
-                $commondity = $row[4];
-                $size = $row[5];
-                $viss = $row[6];
-                $pcs = $row[7];
-                $price = $row[8];
-                $amount = $row[9];
+                if($row[0] != '' || $row[1] != ''){
+                $no = $row[0];
+                $date = date('Y-m-d', strtotime($row[1]));
+                $voucher_no = $row[2];
+                $supplier_id = $row[3];
+                $tclfrozen = $row[4];
+                $commondity = $row[5];
+                $size = $row[6];
+                $viss = $row[7];
+                if(!empty($row[8])){
+                  $pcs = $row[8];
+                }else{
+                  $pcs = 0;
+                }
+                $price = $row[9];
+                $amount = $row[10];
 
-                $stmt = $pdo->prepare("INSERT INTO purchase(date,voucher_no,supplier_id,tclfrozen,commondity,size,viss,pcs,price,amount) VALUES(:date,:voucher_no,:supplier_id,:tclfrozen,:commondity,:size,:viss,:pcs,:price,:amount)");
+                $stmt = $pdo->prepare("INSERT INTO purchase(date,voucher_no,supplier_id,tclfrozen,commodity,size,viss,pcs,price,amount) VALUES(:date,:voucher_no,:supplier_id,:tclfrozen,:commondity,:size,:viss,:pcs,:price,:amount)");
                 $stmt->execute([
                     ':date' => $date,
                     ':voucher_no' => $voucher_no,
@@ -77,6 +83,8 @@ if(isset($_REQUEST['excelimportbtn'])){
                     ':price' => $price,
                     ':amount' => $amount,
                 ]);
+                }
+
             }
           }
         }
