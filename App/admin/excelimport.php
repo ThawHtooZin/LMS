@@ -24,7 +24,7 @@ if(isset($_REQUEST['excelimportbtn'])){
           $data = $obj->getActiveSheet()->toArray();
           if($_POST['importtable'] == 'transaction'){
             foreach($data as $row){
-                $date = $row[0];
+              $date = date('Y-m-d', strtotime($row[0]));
                 $voucher_no = $row[1];
                 $ac_code = $row[2];
                 $description = $row[3];
@@ -34,6 +34,11 @@ if(isset($_REQUEST['excelimportbtn'])){
                 $sr_no = $row[7];
                 $container_no = $row[8];
                 $bank_charges = $row[9];
+                if(!empty($row[10])){
+                  $rate = $row[10];
+                }else{
+                  $rate = 1;
+                }
 
                 $stmt = $pdo->prepare("INSERT INTO transaction(date, voucher_no,ac_code,description,debit,credit,currency,sr_no,container_no,bank_charges) VALUES(:date, :voucher_no,:ac_code,:description,:debit,:credit,:currency,:sr_no,:container_no,:bank_charges)");
                 $stmt->execute([
@@ -47,6 +52,38 @@ if(isset($_REQUEST['excelimportbtn'])){
                     ':sr_no' => $sr_no,
                     ':container_no' => $container_no,
                     ':bank_charges' => $bank_charges,
+                ]);
+
+
+
+                if(!empty($debit)){
+                  $debitorcredit = 'debit';
+            
+                  if($currency == 'usd'){
+                    $mmk_amount = floatval($rate) * floatval($debit);
+                    $usd_amount = $debit;
+                  }elseif($currency == 'mmk'){
+                    $mmk_amount = $debit;
+                    $usd_amount = 0;
+                  }
+                }elseif(!empty($credit)){
+                  $debitorcredit = 'credit';
+                  if($currency == 'usd'){
+                    $mmk_amount = floatval($rate) * floatval($credit);
+                    $usd_amount = $credit;
+                  }elseif($currency == 'mmk'){
+                    $mmk_amount = $credit;
+                    $usd_amount = 0;
+                  }
+                }
+
+                $idstmt = $pdo->prepare("SELECT * FROM transaction ORDER BY id DESC");
+                $idstmt->execute();
+                $iddata = $idstmt->fetch(PDO::FETCH_ASSOC);
+                $transactionid = $iddata['id'];
+                $currencystmt = $pdo->prepare("INSERT INTO currency(dollar_rate, debitorcredit, mmk_amount, usd_amount, voucher_no, transactionid) VALUES('$rate', '$debitorcredit', '$mmk_amount', '$usd_amount', :voucher_no, '$transactionid')");
+                $currencystmt->execute([
+                  ':voucher_no' => $voucher_no,
                 ]);
             }
           }
@@ -85,6 +122,35 @@ if(isset($_REQUEST['excelimportbtn'])){
                 ]);
                 }
 
+            }
+          }
+
+          if($_POST['importtable'] == 'form7stock'){
+            foreach($data as $row){
+                $date = $row[0];
+                $item_id = $row[1];
+                $supplier_name = $row[2];
+                $country = NULL;
+                $type = $row[3];
+                $size = $row[4];
+                $viss = $row[5];
+                $kg = $row[6] * 1.634;
+                $pcspervr = $row[6];
+                $pcsperf7 = 0;
+
+                $stmt = $pdo->prepare("INSERT INTO form7stock(date,item_id,supplier_name,country,type,size,viss,kg,pcspervr,pcsperf7) VALUES(:date,:item_id,:supplier_name,:country,:type,:size,:viss,:kg,:pcspervr,:pcsperf7)");
+                $stmt->execute([
+                    ':date' => $date,
+                    ':item_id' => $item_id,
+                    ':supplier_name' => $supplier_name,
+                    ':country' => $country,
+                    ':type' => $type,
+                    ':size' => $size,
+                    ':viss' => $viss,
+                    ':kg' => $kg,
+                    ':pcspervr' => $pcspervr,
+                    ':pcsperf7' => $pcsperf7,
+                ]);
             }
           }
         }
