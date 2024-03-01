@@ -142,7 +142,7 @@ $query = new Query();
                     <td><?php echo $form7data['country']; ?></td>
                     <td><?php echo $form7data['size']; ?></td>
                     <td><?php echo $form7data['viss']; ?></td>
-                    <td><?php echo $form7data['viss'] * 1.634; ?></td>
+                    <td><?php echo floatval($form7data['viss']) * 1.634; ?></td>
                     <td><?php echo $form7data['kg']; ?></td>
                     <td data-bs-toggle="modal" data-bs-target="#waterkgmodal<?php echo $form7data['id']; ?>"><?php if(!empty($form7data['water_kg'])){ echo $form7data['water_kg'];} ?></td>
                     <td><?php echo $form7data['pcspervr']; ?></td>
@@ -364,7 +364,7 @@ $query = new Query();
                      <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php echo $form7data['country']; ?></td>
                      <td data-bs-toggle="modal" data-bs-target="#addsizemodal<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php echo $form7data['size']; ?></td>
                      <td data-bs-toggle="modal" data-bs-target="#adjustvissandcountry<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php echo $form7data['viss']; ?></td>
-                     <td><?php echo $form7data['viss'] * 1.634; ?></td>
+                     <td><?php echo floatval($form7data['viss']) * 1.634; ?></td>
                     <td data-bs-toggle="modal" data-bs-target="#waterkgmodal<?php echo $form7data['id']; ?>"><?php if(!empty($form7data['water_kg'])){ echo $form7data['water_kg'];} ?></td>
                     <td><?php echo $form7data['kg']; ?></td>
                      <td><?php echo $form7data['pcspervr']; ?></td>
