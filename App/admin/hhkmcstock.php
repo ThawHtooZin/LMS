@@ -33,6 +33,10 @@ $query = new Query();
       $country = $_POST['country'];
 
       $query->addmcstock($date, $particular, $country, $commondity_id, $size, $kg, $mc);
+      $_SESSION['date'] = $_POST['date'];
+      $_SESSION['particular'] = $_POST['particular'];
+      $_SESSION['commondity_id'] = $_POST['commondity_id'];
+      $_SESSION['size'] = $_POST['size'];
     }
 
     if(isset($_POST['transferbtn'])){
@@ -239,7 +243,7 @@ $query = new Query();
                     <div class="row">
                       <div class="col">
                         <label>Date</label>
-                        <input type="date" name="date" class="form-control inpv2 mb-2">
+                        <input type="date" name="date" class="form-control inpv2 mb-2" value="<?php if(!empty($_SESSION['date'])){ echo $_SESSION['date'];} ?>">
                         <label>Commondity</label>
                         <select class="form-control inpv2 mb-2" name="commondity_id" id="commondityid1">
                           <?php
@@ -248,7 +252,7 @@ $query = new Query();
                               $item_id = $form7commonditydata['item_id'];
                               $commonditydata = $query->select('item', $item_id, 'item_id');
                               ?>
-                              <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                              <option value="<?php echo $commonditydata['item_id']; ?>" <?php if($_SESSION['commondity_id'] == $commonditydata['item_id']){ echo "selected"; } ?>><?php echo $commonditydata['item_name']; ?></option>
                               <?php
                             }
                           }
@@ -271,7 +275,7 @@ $query = new Query();
                       </div>
                       <div class="col">
                         <label>Particular</label>
-                        <textarea name="particular" rows="4" class="form-control inpv2 mb-2" id="particular">From From-10</textarea>
+                        <textarea name="particular" rows="4" class="form-control inpv2 mb-2" id="particular"><?php if(!empty($_SESSION['particular'])){ echo $_SESSION['particular'];}else{ echo "From Form-10"; } ?></textarea>
                       </div>
                     </div>
                     <div class="row">
@@ -288,11 +292,11 @@ $query = new Query();
                           }
                           ?>
                         </select>
-                        <input type="text" name="country" id="country2" class="hide form-control inpv2">
+                        <input type="text" name="country" id="country2" class="hide form-control inpv2" value="<?php if(!empty($_SESSION['country'])){ echo $_SESSION['country'];} ?>">
                       </div>
                       <div class="col">
                         <label>Size</label>
-                        <input type="text" name="size" class="form-control inpv2 mb-2">
+                        <input type="text" name="size" class="form-control inpv2 mb-2" value="<?php if(!empty($_SESSION['date'])){ echo $_SESSION['size'];} ?>">
                       </div>
                     </div>
                     <div class="row">
@@ -386,7 +390,7 @@ $query = new Query();
                   }
                   ?>
                 </select>
-                <input type="text" name="country" id="country2" class="form-control inpv2">
+                <input type="text" name="country" id="country2" class="form-control inpv2" value="<?php if(!empty($_SESSION['country'])){ echo $_SESSION['country'];} ?>">
               </div>
               <div class="col">
                 <label>Size</label>
