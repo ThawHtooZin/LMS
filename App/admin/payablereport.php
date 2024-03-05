@@ -144,8 +144,8 @@ $query = new Query();
                     <td><?= $id; ?></td>
                     <td><?= $supplierdata['ac_name']; ?></td>
                     <td><?= $balance; ?></td>
-                    <td><?= $addamount; ?></td>
-                    <td><?= $paidamount; ?></td>
+                    <td><?php if($addamount != 0){echo $addamount;}; ?></td>
+                    <td><?php if($paidamount != 0){echo $paidamount;}; ?></td>
                     <td><?= ($balance + $addamount) - $paidamount; ?></td>
                   </tr>
                   <?php
@@ -225,7 +225,7 @@ $query = new Query();
                   </tr>
                   <?php
                   $originalDate = date('Y-m-d');
-                  $stmt = $pdo->prepare("SELECT DISTINCT supplier_id FROM payable WHERE date='$originalDate' OR paid_date='$originalDate'");
+                  $stmt = $pdo->prepare("SELECT DISTINCT supplier_id FROM payable");
                   $stmt->execute();
                   $payablesuppliers = $stmt->fetchall();
                   $id = 0;
