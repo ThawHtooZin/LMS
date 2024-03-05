@@ -3752,7 +3752,8 @@ Class Query{
       $ac_name = $cashbookdata['ac_code'];
       $sr_no = $cashbookdata['sr_no'];
       $voucher_no = $cashbookdata['voucher_no'];
-      $crossacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no=:voucher_no AND ac_code NOT LIKE '3600%'");
+      $crossid = $cashbookdata['id'] + 1;
+      $crossacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no=:voucher_no AND id = '$crossid' AND ac_code NOT LIKE '3600%'");
       $crossacnamestmt->execute(
         array(':voucher_no' => $voucher_no)
       );
@@ -3810,15 +3811,12 @@ Class Query{
           $balance = 0;
         }
         $balance = ($balance + $debit) - $credit;
-        if(str_contains($crossacname, '3300/')){
-          $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no AND crossac_name=:ac_name AND transactionid='$transactionid'");
-        }else{
-          $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no AND crossac_name=:ac_name OR transactionid='$transactionid'");
-        }
-        $checkcbstmt->execute([
-          ':voucher_no' => $voucher_no,
-          ':ac_name' => $crossacname
-        ]);
+        // if(str_contains($crossacname, '3300/')){
+          $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE transactionid='$transactionid'");
+        // }else{
+          // $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no AND crossac_name=:ac_name OR transactionid='$transactionid'");
+        // }
+        $checkcbstmt->execute();
         $checkcb = $checkcbstmt->fetchall();
         if(empty($checkcb)){
           $cashbookstmt = $pdo->prepare("INSERT INTO cashbook(date, ac_name, particular, debit, credit, balance, voucher_no, crossac_name, transactionid) VALUES('$date', '$ac_name', :description, '$debit', '$credit', '$balance', :voucher_no, '$crossacname', '$transactionid')");
