@@ -330,7 +330,7 @@ $query = new Query();
                 <th>Credit</th>
               </tr>
               <?php
-              $stmt = $pdo->prepare("SELECT * FROM transaction WHERE date='2024-02-12'");
+              $stmt = $pdo->prepare("SELECT * FROM transaction WHERE date='2024-02-14'");
               $stmt->execute();
               $datas = $stmt->fetchall();
               $no = 0;
