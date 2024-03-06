@@ -87,7 +87,7 @@ $query = new Query();
                     <th>Balance</th>
                   </tr>
                   <?php
-                  $stmt = $pdo->prepare("SELECT DISTINCT supplier_id FROM payable WHERE date='$searchdate' OR paid_date='$searchdate'");
+                  $stmt = $pdo->prepare("SELECT DISTINCT supplier_id FROM payable WHERE date='$searchdate' OR paid_date='$searchdate' OR date!='0000-00-00' AND paid_date='0000-00-00'");
                   $stmt->execute();
                   $payablesuppliers = $stmt->fetchall();
                   // print_r($payablesuppliers);
@@ -140,7 +140,7 @@ $query = new Query();
                     $supplierdata = $query->select('acname', $supplier_id, 'code_no');
 
                   ?>
-                  <tr>
+                  <tr style="<?php if($balance == 0 && $addamount == 0 && $paidamount == 0){ echo 'display:none;'; } ?>">
                     <td><?= $id; ?></td>
                     <td><?= $supplierdata['ac_name']; ?></td>
                     <td><?= $balance; ?></td>
@@ -225,7 +225,7 @@ $query = new Query();
                   </tr>
                   <?php
                   $originalDate = date('Y-m-d');
-                  $stmt = $pdo->prepare("SELECT DISTINCT supplier_id FROM payable");
+                  $stmt = $pdo->prepare("SELECT DISTINCT supplier_id FROM payable WHERE date='$originalDate' OR paid_date='$originalDate'");
                   $stmt->execute();
                   $payablesuppliers = $stmt->fetchall();
                   $id = 0;
