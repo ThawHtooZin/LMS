@@ -3752,8 +3752,8 @@ Class Query{
       $ac_name = $cashbookdata['ac_code'];
       $sr_no = $cashbookdata['sr_no'];
       $voucher_no = $cashbookdata['voucher_no'];
-      $crossid = $cashbookdata['id'] + 1;
-      $crossacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no=:voucher_no AND id = '$crossid' AND ac_code NOT LIKE '3600%'");
+      // $crossid = $cashbookdata['id'] + 1;
+      $crossacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no=:voucher_no AND ac_code NOT LIKE '3600%'");
       $crossacnamestmt->execute(
         array(':voucher_no' => $voucher_no)
       );
