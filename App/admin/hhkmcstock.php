@@ -27,12 +27,18 @@ $query = new Query();
       $date = $_POST['date'];
       $particular = $_POST['particular'];
       $commondity_id = $_POST['commondity_id'];
+      if(str_contains($particular, 'balance')){
+        $fish_type = $_POST['fish_type2'];
+        $country = $_POST['country2'];
+      }else{
+        $fish_type = $_POST['fish_type1'];
+        $country = $_POST['country1'];
+      }
       $size = $_POST['size'];
       $kg = $_POST['kg'];
       $mc = $_POST['mc'];
-      $country = $_POST['country'];
 
-      $query->addmcstock($date, $particular, $country, $commondity_id, $size, $kg, $mc);
+      $query->addmcstock($date, $particular, $country, $commondity_id, $fish_type, $size, $kg, $mc);
       $_SESSION['date'] = $_POST['date'];
       $_SESSION['particular'] = $_POST['particular'];
       $_SESSION['commondity_id'] = $_POST['commondity_id'];
@@ -81,21 +87,27 @@ $query = new Query();
 <script>
       $(document).ready(()=>{
         $('#commondityid2').hide();
+        $('#commondityid4').hide();
         $('#particular').on('keyup', ()=>{
           var particular = $('#particular').val();
           if(particular.includes('balance') || particular.includes('Balance')){
             $('#commondityid2').show();
             $('#commondityid1').hide();
+            $('#commondityid4').show();
+            $('#commondityid3').hide();
             $('#country2').show();
             $('#country1').hide();
           }else{
             $('#commondityid2').hide();
             $('#commondityid1').show();
+            $('#commondityid4').hide();
+            $('#commondityid3').show();
             $('#country2').hide();
             $('#country1').show();
           }
         });
         $('#commondityid2').hide();
+        $('#commondityid4').hide();
         $('#country2').hide();
       });
      </script>
@@ -160,7 +172,7 @@ $query = new Query();
                   $_SESSION['tabs'] = $countrydata['country'];
                 }
                 ?>
-                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark rounded <?php echo $countrydata['country']; ?>link" style="text-decoration:none; border:none;" name="<?php echo $btnname; ?>"><?php echo $countrydata['country'] ." Stock"; ?></button>
+                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark rounded <?php echo str_replace('/', '_', $countrydata['country']); ?>link" style="text-decoration:none; border:none;" name="<?php echo $btnname; ?>"><?php echo $countrydata['country'] ." Stock"; ?></button>
                 <?php
               }
               ?>
@@ -169,7 +181,7 @@ $query = new Query();
             <?php
             foreach ($countrydatas as $countrydata) {
              ?>
-            <table class="table table-hover table-bordered table-striped hide" id="<?php echo $countrydata['country']; ?>table">
+            <table class="table table-hover table-bordered table-striped hide" id="<?php echo str_replace('/', '_', $countrydata['country']); ?>table">
               <tr>
                 <th>Commondity</th>
                 <th>Country</th>
@@ -186,7 +198,8 @@ $query = new Query();
                 $searchcommonditystmt->execute();
                 $datas = $searchcommonditystmt->fetchall();
               }else{
-                $stmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country='$country' GROUP BY commondity_id,size");
+                $stmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country=:country GROUP BY commondity_id,size");
+                $stmt->bindParam(':country', $country);
                 $stmt->execute();
                 $datas = $stmt->fetchall();
               }
@@ -208,7 +221,7 @@ $query = new Query();
                   $totalmc = $totalmcnotsub['total_mc'] - $totalmcsubnum['total_mc'];
                   ?>
                   <tr style="<?php if($totalmc > 200){echo 'background-color:rgba(0, 255, 0, 0.4) !important;';} ?>">
-                    <td><?php echo $commonditydata['item_name']; ?></td>
+                    <td><?php echo $commonditydata['item_name'].' ('.$hhkstockdata['fish_type'].')'; ?></td>
                     <td><?php echo $countrydata['country']; ?></td>
                     <td><?php echo $hhkstockdata['size']; ?></td>
                     <td><?php echo $totalmc; ?></td>
@@ -245,33 +258,55 @@ $query = new Query();
                         <label>Date</label>
                         <input type="date" name="date" class="form-control inpv2 mb-2" value="<?php if(!empty($_SESSION['date'])){ echo $_SESSION['date'];} ?>">
                         <label>Commondity</label>
-                        <select class="form-control inpv2 mb-2" name="commondity_id" id="commondityid1">
-                          <?php
-                          if(!empty($form7commonditydatas)){
-                            foreach ($form7commonditydatas as $form7commonditydata) {
-                              $item_id = $form7commonditydata['item_id'];
-                              $commonditydata = $query->select('item', $item_id, 'item_id');
-                              ?>
-                              <option value="<?php echo $commonditydata['item_id']; ?>" <?php if($_SESSION['commondity_id'] == $commonditydata['item_id']){ echo "selected"; } ?>><?php echo $commonditydata['item_name']; ?></option>
-                              <?php
+                        <div class="row">
+                          <div class="col">
+                            <select class="form-control inpv2 mb-2" name="commondity_id" id="commondityid1">
+                            <?php
+                            if(!empty($form7commonditydatas)){
+                              foreach ($form7commonditydatas as $form7commonditydata) {
+                                $item_id = $form7commonditydata['item_id'];
+                                $commonditydata = $query->select('item', $item_id, 'item_id');
+                                ?>
+                                <option value="<?php echo $commonditydata['item_id']; ?>" <?php if(!empty($_SESSION['commondity_id'])){if($_SESSION['commondity_id'] == $commonditydata['item_id']){ echo "selected"; }} ?>><?php echo $commonditydata['item_name']; ?></option>
+                                <?php
+                              }
                             }
-                          }
-                          ?>
-                        </select>
-                        <select class="form-control inpv2 mb-2" name="commondity_id" id="commondityid2">
-                          <?php
-                            $commonditydatastmt = $pdo->prepare("SELECT * FROM item");
-                            $commonditydatastmt->execute();
-                            $commonditydatas = $commonditydatastmt->fetchAll();
-                            foreach ($commonditydatas as $commonditydata) {
-                              $item_id = $commonditydata['item_id'];
-                              $commonditydata = $query->select('item', $item_id, 'item_id');
-                              ?>
-                              <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
-                              <?php
-                            }
-                          ?>
-                        </select>
+                            ?>
+                            </select>
+                          </div>
+                          <div class="col">
+                            <select name="fish_type1" id="commondityid3" class="form-control inpv2">
+                              <option value="">Select Fish Type</option>
+                              <option value="G">G</option>
+                              <option value="Cut_piece">Cut Piece</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <select class="form-control inpv2 mb-2" name="commondity_id" id="commondityid2">
+                            <?php
+                              $commonditydatastmt = $pdo->prepare("SELECT * FROM item");
+                              $commonditydatastmt->execute();
+                              $commonditydatas = $commonditydatastmt->fetchAll();
+                              foreach ($commonditydatas as $commonditydata) {
+                                $item_id = $commonditydata['item_id'];
+                                $commonditydata = $query->select('item', $item_id, 'item_id');
+                                ?>
+                                <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                                <?php
+                              }
+                            ?>
+                          </select>
+                          </div>
+                          <div class="col">
+                            <select name="fish_type2" id="commondityid4" class="form-control inpv2">
+                              <option value="">Select Fish Type</option>
+                              <option value="G">G</option>
+                              <option value="Cut_piece">Cut Piece</option>
+                            </select>
+                          </div>
+                        </div>
                       </div>
                       <div class="col">
                         <label>Particular</label>
@@ -281,7 +316,7 @@ $query = new Query();
                     <div class="row">
                       <div class="col">
                         <label>Country</label>
-                        <select class="form-control inpv2 mb-2" name="country" id="country1">
+                        <select class="form-control inpv2 mb-2" name="country1" id="country1">
                           <?php
                           if(!empty($countrydatas)){
                             foreach ($countrydatas as $countrydata) {
@@ -292,7 +327,7 @@ $query = new Query();
                           }
                           ?>
                         </select>
-                        <input type="text" name="country" id="country2" class="hide form-control inpv2" value="<?php if(!empty($_SESSION['country'])){ echo $_SESSION['country'];} ?>">
+                        <input type="text" name="country2" id="country2" class="hide form-control inpv2" value="<?php if(!empty($_SESSION['country'])){ echo $_SESSION['country'];} ?>">
                       </div>
                       <div class="col">
                         <label>Size</label>
@@ -493,17 +528,18 @@ $query = new Query();
     <script type="text/javascript">
       <?php
       foreach ($countrydatas as $countrydata) {
-        if($_SESSION['tabs'] == $countrydata['country']){
-          echo "show" . $countrydata['country'] . "();";
-          if($_SESSION['tabs'] == $countrydata['country']){
-          echo ' function show' . $countrydata['country'] .'(){';
-            foreach ($countrydatas as $countrydata) {
-              echo 'document.querySelector("#'.$countrydata['country'].'table").classList.add(\'hide\');';
-              echo 'document.querySelector(".'.$countrydata['country'].'link").classList.remove(\'color\');';
-            }
-            echo 'document.querySelector("#'.$_SESSION['tabs'].'table").classList.remove(\'hide\');';
-            echo 'document.querySelector(".'.$_SESSION['tabs'].'link").classList.add(\'color\');';
-            echo '}';
+        if ($_SESSION['tabs'] == $countrydata['country']) {
+          $escapedTabs = str_replace('/', '_', $_SESSION['tabs']);
+          echo "show" . $escapedTabs . "();";
+          if ($_SESSION['tabs'] == $countrydata['country']) {
+              echo ' function show' . $escapedTabs . '(){';
+              foreach ($countrydatas as $countrydata) {
+                  echo 'document.querySelector("#' . $escapedTabs . 'table").classList.add(\'hide\');';
+                  echo 'document.querySelector(".' . $escapedTabs . 'link").classList.remove(\'color\');';
+              }
+              echo 'document.querySelector("#' . $escapedTabs . 'table").classList.remove(\'hide\');';
+              echo 'document.querySelector(".' . $escapedTabs . 'link").classList.add(\'color\');';
+              echo '}';
           }
         }
       }

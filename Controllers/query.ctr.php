@@ -2865,7 +2865,7 @@ Class Query{
     $updatepackingmaterialstmt = $pdo->prepare("UPDATE packingmaterial SET commondity_id='$upitem_id', fish_size='$upsize' WHERE link_id='$upid'");
     $updatepackingmaterialstmt->execute();
   }
-  function addmcstock($date, $particular, $country, $commondity_id, $size, $kg, $mc){
+  function addmcstock($date, $particular, $country, $commondity_id, $fish_type,  $size, $kg, $mc){
     global $pdo;
 
     $mcstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE kg='$kg' AND size='$size' AND commondity_id='$commondity_id' AND country='$country' ORDER BY id DESC");
@@ -2877,8 +2877,9 @@ Class Query{
     }else{
       $balance_mc = $mc;
     }
-    $addmcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc) VALUES('$date', '$country', '$particular', '$commondity_id', '$size', '$kg', '$mc', '$balance_mc')");
+    $addmcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc, fish_type) VALUES('$date', '$country', '$particular', '$commondity_id', '$size', '$kg', '$mc', '$balance_mc', '$fish_type')");
     $addmcstmt->execute();
+    
 
     if(!empty($addmcstmt)){
       echo '<script>swal("Success!", "Mc Added Successfully!", "success");</script>';
