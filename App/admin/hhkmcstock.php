@@ -27,7 +27,7 @@ $query = new Query();
       $date = $_POST['date'];
       $particular = $_POST['particular'];
       $commondity_id = $_POST['commondity_id'];
-      if(str_contains($particular, 'balance')){
+      if(str_contains($particular, 'balance') || str_contains($particular, 'Balance')){
         $fish_type = $_POST['fish_type2'];
         $country = $_POST['country2'];
       }else{
@@ -37,7 +37,6 @@ $query = new Query();
       $size = $_POST['size'];
       $kg = $_POST['kg'];
       $mc = $_POST['mc'];
-
       $query->addmcstock($date, $particular, $country, $commondity_id, $fish_type, $size, $kg, $mc);
       $_SESSION['date'] = $_POST['date'];
       $_SESSION['particular'] = $_POST['particular'];
@@ -221,7 +220,7 @@ $query = new Query();
                   $totalmc = $totalmcnotsub['total_mc'] - $totalmcsubnum['total_mc'];
                   ?>
                   <tr style="<?php if($totalmc > 200){echo 'background-color:rgba(0, 255, 0, 0.4) !important;';} ?>">
-                    <td><?php echo $commonditydata['item_name'].' ('.$hhkstockdata['fish_type'].')'; ?></td>
+                    <td><?php if(!empty($hhkstockdata['fish_type'])){ echo $commonditydata['item_name'].' ('.$hhkstockdata['fish_type'].')'; }else{ echo $commonditydata['item_name']; } ?></td>
                     <td><?php echo $countrydata['country']; ?></td>
                     <td><?php echo $hhkstockdata['size']; ?></td>
                     <td><?php echo $totalmc; ?></td>
@@ -276,7 +275,6 @@ $query = new Query();
                           </div>
                           <div class="col">
                             <select name="fish_type1" id="commondityid3" class="form-control inpv2">
-                              <option value="">Select Fish Type</option>
                               <option value="G">G</option>
                               <option value="Cut_piece">Cut Piece</option>
                             </select>
@@ -301,7 +299,6 @@ $query = new Query();
                           </div>
                           <div class="col">
                             <select name="fish_type2" id="commondityid4" class="form-control inpv2">
-                              <option value="">Select Fish Type</option>
                               <option value="G">G</option>
                               <option value="Cut_piece">Cut Piece</option>
                             </select>
@@ -425,7 +422,7 @@ $query = new Query();
                   }
                   ?>
                 </select>
-                <input type="text" name="country" id="country2" class="form-control inpv2" value="<?php if(!empty($_SESSION['country'])){ echo $_SESSION['country'];} ?>">
+                <input type="text" name="country2" id="country2" class="form-control inpv2" value="<?php if(!empty($_SESSION['country'])){ echo $_SESSION['country'];} ?>">
               </div>
               <div class="col">
                 <label>Size</label>
