@@ -3840,8 +3840,10 @@ Class Query{
     global $pdo;
     // General Ledger
     $accepterror = "";
-    $transactionstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$searchvoucher_no' AND id='$transactionid'");
-    $transactionstmt->execute();
+    $transactionstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND id='$transactionid'");
+    $transactionstmt->execute([
+      ':voucher_no' => $searchvoucher_no
+    ]);
     $transactiondatas = $transactionstmt->fetchall();
     foreach ($transactiondatas as $transactiondata) {
       $ac_code = $transactiondata['ac_code'];
@@ -3859,8 +3861,10 @@ Class Query{
           $bankchargesdata = $bankchargesstmt->fetch(PDO::FETCH_ASSOC);
 
           // Dollor Change
-          $acselectstmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND transaction='$transactionid'");
-          $acselectstmt->execute();
+          $acselectstmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND transaction='$transactionid'");
+          $acselectstmt->execute([
+            ':voucher_no' => $voucher_no
+          ]);
           $rateselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
           $debit = $transactiondata['debit'] - ($transactiondata['bank_charges'] * $rateselect['dollar_rate']);
           $credit = 0;
@@ -3890,14 +3894,18 @@ Class Query{
           $balance = 0 - $credit;
         }
       }
-      $generalledgerstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, balance, narration,sr_no, container_no, bank_charges, acid) VALUES('$date','$voucher_no','$ac_code', '$debit', '$credit', '$balance', '$description', '$sr_no', '$container_no', '$bank_charges', '$acid')");
-      $generalledgerstmt->execute();
+      $generalledgerstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, balance, narration,sr_no, container_no, bank_charges, acid) VALUES('$date',:voucher_no,'$ac_code', '$debit', '$credit', '$balance', '$description', '$sr_no', '$container_no', '$bank_charges', '$acid')");
+      $generalledgerstmt->execute([
+        ':voucher_no' => $voucher_no
+      ]);
       echo "<script>swal('Success', 'Accepted Successfully', 'success');</script>";
     }
 
     // Receivable
-    $stmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$searchvoucher_no' AND ac_code LIKE '3300%'");
-    $stmt->execute();
+    $stmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND ac_code LIKE '3300%'");
+    $stmt->execute([
+      ':voucher_no' => $searchvoucher_no
+    ]);
     $receivabledatas = $stmt->fetchall();
     foreach ($receivabledatas as $receivabledata) {
       $ac_code = $receivabledata['ac_code'];
@@ -3905,8 +3913,10 @@ Class Query{
       $description = $receivabledata['description'];
       if($receivabledata['debit'] != 0){
         $debitorcredit = 'debit';
-        $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='$debitorcredit'");
-        $currencystmt->execute();
+        $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit'");
+        $currencystmt->execute([
+          ':voucher_no' => $searchvoucher_no
+        ]);
         $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
         $receivestmt = $pdo->prepare("SELECT * FROM receivable ORDER BY id DESC");
         $receivestmt->execute();
@@ -3915,12 +3925,16 @@ Class Query{
         $sr_no = $receivabledata['sr_no'];
         $container_no = $receivabledata['container_no'];
         $balance = $currencydata['usd_amount'];
-        $receivestmt = $pdo->prepare("INSERT INTO receivable(date, ac_code, sr_no, container_no, invoice_amount, balance) VALUES('$date', '$ac_code', '$sr_no', '$container_no', '$invoice_amount', '$balance')");
-        $receivestmt->execute();
+        $receivestmt = $pdo->prepare("INSERT INTO receivable(date, ac_code, sr_no, container_no, invoice_amount, balance) VALUES('$date', '$ac_code', '$sr_no', :voucher_no, '$invoice_amount', '$balance')");
+        $receivestmt->execute([
+          ':voucher_no' => $voucher_no
+        ]);
       }elseif($receivabledata['credit'] != 0){
         $debitorcredit = 'credit';
-        $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='$debitorcredit'");
-        $currencystmt->execute();
+        $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no= AND debitorcredit='$debitorcredit'");
+        $currencystmt->execute([
+          ':voucher_no' => $voucher_no
+        ]);
         $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
         $receivestmt = $pdo->prepare("SELECT * FROM receivable WHERE ac_code='$ac_code' ORDER BY id DESC");
         $receivestmt->execute();
@@ -3936,14 +3950,18 @@ Class Query{
         }else{
           $invoice_amount = 0;
         }
-        $receivestmt = $pdo->prepare("INSERT INTO receivable(ac_code, paid_date, payment_no, particulars, paid_amount, balance) VALUES('$ac_code', '$date', '$voucher_no', '$description', '$paid_amount', '$balance')");
-        $receivestmt->execute();
+        $receivestmt = $pdo->prepare("INSERT INTO receivable(ac_code, paid_date, payment_no, particulars, paid_amount, balance) VALUES('$ac_code', '$date', :voucher_no, '$description', '$paid_amount', '$balance')");
+        $receivestmt->execute([
+          ':voucher_no' => $voucher_no
+        ]);
       }
     }
 
     // Payable
-    $stmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$searchvoucher_no' AND ac_code LIKE '4000%'");
-    $stmt->execute();
+    $stmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND ac_code LIKE '4000%'");
+    $stmt->execute([
+      ':voucher_no' => $searchvoucher_no
+    ]);
     $payabledatas = $stmt->fetchall();
     foreach ($payabledatas as $payabledata) {
       $supplier_id = $payabledata['ac_code'];
@@ -3957,10 +3975,10 @@ Class Query{
         $payablesearchdata = $payabledatastmt->fetch(PDO::FETCH_ASSOC);
         if(!empty($payablesearchdata)){
             $balance = $payablesearchdata['balance'] - $paid_amount;
-            $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '$date', '$voucher_no', '$description', '$paid_amount', '$balance')");
+            $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '$date', :voucher_no, '$description', '$paid_amount', '$balance')");
         }else{
           $balance = 0;
-          $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '$date', '$voucher_no', '$description', '$paid_amount', '$balance')");
+          $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, paid_date, paid_voucher, remark, paid_amount, balance) VALUES('$supplier_id', '$date', :voucher_no, '$description', '$paid_amount', '$balance')");
         }
       }else{
         $addamt = $payabledata['credit'];
@@ -3971,26 +3989,39 @@ Class Query{
         $payablesearchdata = $payabledatastmt->fetch(PDO::FETCH_ASSOC);
         if(!empty($payablesearchdata)){
           $balance = $payabledata['credit'];
-          $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, purchase_amount, balance) VALUES('$supplier_id', '$voucher_no', '$addamt', '$balance')");
+          $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, purchase_amount, balance) VALUES('$supplier_id', :voucher_no, '$addamt', '$balance')");
         }else{
           $balance = 0;
-          $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, purchase_amount, balance) VALUES('$supplier_id', '$voucher_no', '$addamt', '$balance')");
+          $payablestmt = $pdo->prepare("INSERT INTO payable(supplier_id, purchase_voucher_no, purchase_amount, balance) VALUES('$supplier_id', :voucher_no, '$addamt', '$balance')");
         }
       }
-      $payablestmt->execute();
+      $payablestmt->execute([
+        ':voucher_no' => $voucher_no
+      ]);
     }
 
     // Cash Book
-    $stmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$searchvoucher_no' AND ac_code LIKE '3600%'");
-    $stmt->execute();
+    $stmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND ac_code LIKE '3600%'");
+    $stmt->execute([
+      ':voucher_no' => $searchvoucher_no
+    ]);
     $cashbookdatas = $stmt->fetchall();
     foreach ($cashbookdatas as $cashbookdata) {
       $ac_name = $cashbookdata['ac_code'];
       $sr_no = $cashbookdata['sr_no'];
       $voucher_no = $cashbookdata['voucher_no'];
-      $id = $cashbookdata['id'];
-      $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no'");
-      $currencystmt->execute();
+      $transaction_id = $cashbookdata['id'];
+      $crossstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND id != $transaction_id AND ac_code NOT LIKE '3600%'");
+      $crossstmt->execute([
+        ':voucher_no'=>$voucher_no
+      ]);
+      $crossac_data = $crossstmt->fetch(PDO::FETCH_ASSOC);
+      print_r($crossac_data);
+      $crossac_name = $crossac_data['crossac_name'];
+      $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no");
+      $currencystmt->execute([
+        ':voucher_no' => $voucher_no
+      ]);
       $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
       if(!empty($cashbookdata['bank_charges'])){
         $predebit = $currencydata['dollar_rate'] * $cashbookdata['bank_charges'];
@@ -4036,9 +4067,10 @@ Class Query{
         $balance = 0;
       }
       $balance = ($balance + $debit) - $credit;
-      $cashbookstmt = $pdo->prepare("INSERT INTO cashbook(date, ac_name, particular, debit, credit, balance, voucher_no) VALUES('$date', '$ac_name', :description, '$debit', '$credit', '$balance', '$voucher_no')");
+      $cashbookstmt = $pdo->prepare("INSERT INTO cashbook(date, ac_name, particular, debit, credit, balance, voucher_no, crossac_name) VALUES('$date', '$ac_name', :description, '$debit', '$credit', '$balance', :voucher_no, '$crossac_name')");
       $cashbookstmt->execute([
-        ':description' => $description
+        ':description' => $description,
+        ':voucher_no' => $voucher_no
       ]);
     }
   }
@@ -4046,33 +4078,41 @@ Class Query{
   // DELOLD TRANSACTION
   function deloldtransaction($voucher_no, $transactionid){
     global $pdo;
+    // echo $voucher_no;
+    echo $transactionid;
+
+    $samedata_stmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$voucher_no' AND id!='$transactionid'");
+    $samedata_stmt->execute();
+    $samedata_datas = $samedata_stmt->fetch(PDO::FETCH_ASSOC);
+    print_r($samedata_datas);
+    $sametransaction_id = $samedata_datas['id'];
 
     // DELETE GENERAL LEDGER
-    $general_ledgerstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE voucherno='$voucher_no'");
+    $general_ledgerstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE voucherno='$voucher_no' AND transactionid='$transactionid' OR transactionid='$sametransaction_id'");
     $general_ledgerstmt->execute();
     $general_ledgerdatas = $general_ledgerstmt->fetchall();
-
+    print_r($general_ledgerdatas);
     foreach ($general_ledgerdatas as $general_ledgerdata) {
       if($general_ledgerdata['debit'] != 0){
-        $generalledgerstmt = $pdo->prepare("DELETE FROM general_ledger WHERE voucherno='$voucher_no' AND debit!=0");
-        $generalledgerstmt->execute();
+        $generalledgerstmt = $pdo->prepare("DELETE FROM general_ledger WHERE voucherno='$voucher_no' AND transactionid='$transactionid' AND debit!=0");
+        // $generalledgerstmt->execute();
       }elseif($general_ledgerdata['credit'] != 0){
-        $generalledgerstmt = $pdo->prepare("DELETE FROM general_ledger WHERE voucherno='$voucher_no' AND credit!=0");
-        $generalledgerstmt->execute();
+        $generalledgerstmt = $pdo->prepare("DELETE FROM general_ledger WHERE voucherno='$voucher_no' AND transactionid='$transactionid' AND credit!=0");
+        // $generalledgerstmt->execute();
       }
     }
 
     // DELETE RECEIVABLE
-    $receivablestmt = $pdo->prepare("DELETE FROM receivable WHERE payment_no='$voucher_no'");
-    $receivablestmt->execute();
+    $receivablestmt = $pdo->prepare("DELETE FROM receivable WHERE payment_no='$voucher_no' AND transactionid='$transactionid'");
+    // $receivablestmt->execute();
 
     // DELETE PAYABLE
     $payablestmt = $pdo->prepare("DELETE FROM payable WHERE paid_voucher='$voucher_no'");
-    $payablestmt->execute();
+    // $payablestmt->execute();
 
     // DELETE CASHBOOK
-    $cashbookstmt = $pdo->prepare("DELETE FROM cashbook WHERE voucher_no='$voucher_no'");
-    $cashbookstmt->execute();
+    $cashbookstmt = $pdo->prepare("DELETE FROM cashbook WHERE voucher_no='$voucher_no' AND transactionid='$transactionid'");
+    // $cashbookstmt->execute();
   }
 
   function addpaymentofreceivable($id, $paid_date, $payment_no, $particular, $paid_amount)
