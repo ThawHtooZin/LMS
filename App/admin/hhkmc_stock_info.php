@@ -135,7 +135,7 @@ $query = new Query();
               <tr style="<?php if(str_contains($sizeinfodata['particular'], 'To') || str_contains($sizeinfodata['particular'], 'to')){echo 'background-color:rgba(255, 0, 0, 0.15) !important;';} ?>"  data-bs-toggle="modal" data-bs-target="#update<?= $sizeinfodata['id']; ?>">
                 <td><?php echo date('d-m-Y', strtotime($sizeinfodata['date'])); ?></td>
                 <td><?php echo $sizeinfodata['particular'];?></td>
-                <td><?php echo $commonditydata['item_name']; ?></td>
+                <td><?php if(!empty($sizeinfodata['fish_type'])){ echo $commonditydata['item_name'].' ('.$sizeinfodata['fish_type'].')'; }else{ echo $commonditydata['item_name']; } ?></td>
                 <td><?php echo $sizeinfodata['country'];?></td>
                 <td><?php echo $sizeinfodata['size'];?></td>
                 <td><?php echo $sizeinfodata['mc']; ?></td>
