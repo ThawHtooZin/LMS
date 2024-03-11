@@ -3465,11 +3465,11 @@ Class Query{
 
     if($selectdata['debit'] != 0){
       $debitorcredit = 'debit';
-      $debitcurrency = $pdo->prepare("DELETE FROM currency WHERE debitorcredit='$debitorcredit' AND voucher_no='$voucher_no'");
+      $debitcurrency = $pdo->prepare("DELETE FROM currency WHERE debitorcredit='$debitorcredit' AND voucher_no='$voucher_no', transactionid='$id'");
       $debitcurrency->execute();
     }elseif($selectdata['credit'] != 0){
       $debitorcredit = 'credit';
-      $creditcurrency = $pdo->prepare("DELETE FROM currency WHERE debitorcredit='$debitorcredit' AND voucher_no='$voucher_no'");
+      $creditcurrency = $pdo->prepare("DELETE FROM currency WHERE debitorcredit='$debitorcredit' AND voucher_no='$voucher_no', transactionid='$id'");
       $creditcurrency->execute();
     }
 
@@ -3836,11 +3836,11 @@ Class Query{
   }
 
   // DELETE ACCEPT
-  function delaccepttransaction($date, $searchvoucher_no){
+  function delaccepttransaction($date, $searchvoucher_no, $transactionid){
     global $pdo;
     // General Ledger
     $accepterror = "";
-    $transactionstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$searchvoucher_no'");
+    $transactionstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$searchvoucher_no' AND id='$transactionid'");
     $transactionstmt->execute();
     $transactiondatas = $transactionstmt->fetchall();
     foreach ($transactiondatas as $transactiondata) {
@@ -3859,7 +3859,7 @@ Class Query{
           $bankchargesdata = $bankchargesstmt->fetch(PDO::FETCH_ASSOC);
 
           // Dollor Change
-          $acselectstmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no'");
+          $acselectstmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND transaction='$transactionid'");
           $acselectstmt->execute();
           $rateselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
           $debit = $transactiondata['debit'] - ($transactiondata['bank_charges'] * $rateselect['dollar_rate']);
@@ -4044,7 +4044,7 @@ Class Query{
   }
 
   // DELOLD TRANSACTION
-  function deloldtransaction($voucher_no){
+  function deloldtransaction($voucher_no, $transactionid){
     global $pdo;
 
     // DELETE GENERAL LEDGER

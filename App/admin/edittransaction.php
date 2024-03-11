@@ -202,13 +202,14 @@ $query = new Query();
       $query->deletetransaction($id, $voucher_no);
     }
     if(isset($_POST['accept'])){
-      $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total FROM transaction WHERE voucher_no='$searchvoucher_no'");
+      $id = $_GET['id'];
+      $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total FROM transaction WHERE voucher_no='$searchvoucher_no' AND id='$id'");
       $totaldebitstmt->execute();
       $totaldebitdata = $totaldebitstmt->fetch(PDO::FETCH_ASSOC);
-      $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total FROM transaction WHERE voucher_no='$searchvoucher_no'");
+      $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total FROM transaction WHERE voucher_no='$searchvoucher_no' AND id='$id'");
       $totalcreditstmt->execute();
       $totalcreditdata = $totalcreditstmt->fetch(PDO::FETCH_ASSOC);
-      $datestmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$searchvoucher_no'");
+      $datestmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$searchvoucher_no' AND id='$id'");
       $datestmt->execute();
       $datedata = $datestmt->fetch(PDO::FETCH_ASSOC);
 
@@ -217,9 +218,10 @@ $query = new Query();
       }else{
         $date = $datedata['date'];
         $voucher_no = $_GET['voucher_no'];
-        $query->deloldtransaction($voucher_no);
-        $query->delaccepttransaction($date, $voucher_no);
-        // echo "<script>swal('Success', 'Accepted Successfully.', 'success');</script>";
+        $transactionid = $_GET['id'];
+        $query->deloldtransaction($voucher_no, $transactionid);
+        $query->delaccepttransaction($date, $voucher_no, $transactionid);
+        echo "<script>swal('Success', 'Accepted Successfully.', 'success');</script>";
       }
     }
      ?>
