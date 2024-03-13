@@ -2879,7 +2879,7 @@ Class Query{
     }
     $addmcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc, fish_type) VALUES('$date', '$country', '$particular', '$commondity_id', '$size', '$kg', '$mc', '$balance_mc', '$fish_type')");
     $addmcstmt->execute();
-    
+
 
     if(!empty($addmcstmt)){
       echo '<script>swal("Success!", "Mc Added Successfully!", "success");</script>';
@@ -3758,7 +3758,15 @@ Class Query{
       // $crossacnamestmt->execute(
       //   array(':voucher_no' => $voucher_no)
       // );
-      $crossacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no=:voucher_no AND ac_code NOT LIKE '3600%'");
+      $oldcrossstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no ORDER BY id DESC");
+      $oldcrossstmt->execute(
+        array(':voucher_no' => $voucher_no)
+      );
+      $oldcrossdata = $oldcrossstmt->fetch(PDO::FETCH_ASSOC);
+      if (!empty($oldcrossdata)) {
+        $oldcrossname = $oldcrossdata['crossac_name'];
+      }
+      $crossacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no=:voucher_no AND ac_code != '$oldcrossname' AND ac_code NOT LIKE '3600%'");
       $crossacnamestmt->execute(
         array(':voucher_no' => $voucher_no)
       );
