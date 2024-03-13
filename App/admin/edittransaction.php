@@ -202,14 +202,23 @@ $query = new Query();
       $query->deletetransaction($id, $voucher_no);
     }
     if(isset($_POST['accept'])){
-      $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total FROM transaction WHERE voucher_no='$searchvoucher_no'");
-      $totaldebitstmt->execute();
+      $id = $_GET['id'];
+      $transactionid = $_GET['transactionid'];
+      $ac_code = $_GET['ac_code'];
+      $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total FROM transaction WHERE voucher_no=:voucher_no");
+      $totaldebitstmt->execute([
+        ':voucher_no' => $searchvoucher_no
+      ]);
       $totaldebitdata = $totaldebitstmt->fetch(PDO::FETCH_ASSOC);
-      $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total FROM transaction WHERE voucher_no='$searchvoucher_no'");
-      $totalcreditstmt->execute();
+      $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total FROM transaction WHERE voucher_no=:voucher_no");
+      $totalcreditstmt->execute([
+        ':voucher_no' => $searchvoucher_no
+      ]);
       $totalcreditdata = $totalcreditstmt->fetch(PDO::FETCH_ASSOC);
-      $datestmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$searchvoucher_no'");
-      $datestmt->execute();
+      $datestmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND id='$transactionid'");
+      $datestmt->execute([
+        ':voucher_no' => $searchvoucher_no
+      ]);
       $datedata = $datestmt->fetch(PDO::FETCH_ASSOC);
 
       if($totaldebitdata['total'] != $totalcreditdata['total']){
@@ -217,9 +226,10 @@ $query = new Query();
       }else{
         $date = $datedata['date'];
         $voucher_no = $_GET['voucher_no'];
-        $query->deloldtransaction($voucher_no);
-        $query->delaccepttransaction($date, $voucher_no);
-        // echo "<script>swal('Success', 'Accepted Successfully.', 'success');</script>";
+        $transactionid = $_GET['id'];
+        $query->deloldtransaction($voucher_no, $transactionid);
+        $query->delaccepttransaction($date, $voucher_no, $transactionid);
+        echo "<script>swal('Success', 'Accepted Successfully.', 'success');</script>";
       }
     }
      ?>
