@@ -330,7 +330,7 @@ $query = new Query();
                 <th>Credit</th>
               </tr>
               <?php
-              $stmt = $pdo->prepare("SELECT * FROM transaction");
+              $stmt = $pdo->prepare("SELECT * FROM transaction WHERE date='2024-02-16'");
               $stmt->execute();
               $datas = $stmt->fetchall();
               $no = 0;
@@ -518,17 +518,17 @@ $query = new Query();
                   </script>
                 <?php
               }
-              $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total FROM transaction");
+              $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total FROM transaction WHERE date='2024-02-16'");
               $totaldebitstmt->execute();
               $totaldebitdata = $totaldebitstmt->fetch(PDO::FETCH_ASSOC);
-              $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total FROM transaction");
+              $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total FROM transaction WHERE date='2024-02-16'");
               $totalcreditstmt->execute();
               $totalcreditdata = $totalcreditstmt->fetch(PDO::FETCH_ASSOC);
                ?>
                <tr style="font-weight:bold;">
                  <td colspan="4">Balance</td>
-                 <td style="<?php if($totaldebitdata['total'] != $totalcreditdata['total']){ echo "color:red;"; } ?>"><?php echo $totaldebitdata['total']; ?></td>
-                 <td style="<?php if($totaldebitdata['total'] != $totalcreditdata['total']){ echo "color:red;"; } ?>"><?php echo $totalcreditdata['total']; ?></td>
+                 <td style="<?php if($totaldebitdata['total'] != $totalcreditdata['total']){ echo "color:red;"; } ?>"><?php echo round($totaldebitdata['total'], 2); ?></td>
+                 <td style="<?php if($totaldebitdata['total'] != $totalcreditdata['total']){ echo "color:red;"; } ?>"><?php echo round($totalcreditdata['total'], 2); ?></td>
                </tr>
             </table>
           </div>
