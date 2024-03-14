@@ -330,7 +330,7 @@ $query = new Query();
                 <th>Credit</th>
               </tr>
               <?php
-              $stmt = $pdo->prepare("SELECT * FROM transaction WHERE date='2024-02-16'");
+              $stmt = $pdo->prepare("SELECT * FROM transaction");
               $stmt->execute();
               $datas = $stmt->fetchall();
               $no = 0;
@@ -518,10 +518,10 @@ $query = new Query();
                   </script>
                 <?php
               }
-              $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total FROM transaction WHERE date='2024-02-16'");
+              $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total FROM transaction");
               $totaldebitstmt->execute();
               $totaldebitdata = $totaldebitstmt->fetch(PDO::FETCH_ASSOC);
-              $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total FROM transaction WHERE date='2024-02-16'");
+              $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total FROM transaction");
               $totalcreditstmt->execute();
               $totalcreditdata = $totalcreditstmt->fetch(PDO::FETCH_ASSOC);
                ?>

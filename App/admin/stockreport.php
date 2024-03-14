@@ -35,25 +35,25 @@ $query = new Query();
       $query->addmcstock($date, $particular, $country, $commondity_id, $size, $kg, $mc);
     }
 
-    if(isset($_POST['transferbtn'])){
-      $transferdate = $_POST['transferdate'];
-      $transferparticular = $_POST['transferparticular'];
-      $transfercommondity_id = $_POST['transfercommondity_id'];
-      $transfersize = $_POST['transfersize'];
-      $transferkg = $_POST['transferkg'];
-      $transfermc = $_POST['transfermc'];
-      $transfercountry = $_POST['transfercountry'];
-
-      $transfercheckstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE size='$transfersize' AND country='$transfercountry' AND commondity_id='$transfercommondity_id' ORDER BY id DESC");
-      $transfercheckstmt->execute();
-      $transfercheck = $transfercheckstmt->fetch(PDO::FETCH_ASSOC);
-
-      if($transfercheck['balance_mc'] >= $transfermc){
-        echo $query->transfermcstock($transferdate, $transferparticular, $transfercountry, $transfercommondity_id, $transfersize, $transferkg, $transfermc);
-      }else{
-        echo '<script>swal("Sorry!", "Not Enough Mc!", "warning");</script>';
-      }
-    }
+    // if(isset($_POST['transferbtn'])){
+    //   $transferdate = $_POST['transferdate'];
+    //   $transferparticular = $_POST['transferparticular'];
+    //   $transfercommondity_id = $_POST['transfercommondity_id'];
+    //   $transfersize = $_POST['transfersize'];
+    //   $transferkg = $_POST['transferkg'];
+    //   $transfermc = $_POST['transfermc'];
+    //   $transfercountry = $_POST['transfercountry'];
+    //
+    //   $transfercheckstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE size='$transfersize' AND country='$transfercountry' AND commondity_id='$transfercommondity_id' ORDER BY id DESC");
+    //   $transfercheckstmt->execute();
+    //   $transfercheck = $transfercheckstmt->fetch(PDO::FETCH_ASSOC);
+    //
+    //   if($transfercheck['balance_mc'] >= $transfermc){
+    //     echo $query->transfermcstock($transferdate, $transferparticular, $transfercountry, $transfercommondity_id, $transfersize, $transferkg, $transfermc);
+    //   }else{
+    //     echo '<script>swal("Sorry!", "Not Enough Mc!", "warning");</script>';
+    //   }
+    // }
      ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
@@ -73,11 +73,11 @@ $query = new Query();
             <select class="form-control w-25 d-inline float-end" style="height:26px; padding-left:10px; padding-top:2px;" name="commondity_id">
               <option value="">View Each Commondity</option>
               <?php
-              $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
+              $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM hhkmcstock WHERE country IS NOT NULL");
               $countrystmt->execute();
               $countrydatas = $countrystmt->fetchall();
 
-              $country = $_SESSION['tabs'];
+              echo $country = $_SESSION['tabs'];
               $hhkcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country='$country'");
               $hhkcommonditystmt->execute();
               $hhkcommonditydatas = $hhkcommonditystmt->fetchall();
@@ -207,7 +207,7 @@ $query = new Query();
 
 
                ?>
-               <tr style="text-align:center !important;">   
+               <tr style="text-align:center !important;">
               <!-- <tr style="text-align:center !important; <?php if($fetchalldata['balance_mc'] == 0 && empty($fetchallgfcdata['balance_mc'])){ echo "display:none;";} ?>"> -->
                 <td><?php if(empty($lastcommondity)){ echo $id;} ?></td>
                 <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name'];} ?></td>

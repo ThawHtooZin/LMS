@@ -3765,6 +3765,13 @@ Class Query{
       $oldcrossdata = $oldcrossstmt->fetch(PDO::FETCH_ASSOC);
       if (!empty($oldcrossdata)) {
         $oldcrossname = $oldcrossdata['crossac_name'];
+      }else{
+        $oldcrossstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND ac_code NOT LIKE '3600%'");
+        $oldcrossstmt->execute(
+          array(':voucher_no' => $voucher_no)
+        );
+        $oldcrossdata = $oldcrossstmt->fetch(PDO::FETCH_ASSOC);
+        $oldcrossname = $oldcrossdata['ac_name'];
       }
       $crossacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no=:voucher_no AND ac_code != '$oldcrossname' AND ac_code NOT LIKE '3600%'");
       $crossacnamestmt->execute(
