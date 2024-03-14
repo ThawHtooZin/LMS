@@ -3523,6 +3523,24 @@ Class Query{
     }
     $currencystmt = $pdo->prepare("UPDATE currency SET dollar_rate='$rate', debitorcredit='$debitorcredit', mmk_amount='$mmk_amount', usd_amount='$usd_amount', voucher_no='$voucher_no' WHERE transactionid='$id'");
     $currencystmt->execute();
+
+    // Cashbook Update
+    $cashbookstmt = $pdo->prepare("UPDATE cashbook SET date='$date', voucher_no=:voucher_no, ac_name='$ac_code', particular=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no' WHERE transactionid='$id'");
+    $cashbookstmt->execute(
+      [
+        ':voucher_no' => $voucher_no,
+        ':description' => $description
+      ]
+    );
+    
+    // General Ledger Update
+    $cashbookstmt = $pdo->prepare("UPDATE general_ledger SET date='$date', voucherno=:voucher_no, ac_code='$ac_code', narration=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no', container_no='$container_no', bank_charges='$bank_charges' WHERE transactionid='$id'");
+    $cashbookstmt->execute(
+      [
+        ':voucher_no' => $voucher_no,
+        ':description' => $description
+      ]
+    );
   }
 
   function accepttransaction($date){

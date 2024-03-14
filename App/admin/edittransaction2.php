@@ -201,6 +201,37 @@ $query = new Query();
 
       $query->deletetransaction($id, $voucher_no);
     }
+    if(isset($_POST['accept'])){
+      $id = $_GET['id'];
+      $transactionid = $_GET['transactionid'];
+      $ac_code = $_GET['ac_code'];
+      $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total FROM transaction WHERE voucher_no=:voucher_no");
+      $totaldebitstmt->execute([
+        ':voucher_no' => $searchvoucher_no
+      ]);
+      $totaldebitdata = $totaldebitstmt->fetch(PDO::FETCH_ASSOC);
+      $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total FROM transaction WHERE voucher_no=:voucher_no");
+      $totalcreditstmt->execute([
+        ':voucher_no' => $searchvoucher_no
+      ]);
+      $totalcreditdata = $totalcreditstmt->fetch(PDO::FETCH_ASSOC);
+      $datestmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND id='$transactionid'");
+      $datestmt->execute([
+        ':voucher_no' => $searchvoucher_no
+      ]);
+      $datedata = $datestmt->fetch(PDO::FETCH_ASSOC);
+
+      if($totaldebitdata['total'] != $totalcreditdata['total']){
+        echo "<script>swal('Dosen\'t Match', 'Debit Credit Dosen\'t Match, Please Check again', 'warning');</script>";
+      }else{
+        $date = $datedata['date'];
+        $voucher_no = $_GET['voucher_no'];
+        $transactionid = $_GET['id'];
+        $query->deloldtransaction($voucher_no, $transactionid);
+        $query->delaccepttransaction($date, $voucher_no, $transactionid);
+        echo "<script>swal('Success', 'Accepted Successfully.', 'success');</script>";
+      }
+    }
      ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
@@ -216,6 +247,7 @@ $query = new Query();
             <div class="card-header bg-info">
 
               <h5 class="text-light d-inline">Edit Transaction</h5>
+              <button type="submit" class="btn btn-primary btn-sm ms-2 float-end" name="accept">Accept</button>
               <a href="<?php if ($_GET['file'] == 'payable') {echo 'acpayable.php';} if ($_GET['file'] == 'receivable') {echo 'accountreceivable.php';} if ($_GET['file'] == 'cashbook') {echo 'cashbook.php';} if ($_GET['file'] == 'general_ledger') {echo 'general_ledger.php';} ?>" class="btn btn-danger btn-sm float-end">Exit</a>
               <!-- <button type="button" class="btn btn-secondary btn-sm float-end" data-bs-toggle="collapse" data-bs-target="#adddiv" id="add">Add</button> -->
             </div>

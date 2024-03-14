@@ -148,6 +148,24 @@ $query = new Query();
                     // acnamechange
 
                     $balance = $gldata['debit'] - $gldata['credit'];
+
+                    if($gldata['debit'] == 0 && $gldata['credit'] == 0){
+                      $debitorcredit = 'balance';
+                    }elseif($gldata['debit'] != 0){
+                      $debitorcredit = 'debit';
+                    }else{
+                      $debitorcredit = 'credit';
+                    }
+                    echo $transactionid = $gldata['transactionid'];
+                    if(str_contains($gldata['ac_code'], '3300/')){
+                      $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit'");
+                    }else{
+                      $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit' AND transactionid='$transactionid'");
+                    }
+                    $currencystmt->execute(
+                      array(':voucher_no' => $voucher_no )
+                    );
+                    $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
                      ?>
                     <tr>
                       <td><?php echo date('d/m/Y', strtotime($gldata['date'])); ?></td>
@@ -156,7 +174,7 @@ $query = new Query();
                       <td><?php echo $gldata['narration']; ?></td>
                       <td><?php echo $gldata['debit']; ?></td>
                       <td><?php echo $gldata['credit']; ?></td>
-                      <td><?php echo $currencydata['debitorcredit'] ?></td>
+                      <td><?php if($currencydata['usd_amount'] == 0){echo 'MMK'; }else{echo 'USD';} ?></td>
                       <td><?php echo $gldata['balance']; ?></td>
                       <td>
                         <a href="edittransaction.php?voucher_no=<?= $gldata['voucherno']; ?>&file=general_ledger" style="<?php if(str_contains(strtolower($acname), 'purchase')){ echo "display:none;"; } ?>">
@@ -247,7 +265,7 @@ $query = new Query();
                 }else{
                   $debitorcredit = 'credit';
                 }
-                $transactionid = $gldata['id'];
+                $transactionid = $gldata['transactionid'];
                 // echo $voucher_no;
                 if(str_contains($gldata['ac_code'], '3300/')){
                   $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit'");
