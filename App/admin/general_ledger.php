@@ -129,14 +129,17 @@ $query = new Query();
                   foreach($gldatas as $gldata) : ?>
                     <?php
                     $ac_code = $gldata['ac_code'];
+                    $gldata['transactionid'];
                     $acname = $query->select('acname', $ac_code, 'code_no');
 
 
                     // acnamechange
                     $voucher_no = $gldata['voucherno'];
                     $ac_code = $gldata['ac_code'];
-                    $acselectstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$voucher_no' AND ac_code!='$ac_code'");
-                    $acselectstmt->execute();
+                    $acselectstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND ac_code!='$ac_code'");
+                    $acselectstmt->execute(
+                      array(':voucher_no' => $voucher_no)
+                    );
                     $acselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
                     $accode = $acselect['ac_code'];
                     if(str_contains($accode, '4000/')){
@@ -156,7 +159,7 @@ $query = new Query();
                     }else{
                       $debitorcredit = 'credit';
                     }
-                    echo $transactionid = $gldata['transactionid'];
+                    $transactionid = $gldata['transactionid'];
                     if(str_contains($gldata['ac_code'], '3300/')){
                       $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit'");
                     }else{
@@ -280,7 +283,7 @@ $query = new Query();
                 <tr>
                   <td><?php echo date('d/m/Y', strtotime($gldata['date'])); ?></td>
                   <td><?php echo $gldata['voucherno']; ?></td>
-                  <td><?php echo $acname; ?></td>
+                  <td><?php echo $acname . $gldata['transactionid']; ?></td>
                   <td><?php echo $gldata['narration']; ?></td>
                   <td><?php if($gldata['debit'] == 0){ echo "-"; }else{if(!empty($currencydata['dollar_rate']) == 0){echo round($gldata['debit'], 2);}else{ if(str_contains($gldata['ac_code'], '3300/')){ echo round($gldata['debit'] * $currencydata['dollar_rate'], 2); }else{echo round($gldata['debit'] / $currencydata['dollar_rate'], 2);};  };} ?></td>
                   <td><?php if($gldata['credit'] == 0){ echo "-"; }else{if(!empty($currencydata['dollar_rate']) == 0){echo round($gldata['credit'], 2);}else{ echo round($gldata['credit'] / $currencydata['dollar_rate'], 2);  };} ?></td>

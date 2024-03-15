@@ -3483,7 +3483,7 @@ Class Query{
     }
   }
 
-  function updatetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $id, $sr_no, $container_no, $bank_charges){
+  function updatetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $id, $sr_no, $container_no, $bank_charges, $cash_id){
     global $pdo;
 
     if($currency == 'usd'){
@@ -3525,22 +3525,114 @@ Class Query{
     $currencystmt->execute();
 
     // Cashbook Update
-    $cashbookstmt = $pdo->prepare("UPDATE cashbook SET date='$date', voucher_no=:voucher_no, ac_name='$ac_code', particular=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no' WHERE transactionid='$id'");
+    $oldcashstmt = $pdo->prepare("SELECT * FROM cashbook WHERE transactionid<'$id' ORDER BY id DESC");
+    $oldcashstmt->execute();
+    $oldcashdata = $oldcashstmt->fetch(PDO::FETCH_ASSOC);
+
+    $oldcashbalance = $oldcashdata['balance'];
+
+    $balance = ($oldcashbalance + $mmkdebit) - $mmkcredit;
+
+    // Cross acname process
+    $oldcrossstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND description LIKE '%***'");
+    $oldcrossstmt->execute(
+      array(':voucher_no' => $voucher_no)
+    );
+    $crossac_name = $oldcrossstmt->fetch(PDO::FETCH_ASSOC);
+    $crossacname = $crossac_name['ac_code'];
+    // Cross asname process
+
+    $cashbookstmt = $pdo->prepare("UPDATE cashbook SET date='$date', voucher_no=:voucher_no, crossac_name='$crossacname', particular=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no', balance='$balance' WHERE id='$cash_id'");
     $cashbookstmt->execute(
       [
         ':voucher_no' => $voucher_no,
         ':description' => $description
       ]
     );
-    
+
+    // Star removal
+
+    $starstmt = $pdo->prepare("SELECT * FROM transaction WHERE description LIKE '%***'");
+    $starstmt->execute();
+    $stardata = $starstmt->fetch(PDO::FETCH_ASSOC);
+
+    $description = $stardata['description'];
+    echo $newdescription = str_replace('***', '', $description);
+    $transacid = $stardata['id'];
+    $descriptionstmt = $pdo->prepare("UPDATE transaction SET description='$newdescription' WHERE id='$transacid'");
+
+    // Star removal
+
+
+    $updatestmt = $pdo->prepare("SELECT * FROM cashbook WHERE transactionid > '$id'");
+    $updatestmt->execute();
+    $updatedatas = $updatestmt->fetchAll();
+    foreach ($updatedatas as $updatedata) {
+      $id = $updatedata['id'];
+      $updatastmt = $pdo->prepare("SELECT * FROM cashbook WHERE id < '$id' ORDER BY id DESC");
+      $updatastmt->execute();
+      $updata = $updatestmt->fetch(PDO::FETCH_ASSOC);
+      if (!empty($updata)) {
+        $oldbalance = $updata['balance'];
+        $newbalance = ($oldbalance + $mmkdebit) - $mmkcredit;
+      }else{
+        $oldbalance = 0;
+        $newbalance = ($oldbalance + $mmkdebit) - $mmkcredit;
+      }
+
+      $updatecashbookstmt = $pdo->prepare("UPDATE cashbook SET balance='$balance' WHERE id='$id'");
+      $updatecashbookstmt->execute();
+
+    }
+
     // General Ledger Update
-    $cashbookstmt = $pdo->prepare("UPDATE general_ledger SET date='$date', voucherno=:voucher_no, ac_code='$ac_code', narration=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no', container_no='$container_no', bank_charges='$bank_charges' WHERE transactionid='$id'");
+    $oldgeneralledgerstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$ac_code' AND transactionid<'$id' ORDER BY id DESC");
+    $oldgeneralledgerstmt->execute();
+    $oldgeneralledgerdata = $oldgeneralledgerstmt->fetch(PDO::FETCH_ASSOC);
+    $oldgeneralledgerbalance = $oldgeneralledgerdata['balance'];
+
+    $balance = ($oldgeneralledgerbalance + $mmkdebit) - $mmkcredit;
+    echo $id;
+    $cashbookstmt = $pdo->prepare("UPDATE general_ledger SET date='$date', voucherno=:voucher_no, ac_code='$ac_code', narration=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no', container_no='$container_no', bank_charges='$bank_charges', balance='$balance' WHERE transactionid='$id'");
     $cashbookstmt->execute(
       [
         ':voucher_no' => $voucher_no,
         ':description' => $description
       ]
     );
+
+    // // payable Update
+    // $oldpayablestmt = $pdo->prepare("SELECT * FROM payable WHERE ac_code='$ac_code' ORDER BY id DESC");
+    // $oldpayablestmt->execute();
+    // $oldpayabledata = $oldpayablestmt->fetch(PDO::FETCH_ASSOC);
+    // $oldpayablebalance = $oldpayabledata['balance'];
+    //
+    // $balance = ($oldpayablebalance + $mmkdebit) - $mmkcredit;
+    // $cashbookstmt = $pdo->prepare("UPDATE payable SET date='$date', paid_voucher=:voucher_no, supplier_id='$ac_code', remark=:description, paid_amount='$mmkdebit', balance='$balance' WHERE voucher_no='$voucher_no'");
+    // $cashbookstmt->execute(
+    //   [
+    //     ':voucher_no' => $voucher_no,
+    //     ':description' => $description
+    //   ]
+    // );
+    //
+    // // receivable Update
+    // $oldreceivablestmt = $pdo->prepare("SELECT * FROM receivable WHERE ac_code='$ac_code' AND transactionid < '$id' ORDER BY id DESC");
+    // $oldreceivablestmt->execute();
+    // $oldreceivabledata = $oldreceivablestmt->fetch(PDO::FETCH_ASSOC);
+    // $oldreceivablebalance = $oldreceivabledata['balance'];
+    // $balance = ($oldreceivablebalance + $mmkdebit) - $mmkcredit;
+    // if (!empty($sr_no)) {
+    //
+    // }
+    // $cashbookstmt = $pdo->prepare("UPDATE receivable SET date='$date', sr_no=:voucher_no, ac_code='$ac_code', remark=:description, invoice_amount='$mmkdebit', balance='$balance' WHERE voucher_no='$voucher_no'");
+    // $cashbookstmt->execute(
+    //   [
+    //     ':voucher_no' => $voucher_no,
+    //     ':description' => $description
+    //   ]
+    // );
+
   }
 
   function accepttransaction($date){
@@ -3784,85 +3876,84 @@ Class Query{
       if (!empty($oldcrossdata)) {
         $oldcrossname = $oldcrossdata['crossac_name'];
       }else{
+        echo "crosssssssssssssssss";
+        echo $voucher_no;
         $oldcrossstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND ac_code NOT LIKE '3600%'");
         $oldcrossstmt->execute(
           array(':voucher_no' => $voucher_no)
         );
-        $oldcrossdata = $oldcrossstmt->fetch(PDO::FETCH_ASSOC);
-        $oldcrossname = $oldcrossdata['ac_name'];
+        $crossac_name = $oldcrossstmt->fetch(PDO::FETCH_ASSOC);
+        $crossacname = $crossac_name['ac_code'];
       }
-      $crossacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no=:voucher_no AND ac_code != '$oldcrossname' AND ac_code NOT LIKE '3600%'");
-      $crossacnamestmt->execute(
-        array(':voucher_no' => $voucher_no)
-      );
-      $crossac_name = $crossacnamestmt->fetchall();
-      $crossacnamerowcount = $crossacnamestmt->rowcount();
-      for($i = 0; $i < $crossacnamerowcount; $i++){
-        $crossacname = $crossac_name[$i]['ac_code'];
+      // $crossacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no=:voucher_no AND ac_code != '$oldcrossname' AND ac_code NOT LIKE '3600%'");
+      // $crossacnamestmt->execute(
+      //   array(':voucher_no' => $voucher_no)
+      // );
+      // $crossacnamerowcount = $crossacnamestmt->rowcount();
+      // $crossacname = $crossac_name[$i]['ac_code'];
 
-        $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND transactionid='$transactionid'");
-        $currencystmt->execute([
-          ':voucher_no' => $voucher_no
+      $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND transactionid='$transactionid'");
+      $currencystmt->execute([
+        ':voucher_no' => $voucher_no
+      ]);
+      $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
+      if(!empty($cashbookdata['bank_charges'])){
+        $predebit = $currencydata['dollar_rate'] * $cashbookdata['bank_charges'];
+         $debit = $cashbookdata['debit'] - $predebit;
+      }else{
+        $debit = $cashbookdata['debit'];
+      }
+      $credit = $cashbookdata['credit'];
+      $description = $cashbookdata['description'];
+      // $selectacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no='$voucher_no' AND id!='$id'");
+      // $selectacnamestmt->execute();
+      // $selectacname = $selectacnamestmt->fetch(PDO::FETCH_ASSOC);
+      // $ac_code = $selectacname['ac_code'];
+      //
+      //
+      // if(str_contains($ac_code, '4000')){
+      //   $ac_code = 'Supplier';
+      //    echo "sup";
+      // }
+      // if(str_contains($ac_code, '3300')){
+      //    echo "cus";
+      //   $ac_code = $selectacname['ac_code'];
+      // }
+      // if(str_contains($ac_code, '9100')){
+      //    echo "expanse";
+      //   $ac_code = $selectacname['ac_code'];
+      // }
+      //
+      // $selectacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE id='$id'");
+      // $selectacnamestmt->execute();
+      // $selectacname = $selectacnamestmt->fetch(PDO::FETCH_ASSOC);
+
+      if($cashbookdata['ac_code'] == '3600/001'){
+        $payabledatastmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='3600/001' ORDER BY id DESC");
+      }else{
+        $payabledatastmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='3600/002' ORDER BY id DESC");
+      }
+      $payabledatastmt->execute();
+      $cashbooksearchdata = $payabledatastmt->fetch(PDO::FETCH_ASSOC);
+      if(!empty($cashbooksearchdata['balance'])){
+          $balance = $cashbooksearchdata['balance'];
+        }else{
+        $balance = 0;
+      }
+      $balance = ($balance + $debit) - $credit;
+      // if(str_contains($crossacname, '3300/')){
+        $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE transactionid='$transactionid'");
+      // }else{
+        // $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no AND crossac_name=:ac_name OR transactionid='$transactionid'");
+      // }
+      $checkcbstmt->execute();
+      $checkcb = $checkcbstmt->fetchall();
+      if(empty($checkcb)){
+        $cashbookstmt = $pdo->prepare("INSERT INTO cashbook(date, ac_name, particular, debit, credit, balance, voucher_no, crossac_name, transactionid) VALUES('$date', '$ac_name', :description, '$debit', '$credit', '$balance', :voucher_no, '$crossacname', '$transactionid')");
+        $cashbookstmt->execute([
+          ':voucher_no' => $voucher_no,
+          ':description' => $description
         ]);
-        $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
-        if(!empty($cashbookdata['bank_charges'])){
-          $predebit = $currencydata['dollar_rate'] * $cashbookdata['bank_charges'];
-           $debit = $cashbookdata['debit'] - $predebit;
-        }else{
-          $debit = $cashbookdata['debit'];
-        }
-        $credit = $cashbookdata['credit'];
-        $description = $cashbookdata['description'];
-        // $selectacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no='$voucher_no' AND id!='$id'");
-        // $selectacnamestmt->execute();
-        // $selectacname = $selectacnamestmt->fetch(PDO::FETCH_ASSOC);
-        // $ac_code = $selectacname['ac_code'];
-        //
-        //
-        // if(str_contains($ac_code, '4000')){
-        //   $ac_code = 'Supplier';
-        //    echo "sup";
-        // }
-        // if(str_contains($ac_code, '3300')){
-        //    echo "cus";
-        //   $ac_code = $selectacname['ac_code'];
-        // }
-        // if(str_contains($ac_code, '9100')){
-        //    echo "expanse";
-        //   $ac_code = $selectacname['ac_code'];
-        // }
-        //
-        // $selectacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE id='$id'");
-        // $selectacnamestmt->execute();
-        // $selectacname = $selectacnamestmt->fetch(PDO::FETCH_ASSOC);
-
-        if($cashbookdata['ac_code'] == '3600/001'){
-          $payabledatastmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='3600/001' ORDER BY id DESC");
-        }else{
-          $payabledatastmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='3600/002' ORDER BY id DESC");
-        }
-        $payabledatastmt->execute();
-        $cashbooksearchdata = $payabledatastmt->fetch(PDO::FETCH_ASSOC);
-        if(!empty($cashbooksearchdata['balance'])){
-            $balance = $cashbooksearchdata['balance'];
-          }else{
-          $balance = 0;
-        }
-        $balance = ($balance + $debit) - $credit;
-        // if(str_contains($crossacname, '3300/')){
-          $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE transactionid='$transactionid'");
-        // }else{
-          // $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no AND crossac_name=:ac_name OR transactionid='$transactionid'");
-        // }
-        $checkcbstmt->execute();
-        $checkcb = $checkcbstmt->fetchall();
-        if(empty($checkcb)){
-          $cashbookstmt = $pdo->prepare("INSERT INTO cashbook(date, ac_name, particular, debit, credit, balance, voucher_no, crossac_name, transactionid) VALUES('$date', '$ac_name', :description, '$debit', '$credit', '$balance', :voucher_no, '$crossacname', '$transactionid')");
-          $cashbookstmt->execute([
-            ':voucher_no' => $voucher_no,
-            ':description' => $description
-          ]);
-        }
       }
 
   }
