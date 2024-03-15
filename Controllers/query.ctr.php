@@ -3521,8 +3521,10 @@ Class Query{
         $usd_amount = 0;
       }
     }
-    $currencystmt = $pdo->prepare("UPDATE currency SET dollar_rate='$rate', debitorcredit='$debitorcredit', mmk_amount='$mmk_amount', usd_amount='$usd_amount', voucher_no='$voucher_no' WHERE transactionid='$id'");
-    $currencystmt->execute();
+    $currencystmt = $pdo->prepare("UPDATE currency SET dollar_rate='$rate', debitorcredit='$debitorcredit', mmk_amount='$mmk_amount', usd_amount='$usd_amount', voucher_no=:voucher_no WHERE transactionid='$id'");
+    $currencystmt->execute([
+      ':voucher_no' => $voucher_no
+    ]);
 
     // Cashbook Update
     $oldcashstmt = $pdo->prepare("SELECT * FROM cashbook WHERE transactionid<'$id' ORDER BY id DESC");
@@ -3539,7 +3541,11 @@ Class Query{
       array(':voucher_no' => $voucher_no)
     );
     $crossac_name = $oldcrossstmt->fetch(PDO::FETCH_ASSOC);
-    $crossacname = $crossac_name['ac_code'];
+    if(!empty($crossac_name['ac_code'])){
+      $crossacname = $crossac_name['ac_code'];
+    }else{
+      $crossacname = '';
+    }
     // Cross asname process
 
     $cashbookstmt = $pdo->prepare("UPDATE cashbook SET date='$date', voucher_no=:voucher_no, crossac_name='$crossacname', particular=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no', balance='$balance' WHERE id='$cash_id'");
@@ -3552,14 +3558,23 @@ Class Query{
 
     // Star removal
 
-    $starstmt = $pdo->prepare("SELECT * FROM transaction WHERE description LIKE '%***'");
-    $starstmt->execute();
-    $stardata = $starstmt->fetch(PDO::FETCH_ASSOC);
-
-    $description = $stardata['description'];
-    echo $newdescription = str_replace('***', '', $description);
-    $transacid = $stardata['id'];
-    $descriptionstmt = $pdo->prepare("UPDATE transaction SET description='$newdescription' WHERE id='$transacid'");
+    if(str_contains($ac_code, '3600/')){
+      $starstmt = $pdo->prepare("SELECT * FROM transaction WHERE description LIKE '%***'");
+      $starstmt->execute();
+      $stardata = $starstmt->fetch(PDO::FETCH_ASSOC);
+  
+      if(!empty($stardata['description'])){
+        $description = $stardata['description'];
+        $transacid = $stardata['id'];
+      }else{
+        $description = '';
+        $transacid = '';
+      }
+      $newdescription = str_replace('***', '', $description);
+      $descriptionstmt = $pdo->prepare("UPDATE transaction SET description='$newdescription' WHERE id='$transacid'");
+      $descriptionstmt->execute();
+  
+    }
 
     // Star removal
 
@@ -3592,7 +3607,6 @@ Class Query{
     $oldgeneralledgerbalance = $oldgeneralledgerdata['balance'];
 
     $balance = ($oldgeneralledgerbalance + $mmkdebit) - $mmkcredit;
-    echo $id;
     $cashbookstmt = $pdo->prepare("UPDATE general_ledger SET date='$date', voucherno=:voucher_no, ac_code='$ac_code', narration=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no', container_no='$container_no', bank_charges='$bank_charges', balance='$balance' WHERE transactionid='$id'");
     $cashbookstmt->execute(
       [
