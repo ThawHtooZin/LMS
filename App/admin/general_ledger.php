@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 include '../../Auth/authrize.ctr.php';
@@ -286,7 +287,7 @@ $query = new Query();
                 <tr>
                   <td><?php echo date('d/m/Y', strtotime($gldata['date'])); ?></td>
                   <td><?php echo $gldata['voucherno']; ?></td>
-                  <td><?php echo $acname; ?></td>
+                  <td><?php echo $acname . $gldata['transactionid']; ?></td>
                   <td><?php echo $gldata['narration']; ?></td>
                   <td><?php if($gldata['debit'] == 0){ echo "-"; }else{if(!empty($currencydata['dollar_rate']) == 0){echo round($gldata['debit'], 2);}else{ if(str_contains($gldata['ac_code'], '3300/')){ echo round($gldata['debit'] * $currencydata['dollar_rate'], 2); }else{echo round($gldata['debit'] / $currencydata['dollar_rate'], 2);};  };} ?></td>
                   <td><?php if($gldata['credit'] == 0){ echo "-"; }else{if(!empty($currencydata['dollar_rate']) == 0){echo round($gldata['credit'], 2);}else{ echo round($gldata['credit'] / $currencydata['dollar_rate'], 2);  };} ?></td>

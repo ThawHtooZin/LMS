@@ -3556,19 +3556,6 @@ Class Query{
       ]
     );
 
-    // Star removal
-
-    $starstmt = $pdo->prepare("SELECT * FROM transaction WHERE description LIKE '%***'");
-    $starstmt->execute();
-    $stardata = $starstmt->fetch(PDO::FETCH_ASSOC);
-
-    $description = $stardata['description'];
-    $newdescription = str_replace('***', '', $description);
-    $transacid = $stardata['id'];
-    $descriptionstmt = $pdo->prepare("UPDATE transaction SET description='$newdescription' WHERE id='$transacid'");
-
-    // Star removal
-
 
     $updatestmt = $pdo->prepare("SELECT * FROM cashbook WHERE transactionid > '$id'");
     $updatestmt->execute();
@@ -3598,7 +3585,6 @@ Class Query{
     $oldgeneralledgerbalance = $oldgeneralledgerdata['balance'];
 
     $balance = ($oldgeneralledgerbalance + $mmkdebit) - $mmkcredit;
-    // echo $id;
     $cashbookstmt = $pdo->prepare("UPDATE general_ledger SET date='$date', voucherno=:voucher_no, ac_code='$ac_code', narration=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no', container_no='$container_no', bank_charges='$bank_charges', balance='$balance' WHERE transactionid='$id'");
     $cashbookstmt->execute(
       [
