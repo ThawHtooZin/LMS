@@ -3556,35 +3556,13 @@ Class Query{
       ]
     );
 
-    // Star removal
-
-    if(str_contains($ac_code, '3600/')){
-      $starstmt = $pdo->prepare("SELECT * FROM transaction WHERE description LIKE '%***'");
-      $starstmt->execute();
-      $stardata = $starstmt->fetch(PDO::FETCH_ASSOC);
-  
-      if(!empty($stardata['description'])){
-        $description = $stardata['description'];
-        $transacid = $stardata['id'];
-      }else{
-        $description = '';
-        $transacid = '';
-      }
-      $newdescription = str_replace('***', '', $description);
-      $descriptionstmt = $pdo->prepare("UPDATE transaction SET description='$newdescription' WHERE id='$transacid'");
-      $descriptionstmt->execute();
-  
-    }
-
-    // Star removal
-
 
     $updatestmt = $pdo->prepare("SELECT * FROM cashbook WHERE transactionid > '$id'");
     $updatestmt->execute();
     $updatedatas = $updatestmt->fetchAll();
     foreach ($updatedatas as $updatedata) {
-      $id = $updatedata['id'];
-      $updatastmt = $pdo->prepare("SELECT * FROM cashbook WHERE id < '$id' ORDER BY id DESC");
+      $updateid = $updatedata['id'];
+      $updatastmt = $pdo->prepare("SELECT * FROM cashbook WHERE id < '$updateid' ORDER BY id DESC");
       $updatastmt->execute();
       $updata = $updatestmt->fetch(PDO::FETCH_ASSOC);
       if (!empty($updata)) {
@@ -3595,7 +3573,7 @@ Class Query{
         $newbalance = ($oldbalance + $mmkdebit) - $mmkcredit;
       }
 
-      $updatecashbookstmt = $pdo->prepare("UPDATE cashbook SET balance='$balance' WHERE id='$id'");
+      $updatecashbookstmt = $pdo->prepare("UPDATE cashbook SET balance='$newbalance' WHERE id='$updateid'");
       $updatecashbookstmt->execute();
 
     }
@@ -3614,7 +3592,6 @@ Class Query{
         ':description' => $description
       ]
     );
-
     // // payable Update
     // $oldpayablestmt = $pdo->prepare("SELECT * FROM payable WHERE ac_code='$ac_code' ORDER BY id DESC");
     // $oldpayablestmt->execute();
@@ -3647,13 +3624,36 @@ Class Query{
     //   ]
     // );
 
+    // Star removal
+
+    if(str_contains($ac_code, '3600/')){
+      $starstmt = $pdo->prepare("SELECT * FROM transaction WHERE description LIKE '%***'");
+      $starstmt->execute();
+      $stardata = $starstmt->fetch(PDO::FETCH_ASSOC);
+
+      if(!empty($stardata['description'])){
+        $description = $stardata['description'];
+        $transacid = $stardata['id'];
+      }else{
+        $description = '';
+        $transacid = '';
+      }
+      $newdescription = str_replace('***', '', $description);
+      $descriptionstmt = $pdo->prepare("UPDATE transaction SET description='$newdescription' WHERE id='$transacid'");
+      $descriptionstmt->execute();
+      $descriptionstmt = $pdo->prepare("UPDATE general_ledger SET narration='$newdescription' WHERE transactionid='$transacid'");
+      $descriptionstmt->execute();
+
+    }
+
+    // Star removal
+
   }
 
   function accepttransaction($date){
     global $pdo;
 
     // General Ledger
-    $accepterror = "";
     $transactionstmt = $pdo->prepare("SELECT * FROM transaction WHERE date='$date'");
     $transactionstmt->execute();
     $transactiondatas = $transactionstmt->fetchall();
@@ -3888,10 +3888,8 @@ Class Query{
       );
       $oldcrossdata = $oldcrossstmt->fetch(PDO::FETCH_ASSOC);
       if (!empty($oldcrossdata)) {
-        $oldcrossname = $oldcrossdata['crossac_name'];
+        $crossacname = $oldcrossdata['crossac_name'];
       }else{
-        echo "crosssssssssssssssss";
-        echo $voucher_no;
         $oldcrossstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND ac_code NOT LIKE '3600%'");
         $oldcrossstmt->execute(
           array(':voucher_no' => $voucher_no)
