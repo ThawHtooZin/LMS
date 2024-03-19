@@ -3526,72 +3526,193 @@ Class Query{
       ':voucher_no' => $voucher_no
     ]);
 
-    // Cashbook Update
-    $oldcashstmt = $pdo->prepare("SELECT * FROM cashbook WHERE transactionid<'$id' ORDER BY id DESC");
-    $oldcashstmt->execute();
-    $oldcashdata = $oldcashstmt->fetch(PDO::FETCH_ASSOC);
+    if ($_GET['file'] == 'cashbook') {
+      echo "CASHBOOK";
 
-    $oldcashbalance = $oldcashdata['balance'];
+      // Cashbook Update
+      $oldcashstmt = $pdo->prepare("SELECT * FROM cashbook WHERE transactionid<'$id' ORDER BY id DESC");
+      $oldcashstmt->execute();
+      $oldcashdata = $oldcashstmt->fetch(PDO::FETCH_ASSOC);
 
-    $balance = ($oldcashbalance + $mmkdebit) - $mmkcredit;
+      $oldcashbalance = $oldcashdata['balance'];
 
-    // Cross acname process
-    $oldcrossstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND description LIKE '%***'");
-    $oldcrossstmt->execute(
-      array(':voucher_no' => $voucher_no)
-    );
-    $crossac_name = $oldcrossstmt->fetch(PDO::FETCH_ASSOC);
-    if(!empty($crossac_name['ac_code'])){
-      $crossacname = $crossac_name['ac_code'];
-    }else{
-      $crossacname = '';
-    }
-    // Cross asname process
+      $balance = ($oldcashbalance + $mmkdebit) - $mmkcredit;
 
-    $cashbookstmt = $pdo->prepare("UPDATE cashbook SET date='$date', voucher_no=:voucher_no, crossac_name='$crossacname', particular=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no', balance='$balance' WHERE id='$cash_id'");
-    $cashbookstmt->execute(
-      [
-        ':voucher_no' => $voucher_no,
-        ':description' => $description
-      ]
-    );
-
-
-    $updatestmt = $pdo->prepare("SELECT * FROM cashbook WHERE transactionid > '$id'");
-    $updatestmt->execute();
-    $updatedatas = $updatestmt->fetchAll();
-    foreach ($updatedatas as $updatedata) {
-      $updateid = $updatedata['id'];
-      $updatastmt = $pdo->prepare("SELECT * FROM cashbook WHERE id < '$updateid' ORDER BY id DESC");
-      $updatastmt->execute();
-      $updata = $updatestmt->fetch(PDO::FETCH_ASSOC);
-      if (!empty($updata)) {
-        $oldbalance = $updata['balance'];
-        $newbalance = ($oldbalance + $mmkdebit) - $mmkcredit;
+      // Cross acname process
+      $oldcrossstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND description LIKE '%***'");
+      $oldcrossstmt->execute(
+        array(':voucher_no' => $voucher_no)
+      );
+      $crossac_name = $oldcrossstmt->fetch(PDO::FETCH_ASSOC);
+      if(!empty($crossac_name['ac_code'])){
+        $crossacname = $crossac_name['ac_code'];
       }else{
-        $oldbalance = 0;
-        $newbalance = ($oldbalance + $mmkdebit) - $mmkcredit;
+        $crossacname = '';
+      }
+      // Cross asname process
+      $cashbookstmt = $pdo->prepare("UPDATE cashbook SET date='$date', voucher_no=:voucher_no, crossac_name='$crossacname', particular=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no', balance='$balance' WHERE id='$cash_id'");
+      $cashbookstmt->execute(
+        [
+          ':voucher_no' => $voucher_no,
+          ':description' => $description
+        ]
+      );
+
+
+      $updatestmt = $pdo->prepare("SELECT * FROM cashbook WHERE transactionid > '$id'");
+      $updatestmt->execute();
+      $updatedatas = $updatestmt->fetchAll();
+      foreach ($updatedatas as $updatedata) {
+        $updateid = $updatedata['id'];
+        $updatastmt = $pdo->prepare("SELECT * FROM cashbook WHERE id < '$updateid' ORDER BY id DESC");
+        $updatastmt->execute();
+        $updata = $updatestmt->fetch(PDO::FETCH_ASSOC);
+        if (!empty($updata)) {
+          $oldbalance = $updata['balance'];
+          $newbalance = ($oldbalance + $mmkdebit) - $mmkcredit;
+        }else{
+          $oldbalance = 0;
+          $newbalance = ($oldbalance + $mmkdebit) - $mmkcredit;
+        }
+
+        $updatecashbookstmt = $pdo->prepare("UPDATE cashbook SET balance='$newbalance' WHERE id='$updateid'");
+        $updatecashbookstmt->execute();
+
       }
 
-      $updatecashbookstmt = $pdo->prepare("UPDATE cashbook SET balance='$newbalance' WHERE id='$updateid'");
-      $updatecashbookstmt->execute();
+      // General Ledger Update
+      $oldgeneralledgerstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$ac_code' AND transactionid<'$id' ORDER BY id DESC");
+      $oldgeneralledgerstmt->execute();
+      $oldgeneralledgerdata = $oldgeneralledgerstmt->fetch(PDO::FETCH_ASSOC);
+      $oldgeneralledgerbalance = $oldgeneralledgerdata['balance'];
+
+      $balance = ($oldgeneralledgerbalance + $mmkdebit) - $mmkcredit;
+      $cashbookstmt = $pdo->prepare("UPDATE general_ledger SET date='$date', voucherno=:voucher_no, ac_code='$ac_code', narration=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no', container_no='$container_no', bank_charges='$bank_charges', balance='$balance' WHERE transactionid='$id'");
+      $cashbookstmt->execute(
+        [
+          ':voucher_no' => $voucher_no,
+          ':description' => $description
+        ]
+      );
+
+      $upgeneralledgerstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE transactionid > '$id' AND ac_code='$ac_code'");
+      $upgeneralledgerstmt->execute();
+      $upgeneralledgerdatas = $upgeneralledgerstmt->fetchall();
+      foreach ($upgeneralledgerdatas as $upgeneralledgerdata) {
+        $updateid = $upgeneralledgerdata['id'];
+        $updateac_code = $upgeneralledgerdata['ac_code'];
+        $updatedebit = $upgeneralledgerdata['debit'];
+        $updatecredit = $upgeneralledgerdata['credit'];
+        $updatestmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$updateac_code' AND id < '$updateid' ORDER BY id DESC");
+        $updatestmt->execute();
+        $updatedatas = $updatestmt->fetch(PDO::FETCH_ASSOC);
+        if (!empty($updatedatas)) {
+          $oldbalance = $updatedatas['balance'];
+          $newbalance = ($oldbalance + $updatedebit) - $updatecredit;
+        }else{
+          $oldbalance = 0;
+          $newbalance = ($oldbalance + $updatedebit) - $updatecredit;
+        }
+
+        $updatestmt = $pdo->prepare("UPDATE general_ledger SET balance='$newbalance' WHERE id='$updateid'");
+        $updatestmt->execute();
+
+      }
+    }elseif($_GET['file'] == 'general_ledger'){
+      // General Ledger Update
+      $oldgeneralledgerstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$ac_code' AND transactionid<'$id' ORDER BY id DESC");
+      $oldgeneralledgerstmt->execute();
+      $oldgeneralledgerdata = $oldgeneralledgerstmt->fetch(PDO::FETCH_ASSOC);
+      $oldgeneralledgerbalance = $oldgeneralledgerdata['balance'];
+
+      $balance = ($oldgeneralledgerbalance + $mmkdebit) - $mmkcredit;
+      $cashbookstmt = $pdo->prepare("UPDATE general_ledger SET date='$date', voucherno=:voucher_no, ac_code='$ac_code', narration=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no', container_no='$container_no', bank_charges='$bank_charges', balance='$balance' WHERE transactionid='$id'");
+      $cashbookstmt->execute(
+        [
+          ':voucher_no' => $voucher_no,
+          ':description' => $description
+        ]
+      );
+
+      $upgeneralledgerstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE transactionid > '$id' AND ac_code='$ac_code'");
+      $upgeneralledgerstmt->execute();
+      $upgeneralledgerdatas = $upgeneralledgerstmt->fetchall();
+      foreach ($upgeneralledgerdatas as $upgeneralledgerdata) {
+        $updateid = $upgeneralledgerdata['id'];
+        $updateac_code = $upgeneralledgerdata['ac_code'];
+        $updatedebit = $upgeneralledgerdata['debit'];
+        $updatecredit = $upgeneralledgerdata['credit'];
+        $updatestmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$updateac_code' AND id < '$updateid' ORDER BY id DESC");
+        $updatestmt->execute();
+        $updatedatas = $updatestmt->fetch(PDO::FETCH_ASSOC);
+        if (!empty($updatedatas)) {
+          $oldbalance = $updatedatas['balance'];
+          $newbalance = ($oldbalance + $updatedebit) - $updatecredit;
+        }else{
+          $oldbalance = 0;
+          $newbalance = ($oldbalance + $updatedebit) - $updatecredit;
+        }
+
+        $updatestmt = $pdo->prepare("UPDATE general_ledger SET balance='$newbalance' WHERE id='$updateid'");
+        $updatestmt->execute();
+
+      }
+      // General Ledger Update
+
+      // Cashbook Update
+      $oldcashstmt = $pdo->prepare("SELECT * FROM cashbook WHERE transactionid<'$id' ORDER BY id DESC");
+      $oldcashstmt->execute();
+      $oldcashdata = $oldcashstmt->fetch(PDO::FETCH_ASSOC);
+
+      $oldcashbalance = $oldcashdata['balance'];
+
+      $balance = ($oldcashbalance + $mmkdebit) - $mmkcredit;
+
+      // Cross acname process
+      $oldcrossstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND description LIKE '%***'");
+      $oldcrossstmt->execute(
+        array(':voucher_no' => $voucher_no)
+      );
+      $crossac_name = $oldcrossstmt->fetch(PDO::FETCH_ASSOC);
+      if(!empty($crossac_name['ac_code'])){
+        $crossacname = $crossac_name['ac_code'];
+      }else{
+        $crossacname = '';
+      }
+      // Cross asname process
+      $cashbookstmt = $pdo->prepare("UPDATE cashbook SET date='$date', voucher_no=:voucher_no, crossac_name='$crossacname', particular=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no', balance='$balance' WHERE transactionid='$id'");
+      $cashbookstmt->execute(
+        [
+          ':voucher_no' => $voucher_no,
+          ':description' => $description
+        ]
+      );
+
+
+      // $updatestmt = $pdo->prepare("SELECT * FROM cashbook WHERE transactionid > '$id'");
+      // $updatestmt->execute();
+      // $updatedatas = $updatestmt->fetchAll();
+      // foreach ($updatedatas as $updatedata) {
+      //   $updateid = $updatedata['id'];
+      //   $updatastmt = $pdo->prepare("SELECT * FROM cashbook WHERE id < '$updateid' ORDER BY id DESC");
+      //   $updatastmt->execute();
+      //   $updata = $updatestmt->fetch(PDO::FETCH_ASSOC);
+      //   if (!empty($updata)) {
+      //     $oldbalance = $updata['balance'];
+      //     $newbalance = ($oldbalance + $mmkdebit) - $mmkcredit;
+      //   }else{
+      //     $oldbalance = 0;
+      //     $newbalance = ($oldbalance + $mmkdebit) - $mmkcredit;
+      //   }
+      //
+      //   $updatecashbookstmt = $pdo->prepare("UPDATE cashbook SET balance='$newbalance' WHERE id='$updateid'");
+      //   $updatecashbookstmt->execute();
+      //
+      // }
 
     }
 
-    // General Ledger Update
-    $oldgeneralledgerstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$ac_code' AND transactionid<'$id' ORDER BY id DESC");
-    $oldgeneralledgerstmt->execute();
-    $oldgeneralledgerdata = $oldgeneralledgerstmt->fetch(PDO::FETCH_ASSOC);
-    $oldgeneralledgerbalance = $oldgeneralledgerdata['balance'];
 
-    $balance = ($oldgeneralledgerbalance + $mmkdebit) - $mmkcredit;
-    $cashbookstmt = $pdo->prepare("UPDATE general_ledger SET date='$date', voucherno=:voucher_no, ac_code='$ac_code', narration=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no', container_no='$container_no', bank_charges='$bank_charges', balance='$balance' WHERE transactionid='$id'");
-    $cashbookstmt->execute(
-      [
-        ':voucher_no' => $voucher_no,
-        ':description' => $description
-      ]
-    );
     // // payable Update
     // $oldpayablestmt = $pdo->prepare("SELECT * FROM payable WHERE ac_code='$ac_code' ORDER BY id DESC");
     // $oldpayablestmt->execute();
