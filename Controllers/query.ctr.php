@@ -3483,7 +3483,7 @@ Class Query{
     }
   }
 
-  function updatetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $id, $sr_no, $container_no, $bank_charges, $cash_id){
+  function updatetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $id, $sr_no, $container_no, $bank_charges, $cash_id, $payableid){
     global $pdo;
 
     if($currency == 'usd'){
@@ -3689,45 +3689,64 @@ Class Query{
       );
 
 
-      // $updatestmt = $pdo->prepare("SELECT * FROM cashbook WHERE transactionid > '$id'");
-      // $updatestmt->execute();
-      // $updatedatas = $updatestmt->fetchAll();
-      // foreach ($updatedatas as $updatedata) {
-      //   $updateid = $updatedata['id'];
-      //   $updatastmt = $pdo->prepare("SELECT * FROM cashbook WHERE id < '$updateid' ORDER BY id DESC");
-      //   $updatastmt->execute();
-      //   $updata = $updatestmt->fetch(PDO::FETCH_ASSOC);
-      //   if (!empty($updata)) {
-      //     $oldbalance = $updata['balance'];
-      //     $newbalance = ($oldbalance + $mmkdebit) - $mmkcredit;
-      //   }else{
-      //     $oldbalance = 0;
-      //     $newbalance = ($oldbalance + $mmkdebit) - $mmkcredit;
-      //   }
-      //
-      //   $updatecashbookstmt = $pdo->prepare("UPDATE cashbook SET balance='$newbalance' WHERE id='$updateid'");
-      //   $updatecashbookstmt->execute();
-      //
-      // }
+      $updatestmt = $pdo->prepare("SELECT * FROM cashbook WHERE transactionid > '$id'");
+      $updatestmt->execute();
+      $updatedatas = $updatestmt->fetchAll();
+      foreach ($updatedatas as $updatedata) {
+        $updateid = $updatedata['id'];
+        $updatastmt = $pdo->prepare("SELECT * FROM cashbook WHERE id < '$updateid' ORDER BY id DESC");
+        $updatastmt->execute();
+        $updata = $updatestmt->fetch(PDO::FETCH_ASSOC);
+        if (!empty($updata)) {
+          $oldbalance = $updata['balance'];
+          $newbalance = ($oldbalance + $mmkdebit) - $mmkcredit;
+        }else{
+          $oldbalance = 0;
+          $newbalance = ($oldbalance + $mmkdebit) - $mmkcredit;
+        }
 
+        $updatecashbookstmt = $pdo->prepare("UPDATE cashbook SET balance='$newbalance' WHERE id='$updateid'");
+        $updatecashbookstmt->execute();
+
+      }
+      // Cashbook Update
+
+    }elseif($_GET['file'] == 'payable'){
+      echo $ac_code;
+      echo "<br>";
+      echo $mmkdebit;
+      echo "<br>";
+      echo $payableid;
+      //Payable Update
+      $total_closingstmt = $pdo->prepare("SELECT SUM(closing_balance) AS balance FROM payable WHERE supplier_id='$ac_code' AND purchase_voucher_no = '' AND paid_voucher = ''");
+      $total_closingstmt->execute();
+      $total_closingdata = $total_closingstmt->fetch(PDO::FETCH_ASSOC);
+      $total_closingdata = $total_closingdata['balance'];
+
+      $total_purchase_amountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS total_purchase_amount FROM payable WHERE supplier_id='$ac_code' AND purchase_voucher_no != '0' AND paid_voucher = ''");
+      $total_purchase_amountstmt->execute();
+      $total_purchase_amountdata = $total_purchase_amountstmt->fetch(PDO::FETCH_ASSOC);
+      $total_purchase_amount = $total_purchase_amountdata['total_purchase_amount'];
+
+      $total_paid_amountstmt = $pdo->prepare("SELECT SUM(paid_amount) AS total_paid_amount FROM payable WHERE supplier_id='$ac_code' AND purchase_voucher_no != '0' AND paid_voucher != '0' AND id!='$payableid'");
+      $total_paid_amountstmt->execute();
+      $total_paid_amountdata = $total_paid_amountstmt->fetch(PDO::FETCH_ASSOC);
+      $total_paid_amount = $total_paid_amountdata['total_paid_amount'];
+      //
+      $balance = (($total_closingdata + $total_purchase_amount) - $total_paid_amount) - $mmkdebit;
+      // $balance = ($oldpayablebalance + $mmkdebit) - $mmkcredit;
+      $payablestmt = $pdo->prepare("UPDATE payable SET paid_date='$date', paid_voucher=:voucher_no, supplier_id='$ac_code', remark=:description, paid_amount='$mmkdebit', balance='$balance' WHERE id='$payableid'");
+      $payablestmt->execute(
+        [
+          ':voucher_no' => $voucher_no,
+          ':description' => $description
+        ]
+      );
+
+
+      //Payable Update
     }
 
-
-    // // payable Update
-    // $oldpayablestmt = $pdo->prepare("SELECT * FROM payable WHERE ac_code='$ac_code' ORDER BY id DESC");
-    // $oldpayablestmt->execute();
-    // $oldpayabledata = $oldpayablestmt->fetch(PDO::FETCH_ASSOC);
-    // $oldpayablebalance = $oldpayabledata['balance'];
-    //
-    // $balance = ($oldpayablebalance + $mmkdebit) - $mmkcredit;
-    // $cashbookstmt = $pdo->prepare("UPDATE payable SET date='$date', paid_voucher=:voucher_no, supplier_id='$ac_code', remark=:description, paid_amount='$mmkdebit', balance='$balance' WHERE voucher_no='$voucher_no'");
-    // $cashbookstmt->execute(
-    //   [
-    //     ':voucher_no' => $voucher_no,
-    //     ':description' => $description
-    //   ]
-    // );
-    //
     // // receivable Update
     // $oldreceivablestmt = $pdo->prepare("SELECT * FROM receivable WHERE ac_code='$ac_code' AND transactionid < '$id' ORDER BY id DESC");
     // $oldreceivablestmt->execute();

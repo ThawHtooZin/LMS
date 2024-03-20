@@ -156,6 +156,7 @@ $query = new Query();
     if (isset($_POST['update'])) {
       $id = $_POST['id'];
       $cash_id = $_POST['cash_id'];
+      $payableid = $_POST['payableid'];
       $date = $_POST['date'];
       $voucher_no = $_POST['voucher_no'];
       $ac_code = $_POST['ac_code'];
@@ -194,7 +195,7 @@ $query = new Query();
         $container_no = '';
       }
       $bank_charges = $_POST['bank_charges'];
-      $query->updatetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $id,  $sr_no, $container_no, $bank_charges, $cash_id);
+      $query->updatetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $id,  $sr_no, $container_no, $bank_charges, $cash_id, $payableid);
     }
     if (isset($_POST['delete'])) {
       $id = $_POST['id'];
@@ -290,7 +291,8 @@ $query = new Query();
                       <div id="updatecollapse<?php echo $data['id']; ?>" class="collapse mb-2" data-bs-parent="#accordion">
                       <form action="" method="post">
                         <input type="hidden" name="id" value="<?php echo $data['id']; ?>">
-                        <input type="hidden" name="cash_id" value="<?php echo $_GET['id']; ?>">
+                        <input type="hidden" name="cash_id" value="<?php if(!empty($_GET['id'])){echo $_GET['id'];} ?>">
+                        <input type="hidden" name="payableid" value="<?php if(!empty($_GET['payableid'])){echo $_GET['payableid'];} ?>">
                         <input type="hidden" name="voucher_no" value="<?php echo $data['voucher_no']; ?>">
                       <div class="row">
                           <div class="col">
