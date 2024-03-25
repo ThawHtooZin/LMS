@@ -189,7 +189,17 @@ $query = new Query();
                 <td><?php echo $payabledata['paid_voucher']; ?></td>
                 <td><?php echo $payabledata['remark']; ?></td>
                 <td><?php if(!empty($payabledata['paid_amount'])){ echo $payabledata['paid_amount'];}; ?></td>
+                <?php
+                if ($payabledata['paid_date'] != "0000-00-00") {
+                ?>
+                <td><?php if(!empty($thebalanceamount) || $thebalanceamount == '0'){ echo $thebalanceamount; }?></td>
+                <?php
+              }else{
+                ?>
                 <td><?php if(!empty($thebalanceamount)){ echo $thebalanceamount; }else{ echo $balanceamount['closing_balance'];} ?></td>
+                <?php
+              }
+                 ?>
                 <td>
                   <a href="edittransaction.php?voucher_no=<?= $payabledata['paid_voucher']; ?>&file=payable&payableid=<?php echo $payabledata['id']; ?>&transactionid=<?php
                   $voucher_no = $payabledata['paid_voucher'];

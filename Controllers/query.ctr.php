@@ -3483,7 +3483,51 @@ Class Query{
     }
   }
 
-  function updatetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $id, $sr_no, $container_no, $bank_charges, $cash_id, $payableid){
+  function updatetransaction_fromtransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $id,  $sr_no, $container_no, $bank_charges){
+    global $pdo;
+
+    if($currency == 'usd'){
+      $mmkdebit = floatval($rate) * floatval($debit);
+      $mmkcredit = floatval($rate) * floatval($credit);
+    }elseif($currency == 'mmk'){
+      $mmkdebit = $debit;
+      $mmkcredit = $credit;
+    }
+
+    $transactionstmt = $pdo->prepare("UPDATE transaction SET date='$date', voucher_no=:voucher_no, ac_code='$ac_code', description=:description, debit='$mmkdebit', credit='$mmkcredit', currency='$currency', sr_no='$sr_no', container_no='$container_no', bank_charges='$bank_charges' WHERE id='$id'");
+    $transactionstmt->execute(
+      [
+        ':voucher_no' => $voucher_no,
+        ':description' => $description
+      ]
+    );
+
+    if(!empty($debit)){
+      $debitorcredit = 'debit';
+      if($currency == 'usd'){
+        $mmk_amount = floatval($rate) * floatval($debit);
+        $usd_amount = $debit;
+      }elseif($currency == 'mmk'){
+        $mmk_amount = $debit;
+        $usd_amount = 0;
+      }
+    }elseif(!empty($credit)){
+      $debitorcredit = 'credit';
+      if($currency == 'usd'){
+        $mmk_amount = floatval($rate) * floatval($credit);
+        $usd_amount = $credit;
+      }elseif($currency == 'mmk'){
+        $mmk_amount = $credit;
+        $usd_amount = 0;
+      }
+    }
+    $currencystmt = $pdo->prepare("UPDATE currency SET dollar_rate='$rate', debitorcredit='$debitorcredit', mmk_amount='$mmk_amount', usd_amount='$usd_amount', voucher_no=:voucher_no WHERE transactionid='$id'");
+    $currencystmt->execute([
+      ':voucher_no' => $voucher_no
+    ]);
+  }
+
+  function updatetransaction_fromany($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $id, $sr_no, $container_no, $bank_charges, $cash_id, $payableid){
     global $pdo;
 
     if($currency == 'usd'){
@@ -3717,6 +3761,9 @@ Class Query{
       echo $mmkdebit;
       echo "<br>";
       echo $payableid;
+      echo "<br>";
+      echo $id;
+
       //Payable Update
       $total_closingstmt = $pdo->prepare("SELECT SUM(closing_balance) AS balance FROM payable WHERE supplier_id='$ac_code' AND purchase_voucher_no = '' AND paid_voucher = ''");
       $total_closingstmt->execute();
@@ -4509,40 +4556,40 @@ Class Query{
     }
    }
 
-   function payablereport(){
-    global $pdo;
-
-    $payablesuppliers = $this->selectdis('payable', 'supplier_id');
-    foreach ($payablesuppliers as $payablesupplier) {
-      $date = date('Y-m-d');
-      $supplier_id = $payablesupplier['supplier_id'];
-      $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id'");
-      $payablestmt->execute();
-      $payabledata = $payablestmt->fetch(PDO::FETCH_ASSOC);
-
-      $idofrow = $payabledata['id'];
-      $openingamountstmt = $pdo->prepare("SELECT balance FROM payable WHERE supplier_id='$supplier_id' AND id < '$idofrow' AND report_date!='0000-00-00' ORDER BY id DESC");
-      $openingamountstmt->execute();
-      $openingamount = $openingamountstmt->fetch(PDO::FETCH_ASSOC);
-
-      $purchaseamtstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS purchase_amount FROM payable WHERE supplier_id='$supplier_id'");
-      $purchaseamtstmt->execute();
-      $purchaseamt = $purchaseamtstmt->fetch(PDO::FETCH_ASSOC);
-
-      $paidamtstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE supplier_id='$supplier_id'");
-      $paidamtstmt->execute();
-      $paidamt = $paidamtstmt->fetch(PDO::FETCH_ASSOC);
-      if (!empty($openingamount['balance'])) {
-        $openingamt = $openingamount['balance'];
-      }else{
-        $openingamt = 0;
-      }
-      $closing_balance =  ($openingamt + $purchaseamt['purchase_amount']) - $paidamt['paid_amount'];
-      $payableid = $payabledata['id'];
-      $payablereportstmt = $pdo->prepare("UPDATE payable SET closing_balance='$closing_balance',  report_date='$date' WHERE id='$payableid'");
-      $payablereportstmt->execute();
-    }
-   }
+   // function payablereport(){
+   //  global $pdo;
+   //
+   //  $payablesuppliers = $this->selectdis('payable', 'supplier_id');
+   //  foreach ($payablesuppliers as $payablesupplier) {
+   //    $date = date('Y-m-d');
+   //    $supplier_id = $payablesupplier['supplier_id'];
+   //    $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id'");
+   //    $payablestmt->execute();
+   //    $payabledata = $payablestmt->fetch(PDO::FETCH_ASSOC);
+   //
+   //    $idofrow = $payabledata['id'];
+   //    $openingamountstmt = $pdo->prepare("SELECT balance FROM payable WHERE supplier_id='$supplier_id' AND id < '$idofrow' AND report_date!='0000-00-00' ORDER BY id DESC");
+   //    $openingamountstmt->execute();
+   //    $openingamount = $openingamountstmt->fetch(PDO::FETCH_ASSOC);
+   //
+   //    $purchaseamtstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS purchase_amount FROM payable WHERE supplier_id='$supplier_id'");
+   //    $purchaseamtstmt->execute();
+   //    $purchaseamt = $purchaseamtstmt->fetch(PDO::FETCH_ASSOC);
+   //
+   //    $paidamtstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE supplier_id='$supplier_id'");
+   //    $paidamtstmt->execute();
+   //    $paidamt = $paidamtstmt->fetch(PDO::FETCH_ASSOC);
+   //    if (!empty($openingamount['balance'])) {
+   //      $openingamt = $openingamount['balance'];
+   //    }else{
+   //      $openingamt = 0;
+   //    }
+   //    $closing_balance =  ($openingamt + $purchaseamt['purchase_amount']) - $paidamt['paid_amount'];
+   //    $payableid = $payabledata['id'];
+   //    $payablereportstmt = $pdo->prepare("UPDATE payable SET closing_balance='$closing_balance',  report_date='$date' WHERE id='$payableid'");
+   //    $payablereportstmt->execute();
+   //  }
+   // }
 
    function addopeningamount($openingamount){
      global $pdo;

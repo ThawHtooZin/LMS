@@ -195,7 +195,7 @@ $query = new Query();
         $container_no = '';
       }
       $bank_charges = $_POST['bank_charges'];
-      $query->updatetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $id,  $sr_no, $container_no, $bank_charges, $cash_id, $payableid);
+      $query->updatetransaction_fromany($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $id,  $sr_no, $container_no, $bank_charges, $cash_id, $payableid);
     }
     if (isset($_POST['delete'])) {
       $id = $_POST['id'];

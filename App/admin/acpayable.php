@@ -47,7 +47,7 @@ $query = new Query();
         <div class="card">
           <div class="card-header bg-info text-light">
             <h3 class="d-inline">Payable for Supplier</h3>
-          
+
             <form action="" method="post" class="d-inline">
               <button type="button" class="btn btn-secondary float-end btn-sm me-2" data-bs-toggle="modal"
               data-bs-target="#addbalancemodal">
@@ -100,7 +100,7 @@ $query = new Query();
                 $supplierdata = $query->select('acname', $supplier_id, 'code_no');
 
               ?>
-              <tr style="<?php if($balance == 0){ echo "display:none;";} ?>">
+              <tr style="">
                 <td><?= $id; ?></td>
                 <td><?= $supplierdata['ac_name']; ?></td>
                 <!-- <td<?php if(empty($openingamount['closing_balance'])){ echo "data-bs-toggle='modal' data-bs-target='#addbalancemodal'";} ?>><?php if(!empty($openingamount['closing_balance'])){ echo $openingamount['closing_balance']; } ?></td> -->

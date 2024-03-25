@@ -24,7 +24,7 @@ $query = new Query();
   <body>
     <?php
     if(isset($_POST['print'])){
-      $query->payablereport();
+      // $query->payablereport();
     }
     if (isset($_POST['addbalance'])) {
       $date = $_POST['date'];
@@ -47,8 +47,8 @@ $query = new Query();
         <div class="card">
           <div class="card-header bg-info text-light">
             <h5>Payable Reports</h5>
-            
-            <?php 
+
+            <?php
               if(isset($_POST['date_search'])){
                 ?>
                   <a href="export.php?table_name=payable&search_date=<?= $_POST['date_search_inp']; ?>" class="btn btn-success btn-sm ms-2 float-end">Export To Excel</a>
@@ -60,7 +60,7 @@ $query = new Query();
               }
             ?>
             <form action="" method="post" class="d-inline">
-              <button type="submit" name="print" class="btn btn-success float-end btn-sm d-inline" onclick="window.open('print/payablereportprint.php');">Print</button>
+              <!-- <button type="submit" name="print" class="btn btn-success float-end btn-sm d-inline" onclick="window.open('print/payablereportprint.php');">Print</button> -->
             <button type="submit" name="date_search" class="btn btn-primary float-end btn-sm ms-2 me-2">Search</button>
             <input type="date" name="date_search_inp" class="inpv2 form-control d-inline float-end ms-2" style=" width: 150px; padding: 2px;">
           </form>
@@ -99,11 +99,11 @@ $query = new Query();
                     $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' AND date='$searchdate'");
                     $payablestmt->execute();
                     $payabledata = $payablestmt->fetch(PDO::FETCH_ASSOC);
-                    
+
                     $openingamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id' AND date<'$searchdate' OR paid_date='$searchdate'");
                     $openingamountstmt->execute();
                     $openingamount = $openingamountstmt->fetch(PDO::FETCH_ASSOC);
-                    
+
 
                     $purchaseamtstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND date<'$searchdate'");
                     $purchaseamtstmt->execute();
@@ -127,7 +127,7 @@ $query = new Query();
                     $paidamountdata = $paidamountstmt->fetch(PDO::FETCH_ASSOC);
                     $paidamount = $paidamountdata['paid_amount'];
 
-                    
+
                     $id++;
                     if (!empty($openingamount['closing_balance'])) {
                       $openingamt = $openingamount['closing_balance'];
@@ -155,7 +155,7 @@ $query = new Query();
                   //   $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' AND date='$searchdate'");
                   //   $payablestmt->execute();
                   //   $payabledata = $payablestmt->fetch(PDO::FETCH_ASSOC);
-                    
+
                   //   $openingamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id' AND date='$date'");
                   //   $openingamountstmt->execute();
                   //   $openingamount = $openingamountstmt->fetch(PDO::FETCH_ASSOC);
@@ -183,7 +183,7 @@ $query = new Query();
                   //   $paidamountdata = $paidamountstmt->fetch(PDO::FETCH_ASSOC);
                   //   $paidamount = $paidamountdata['paid_amount'];
 
-                    
+
                   //   $id++;
                   //   if (!empty($openingamount['closing_balance'])) {
                   //     $openingamt = $openingamount['closing_balance'];
@@ -207,7 +207,7 @@ $query = new Query();
                 </table>
                 <?php
               }else{
-                ?>  
+                ?>
                 <div class="float-end">
                   <b>
                     Date :
@@ -263,7 +263,7 @@ $query = new Query();
                     $paidamountdata = $paidamountstmt->fetch(PDO::FETCH_ASSOC);
                     $paidamount = $paidamountdata['paid_amount'];
 
-                    
+
                     $id++;
                     if (!empty($openingamount['closing_balance'])) {
                       $openingamt = $openingamount['closing_balance'];
