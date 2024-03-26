@@ -26,11 +26,12 @@ $query = new Query();
     if(isset($_POST['addbtn'])){
       $date = $_POST['date'];
       $particular = $_POST['particular'];
-      $commondity_id = $_POST['commondity_id'];
       if(str_contains($particular, 'balance') || str_contains($particular, 'Balance')){
+        $commondity_id = $_POST['commondity_id2'];
         $fish_type = $_POST['fish_type2'];
         $country = $_POST['country2'];
       }else{
+        $commondity_id = $_POST['commondity_id1'];
         $fish_type = $_POST['fish_type1'];
         $country = $_POST['country1'];
       }
@@ -40,7 +41,8 @@ $query = new Query();
       $query->addmcstock($date, $particular, $country, $commondity_id, $fish_type, $size, $kg, $mc);
       $_SESSION['date'] = $_POST['date'];
       $_SESSION['particular'] = $_POST['particular'];
-      $_SESSION['commondity_id'] = $_POST['commondity_id'];
+      $_SESSION['commondity_id1'] = $_POST['commondity_id1'];
+      $_SESSION['commondity_id2'] = $_POST['commondity_id2'];
       $_SESSION['size'] = $_POST['size'];
     }
 
@@ -259,14 +261,14 @@ $query = new Query();
                         <label>Commondity</label>
                         <div class="row">
                           <div class="col">
-                            <select class="form-control inpv2 mb-2" name="commondity_id" id="commondityid1">
+                            <select class="form-control inpv2 mb-2" name="commondity_id1" id="commondityid1">
                             <?php
                             if(!empty($form7commonditydatas)){
                               foreach ($form7commonditydatas as $form7commonditydata) {
                                 $item_id = $form7commonditydata['item_id'];
                                 $commonditydata = $query->select('item', $item_id, 'item_id');
                                 ?>
-                                <option value="<?php echo $commonditydata['item_id']; ?>" <?php if(!empty($_SESSION['commondity_id'])){if($_SESSION['commondity_id'] == $commonditydata['item_id']){ echo "selected"; }} ?>><?php echo $commonditydata['item_name']; ?></option>
+                                <option value="<?php echo $commonditydata['item_id']; ?>" <?php if(!empty($_SESSION['commondity_id1'])){if($_SESSION['commondity_id1'] == $commonditydata['item_id']){ echo "selected"; }} ?>><?php echo $commonditydata['item_name']; ?></option>
                                 <?php
                               }
                             }
@@ -282,7 +284,7 @@ $query = new Query();
                         </div>
                         <div class="row">
                           <div class="col">
-                            <select class="form-control inpv2 mb-2" name="commondity_id" id="commondityid2">
+                            <select class="form-control inpv2 mb-2" name="commondity_id2" id="commondityid2">
                             <?php
                               $commonditydatastmt = $pdo->prepare("SELECT * FROM item");
                               $commonditydatastmt->execute();
@@ -328,7 +330,7 @@ $query = new Query();
                       </div>
                       <div class="col">
                         <label>Size</label>
-                        <input type="text" name="size" class="form-control inpv2 mb-2" value="<?php if(!empty($_SESSION['date'])){ echo $_SESSION['size'];} ?>">
+                        <input type="text" name="size" class="form-control inpv2 mb-2" value="<?php if(!empty($_SESSION['size'])){ echo $_SESSION['size'];} ?>">
                       </div>
                     </div>
                     <div class="row">

@@ -202,17 +202,19 @@ $query = new Query();
                     $nowid = $payabledata['id'];
                     $date = $payabledata['date'];
                     $purchase_voucher_no = $payabledata['purchase_voucher_no'];
-                    $balanceamountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS total_purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no!='$purchase_voucher_no' AND date<'$date'");
+                    $balanceamountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS total_purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND date='$date'");
                     $balanceamountstmt->execute();
                     $balanceamountdata = $balanceamountstmt->fetch(PDO::FETCH_ASSOC);
-                    // echo $balanceamountdata['total_purchase_amount'];
+                    echo $balanceamountdata['total_purchase_amount'];
+                    echo "<br>";
 
-                    $balanceamountstmt2 = $pdo->prepare("SELECT SUM(purchase_amount) AS total_purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND date='$date'");
-                    $balanceamountstmt2->execute();
-                    $balanceamountdata2 = $balanceamountstmt2->fetch(PDO::FETCH_ASSOC);
+                    // $balanceamountstmt2 = $pdo->prepare("SELECT SUM(purchase_amount) AS total_purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND date='$date'");
+                    // $balanceamountstmt2->execute();
+                    // $balanceamountdata2 = $balanceamountstmt2->fetch(PDO::FETCH_ASSOC);
                     // echo $balanceamountdata2['total_purchase_amount'];
+                    // echo "<br>";
 
-                    $total_purchase = $balanceamountdata['total_purchase_amount'] + $balanceamountdata2['total_purchase_amount'];
+                    $total_purchase = $balanceamountdata['total_purchase_amount'];
                   
                     $closingbalanceamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id' AND closing_balance != 0 ORDER BY 
                     CASE 
@@ -223,12 +225,21 @@ $query = new Query();
                     $closingbalanceamountstmt->execute();
                     $closingbalanceamount = $closingbalanceamountstmt->fetch(PDO::FETCH_ASSOC);
                     // print_r($closingbalanceamount);
-                    $totalpaidamountstmt = $pdo->prepare("SELECT SUM(paid_amount) AS total_paid_amount FROM payable WHERE supplier_id='$supplier_id' AND paid_voucher != '' AND id < $nowid AND paid_date='$paid_date'");
+                    $totalpaidamountstmt = $pdo->prepare("SELECT SUM(paid_amount) AS total_paid_amount FROM payable WHERE supplier_id='$supplier_id' AND paid_voucher != '' AND paid_date='$paid_date' ORDER BY 
+                    CASE 
+                        WHEN date = '0000-00-00' THEN paid_date 
+                        ELSE date 
+                    END,
+                    paid_date");
                     $totalpaidamountstmt->execute();
                     $totalpaidamount = $totalpaidamountstmt->fetch(PDO::FETCH_ASSOC);
                     // echo $totalpaidamount['total_paid_amount'];
 
-                    $totalpaidamountstmt2 = $pdo->prepare("SELECT SUM(paid_amount) AS total_paid_amount FROM payable WHERE supplier_id='$supplier_id' AND paid_voucher != '' AND paid_date<'$paid_date'");
+                    $totalpaidamountstmt2 = $pdo->prepare("SELECT SUM(paid_amount) AS total_paid_amount FROM payable WHERE supplier_id='$supplier_id' AND paid_voucher != '' AND paid_date<'$paid_date' ORDER BY 
+                    CASE 
+                        WHEN date = '0000-00-00' THEN paid_date 
+                        ELSE date 
+                    END");
                     $totalpaidamountstmt2->execute();
                     $totalpaidamount2 = $totalpaidamountstmt2->fetch(PDO::FETCH_ASSOC);
                     // echo $totalpaidamount2['total_paid_amount'];
@@ -237,6 +248,12 @@ $query = new Query();
                     
                     // $total_paid_amount = $totalpaidamount['total_paid_amount'];
                     // $total_paid_amount = $total_paid_amount + $payabledata['paid_amount'];
+
+                    echo $total_purchase;
+                    echo "<br>";
+                    echo $idd;
+                    echo "<br>";
+                    echo "<br>";
 
                     $thebalanceamount = $total_purchase + $closingbalanceamount['closing_balance'] - $total_paid_amount;
                   }
