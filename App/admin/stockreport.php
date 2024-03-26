@@ -220,7 +220,7 @@ $query = new Query();
               </tr>
               <?php
               }
-              $hhktotalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE commondity_id='$item_id' AND particular LIKE '%from%' AND country='$country'");
+              $hhktotalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE commondity_id='$item_id' AND particular NOT LIKE '%to%' AND country='$country'");
               $hhktotalmcstmt->execute();
               $hhktotalmcnotsub = $hhktotalmcstmt->fetch(PDO::FETCH_ASSOC);
               $hhktotalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE commondity_id='$item_id' AND particular LIKE '%to%' AND country='$country'");
@@ -238,7 +238,7 @@ $query = new Query();
 
               ?>
               <!-- <tr style="background-color:#c1f5cf;"> -->
-              <tr class="text-center">
+              <tr class="text-center" style="background-color:#c1f5cf;">
                 <td style="font-weight: bold;">Total</td>
                 <td style="font-weight: bold;"></td>
                 <td style="font-weight: bold;"></td>
