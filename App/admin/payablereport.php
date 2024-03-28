@@ -92,6 +92,7 @@ $query = new Query();
                   $payablesuppliers = $stmt->fetchall();
                   // print_r($payablesuppliers);
                   $id = 0;
+                  $totalbalance = 0;
                   foreach ($payablesuppliers as $payablesupplier) :
                     $supplier_id = $payablesupplier['supplier_id'];
 
@@ -149,61 +150,38 @@ $query = new Query();
                     <td><?= ($balance + $addamount) - $paidamount; ?></td>
                   </tr>
                   <?php
+                  // Calculate individual balance
+                  $balance = ($openingamt + $purchaseamt['purchase_amount']) - $paidamt['paid_amount'];
+
+                  // Add individual balance to total balance
+                  $totalbalance += $balance;
                   endforeach;
-                  // if(isset($_POST['date_search'])){
-                  //   $date = date('Y-m-d', strtotime($searchdate . ' -1 day'));
-                  //   $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' AND date='$searchdate'");
-                  //   $payablestmt->execute();
-                  //   $payabledata = $payablestmt->fetch(PDO::FETCH_ASSOC);
+                  // Add Amount Total
+                  $addamountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS add_amount FROM payable WHERE date='$searchdate'");
+                  $addamountstmt->execute();
+                  $addamountdata = $addamountstmt->fetch(PDO::FETCH_ASSOC);
+                  $addamount = $addamountdata['add_amount'];
 
-                  //   $openingamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id' AND date='$date'");
-                  //   $openingamountstmt->execute();
-                  //   $openingamount = $openingamountstmt->fetch(PDO::FETCH_ASSOC);
-                  //   // print_r($openingamount['closing_balance']);
+                  // Paid Amount Total
+                  $paidamountstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE paid_date='$searchdate'");
+                  $paidamountstmt->execute();
+                  $paidamountdata = $paidamountstmt->fetch(PDO::FETCH_ASSOC);
+                  $paidamount = $paidamountdata['paid_amount'];
 
-                  //   $purchaseamtstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND date='$date'");
-                  //   $purchaseamtstmt->execute();
-                  //   $purchaseamt = $purchaseamtstmt->fetch(PDO::FETCH_ASSOC);
-                  //   // print_r($purchaseamt['purchase_amount']);
-
-                  //   $paidamtstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE supplier_id='$supplier_id' AND paid_date='$date'");
-                  //   $paidamtstmt->execute();
-                  //   $paidamt = $paidamtstmt->fetch(PDO::FETCH_ASSOC);
-                  //   // print_r($paidamt['paid_amount']);
-
-                  //   // Add Amount Total
-                  //   $addamountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS add_amount FROM payable WHERE supplier_id='$supplier_id' AND date='$searchdate'");
-                  //   $addamountstmt->execute();
-                  //   $addamountdata = $addamountstmt->fetch(PDO::FETCH_ASSOC);
-                  //   $addamount = $addamountdata['add_amount'];
-
-                  //   // Paid Amount Total
-                  //   $paidamountstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE supplier_id='$supplier_id' AND paid_date='$searchdate'");
-                  //   $paidamountstmt->execute();
-                  //   $paidamountdata = $paidamountstmt->fetch(PDO::FETCH_ASSOC);
-                  //   $paidamount = $paidamountdata['paid_amount'];
-
-
-                  //   $id++;
-                  //   if (!empty($openingamount['closing_balance'])) {
-                  //     $openingamt = $openingamount['closing_balance'];
-                  //   }else{
-                  //     $openingamt = 0;
-                  //   }
-                  //   $balance =  ($openingamt + $purchaseamt['purchase_amount']) - $paidamt['paid_amount'];
-
-                    ?>
-                    <tr>
-                  <!-- <td>TOTAL</td>
-                  <td></td>
-                  <td><?php// $balance; ?></td>
-                  <td><?php// $addamount; ?></td>
-                  <td><?php// $paidamount; ?></td>
-                  <td><?php// ($balance + $addamount) - $paidamount; ?></td>
-                </tr>   -->
-                    <?php
-                  // }
-                ?>
+                  if (!empty($openingamount['closing_balance'])) {
+                    $openingamt = $openingamount['closing_balance'];
+                  }else{
+                    $openingamt = 0;
+                  }
+                  ?>
+                  <tr style="background-color: lightgreen;">
+                <td>TOTAL</td>
+                <td></td>
+                <td><?= $totalbalance; ?></td>
+                <td><?= $addamount; ?></td>
+                <td><?= $paidamount; ?></td>
+                <td><?= ($totalbalance + $addamount) - $paidamount; ?></td>
+              </tr>  
                 </table>
                 <?php
               }else{
