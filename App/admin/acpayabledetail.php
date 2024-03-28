@@ -178,6 +178,7 @@ $query = new Query();
                   }else{
                     if($idd <= 1){
                       $nowid = $payabledata['id'];
+                      $paid_date = $payabledata['paid_date'];
                     $closingbalanceamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id' AND closing_balance != 0 ORDER BY id DESC");
                     $closingbalanceamountstmt->execute();
                     $closingbalanceamount = $closingbalanceamountstmt->fetch(PDO::FETCH_ASSOC);
