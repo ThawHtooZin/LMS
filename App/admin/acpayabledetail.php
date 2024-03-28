@@ -32,6 +32,7 @@ $query = new Query();
         <div class="card">
           <div class="card-header bg-info text-light">
             <a href="acpayable.php" class="btn btn-secondary btn-sm float-end">Back</a>
+            <a href="export.php?table_name=payabledetail&supplier_id=<?= $_GET['supplier_id']; ?>" class="btn btn-success btn-sm float-end me-2">Excel Report</a>
             <h5><?php $supplier_name = $query->select('acname', $_GET['supplier_id'], 'code_no'); echo $supplier_name['ac_name']; ?> Payable Detail Info</h5>
             <!-- <form class="float-end" action="" method="post">
 
