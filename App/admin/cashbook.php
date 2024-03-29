@@ -302,9 +302,9 @@ $query = new Query();
                 $cashdatas = $stmt->fetchall();
               }else{
                 if (empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'ks') {
-                  $stmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/001'");
+                  $stmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/001' ORDER BY date, id");
                 }else{
-                  $stmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/002'");
+                  $stmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/002' ORDER BY date, id");
                 }
                 $stmt->execute();
                 $cashdatas = $stmt->fetchAll();
@@ -313,6 +313,28 @@ $query = new Query();
               <?php
               $idd = 1;
               foreach ($cashdatas as $cashdata) {
+                $rowid = $cashdata['id'];
+                $interfacerowid = $cashdata['interfacerowid'];
+                $idupdatestmt = $pdo->prepare("UPDATE cashbook SET interfacerowid = '$idd' WHERE id='$rowid'");
+                $idupdatestmt->execute();
+                $date = $cashdata['date'];
+                 if(empty($cashdata['voucher_no'])){
+                  // balancecalculate
+                 $transactionid = $cashdata['transactionid'];
+                    
+                 $lastrowstmt = $pdo->prepare("SELECT balance FROM cashbook WHERE interfacerowid>'$interfacerowid'");
+                 
+                 $lastrowstmt->execute();
+                 $lastrowdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
+                 }else{
+                  // balancecalculate
+                 $transactionid = $cashdata['transactionid'];
+                    
+                 $lastrowstmt = $pdo->prepare("SELECT balance FROM cashbook WHERE interfacerowid<'$interfacerowid' ORDER BY id DESC");
+                 
+                 $lastrowstmt->execute();
+                 $lastrowdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
+                 }
                 if(!empty($cashdata['voucher_no'])){
                   if(!empty($cashdata['ac_name'])){
                     $voucher_no = $cashdata['voucher_no'];
@@ -327,12 +349,6 @@ $query = new Query();
                     $debit = $cashdata['debit'];
                     $credit = $cashdata['credit'];
                     // $balance = $cashdata['balance'];
-
-                    // balancecalculate
-                    $rowid = $cashdata['id'];
-                    $lastrowstmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='$ac_code' AND id<'$rowid' ORDER BY id DESC");
-                    $lastrowstmt->execute();
-                    $lastrowdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
                     if(!empty($lastrowdata)){
                       $balance = ($debit + $lastrowdata['balance']) - $credit;
                     }else{
@@ -345,7 +361,7 @@ $query = new Query();
                       $balanceupdatestmt = $pdo->prepare("UPDATE cashbook SET balance='$balance' WHERE id='$rowid'");
                       $balanceupdatestmt->execute();
                     }else{
-                      $balance = $cashdata['balance'];
+                      $balance = $cashdata['balance'];  
                     }
                     // balanceupdate
                   }else{
@@ -408,7 +424,7 @@ $query = new Query();
                   <td><?php echo $cashdata['particular']; ?></td>
                   <td><?php if($cashdata['debit'] == 0){echo "";}else{echo round($debit, 2);}; ?></td>
                   <td><?php if($cashdata['credit'] == 0){echo "";}else{echo round($credit, 2);}; ?></td>
-                  <td><?php echo round($balance, 2); ?></td>
+                  <td><?php echo round($cashdata['balance'], 2); ?></td>
                   <td>
                     <?php
                       if(!empty($crossacnamedata['ac_name'])){

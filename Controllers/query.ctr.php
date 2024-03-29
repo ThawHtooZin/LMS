@@ -4128,9 +4128,9 @@ Class Query{
       // $selectacname = $selectacnamestmt->fetch(PDO::FETCH_ASSOC);
 
       if($cashbookdata['ac_code'] == '3600/001'){
-        $payabledatastmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='3600/001' ORDER BY id DESC");
+        $payabledatastmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='3600/001' AND date='$date' AND transactionid!='$transactionid' ORDER BY id DESC");
       }else{
-        $payabledatastmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='3600/002' ORDER BY id DESC");
+        $payabledatastmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='3600/002' AND date='$date' AND transactionid!='$transactionid' ORDER BY id DESC");
       }
       $payabledatastmt->execute();
       $cashbooksearchdata = $payabledatastmt->fetch(PDO::FETCH_ASSOC);
