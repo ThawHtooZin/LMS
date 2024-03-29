@@ -321,17 +321,17 @@ $query = new Query();
                  if(empty($cashdata['voucher_no'])){
                   // balancecalculate
                  $transactionid = $cashdata['transactionid'];
-                    
+
                  $lastrowstmt = $pdo->prepare("SELECT balance FROM cashbook WHERE interfacerowid>'$interfacerowid'");
-                 
+
                  $lastrowstmt->execute();
                  $lastrowdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
                  }else{
                   // balancecalculate
                  $transactionid = $cashdata['transactionid'];
-                    
+
                  $lastrowstmt = $pdo->prepare("SELECT balance FROM cashbook WHERE interfacerowid<'$interfacerowid' ORDER BY id DESC");
-                 
+
                  $lastrowstmt->execute();
                  $lastrowdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
                  }
@@ -361,7 +361,7 @@ $query = new Query();
                       $balanceupdatestmt = $pdo->prepare("UPDATE cashbook SET balance='$balance' WHERE id='$rowid'");
                       $balanceupdatestmt->execute();
                     }else{
-                      $balance = $cashdata['balance'];  
+                      $balance = $cashdata['balance'];
                     }
                     // balanceupdate
                   }else{
