@@ -3465,11 +3465,11 @@ Class Query{
 
     if($selectdata['debit'] != 0){
       $debitorcredit = 'debit';
-      $debitcurrency = $pdo->prepare("DELETE FROM currency WHERE debitorcredit='$debitorcredit' AND voucher_no='$voucher_no', transactionid='$id'");
+      $debitcurrency = $pdo->prepare("DELETE FROM currency WHERE debitorcredit='$debitorcredit' AND voucher_no='$voucher_no' AND transactionid='$id'");
       $debitcurrency->execute();
     }elseif($selectdata['credit'] != 0){
       $debitorcredit = 'credit';
-      $creditcurrency = $pdo->prepare("DELETE FROM currency WHERE debitorcredit='$debitorcredit' AND voucher_no='$voucher_no', transactionid='$id'");
+      $creditcurrency = $pdo->prepare("DELETE FROM currency WHERE debitorcredit='$debitorcredit' AND voucher_no='$voucher_no' AND transactionid='$id'");
       $creditcurrency->execute();
     }
 
