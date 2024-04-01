@@ -39,7 +39,7 @@ $query = new Query();
       });
   }
     $(document).ready(function(){
-      $('#addac_code').on('keyup', function(){
+      $('#addac_code').blur( function(){
         var ac_codepost = $('#addac_code').val();
         var type = "";
         if(ac_codepost.includes('/')){
