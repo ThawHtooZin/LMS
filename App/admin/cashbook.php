@@ -311,30 +311,27 @@ $query = new Query();
               }
               ?>
               <?php
+              $iddd = 1;
+              $allcashstmt = $pdo->prepare("SELECT * FROM cashbook");
+              $allcashstmt->execute();
+              $allcashdatas = $allcashstmt->fetchall();
+              foreach($allcashdatas as $allcashdata){
+                $rowid = $allcashdata['id'];
+                $idupdatestmt = $pdo->prepare("UPDATE cashbook SET interfacerowid = '$iddd' WHERE id='$rowid'");
+                $idupdatestmt->execute();
+                $iddd++;
+              }
               $idd = 1;
               foreach ($cashdatas as $cashdata) {
                 $rowid = $cashdata['id'];
                 $interfacerowid = $cashdata['interfacerowid'];
-                $idupdatestmt = $pdo->prepare("UPDATE cashbook SET interfacerowid = '$idd' WHERE id='$rowid'");
-                $idupdatestmt->execute();
                 $date = $cashdata['date'];
-                 if(empty($cashdata['voucher_no'])){
-                  // balancecalculate
-                 $transactionid = $cashdata['transactionid'];
-                    
-                 $lastrowstmt = $pdo->prepare("SELECT balance FROM cashbook WHERE interfacerowid>'$interfacerowid'");
-                 
-                 $lastrowstmt->execute();
-                 $lastrowdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
-                 }else{
-                  // balancecalculate
-                 $transactionid = $cashdata['transactionid'];
-                    
-                 $lastrowstmt = $pdo->prepare("SELECT balance FROM cashbook WHERE interfacerowid<'$interfacerowid' ORDER BY id DESC");
-                 
-                 $lastrowstmt->execute();
-                 $lastrowdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
-                 }
+                if(!empty($cashdata['voucher_no'])){
+                  $lastrowstmt = $pdo->prepare("SELECT balance FROM cashbook WHERE interfacerowid<'$interfacerowid' AND interfacerowid!='0' ORDER BY id DESC");
+                  
+                  $lastrowstmt->execute();
+                  $lastrowdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
+                }
                 if(!empty($cashdata['voucher_no'])){
                   if(!empty($cashdata['ac_name'])){
                     $voucher_no = $cashdata['voucher_no'];
@@ -358,7 +355,7 @@ $query = new Query();
 
                     // balanceupdate
                     if($cashdata['balance'] != $balance){
-                      $balanceupdatestmt = $pdo->prepare("UPDATE cashbook SET balance='$balance' WHERE id='$rowid'");
+                      $balanceupdatestmt = $pdo->prepare("UPDATE cashbook SET balance='$balance' WHERE interfacerowid='$rowid' AND interfacerowid!='0'");
                       $balanceupdatestmt->execute();
                     }else{
                       $balance = $cashdata['balance'];  
