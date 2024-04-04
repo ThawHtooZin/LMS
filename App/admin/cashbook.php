@@ -312,7 +312,7 @@ $query = new Query();
               ?>
               <?php
               $iddd = 1;
-              $allcashstmt = $pdo->prepare("SELECT * FROM cashbook");
+              $allcashstmt = $pdo->prepare("SELECT * FROM cashbook ORDER BY date");
               $allcashstmt->execute();
               $allcashdatas = $allcashstmt->fetchall();
               foreach($allcashdatas as $allcashdata){
@@ -324,14 +324,7 @@ $query = new Query();
               $idd = 1;
               foreach ($cashdatas as $cashdata) {
                 $rowid = $cashdata['id'];
-                $interfacerowid = $cashdata['interfacerowid'];
                 $date = $cashdata['date'];
-                if(!empty($cashdata['voucher_no'])){
-                  $lastrowstmt = $pdo->prepare("SELECT balance FROM cashbook WHERE interfacerowid<'$interfacerowid' AND interfacerowid!='0' ORDER BY id DESC");
-                  
-                  $lastrowstmt->execute();
-                  $lastrowdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
-                }
                 if(!empty($cashdata['voucher_no'])){
                   if(!empty($cashdata['ac_name'])){
                     $voucher_no = $cashdata['voucher_no'];
@@ -345,21 +338,12 @@ $query = new Query();
                   if (empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'ks') {
                     $debit = $cashdata['debit'];
                     $credit = $cashdata['credit'];
-                    // $balance = $cashdata['balance'];
-                    if(!empty($lastrowdata)){
-                      $balance = ($debit + $lastrowdata['balance']) - $credit;
-                    }else{
-                      $balance = ($debit + 0) - $credit;
-                    }
-                    // balancecalculate
-
+                
+                    // Calculate balance
+                    $balance += $debit - $credit;
                     // balanceupdate
-                    if($cashdata['balance'] != $balance){
-                      $balanceupdatestmt = $pdo->prepare("UPDATE cashbook SET balance='$balance' WHERE interfacerowid='$rowid' AND interfacerowid!='0'");
-                      $balanceupdatestmt->execute();
-                    }else{
-                      $balance = $cashdata['balance'];  
-                    }
+                    $balanceupdatestmt = $pdo->prepare("UPDATE cashbook SET balance='$balance' WHERE id='$rowid'");
+                    $balanceupdatestmt->execute();
                     // balanceupdate
                   }else{
                     if($acselect['debit'] != 0){
@@ -563,9 +547,10 @@ $query = new Query();
                   if(!empty($_SESSION['cashbooktype']) && $_SESSION['cashbooktype'] != 'usd'){
                     $total_debit = $query->selectallsumcheck('cashbook', 'debit', 'total_debit', 'ac_name', $ac_name);
                     $total_credit = $query->selectallsumcheck('cashbook', 'credit', 'total_credit', 'ac_name', $ac_name);
-                    $balancestmt = $pdo->prepare("SELECT balance FROM cashbook WHERE ac_name='$ac_name' ORDER BY id DESC");
+                    $balancestmt = $pdo->prepare("SELECT * FROM cashbook WHERE interfacerowid='1'");
                     $balancestmt->execute();
-                    $balance = $balancestmt->fetch(PDO::FETCH_ASSOC);
+                    $balancedata = $balancestmt->fetch(PDO::FETCH_ASSOC);
+                    $balance = ($total_debit['total_debit'] + $balancedata['balance']) - $total_credit['total_credit'];
                     ?>
                     <tr style="font-weight: bold;">
                       <td>Total:</td>
@@ -575,7 +560,7 @@ $query = new Query();
                       <td></td>
                       <td><?php echo $total_debit['total_debit'] ?></td>
                       <td><?php if($total_credit['total_credit'] != 0){ echo $total_credit['total_credit'];} ?></td>
-                      <td><?php if(!empty($balance['balance'])){echo $balance['balance'];}; ?></td>
+                      <td><?php if(!empty($balance)){echo $balance;}; ?></td>
                       <td></td>
                     </tr>
                     <?php
