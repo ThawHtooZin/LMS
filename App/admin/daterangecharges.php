@@ -167,7 +167,7 @@ $query = new Query();
             <button type="submit" class="btn btn-success float-end addnewcharges" data-bs-toggle="modal" data-bs-target="#newcharges">Add New Charges</button>
             <button type="submit" class="btn btn-success float-end hide addrepackingcharges" data-bs-toggle="modal" data-bs-target="#repackingcharges">Add Repacking Charges</button>
             <button type="submit" class="btn btn-dark text-light float-end hide addtotalcharges ms-2" data-bs-toggle="modal" data-bs-target="#addpayment">Add Payment</button>
-            <a href="export.php?table_name=daterangecharges&date=<?php if(isset()){} ?>" class="btn btn-success text-light export float-end">Export to Excel</a>
+            <a href="export.php?table_name=daterangecharges&date=" class="btn btn-success text-light export float-end">Export to Excel</a>
           </div>
           <div class="card-body">
             <div class="text-center">
