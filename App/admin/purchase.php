@@ -89,6 +89,12 @@ $query = new Query();
 
               $message = $query->updatepurchase('purchase', $date, $voucher_no, $supplier_name, $tclfrozen, $commodity, $size, $viss, $pcs, $price, $no);
             }
+            $date_error = '';
+            $voucher_no_error = '';
+            $type_error = '';
+            $supplier_name_error = '';
+            $viss_error = '';
+            $price_error = '';
             if(isset($_POST['addbutton'])){
               $date = $_POST['date'];
               $voucher_no = $_POST['voucher_no'];
@@ -100,11 +106,34 @@ $query = new Query();
               $pcs = $_POST['pcs'];
               $price = $_POST['price'];
 
-              $query->addpurchase('purchase' , $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price);
               $_SESSION['purchase_date'] = $date;
               $_SESSION['purchase_voucher_no'] = $voucher_no;
               $_SESSION['purchase_tclfrozen'] = $tclfrozen;
               $_SESSION['purchase_supplier_name'] = $supplier_name;
+
+              if (empty($date) || empty($voucher_no) || empty($tclfrozen) || empty($supplier_name) || empty($viss) || empty($price)) {
+                echo '<script>swal("Error!", "Error accors when added Purchase Voucher", "error");</script>';
+                if (empty($date)) {
+                  $date_error = "Please Enter The Date";
+                }
+                if(empty($voucher_no)){
+                  $voucher_no_error = "Please Enter The Voucher_no";
+                }
+                if(empty($tclfrozen)){
+                  $type_error = "Please Enter Tcl Or Frozen";
+                }
+                if(empty($supplier_name)) {
+                  $supplier_name_error = "Please Enter The Supplier A/C Code";
+                }
+                if (empty($viss)) {
+                  $viss_error = "Please Enter The Viss";
+                }
+                if (empty($price)){
+                  $price_error = "Please Enter The Price";
+                }
+              }else{
+                $query->addpurchase('purchase' , $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price);
+              }
             }
 
             if(isset($_POST['total'])){
@@ -479,7 +508,7 @@ $query = new Query();
       </div>
     </div>
   <!-- Data Add Modal -->
-  <div class="modal fade" id="addmodal" tabindex="-1" role="dialog" aria-hidden="true" style="margin-left:auto !important; margin-right: auto !important;">
+  <div class="modal fade" id="addmodal" style="margin-left:auto !important; margin-right: auto !important;">
     <div class="modal-dialog" role="document">
       <div class="modal-content"  style="width: 750px; !important; margin-top:70px !important;">
         <div class="modal-header bg-secondary text-light">
@@ -493,27 +522,30 @@ $query = new Query();
             <div class="row">
               <div class="col">
                 <label style="font-weight: bold;">Date</label>
-                <input type="date" name="date" class="form-control inpv2" value="<?php if(!empty($_SESSION['purchase_date'])){echo $_SESSION['purchase_date']; }; ?>">
+                <input type="date" name="date" <?php if(!empty($date_error)){ echo "class=\"form-control is-invalid\""; }else{ echo "class=\"form-control inpv2\""; } ?> value="<?php if(!empty($_SESSION['purchase_date'])){echo $_SESSION['purchase_date']; }; ?>">
+                <span class="text-danger" style="font-size:12px; font-weight:bold;" style="font-weight:bold !important;"><?php echo $date_error; ?></span>
               </div>
               <div class="col">
                 <label style="font-weight: bold;">Voucher No</label>
-                <input type="number" name="voucher_no" class="form-control inpv2 mb-2" value="<?php if(!empty($_SESSION['purchase_voucher_no'])){echo $_SESSION['purchase_voucher_no']; }; ?>">
+                <input type="number" name="voucher_no" <?php if(!empty($voucher_no_error)){ echo "class=\"form-control is-invalid\""; }else{ echo "class=\"form-control inpv2\""; } ?> value="<?php if(!empty($_SESSION['purchase_voucher_no'])){echo $_SESSION['purchase_voucher_no']; }; ?>">
+                <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;" style="font-weight:bold !important;"><?php echo $voucher_no_error; ?></span>
               </div>
             </div>
             <div class="row">
               <div class="col">
                 <label style="font-weight: bold;">TCL (or) Frozen</label>
-                <select class="form-control inpv2 mb-2" name="tclfrozen">
+                <select <?php if(!empty($type_error)){ echo "class=\"form-control is-invalid\""; }else{ echo "class=\"form-control inpv2\""; } ?> name="tclfrozen">
                   <option value="">Select</option>
                   <option value="tcl" <?php if(!empty($_SESSION['purchase_tclfrozen'])){if($_SESSION['purchase_tclfrozen'] == 'tcl'){echo "selected";}} ?>>TCL</option>
                   <option value="frozen" <?php if(!empty($_SESSION['purchase_tclfrozen'])){if($_SESSION['purchase_tclfrozen'] == 'frozen'){echo "selected";}} ?>>Frozen</option>
                 </select>
+                <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;" style="font-weight:bold !important;"><?php echo $type_error; ?></span>
               </div>
               <div class="col-6">
                 <label style="font-weight: bold;">Supplier A/C Code</label>
                 <div class="row">
                   <div style="width: 40%;">
-                    <input type="text" id="addac_code" name="supplier_code_no" class="form-control inpv2 mb-1" style="padding-top: 2px; padding-bottom: 2px;" value="<?php if(!empty($_SESSION['purchase_supplier_name'])){echo $_SESSION['purchase_supplier_name']; }; ?>">
+                    <input type="text" id="addac_code" name="supplier_code_no" <?php if(!empty($supplier_name_error)){ echo "class=\"form-control is-invalid\""; }else{ echo "class=\"form-control inpv2\""; } ?> style="padding-top: 2px; padding-bottom: 2px;" value="<?php if(!empty($_SESSION['purchase_supplier_name'])){echo $_SESSION['purchase_supplier_name']; }; ?>">
                     </div>
                   <div style="width: 10%;">
                     <a href="supplier.php" target="_blank" style="width: 10%; padding: 2.5px; color:black; text-align: center;">
@@ -527,6 +559,7 @@ $query = new Query();
                       <input type="text" name="addac_name" disabled class="form-control inpv2 mb-1" style="padding-top: 2px; padding-bottom: 2px;">
                     </div>
                   </div>
+                  <span class="text-danger mb-1" style="font-size:12px; font-weight:bold;"><?php echo $supplier_name_error; ?></span>
                 </div>
               </div>
             </div>
@@ -552,7 +585,8 @@ $query = new Query();
             <div class="row">
               <div class="col">
                 <label style="font-weight: bold;">Viss</label>
-                <input type="text" name="viss" class="form-control inpv2 mb-2">
+                <input type="text" name="viss" <?php if(!empty($viss_error)){ echo "class=\"form-control is-invalid\""; }else{ echo "class=\"form-control inpv2\""; } ?>>
+                <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;"><?php echo $viss_error; ?></span>
               </div>
               <div class="col">
                 <label style="font-weight: bold;">Pcs</label>
@@ -562,9 +596,10 @@ $query = new Query();
             <div class="row">
               <div class="col">
                 <label style="font-weight: bold;">Price</label>
-                <input type="number" name="price" class="form-control inpv2 mb-2">
+                <input type="number" name="price" <?php if(!empty($price_error)){ echo "class=\"form-control is-invalid\""; }else{ echo "class=\"form-control inpv2\""; } ?>>
+                <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;" style="font-weight:bold !important;"><?php echo $price_error; ?></span>
               </div>
-              <div class="col mt-4">
+              <div class="col mt-4 mb-4">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="submit" class="btn btn-success" name="addbutton">Create Voucher</button>
               </div>

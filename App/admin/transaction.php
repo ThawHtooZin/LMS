@@ -211,7 +211,7 @@ $query = new Query();
       if($totaldebitdata['total'] != $totalcreditdata['total']){
         echo "<script>swal('Dosen\'t Match', 'Debit Credit Dosen\'t Match, Please Check again', 'warning');</script>";
       }else{
-        $datestmt = $pdo->prepare("SELECT * FROM transaction GROUP BY `date`");
+        $datestmt = $pdo->prepare("SELECT * FROM transaction GROUP BY `date` order by id desc");
         $datestmt->execute();
         $datesdatas = $datestmt->fetchall();
         foreach ($datesdatas as $datesdata) {
@@ -330,7 +330,10 @@ $query = new Query();
                 <th>Credit</th>
               </tr>
               <?php
-              $stmt = $pdo->prepare("SELECT * FROM transaction");
+              $stmt = $pdo->prepare("SELECT t.*
+              FROM transaction t
+              LEFT JOIN general_ledger g ON t.id = g.transactionid
+              WHERE g.transactionid IS NULL;");
               $stmt->execute();
               $datas = $stmt->fetchall();
               $no = 0;
@@ -518,10 +521,26 @@ $query = new Query();
                   </script>
                 <?php
               }
-              $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total FROM transaction");
+              $totaldebitstmt = $pdo->prepare("
+              SELECT SUM(debit) AS total 
+              FROM transaction t
+              WHERE NOT EXISTS (
+                  SELECT 1 
+                  FROM general_ledger g 
+                  WHERE g.transactionid = t.id
+              )
+          ");
               $totaldebitstmt->execute();
               $totaldebitdata = $totaldebitstmt->fetch(PDO::FETCH_ASSOC);
-              $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total FROM transaction");
+              $totalcreditstmt = $pdo->prepare("
+              SELECT SUM(credit) AS total 
+              FROM transaction t
+              WHERE NOT EXISTS (
+                  SELECT 1 
+                  FROM general_ledger g 
+                  WHERE g.transactionid = t.id
+              )
+              ");
               $totalcreditstmt->execute();
               $totalcreditdata = $totalcreditstmt->fetch(PDO::FETCH_ASSOC);
                ?>
