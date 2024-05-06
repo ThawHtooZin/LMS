@@ -4982,6 +4982,47 @@ Class Query{
       $glstmt = $pdo->prepare("INSERT INTO general_ledger(date, ac_code, narration ,balance) VALUES('$date', '$supplier_id', '$description', '$amount')");
       $glstmt->execute();
     }
+
+  function updategfcmcstock($newdate, $newparticular, $newcommondity_id, $newsize, $newkg, $newmc, $newcountry, $updateid){
+      global $pdo;
+
+        $olddatastmt = $pdo->prepare("SELECT balance_mc FROM gfcmcstock WHERE commondity_id='$newcommondity_id' AND size='$newsize' AND kg='$newkg' AND id < '$updateid' ORDER BY id DESC");
+        $olddatastmt->execute();
+        $olddata = $olddatastmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!empty($olddata)) {
+          if (str_contains($newparticular, "GFC") || str_contains($newparticular, "gfc")) {
+            $balance_mc = $olddata['balance_mc'] + $newmc;
+          }else{
+            $balance_mc = $olddata['balance_mc'] - $newmc;
+          }
+        }else{
+          $balance_mc = $newmc;
+        }
+
+        $stmt = $pdo->prepare("UPDATE gfcmcstock SET date='$newdate', particular='$newparticular', commondity_id='$newcommondity_id', size='$newsize', kg='$newkg', mc='$newmc', country='$newcountry', balance_mc='$balance_mc' WHERE id='$updateid'");
+        $stmt->execute();
+
+          $updatedatastmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id = '$newcommondity_id' AND size = '$newsize' AND kg='$newkg' AND id > '$updateid'");
+          $updatedatastmt->execute();
+          $updatedatas = $updatedatastmt->fetchAll();
+        //update gfcmc for more rows
+        foreach ($updatedatas as $updatedata) {
+          $id = $updatedata['id'];
+          $mc = $updatedata['mc'];
+          $datasstmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id = '$newcommondity_id' AND size = '$newsize' AND kg = '$newkg' AND id < '$id' ORDER BY id DESC");
+          $datasstmt->execute();
+          $datas = $datasstmt->fetch(PDO::FETCH_ASSOC);
+          if (str_contains($updatedata['particular'], "GFC") || str_contains($updatedata['particular'], "gfc")) {
+            $balance_mc = $datas['balance_mc'] + $mc;
+          }else{
+            $balance_mc = $datas['balance_mc'] - $mc;
+          }
+
+          $updatestmt = $pdo->prepare("UPDATE gfcmcstock SET balance_mc='$balance_mc' WHERE id='$id'");
+          $updatestmt->execute();
+        }
+    }
   // MORE SELECTS
 
   function selectsum($table, $id, $selectwhat){
