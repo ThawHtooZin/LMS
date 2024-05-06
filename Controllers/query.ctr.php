@@ -664,9 +664,11 @@ Class Query{
 
     function updatehhkmcstock($newdate, $newparticular, $newcommondity_id, $newsize, $newkg, $newmc, $newcountry, $updateid){
       global $pdo;
-
-      $stmt = $pdo->prepare("UPDATE hhkmcstock SET date='$newdate', particular='$newparticular', commondity_id='$newcommondity_id', size='$newsize', kg='$newkg', mc='$newmc', country='$newcountry' WHERE id='$updateid' ");
+      
+      $stmt = $pdo->prepare("UPDATE hhkmcstock SET date='$newdate', particular='$newparticular', commondity_id='$newcommondity_id', size='$newsize', kg='$newkg', mc='$newmc', country='$newcountry' WHERE id='$updateid'");
       $stmt->execute();
+
+      echo "<script>window.location.href=\"?sizeinfo=$newsize&commondity=$newcommondity_id&country=$newcountry\"</script>";
     }
 
     function addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $pcharges){
