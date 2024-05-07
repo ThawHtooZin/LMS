@@ -246,6 +246,57 @@ $query = new Query();
           <div class="card-body">
             <div id="adddiv" class="collapse mb-2 show" name="outsidething" data-bs-parent="#accordion">
             <form action="" method="post">
+              <div class="row">
+                <div class="col-3">
+                  <input type="text" name="" placeholder="date" value="" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;">
+                  <input type="text" name="" placeholder="Vr No" value="" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;">
+                  <input type="text" name="" placeholder="Currency" value="" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;">
+                  <!-- <input type="text" name="" placeholder="" value="" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;"> -->
+                </div>
+                <div class="col-3">
+                  <textarea name="name" rows="3" cols="80" class="form-control inpv2 mb-3" placeholder="Desc" style="padding-top: 1px; padding-bottom: 1px; height:60px;"></textarea>
+                  <input type="text" name="" value="" placeholder="rate" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;">
+                  <!-- <input type="text" name="" value="" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;"> -->
+                </div>
+                <div class="col-3 text-center">
+                  <input type="text" name="" value="" placeholder="Dr A/C Code" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;">
+                  <input type="text" name="" value="" placeholder="Cr A/C Code" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;">
+                  <input type="text" name="" value="" placeholder="Debit" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;">
+                </div>
+                <div class="col-3 text-center">
+                  <input type="text" name="" value="" placeholder="Dr A/C Name" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;">
+                  <input type="text" name="" value="" placeholder="Dr A/C Name" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;">
+                  <input type="text" name="" value="" placeholder="Credit" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;">
+                </div>
+
+                <div class="d-flex text-center">
+                  <div class="col-6 m-1" style="border-top:1px solid black; border-bottom:1px solid black;">
+                      <span class="" style="font-size:16px;">
+                        Total
+                      </span>
+                  </div>
+                  <div class="col-6 d-flex" style="width:550px;">
+                    <div class="col-6 m-1" style="border-top:1px solid black; border-bottom:1px solid black; font-size:16px;">
+                      0.00
+                    </div>
+                    <div class="col-6 m-1" style="border-top:1px solid black; border-bottom:1px solid black; font-size:16px;">
+                      0.00
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <!-- <div class="col-8">
+
+                  </div> -->
+                  <div class="col-6 mt-3">
+                    <button type="button" name="button" class="btn btn-sm btn-success form-control">Save</button>
+                  </div>
+                  <div class="col-6 mt-3">
+                    <button type="button" name="button" class="btn btn-sm btn-danger form-control">Cancel</button>
+                  </div>
+                </div>
+              </div>
+              <br><br>
             <div class="row">
                 <div class="col">
                   <label>Date</label>
@@ -522,22 +573,22 @@ $query = new Query();
                 <?php
               }
               $totaldebitstmt = $pdo->prepare("
-              SELECT SUM(debit) AS total 
+              SELECT SUM(debit) AS total
               FROM transaction t
               WHERE NOT EXISTS (
-                  SELECT 1 
-                  FROM general_ledger g 
+                  SELECT 1
+                  FROM general_ledger g
                   WHERE g.transactionid = t.id
               )
           ");
               $totaldebitstmt->execute();
               $totaldebitdata = $totaldebitstmt->fetch(PDO::FETCH_ASSOC);
               $totalcreditstmt = $pdo->prepare("
-              SELECT SUM(credit) AS total 
+              SELECT SUM(credit) AS total
               FROM transaction t
               WHERE NOT EXISTS (
-                  SELECT 1 
-                  FROM general_ledger g 
+                  SELECT 1
+                  FROM general_ledger g
                   WHERE g.transactionid = t.id
               )
               ");
