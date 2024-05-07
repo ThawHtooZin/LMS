@@ -41,6 +41,19 @@ $query = new Query();
 
           $query->editgfcmcstocklooseinorout($loosein_size, $loosein_kg, $looseout_size, $looseout_kg, $loosein_pcs, $looseout_pcs, $updateid);
         }
+
+        if (isset($_POST['updatebtn'])) {
+          $newdate = $_POST['newdate'];
+          $newparticular = $_POST['newparticular'];
+          $newcommondity_id = $_POST['newcommondity_id'];
+          $newsize = $_POST['newsize'];
+          $newkg = $_POST['newkg'];
+          $newmc = $_POST['newmc'];
+          $newcountry = $_POST['newcountry'];
+          $updateid = $_POST['upid'];
+
+          $query->updategfcmcstock($newdate, $newparticular, $newcommondity_id, $newsize, $newkg, $newmc, $newcountry, $updateid);
+        }
      ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
@@ -119,7 +132,7 @@ $query = new Query();
                 $item_id = $sizeinfodata['commondity_id'];
                 $commonditydata = $query->select('item', $item_id, 'item_id');
                ?>
-               <tr style="<?php if(str_contains($sizeinfodata['particular'], 'Ship')){echo 'background-color:rgba(255, 0, 0, 0.3) !important;';} ?>">
+               <tr style="<?php if(str_contains($sizeinfodata['particular'], 'Ship')){echo 'background-color:rgba(255, 0, 0, 0.3) !important;';} ?>" data-bs-toggle="<?php if(!str_contains($sizeinfodata['particular'], "GFC")){ echo "modal";} ?>" data-bs-target="#update<?= $sizeinfodata['id']; ?>">
                 <td><?php echo date('d-m-Y', strtotime($sizeinfodata['date'])); ?></td>
                 <td><?php echo $sizeinfodata['particular'];?></td>
                 <td><?php echo $commonditydata['item_name']; ?></td>
@@ -201,6 +214,82 @@ $query = new Query();
                         <button type="submit" class="btn btn-primary" name="remarkeditbtn">Save</button>
                       </div>
                     </form>
+                  </div>
+                </div>
+              </div>
+              <div class="modal fade" id="update<?= $sizeinfodata['id']; ?>">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                    <div class="modal-header bg-secondary text-light">
+                      <h1 class="modal-title fs-5">Update Data</h1>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                  <form action="" method="post">
+                    <input type="hidden" name="upid" value="<?php echo $sizeinfodata['id']; ?>">
+                    <div class="modal-body">
+                      <div class="row">
+                        <div class="col">
+                          <label>Date</label>
+                          <input type="date" name="newdate" class="form-control inpv2 mb-2" value="<?php echo $sizeinfodata['date']; ?>">
+                          <label>Commondity</label>
+                          <select class="form-control inpv2 mb-2" name="newcommondity_id">
+                            <?php
+                            $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM item");
+                            $form7commonditystmt->execute();
+                            $form7commonditydatas = $form7commonditystmt->fetchall();
+                            foreach ($form7commonditydatas as $form7commonditydata) {
+                              $item_id = $form7commonditydata['item_id'];
+                              $commonditydata = $query->select('item', $item_id, 'item_id');
+                              ?>
+                              <option value="<?php echo $commonditydata['item_id']; ?>" <?php if($sizeinfodata['commondity_id'] == $commonditydata['item_id']){ echo "selected"; } ?>><?php echo $commonditydata['item_name']; ?></option>
+                              <?php
+                            }
+                            ?>
+                          </select>
+                        </div>
+                        <div class="col">
+                          <label>Particular</label>
+                          <textarea name="newparticular" rows="4" class="form-control inpv2 mb-2"><?php echo $sizeinfodata['particular']; ?></textarea>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col">
+                          <label>Country</label>
+                          <select class="form-control inpv2 mb-2" name="newcountry">
+
+                            <?php
+                            $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM hhkmcstock WHERE country IS NOT NULL");
+                            $countrystmt->execute();
+                            $countrydatas = $countrystmt->fetchall();
+                            foreach ($countrydatas as $countrydata) {
+                              ?>
+                              <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
+                              <?php
+                            }
+                            ?>
+                          </select>
+                        </div>
+                        <div class="col">
+                          <label>Size</label>
+                          <input type="text" name="newsize" class="form-control inpv2 mb-2" value="<?php echo $sizeinfodata['size']; ?>">
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col">
+                          <label>Kg</label>
+                          <input type="text" name="newkg" class="form-control inpv2 mb-2" value="<?php echo $sizeinfodata['kg']; ?>">
+                        </div>
+                        <div class="col">
+                          <label>Mc</label>
+                          <input type="number" name="newmc" class="form-control inpv2 mb-2" value="<?php echo $sizeinfodata['mc']; ?>">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="submit" class="btn btn-success" name="updatebtn">Update</button>
+                    </div>
+                  </form>
                   </div>
                 </div>
               </div>

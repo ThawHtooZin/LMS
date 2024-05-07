@@ -234,14 +234,14 @@ $query = new Query();
                           <label>Commondity</label>
                           <select class="form-control inpv2 mb-2" name="newcommondity_id">
                             <?php
-                            $form7commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock");
+                            $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM item");
                             $form7commonditystmt->execute();
                             $form7commonditydatas = $form7commonditystmt->fetchall();
                             foreach ($form7commonditydatas as $form7commonditydata) {
-                              $item_id = $form7commonditydata['commondity_id'];
+                              $item_id = $form7commonditydata['item_id'];
                               $commonditydata = $query->select('item', $item_id, 'item_id');
                               ?>
-                              <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                              <option value="<?php echo $commonditydata['item_id']; ?>" <?php if($sizeinfodata['commondity_id'] == $commonditydata['item_id']){ echo "selected"; } ?>><?php echo $commonditydata['item_name']; ?></option>
                               <?php
                             }
                             ?>
