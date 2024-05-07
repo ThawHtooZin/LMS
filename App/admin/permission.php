@@ -121,6 +121,9 @@ $query = new Query();
       if(!empty($_POST['manage_tclmcstock'])){
         $permission .= ",manage_tclmcstock";
       }
+      if(!empty($_POST['manage_generalledger'])){
+        $permission .= ",manage_generalledger";
+      }
 
       $permission;
       $role_id = $_GET['role_id'];
@@ -258,6 +261,10 @@ $query = new Query();
                   <td><input type="checkbox" name="payable_report" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'payable_report') == 1){echo "checked";}} ?>></td>
                   <td>Manage Stock Report</td>
                   <td><input type="checkbox" name="manage_stockreport" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_stockreport') == 1){echo "checked";}} ?>></td>
+                </tr>
+                <tr>
+                  <td>Manage General Ledger Report</td>
+                  <td><input type="checkbox" name="manage_generalledger" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'manage_generalledger') == 1){echo "checked";}} ?>></td>
                 </tr>
                 <tr>
                   <td></td>
