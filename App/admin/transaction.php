@@ -105,7 +105,8 @@ $query = new Query();
     if(isset($_POST['save'])){
       $date = $_POST['adddate'];
       $voucher_no = $_POST['addvoucher_no'];
-      $ac_code = $_POST['addac_code'];
+      $drac_code = $_POST['drac_code'];
+      $crac_code = $_POST['crac_code'];
       if(str_contains($ac_code, '3600')){
         $description = $_POST['adddescriptionbank'];
         $_SESSION['description'] = '';
@@ -151,7 +152,7 @@ $query = new Query();
       $_SESSION['addac_code'] = $_POST['addac_code'];
       $_SESSION['ac_name'] = $ac_name;
 
-      $query->savetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $sr_no, $container_no, $bank_charges);
+      $query->savetransaction($date, $voucher_no, $drac_code, $crac_code, $description, $currency, $rate, $debit, $credit, $sr_no, $container_no, $bank_charges);
     }
     if (isset($_POST['update'])) {
       $id = $_POST['id'];
@@ -245,58 +246,7 @@ $query = new Query();
           <div class="panel-group" id="accordion">
           <div class="card-body">
             <div id="adddiv" class="collapse mb-2 show" name="outsidething" data-bs-parent="#accordion">
-            <form action="" method="post">
-              <div class="row">
-                <div class="col-3">
-                  <input type="text" name="" placeholder="date" value="" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;">
-                  <input type="text" name="" placeholder="Vr No" value="" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;">
-                  <input type="text" name="" placeholder="Currency" value="" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;">
-                  <!-- <input type="text" name="" placeholder="" value="" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;"> -->
-                </div>
-                <div class="col-3">
-                  <textarea name="name" rows="3" cols="80" class="form-control inpv2 mb-3" placeholder="Desc" style="padding-top: 1px; padding-bottom: 1px; height:60px;"></textarea>
-                  <input type="text" name="" value="" placeholder="rate" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;">
-                  <!-- <input type="text" name="" value="" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;"> -->
-                </div>
-                <div class="col-3 text-center">
-                  <input type="text" name="" value="" placeholder="Dr A/C Code" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;">
-                  <input type="text" name="" value="" placeholder="Cr A/C Code" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;">
-                  <input type="text" name="" value="" placeholder="Debit" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;">
-                </div>
-                <div class="col-3 text-center">
-                  <input type="text" name="" value="" placeholder="Dr A/C Name" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;">
-                  <input type="text" name="" value="" placeholder="Dr A/C Name" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;">
-                  <input type="text" name="" value="" placeholder="Credit" class="form-control inpv2 mb-3" style="padding-top: 1px; padding-bottom: 1px;">
-                </div>
-
-                <div class="d-flex text-center">
-                  <div class="col-6 m-1" style="border-top:1px solid black; border-bottom:1px solid black;">
-                      <span class="" style="font-size:16px;">
-                        Total
-                      </span>
-                  </div>
-                  <div class="col-6 d-flex" style="width:550px;">
-                    <div class="col-6 m-1" style="border-top:1px solid black; border-bottom:1px solid black; font-size:16px;">
-                      0.00
-                    </div>
-                    <div class="col-6 m-1" style="border-top:1px solid black; border-bottom:1px solid black; font-size:16px;">
-                      0.00
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <!-- <div class="col-8">
-
-                  </div> -->
-                  <div class="col-6 mt-3">
-                    <button type="button" name="button" class="btn btn-sm btn-success form-control">Save</button>
-                  </div>
-                  <div class="col-6 mt-3">
-                    <button type="button" name="button" class="btn btn-sm btn-danger form-control">Cancel</button>
-                  </div>
-                </div>
-              </div>
-              <br><br>
+          <form action="" method="post">
             <div class="row">
                 <div class="col">
                   <label>Date</label>
@@ -307,29 +257,34 @@ $query = new Query();
                   <input type="text" name="addvoucher_no" class="form-control inpv2 mb-1" value="<?php if(!empty($_SESSION['addvoucher_no'])){echo $_SESSION['addvoucher_no']; } ?>" style="padding-top: 2px; padding-bottom: 2px;">
                 </div>
                 <div class="col">
-                  <label>A/C Code</label>
-                  <div class="d-flex">
-                    <input type="text" id="addac_code" name="addac_code" class="form-control inpv2 mb-1" value="<?php if(!empty($_SESSION['addac_code'])){echo $_SESSION['addac_code']; } ?>" style="padding-top: 2px; padding-bottom: 2px; width:90%;">
-                    <a href="acname.php?fromtransaction=true" style="width: 10%; color:black; text-align: center; margin-left: 8px; border: 1px solid black; border-radius: 5px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                      <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-                    </svg>
-                    </a>
-                  </div>
-                  <!-- <div class="d-flex">
-                    <input type="text" id="addac_code" name="addac_code" class="form-control inpv2 mb-1" value="<?php if(!empty($_SESSION['addac_code'])){echo $_SESSION['addac_code']; } ?>" style="padding-top: 2px; padding-bottom: 2px; width:90%;">
-                    <a href="acname.php" target="_blank" style="width: 10%; color:black; text-align: center; margin-left: 8px; border: 1px solid black; border-radius: 5px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                      <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-                    </svg>
-                    </a>
-                  </div> -->
+                  <label style="display: block !important;">Debit AC/Code</label>
+                  <select name="drac_code" class="chzn-select" style="width: 100%;">
+                  <?php
+                    $stmt = $pdo->prepare("SELECT * FROM acname");
+                    $stmt->execute();
+                    $acdatas = $stmt->fetchAll();
+                    foreach($acdatas as $acdata){
+                      ?>
+                        <option value="<?= $acdata['code_no'] ?>"><?= $acdata['ac_name'] ?> - <?= $acdata['code_no'] ?></option>
+                      <?php
+                    }
+                  ?>
+                  </select>
                 </div>
                 <div class="col">
-                  <label>A/C Name</label>
-                  <div id='addac_name' style="padding-top:2px; padding-bottom:2px;">
-                    <input type="text" name="addac_name" disabled class="form-control inpv2 mb-1" value="<?php if(!empty($_SESSION['ac_name'])){echo $_SESSION['ac_name']; } ?>" style="padding-top: 2px; padding-bottom: 2px;">
-                  </div>
+                  <label style="display: block !important;">Credit AC/Code</label>
+                  <select name="crac_code" class="chzn-select" style="width: 100%;">
+                  <?php
+                    $stmt = $pdo->prepare("SELECT * FROM acname");
+                    $stmt->execute();
+                    $acdatas = $stmt->fetchAll();
+                    foreach($acdatas as $acdata){
+                      ?>
+                        <option value="<?= $acdata['code_no'] ?>"><?= $acdata['ac_name'] ?> - <?= $acdata['code_no'] ?></option>
+                      <?php
+                    }
+                  ?>
+                  </select>
                 </div>
             </div>
             <!-- <button type="submit" style="display:none;"></button> -->
@@ -368,7 +323,7 @@ $query = new Query();
                 <button type="submit" class="btn btn-success mt-3 btn-sm" style="width: 100%;" name="save">Save</button>
               </div>
               </div>
-            </form>
+          </form>
             </div>
             <!-- TABLEEEEEEEEEEEEEEEEEEEE -->
             <table class="table table-hover table-striped">

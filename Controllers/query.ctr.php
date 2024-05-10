@@ -3486,7 +3486,7 @@ Class Query{
     }
   }
 
-  function savetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $sr_no, $container_no, $bank_charges){
+  function savetransaction($date, $voucher_no, $drac_code, $crac_code, $description, $currency, $rate, $debit, $credit, $sr_no, $container_no, $bank_charges){
     global $pdo;
 
     if($currency == 'usd'){
@@ -3501,7 +3501,8 @@ Class Query{
       $mmkdebit = $debit;
       $mmkcredit = $credit;
     }
-    $transactionstmt = $pdo->prepare("INSERT INTO transaction(date, voucher_no, ac_code, description, debit, credit, currency, sr_no, container_no,bank_charges) VALUES('$date', :voucher_no, '$ac_code', :description, '$mmkdebit', '$mmkcredit', '$currency', '$sr_no', '$container_no', '$bank_charges')");
+    // Dr Transaction
+    $transactionstmt = $pdo->prepare("INSERT INTO transaction(date, voucher_no, ac_code, description, debit, currency, sr_no, container_no,bank_charges) VALUES('$date', :voucher_no, '$drac_code', :description, '$mmkdebit', , '$currency', '$sr_no', '$container_no', '$bank_charges')");
 
     $transactionstmt->execute(
       [
@@ -3509,37 +3510,39 @@ Class Query{
         ':description' => $description
       ]
     );
+    // Cr Transaction
+    $transactionstmt = $pdo->prepare("INSERT INTO transaction(date, voucher_no, ac_code, description, credit, currency, sr_no, container_no,bank_charges) VALUES('$date', :voucher_no, '$crac_code', :description, '$mmkcredit', '$currency', '$sr_no', '$container_no', '$bank_charges')");
 
-    if(!empty($debit)){
-      $debitorcredit = 'debit';
-
-      if($currency == 'usd'){
-        $mmk_amount = floatval($rate) * floatval($debit);
-        $usd_amount = $debit;
-      }elseif($currency == 'mmk'){
-        $mmk_amount = $debit;
-        $usd_amount = 0;
-      }
-    }elseif(!empty($credit)){
-      $debitorcredit = 'credit';
-      if($currency == 'usd'){
-        $mmk_amount = floatval($rate) * floatval($credit);
-        $usd_amount = $credit;
-      }elseif($currency == 'mmk'){
-        $mmk_amount = $credit;
-        $usd_amount = 0;
-      }
+    $transactionstmt->execute(
+      [
+        ':voucher_no' => $voucher_no,
+        ':description' => $description
+      ]
+    );
+    if($currency == 'usd'){
+      $mmk_amount = floatval($rate) * floatval($credit);
+      $usd_amount = $credit;
+    }elseif($currency == 'mmk'){
+      $mmk_amount = $credit;
+      $usd_amount = 0;
     }
 
     $idstmt = $pdo->prepare("SELECT * FROM transaction ORDER BY id DESC");
     $idstmt->execute();
     $iddata = $idstmt->fetch(PDO::FETCH_ASSOC);
     $transactionid = $iddata['id'];
+    // Dr Currency
+    $debitorcredit = 'debit';
     $currencystmt = $pdo->prepare("INSERT INTO currency(dollar_rate, debitorcredit, mmk_amount, usd_amount, voucher_no, transactionid) VALUES('$rate', '$debitorcredit', '$mmk_amount', '$usd_amount', :voucher_no, '$transactionid')");
     $currencystmt->execute([
       ':voucher_no' => $voucher_no,
     ]);
-
+    // Cr Currency
+    $debitorcredit = 'credit';
+    $currencystmt = $pdo->prepare("INSERT INTO currency(dollar_rate, debitorcredit, mmk_amount, usd_amount, voucher_no, transactionid) VALUES('$rate', '$debitorcredit', '$mmk_amount', '$usd_amount', :voucher_no, '$transactionid')");
+    $currencystmt->execute([
+      ':voucher_no' => $voucher_no,
+    ]);
   }
 
   function deletetransaction($id, $voucher_no){

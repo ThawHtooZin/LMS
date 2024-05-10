@@ -263,7 +263,7 @@ $query = new Query();
                             $countrydatas = $countrystmt->fetchall();
                             foreach ($countrydatas as $countrydata) {
                               ?>
-                              <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
+                              <option value="<?php echo $countrydata['country']; ?>" <?php if($countrydata['country'] == $sizeinfodata['country']){ echo 'selected'; }; ?>><?php echo $countrydata['country']; ?></option>
                               <?php
                             }
                             ?>
