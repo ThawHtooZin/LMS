@@ -107,12 +107,12 @@ $query = new Query();
       $voucher_no = $_POST['addvoucher_no'];
       $drac_code = $_POST['drac_code'];
       $crac_code = $_POST['crac_code'];
-      if(str_contains($ac_code, '3600')){
+      if(str_contains($drac_code, '3600')){
         $description = $_POST['adddescriptionbank'];
         $_SESSION['description'] = '';
         $_SESSION['descriptionrec'] = '';
         $_SESSION['descriptionbank'] = $_POST['adddescriptionbank'];
-      }elseif(str_contains($ac_code, '3300')){
+      }elseif(str_contains($drac_code, '3300')){
         $description = $_POST['adddescriptionrec'];
         $_SESSION['description'] = '';
         $_SESSION['descriptionbank'] = '';
@@ -149,7 +149,6 @@ $query = new Query();
       }
       $_SESSION['adddate'] = $_POST['adddate'];
       $_SESSION['addvoucher_no'] = $_POST['addvoucher_no'];
-      $_SESSION['addac_code'] = $_POST['addac_code'];
       $_SESSION['ac_name'] = $ac_name;
 
       $query->savetransaction($date, $voucher_no, $drac_code, $crac_code, $description, $currency, $rate, $debit, $credit, $sr_no, $container_no, $bank_charges);
@@ -564,22 +563,6 @@ $query = new Query();
       </div>
     </div>
     <script type="text/javascript">
-    $(document).ready(function(){
-      $('#adddebitinp').on('keyup', function(){
-        if($('#adddebitinp').val() == ''){
-          document.getElementById('addcreditinp').disabled = false;
-        }else{
-          document.getElementById('addcreditinp').disabled = true;
-        }
-      });
-      $('#addcreditinp').on('keyup', function(){
-        if($('#addcreditinp').val() == ''){
-          document.getElementById('adddebitinp').disabled = false;
-        }else{
-          document.getElementById('adddebitinp').disabled = true;
-        }
-      });
-    });
       function addcheckrate(){
         let addrateinp = document.getElementById('addrate');
         let addselectcurrecy = document.getElementById('addselectcurrecy');

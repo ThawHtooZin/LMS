@@ -340,7 +340,7 @@ $query = new Query();
                     $credit = $cashdata['credit'];
                 
                     // Calculate balance
-                    $balance += $debit - $credit;
+                    $balance += intval($debit) - intval($credit);
                     // balanceupdate
                     $balanceupdatestmt = $pdo->prepare("UPDATE cashbook SET balance='$balance' WHERE id='$rowid'");
                     $balanceupdatestmt->execute();

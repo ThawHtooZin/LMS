@@ -3502,7 +3502,7 @@ Class Query{
       $mmkcredit = $credit;
     }
     // Dr Transaction
-    $transactionstmt = $pdo->prepare("INSERT INTO transaction(date, voucher_no, ac_code, description, debit, currency, sr_no, container_no,bank_charges) VALUES('$date', :voucher_no, '$drac_code', :description, '$mmkdebit', , '$currency', '$sr_no', '$container_no', '$bank_charges')");
+    $transactionstmt = $pdo->prepare("INSERT INTO transaction(date, voucher_no, ac_code, description, debit, currency, sr_no, container_no,bank_charges) VALUES('$date', :voucher_no, '$drac_code', :description, '$mmkdebit', '$currency', '$sr_no', '$container_no', '$bank_charges')");
 
     $transactionstmt->execute(
       [
@@ -4231,7 +4231,7 @@ Class Query{
         }else{
         $balance = 0;
       }
-      $balance = ($balance + $debit) - $credit;
+      $balance = ($balance + intval($debit)) - $credit;
       // if(str_contains($crossacname, '3300/')){
         $checkcbstmt = $pdo->prepare("SELECT * FROM cashbook WHERE transactionid='$transactionid'");
       // }else{
