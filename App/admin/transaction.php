@@ -105,14 +105,13 @@ $query = new Query();
     if(isset($_POST['save'])){
       $date = $_POST['adddate'];
       $voucher_no = $_POST['addvoucher_no'];
-      $drac_code = $_POST['drac_code'];
-      $crac_code = $_POST['crac_code'];
-      if(str_contains($drac_code, '3600')){
+      $ac_code = $_POST['addac_code'];
+      if(str_contains($ac_code, '3600')){
         $description = $_POST['adddescriptionbank'];
         $_SESSION['description'] = '';
         $_SESSION['descriptionrec'] = '';
         $_SESSION['descriptionbank'] = $_POST['adddescriptionbank'];
-      }elseif(str_contains($drac_code, '3300')){
+      }elseif(str_contains($ac_code, '3300')){
         $description = $_POST['adddescriptionrec'];
         $_SESSION['description'] = '';
         $_SESSION['descriptionbank'] = '';
@@ -149,9 +148,10 @@ $query = new Query();
       }
       $_SESSION['adddate'] = $_POST['adddate'];
       $_SESSION['addvoucher_no'] = $_POST['addvoucher_no'];
+      $_SESSION['addac_code'] = $_POST['addac_code'];
       $_SESSION['ac_name'] = $ac_name;
 
-      $query->savetransaction($date, $voucher_no, $drac_code, $crac_code, $description, $currency, $rate, $debit, $credit, $sr_no, $container_no, $bank_charges);
+      $query->savetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $sr_no, $container_no, $bank_charges);
     }
     if (isset($_POST['update'])) {
       $id = $_POST['id'];
@@ -245,7 +245,7 @@ $query = new Query();
           <div class="panel-group" id="accordion">
           <div class="card-body">
             <div id="adddiv" class="collapse mb-2 show" name="outsidething" data-bs-parent="#accordion">
-          <form action="" method="post">
+            <form action="" method="post">
             <div class="row">
                 <div class="col">
                   <label>Date</label>
@@ -256,34 +256,29 @@ $query = new Query();
                   <input type="text" name="addvoucher_no" class="form-control inpv2 mb-1" value="<?php if(!empty($_SESSION['addvoucher_no'])){echo $_SESSION['addvoucher_no']; } ?>" style="padding-top: 2px; padding-bottom: 2px;">
                 </div>
                 <div class="col">
-                  <label style="display: block !important;">Debit AC/Code</label>
-                  <select name="drac_code" class="chzn-select" style="width: 100%;">
-                  <?php
-                    $stmt = $pdo->prepare("SELECT * FROM acname");
-                    $stmt->execute();
-                    $acdatas = $stmt->fetchAll();
-                    foreach($acdatas as $acdata){
-                      ?>
-                        <option value="<?= $acdata['code_no'] ?>"><?= $acdata['ac_name'] ?> - <?= $acdata['code_no'] ?></option>
-                      <?php
-                    }
-                  ?>
-                  </select>
+                  <label>A/C Code</label>
+                  <div class="d-flex">
+                    <input type="text" id="addac_code" name="addac_code" class="form-control inpv2 mb-1" value="<?php if(!empty($_SESSION['addac_code'])){echo $_SESSION['addac_code']; } ?>" style="padding-top: 2px; padding-bottom: 2px; width:90%;">
+                    <a href="acname.php?fromtransaction=true" style="width: 10%; color:black; text-align: center; margin-left: 8px; border: 1px solid black; border-radius: 5px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                      <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                    </svg>
+                    </a>
+                  </div>
+                  <!-- <div class="d-flex">
+                    <input type="text" id="addac_code" name="addac_code" class="form-control inpv2 mb-1" value="<?php if(!empty($_SESSION['addac_code'])){echo $_SESSION['addac_code']; } ?>" style="padding-top: 2px; padding-bottom: 2px; width:90%;">
+                    <a href="acname.php" target="_blank" style="width: 10%; color:black; text-align: center; margin-left: 8px; border: 1px solid black; border-radius: 5px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                      <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                    </svg>
+                    </a>
+                  </div> -->
                 </div>
                 <div class="col">
-                  <label style="display: block !important;">Credit AC/Code</label>
-                  <select name="crac_code" class="chzn-select" style="width: 100%;">
-                  <?php
-                    $stmt = $pdo->prepare("SELECT * FROM acname");
-                    $stmt->execute();
-                    $acdatas = $stmt->fetchAll();
-                    foreach($acdatas as $acdata){
-                      ?>
-                        <option value="<?= $acdata['code_no'] ?>"><?= $acdata['ac_name'] ?> - <?= $acdata['code_no'] ?></option>
-                      <?php
-                    }
-                  ?>
-                  </select>
+                  <label>A/C Name</label>
+                  <div id='addac_name' style="padding-top:2px; padding-bottom:2px;">
+                    <input type="text" name="addac_name" disabled class="form-control inpv2 mb-1" value="<?php if(!empty($_SESSION['ac_name'])){echo $_SESSION['ac_name']; } ?>" style="padding-top: 2px; padding-bottom: 2px;">
+                  </div>
                 </div>
             </div>
             <!-- <button type="submit" style="display:none;"></button> -->
@@ -322,7 +317,7 @@ $query = new Query();
                 <button type="submit" class="btn btn-success mt-3 btn-sm" style="width: 100%;" name="save">Save</button>
               </div>
               </div>
-          </form>
+            </form>
             </div>
             <!-- TABLEEEEEEEEEEEEEEEEEEEE -->
             <table class="table table-hover table-striped">
@@ -527,22 +522,22 @@ $query = new Query();
                 <?php
               }
               $totaldebitstmt = $pdo->prepare("
-              SELECT SUM(debit) AS total
+              SELECT SUM(debit) AS total 
               FROM transaction t
               WHERE NOT EXISTS (
-                  SELECT 1
-                  FROM general_ledger g
+                  SELECT 1 
+                  FROM general_ledger g 
                   WHERE g.transactionid = t.id
               )
           ");
               $totaldebitstmt->execute();
               $totaldebitdata = $totaldebitstmt->fetch(PDO::FETCH_ASSOC);
               $totalcreditstmt = $pdo->prepare("
-              SELECT SUM(credit) AS total
+              SELECT SUM(credit) AS total 
               FROM transaction t
               WHERE NOT EXISTS (
-                  SELECT 1
-                  FROM general_ledger g
+                  SELECT 1 
+                  FROM general_ledger g 
                   WHERE g.transactionid = t.id
               )
               ");
@@ -563,6 +558,22 @@ $query = new Query();
       </div>
     </div>
     <script type="text/javascript">
+    $(document).ready(function(){
+      $('#adddebitinp').on('keyup', function(){
+        if($('#adddebitinp').val() == ''){
+          document.getElementById('addcreditinp').disabled = false;
+        }else{
+          document.getElementById('addcreditinp').disabled = true;
+        }
+      });
+      $('#addcreditinp').on('keyup', function(){
+        if($('#addcreditinp').val() == ''){
+          document.getElementById('adddebitinp').disabled = false;
+        }else{
+          document.getElementById('adddebitinp').disabled = true;
+        }
+      });
+    });
       function addcheckrate(){
         let addrateinp = document.getElementById('addrate');
         let addselectcurrecy = document.getElementById('addselectcurrecy');
