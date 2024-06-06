@@ -749,7 +749,7 @@ Class Query{
         }
       }
       }
-        // echo "<script>window.location.href=\"?sizeinfo=$newsize&commondity=$newcommondity_id&country=$newcountry\"</script>";
+        echo "<script>window.location.href=\"?sizeinfo=$newsize&commondity=$newcommondity_id&country=$newcountry\"</script>";
       }
 
 
@@ -5022,6 +5022,7 @@ Class Query{
           $updatestmt = $pdo->prepare("UPDATE gfcmcstock SET balance_mc='$balance_mc' WHERE id='$id'");
           $updatestmt->execute();
         }
+        echo "<script>window.location.href=\"?sizeinfo=$newsize&commondity=$newcommondity_id&country=$newcountry\"</script>";
     }
   // MORE SELECTS
 

@@ -152,17 +152,30 @@ $query = new Query();
                 $sizestmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE size='$size' ORDER BY id DESC");
                 $sizestmt->execute();
                 $sizedata = $sizestmt->fetch(PDO::FETCH_ASSOC);
+                // IN
                 $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular='HHK to GFC'");
                 $totalmcstmt->execute();
                 $totalmcnotsub = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
-                $totalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular!='HHK to GFC'");
+                
+                // Ship
+                $totalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular='ship'");
                 $totalmcsubnumstmt->execute();
-                $totalmcsubnum = $totalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
-                if($gfcstockdata['particular'] == 'balance' || $gfcstockdata['particular'] == 'Balance' && $totalmcnotsub['total_mc'] != 0){
+
+                // Balance
+                $totalbalancemcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular LIKE '%balance%' ");
+                $totalbalancemcsubnumstmt->execute();
+                $totalbalancemcsubnum = $totalbalancemcsubnumstmt->fetch(PDO::FETCH_ASSOC);
+
+                // if($gfcstockdata['particular'] == 'balance' || $gfcstockdata['particular'] == 'Balance' && $totalmcnotsub['total_mc'] != 0){
+                //   $totalmc = $totalmcsubnum['total_mc'];
+                // }else{
+                //   echo $gfcstockdata['particular'];
+                //   echo $totalmcnotsub['total_mc'];
+                // }
+                if(str_contains($gfcstockdata['particular'], 'balance')){
                   $totalmc = $totalmcsubnum['total_mc'];
-                }else{
-                  $totalmc = $totalmcnotsub['total_mc'] - $totalmcsubnum['total_mc'];
                 }
+                $totalmc = $totalmcnotsub['total_mc'] - $totalmcsubnum['total_mc'];
                ?>
               <tr style="<?php if($totalmc > 200){echo 'background-color:rgba(0, 255, 0, 0.4) !important;';} ?>">
                 <td><?php echo $commonditydata['item_name']; ?></td>
