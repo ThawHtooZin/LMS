@@ -338,9 +338,9 @@ $query = new Query();
                   if (empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'ks') {
                     $debit = $cashdata['debit'];
                     $credit = $cashdata['credit'];
-                
+
                     // Calculate balance
-                    $balance += $debit - $credit;
+                    $balance += intval($debit) - intval($credit);
                     // balanceupdate
                     $balanceupdatestmt = $pdo->prepare("UPDATE cashbook SET balance='$balance' WHERE id='$rowid'");
                     $balanceupdatestmt->execute();
@@ -569,9 +569,9 @@ $query = new Query();
                     $total_debit = $query->selectallsumcheck('cashbook', 'debit', 'total_debit', 'ac_name', $ac_name);
                     $total_credit = $query->selectallsumcheck('cashbook', 'credit', 'total_credit', 'ac_name', $ac_name);
                     // print_r($total_debit);
-
-
-
+                    $opening_amountstmt = $pdo->prepare("SELECT * FROM cashbook ORDER BY id asc");
+                    $opening_amountstmt->execute();
+                    $opening_amount = $opening_amountstmt->fetch(PDO::FETCH_ASSOC);
 
 
                     // Dollor Change
@@ -584,7 +584,7 @@ $query = new Query();
                       <td></td>
                       <td><?php if(!empty($total_debit['total_debit'])){ echo $total_debit['total_debit'];} ?></td>
                       <td><?php if(!empty($total_credit['total_credit'])){ echo $total_credit['total_credit'];} ?></td>
-                      <td><?php echo $total_debit['total_debit'] - $total_credit['total_credit']; ?></td>
+                      <td><?php echo $opening_amount['balance']+ $total_debit['total_debit'] - $total_credit['total_credit']; ?></td>
                       <td></td>
                     </tr>
                     <?php

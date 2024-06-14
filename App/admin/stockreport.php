@@ -73,7 +73,10 @@ $query = new Query();
             <select class="form-control w-25 d-inline float-end" style="height:26px; padding-left:10px; padding-top:2px;" name="commondity_id">
               <option value="">View Each Commondity</option>
               <?php
-              $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM hhkmcstock WHERE country IS NOT NULL");
+              $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM hhkmcstock WHERE country IS NOT NULL
+              UNION
+              SELECT DISTINCT country FROM gfcmcstock WHERE country IS NOT NULL;
+              ");
               $countrystmt->execute();
               $countrydatas = $countrystmt->fetchall();
 
@@ -144,12 +147,17 @@ $query = new Query();
                 $hhkmcstockcommonditystmt->execute();
                 $hhkmcstockcommonditydatas = $hhkmcstockcommonditystmt->rowCount();
             }else{
-                $hhkmcstockcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country='$country'");
+                $hhkmcstockcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country = '$country'
+                UNION
+                SELECT DISTINCT commondity_id FROM gfcmcstock WHERE country = '$country';
+                ");
                 $hhkmcstockcommonditystmt->execute();
                 $hhkmcstockcommonditydatas = $hhkmcstockcommonditystmt->rowCount();
             }
               for ($i=0; $i < $hhkmcstockcommonditydatas; $i++) {
-                $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country='$country'");
+                $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country = '$country'
+                UNION
+                SELECT DISTINCT commondity_id FROM gfcmcstock WHERE country = '$country'");
                 $commonditystmt->execute();
                 $commonditydata = $commonditystmt->fetchall();
                 $commondity_id = $commonditydata[$i]['commondity_id'];

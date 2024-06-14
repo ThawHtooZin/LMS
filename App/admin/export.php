@@ -1024,7 +1024,7 @@ if($_GET['table_name'] == 'mcstockreport'){
     </tr>
     <?php
     }
-    $hhktotalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE commondity_id='$item_id' AND particular LIKE '%from%' AND country='$country'");
+    $hhktotalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE commondity_id='$item_id' AND particular NOT LIKE '%to%' AND country='$country'");
     $hhktotalmcstmt->execute();
     $hhktotalmcnotsub = $hhktotalmcstmt->fetch(PDO::FETCH_ASSOC);
     $hhktotalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE commondity_id='$item_id' AND particular LIKE '%to%' AND country='$country'");
@@ -1053,7 +1053,7 @@ if($_GET['table_name'] == 'mcstockreport'){
       <td style="font-weight: bold;"><?php if($gfctotalmc != 0 || $hhktotalmc != 0){echo $hhktotalmc + $gfctotalmc;}else{echo "-";}; ?></td>
     </tr>
     <?php
-    }
+  }
       ?>
   </table>
   <?php
@@ -2448,8 +2448,20 @@ if ($_GET['table_name'] == "form10frozen") {
 
       $totalform7pcs = $pdo->prepare("SELECT SUM(pcsperf7) AS totalform7pcs FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id'");
       $totalform7pcs->execute();
-      $totalform7data = $totalform7pcs->fetch(PDO::FETCH_ASSOC);
+      $totalform7pcsdata = $totalform7pcs->fetch(PDO::FETCH_ASSOC);
 
+      $totalform7viss = $pdo->prepare("SELECT SUM(viss) AS totalform7viss FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id'");
+      $totalform7viss->execute();
+      $totalform7vissdata = $totalform7viss->fetch(PDO::FETCH_ASSOC);
+
+      $totalform7kg = $pdo->prepare("SELECT SUM(kg) AS totalform7kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id'");
+      $totalform7kg->execute();
+      $totalform7kgdata = $totalform7kg->fetch(PDO::FETCH_ASSOC);
+
+      $totalform7pcsvr = $pdo->prepare("SELECT SUM(pcspervr) AS totalform7pcs FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id'");
+      $totalform7pcsvr->execute();
+      $totalform7pcsvrdata = $totalform7pcsvr->fetch(PDO::FETCH_ASSOC);
+      
       $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
       $totalkgstmt->execute();
       $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
@@ -2477,19 +2489,42 @@ if ($_GET['table_name'] == "form10frozen") {
       $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
       $kgstmt->execute();
       $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
+
+      $form10pcs = $pdo->prepare("SELECT SUM(pcs) AS pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+      $form10pcs->execute();
+      $form10dbpcsdata = $form10pcs->fetch(PDO::FETCH_ASSOC);
+
+      $form10looseinkg = $pdo->prepare("SELECT SUM(looseinkg) AS kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+      $form10looseinkg->execute();
+      $form10looseinkgdata = $form10looseinkg->fetch(PDO::FETCH_ASSOC);
+
+      $form10looseinpcs = $pdo->prepare("SELECT SUM(looseinpcs) AS pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+      $form10looseinpcs->execute();
+      $form10looseinpcsdata = $form10looseinpcs->fetch(PDO::FETCH_ASSOC);
+
+      $form10looseoutkg = $pdo->prepare("SELECT SUM(looseoutkg) AS kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+      $form10looseoutkg->execute();
+      $form10looseoutkgdata = $form10looseoutkg->fetch(PDO::FETCH_ASSOC);
+
+      $form10looseoutpcs = $pdo->prepare("SELECT SUM(looseoutpcs) AS pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+      $form10looseoutpcs->execute();
+      $form10looseoutpcsdata = $form10looseoutpcs->fetch(PDO::FETCH_ASSOC);
       ?>
       <tr>
-      <td style="font-weight:bold; text-align:center;" colspan="8">Total</td>
-      <td style="font-weight:bold;"><?php echo round($totalform7data['totalform7pcs'], 2); ?></td>
+      <td style="font-weight:bold; text-align:center;" colspan="5">Total</td>
+      <td style="font-weight:bold;"><?php echo round($totalform7vissdata['totalform7viss'], 2); ?></td>
+      <td style="font-weight:bold;"><?php echo round($totalform7kgdata['totalform7kg'], 2); ?></td>
+      <td style="font-weight:bold;"><?php echo round($totalform7pcsvrdata['totalform7pcs'], 2); ?></td>
+      <td style="font-weight:bold;"><?php echo round($totalform7pcsdata['totalform7pcs'], 2); ?></td>
       <td></td>
       <td style="font-weight:bold;"><?php echo round($form10pcsdata['total_form10_pcs'], 2); ?></td>
       <td style="font-weight:bold;"><?php echo round($mcdata['total_mc'], 2); ?></td>
       <td style="font-weight:bold;"><?php echo round($kgdata['kg'], 2); ?></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
+      <td style="font-weight:bold;"><?php echo round($form10dbpcsdata['pcs'], 2); ?></td>
+      <td style="font-weight:bold;"><?php echo round($form10looseinkgdata['kg'], 2); ?></td>
+      <td style="font-weight:bold;"><?php echo round($form10looseinpcsdata['pcs'], 2); ?></td>
+      <td style="font-weight:bold;"><?php echo round($form10looseoutkgdata['kg'], 2); ?></td>
+      <td style="font-weight:bold;"><?php echo round($form10looseoutpcsdata['pcs'], 2); ?></td>
       <td style="font-weight:bold;"><?php echo round($totalkgdata['total_kg'], 2); ?></td>
       <td style="font-weight:bold; <?php if(strpos(round($percentage, 2), '-') !== false){echo 'color:red;';} ?>"><?php echo round($percentage, 2). "%"; ?></td>
       </tr>
