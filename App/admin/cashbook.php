@@ -334,7 +334,7 @@ $query = new Query();
                     ':voucher_no' => $voucher_no
                   ]);
                   $acselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
-                  $accode = $acselect['ac_code'];
+                  // $accode = $acselect['ac_code'];
                   if (empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'ks') {
                     $debit = $cashdata['debit'];
                     $credit = $cashdata['credit'];

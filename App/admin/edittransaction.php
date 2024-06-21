@@ -241,6 +241,7 @@ $query = new Query();
                 $stmt->execute(
                   array(':searchvoucher_no' => $searchvoucher_no)
                 );
+
               }else{
                 $searchsr_no = $_GET['sr_no'];
                 $stmt = $pdo->prepare("SELECT * FROM transaction WHERE sr_no=:sr_name");
