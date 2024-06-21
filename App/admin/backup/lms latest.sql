@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 21, 2024 at 02:58 PM
+-- Generation Time: Jun 21, 2024 at 03:59 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -6826,8 +6826,65 @@ CREATE TABLE `gfcfishlabour` (
 --
 -- Table structure for table `gfcmcstock`
 --
--- Error reading structure for table lms.gfcmcstock: #1932 - Table &#039;lms.gfcmcstock&#039; doesn&#039;t exist in engine
--- Error reading data for table lms.gfcmcstock: #1064 - You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near &#039;FROM `lms`.`gfcmcstock`&#039; at line 1
+
+CREATE TABLE `gfcmcstock` (
+  `id` int(11) NOT NULL,
+  `country` varchar(19) NOT NULL,
+  `particular` varchar(255) NOT NULL,
+  `date` date NOT NULL,
+  `commondity_id` varchar(11) NOT NULL,
+  `size` varchar(11) NOT NULL,
+  `kg` varchar(11) NOT NULL,
+  `mc` int(11) NOT NULL,
+  `balance_mc` bigint(17) NOT NULL,
+  `loosein_size` varchar(20) NOT NULL,
+  `loosein_kg` varchar(20) NOT NULL,
+  `loosein_pcs` varchar(20) NOT NULL,
+  `looseout_size` varchar(20) NOT NULL,
+  `looseout_kg` varchar(20) NOT NULL,
+  `looseout_pcs` varchar(20) NOT NULL,
+  `remark` text NOT NULL,
+  `hhk_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `gfcmcstock`
+--
+
+INSERT INTO `gfcmcstock` (`id`, `country`, `particular`, `date`, `commondity_id`, `size`, `kg`, `mc`, `balance_mc`, `loosein_size`, `loosein_kg`, `loosein_pcs`, `looseout_size`, `looseout_kg`, `looseout_pcs`, `remark`, `hhk_id`) VALUES
+(31, 'LM', 'Balance', '2024-05-07', '1015', '3/5', '20', 3, 3, '', '', '', '', '', '', '', 0),
+(32, 'LM', 'Balance', '2024-05-07', '1015', '5/8', '20', 605, 605, '', '', '', '', '', '', '', 0),
+(33, 'LM', 'Balance', '2024-05-07', '1015', '6/8', '20', 9, 9, '', '', '', '', '', '', '', 0),
+(34, 'LM', 'Balance', '2024-05-07', '1015', '10/12', '21', 5, 5, '', '', '', '', '', '', '', 0),
+(35, 'LM', 'Balance', '2024-05-07', '1015', '15/20', '20', 1224, 1224, '', '', '', '', '', '', '', 0),
+(36, 'LM', 'Balance', '2024-05-07', '1015', '12/15', '21', 514, 514, '', '', '', '', '', '', '', 0),
+(37, 'LM', 'Balance', '2024-05-07', '1015', '15/20', '20', 10, 1234, '', '', '', '', '', '', '', 0),
+(38, 'LM', 'Balance', '2024-05-07', '1015', '18up', '20', 50, 50, '', '', '', '', '', '', '', 0),
+(39, 'LM', 'Balance', '2024-05-07', '1015', '2up', '20', 30, 30, '', '', '', '', '', '', '', 0),
+(40, '', 'Balance', '0000-00-00', '1001', '', '', 0, 0, '', '', '', '', '', '', '', 0),
+(41, 'NY', 'Balance', '2024-05-08', '1031', '2up', '20', 28, 28, '', '', '', '', '', '', '', 0),
+(42, 'NY', 'Balance', '2024-05-08', '1031', '2up', '21', 7, 7, '', '', '', '', '', '', '', 0),
+(43, 'NY', 'Balance', '2024-05-08', '1031', '3up', '20', 35, 35, '', '', '', '', '', '', '', 0),
+(44, 'NY', 'Balance', '2024-05-08', '1031', '3up', '21', 122, 122, '', '', '', '', '', '', '', 0),
+(45, 'NY', 'Balance', '2024-05-08', '1031', '3up', '22', 177, 177, '', '', '', '', '', '', '', 0),
+(46, 'NY', 'Balance', '2024-05-08', '1031', '3up', '23', 53, 53, '', '', '', '', '', '', '', 0),
+(47, 'NY', 'Balance', '2024-05-08', '1031', '3up', '24', 9, 9, '', '', '', '', '', '', '', 0),
+(48, 'NY', 'Balance', '2024-05-08', '1031', '4up', '21', 87, 87, '', '', '', '', '', '', '', 0),
+(49, 'NY', 'Balance', '2024-05-08', '1031', '4up', '22', 137, 137, '', '', '', '', '', '', '', 0),
+(50, 'NY', 'Balance', '2024-05-08', '1031', '4up', '23', 79, 79, '', '', '', '', '', '', '', 0),
+(51, 'NY', 'Balance', '2024-05-08', '1031', '4up', '24', 2, 2, '', '', '', '', '', '', '', 0),
+(52, 'NY', 'Balance', '2024-05-08', '1031', '4up', '17.5', 1, 1, '', '', '', '', '', '', '', 0),
+(53, 'NY', 'Balance', '2024-05-08', '1031', '5up', '21', 23, 23, '', '', '', '', '', '', '', 0),
+(54, 'NY', 'Balance', '2024-05-08', '1031', '5up', '22', 20, 20, '', '', '', '', '', '', '', 0),
+(55, 'NY', 'Balance', '2024-05-08', '1031', '5up', '23', 2, 2, '', '', '', '', '', '', '', 0),
+(56, 'NY', 'Balance', '2024-05-08', '1031', '6up', '19', 2, 2, '', '', '', '', '', '', '', 0),
+(57, 'NY', 'Balance', '2024-05-08', '1031', '6up', '18.6', 1, 1, '', '', '', '', '', '', '', 0),
+(58, 'NY', 'Balance', '2024-05-08', '1031', '2up', '17.5', 1, 1, '', '', '', '', '', '', '', 0),
+(59, 'NY', 'Balance', '2024-05-06', '1023', '4up', '22', 1, 1, '', '', '', '', '', '', '', 0),
+(60, 'NY', 'Balance', '2024-05-06', '1023', '4up', '23', 3, 3, '', '', '', '', '', '', '', 0),
+(61, 'NY', 'Balance', '2024-05-06', '1023', '2up', '20', 18, 18, '', '', '', '', '', '', '', 0),
+(62, 'NY', 'Balance', '2024-05-06', '1023', '2up', '21', 8, 8, '', '', '', '', '', '', '', 0),
+(63, 'NY', 'Balance', '2024-05-06', '1023', '3up', '20', 1, 1, '', '', '', '', '', '', '', 0);
 
 -- --------------------------------------------------------
 
@@ -13043,6 +13100,12 @@ ALTER TABLE `gfcfishlabour`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `gfcmcstock`
+--
+ALTER TABLE `gfcmcstock`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `gfctotal`
 --
 ALTER TABLE `gfctotal`
@@ -13369,6 +13432,12 @@ ALTER TABLE `gfcfishcoldstore`
 --
 ALTER TABLE `gfcfishlabour`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+
+--
+-- AUTO_INCREMENT for table `gfcmcstock`
+--
+ALTER TABLE `gfcmcstock`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `gfctotal`

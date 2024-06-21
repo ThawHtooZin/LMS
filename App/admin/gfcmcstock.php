@@ -156,10 +156,11 @@ $query = new Query();
                 $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular='HHK to GFC'");
                 $totalmcstmt->execute();
                 $totalmcnotsub = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
-                
+
                 // Ship
                 $totalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular='ship'");
                 $totalmcsubnumstmt->execute();
+                $totalmcsubnum = $totalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
 
                 // Balance
                 $totalbalancemcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular LIKE '%balance%' ");
