@@ -3672,13 +3672,17 @@ Class Query{
       $balance = ($oldcashbalance + $mmkdebit) - $mmkcredit;
 
       // Cross acname process
-      $oldcrossstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND description LIKE '%***'");
+      // echo $voucher_no;
+      // echo "<br>";
+      $oldcrossstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND description LIKE '%***%'");
       $oldcrossstmt->execute(
         array(':voucher_no' => $voucher_no)
       );
       $crossac_name = $oldcrossstmt->fetch(PDO::FETCH_ASSOC);
+      // print_r($crossac_name);
+
       if(!empty($crossac_name['ac_code'])){
-        $crossacname = $crossac_name['ac_code'];
+        echo $crossacname = $crossac_name['ac_code'];
       }else{
         $crossacname = '';
       }
