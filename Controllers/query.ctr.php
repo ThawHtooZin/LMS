@@ -3562,6 +3562,54 @@ Class Query{
       $creditcurrency->execute();
     }
 
+
+    if($stmt){
+      echo "<script>swal('Success', 'Deleted Transaction Successfully' , 'success')</script>";
+      $_SESSION['adddate'] = "";
+      $_SESSION['addvoucher_no'] = "";
+      $_SESSION['addac_code'] = "";
+      $_SESSION['ac_name'] = "";
+      $_SESSION['description'] = "";
+    }
+  }
+
+  function deleteedittransaction($id, $voucher_no){
+    global $pdo;
+
+    $selectstmt = $pdo->prepare("SELECT * FROM transaction WHERE id='$id'");
+    $selectstmt->execute();
+    $selectdata = $selectstmt->fetch(PDO::FETCH_ASSOC);
+
+    $stmt = $pdo->prepare("DELETE FROM transaction WHERE id='$id'");
+    $stmt->execute();
+
+    if($selectdata['debit'] != 0){
+      $debitorcredit = 'debit';
+      $debitcurrency = $pdo->prepare("DELETE FROM currency WHERE debitorcredit='$debitorcredit' AND voucher_no='$voucher_no' AND transactionid='$id'");
+      $debitcurrency->execute();
+    }elseif($selectdata['credit'] != 0){
+      $debitorcredit = 'credit';
+      $creditcurrency = $pdo->prepare("DELETE FROM currency WHERE debitorcredit='$debitorcredit' AND voucher_no='$voucher_no' AND transactionid='$id'");
+      $creditcurrency->execute();
+    }
+    $ac_code = $selectdata['ac_code'];
+
+    // Cashbook
+    $deletesmt = $pdo->prepare("DELETE FROM cashbook WHERE transactionid='$id'");
+    $deletesmt->execute();
+
+    // Payable
+    $payabledeletestmt = $pdo->prepare("DELETE FROM payable WHERE paid_voucher='$voucher_no' AND supplier_id='$ac_code'");
+    $payabledeletestmt->execute();
+
+    // Receivable
+    $receivabledeletestmt = $pdo->prepare("DELETE FROM receivable WHERE transactionid='$id'");
+    $receivabledeletestmt->execute();
+
+    // general ledger
+    $gldeletestmt = $pdo->prepare("DELETE FROM general_ledger WHERE transactionid='$id'");
+    $gldeletestmt->execute();
+
     if($stmt){
       echo "<script>swal('Success', 'Deleted Transaction Successfully' , 'success')</script>";
       $_SESSION['adddate'] = "";
@@ -3806,7 +3854,7 @@ Class Query{
       $balance = ($oldcashbalance + $mmkdebit) - $mmkcredit;
 
       // Cross acname process
-      $oldcrossstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND description LIKE '%***'");
+      $oldcrossstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND description LIKE '%***%'");
       $oldcrossstmt->execute(
         array(':voucher_no' => $voucher_no)
       );
@@ -3907,7 +3955,7 @@ Class Query{
     // Star removal
 
     if(str_contains($ac_code, '3600/')){
-      $starstmt = $pdo->prepare("SELECT * FROM transaction WHERE description LIKE '%***'");
+      $starstmt = $pdo->prepare("SELECT * FROM transaction WHERE description LIKE '%***%'");
       $starstmt->execute();
       $stardata = $starstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -4162,21 +4210,22 @@ Class Query{
       // $crossacnamestmt->execute(
       //   array(':voucher_no' => $voucher_no)
       // );
-      $oldcrossstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no ORDER BY id DESC");
-      $oldcrossstmt->execute(
-        array(':voucher_no' => $voucher_no)
-      );
-      $oldcrossdata = $oldcrossstmt->fetch(PDO::FETCH_ASSOC);
-      if (!empty($oldcrossdata)) {
-        $crossacname = $oldcrossdata['crossac_name'];
-      }else{
-        $oldcrossstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND ac_code NOT LIKE '3600%'");
+      // $oldcrossstmt = $pdo->prepare("SELECT * FROM cashbook WHERE voucher_no=:voucher_no ORDER BY id DESC");
+      // $oldcrossstmt->execute(
+      //   array(':voucher_no' => $voucher_no)
+      // );
+      // $oldcrossdata = $oldcrossstmt->fetch(PDO::FETCH_ASSOC);
+      // if (!empty($oldcrossdata)) {
+      //   $crossacname = $oldcrossdata['crossac_name'];
+      // }else{
+        $beforetransactionid = $transactionid - 1;
+        $oldcrossstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND ac_code NOT LIKE '3600%' AND id='$beforetransactionid' ORDER BY id DESC");
         $oldcrossstmt->execute(
           array(':voucher_no' => $voucher_no)
         );
         $crossac_name = $oldcrossstmt->fetch(PDO::FETCH_ASSOC);
         $crossacname = $crossac_name['ac_code'];
-      }
+      // }
       // $crossacnamestmt = $pdo->prepare("SELECT ac_code FROM transaction WHERE voucher_no=:voucher_no AND ac_code != '$oldcrossname' AND ac_code NOT LIKE '3600%'");
       // $crossacnamestmt->execute(
       //   array(':voucher_no' => $voucher_no)
@@ -4248,7 +4297,10 @@ Class Query{
         ]);
       }
 
-  }
+    }
+    
+    $stmt = $pdo->prepare("UPDATE transaction SET status='accepted' WHERE status LIKE '%selected%'");
+    $stmt->execute();
   }
 
   // DELETE ACCEPT
@@ -5173,6 +5225,13 @@ Class Query{
     $stmt = $pdo->prepare("SELECT * FROM $table ORDER BY $orderby");
     $stmt->execute();
     return $stmt->fetchall();
+  }
+
+  function selectacname($code_no){
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM acname WHERE code_no='$code_no'");
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 }
 

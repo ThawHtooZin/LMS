@@ -75,83 +75,79 @@ $query = new Query();
           }
         }
       });
-      $('#finishbtn').on('click', function(){
-        swal({
-          title: "Are you Finish?",
-          text: "If you are really finish just click the accept button!",
-          icon: "warning",
-          buttons: [
-            'No, Not Finished!',
-            'Yes, I am Done!'
-          ],
-        }).then(function(isConfirm) {
-          if (isConfirm) {
-            $('#notfinishbtn').show();
-            $('#acceptbtn').show();
-            $("#finishbtn").hide();
-          }
-        })
-      });
-      $('#notfinishbtn').on('click', function(){
-        $('#acceptbtn').hide();
-        $('#notfinishbtn').hide();
-        $('#finishbtn').show();
-      });
     });
   </script>
   <body>
     <?php
     $ac_name = '';
     if(isset($_POST['save'])){
-      $date = $_POST['adddate'];
-      $voucher_no = $_POST['addvoucher_no'];
-      $ac_code = $_POST['addac_code'];
-      if(str_contains($ac_code, '3600')){
-        $description = $_POST['adddescriptionbank'];
-        $_SESSION['description'] = '';
-        $_SESSION['descriptionrec'] = '';
-        $_SESSION['descriptionbank'] = $_POST['adddescriptionbank'];
-      }elseif(str_contains($ac_code, '3300')){
-        $description = $_POST['adddescriptionrec'];
-        $_SESSION['description'] = '';
-        $_SESSION['descriptionbank'] = '';
-        $_SESSION['descriptionrec'] = $_POST['adddescriptionrec'];
-      }else{
-        $description = $_POST['adddescription'];
-        $_SESSION['descriptionrec'] = '';
-        $_SESSION['descriptionbank'] = '';
-        $_SESSION['description'] = $_POST['adddescription'];
-      }
-      $currency = $_POST['addcurrency'];
-      $bank_charges = $_POST['bank_charges'];
-      if(!empty($_POST['addrate'])){
-        $rate = $_POST['addrate'];
-      }else{
-        $rate = "";
-      }
-      if(!empty($_POST['adddebit'])){
-        $debit = $_POST['adddebit'];
-      }else{
-        $debit = 0;
-      }
-      if(!empty($_POST['addcredit'])){
-        $credit = $_POST['addcredit'];
-      }else{
-        $credit = 0;
-      }
-      if(!empty($_POST['addsr_no']) && !empty($_POST['addcontainer_no'])){
-        $sr_no = $_POST['addsr_no'];
-        $container_no = $_POST['addcontainer_no'];
-      }else{
-        $sr_no = '';
-        $container_no = '';
-      }
-      $_SESSION['adddate'] = $_POST['adddate'];
-      $_SESSION['addvoucher_no'] = $_POST['addvoucher_no'];
-      $_SESSION['addac_code'] = $_POST['addac_code'];
-      $_SESSION['ac_name'] = $ac_name;
+      if(!empty($_POST['addvoucher_no']) && !empty($_POST['adddate']) && !empty($_POST['addac_code']) && !empty($_POST['adddebit']) || !empty($_POST['addcredit']) ){
+        $date = $_POST['adddate'];
+        $voucher_no = $_POST['addvoucher_no'];
+        $ac_code = $_POST['addac_code'];
+        if(str_contains($ac_code, '3600')){
+          $description = $_POST['adddescriptionbank'];
+          $_SESSION['description'] = '';
+          $_SESSION['descriptionrec'] = '';
+          $_SESSION['descriptionbank'] = $_POST['adddescriptionbank'];
+        }elseif(str_contains($ac_code, '3300')){
+          $description = $_POST['adddescriptionrec'];
+          $_SESSION['description'] = '';
+          $_SESSION['descriptionbank'] = '';
+          $_SESSION['descriptionrec'] = $_POST['adddescriptionrec'];
+        }else{
+          $description = $_POST['adddescription'];
+          $_SESSION['descriptionrec'] = '';
+          $_SESSION['descriptionbank'] = '';
+          $_SESSION['description'] = $_POST['adddescription'];
+        }
+        $currency = $_POST['addcurrency'];
+        $bank_charges = $_POST['bank_charges'];
+        if(!empty($_POST['addrate'])){
+          $rate = $_POST['addrate'];
+        }else{
+          $rate = "";
+        }
+        if(!empty($_POST['adddebit'])){
+          $debit = $_POST['adddebit'];
+        }else{
+          $debit = 0;
+        }
+        if(!empty($_POST['addcredit'])){
+          $credit = $_POST['addcredit'];
+        }else{
+          $credit = 0;
+        }
+        if(!empty($_POST['addsr_no']) && !empty($_POST['addcontainer_no'])){
+          $sr_no = $_POST['addsr_no'];
+          $container_no = $_POST['addcontainer_no'];
+        }else{
+          $sr_no = '';
+          $container_no = '';
+        }
+        $_SESSION['adddate'] = $_POST['adddate'];
+        $_SESSION['addvoucher_no'] = $_POST['addvoucher_no'];
+        $_SESSION['addac_code'] = $_POST['addac_code'];
+        $_SESSION['ac_name'] = $ac_name;
 
-      $query->savetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $sr_no, $container_no, $bank_charges);
+        $query->savetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $sr_no, $container_no, $bank_charges);
+      }else{
+        if(empty($_POST['addvoucher_no'])){
+          $addvoucher_noerror = 'error';
+        }
+        if(empty($_POST['adddate'])){
+          $adddateerror = 'error';
+        }
+        if(empty($_POST['addac_code'])){
+          $addac_codeerror = 'error';
+        }
+        if(empty($_POST['adddebit']) && !empty($_POST['addcredit'])){
+          $adddebiterror = 'error';
+        }
+        if(empty($_POST['addcredit'] && !empty($_POST['adddebit']))){
+          $addcrediterror = 'error';
+        }
+      }
     }
     if (isset($_POST['update'])) {
       $id = $_POST['id'];
@@ -211,15 +207,13 @@ $query = new Query();
       if($totaldebitdata['total'] != $totalcreditdata['total']){
         echo "<script>swal('Dosen\'t Match', 'Debit Credit Dosen\'t Match, Please Check again', 'warning');</script>";
       }else{
-        $datestmt = $pdo->prepare("SELECT * FROM transaction GROUP BY `date` order by id desc");
+        $datestmt = $pdo->prepare("SELECT * FROM transaction WHERE status='selected' GROUP BY `date` order by id desc");
         $datestmt->execute();
         $datesdatas = $datestmt->fetchall();
         foreach ($datesdatas as $datesdata) {
-          // echo "<br>";
-          // echo $datesdata['date'];
+          
           $query->accepttransaction($datesdata['date']);
         }
-        // echo "<script>swal('Success', 'Accepted Successfully.', 'success');</script>";
       }
     }
      ?>
@@ -249,16 +243,16 @@ $query = new Query();
             <div class="row">
                 <div class="col">
                   <label>Date</label>
-                  <input type="date" name="adddate" class="form-control inpv2 mb-1" value="<?php if(!empty($_SESSION['adddate'])){echo $_SESSION['adddate']; } ?>" style="padding-top: 2px; padding-bottom: 2px;">
+                  <input type="date" name="adddate" style="<?php if(!empty($addvoucher_noerror) && $addvoucher_noerror == 'error'){ echo 'border: 1px solid red !important;'; } ?>" class="form-control inpv2 mb-1" value="<?php if(!empty($_SESSION['adddate'])){echo $_SESSION['adddate']; } ?>" style="padding-top: 2px; padding-bottom: 2px;">
                 </div>
                 <div class="col">
                   <label>Vr. No</label>
-                  <input type="text" name="addvoucher_no" class="form-control inpv2 mb-1" value="<?php if(!empty($_SESSION['addvoucher_no'])){echo $_SESSION['addvoucher_no']; } ?>" style="padding-top: 2px; padding-bottom: 2px;">
+                  <input type="text" name="addvoucher_no" style="<?php if(!empty($adddateerror) && $adddateerror == 'error'){ echo 'border: 1px solid red !important;'; } ?>" class="form-control inpv2 mb-1" value="<?php if(!empty($_SESSION['addvoucher_no'])){echo $_SESSION['addvoucher_no']; } ?>" style="padding-top: 2px; padding-bottom: 2px;">
                 </div>
                 <div class="col">
                   <label>A/C Code</label>
                   <div class="d-flex">
-                    <input type="text" id="addac_code" name="addac_code" class="form-control inpv2 mb-1" value="<?php if(!empty($_SESSION['addac_code'])){echo $_SESSION['addac_code']; } ?>" style="padding-top: 2px; padding-bottom: 2px; width:90%;">
+                    <input type="text" id="addac_code" style="<?php if(!empty($addac_codeerror) && $addac_codeerror == 'error'){ echo 'border: 1px solid red !important;'; } ?>" name="addac_code" class="form-control inpv2 mb-1" value="<?php if(!empty($_SESSION['addac_code'])){echo $_SESSION['addac_code']; } ?>" style="padding-top: 2px; padding-bottom: 2px; width:90%;">
                     <a href="acname.php?fromtransaction=true" style="width: 10%; color:black; text-align: center; margin-left: 8px; border: 1px solid black; border-radius: 5px;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
                       <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
@@ -308,8 +302,10 @@ $query = new Query();
                   <option value="mmk">MMK</option>
                   <option value="usd">USD</option>
                 </select>
-                  <input type="text" name="adddebit" id="adddebitinp" class="form-control inpv2" placeholder="Debit" style="padding-top: 2px; padding-bottom: 2px; width: 45%; display:inline; margin-top:15px;">
-                  <input type="text" name="addcredit" id="addcreditinp" class="form-control inpv2" placeholder="Credit" style="padding-top: 2px; padding-bottom: 2px; width: 45%; display:inline; margin-top:15px; margin-left:20px;">
+                  <div class="d-flex gap-2 mt-3">
+                    <input type="text" name="adddebit" style="<?php if(!empty($adddebiterror) && $adddebiterror == 'error'){ echo 'border: 1px solid red !important;'; } ?>" id="adddebitinp" class="form-control inpv2" placeholder="Debit" style="padding-top: 2px; padding-bottom: 2px; width: 45%; display:inline; margin-top:15px;">
+                    <input type="text" name="addcredit" style="<?php if(!empty($addcrediterror) && $addcrediterror == 'error'){ echo 'border: 1px solid red !important;'; } ?>" id="addcreditinp" class="form-control inpv2" placeholder="Credit" style="padding-top: 2px; padding-bottom: 2px; width: 45%; display:inline; margin-top:15px; margin-left:20px;">
+                  </div>
               </div>
               <div class="col-3">
                 <label>Rate</label>
@@ -330,10 +326,11 @@ $query = new Query();
                 <th>Credit</th>
               </tr>
               <?php
-              $stmt = $pdo->prepare("SELECT t.*
-              FROM transaction t
-              LEFT JOIN general_ledger g ON t.id = g.transactionid
-              WHERE g.transactionid IS NULL;");
+              // $stmt = $pdo->prepare("SELECT t.*
+              // FROM transaction t
+              // LEFT JOIN general_ledger g ON t.id = g.transactionid
+              // WHERE g.transactionid IS NULL;");
+              $stmt = $pdo->prepare("SELECT * FROM transaction WHERE status='selected'");
               $stmt->execute();
               $datas = $stmt->fetchall();
               $no = 0;

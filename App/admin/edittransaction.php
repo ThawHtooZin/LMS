@@ -201,7 +201,7 @@ $query = new Query();
       $id = $_POST['id'];
       $voucher_no = $_POST['voucher_no'];
 
-      $query->deletetransaction($id, $voucher_no);
+      $query->deleteedittransaction($id, $voucher_no);
     }
      ?>
     <div class="row">
