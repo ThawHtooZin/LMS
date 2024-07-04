@@ -7,7 +7,7 @@ include '../../Controllers/query.ctr.php';
 $auth = new auth();
 $auth->checkadmin();
 $bootstrap = new Bootstrap();
-$query = new Query();
+$query = new Query();   
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -47,6 +47,18 @@ $query = new Query();
 
       if(isset($_POST['searchacnamebtn'])){
         $_SESSION['search']['acnamesearch'] = $_POST['searchacname'];
+        $_SESSION['search']['startdate'] = '';
+        $_SESSION['search']['enddate'] = '';
+      }
+
+      if(isset($_POST['dbwsearch'])){
+        $_SESSION['search']['startdate'] = $_POST['startdate'];
+        $_SESSION['search']['enddate'] = $_POST['enddate'];
+        $_SESSION['search']['acnamesearch'] = '';
+      }
+
+      if(isset($_POST['clearfilter'])){
+        unset($_SESSION['search']);
       }
     ?>
     <div class="row">
@@ -60,7 +72,28 @@ $query = new Query();
         <form action="" method="POST">
             <div class="card">
                 <div class="card-header text-light bg-info">
-                    
+                <?php
+              if(!empty($_SESSION['search']['startdate']) && !empty($_SESSION['search']['enddate']) && $_SESSION['search']['startdate'] != '' && $_SESSION['search']['enddate'] != ''){
+                $startdate = $_SESSION['search']['startdate'];
+                $enddate = $_SESSION['search']['enddate'];
+                ?>
+                <a href="cashbookexport.php?forment=excel&filter=dbwsearch&startdate=<?= $startdate; ?>&enddate=<?= $enddate; ?>" class="btn btn-success float-end ms-2">Export to Excel</a>
+                <?php
+              }
+              if(!empty($_SESSION['search']['acnamesearch']) && $_SESSION['search']['acnamesearch'] != ''){
+                $searchacname = $_SESSION['search']['acnamesearch'];
+                ?>
+                <a href="cashbookexport.php?forment=excel&filter=acnamesearch&searchacname=<?= $searchacname; ?>" class="btn btn-success float-end ms-2">Export to Excel</a>
+                <?php
+              }
+              if(!empty($_SESSION['search'])){
+                if(empty($_SESSION['search']['acnamesearch']) && $_SESSION['search']['acnamesearch'] == '' && empty($_SESSION['search']['startdate']) && empty($_SESSION['search']['enddate']) && $_SESSION['search']['startdate'] == '' && $_SESSION['search']['enddate'] == ''){
+                    ?>
+                    <a href="cashbookexport.php?forment=excel&filter=normal" class="btn btn-success float-end ms-2">Export to Excel</a>
+                    <?php
+                  }
+              }
+              ?>
                 <?php
                     if(empty($_SESSION['cashbooktype'])){
                     ?>
@@ -96,17 +129,21 @@ $query = new Query();
 
                 <div class="card-body">
                 <div class="row">
-                    <!-- <div class="col-3">
+                    <div class="col-3">
                         <form class="d-flex" action="cashbook.php" method="post">
                             <select class="form-control w-50" name="searchacname">
                                 <option value="">Select Ac Name</option>
                                 <?php
-                                    $acnamestmt = $pdo->prepare("SELECT * FROM acname WHERE code_no NOT LIKE '%3600/%'");
+                                    $acnamestmt = $pdo->prepare("SELECT * FROM cashbook WHERE crossac_name NOT LIKE '%3600/%'");
                                     $acnamestmt->execute();
                                     $acnamedatas = $acnamestmt->fetchAll();
                                     foreach($acnamedatas as $acnamedata){
+                                        $acnameid = $acnamedata['crossac_name'];
+                                        $crossacnamestmt = $pdo->prepare("SELECT * FROM acname WHERE code_no='$acnameid'");
+                                        $crossacnamestmt->execute();
+                                        $crossacname = $crossacnamestmt->fetch(PDO::FETCH_ASSOC);
                                         ?>
-                                            <option value="<?= $acnamedata['code_no']; ?>"><?= $acnamedata['ac_name']; ?></option>
+                                            <option value="<?= $acnamedata['crossac_name']; ?>"><?= $crossacname['ac_name']; ?></option>
                                         <?php
                                     }
                                 ?>
@@ -115,17 +152,18 @@ $query = new Query();
                         </form>
                     </div>
                     <div class="col-9">
-                        <form class="d-flex" action="cashbook.php" method="post">
-                        <span class="mt-2">Start Date:</span>
-                        <input type="date" name="startdate" class="form-control" style="width: 35%;">
-                        <span class="mt-2">End Date</span>
-                        <input type="date" name="enddate" class="form-control" style="width: 35%;">
-                        <button type="submit" name="dbwsearch" class="btn btn-primary btn-sm">Search</button>
+                        <form class="d-flex gap-2" action="cashbook.php" method="post">
+                            <span class="mt-2">Start Date:</span>
+                            <input type="date" name="startdate" class="form-control" style="width: 35%;">
+                            <span class="mt-2">End Date</span>
+                            <input type="date" name="enddate" class="form-control" style="width: 35%;">
+                            <button type="submit" name="dbwsearch" class="btn btn-primary btn-sm">Search</button>
+                            <button type="submit" name="clearfilter" class="btn btn-danger btn-sm">Clear Filter</button>
                         </form>
-                    </div> -->
+                        </div>
                 </div>
                     <?php
-                        // if(!empty($_SESSION['search'])){
+                        if(!empty($_SESSION['search']) || !empty($_SESSION['search']['searchacname']) || !empty($_SESSION['search']['startdate']) || !empty($_SESSION['search']['enddate'])){
                             ?>
                                 <table class="table table-bordered table-striped rounded mt-3">
                                     <tr>
@@ -140,12 +178,20 @@ $query = new Query();
                                         <th>Action</th>
                                     </tr>
                                     <?php 
-                                        if(!empty($_SESSION['search']['acnamesearch'])){
+                                        if(!empty($_SESSION['search']['acnamesearch']) && $_SESSION['search']['acnamesearch'] != ''){
                                             $acnamesearch = $_SESSION['search']['acnamesearch'];
                                             if (empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'ks') {
                                                 $cashbookstmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/001' AND crossac_name = '$acnamesearch'");
                                             }else{
                                                 $cashbookstmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/002' AND crossac_name = '$acnamesearch'");
+                                            } 
+                                        }elseif(!empty($_SESSION['search']['startdate']) && !empty($_SESSION['search']['enddate']) && $_SESSION['search']['startdate'] != '' && $_SESSION['search']['enddate'] != ''){
+                                            $startdate = $_SESSION['search']['startdate'];
+                                            $enddate = $_SESSION['search']['enddate'];
+                                            if (empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'ks') {
+                                                $cashbookstmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/001' AND date BETWEEN '$startdate' AND '$enddate'");
+                                            }else{
+                                                $cashbookstmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/002' AND date BETWEEN '$startdate' AND '$enddate'");
                                             } 
                                         }else{
                                             if (empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'ks') {
@@ -153,6 +199,8 @@ $query = new Query();
                                             }else{
                                                 $cashbookstmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/002'");
                                             } 
+
+                                            
                                         }
                                         $cashbookstmt->execute();
                                         $cashbookdatas = $cashbookstmt->fetchAll();
@@ -171,41 +219,33 @@ $query = new Query();
                                             }
                                             $voucher_no = $cashbookdata['voucher_no'];
                         
-                                            
+                                            if(!empty($_SESSION['search']['acnamesearch']) && $_SESSION['search']['acnamesearch'] != ''){
+                                                $balance = $cashbookdata['balance'];
+                                            }elseif(!empty($_SESSION['search']['startdate']) && !empty($_SESSION['search']['enddate']) && $_SESSION['search']['startdate'] != '' && $_SESSION['search']['enddate'] != ''){
+                                                $balance = $cashbookdata['balance'];
+                                            }else{
+                                            }
 
-                                            
-                                            if (empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'ks') {
-                                                // Dollor Change
-                                                
-                                                // Check if row is balance
-                                                if(empty($cashbookdata['crossac_name']) && empty($cashbookdata['voucher_no'])){
-                                                    $rowname = 'balance';
-                                                    $balance = $cashbookdata['balance'];
-                                                }else{
-                                                    $rowname = '';
-                                                }
-
-                                                if($iddd == 1){
-                                                    $firstrow = true;
-                                                }else{
-                                                    $firstrow = false;
-                                                }
-                                                
+                                            // Check if row is balance
+                                            if(empty($cashbookdata['crossac_name']) && empty($cashbookdata['voucher_no'])){
+                                                $rowname = 'balance';
+                                                $balance = $cashbookdata['balance'];
+                                            }else{
+                                                $rowname = '';
+                                            }
+                                            if(empty($_SESSION['search']['searchacname']) && empty($_SESSION['search']['startdate']) && empty($_SESSION['search']['enddate'])){
                                                 // --- Balance Calculate
                                                 if($rowname != 'balance'){
                                                     $debit = $cashbookdata['debit'];
                                                     $credit = $cashbookdata['credit'];
                                                     
+                                                    $balance += intval($debit) - intval($credit);
                                                     // Calculate balance
-                                                    if($firstrow !== true){
-                                                        $balance += intval($debit) - intval($credit);
-                                                    }else{
-                                                        $balance = intval($debit) - intval($credit);
-                                                    }
                                                     $balanceupdatestmt = $pdo->prepare("UPDATE cashbook SET balance='$balance' WHERE id='$rowid'");
                                                     $balanceupdatestmt->execute();
                                                 }
-                                            }else{
+                                            }
+                                            if (empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'ks') {
                                                 // Dollor Change
                                                 $transactionid = $cashbookdata['transactionid'];
                                                 $acselectstmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit' AND transactionid='$transactionid'");
@@ -248,7 +288,7 @@ $query = new Query();
                                         <td><?php echo round($cashbookdata['balance'], 2); ?></td>
                                         <td>
                                             <?php
-                                            if(!empty($ac_name)){
+                                            if(!empty($cashbookdata['voucher_no'])){
                                                 ?>
                                                 <a href="edittransaction.php?voucher_no=<?= $cashbookdata['voucher_no']; ?>&file=cashbook&transactionid=<?php if(!empty($cashbookdata['transactionid'])){echo $cashbookdata['transactionid'];}; ?>&id=<?= $cashbookdata['id']; ?>&ac_code=<?php if(!empty($cashbookdata['ac_name'])){ echo $cashbookdata['ac_name']; } ?>&crossac_code=<?php if(!empty($cashbookdata['crossac_name'])){ echo $cashbookdata['crossac_name']; } ?>">
                                                 <button type="button" class="btn btn-warning btn-sm text-light"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -326,28 +366,46 @@ $query = new Query();
                                     }else{
                                         $ac_name = '';
                                     }
-                                        if(!empty($_SESSION['cashbooktype']) && $_SESSION['cashbooktype'] != 'usd'){
-                                            if(!empty($_SESSION['search']['acnamesearch'])){
-                                                $crossac_name = $_SESSION['search']['acnamesearch'];
-                                                $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total_debit FROM cashbook WHERE ac_name='$ac_name' AND crossac_name = '$crossac_name'");
-                                                $totaldebitstmt->execute();
-                                                $total_debit = $totaldebitstmt->fetch(PDO::FETCH_ASSOC);
-
-                                                $totalcreditstmt = $pdo->prepare("SELECT SUM(debit) AS total_debit FROM cashbook WHERE ac_name='$ac_name' AND crossac_name = '$crossac_name'");
-                                                $totalcreditstmt->execute();
-                                                $total_credit = $totalcreditstmt->fetch(PDO::FETCH_ASSOC);
-                                                
-                                                $balancestmt = $pdo->prepare("SELECT * FROM cashbook WHERE interfacerowid='1'");
-                                                $balancestmt->execute();
-                                                $balancedata = $balancestmt->fetch(PDO::FETCH_ASSOC);
+                                    if(empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] != 'usd'){
+                                            if(!empty($_SESSION['search'])){
+                                                if(!empty($_SESSION['search']['acnamesearch']) || $_SESSION['search']['acnamesearch'] != ''){
+                                                    $crossac_name = $_SESSION['search']['acnamesearch'];
+                                                    $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total_debit FROM cashbook WHERE crossac_name = '$crossac_name' AND ac_name='3600/001'");
+                                                    $totaldebitstmt->execute();
+                                                    $total_debit = $totaldebitstmt->fetch(PDO::FETCH_ASSOC);
+    
+                                                    $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total_credit FROM cashbook WHERE crossac_name = '$crossac_name' AND ac_name='3600/001'");
+                                                    $totalcreditstmt->execute();
+                                                    $total_credit = $totalcreditstmt->fetch(PDO::FETCH_ASSOC);
+    
+                                                    $balance = $total_debit['total_debit'] - $total_credit['total_credit'];
+                                                }elseif(!empty($_SESSION['search']['startdate']) && !empty($_SESSION['search']['enddate']) || $_SESSION['search']['startdate'] != '' && $_SESSION['search']['enddate'] != ''){
+                                                    $startdate = $_SESSION['search']['startdate'];
+                                                    $endddate = $_SESSION['search']['enddate'];
+                                                    $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total_debit FROM cashbook WHERE ac_name='3600/001' AND date BETWEEN '$startdate' AND '$enddate'");
+                                                    $totaldebitstmt->execute();
+                                                    $total_debit = $totaldebitstmt->fetch(PDO::FETCH_ASSOC);
+                                                    $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total_credit FROM cashbook WHERE ac_name='3600/001' AND date BETWEEN '$startdate' AND '$enddate'");
+                                                    $totalcreditstmt->execute();
+                                                    $total_credit = $totalcreditstmt->fetch(PDO::FETCH_ASSOC);
+                                                    
+                                                    $balance = $total_debit['total_debit'] - $total_credit['total_credit'];
+                                                }else{
+                                                    $total_debit = $query->selectallsumcheck('cashbook', 'debit', 'total_debit', 'ac_name', $ac_name);
+                                                    $total_credit = $query->selectallsumcheck('cashbook', 'credit', 'total_credit', 'ac_name', $ac_name);
+                                                    $openingamtstmt = $pdo->prepare("SELECT * FROM cashbook ORDER BY id ASC");
+                                                    $openingamtstmt->execute();
+                                                    $openingbalance = $openingamtstmt->fetch(PDO::FETCH_ASSOC);
+                                                    $balance = ($total_debit['total_debit'] + $openingbalance['balance']) - $total_credit['total_credit'];
+                                                }
                                             }else{
                                                 $total_debit = $query->selectallsumcheck('cashbook', 'debit', 'total_debit', 'ac_name', $ac_name);
                                                 $total_credit = $query->selectallsumcheck('cashbook', 'credit', 'total_credit', 'ac_name', $ac_name);
-                                                $balancestmt = $pdo->prepare("SELECT * FROM cashbook WHERE interfacerowid='1'");
-                                                $balancestmt->execute();
-                                                $balancedata = $balancestmt->fetch(PDO::FETCH_ASSOC);
+                                                $openingamtstmt = $pdo->prepare("SELECT * FROM cashbook ORDER BY id ASC");
+                                                $openingamtstmt->execute();
+                                                $openingbalance = $openingamtstmt->fetch(PDO::FETCH_ASSOC);
+                                                $balance = ($total_debit['total_debit'] + $openingbalance['balance']) - $total_credit['total_credit'];
                                             }
-                                            $balance = ($total_debit['total_debit'] + $balancedata['balance']) - $total_credit['total_credit'];
                                             ?>
                                             <tr style="font-weight: bold;">
                                             <td>Total:</td>
@@ -361,7 +419,7 @@ $query = new Query();
                                             <td></td>
                                             </tr>
                                             <?php
-                                        }elseif(empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'usd'){
+                                        }elseif(!empty($_SESSION['cashbooktype']) && $_SESSION['cashbooktype'] == 'usd'){
                                             // echo $ac_name;
                                             $total_debit = $query->selectallsumcheck('cashbook', 'debit', 'total_debit', 'ac_name', $ac_name);
                                             $total_credit = $query->selectallsumcheck('cashbook', 'credit', 'total_credit', 'ac_name', $ac_name);
@@ -389,11 +447,11 @@ $query = new Query();
                                     ?>
                                 </table>
                             <?php
-                        // }else{
+                        }else{
                             ?>
-                            <!-- <h4 class="text-center mt-5 text-info">Search To See Result!</h4> -->
+                            <h4 class="text-center mt-5 text-info">Search To See Result!</h4>
                             <?php
-                        // }
+                        }
                     ?>
                 </div>
             </div>

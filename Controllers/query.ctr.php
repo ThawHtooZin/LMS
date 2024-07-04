@@ -6,6 +6,16 @@ require 'ValidatorInstance.php';
 
 Class Query{
 
+  function __construct(){
+    global $pdo;
+    $nowdate = new DateTime();
+    $nowdate->modify('-6 months');
+    
+    $deletedate = $nowdate->format('d-m-Y');
+
+    
+  }
+
   function login($username, $password){
     global $pdo;
     $stmt = $pdo->prepare("SELECT * FROM accounts WHERE username='$username'");

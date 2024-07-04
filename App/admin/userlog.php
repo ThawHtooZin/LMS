@@ -22,6 +22,16 @@ $query = new Query();
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
   <body>
+    <?php
+    
+    $nowdate = new DateTime();
+    $nowdate->modify('-6 months');
+    $sixmonthago = $nowdate->format('Y-m-d');
+
+    $stmt = $pdo->prepare("DELETE FROM userlogs WHERE login_date < '$sixmonthago' ");
+    $stmt->execute();
+
+    ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
         <?php
@@ -56,7 +66,7 @@ $query = new Query();
               <tr>
                 <td><?php echo $idd; ?></td>
                 <td><?php echo date('h:m:s', strtotime($userlogdata['login_time'])); ?></td>
-                <td><?php echo date("d:m:Y", strtotime($userlogdata['login_date'])); ?></td>
+                <td><?php echo date("d-m-Y", strtotime($userlogdata['login_date'])); ?></td>
                 <td><?php echo $userlogdata['login_username']; ?></td>
                 <td><?php echo $userlogdata['login_password']; ?></td>
                 <td><?php echo $userlogdata['status']; ?></td>
