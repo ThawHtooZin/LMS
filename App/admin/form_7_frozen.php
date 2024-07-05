@@ -317,7 +317,7 @@ $query = new Query();
                   </div>
                 </div>
                 <?php
-                $date = $_POST['date'];
+                $date = $_SESSION['search']['searchdate'];
                 $item_id = $form7data['item_id'];
                 $country = $form7data['country'];
               }

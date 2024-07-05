@@ -277,7 +277,7 @@ $query = new Query();
                                             }
                                             // ---
                                         ?>
-                                    <tr>
+                                    <tr id="nowtr">
                                         <td><?= $iddd; ?></td>
                                         <td><?= date('d-m-Y', strtotime($cashbookdata['date'])); ?></td>
                                         <td><?= $cashbookdata['voucher_no']; ?></td>
@@ -367,45 +367,12 @@ $query = new Query();
                                         $ac_name = '';
                                     }
                                     if(empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] != 'usd'){
-                                            if(!empty($_SESSION['search'])){
-                                                if(!empty($_SESSION['search']['acnamesearch']) || $_SESSION['search']['acnamesearch'] != ''){
-                                                    $crossac_name = $_SESSION['search']['acnamesearch'];
-                                                    $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total_debit FROM cashbook WHERE crossac_name = '$crossac_name' AND ac_name='3600/001'");
-                                                    $totaldebitstmt->execute();
-                                                    $total_debit = $totaldebitstmt->fetch(PDO::FETCH_ASSOC);
-    
-                                                    $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total_credit FROM cashbook WHERE crossac_name = '$crossac_name' AND ac_name='3600/001'");
-                                                    $totalcreditstmt->execute();
-                                                    $total_credit = $totalcreditstmt->fetch(PDO::FETCH_ASSOC);
-    
-                                                    $balance = $total_debit['total_debit'] - $total_credit['total_credit'];
-                                                }elseif(!empty($_SESSION['search']['startdate']) && !empty($_SESSION['search']['enddate']) || $_SESSION['search']['startdate'] != '' && $_SESSION['search']['enddate'] != ''){
-                                                    $startdate = $_SESSION['search']['startdate'];
-                                                    $endddate = $_SESSION['search']['enddate'];
-                                                    $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total_debit FROM cashbook WHERE ac_name='3600/001' AND date BETWEEN '$startdate' AND '$enddate'");
-                                                    $totaldebitstmt->execute();
-                                                    $total_debit = $totaldebitstmt->fetch(PDO::FETCH_ASSOC);
-                                                    $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total_credit FROM cashbook WHERE ac_name='3600/001' AND date BETWEEN '$startdate' AND '$enddate'");
-                                                    $totalcreditstmt->execute();
-                                                    $total_credit = $totalcreditstmt->fetch(PDO::FETCH_ASSOC);
-                                                    
-                                                    $balance = $total_debit['total_debit'] - $total_credit['total_credit'];
-                                                }else{
-                                                    $total_debit = $query->selectallsumcheck('cashbook', 'debit', 'total_debit', 'ac_name', $ac_name);
-                                                    $total_credit = $query->selectallsumcheck('cashbook', 'credit', 'total_credit', 'ac_name', $ac_name);
-                                                    $openingamtstmt = $pdo->prepare("SELECT * FROM cashbook ORDER BY id ASC");
-                                                    $openingamtstmt->execute();
-                                                    $openingbalance = $openingamtstmt->fetch(PDO::FETCH_ASSOC);
-                                                    $balance = ($total_debit['total_debit'] + $openingbalance['balance']) - $total_credit['total_credit'];
-                                                }
-                                            }else{
-                                                $total_debit = $query->selectallsumcheck('cashbook', 'debit', 'total_debit', 'ac_name', $ac_name);
-                                                $total_credit = $query->selectallsumcheck('cashbook', 'credit', 'total_credit', 'ac_name', $ac_name);
-                                                $openingamtstmt = $pdo->prepare("SELECT * FROM cashbook ORDER BY id ASC");
-                                                $openingamtstmt->execute();
-                                                $openingbalance = $openingamtstmt->fetch(PDO::FETCH_ASSOC);
-                                                $balance = ($total_debit['total_debit'] + $openingbalance['balance']) - $total_credit['total_credit'];
-                                            }
+                                            $total_debit = $query->selectallsumcheck('cashbook', 'debit', 'total_debit', 'ac_name', $ac_name);
+                                            $total_credit = $query->selectallsumcheck('cashbook', 'credit', 'total_credit', 'ac_name', $ac_name);
+                                            $openingamtstmt = $pdo->prepare("SELECT * FROM cashbook ORDER BY id ASC");
+                                            $openingamtstmt->execute();
+                                            $openingbalance = $openingamtstmt->fetch(PDO::FETCH_ASSOC);
+                                            $balance = ($total_debit['total_debit'] + $openingbalance['balance']) - $total_credit['total_credit'];
                                             ?>
                                             <tr style="font-weight: bold;">
                                             <td>Total:</td>
