@@ -134,7 +134,7 @@ $query = new Query();
                             <select class="form-control w-50" name="searchacname">
                                 <option value="">Select Ac Name</option>
                                 <?php
-                                    $acnamestmt = $pdo->prepare("SELECT * FROM cashbook WHERE crossac_name NOT LIKE '%3600/%'");
+                                    $acnamestmt = $pdo->prepare("SELECT DISTINCT(crossac_name) FROM cashbook WHERE crossac_name NOT LIKE '%3600/%'");
                                     $acnamestmt->execute();
                                     $acnamedatas = $acnamestmt->fetchAll();
                                     foreach($acnamedatas as $acnamedata){
@@ -181,23 +181,46 @@ $query = new Query();
                                         if(!empty($_SESSION['search']['acnamesearch']) && $_SESSION['search']['acnamesearch'] != ''){
                                             $acnamesearch = $_SESSION['search']['acnamesearch'];
                                             if (empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'ks') {
-                                                $cashbookstmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/001' AND crossac_name = '$acnamesearch'");
+                                                $cashbookstmt = $pdo->prepare("SELECT *
+                                                    FROM cashbook
+                                                    ORDER BY 
+                                                        -- Extract the year from voucher_no
+                                                        CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(voucher_no, '/', -1), ' ', 1) AS UNSIGNED),
+
+                                                        -- Extract the month from voucher_no
+                                                        STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(voucher_no, ' ', 2), ' ', -1), '%M'),
+
+                                                        -- Extract the sequence number from voucher_no
+                                                        CAST(SUBSTRING_INDEX(voucher_no, '/', -1) AS UNSIGNED);
+                                                    DEX(REPLACE(REPLACE(voucher_no, 'Dr-', ''), 'Cr-', ''), '/', -1) AS UNSIGNED) ASC;
+                                                ");
                                             }else{
-                                                $cashbookstmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/002' AND crossac_name = '$acnamesearch'");
+                                                $cashbookstmt = $pdo->prepare("SELECT *
+                                                    FROM cashbook
+                                                    ORDER BY 
+                                                        -- Extract the year from voucher_no
+                                                        CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(voucher_no, '/', -1), ' ', 1) AS UNSIGNED),
+
+                                                        -- Extract the month from voucher_no
+                                                        STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(voucher_no, ' ', 2), ' ', -1), '%M'),
+
+                                                        -- Extract the sequence number from voucher_no
+                                                        CAST(SUBSTRING_INDEX(voucher_no, '/', -1) AS UNSIGNED);
+                                                ");
                                             } 
                                         }elseif(!empty($_SESSION['search']['startdate']) && !empty($_SESSION['search']['enddate']) && $_SESSION['search']['startdate'] != '' && $_SESSION['search']['enddate'] != ''){
                                             $startdate = $_SESSION['search']['startdate'];
                                             $enddate = $_SESSION['search']['enddate'];
                                             if (empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'ks') {
-                                                $cashbookstmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/001' AND date BETWEEN '$startdate' AND '$enddate'");
+                                                $cashbookstmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/001' AND date BETWEEN '$startdate' AND '$enddate' ORDER BY date ASC");
                                             }else{
-                                                $cashbookstmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/002' AND date BETWEEN '$startdate' AND '$enddate'");
+                                                $cashbookstmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/002' AND date BETWEEN '$startdate' AND '$enddate' ORDER BY date ASC");
                                             } 
                                         }else{
                                             if (empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'ks') {
-                                                $cashbookstmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/001'");
+                                                $cashbookstmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/001' ORDER BY date ASC");
                                             }else{
-                                                $cashbookstmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/002'");
+                                                $cashbookstmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/002' ORDER BY date ASC");
                                             } 
 
                                             
@@ -245,36 +268,38 @@ $query = new Query();
                                                     $balanceupdatestmt->execute();
                                                 }
                                             }
-                                            if (empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'ks') {
-                                                // Dollor Change
-                                                $transactionid = $cashbookdata['transactionid'];
-                                                $acselectstmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit' AND transactionid='$transactionid'");
-                                                $acselectstmt->execute([
-                                                    ':voucher_no' => $voucher_no
-                                                ]);
-                                                $rateselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
+                                            // if (empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'ks') {
+                                            //     // Dollor Change
+                                            //     $transactionid = $cashbookdata['transactionid'];
+                                            //     $acselectstmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit' AND transactionid='$transactionid'");
+                                            //     $acselectstmt->execute([
+                                            //         ':voucher_no' => $voucher_no
+                                            //     ]);
+                                            //     $rateselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
                             
-                                                if(!empty($rateselect['dollar_rate'])){
-                                                    if($cashbookdata['debit'] != 0){
-                                                    $debit = $cashbookdata['debit'] / $rateselect['dollar_rate'];
-                                                    }else{
-                                                    $credit = $cashbookdata['credit'] / $rateselect['dollar_rate'];
-                                                    }
-                                                }else{
-                                                    if($cashbookdata['debit'] != 0){
-                                                    $debit = $cashbookdata['debit'];
+                                            //     if(!empty($rateselect['dollar_rate'])){
+                                            //         if($cashbookdata['debit'] != 0){
+                                            //         $debit = $cashbookdata['debit'] / $rateselect['dollar_rate'];
+                                            //         }else{
+                                            //         $credit = $cashbookdata['credit'] / $rateselect['dollar_rate'];
+                                            //         }
+                                            //     }else{
+                                            //         if($cashbookdata['debit'] != 0){
+                                            //         $debit = $cashbookdata['debit'];
                             
-                                                    }else{
-                                                    $credit = $cashbookdata['credit'];
-                                                    }
-                                                }
+                                            //         }else{
+                                            //         $credit = $cashbookdata['credit'];
+                                            //         }
+                                            //     }
                             
                             
                             
-                                                if(!empty($rateselect['dollar_rate'])){
-                                                    $balance = $cashbookdata['balance'];
-                                                }
-                                            }
+                                            //     if(!empty($rateselect['dollar_rate'])){
+                                            //         $balance = $cashbookdata['balance'];
+                                            //     }
+                                            // }
+                                            $debit = $cashbookdata['debit'];
+                                            $credit = $cashbookdata['credit'];
                                             // ---
                                         ?>
                                     <tr id="nowtr">

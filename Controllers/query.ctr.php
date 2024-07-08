@@ -3458,14 +3458,17 @@ Class Query{
     $accheckstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no='$code_no'");
     $accheckstmt->execute();
     $accheck = $accheckstmt->fetchAll();
+    $acnamecheckstmt = $pdo->prepare("SELECT * FROM acname WHERE ac_name LIKE '%$acname%'");
+    $acnamecheckstmt->execute();
+    $acnamecheck = $acnamecheckstmt->fetchAll();
 
     $stmt = $pdo->prepare("INSERT INTO acname(code_no, ac_type, ac_name) VALUES('$code_no', '$actype', '$acname')");
 
-    if (empty($accheck)) {
+    if (empty($accheck) && empty($acnamecheck)) {
       echo "<script>swal('Success', 'Added A/C name' , 'success')</script>";
       $stmt->execute();
     }else{
-      echo "<script>swal('Error', 'Duplicate A/C Name' , 'error')</script>";
+      echo "<script>swal('Error', 'Duplicate A/C Code, Name' , 'error')</script>";
     }
   }
 
@@ -4229,7 +4232,7 @@ Class Query{
       //   $crossacname = $oldcrossdata['crossac_name'];
       // }else{
         $beforetransactionid = $transactionid - 1;
-        $oldcrossstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND ac_code NOT LIKE '3600%' AND id='$beforetransactionid' ORDER BY id DESC");
+        $oldcrossstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND ac_code NOT LIKE '3600%' OR LIKE '3600/002' OR LIKE '3600/004' ORDER BY id DESC");
         $oldcrossstmt->execute(
           array(':voucher_no' => $voucher_no)
         );

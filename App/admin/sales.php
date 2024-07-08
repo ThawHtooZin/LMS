@@ -201,7 +201,9 @@ $query = new Query();
                 $dollarrate = $dollarratestmt->fetch(PDO::FETCH_ASSOC);
 
                 // acnamechange
-
+                if($dollarrate['dollar_rate'] == 0){
+                  $dollarrate['dollar_rate'] = 1;
+                }
                 $balance = $gldata['balance'] / $dollarrate['dollar_rate'];
                  ?>
                 <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $gldata['id']; ?>">
@@ -225,6 +227,10 @@ $query = new Query();
               $creditstmt->execute();
               $totalcredit = $creditstmt->fetch(PDO::FETCH_ASSOC);
               $totalbalance = $totaldebit['total_debit'] - $totalcredit['total_credit'];
+
+                if($dollarrate['dollar_rate'] != 0){
+                  $dollarrate['dollar_rate'] = 1;
+                }
 
               $totaldebit = $totaldebit['total_debit'] / $dollarrate['dollar_rate'];
               $totalcredit = $totalcredit['total_credit'] / $dollarrate['dollar_rate'];
