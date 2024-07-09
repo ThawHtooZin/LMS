@@ -5090,7 +5090,9 @@ Class Query{
         }
         echo "<script>window.location.href=\"?sizeinfo=$newsize&commondity=$newcommondity_id&country=$newcountry\"</script>";
     }
-  // MORE SELECTS
+
+
+  // MORE Functions
 
   function selectsum($table, $id, $selectwhat){
     global $pdo;
@@ -5243,6 +5245,34 @@ Class Query{
     $stmt->execute();
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
-}
 
-?>
+  function checkifacexists($accode){
+    global $pdo;
+      // Transaction Check
+      $transactioncheckstmt =  $pdo->prepare("SELECT * FROM `transaction` WHERE ac_code='$accode'");
+      $transactioncheckstmt->execute();
+      $transactioncheckdata = $transactioncheckstmt->fetch(PDO::FETCH_ASSOC);
+      // Cashbook Check
+      $cashbookcheckstmt =  $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='$accode'");
+      $cashbookcheckstmt->execute();
+      $cashbookcheckdata = $cashbookcheckstmt->fetch(PDO::FETCH_ASSOC);
+      // Receivable Check
+      $receivablecheckstmt =  $pdo->prepare("SELECT * FROM receivable WHERE ac_code='$accode'");
+      $receivablecheckstmt->execute();
+      $receivablecheckdata = $receivablecheckstmt->fetch(PDO::FETCH_ASSOC);
+      // Payable Check
+      $payablecheckstmt =  $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$accode'");
+      $payablecheckstmt->execute();
+      $payablecheckdata = $payablecheckstmt->fetch(PDO::FETCH_ASSOC);
+      // General_Ledger Check
+      $general_ledgercheckstmt =  $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$accode'");
+      $general_ledgercheckstmt->execute();
+      $general_ledgercheckdata = $general_ledgercheckstmt->fetch(PDO::FETCH_ASSOC);
+
+      if(!empty($transactioncheckdata) || !empty($cashbookcheckdata) || !empty($receivablecheckdata) || !empty($payablecheckdata) || !empty($general_ledgercheckdata)){ 
+        return $status = true;
+      }else{
+        return $status = false;
+      }
+  }
+}

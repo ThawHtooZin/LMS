@@ -140,31 +140,9 @@ $query = new Query();
                 $actype = $query->select('actype', $data['ac_type'], 'acid');
                 $accode = $data['code_no'];
 
-                // Transaction Check
-                $transactioncheckstmt =  $pdo->prepare("SELECT * FROM `transaction` WHERE ac_code='$accode'");
-                $transactioncheckstmt->execute();
-                $transactioncheckdata = $transactioncheckstmt->fetch(PDO::FETCH_ASSOC);
-                // Cashbook Check
-                $cashbookcheckstmt =  $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='$accode'");
-                $cashbookcheckstmt->execute();
-                $cashbookcheckdata = $cashbookcheckstmt->fetch(PDO::FETCH_ASSOC);
-                // Receivable Check
-                $receivablecheckstmt =  $pdo->prepare("SELECT * FROM receivable WHERE ac_code='$accode'");
-                $receivablecheckstmt->execute();
-                $receivablecheckdata = $receivablecheckstmt->fetch(PDO::FETCH_ASSOC);
-                // Payable Check
-                $payablecheckstmt =  $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$accode'");
-                $payablecheckstmt->execute();
-                $payablecheckdata = $payablecheckstmt->fetch(PDO::FETCH_ASSOC);
-                // General_Ledger Check
-                $general_ledgercheckstmt =  $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$accode'");
-                $general_ledgercheckstmt->execute();
-                $general_ledgercheckdata = $general_ledgercheckstmt->fetch(PDO::FETCH_ASSOC);
-
-                // Delete Condition
-                // $acnamestmt = $pdo->prepare("SELECT * FROM acname WHERE acname");
+                $check = $query->checkifacexists($accode);
               ?>
-              <tr data-bs-toggle='modal' data-bs-target="#updatemodal<?php echo $data['id']; ?>">
+              <tr  <?php if(!str_contains($data['code_no'], '4000/') && !str_contains($data['code_no'], '3300/')){echo "data-bs-toggle='modal' data-bs-target=\"#updatemodal" .$data['id'] . "\"";}else{if(str_contains($data['code_no'], '4000/')){echo "data-bs-toggle='modal' data-bs-target=\"#cantupdatesupplier\"";}elseif(str_contains($data['code_no'], '3300/')){echo "data-bs-toggle='modal' data-bs-target=\"#cantupdatecustomer\"";}} ?> >
                 <td><?php echo $idd; ?></td>
                 <td><?php echo $data['code_no']; ?></td>
                 <td><?php echo $actype['ac_type']; ?></td>
@@ -185,7 +163,7 @@ $query = new Query();
                             </svg>
                           </button>
                           <?php
-                            if( empty($transactioncheckdata) && empty($cashbookcheckdata) && empty($receivablecheckdata) && empty($payablecheckdata) && empty($general_ledgercheckdata)){
+                            if($check === false){
                               ?>
                                 <button type="submit" name="deletebutton" class="btn btn-danger d-inline">
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
@@ -241,6 +219,34 @@ $query = new Query();
               }
                ?>
             </table>
+            <div class="modal fade" id="cantupdatecustomer" tabindex="-1" role="dialog" style="margin-left:auto !important; margin-right: auto !important;">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content p-5">
+                  <div class="modal-body text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="75" height="75" style="color: #ffc107;" fill="currentColor" class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+                      <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                    </svg>
+                    <h2 class="text-center">Can't Update!</h2>
+                    <p style="font-size: 17px;">Must go to Customer to edit <b>Customer</b> IDs</p>
+                    <a href="customer.php" class="btn btn-success btn-lg">Go Edit</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal fade" id="cantupdatesupplier" tabindex="-1" role="dialog" style="margin-left:auto !important; margin-right: auto !important;">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content p-5">
+                  <div class="modal-body text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="75" height="75" style="color: #ffc107;" fill="currentColor" class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+                      <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                    </svg>
+                    <h2 class="text-center">Can't Update!</h2>
+                    <p style="font-size: 17px;">Must go to supplier to edit <b>Supplier</b> IDs</p>
+                    <a href="supplier.php" class="btn btn-success btn-lg">Go Edit</a>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div class="modal fade" id="addmodal" tabindex="-1" role="dialog"  style="margin-left:auto !important; margin-right: auto !important;">
               <div class="modal-dialog" role="document">
                 <form action="acname.php" method="post">
