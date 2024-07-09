@@ -3458,13 +3458,10 @@ Class Query{
     $accheckstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no='$code_no'");
     $accheckstmt->execute();
     $accheck = $accheckstmt->fetchAll();
-    $acnamecheckstmt = $pdo->prepare("SELECT * FROM acname WHERE ac_name LIKE '%$acname%'");
-    $acnamecheckstmt->execute();
-    $acnamecheck = $acnamecheckstmt->fetchAll();
 
     $stmt = $pdo->prepare("INSERT INTO acname(code_no, ac_type, ac_name) VALUES('$code_no', '$actype', '$acname')");
 
-    if (empty($accheck) && empty($acnamecheck)) {
+    if (empty($accheck)) {
       echo "<script>swal('Success', 'Added A/C name' , 'success')</script>";
       $stmt->execute();
     }else{
