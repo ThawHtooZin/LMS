@@ -178,8 +178,8 @@ $query = new Query();
                       <td><?php echo $gldata['narration']; ?></td>
                       <td><?php echo $gldata['debit']; ?></td>
                       <td><?php echo $gldata['credit']; ?></td>
-                      <td><?php if($currencydata['usd_amount'] == 0){echo 'MMK'; }else{echo 'USD';} ?></td>
-                      <td><?php echo $gldata['balance']; ?></td>
+                      <td><?php if(empty($currencydata['usd_amount']) || $currencydata['usd_amount'] == 0 || str_contains($gldata['ac_code'], '3600/001')){echo 'MMK'; }else{echo 'USD';} ?></td>
+                      <td><?php echo round(floatval($gldata['balance']), 2); ?></td>
                       <td>
                         <a href="edittransaction.php?voucher_no=<?= $gldata['voucherno']; ?>&file=general_ledger&transactionid=<?= $gldata['transactionid']; ?>&id=<?= $gldata['id']; ?>" style="<?php if(str_contains(strtolower($acname), 'purchase')){ echo "display:none;"; } ?>">
                           <button type="submit" class="btn btn-warning btn-sm text-light" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -207,6 +207,7 @@ $query = new Query();
                     <td></td>
                     <td><?= $totaldebit['total_debit']; ?></td>
                     <td><?= $totalcredit['total_credit']; ?></td>
+                    <td></td>
                     <td><?= $totalbalance; ?></td>
                     <td></td>
                   </tr>
@@ -274,11 +275,11 @@ $query = new Query();
                 }
                 $transactionid = $gldata['transactionid'];
                 // echo $voucher_no;
-                if(str_contains($gldata['ac_code'], '3300/')){
-                  $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit'");
-                }else{
+                // if(str_contains($gldata['ac_code'], '3300/')){
+                //   $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit'");
+                // }else{
                   $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit' AND transactionid='$transactionid'");
-                }
+                // }
                 $currencystmt->execute(
                   array(':voucher_no' => $voucher_no )
                 );
@@ -289,10 +290,10 @@ $query = new Query();
                   <td><?php echo $gldata['voucherno']; ?></td>
                   <td><?php echo $acname; ?></td>
                   <td><?php echo $gldata['narration']; ?></td>
-                  <td><?php if($gldata['debit'] == 0 || empty($gldata['debit'])){ echo "-"; }else{if(!empty($currencydata['dollar_rate']) == 0){echo round($gldata['debit'], 2);}else{ if(str_contains($gldata['ac_code'], '3300/')){ echo round($gldata['debit'] * $currencydata['dollar_rate'], 2); }else{echo round($gldata['debit'] / $currencydata['dollar_rate'], 2);};  };} ?></td>
-                  <td><?php if($gldata['credit'] == 0){ echo "-"; }else{if(!empty($currencydata['dollar_rate']) == 0){echo round($gldata['credit'], 2);}else{ echo round($gldata['credit'] / $currencydata['dollar_rate'], 2);  };} ?></td>
-                  <td><?php if(!empty($currencydata['dollar_rate']) && $currencydata['dollar_rate'] != 0){ echo "USD"; }else{ echo "MMK"; }?> </td>
-                  <td><?php if(!empty($currencydata['dollar_rate']) == 0){echo round($gldata['balance'], 2);}else{ echo round($gldata['balance'] / $currencydata['dollar_rate'], 2);  }; ?></td>
+                  <td><?php echo $gldata['debit']; ?></td>
+                  <td><?php echo $gldata['credit']; ?></td>
+                  <td><?php if(empty($currencydata['usd_amount']) || $currencydata['usd_amount'] == 0 || str_contains($gldata['ac_code'], '3600/001')){echo 'MMK'; }else{echo 'USD';} ?></td>
+                  <td><?php echo round(floatval($gldata['balance']), 2); ?></td>
                   <td>
                     <a href="edittransaction.php?voucher_no=<?= $gldata['voucherno']; ?>&file=general_ledger&transactionid=<?= $gldata['transactionid']; ?>&id=<?= $gldata['id']; ?>" style="<?php if(str_contains(strtolower($acname), 'purchase')){ echo "display:none;"; } ?>">
                       <button type="submit" class="btn btn-warning btn-sm text-light" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -391,20 +392,22 @@ $query = new Query();
                 $balancestmt->execute();
                 $balancedata = $balancestmt->fetch(PDO::FETCH_ASSOC);
                 if(!empty($balancedata)){
-                  $balance = $balancedata['balance'];
+                  echo $balance = $balancedata['balance'];
                 }else{
                   $balance = 0;
                 }
                 $totalbalance = ($balance + $totaldebit['total_debit']) - $totalcredit['total_credit'];
               }else{
-                $balancestmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$ac_code' AND transactionid < '$transactionid'");
+                $balancestmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$ac_code' AND debit = '0' AND credit = '0' ORDER BY id DESC");
                 $balancestmt->execute();
                 $balancedata = $balancestmt->fetch(PDO::FETCH_ASSOC);
 
-                if(empty($balancedata)){
-                  $balancedata['balance'] = 0;
+                if(empty($balancedata) || $balancedata['balance'] == 0){
+                  $balance = 0;
+                }else{
+                  $balance = $balancedata['balance'];
                 }
-                $totalbalance = ($balancedata['balance'] + $totaldebit['total_debit']) - $totalcredit['total_credit'];
+                  $totalbalance = ($balance + $totaldebit['total_debit']) - $totalcredit['total_credit'];
               }
 
                ?>
@@ -413,10 +416,10 @@ $query = new Query();
                  <td></td>
                  <td></td>
                  <td></td>
-                 <td><?php if($totaldebit['total_debit'] == 0){ echo "-"; }else{ if(!empty(!empty($currencydata['dollar_rate'])) == 0){echo round($totaldebit['total_debit'], 2);}else{ echo round($totaldebit['total_debit'] / $currencydata['dollar_rate'], 2);  }; }; ?></td>
-                 <td><?php if($totalcredit['total_credit'] == 0){ echo "-"; }else{ if(!empty(!empty($currencydata['dollar_rate'])) == 0){echo round($totalcredit['total_credit'], 2);}else{ echo round($totalcredit['total_credit'] / $currencydata['dollar_rate'], 2);  }; }; ?></td>
+                 <td><?= $totaldebit['total_debit']; ?></td>
+                 <td><?= $totalcredit['total_credit']; ?></td>
                  <td></td>
-                 <td><?php if($totalbalance == 0){echo "-"; }else{ if(!empty(!empty($currencydata['dollar_rate'])) == 0){echo round($totalbalance, 2);}else{ echo round($totalbalance / $currencydata['dollar_rate'], 2);  };} ?></td>
+                 <td><?= $totalbalance; ?></td>
                  <td></td>
                </tr>
               <?php } } ?>

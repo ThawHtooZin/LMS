@@ -86,7 +86,7 @@ $query = new Query();
             <div class="card-header bg-info text-light pb-3">
               <b class="h5">Link Mark Limited (F-7) Frozen</b>
               <button type="button" class="btn btn-success btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#addmodal">Add Data</button>
-              <button type="submit" name="searchbtncommondity" class="btn btn-secondary btn-sm float-end" style="border-top-left-radius:0px; border-bottom-left-radius:0px;">View</button>
+              <button type="submit" name="searchbtncommondity" class="btn btn-secondary btn-sm float-end" style="border-top-left-radius:0px; border-bottom-left-radius:0px;">View/Clear</button>
               <select name="commondity_id" class="form-control inpv2 d-inline float-end" style="border-top-right-radius:0px; border-bottom-right-radius:0px; width: 10%; height:26px !important; padding:0px 2px;">
                 <option value="">Select Commondity</option>
                 <?php
@@ -161,7 +161,7 @@ $query = new Query();
                     <td><?php echo $supplierdata['ac_name']; ?></td>
                     <td><?php echo $form7data['type']; ?></td>
                     <td><?php echo $form7data['country']; ?></td>
-                    <td><?php echo $form7data['size']; ?></td>
+                    <td data-bs-target="#updatesizemodal<?php echo $form7data['id']; ?>" data-bs-toggle="modal"><?php echo $form7data['size']; ?></td>
                     <td><?php echo $form7data['viss']; ?></td>
                     <td><?php echo floatval($form7data['viss']) * 1.634; ?></td>
                     <td><?php echo $form7data['kg']; ?></td>
@@ -207,6 +207,37 @@ $query = new Query();
                           <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-warning" name="update">Update</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal fade" id="updatesizemodal<?php echo $form7data['id']; ?>">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                        <div class="modal-header bg-primary text-light">
+                          <h1 class="modal-title fs-5">Add Size</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <form action="form_7_frozen.php" method="post">
+                            <input type="hidden" name="id" value="<?php echo $form7data['id']; ?>">
+                            <div class="modal-body">
+                              <?php
+                              $idd = $form7data['id'];
+                              $updata = $query->select('form7stock', $idd, 'id');
+                              ?>
+                              <div class="row">
+                                <div class="col">
+                                  <label>Size</label>
+                                  <input type="text" name="size" class="form-control inpv2 mt-1" value="<?php echo $updata['size']; ?>">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-warning" name="addsize">Update</button>
                           </div>
                         </form>
                       </div>
@@ -265,7 +296,7 @@ $query = new Query();
                   <td><?php echo $supplierdata['ac_name']; ?></td>
                   <td><?php echo $form7data['type']; ?></td>
                   <td><?php echo $form7data['country']; ?></td>
-                  <td><?php echo $form7data['size']; ?></td>
+                  <td data-bs-target="#updatesizemodal<?php echo $form7data['id']; ?>" data-bs-toggle="modal"><?php echo $form7data['size']; ?></td>
                   <td><?php echo $form7data['viss']; ?></td>
                   <td><?php echo $form7data['viss'] * 1.634; ?></td>
                     <td data-bs-toggle="modal" data-bs-target="#waterkgmodal<?php echo $form7data['id']; ?>"><?php if(!empty($form7data['water_kg'])){ echo $form7data['water_kg'];} ?></td>
@@ -316,6 +347,37 @@ $query = new Query();
                     </div>
                   </div>
                 </div>
+                <div class="modal fade" id="updatesizemodal<?php echo $form7data['id']; ?>">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                        <div class="modal-header bg-info text-light">
+                          <h1 class="modal-title fs-5">Add Size</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <form action="form_7_frozen.php" method="post">
+                            <input type="hidden" name="id" value="<?php echo $form7data['id']; ?>">
+                            <div class="modal-body">
+                              <?php
+                              $idd = $form7data['id'];
+                              $updata = $query->select('form7stock', $idd, 'id');
+                              ?>
+                              <div class="row">
+                                <div class="col">
+                                  <label>Size</label>
+                                  <input type="text" name="size" class="form-control inpv2 mt-1" value="<?php echo $updata['size']; ?>">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-warning" name="addsize">Update</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
                 <?php
                 $date = $_SESSION['search']['searchdate'];
                 $item_id = $form7data['item_id'];
@@ -368,7 +430,7 @@ $query = new Query();
                 <td><?php echo $supplierdata['ac_name']; ?></td>
                 <td><?php echo $form7data['type']; ?></td>
                 <td><?php echo $form7data['country']; ?></td>
-                <td><?php echo $form7data['size']; ?></td>
+                <td data-bs-toggle="modal" data-bs-target="#updatesizemodal<?php echo $form7data['id']; ?>"><?php echo $form7data['size']; ?></td>
                 <td><?php echo $form7data['viss']; ?></td>
                 <td><?php echo floatval($form7data['viss']) * 1.634; ?></td>
                   <td data-bs-toggle="modal" data-bs-target="#waterkgmodal<?php echo $form7data['id']; ?>"><?php if(!empty($form7data['water_kg'])){ echo $form7data['water_kg'];} ?></td>
@@ -419,6 +481,37 @@ $query = new Query();
                   </div>
                 </div>
               </div>
+              <div class="modal fade" id="updatesizemodal<?php echo $form7data['id']; ?>">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                        <div class="modal-header bg-warning text-light">
+                          <h1 class="modal-title fs-5">Add Size</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <form action="form_7_frozen.php" method="post">
+                            <input type="hidden" name="id" value="<?php echo $form7data['id']; ?>">
+                            <div class="modal-body">
+                              <?php
+                              $idd = $form7data['id'];
+                              $updata = $query->select('form7stock', $idd, 'id');
+                              ?>
+                              <div class="row">
+                                <div class="col">
+                                  <label>Size</label>
+                                  <input type="text" name="size" class="form-control inpv2 mt-1" value="<?php echo $updata['size']; ?>">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-warning" name="addsize">Update</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
               <?php
               $item_id = $form7data['item_id'];
               $country = $form7data['country'];

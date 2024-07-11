@@ -278,6 +278,7 @@ $query = new Query();
                           <div class="col">
                             <select name="fish_type1" id="commondityid3" class="form-control inpv2">
                               <option value="G">G</option>
+                              <option value="W">W</option>
                               <option value="Cut_piece">Cut Piece</option>
                             </select>
                           </div>
@@ -302,6 +303,7 @@ $query = new Query();
                           <div class="col">
                             <select name="fish_type2" id="commondityid4" class="form-control inpv2">
                               <option value="G">G</option>
+                              <option value="W">W</option>
                               <option value="Cut_piece">Cut Piece</option>
                             </select>
                           </div>

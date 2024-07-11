@@ -161,7 +161,9 @@ $query = new Query();
                     $closingbalanceamountstmt->execute();
                     $closingbalanceamount = $closingbalanceamountstmt->fetch(PDO::FETCH_ASSOC);
 
-                    $closingbalanceamount['closing_balance'];
+                    if(empty($closingbalanceamount['closing_balance'])){
+                      $closingbalanceamount['closing_balance'] = 0;
+                    }
 
                     // total paid_amount
                     $totalpaidamountstmt = $pdo->prepare("SELECT SUM(paid_amount) AS total_paid_amount FROM payable WHERE supplier_id='$supplier_id' AND paid_voucher != '' AND paid_date='$paid_date'");
@@ -202,7 +204,9 @@ $query = new Query();
 
                   }else{
                     $nowid = $payabledata['id'];
+                    // echo "<br>";
                     $date = $payabledata['date'];
+                    // echo "<br>";
                     $purchase_voucher_no = $payabledata['purchase_voucher_no'];
                     $purchase_voucher_no = $payabledata['purchase_voucher_no'];
 
@@ -240,6 +244,9 @@ $query = new Query();
                     paid_date;");
                     $closingbalanceamountstmt->execute();
                     $closingbalanceamount = $closingbalanceamountstmt->fetch(PDO::FETCH_ASSOC);
+                    if(empty($closingbalanceamount['closing_balance'])){
+                      $closingbalanceamount['closing_balance'] = 0;
+                    }
                     // print_r($closingbalanceamount);
                     $totalpaidamountstmt = $pdo->prepare("SELECT SUM(paid_amount) AS total_paid_amount FROM payable WHERE supplier_id='$supplier_id' AND paid_voucher != '' AND paid_date='$paid_date' ORDER BY
                     CASE
@@ -249,13 +256,14 @@ $query = new Query();
                     paid_date");
                     $totalpaidamountstmt->execute();
                     $totalpaidamount = $totalpaidamountstmt->fetch(PDO::FETCH_ASSOC);
-                    // echo $totalpaidamount['total_paid_amount'];
+                    $totalpaidamount['total_paid_amount'];
 
                     $totalpaidamountstmt2 = $pdo->prepare("SELECT SUM(paid_amount) AS total_paid_amount FROM payable WHERE supplier_id='$supplier_id' AND paid_voucher != '' AND paid_date<'$paid_date' ORDER BY
                     CASE
                         WHEN date = '0000-00-00' THEN paid_date
                         ELSE date
-                    END");
+                    END,
+                    paid_date");
                     $totalpaidamountstmt2->execute();
                     $totalpaidamount2 = $totalpaidamountstmt2->fetch(PDO::FETCH_ASSOC);
                     // echo $totalpaidamount2['total_paid_amount'];
@@ -264,7 +272,6 @@ $query = new Query();
 
                     // $total_paid_amount = $totalpaidamount['total_paid_amount'];
                     // $total_paid_amount = $total_paid_amount + $payabledata['paid_amount'];
-
                     $thebalanceamount = $total_purchase + $closingbalanceamount['closing_balance'] - $total_paid_amount;
                   }
                   }
@@ -290,17 +297,18 @@ $query = new Query();
                 <td><?php if(!empty($thebalanceamount)){ echo $thebalanceamount; }else{ echo $balanceamount['closing_balance'];} ?></td>
                 <?php
               }
-                 ?>
-                <td>
-                  <a href="edittransaction.php?voucher_no=<?= $payabledata['paid_voucher']; ?>&file=payable&payableid=<?php echo $payabledata['id']; ?>&transactionid=<?php
                   $voucher_no = $payabledata['paid_voucher'];
                   $ac_code = $payabledata['supplier_id'];
                   $description = $payabledata['remark'];
-                  $transactionidstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$voucher_no' AND ac_code='$ac_code' AND description='$description'");
-                  $transactionidstmt->execute();
+                  $transactionidstmt = $pdo->prepare("SELECT * FROM `transaction` WHERE voucher_no=:voucher_no AND ac_code='$ac_code' AND `description`=:description");
+                  $transactionidstmt->execute([
+                    ':voucher_no' => $voucher_no,
+                    ':description' => $description,
+                  ]);
                   $transactioniddata = $transactionidstmt->fetch(PDO::FETCH_ASSOC);
-                  echo $transactioniddata['id'];
-                   ?>" style="<?php if(empty($payabledata['paid_amount'])){ echo "display:none;"; } ?>">
+                 ?>
+                <td>
+                  <a href="edittransaction.php?voucher_no=<?= $payabledata['paid_voucher']; ?>&file=payable&payableid=<?php echo $payabledata['id']; ?>&transactionid=<?= $transactioniddata['id'];?>" style="<?php if(empty($payabledata['paid_amount'])){ echo "display:none;"; } ?>">
                     <button type="submit" class="btn btn-warning btn-sm text-light" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                         <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
                         <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>

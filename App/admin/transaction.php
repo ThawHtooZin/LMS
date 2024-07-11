@@ -200,9 +200,11 @@ $query = new Query();
       $totaldebitstmt = $pdo->prepare("SELECT SUM(debit) AS total FROM transaction");
       $totaldebitstmt->execute();
       $totaldebitdata = $totaldebitstmt->fetch(PDO::FETCH_ASSOC);
+      print_r($totaldebitdata);
       $totalcreditstmt = $pdo->prepare("SELECT SUM(credit) AS total FROM transaction");
       $totalcreditstmt->execute();
       $totalcreditdata = $totalcreditstmt->fetch(PDO::FETCH_ASSOC);
+      print_r($totalcreditdata);
 
       if($totaldebitdata['total'] != $totalcreditdata['total']){
         echo "<script>swal('Dosen\'t Match', 'Debit Credit Dosen\'t Match, Please Check again', 'warning');</script>";

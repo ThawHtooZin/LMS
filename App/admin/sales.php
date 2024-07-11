@@ -69,7 +69,7 @@ $query = new Query();
                 <th>Account Name</th>
                 <th>Description</th>
                 <th>Debit</th>
-                <th>Cerdit</th>
+                <th>Credit</th>
                 <th>Balance</th>
               </tr>
               <?php
@@ -201,7 +201,7 @@ $query = new Query();
                 $dollarrate = $dollarratestmt->fetch(PDO::FETCH_ASSOC);
 
                 // acnamechange
-                if($dollarrate['dollar_rate'] == 0){
+                if(empty($dollarrate['dollar_rate']) || $dollarrate['dollar_rate'] == 0){
                   $dollarrate['dollar_rate'] = 1;
                 }
                 $balance = $gldata['balance'] / $dollarrate['dollar_rate'];
@@ -212,7 +212,7 @@ $query = new Query();
                   <td><?php echo $acname['ac_name']; ?></td>
                   <td><?php echo $gldata['narration']; ?></td>
                   <td><?php echo $gldata['debit']; ?></td>
-                  <td><?php echo $dollarrate['usd_amount']; ?></td>
+                  <td><?php echo $gldata['credit']; ?></td>
                   <td><?php echo $balance; ?></td>
                 </tr>
               <?php endforeach; ?>

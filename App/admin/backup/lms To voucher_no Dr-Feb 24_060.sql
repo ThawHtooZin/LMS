@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 11, 2024 at 04:05 AM
+-- Generation Time: Jul 10, 2024 at 01:50 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -369,23 +369,7 @@ INSERT INTO `cashbook` (`id`, `date`, `sr_no`, `ac_name`, `particular`, `debit`,
 (3562, '2024-02-02', '', '3600/001', 'Meal Allowance for Office 5pcs Payment Day', '0', '10000', '261923333', 'Dr-Feb 24/034', '9100/012', 137, 0),
 (3563, '2024-02-02', '', '3600/001', 'Water Bill and services for WH (Dec/23) (78000+2000)', '0', '80000', '261843333', 'Dr-Feb 24/035', '9100/013', 139, 0),
 (3564, '2024-02-02', '', '3600/001', 'Paid to Sticker 5 colour for penam-sticker+other', '0', '1697000', '260146333', 'Dr-Feb 24/036', '6100/006', 141, 0),
-(3565, '2024-02-02', '', '3600/001', 'Taxi Charges for WH to Daw Nan house go for (Htet Paing Aye)', '0', '6000', '260140333', 'Dr-Feb 24/037', '9100/002', 143, 0),
-(3566, '2024-02-05', '', '3600/001', 'Fruit selling Income Money from (Naung Yoe)', '200000', '0', '221765583', 'Cr-Feb 24/002', '7000/001', 208, 0),
-(3567, '2024-02-05', '', '3600/001', 'Water 2 pk purchase for WH', '0', '1800', '221763783', 'Dr-Feb 24/061', '9100/003', 211, 0),
-(3568, '2024-02-05', '', '3600/001', 'Car Diesel for 6J-3015 (4.2)-50000/ (5.2)-50000', '0', '100000', '221663783', 'Dr-Feb 24/062', '9100/006', 213, 0),
-(3569, '2024-02-05', '', '3600/001', 'Car police catch for 6J-3015 (Market)', '0', '5000', '221658783', 'Dr-Feb 24/063', '9100/014', 215, 0),
-(3570, '2024-02-05', '', '3600/001', 'Taxi Charges for HHK to WH (pk)', '0', '17000', '221641783', 'Dr-Feb 24/064', '9100/002', 217, 0),
-(3571, '2024-02-05', '', '3600/001', 'Material purchase for WH', '0', '31500', '221610283', 'Dr-Feb 24/065', '9100/007', 219, 0),
-(3572, '2024-02-05', '', '3600/001', 'Photo paper and A4 purchase for WH', '0', '107500', '221502783', 'Dr-Feb 24/066', '9100/016', 221, 0),
-(3573, '2024-02-05', '', '3600/001', 'Battery 2 pcs charging charges and carry charges for (office)', '0', '15000', '221487783', 'Dr-Feb 24/067', '9100/007', 223, 0),
-(3574, '2024-02-05', '', '3600/001', 'Taxi charges for Ocean Pacific go workers', '0', '24000', '221463783', 'Dr-Feb 24/068', '9100/002', 225, 0),
-(3575, '2024-02-05', '', '3600/001', 'Paid to Moe Kyaw for Vr No-11332, 11339, Cheque No-052402', '0', '12503950', '208959833', 'Dr-Feb 24/069', '4000/M07', 227, 0),
-(3576, '2024-02-06', '', '3600/001', 'Canada Money $41000-$40862.68 from UAB 50%  50%  $20431.34-10=20421.34*2100ks', '42884814', '0', '251844647', 'Cr-Feb 24/003', '3800/001', 230, 0),
-(3577, '2024-02-06', '', '3600/001', 'Canada Money $41000-$40862.68 from UAB 50%  50%  $20431.34*3370ks $20431.34*105ks', '70998906.5', '0', '322843553', 'Cr-Feb 24/003', '3800/001', 232, 0),
-(3578, '2024-02-06', '', '3600/001', 'Italy Money from UAB ($46960-$46925) 50%   50% $23462.5-10=$23452.5*2100ks', '49250250', '0', '372093803', 'Cr-Feb 24/004', '3800/001', 238, 0),
-(3579, '2024-02-06', '', '3600/001', 'USA Money from UAB$75000 ($74925=50 50-$32761.64,65 35-$42163.36) $32761.64=>$16380.82-10=$16370.82*2100ks ', '34378722', '0', '406472525', 'Cr-Feb 24/005', '3800/001', 242, 0),
-(3580, '2024-02-06', '', '3600/001', 'USA Money from UAB ($74925=50 50-$32761.64,65 35-$42163.36) $32761.64=> $16380.82*3370ks $16380.82*105ks ', '56923349.5', '0', '463395874', 'Cr-Feb 24/005', '3800/001', 244, 0),
-(3581, '2024-02-06', '', '3600/001', 'USA Money from UAB $75000 ($74925=50 50-$32761.64,65 35-$42163.36)  $42163.36=> $14757.18*2100ks, $27406.18 in UAB USD Bank\r\n', '30990078', '0', '494385952', 'Cr-Feb 24/005', '3800/001', 246, 0);
+(3565, '2024-02-02', '', '3600/001', 'Taxi Charges for WH to Daw Nan house go for (Htet Paing Aye)', '0', '6000', '260140333', 'Dr-Feb 24/037', '9100/002', 143, 0);
 
 -- --------------------------------------------------------
 
@@ -611,47 +595,7 @@ INSERT INTO `currency` (`id`, `dollar_rate`, `debitorcredit`, `mmk_amount`, `usd
 (204, 1, 'debit', '0', '91268.45', 'SAF-008', 204),
 (205, 1, 'credit', '0', '91268.45', 'SAF-008', 205),
 (206, 1, 'debit', '0', '105649.44', 'SAF-009', 206),
-(207, 1, 'credit', '0', '105649.44', 'SAF-009', 207),
-(208, 0, 'debit', '200000', '0', 'Cr-Feb 24/002', 208),
-(209, 0, 'credit', '200000', '0', 'Cr-Feb 24/002', 209),
-(210, 0, 'debit', '1800', '0', 'Dr-Feb 24/061', 210),
-(211, 0, 'credit', '1800', '0', 'Dr-Feb 24/061', 211),
-(212, 0, 'debit', '100000', '0', 'Dr-Feb 24/062', 212),
-(213, 0, 'credit', '100000', '0', 'Dr-Feb 24/062', 213),
-(214, 0, 'debit', '5000', '0', 'Dr-Feb 24/063', 214),
-(215, 0, 'credit', '5000', '0', 'Dr-Feb 24/063', 215),
-(216, 0, 'debit', '17000', '0', 'Dr-Feb 24/064', 216),
-(217, 0, 'credit', '17000', '0', 'Dr-Feb 24/064', 217),
-(218, 0, 'debit', '31500', '0', 'Dr-Feb 24/065', 218),
-(219, 0, 'credit', '31500', '0', 'Dr-Feb 24/065', 219),
-(220, 0, 'debit', '107500', '0', 'Dr-Feb 24/066', 220),
-(221, 0, 'credit', '107500', '0', 'Dr-Feb 24/066', 221),
-(222, 0, 'debit', '15000', '0', 'Dr-Feb 24/067', 222),
-(223, 0, 'credit', '15000', '0', 'Dr-Feb 24/067', 223),
-(224, 0, 'debit', '24000', '0', 'Dr-Feb 24/068', 224),
-(225, 0, 'credit', '24000', '0', 'Dr-Feb 24/068', 225),
-(226, 0, 'debit', '12503950', '0', 'Dr-Feb 24/069', 226),
-(227, 0, 'credit', '12503950', '0', 'Dr-Feb 24/069', 227),
-(228, 1, 'debit', '41000', '41000', 'Cr-Feb 24/003', 228),
-(229, 1, 'credit', '41000', '41000', 'Cr-Feb 24/003', 229),
-(230, 2100, 'debit', '43194186', '20568.66', 'Cr-Feb 24/003', 230),
-(231, 2100, 'credit', '43194186', '20568.66', 'Cr-Feb 24/003', 231),
-(232, 3475, 'debit', '70998906.5', '20431.34', 'Cr-Feb 24/003', 232),
-(233, 3475, 'credit', '70998906.5', '20431.34', 'Cr-Feb 24/003', 233),
-(234, 1, 'debit', '91728.97', '91728.97', 'CAN-02/2024', 234),
-(235, 1, 'credit', '91728.97', '91728.97', 'CAN-02/2024', 235),
-(236, 1, 'debit', '46960', '46960', 'Cr-Feb 24/004', 236),
-(237, 1, 'credit', '46960', '46960', 'Cr-Feb 24/004', 237),
-(238, 2100, 'debit', '49344750', '23497.5', 'Cr-Feb 24/004', 238),
-(239, 2100, 'credit', '49344750', '23497.5', 'Cr-Feb 24/004', 239),
-(240, 1, 'debit', '75000', '75000', 'Cr-Feb 24/005', 240),
-(241, 1, 'credit', '75000', '75000', 'Cr-Feb 24/005', 241),
-(242, 2100, 'debit', '34557222', '16455.82', 'Cr-Feb 24/005', 242),
-(243, 2100, 'credit', '34557222', '16455.82', 'Cr-Feb 24/005', 243),
-(244, 3475, 'debit', '56923349.5', '16380.82', 'Cr-Feb 24/005', 244),
-(245, 3475, 'credit', '56923349.5', '16380.82', 'Cr-Feb 24/005', 245),
-(246, 2100, 'debit', '30990078', '14757.18', 'Cr-Feb 24/005', 246),
-(247, 2100, 'credit', '30990078', '14757.18', 'Cr-Feb 24/005', 247);
+(207, 1, 'credit', '0', '105649.44', 'SAF-009', 207);
 
 -- --------------------------------------------------------
 
@@ -2447,47 +2391,7 @@ INSERT INTO `general_ledger` (`id`, `date`, `voucherno`, `ac_code`, `debit`, `cr
 (5563, '2024-02-02', 'Dr-Feb 24/036', '6100/006', '1697000', '0', '1697000', 'Paid to Sticker 5 colour for penam-sticker+other', '', '', 0, 37, 140),
 (5564, '2024-02-02', 'Dr-Feb 24/036', '3600/001', '0', '1697000', '221571583', 'Paid to Sticker 5 colour for penam-sticker+other', '', '', 0, 35, 141),
 (5565, '2024-02-02', 'Dr-Feb 24/037', '9100/002', '6000', '0', '137500', 'Taxi Charges for WH to Daw Nan house go for (Htet Paing Aye)', '', '', 0, 39, 142),
-(5566, '2024-02-02', 'Dr-Feb 24/037', '3600/001', '0', '6000', '221565583', 'Taxi Charges for WH to Daw Nan house go for (Htet Paing Aye)', '', '', 0, 35, 143),
-(5567, '2024-02-05', 'Cr-Feb 24/002', '3600/001', '200000', '0', '221765583', 'Fruit selling Income Money from (Naung Yoe)', '', '', 0, 35, 208),
-(5568, '2024-02-05', 'Cr-Feb 24/002', '7000/001', '0', '200000', '-200000', 'Fruit selling Income Money from (Naung Yoe)', '', '', 0, 38, 209),
-(5569, '2024-02-05', 'Dr-Feb 24/061', '9100/003', '1800', '0', '9000', 'Water 2 pk purchase for WH', '', '', 0, 39, 210),
-(5570, '2024-02-05', 'Dr-Feb 24/061', '3600/001', '0', '1800', '221763783', 'Water 2 pk purchase for WH', '', '', 0, 35, 211),
-(5571, '2024-02-05', 'Dr-Feb 24/062', '9100/006', '100000', '0', '330000', 'Car Diesel for 6J-3015 (4.2)-50000/ (5.2)-50000', '', '', 0, 39, 212),
-(5572, '2024-02-05', 'Dr-Feb 24/062', '3600/001', '0', '100000', '221663783', 'Car Diesel for 6J-3015 (4.2)-50000/ (5.2)-50000', '', '', 0, 35, 213),
-(5573, '2024-02-05', 'Dr-Feb 24/063', '9100/014', '5000', '0', '23000', 'Car police catch for 6J-3015 (Market)', '', '', 0, 39, 214),
-(5574, '2024-02-05', 'Dr-Feb 24/063', '3600/001', '0', '5000', '221658783', 'Car police catch for 6J-3015 (Market)', '', '', 0, 35, 215),
-(5575, '2024-02-05', 'Dr-Feb 24/064', '9100/002', '17000', '0', '154500', 'Taxi Charges for HHK to WH (pk)', '', '', 0, 39, 216),
-(5576, '2024-02-05', 'Dr-Feb 24/064', '3600/001', '0', '17000', '221641783', 'Taxi Charges for HHK to WH (pk)', '', '', 0, 35, 217),
-(5577, '2024-02-05', 'Dr-Feb 24/065', '9100/007', '31500', '0', '166500', 'Material purchase for WH', '', '', 0, 39, 218),
-(5578, '2024-02-05', 'Dr-Feb 24/065', '3600/001', '0', '31500', '221610283', 'Material purchase for WH', '', '', 0, 35, 219),
-(5579, '2024-02-05', 'Dr-Feb 24/066', '9100/016', '107500', '0', '107500', 'Photo paper and A4 purchase for WH', '', '', 0, 39, 220),
-(5580, '2024-02-05', 'Dr-Feb 24/066', '3600/001', '0', '107500', '221502783', 'Photo paper and A4 purchase for WH', '', '', 0, 35, 221),
-(5581, '2024-02-05', 'Dr-Feb 24/067', '9100/007', '15000', '0', '181500', 'Battery 2 pcs charging charges and carry charges for (office)', '', '', 0, 39, 222),
-(5582, '2024-02-05', 'Dr-Feb 24/067', '3600/001', '0', '15000', '221487783', 'Battery 2 pcs charging charges and carry charges for (office)', '', '', 0, 35, 223),
-(5583, '2024-02-05', 'Dr-Feb 24/068', '9100/002', '24000', '0', '178500', 'Taxi charges for Ocean Pacific go workers', '', '', 0, 39, 224),
-(5584, '2024-02-05', 'Dr-Feb 24/068', '3600/001', '0', '24000', '221463783', 'Taxi charges for Ocean Pacific go workers', '', '', 0, 35, 225),
-(5585, '2024-02-05', 'Dr-Feb 24/069', '4000/M07', '12503950', '0', '12503950', 'Paid to Moe Kyaw for Vr No-11332, 11339, Cheque No-052402', '', '', 0, 40, 226),
-(5586, '2024-02-05', 'Dr-Feb 24/069', '3600/001', '0', '12503950', '208959833', 'Paid to Moe Kyaw for Vr No-11332, 11339, Cheque No-052402', '', '', 0, 35, 227),
-(5587, '2024-02-06', 'Cr-Feb 24/003', '3800/001', '41000', '0', '41000', 'Money Received from Canada to UAB Bank\r\n', '', '', 0, 35, 228),
-(5588, '2024-02-06', 'Cr-Feb 24/003', '3300/003', '0', '41000', '-75007.64', 'Money Received from Canada to UAB Bank', '', '', 0, 35, 229),
-(5589, '2024-02-06', 'Cr-Feb 24/003', '3600/001', '42884814', '0', '251844647', 'Canada Money $41000-$40862.68 from UAB 50%  50%  $20431.34-10=20421.34*2100ks', '', '', 147.32, 35, 230),
-(5590, '2024-02-06', 'Cr-Feb 24/003', '3800/001', '0', '20568.66', '20431.34', 'Canada Money $41000-$40862.68 from UAB 50%  50%  $20431.34-10=20421.34*2100ks\r\n', '', '', 0, 35, 231),
-(5591, '2024-02-06', 'Cr-Feb 24/003', '3600/001', '70998906.5', '0', '322843553.5', 'Canada Money $41000-$40862.68 from UAB 50%  50%  $20431.34*3370ks $20431.34*105ks', '', '', 0, 35, 232),
-(5592, '2024-02-06', 'Cr-Feb 24/003', '3800/001', '0', '20431.34', '0', 'Canada Money $41000-$40862.68 from UAB 50%  50% $20431.34*3370ks $20431.34*105ks', '', '', 0, 35, 233),
-(5593, '2024-02-14', 'CAN-02/2024', '3300/003', '91728.97', '0', '16721.33', 'Credit Sale to Canada for Inv No. Can-02/2024 ', 'CAN-02/24', 'OOLU6249050', 0, 35, 234),
-(5594, '2024-02-14', 'CAN-02/2024', '5000/002', '0', '91728.97', '-91728.97', 'Credit Sale to Canada for Inv No. CAN-02/2024', '', '', 0, 36, 235),
-(5595, '2024-02-06', 'Cr-Feb 24/004', '3800/001', '46960', '0', '46960', 'Money Received from ITALY to UAB Bank for InvNo. Italy-01/2024', '', '', 0, 35, 236),
-(5596, '2024-02-06', 'Cr-Feb 24/004', '3300/004', '0', '46960', '9.3600000000006', 'Money Received from ITALY to UAB Bank for InvNo. Italy-01/2024', '', '', 0, 35, 237),
-(5597, '2024-02-06', 'Cr-Feb 24/004', '3600/001', '49250250', '0', '372093803.5', 'Italy Money from UAB ($46960-$46925) 50%   50% $23462.5-10=$23452.5*2100ks', '', '', 45, 35, 238),
-(5598, '2024-02-06', 'Cr-Feb 24/004', '3800/001', '0', '23497.5', '23462.5', 'Italy Money from UAB ($46960-$46925) 50%   50% $23462.5-10=$23452.5*2100ks', '', '', 0, 35, 239),
-(5599, '2024-02-06', 'Cr-Feb 24/005', '3800/001', '75000', '0', '98462.5', 'Money Received from USA to UAB Bank for Inv No. SAF-19/2023', '', '', 0, 35, 240),
-(5600, '2024-02-06', 'Cr-Feb 24/005', '3300/002', '0', '75000', '892934.81', 'Money Received from USA to UAB Bank for Inv No. SAF-19/2023', '', '', 0, 35, 241),
-(5601, '2024-02-06', 'Cr-Feb 24/005', '3600/001', '34378722', '0', '406472525.5', 'USA Money from UAB$75000 ($74925=50 50-$32761.64,65 35-$42163.36) $32761.64=>$16380.82-10=$16370.82*2100ks ', '', '', 85, 35, 242),
-(5602, '2024-02-06', 'Cr-Feb 24/005', '3800/001', '0', '16455.82', '82006.68', 'USA Money from UAB$75000 ($74925=50 50-$32761.64,65 35-$42163.36) $32761.64=>$16380.82-10=$16370.82*2100ks ', '', '', 0, 35, 243),
-(5603, '2024-02-06', 'Cr-Feb 24/005', '3600/001', '56923349.5', '0', '463395875', 'USA Money from UAB ($74925=50 50-$32761.64,65 35-$42163.36) $32761.64=> $16380.82*3370ks $16380.82*105ks ', '', '', 0, 35, 244),
-(5604, '2024-02-06', 'Cr-Feb 24/005', '3800/001', '0', '16380.82', '65625.86', 'USA Money from UAB ($74925=50 50-$32761.64,65 35-$42163.36) $32761.64=> $16380.82*3370ks $16380.82*105ks ', '', '', 0, 35, 245),
-(5605, '2024-02-06', 'Cr-Feb 24/005', '3600/001', '30990078', '0', '494385953', 'USA Money from UAB $75000 ($74925=50 50-$32761.64,65 35-$42163.36)  $42163.36=> $14757.18*2100ks, $27406.18 in UAB USD Bank\r\n', '', '', 0, 35, 246),
-(5606, '2024-02-06', 'Cr-Feb 24/005', '3800/001', '0', '14757.18', '50868.68', 'USA Money from UAB $75000 ($74925=50 50-$32761.64,65 35-$42163.36)  $42163.36=> $14757.18*2100ks, $27406.18 in UAB USD Bank\r\n', '', '', 0, 35, 247);
+(5566, '2024-02-02', 'Dr-Feb 24/037', '3600/001', '0', '6000', '221565583', 'Taxi Charges for WH to Daw Nan house go for (Htet Paing Aye)', '', '', 0, 35, 143);
 
 -- --------------------------------------------------------
 
@@ -4629,8 +4533,7 @@ INSERT INTO `payable` (`id`, `date`, `supplier_id`, `purchase_voucher_no`, `purc
 (1873, '0000-00-00', '4000/Y01', '853532078', 0, '2024-02-02', 'Dr-Feb 24/029', 'Paid to Ye Yint for Vr No-11115,11133', 5000000, 107996000, 0, 0, '0000-00-00'),
 (1874, '0000-00-00', '4000/H01', '303428819', 0, '2024-02-02', 'Dr-Feb 24/030', 'Paid to Htet Aung Lin for Vr No-10877', 444200, 0, 0, 0, '0000-00-00'),
 (1875, '0000-00-00', '4000/P01', '153905841', 0, '2024-02-02', 'Dr-Feb 24/031', 'Paid to Phone Naing for Vr No-11249,11268', 3500000, 21345600, 0, 0, '0000-00-00'),
-(1876, '0000-00-00', '4000/T02', '659767038', 0, '2024-02-02', 'Dr-Feb 24/032', 'Paid to Thein Htay for Vr No-11269', 4000000, 219407800, 0, 0, '0000-00-00'),
-(1877, '0000-00-00', '4000/M07', '282856713', 0, '2024-02-05', 'Dr-Feb 24/069', 'Paid to Moe Kyaw for Vr No-11332, 11339, Cheque No-052402', 12503950, 21782850, 0, 0, '0000-00-00');
+(1876, '0000-00-00', '4000/T02', '659767038', 0, '2024-02-02', 'Dr-Feb 24/032', 'Paid to Thein Htay for Vr No-11269', 4000000, 219407800, 0, 0, '0000-00-00');
 
 -- --------------------------------------------------------
 
@@ -6123,11 +6026,7 @@ INSERT INTO `receivable` (`id`, `date`, `ac_code`, `sr_no`, `container_no`, `inv
 (70, '2023-12-15', '3300/002', 'SAF-25/2023', ':OERU-4219167', '66774.05', '0000-00-00', '', '', '0', '846016.92', 0),
 (71, '2023-12-21', '3300/002', 'SAF-26/2023', ':TTNU-8059533', '91268.45', '0000-00-00', '', '', '0', '937285.37', 0),
 (72, '2023-12-28', '3300/002', 'SAF-27/2023', ':SEGU-9662141', '105649.44', '0000-00-00', '', '', '0', '1042934.81', 0),
-(171, '0000-00-00', '3300/002', '', '', '', '2024-02-01', 'Cr-Feb 24/001', 'Money Transfer From USA to UAB Bank', '75000', '967934.81', 87),
-(172, '0000-00-00', '3300/003', '', '', '', '2024-02-06', 'Cr-Feb 24/003', 'Money Received from Canada to UAB Bank', '41000', '-75007.64', 229),
-(173, '2024-02-14', '3300/003', 'CAN-02/24', 'OOLU6249050', '91728.97', '0000-00-00', '', '', '', '16721.33', 234),
-(174, '0000-00-00', '3300/004', '', '', '', '2024-02-06', 'Cr-Feb 24/004', 'Money Received from ITALY to UAB Bank for InvNo. Italy-01/2024', '46960', '9.3600000000006', 237),
-(175, '0000-00-00', '3300/002', '', '', '', '2024-02-06', 'Cr-Feb 24/005', 'Money Received from USA to UAB Bank for Inv No. SAF-19/2023', '75000', '892934.81', 241);
+(171, '0000-00-00', '3300/002', '', '', '', '2024-02-01', 'Cr-Feb 24/001', 'Money Transfer From USA to UAB Bank', '75000', '967934.81', 87);
 
 -- --------------------------------------------------------
 
@@ -6373,192 +6272,152 @@ CREATE TABLE `transaction` (
 --
 
 INSERT INTO `transaction` (`id`, `date`, `voucher_no`, `ac_code`, `description`, `debit`, `credit`, `currency`, `sr_no`, `container_no`, `bank_charges`, `status`) VALUES
-(54, '2024-02-01', 'Dr-Feb 24/001', '9100/003', 'Water 6 pk purchase for WH', '5400', '0', 'mmk', '', '', 0, 'accepted'),
-(55, '2024-02-01', 'Dr-Feb 24/001', '3600/001', 'Water 6 pk purchase for WH', '0', '5400', 'mmk', '', '', 0, 'accepted'),
-(58, '2024-02-01', 'Dr-Feb 24/002', '9100/004', 'Sir Phone Bill and Monthly/ Phone 6 pcs Bill/ Sir-6000 (Sir,Daw Nan,Lai-15000) (Office,Sandar,Mar)', '39000', '0', 'mmk', '', '', 0, 'accepted'),
-(59, '2024-02-01', 'Dr-Feb 24/002', '3600/001', 'Sir Phone Bill and Monthly/ Phone 6 pcs Bill/ Sir-6000 (Sir,Daw Nan,Lai-15000) (Office,Sandar,Mar)', '0', '39000', 'mmk', '', '', 0, 'accepted'),
-(60, '2024-02-01', 'Dr Feb\'24/003', '9100/005', 'Medicine and Taxi for sir', '14000', '0', 'mmk', '', '', 0, 'accepted'),
-(61, '2024-02-01', 'Dr Feb\'24/003', '3600/001', 'Medicine and Taxi for sir', '0', '14000', 'mmk', '', '', 0, 'accepted'),
-(62, '2024-02-01', 'Dr Feb\'24/004', '9100/006', 'Car Diesel for 5L-2848 (30.1.24-10000)(30.1.24-70000)', '80000', '0', 'mmk', '', '', 0, 'accepted'),
-(63, '2024-02-01', 'Dr Feb\'24/004', '3600/001', 'Car Diesel for 5L-2848 (30.1.24-10000)(30.1.24-70000)', '0', '80000', 'mmk', '', '', 0, 'accepted'),
-(64, '2024-02-01', 'Dr Feb\'24/005', '9100/006', 'Car Diesel for 6J-3015 (31.1.24-50000)', '50000', '0', 'mmk', '', '', 0, 'accepted'),
-(65, '2024-02-01', 'Dr Feb\'24/005', '3600/001', 'Car Diesel for 6J-3015 (31.1.24-50000)', '0', '50000', 'mmk', '', '', 0, 'accepted'),
-(66, '2024-02-01', 'Dr Feb\'24/006', '9100/007', 'Material and Taxi Charges for PK Machine', '50000', '0', 'mmk', '', '', 0, 'accepted'),
-(67, '2024-02-01', 'Dr Feb\'24/006', '3600/001', 'Material and Taxi Charges for PK Machine', '0', '50000', 'mmk', '', '', 0, 'accepted'),
-(68, '2024-02-01', 'Dr Feb\'24/007', '3300/001', 'Bejon Loan take from LM 2020ED Balance $25176*3572ks(Best Brand)', '89928700', '0', 'mmk', '', '', 0, 'accepted'),
-(69, '2024-02-01', 'Dr Feb\'24/007', '3600/001', 'Bejon Loan take from LM 2020ED Balance $25176*3572ks(Best Brand)', '0', '89928700', 'mmk', '', '', 0, 'accepted'),
-(70, '2024-02-01', 'Dr Feb\'24/008', '9100/008', 'DHL charges for Italy Document sent', '377000', '0', 'mmk', '', '', 0, 'accepted'),
-(71, '2024-02-01', 'Dr Feb\'24/008', '3600/001', 'DHL charges for Italy Document sent', '0', '377000', 'mmk', '', '', 0, 'accepted'),
-(76, '2024-02-01', 'Dr Feb\'24/009', '4000/K06', 'Paid to Ka Yin Lay for Vr No-11337', '100000', '0', 'mmk', '', '', 0, 'accepted'),
-(77, '2024-02-01', 'Dr Feb\'24/009', '3600/001', 'Paid to Ka Yin Lay for Vr No-11337', '0', '100000', 'mmk', '', '', 0, 'accepted'),
-(78, '2024-02-01', 'Dr Feb\'24/010', '9100/009', 'Wave Money charges for Ka Yin Lay Money sent', '1500', '0', 'mmk', '', '', 0, 'accepted'),
-(79, '2024-02-01', 'Dr Feb\'24/010', '3600/001', 'Wave Money charges for Ka Yin Lay Money sent', '0', '1500', 'mmk', '', '', 0, 'accepted'),
-(80, '2024-02-01', 'Dr Feb\'24/011', '9100/001', 'All people Salary Payment for Jan/24', '17754000', '0', 'mmk', '', '', 0, 'accepted'),
-(81, '2024-02-01', 'Dr Feb\'24/011', '3600/001', 'All people Salary Payment for Jan/24', '0', '17754000', 'mmk', '', '', 0, 'accepted'),
-(82, '2024-02-01', 'Dr Feb\'24/011', '9100/010', 'All people Annual Bonus Paid for Jan/24', '17351000', '0', 'mmk', '', '', 0, 'accepted'),
-(83, '2024-02-01', 'Dr Feb\'24/011', '3600/001', 'All people Annual Bonus Paid for Jan/24', '0', '17351000', 'mmk', '', '', 0, 'accepted'),
-(84, '2024-02-01', 'Dr Feb\'24/012', '9100/011', 'Donation for Bangladesh Embassy', '3000000', '0', 'mmk', '', '', 0, 'accepted'),
-(85, '2024-02-01', 'Dr Feb\'24/012', '3600/001', 'Donation for Bangladesh Embassy', '0', '3000000', 'mmk', '', '', 0, 'accepted'),
+(54, '2024-02-01', 'Dr-Feb 24/001', '9100/003', 'Water 6 pk purchase for WH', '5400', '0', 'mmk', '', '', 0, 'selected'),
+(55, '2024-02-01', 'Dr-Feb 24/001', '3600/001', 'Water 6 pk purchase for WH', '0', '5400', 'mmk', '', '', 0, 'selected'),
+(58, '2024-02-01', 'Dr-Feb 24/002', '9100/004', 'Sir Phone Bill and Monthly/ Phone 6 pcs Bill/ Sir-6000 (Sir,Daw Nan,Lai-15000) (Office,Sandar,Mar)', '39000', '0', 'mmk', '', '', 0, 'selected'),
+(59, '2024-02-01', 'Dr-Feb 24/002', '3600/001', 'Sir Phone Bill and Monthly/ Phone 6 pcs Bill/ Sir-6000 (Sir,Daw Nan,Lai-15000) (Office,Sandar,Mar)', '0', '39000', 'mmk', '', '', 0, 'selected'),
+(60, '2024-02-01', 'Dr Feb\'24/003', '9100/005', 'Medicine and Taxi for sir', '14000', '0', 'mmk', '', '', 0, 'selected'),
+(61, '2024-02-01', 'Dr Feb\'24/003', '3600/001', 'Medicine and Taxi for sir', '0', '14000', 'mmk', '', '', 0, 'selected'),
+(62, '2024-02-01', 'Dr Feb\'24/004', '9100/006', 'Car Diesel for 5L-2848 (30.1.24-10000)(30.1.24-70000)', '80000', '0', 'mmk', '', '', 0, 'selected'),
+(63, '2024-02-01', 'Dr Feb\'24/004', '3600/001', 'Car Diesel for 5L-2848 (30.1.24-10000)(30.1.24-70000)', '0', '80000', 'mmk', '', '', 0, 'selected'),
+(64, '2024-02-01', 'Dr Feb\'24/005', '9100/006', 'Car Diesel for 6J-3015 (31.1.24-50000)', '50000', '0', 'mmk', '', '', 0, 'selected'),
+(65, '2024-02-01', 'Dr Feb\'24/005', '3600/001', 'Car Diesel for 6J-3015 (31.1.24-50000)', '0', '50000', 'mmk', '', '', 0, 'selected'),
+(66, '2024-02-01', 'Dr Feb\'24/006', '9100/007', 'Material and Taxi Charges for PK Machine', '50000', '0', 'mmk', '', '', 0, 'selected'),
+(67, '2024-02-01', 'Dr Feb\'24/006', '3600/001', 'Material and Taxi Charges for PK Machine', '0', '50000', 'mmk', '', '', 0, 'selected'),
+(68, '2024-02-01', 'Dr Feb\'24/007', '3300/001', 'Bejon Loan take from LM 2020ED Balance $25176*3572ks(Best Brand)', '89928700', '0', 'mmk', '', '', 0, 'selected'),
+(69, '2024-02-01', 'Dr Feb\'24/007', '3600/001', 'Bejon Loan take from LM 2020ED Balance $25176*3572ks(Best Brand)', '0', '89928700', 'mmk', '', '', 0, 'selected'),
+(70, '2024-02-01', 'Dr Feb\'24/008', '9100/008', 'DHL charges for Italy Document sent', '377000', '0', 'mmk', '', '', 0, 'selected'),
+(71, '2024-02-01', 'Dr Feb\'24/008', '3600/001', 'DHL charges for Italy Document sent', '0', '377000', 'mmk', '', '', 0, 'selected'),
+(76, '2024-02-01', 'Dr Feb\'24/009', '4000/K06', 'Paid to Ka Yin Lay for Vr No-11337', '100000', '0', 'mmk', '', '', 0, 'selected'),
+(77, '2024-02-01', 'Dr Feb\'24/009', '3600/001', 'Paid to Ka Yin Lay for Vr No-11337', '0', '100000', 'mmk', '', '', 0, 'selected'),
+(78, '2024-02-01', 'Dr Feb\'24/010', '9100/009', 'Wave Money charges for Ka Yin Lay Money sent', '1500', '0', 'mmk', '', '', 0, 'selected'),
+(79, '2024-02-01', 'Dr Feb\'24/010', '3600/001', 'Wave Money charges for Ka Yin Lay Money sent', '0', '1500', 'mmk', '', '', 0, 'selected'),
+(80, '2024-02-01', 'Dr Feb\'24/011', '9100/001', 'All people Salary Payment for Jan/24', '17754000', '0', 'mmk', '', '', 0, 'selected'),
+(81, '2024-02-01', 'Dr Feb\'24/011', '3600/001', 'All people Salary Payment for Jan/24', '0', '17754000', 'mmk', '', '', 0, 'selected'),
+(82, '2024-02-01', 'Dr Feb\'24/011', '9100/010', 'All people Annual Bonus Paid for Jan/24', '17351000', '0', 'mmk', '', '', 0, 'selected'),
+(83, '2024-02-01', 'Dr Feb\'24/011', '3600/001', 'All people Annual Bonus Paid for Jan/24', '0', '17351000', 'mmk', '', '', 0, 'selected'),
+(84, '2024-02-01', 'Dr Feb\'24/012', '9100/011', 'Donation for Bangladesh Embassy', '3000000', '0', 'mmk', '', '', 0, 'selected'),
+(85, '2024-02-01', 'Dr Feb\'24/012', '3600/001', 'Donation for Bangladesh Embassy', '0', '3000000', 'mmk', '', '', 0, 'selected'),
 (86, '2024-02-01', 'Cr-Feb 24/001', '3800/001', 'Money Transfer From USA to UAB Bank', '75000', '0', 'usd', '', '', 0, 'accepted'),
 (87, '2024-02-01', 'Cr-Feb 24/001', '3300/002', 'Money Transfer From USA to UAB Bank', '0', '75000', 'usd', '', '', 0, 'accepted'),
 (90, '2024-02-01', 'Cr-Feb 24/001', '3600/001', 'USA Money Receive from UAB  ($75000-$74925=75) 50% 37462.5*3480ks ', '130369500', '0', 'usd', '', '', 0, 'accepted'),
 (91, '2024-02-01', 'Cr-Feb 24/001', '3800/001', 'USA Money Receive from UAB  ($75000-$74925=75) 50% 37462.5*3480ks ', '0', '130369500', 'usd', '', '', 0, 'accepted'),
 (92, '2024-02-01', 'Cr-Feb 24/001', '3600/001', 'USA Money Receive from UAB  ($75000-$74925=75) 50% 37452.5*2100ks+bank charges 85 ', '78828750', '0', 'usd', '', '', 85, 'accepted'),
 (93, '2024-02-01', 'Cr-Feb 24/001', '3800/001', 'USA Money Receive from UAB  ($75000-$74925=75) 50% 37452.5*2100ks+bank charges 85 ', '0', '78828750', 'usd', '', '', 0, 'accepted'),
-(94, '2024-02-02', 'Dr Feb\'24/013', '9100/002', 'Taxi charges for Ocean Pacfic to WH', '15000', '0', 'mmk', '', '', 0, 'accepted'),
-(95, '2024-02-02', 'Dr Feb\'24/013', '3600/001', 'Taxi charges for Ocean Pacfic to WH', '0', '15000', 'mmk', '', '', 0, 'accepted'),
-(96, '2024-02-02', 'Dr Feb\'24/014', '6100/003', 'Carton Box purchase for Ocean Pacfic pk', '52500', '0', 'mmk', '', '', 0, 'accepted'),
-(97, '2024-02-02', 'Dr Feb\'24/014', '3600/001', 'Carton Box purchase for Ocean Pacfic pk', '0', '52500', 'mmk', '', '', 0, 'accepted'),
-(98, '2024-02-02', 'Dr Feb\'24/015', '6100/001', 'Labour Charges and Taxi Charges for (Rohu)', '289000', '0', 'mmk', '', '', 0, 'accepted'),
-(99, '2024-02-02', 'Dr Feb\'24/015', '3600/001', 'Labour Charges and Taxi Charges for (Rohu)', '0', '289000', 'mmk', '', '', 0, 'accepted'),
-(100, '2024-02-02', 'Dr Feb\'24/016', '6100/002', 'Ice 10 pcs purchase for HHK (D-Puti,Rohu,Ayer)', '90000', '0', 'mmk', '', '', 0, 'accepted'),
-(101, '2024-02-02', 'Dr Feb\'24/016', '3600/001', 'Ice 10 pcs purchase for HHK (D-Puti,Rohu,Ayer)', '0', '90000', 'mmk', '', '', 0, 'accepted'),
-(102, '2024-02-02', 'Dr Feb\'24/017', '6100/003', 'JCV Rope purchase for HHK pk pcs*85000', '170000', '0', 'mmk', '', '', 0, 'accepted'),
-(103, '2024-02-02', 'Dr Feb\'24/017', '3600/001', 'JCV Rope purchase for HHK pk pcs*85000', '0', '170000', 'mmk', '', '', 0, 'accepted'),
-(104, '2024-02-02', 'Dr Feb\'24/018', '9100/002', 'Taxi Charges for HHK to WH and WH to GFC', '43000', '0', 'mmk', '', '', 0, 'accepted'),
-(105, '2024-02-02', 'Dr Feb\'24/018', '3600/001', 'Taxi Charges for HHK to WH and WH to GFC', '0', '43000', 'mmk', '', '', 0, 'accepted'),
-(106, '2024-02-02', 'Dr Feb\'24/019', '6100/004', 'WH to HHK Fish carry car charges', '130000', '0', 'mmk', '', '', 0, 'accepted'),
-(107, '2024-02-02', 'Dr Feb\'24/019', '3600/001', 'WH to HHK Fish carry car charges', '0', '130000', 'mmk', '', '', 0, 'accepted'),
-(108, '2024-02-02', 'Dr Feb\'24/020', '9100/012', 'Workers 31 pcs Dinner for (OT) (Rohu)', '62000', '0', 'mmk', '', '', 0, 'accepted'),
-(109, '2024-02-02', 'Dr Feb\'24/020', '3600/001', 'Workers 31 pcs Dinner for (OT) (Rohu)', '0', '62000', 'mmk', '', '', 0, 'accepted'),
-(110, '2024-02-02', 'Dr Feb\'24/021', '9100/007', 'Material purchase and service charges for WH (Boy Tiolet)', '85000', '0', 'mmk', '', '', 0, 'accepted'),
-(111, '2024-02-02', 'Dr Feb\'24/021', '3600/001', 'Material purchase and service charges for WH (Boy Tiolet)', '0', '85000', 'mmk', '', '', 0, 'accepted'),
-(112, '2024-02-02', 'Dr Feb\'24/022', '9100/012', 'Fruit purchase for Sir', '7000', '0', 'mmk', '', '', 0, 'accepted'),
-(113, '2024-02-02', 'Dr Feb\'24/022', '3600/001', 'Fruit purchase for Sir', '0', '7000', 'mmk', '', '', 0, 'accepted'),
-(114, '2024-02-02', 'Dr Feb\'24/023', '6100/003', 'Penam and other purchase for WH', '814500', '0', 'mmk', '', '', 0, 'accepted'),
-(115, '2024-02-02', 'Dr Feb\'24/023', '3600/001', 'Penam and other purchase for WH', '0', '814500', 'mmk', '', '', 0, 'accepted'),
-(116, '2024-02-02', 'Dr Feb\'24/024', '6100/002', 'Ice 4 pcs and car pk for D-Puti', '42000', '0', 'mmk', '', '', 0, 'accepted'),
-(117, '2024-02-02', 'Dr Feb\'24/024', '3600/001', 'Ice 4 pcs and car pk for D-Puti', '0', '42000', 'mmk', '', '', 0, 'accepted'),
-(118, '2024-02-02', 'Dr Feb\'24/025', '4000/M06', 'Paid to Mg Mg Soe for Vr No-11152,11185', '4000000', '0', 'mmk', '', '', 0, 'accepted'),
-(119, '2024-02-02', 'Dr Feb\'24/025', '3600/001', 'Paid to Mg Mg Soe for Vr No-11152,11185', '0', '4000000', 'mmk', '', '', 0, 'accepted'),
-(120, '2024-02-02', 'Dr-Feb\'24/026', '4000/M03', 'Paid to Mg Mg Nyunt for Vr-11183,11192', '5000000', '0', 'mmk', '', '', 0, 'accepted'),
-(121, '2024-02-02', 'Dr-Feb\'24/026', '3600/001', 'Paid to Mg Mg Nyunt for Vr-11183,11192', '0', '5000000', 'mmk', '', '', 0, 'accepted'),
-(122, '2024-02-02', 'Dr-Feb 24/027', '4000/P02', 'Paid to BLC (PYM) for Vr No-11221', '3400000', '0', 'mmk', '', '', 0, 'accepted'),
-(123, '2024-02-02', 'Dr-Feb 24/027', '3600/001', 'Paid to BLC (PYM) for Vr No-11221', '0', '3400000', 'mmk', '', '', 0, 'accepted'),
-(124, '2024-02-02', 'Dr-Feb 24/028', '4000/T17', 'Paid to Than Than Myint for Vr No-107788 (10810-2696450)', '5000000', '0', 'mmk', '', '', 0, 'accepted'),
-(125, '2024-02-02', 'Dr-Feb 24/028', '3600/001', 'Paid to Than Than Myint for Vr No-107788 (10810-2696450)', '0', '5000000', 'mmk', '', '', 0, 'accepted'),
-(126, '2024-02-02', 'Dr-Feb 24/029', '4000/Y01', 'Paid to Ye Yint for Vr No-11115,11133', '5000000', '0', 'mmk', '', '', 0, 'accepted'),
-(127, '2024-02-02', 'Dr-Feb 24/029', '3600/001', 'Paid to  Ye Yint for Vr No-11115,11133', '0', '5000000', 'mmk', '', '', 0, 'accepted'),
-(128, '2024-02-02', 'Dr-Feb 24/030', '4000/H01', 'Paid to Htet Aung Lin for Vr No-10877', '444200', '0', 'mmk', '', '', 0, 'accepted'),
-(129, '2024-02-02', 'Dr-Feb 24/030', '3600/001', 'Paid to Htet Aung Lin for Vr No-10877', '0', '444200', 'mmk', '', '', 0, 'accepted'),
-(130, '2024-02-02', 'Dr-Feb 24/031', '4000/P01', 'Paid to Phone Naing for Vr No-11249,11268', '3500000', '0', 'mmk', '', '', 0, 'accepted'),
-(131, '2024-02-02', 'Dr-Feb 24/031', '3600/001', 'Paid to Phone Naing for Vr No-11249,11268', '0', '3500000', 'mmk', '', '', 0, 'accepted'),
-(132, '2024-02-02', 'Dr-Feb 24/032', '4000/T02', 'Paid to Thein Htay for Vr No-11269', '4000000', '0', 'mmk', '', '', 0, 'accepted'),
-(133, '2024-02-02', 'Dr-Feb 24/032', '3600/001', 'Paid to Thein Htay for Vr No-11269', '0', '4000000', 'mmk', '', '', 0, 'accepted'),
-(134, '2024-02-02', 'Dr Feb\'24/033', '9100/002', 'Taxi Charges For Office 5 pcs Payment Day (6:30) PM', '39500', '0', 'mmk', '', '', 0, 'accepted'),
-(135, '2024-02-02', 'Dr Feb\'24/033', '3600/001', 'Taxi Charges For Office 5 pcs Payment Day (6:30) PM', '0', '39500', 'mmk', '', '', 0, 'accepted'),
-(136, '2024-02-02', 'Dr-Feb 24/034', '9100/012', 'Meal Allowance for Office 5pcs Payment Day', '10000', '0', 'mmk', '', '', 0, 'accepted'),
-(137, '2024-02-02', 'Dr-Feb 24/034', '3600/001', 'Meal Allowance for Office 5pcs Payment Day', '0', '10000', 'mmk', '', '', 0, 'accepted'),
-(138, '2024-02-02', 'Dr-Feb 24/035', '9100/013', 'Water Bill and services for WH (Dec/23) (78000+2000)', '80000', '0', 'mmk', '', '', 0, 'accepted'),
-(139, '2024-02-02', 'Dr-Feb 24/035', '3600/001', 'Water Bill and services for WH (Dec/23) (78000+2000)', '0', '80000', 'mmk', '', '', 0, 'accepted'),
-(140, '2024-02-02', 'Dr-Feb 24/036', '6100/006', 'Paid to Sticker 5 colour for penam-sticker+other', '1697000', '0', 'mmk', '', '', 0, 'accepted'),
-(141, '2024-02-02', 'Dr-Feb 24/036', '3600/001', 'Paid to Sticker 5 colour for penam-sticker+other', '0', '1697000', 'mmk', '', '', 0, 'accepted'),
-(142, '2024-02-02', 'Dr-Feb 24/037', '9100/002', 'Taxi Charges for WH to Daw Nan house go for (Htet Paing Aye)', '6000', '0', 'mmk', '', '', 0, 'accepted'),
-(143, '2024-02-02', 'Dr-Feb 24/037', '3600/001', 'Taxi Charges for WH to Daw Nan house go for (Htet Paing Aye)', '0', '6000', 'mmk', '', '', 0, 'accepted'),
-(144, '2024-02-03', 'Dr-Feb 24/038', '4000/M01', 'Paid to MA for Vr No-10586', '4000000', '0', 'mmk', '', '', 0, 'accepted'),
-(145, '2024-02-03', 'Dr-Feb 24/038', '3600/001', 'Paid to MA for Vr No-10586', '0', '4000000', 'mmk', '', '', 0, 'accepted'),
-(146, '2024-02-03', 'Dr-Feb 24/039', '4000/S08', 'Paid to Soe Naing for Vr No-10534,10542', '4000000', '0', 'mmk', '', '', 0, 'accepted'),
-(147, '2024-02-03', 'Dr-Feb 24/039', '3600/001', 'Paid to Soe Naing for Vr No-10534,10542', '0', '4000000', 'mmk', '', '', 0, 'accepted'),
-(148, '2024-02-03', 'Dr-Feb 24/040', '4000/K07', 'Paid to Khin Mg Myint for Vr N0-11189', '7000000', '0', 'mmk', '', '', 0, 'accepted'),
-(149, '2024-02-03', 'Dr-Feb 24/040', '3600/001', 'paid to Khin Mg Myint for Vr No-11189', '0', '7000000', 'mmk', '', '', 0, 'accepted'),
-(150, '2024-02-03', 'Dr-Feb 24/041', '9100/006', 'Car Diesel for 6J-3015(1.2)-50000/ (3.2)-50000', '100000', '0', 'mmk', '', '', 0, 'accepted'),
-(151, '2024-02-03', 'Dr-Feb 24/041', '3600/001', 'Car Diesel for 6J-3015(1.2)-50000/ (3.2)-50000', '0', '100000', 'mmk', '', '', 0, 'accepted'),
-(152, '2024-02-03', 'Dr-Feb 24/042', '9100/014', 'Engin Oil purchase for 6J-3015', '10000', '0', 'mmk', '', '', 0, 'accepted'),
-(153, '2024-02-03', 'Dr-Feb 24/042', '3600/001', 'Engin Oil purchase for 6J-3015', '0', '10000', 'mmk', '', '', 0, 'accepted'),
-(154, '2024-02-03', 'Dr-Feb 24/043', '9100/014', 'Car police catch for 6J-3015(2.2)(3.2)', '8000', '0', 'mmk', '', '', 0, 'accepted'),
-(155, '2024-02-03', 'Dr-Feb 24/043', '3600/001', 'Car police catch for 6J-3015(2.2)(3.2)', '0', '8000', 'mmk', '', '', 0, 'accepted'),
-(156, '2024-02-03', 'Dr-Feb 24/044', '6100/003', 'paid to plastic (G/F) for Vr No-(31.1.24)(30.1.24)(30.1.24)', '2112000', '0', 'mmk', '', '', 0, 'accepted'),
-(157, '2024-02-03', 'Dr-Feb 24/044', '3600/001', 'Paid to plastic (G/F)for Vr No-(31.1.24)(30.1.24)(30.1.24)', '0', '2112000', 'mmk', '', '', 0, 'accepted'),
-(158, '2024-02-03', 'Dr-Feb 24/045', '6100/003', 'Paid to Carton Box (MMMO)for (31.1.24)Vr 3 pcs', '2193960', '0', 'mmk', '', '', 0, 'accepted'),
-(159, '2024-02-03', 'Dr-Feb 24/045', '3600/001', 'Paid to Carton Box (MMMO)for (31.1.24)Vr 3 pcs', '0', '2193960', 'mmk', '', '', 0, 'accepted'),
-(160, '2024-02-03', 'Dr-Feb 24/046', '6100/007', 'Paid to HHK Cold Store', '10000000', '0', 'mmk', '', '', 0, 'accepted'),
-(161, '2024-02-03', 'Dr-Feb 24/046', '3600/001', 'Paid to HHK Cold Store', '0', '10000000', 'mmk', '', '', 0, 'accepted'),
-(162, '2024-02-03', 'Dr-Feb 24/047', '6100/003', 'Paid to Carton Box (Swan Pyae) for Vr No-(19.12.23 to 22.12.23)(26.12.23)(27.12.23)(27.12.23)', '5730540', '0', 'mmk', '', '', 0, 'accepted'),
-(163, '2024-02-03', 'Dr-Feb 24/047', '3600/001', 'Paid to Carton Box (Swan Pyae) for Vr No-(19.12.23 to 22.12.23)(26.12.23)(27.12.23)(27.12.23)', '0', '5730540', 'mmk', '', '', 0, 'accepted'),
-(164, '2024-02-03', 'Dr-Feb 24/048', '6100/003', 'Plastic Packing Strap 3000 M W 5*87000ks', '435000', '0', 'mmk', '', '', 0, 'accepted'),
-(165, '2024-02-03', 'Dr-Feb 24/048', '3600/001', 'Plastic Packing Strap 3000 M W 5*87000ks', '0', '435000', 'mmk', '', '', 0, 'accepted'),
-(166, '2024-02-03', 'Dr-Feb 24/049', '6100/003', 'Paid to Carton Box (Shwe Myay) for (2.12)(12.12)(14.12)', '2000000', '0', 'mmk', '', '', 0, 'accepted'),
-(167, '2024-02-03', 'Dr-Feb 24/049', '3600/001', 'Paid to Carton Box (Shwe Myay) for (2.12)(12.12)(14.12)', '0', '2000000', 'mmk', '', '', 0, 'accepted'),
-(168, '2024-02-03', 'Dr-Feb 24/050', '9100/003', 'Water 2 pk purchase for WH', '1800', '0', 'mmk', '', '', 0, 'accepted'),
-(169, '2024-02-03', 'Dr-Feb 24/050', '3600/001', 'Water 2 pk purchase for WH', '0', '1800', 'mmk', '', '', 0, 'accepted'),
-(170, '2024-02-03', 'Dr-Feb 24/051', '6100/002', 'lce 3 pcs purchase for HHk(Puti)', '27000', '0', 'mmk', '', '', 0, 'accepted'),
-(171, '2024-02-03', 'Dr-Feb 24/051', '3600/001', 'lce 3 pcs purchase for HHk(Puti)', '0', '27000', 'mmk', '', '', 0, 'accepted'),
-(172, '2024-02-03', 'Dr-Feb 24/052', '6100/001', 'Labour Charges and Taxi Charges for (D-Puti) (109200+15000)', '124200', '0', 'mmk', '', '', 0, 'accepted'),
-(173, '2024-02-03', 'Dr-Feb 24/052', '3600/001', 'Labour Charges and Taxi Charges for (D-Puti) (109200+15000)', '0', '124200', 'mmk', '', '', 0, 'accepted'),
-(174, '2024-02-03', 'Dr-Feb 24/053', '9100/002', 'Taxi charges for HHK to WH pk', '17000', '0', 'mmk', '', '', 0, 'accepted'),
-(175, '2024-02-03', 'Dr-Feb 24/053', '3600/001', 'Taxi charges for HHK to WH pk', '0', '17000', 'mmk', '', '', 0, 'accepted'),
-(176, '2024-02-03', 'Dr-Feb 24/054', '6100/001', 'labour and Taxi Charges for (D-Puit)', '106800', '0', 'mmk', '', '', 0, 'accepted'),
-(177, '2024-02-03', 'Dr-Feb 24/054', '3600/001', 'labour and Taxi Charges for (D-Puit)', '0', '106800', 'mmk', '', '', 0, 'accepted'),
-(178, '2024-02-03', 'Dr-Feb 24/055', '6100/002', 'lce 4 pcs purchase for (D-Puit)', '36000', '0', 'mmk', '', '', 0, 'accepted'),
-(179, '2024-02-03', 'Dr-Feb 24/055', '3600/001', 'lce 4 pcs purchase for (D-Puit)', '0', '36000', 'mmk', '', '', 0, 'accepted'),
-(180, '2024-02-03', 'Dr-Feb 24/056', '9100/002', 'Taxi Charges for HHK to WH', '17000', '0', 'mmk', '', '', 0, 'accepted'),
-(181, '2024-02-03', 'Dr-Feb 24/056', '3600/001', 'Taxi Charges for HHK to WH', '0', '17000', 'mmk', '', '', 0, 'accepted'),
-(182, '2024-02-03', 'Dr-Feb 24/057', '6100/002', 'Ice 3pcs purchase for ( Ocean - Rohn )', '30000', '0', 'mmk', '', '', 0, 'accepted'),
-(183, '2024-02-03', 'Dr-Feb 24/057', '3600/001', 'Ice 3pcs purchase for ( Ocean - Rohn )', '0', '30000', 'mmk', '', '', 0, 'accepted'),
-(184, '2024-02-03', 'Dr-Feb 24/058', '6100/001', 'Labour Charges for (Rohn)', '10000', '0', 'mmk', '', '', 0, 'accepted'),
-(185, '2024-02-03', 'Dr-Feb 24/058', '3600/001', 'Labour Charges for (Rohn)', '0', '10000', 'mmk', '', '', 0, 'accepted'),
-(186, '2024-02-03', 'Dr-Feb 24/059', '9100/015', 'Sir present purchase for ( Cambodia go ) wallet and bags (Yangoods)\r\n\r\n', '519600', '0', 'mmk', '', '', 0, 'accepted'),
-(187, '2024-02-03', 'Dr-Feb 24/059', '3600/001', 'Sir present purchase for ( Cambodia go ) wallet and bags (Yangoods)\r\n\r\n', '0', '519600', 'mmk', '', '', 0, 'accepted'),
-(188, '2024-02-03', 'Dr-Feb 24/060', '9100/012', 'Meal Allowance for Sir +2 pcs', '95850', '0', 'mmk', '', '', 0, 'accepted'),
-(189, '2024-02-03', 'Dr-Feb 24/060', '3600/001', 'Meal Allowance for Sir +2 pcs', '0', '95850', 'mmk', '', '', 0, 'accepted'),
-(190, '2023-09-08', 'SAF-001', '3300/002', '', '151492.37', '0', 'usd', 'SAF-19/2023', ':FBIU-5271600', 0, 'accepted'),
-(191, '2023-09-08', 'SAF-001', '5000/001', '', '0', '151492.37', 'usd', '', '', 0, 'accepted'),
-(192, '2023-09-26', 'SAF-002', '3300/002', '', '116818.20', '0', 'usd', 'SAF-20/2023', ':FSCU-5300057', 0, 'accepted'),
-(193, '2023-09-26', 'SAF-002', '5000/001', '', '0', '116818.20', 'usd', '', '', 0, 'accepted'),
-(194, '2023-10-26', 'SAF-003', '3300/002', '', '87343.73', '0', 'usd', 'SAF-21/2023', ':TTNU-8730235', 0, 'accepted'),
-(195, '2023-10-26', 'SAF-003', '5000/001', '', '0', '87343.73', 'usd', '', '', 0, 'accepted'),
-(196, '2023-10-26', 'SAF-004', '3300/002', '', '92746.57', '0', 'usd', 'SAF-22/2023', ':OOLU-6250426', 0, 'accepted'),
-(197, '2023-10-26', 'SAF-004', '5000/001', '', '0', '92746.57', 'usd', '', '', 0, 'accepted'),
-(198, '2023-11-22', 'SAF-005', '3300/002', '', '98874.20', '0', 'usd', 'SAF-23/2023', ':CRSU-6118527', 0, 'accepted'),
-(199, '2023-11-22', 'SAF-005', '5000/001', '', '0', '98874.20', 'usd', '', '', 0, 'accepted'),
-(200, '2023-11-23', 'SAF-006', '3300/002', '', '95217.11', '0', 'usd', 'SAF-24/2023', ':CXRU-1440458', 0, 'accepted'),
-(201, '2023-11-23', 'SAF-006', '5000/001', '', '0', '95217.11', 'usd', '', '', 0, 'accepted'),
-(202, '2023-12-15', 'SAF-007', '3300/002', '', '66774.05', '0', 'usd', 'SAF-25/2023', ':OERU-4219167', 0, 'accepted'),
-(203, '2023-12-15', 'SAF-007', '5000/001', '', '0', '66774.05', 'usd', '', '', 0, 'accepted'),
-(204, '2023-12-21', 'SAF-008', '3300/002', '', '91268.45', '0', 'usd', 'SAF-26/2023', ':TTNU-8059533', 0, 'accepted'),
-(205, '2023-12-21', 'SAF-008', '5000/001', '', '0', '91268.45', 'usd', '', '', 0, 'accepted'),
-(206, '2023-12-28', 'SAF-009', '3300/002', '', '105649.44', '0', 'usd', 'SAF-27/2023', ':SEGU-9662141', 0, 'accepted'),
-(207, '2023-12-28', 'SAF-009', '5000/001', '', '0', '105649.44', 'usd', '', '', 0, 'accepted'),
-(208, '2024-02-05', 'Cr-Feb 24/002', '3600/001', 'Fruit selling Income Money from (Naung Yoe)', '200000', '0', 'mmk', '', '', 0, 'accepted'),
-(209, '2024-02-05', 'Cr-Feb 24/002', '7000/001', 'Fruit selling Income Money from (Naung Yoe)', '0', '200000', 'mmk', '', '', 0, 'accepted'),
-(210, '2024-02-05', 'Dr-Feb 24/061', '9100/003', 'Water 2 pk purchase for WH', '1800', '0', 'mmk', '', '', 0, 'accepted'),
-(211, '2024-02-05', 'Dr-Feb 24/061', '3600/001', 'Water 2 pk purchase for WH', '0', '1800', 'mmk', '', '', 0, 'accepted'),
-(212, '2024-02-05', 'Dr-Feb 24/062', '9100/006', 'Car Diesel for 6J-3015 (4.2)-50000/ (5.2)-50000', '100000', '0', 'mmk', '', '', 0, 'accepted'),
-(213, '2024-02-05', 'Dr-Feb 24/062', '3600/001', 'Car Diesel for 6J-3015 (4.2)-50000/ (5.2)-50000', '0', '100000', 'mmk', '', '', 0, 'accepted'),
-(214, '2024-02-05', 'Dr-Feb 24/063', '9100/014', 'Car police catch for 6J-3015 (Market)', '5000', '0', 'mmk', '', '', 0, 'accepted'),
-(215, '2024-02-05', 'Dr-Feb 24/063', '3600/001', 'Car police catch for 6J-3015 (Market)', '0', '5000', 'mmk', '', '', 0, 'accepted'),
-(216, '2024-02-05', 'Dr-Feb 24/064', '9100/002', 'Taxi Charges for HHK to WH (pk)', '17000', '0', 'mmk', '', '', 0, 'accepted'),
-(217, '2024-02-05', 'Dr-Feb 24/064', '3600/001', 'Taxi Charges for HHK to WH (pk)', '0', '17000', 'mmk', '', '', 0, 'accepted'),
-(218, '2024-02-05', 'Dr-Feb 24/065', '9100/007', 'Material purchase for WH', '31500', '0', 'mmk', '', '', 0, 'accepted'),
-(219, '2024-02-05', 'Dr-Feb 24/065', '3600/001', 'Material purchase for WH', '0', '31500', 'mmk', '', '', 0, 'accepted'),
-(220, '2024-02-05', 'Dr-Feb 24/066', '9100/016', 'Photo paper and A4 purchase for WH', '107500', '0', 'mmk', '', '', 0, 'accepted'),
-(221, '2024-02-05', 'Dr-Feb 24/066', '3600/001', 'Photo paper and A4 purchase for WH', '0', '107500', 'mmk', '', '', 0, 'accepted'),
-(222, '2024-02-05', 'Dr-Feb 24/067', '9100/007', 'Battery 2 pcs charging charges and carry charges for (office)', '15000', '0', 'mmk', '', '', 0, 'accepted'),
-(223, '2024-02-05', 'Dr-Feb 24/067', '3600/001', 'Battery 2 pcs charging charges and carry charges for (office)', '0', '15000', 'mmk', '', '', 0, 'accepted'),
-(224, '2024-02-05', 'Dr-Feb 24/068', '9100/002', 'Taxi charges for Ocean Pacific go workers', '24000', '0', 'mmk', '', '', 0, 'accepted'),
-(225, '2024-02-05', 'Dr-Feb 24/068', '3600/001', 'Taxi charges for Ocean Pacific go workers', '0', '24000', 'mmk', '', '', 0, 'accepted'),
-(226, '2024-02-05', 'Dr-Feb 24/069', '4000/M07', 'Paid to Moe Kyaw for Vr No-11332, 11339, Cheque No-052402', '12503950', '0', 'mmk', '', '', 0, 'accepted'),
-(227, '2024-02-05', 'Dr-Feb 24/069', '3600/001', 'Paid to Moe Kyaw for Vr No-11332, 11339, Cheque No-052402', '0', '12503950', 'mmk', '', '', 0, 'accepted'),
-(228, '2024-02-06', 'Cr-Feb 24/003', '3800/001', 'Money Received from Canada to UAB Bank\r\n', '41000', '0', 'usd', '', '', 0, 'accepted'),
-(229, '2024-02-06', 'Cr-Feb 24/003', '3300/003', 'Money Received from Canada to UAB Bank', '0', '41000', 'usd', '', '', 0, 'accepted'),
-(230, '2024-02-06', 'Cr-Feb 24/003', '3600/001', 'Canada Money $41000-$40862.68 from UAB 50%  50%  $20431.34-10=20421.34*2100ks', '43194186', '0', 'usd', '', '', 147.32, 'accepted'),
-(231, '2024-02-06', 'Cr-Feb 24/003', '3800/001', 'Canada Money $41000-$40862.68 from UAB 50%  50%  $20431.34-10=20421.34*2100ks\r\n', '0', '43194186', 'usd', '', '', 0, 'accepted'),
-(232, '2024-02-06', 'Cr-Feb 24/003', '3600/001', 'Canada Money $41000-$40862.68 from UAB 50%  50%  $20431.34*3370ks $20431.34*105ks', '70998906.5', '0', 'usd', '', '', 0, 'accepted'),
-(233, '2024-02-06', 'Cr-Feb 24/003', '3800/001', 'Canada Money $41000-$40862.68 from UAB 50%  50% $20431.34*3370ks $20431.34*105ks', '0', '70998906.5', 'usd', '', '', 0, 'accepted'),
-(234, '2024-02-14', 'CAN-02/2024', '3300/003', 'Credit Sale to Canada for Inv No. Can-02/2024 ', '91728.97', '0', 'usd', 'CAN-02/24', 'OOLU6249050', 0, 'accepted'),
-(235, '2024-02-14', 'CAN-02/2024', '5000/002', 'Credit Sale to Canada for Inv No. CAN-02/2024', '0', '91728.97', 'usd', '', '', 0, 'accepted'),
-(236, '2024-02-06', 'Cr-Feb 24/004', '3800/001', 'Money Received from ITALY to UAB Bank for InvNo. Italy-01/2024', '46960', '0', 'usd', '', '', 0, 'accepted'),
-(237, '2024-02-06', 'Cr-Feb 24/004', '3300/004', 'Money Received from ITALY to UAB Bank for InvNo. Italy-01/2024', '0', '46960', 'usd', '', '', 0, 'accepted'),
-(238, '2024-02-06', 'Cr-Feb 24/004', '3600/001', 'Italy Money from UAB ($46960-$46925) 50%   50% $23462.5-10=$23452.5*2100ks', '49344750', '0', 'usd', '', '', 45, 'accepted'),
-(239, '2024-02-06', 'Cr-Feb 24/004', '3800/001', 'Italy Money from UAB ($46960-$46925) 50%   50% $23462.5-10=$23452.5*2100ks', '0', '49344750', 'usd', '', '', 0, 'accepted'),
-(240, '2024-02-06', 'Cr-Feb 24/005', '3800/001', 'Money Received from USA to UAB Bank for Inv No. SAF-19/2023', '75000', '0', 'usd', '', '', 0, 'accepted'),
-(241, '2024-02-06', 'Cr-Feb 24/005', '3300/002', 'Money Received from USA to UAB Bank for Inv No. SAF-19/2023', '0', '75000', 'usd', '', '', 0, 'accepted'),
-(242, '2024-02-06', 'Cr-Feb 24/005', '3600/001', 'USA Money from UAB$75000 ($74925=50 50-$32761.64,65 35-$42163.36) $32761.64=>$16380.82-10=$16370.82*2100ks ', '34557222', '0', 'usd', '', '', 85, 'accepted'),
-(243, '2024-02-06', 'Cr-Feb 24/005', '3800/001', 'USA Money from UAB$75000 ($74925=50 50-$32761.64,65 35-$42163.36) $32761.64=>$16380.82-10=$16370.82*2100ks ', '0', '34557222', 'usd', '', '', 0, 'accepted'),
-(244, '2024-02-06', 'Cr-Feb 24/005', '3600/001', 'USA Money from UAB ($74925=50 50-$32761.64,65 35-$42163.36) $32761.64=> $16380.82*3370ks $16380.82*105ks ', '56923349.5', '0', 'usd', '', '', 0, 'accepted'),
-(245, '2024-02-06', 'Cr-Feb 24/005', '3800/001', 'USA Money from UAB ($74925=50 50-$32761.64,65 35-$42163.36) $32761.64=> $16380.82*3370ks $16380.82*105ks ', '0', '56923349.5', 'usd', '', '', 0, 'accepted'),
-(246, '2024-02-06', 'Cr-Feb 24/005', '3600/001', 'USA Money from UAB $75000 ($74925=50 50-$32761.64,65 35-$42163.36)  $42163.36=> $14757.18*2100ks, $27406.18 in UAB USD Bank\r\n', '30990078', '0', 'usd', '', '', 0, 'accepted'),
-(247, '2024-02-06', 'Cr-Feb 24/005', '3800/001', 'USA Money from UAB $75000 ($74925=50 50-$32761.64,65 35-$42163.36)  $42163.36=> $14757.18*2100ks, $27406.18 in UAB USD Bank\r\n', '0', '30990078', 'usd', '', '', 0, 'accepted');
+(94, '2024-02-02', 'Dr Feb\'24/013', '9100/002', 'Taxi charges for Ocean Pacfic to WH', '15000', '0', 'mmk', '', '', 0, 'selected'),
+(95, '2024-02-02', 'Dr Feb\'24/013', '3600/001', 'Taxi charges for Ocean Pacfic to WH', '0', '15000', 'mmk', '', '', 0, 'selected'),
+(96, '2024-02-02', 'Dr Feb\'24/014', '6100/003', 'Carton Box purchase for Ocean Pacfic pk', '52500', '0', 'mmk', '', '', 0, 'selected'),
+(97, '2024-02-02', 'Dr Feb\'24/014', '3600/001', 'Carton Box purchase for Ocean Pacfic pk', '0', '52500', 'mmk', '', '', 0, 'selected'),
+(98, '2024-02-02', 'Dr Feb\'24/015', '6100/001', 'Labour Charges and Taxi Charges for (Rohu)', '289000', '0', 'mmk', '', '', 0, 'selected'),
+(99, '2024-02-02', 'Dr Feb\'24/015', '3600/001', 'Labour Charges and Taxi Charges for (Rohu)', '0', '289000', 'mmk', '', '', 0, 'selected'),
+(100, '2024-02-02', 'Dr Feb\'24/016', '6100/002', 'Ice 10 pcs purchase for HHK (D-Puti,Rohu,Ayer)', '90000', '0', 'mmk', '', '', 0, 'selected'),
+(101, '2024-02-02', 'Dr Feb\'24/016', '3600/001', 'Ice 10 pcs purchase for HHK (D-Puti,Rohu,Ayer)', '0', '90000', 'mmk', '', '', 0, 'selected'),
+(102, '2024-02-02', 'Dr Feb\'24/017', '6100/003', 'JCV Rope purchase for HHK pk pcs*85000', '170000', '0', 'mmk', '', '', 0, 'selected'),
+(103, '2024-02-02', 'Dr Feb\'24/017', '3600/001', 'JCV Rope purchase for HHK pk pcs*85000', '0', '170000', 'mmk', '', '', 0, 'selected'),
+(104, '2024-02-02', 'Dr Feb\'24/018', '9100/002', 'Taxi Charges for HHK to WH and WH to GFC', '43000', '0', 'mmk', '', '', 0, 'selected'),
+(105, '2024-02-02', 'Dr Feb\'24/018', '3600/001', 'Taxi Charges for HHK to WH and WH to GFC', '0', '43000', 'mmk', '', '', 0, 'selected'),
+(106, '2024-02-02', 'Dr Feb\'24/019', '6100/004', 'WH to HHK Fish carry car charges', '130000', '0', 'mmk', '', '', 0, 'selected'),
+(107, '2024-02-02', 'Dr Feb\'24/019', '3600/001', 'WH to HHK Fish carry car charges', '0', '130000', 'mmk', '', '', 0, 'selected'),
+(108, '2024-02-02', 'Dr Feb\'24/020', '9100/012', 'Workers 31 pcs Dinner for (OT) (Rohu)', '62000', '0', 'mmk', '', '', 0, 'selected'),
+(109, '2024-02-02', 'Dr Feb\'24/020', '3600/001', 'Workers 31 pcs Dinner for (OT) (Rohu)', '0', '62000', 'mmk', '', '', 0, 'selected'),
+(110, '2024-02-02', 'Dr Feb\'24/021', '9100/007', 'Material purchase and service charges for WH (Boy Tiolet)', '85000', '0', 'mmk', '', '', 0, 'selected'),
+(111, '2024-02-02', 'Dr Feb\'24/021', '3600/001', 'Material purchase and service charges for WH (Boy Tiolet)', '0', '85000', 'mmk', '', '', 0, 'selected'),
+(112, '2024-02-02', 'Dr Feb\'24/022', '9100/012', 'Fruit purchase for Sir', '7000', '0', 'mmk', '', '', 0, 'selected'),
+(113, '2024-02-02', 'Dr Feb\'24/022', '3600/001', 'Fruit purchase for Sir', '0', '7000', 'mmk', '', '', 0, 'selected'),
+(114, '2024-02-02', 'Dr Feb\'24/023', '6100/003', 'Penam and other purchase for WH', '814500', '0', 'mmk', '', '', 0, 'selected'),
+(115, '2024-02-02', 'Dr Feb\'24/023', '3600/001', 'Penam and other purchase for WH', '0', '814500', 'mmk', '', '', 0, 'selected'),
+(116, '2024-02-02', 'Dr Feb\'24/024', '6100/002', 'Ice 4 pcs and car pk for D-Puti', '42000', '0', 'mmk', '', '', 0, 'selected'),
+(117, '2024-02-02', 'Dr Feb\'24/024', '3600/001', 'Ice 4 pcs and car pk for D-Puti', '0', '42000', 'mmk', '', '', 0, 'selected'),
+(118, '2024-02-02', 'Dr Feb\'24/025', '4000/M06', 'Paid to Mg Mg Soe for Vr No-11152,11185', '4000000', '0', 'mmk', '', '', 0, 'selected'),
+(119, '2024-02-02', 'Dr Feb\'24/025', '3600/001', 'Paid to Mg Mg Soe for Vr No-11152,11185', '0', '4000000', 'mmk', '', '', 0, 'selected'),
+(120, '2024-02-02', 'Dr-Feb\'24/026', '4000/M03', 'Paid to Mg Mg Nyunt for Vr-11183,11192', '5000000', '0', 'mmk', '', '', 0, 'selected'),
+(121, '2024-02-02', 'Dr-Feb\'24/026', '3600/001', 'Paid to Mg Mg Nyunt for Vr-11183,11192', '0', '5000000', 'mmk', '', '', 0, 'selected'),
+(122, '2024-02-02', 'Dr-Feb 24/027', '4000/P02', 'Paid to BLC (PYM) for Vr No-11221', '3400000', '0', 'mmk', '', '', 0, 'selected'),
+(123, '2024-02-02', 'Dr-Feb 24/027', '3600/001', 'Paid to BLC (PYM) for Vr No-11221', '0', '3400000', 'mmk', '', '', 0, 'selected'),
+(124, '2024-02-02', 'Dr-Feb 24/028', '4000/T17', 'Paid to Than Than Myint for Vr No-107788 (10810-2696450)', '5000000', '0', 'mmk', '', '', 0, 'selected'),
+(125, '2024-02-02', 'Dr-Feb 24/028', '3600/001', 'Paid to Than Than Myint for Vr No-107788 (10810-2696450)', '0', '5000000', 'mmk', '', '', 0, 'selected'),
+(126, '2024-02-02', 'Dr-Feb 24/029', '4000/Y01', 'Paid to Ye Yint for Vr No-11115,11133', '5000000', '0', 'mmk', '', '', 0, 'selected'),
+(127, '2024-02-02', 'Dr-Feb 24/029', '3600/001', 'Paid to  Ye Yint for Vr No-11115,11133', '0', '5000000', 'mmk', '', '', 0, 'selected'),
+(128, '2024-02-02', 'Dr-Feb 24/030', '4000/H01', 'Paid to Htet Aung Lin for Vr No-10877', '444200', '0', 'mmk', '', '', 0, 'selected'),
+(129, '2024-02-02', 'Dr-Feb 24/030', '3600/001', 'Paid to Htet Aung Lin for Vr No-10877', '0', '444200', 'mmk', '', '', 0, 'selected'),
+(130, '2024-02-02', 'Dr-Feb 24/031', '4000/P01', 'Paid to Phone Naing for Vr No-11249,11268', '3500000', '0', 'mmk', '', '', 0, 'selected'),
+(131, '2024-02-02', 'Dr-Feb 24/031', '3600/001', 'Paid to Phone Naing for Vr No-11249,11268', '0', '3500000', 'mmk', '', '', 0, 'selected'),
+(132, '2024-02-02', 'Dr-Feb 24/032', '4000/T02', 'Paid to Thein Htay for Vr No-11269', '4000000', '0', 'mmk', '', '', 0, 'selected'),
+(133, '2024-02-02', 'Dr-Feb 24/032', '3600/001', 'Paid to Thein Htay for Vr No-11269', '0', '4000000', 'mmk', '', '', 0, 'selected'),
+(134, '2024-02-02', 'Dr Feb\'24/033', '9100/002', 'Taxi Charges For Office 5 pcs Payment Day (6:30) PM', '39500', '0', 'mmk', '', '', 0, 'selected'),
+(135, '2024-02-02', 'Dr Feb\'24/033', '3600/001', 'Taxi Charges For Office 5 pcs Payment Day (6:30) PM', '0', '39500', 'mmk', '', '', 0, 'selected'),
+(136, '2024-02-02', 'Dr-Feb 24/034', '9100/012', 'Meal Allowance for Office 5pcs Payment Day', '10000', '0', 'mmk', '', '', 0, 'selected'),
+(137, '2024-02-02', 'Dr-Feb 24/034', '3600/001', 'Meal Allowance for Office 5pcs Payment Day', '0', '10000', 'mmk', '', '', 0, 'selected'),
+(138, '2024-02-02', 'Dr-Feb 24/035', '9100/013', 'Water Bill and services for WH (Dec/23) (78000+2000)', '80000', '0', 'mmk', '', '', 0, 'selected'),
+(139, '2024-02-02', 'Dr-Feb 24/035', '3600/001', 'Water Bill and services for WH (Dec/23) (78000+2000)', '0', '80000', 'mmk', '', '', 0, 'selected'),
+(140, '2024-02-02', 'Dr-Feb 24/036', '6100/006', 'Paid to Sticker 5 colour for penam-sticker+other', '1697000', '0', 'mmk', '', '', 0, 'selected'),
+(141, '2024-02-02', 'Dr-Feb 24/036', '3600/001', 'Paid to Sticker 5 colour for penam-sticker+other', '0', '1697000', 'mmk', '', '', 0, 'selected'),
+(142, '2024-02-02', 'Dr-Feb 24/037', '9100/002', 'Taxi Charges for WH to Daw Nan house go for (Htet Paing Aye)', '6000', '0', 'mmk', '', '', 0, 'selected'),
+(143, '2024-02-02', 'Dr-Feb 24/037', '3600/001', 'Taxi Charges for WH to Daw Nan house go for (Htet Paing Aye)', '0', '6000', 'mmk', '', '', 0, 'selected'),
+(144, '2024-02-03', 'Dr-Feb 24/038', '4000/M01', 'Paid to MA for Vr No-10586', '4000000', '0', 'mmk', '', '', 0, 'selected'),
+(145, '2024-02-03', 'Dr-Feb 24/038', '3600/001', 'Paid to MA for Vr No-10586', '0', '4000000', 'mmk', '', '', 0, 'selected'),
+(146, '2024-02-03', 'Dr-Feb 24/039', '4000/S08', 'Paid to Soe Naing for Vr No-10534,10542', '4000000', '0', 'mmk', '', '', 0, 'selected'),
+(147, '2024-02-03', 'Dr-Feb 24/039', '3600/001', 'Paid to Soe Naing for Vr No-10534,10542', '0', '4000000', 'mmk', '', '', 0, 'selected'),
+(148, '2024-02-03', 'Dr-Feb 24/040', '4000/K07', 'Paid to Khin Mg Myint for Vr N0-11189', '7000000', '0', 'mmk', '', '', 0, 'selected'),
+(149, '2024-02-03', 'Dr-Feb 24/040', '3600/001', 'paid to Khin Mg Myint for Vr No-11189', '0', '7000000', 'mmk', '', '', 0, 'selected'),
+(150, '2024-02-03', 'Dr-Feb 24/041', '9100/006', 'Car Diesel for 6J-3015(1.2)-50000/ (3.2)-50000', '100000', '0', 'mmk', '', '', 0, 'selected'),
+(151, '2024-02-03', 'Dr-Feb 24/041', '3600/001', 'Car Diesel for 6J-3015(1.2)-50000/ (3.2)-50000', '0', '100000', 'mmk', '', '', 0, 'selected'),
+(152, '2024-02-03', 'Dr-Feb 24/042', '9100/014', 'Engin Oil purchase for 6J-3015', '10000', '0', 'mmk', '', '', 0, 'selected'),
+(153, '2024-02-03', 'Dr-Feb 24/042', '3600/001', 'Engin Oil purchase for 6J-3015', '0', '10000', 'mmk', '', '', 0, 'selected'),
+(154, '2024-02-03', 'Dr-Feb 24/043', '9100/014', 'Car police catch for 6J-3015(2.2)(3.2)', '8000', '0', 'mmk', '', '', 0, 'selected'),
+(155, '2024-02-03', 'Dr-Feb 24/043', '3600/001', 'Car police catch for 6J-3015(2.2)(3.2)', '0', '8000', 'mmk', '', '', 0, 'selected'),
+(156, '2024-02-03', 'Dr-Feb 24/044', '6100/003', 'paid to plastic (G/F) for Vr No-(31.1.24)(30.1.24)(30.1.24)', '2112000', '0', 'mmk', '', '', 0, 'selected'),
+(157, '2024-02-03', 'Dr-Feb 24/044', '3600/001', 'Paid to plastic (G/F)for Vr No-(31.1.24)(30.1.24)(30.1.24)', '0', '2112000', 'mmk', '', '', 0, 'selected'),
+(158, '2024-02-03', 'Dr-Feb 24/045', '6100/003', 'Paid to Carton Box (MMMO)for (31.1.24)Vr 3 pcs', '2193960', '0', 'mmk', '', '', 0, 'selected'),
+(159, '2024-02-03', 'Dr-Feb 24/045', '3600/001', 'Paid to Carton Box (MMMO)for (31.1.24)Vr 3 pcs', '0', '2193960', 'mmk', '', '', 0, 'selected'),
+(160, '2024-02-03', 'Dr-Feb 24/046', '6100/007', 'Paid to HHK Cold Store', '10000000', '0', 'mmk', '', '', 0, 'selected'),
+(161, '2024-02-03', 'Dr-Feb 24/046', '3600/001', 'Paid to HHK Cold Store', '0', '10000000', 'mmk', '', '', 0, 'selected'),
+(162, '2024-02-03', 'Dr-Feb 24/047', '6100/003', 'Paid to Carton Box (Swan Pyae) for Vr No-(19.12.23 to 22.12.23)(26.12.23)(27.12.23)(27.12.23)', '5730540', '0', 'mmk', '', '', 0, 'selected'),
+(163, '2024-02-03', 'Dr-Feb 24/047', '3600/001', 'Paid to Carton Box (Swan Pyae) for Vr No-(19.12.23 to 22.12.23)(26.12.23)(27.12.23)(27.12.23)', '0', '5730540', 'mmk', '', '', 0, 'selected'),
+(164, '2024-02-03', 'Dr-Feb 24/048', '6100/003', 'Plastic Packing Strap 3000 M W 5*87000ks', '435000', '0', 'mmk', '', '', 0, 'selected'),
+(165, '2024-02-03', 'Dr-Feb 24/048', '3600/001', 'Plastic Packing Strap 3000 M W 5*87000ks', '0', '435000', 'mmk', '', '', 0, 'selected'),
+(166, '2024-02-03', 'Dr-Feb 24/049', '6100/003', 'Paid to Carton Box (Shwe Myay) for (2.12)(12.12)(14.12)', '2000000', '0', 'mmk', '', '', 0, 'selected'),
+(167, '2024-02-03', 'Dr-Feb 24/049', '3600/001', 'Paid to Carton Box (Shwe Myay) for (2.12)(12.12)(14.12)', '0', '2000000', 'mmk', '', '', 0, 'selected'),
+(168, '2024-02-03', 'Dr-Feb 24/050', '9100/003', 'Water 2 pk purchase for WH', '1800', '0', 'mmk', '', '', 0, 'selected'),
+(169, '2024-02-03', 'Dr-Feb 24/050', '3600/001', 'Water 2 pk purchase for WH', '0', '1800', 'mmk', '', '', 0, 'selected'),
+(170, '2024-02-03', 'Dr-Feb 24/051', '6100/002', 'lce 3 pcs purchase for HHk(Puti)', '27000', '0', 'mmk', '', '', 0, 'selected'),
+(171, '2024-02-03', 'Dr-Feb 24/051', '3600/001', 'lce 3 pcs purchase for HHk(Puti)', '0', '27000', 'mmk', '', '', 0, 'selected'),
+(172, '2024-02-03', 'Dr-Feb 24/052', '6100/001', 'Labour Charges and Taxi Charges for (D-Puti) (109200+15000)', '124200', '0', 'mmk', '', '', 0, 'selected'),
+(173, '2024-02-03', 'Dr-Feb 24/052', '3600/001', 'Labour Charges and Taxi Charges for (D-Puti) (109200+15000)', '0', '124200', 'mmk', '', '', 0, 'selected'),
+(174, '2024-02-03', 'Dr-Feb 24/053', '9100/002', 'Taxi charges for HHK to WH pk', '17000', '0', 'mmk', '', '', 0, 'selected'),
+(175, '2024-02-03', 'Dr-Feb 24/053', '3600/001', 'Taxi charges for HHK to WH pk', '0', '17000', 'mmk', '', '', 0, 'selected'),
+(176, '2024-02-03', 'Dr-Feb 24/054', '6100/001', 'labour and Taxi Charges for (D-Puit)', '106800', '0', 'mmk', '', '', 0, 'selected'),
+(177, '2024-02-03', 'Dr-Feb 24/054', '3600/001', 'labour and Taxi Charges for (D-Puit)', '0', '106800', 'mmk', '', '', 0, 'selected'),
+(178, '2024-02-03', 'Dr-Feb 24/055', '6100/002', 'lce 4 pcs purchase for (D-Puit)', '36000', '0', 'mmk', '', '', 0, 'selected'),
+(179, '2024-02-03', 'Dr-Feb 24/055', '3600/001', 'lce 4 pcs purchase for (D-Puit)', '0', '36000', 'mmk', '', '', 0, 'selected'),
+(180, '2024-02-03', 'Dr-Feb 24/056', '9100/002', 'Taxi Charges for HHK to WH', '17000', '0', 'mmk', '', '', 0, 'selected'),
+(181, '2024-02-03', 'Dr-Feb 24/056', '3600/001', 'Taxi Charges for HHK to WH', '0', '17000', 'mmk', '', '', 0, 'selected'),
+(182, '2024-02-03', 'Dr-Feb 24/057', '6100/002', 'Ice 3pcs purchase for ( Ocean - Rohn )', '30000', '0', 'mmk', '', '', 0, 'selected'),
+(183, '2024-02-03', 'Dr-Feb 24/057', '3600/001', 'Ice 3pcs purchase for ( Ocean - Rohn )', '0', '30000', 'mmk', '', '', 0, 'selected'),
+(184, '2024-02-03', 'Dr-Feb 24/058', '6100/001', 'Labour Charges for (Rohn)', '10000', '0', 'mmk', '', '', 0, 'selected'),
+(185, '2024-02-03', 'Dr-Feb 24/058', '3600/001', 'Labour Charges for (Rohn)', '0', '10000', 'mmk', '', '', 0, 'selected'),
+(186, '2024-02-03', 'Dr-Feb 24/059', '9100/015', 'Sir present purchase for ( Cambodia go ) wallet and bags (Yangoods)\r\n\r\n', '519600', '0', 'mmk', '', '', 0, 'selected'),
+(187, '2024-02-03', 'Dr-Feb 24/059', '3600/001', 'Sir present purchase for ( Cambodia go ) wallet and bags (Yangoods)\r\n\r\n', '0', '519600', 'mmk', '', '', 0, 'selected'),
+(188, '2024-02-03', 'Dr-Feb 24/060', '9100/012', 'Meal Allowance for Sir +2 pcs', '95850', '0', 'mmk', '', '', 0, 'selected'),
+(189, '2024-02-03', 'Dr-Feb 24/060', '3600/001', 'Meal Allowance for Sir +2 pcs', '0', '95850', 'mmk', '', '', 0, 'selected'),
+(190, '2023-09-08', 'SAF-001', '3300/002', '', '151492.37', '0', 'usd', 'SAF-19/2023', ':FBIU-5271600', 0, 'selected'),
+(191, '2023-09-08', 'SAF-001', '5000/001', '', '0', '151492.37', 'usd', '', '', 0, 'selected'),
+(192, '2023-09-26', 'SAF-002', '3300/002', '', '116818.20', '0', 'usd', 'SAF-20/2023', ':FSCU-5300057', 0, 'selected'),
+(193, '2023-09-26', 'SAF-002', '5000/001', '', '0', '116818.20', 'usd', '', '', 0, 'selected'),
+(194, '2023-10-26', 'SAF-003', '3300/002', '', '87343.73', '0', 'usd', 'SAF-21/2023', ':TTNU-8730235', 0, 'selected'),
+(195, '2023-10-26', 'SAF-003', '5000/001', '', '0', '87343.73', 'usd', '', '', 0, 'selected'),
+(196, '2023-10-26', 'SAF-004', '3300/002', '', '92746.57', '0', 'usd', 'SAF-22/2023', ':OOLU-6250426', 0, 'selected'),
+(197, '2023-10-26', 'SAF-004', '5000/001', '', '0', '92746.57', 'usd', '', '', 0, 'selected'),
+(198, '2023-11-22', 'SAF-005', '3300/002', '', '98874.20', '0', 'usd', 'SAF-23/2023', ':CRSU-6118527', 0, 'selected'),
+(199, '2023-11-22', 'SAF-005', '5000/001', '', '0', '98874.20', 'usd', '', '', 0, 'selected'),
+(200, '2023-11-23', 'SAF-006', '3300/002', '', '95217.11', '0', 'usd', 'SAF-24/2023', ':CXRU-1440458', 0, 'selected'),
+(201, '2023-11-23', 'SAF-006', '5000/001', '', '0', '95217.11', 'usd', '', '', 0, 'selected'),
+(202, '2023-12-15', 'SAF-007', '3300/002', '', '66774.05', '0', 'usd', 'SAF-25/2023', ':OERU-4219167', 0, 'selected'),
+(203, '2023-12-15', 'SAF-007', '5000/001', '', '0', '66774.05', 'usd', '', '', 0, 'selected'),
+(204, '2023-12-21', 'SAF-008', '3300/002', '', '91268.45', '0', 'usd', 'SAF-26/2023', ':TTNU-8059533', 0, 'selected'),
+(205, '2023-12-21', 'SAF-008', '5000/001', '', '0', '91268.45', 'usd', '', '', 0, 'selected'),
+(206, '2023-12-28', 'SAF-009', '3300/002', '', '105649.44', '0', 'usd', 'SAF-27/2023', ':SEGU-9662141', 0, 'selected'),
+(207, '2023-12-28', 'SAF-009', '5000/001', '', '0', '105649.44', 'usd', '', '', 0, 'selected');
 
 -- --------------------------------------------------------
 
@@ -7282,8 +7141,7 @@ INSERT INTO `userlogs` (`id`, `login_time`, `login_date`, `login_username`, `log
 (462, '03:49:12.000000', '2024-07-08', 'Ma Soe Soe Khaing', 'stockstock', 'Login Success'),
 (463, '04:35:46.000000', '2024-07-08', 'Su Thiri Kyaw', 'su122333', 'Login Success'),
 (464, '01:50:28.000000', '2024-07-10', 'Administrator', 'protechadmin2024', 'Login Password Invalid'),
-(465, '01:50:41.000000', '2024-07-10', 'Administrator', 'protechadmin2024***', 'Login Success'),
-(466, '08:34:26.000000', '2024-07-11', 'Administrator', 'protechadmin2024***', 'Login Success');
+(465, '01:50:41.000000', '2024-07-10', 'Administrator', 'protechadmin2024***', 'Login Success');
 
 --
 -- Indexes for dumped tables
@@ -7663,7 +7521,7 @@ ALTER TABLE `bankdetail`
 -- AUTO_INCREMENT for table `cashbook`
 --
 ALTER TABLE `cashbook`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3582;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3566;
 
 --
 -- AUTO_INCREMENT for table `category`
@@ -7687,7 +7545,7 @@ ALTER TABLE `container`
 -- AUTO_INCREMENT for table `currency`
 --
 ALTER TABLE `currency`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=248;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=208;
 
 --
 -- AUTO_INCREMENT for table `form7stock`
@@ -7717,7 +7575,7 @@ ALTER TABLE `form10stocktcl`
 -- AUTO_INCREMENT for table `general_ledger`
 --
 ALTER TABLE `general_ledger`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5607;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5567;
 
 --
 -- AUTO_INCREMENT for table `gfcdryfishcoldstore`
@@ -7843,7 +7701,7 @@ ALTER TABLE `packingmaterial`
 -- AUTO_INCREMENT for table `payable`
 --
 ALTER TABLE `payable`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1878;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1877;
 
 --
 -- AUTO_INCREMENT for table `permission`
@@ -7867,7 +7725,7 @@ ALTER TABLE `purchase`
 -- AUTO_INCREMENT for table `receivable`
 --
 ALTER TABLE `receivable`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=176;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=172;
 
 --
 -- AUTO_INCREMENT for table `repacking`
@@ -7909,7 +7767,7 @@ ALTER TABLE `total_charges`
 -- AUTO_INCREMENT for table `transaction`
 --
 ALTER TABLE `transaction`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=248;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=208;
 
 --
 -- AUTO_INCREMENT for table `truckactualinvoice`
@@ -7957,7 +7815,7 @@ ALTER TABLE `trucktotalcosting`
 -- AUTO_INCREMENT for table `userlogs`
 --
 ALTER TABLE `userlogs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=467;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=466;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

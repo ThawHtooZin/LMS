@@ -22,6 +22,62 @@ $query = new Query();
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
   <body>
+      <script>
+      function sweetConfirm(event, title, message, callback) {
+        event.preventDefault(); // Prevent the default form submission
+        swal({
+          title: title,
+          text: message,
+          icon: 'warning',
+          buttons: {
+            cancel: true,
+            confirm: true
+          }
+        }).then((confirmed) => {
+          callback(confirmed);
+        });
+      }
+    </script>
+    <script>
+    $(document).ready(function(){
+      $('#fromaccode').blur( function(){
+      var ac_codepost = $('#fromaccode').val();
+        var type = "";
+        if(ac_codepost.includes('/')){
+          ac_code = ac_codepost.split('/');
+          type = "slash";
+        }else{
+          ac_code = ac_codepost.split('-');
+          type = "dash";
+        }
+        firstpart = ac_code[0];
+        lastpart = ac_code[1];
+        $('#fromac_code').load('ac_name.php', {
+          FirstPart : firstpart,
+          LastPart: JSON.stringify(lastpart),
+          Type: type
+        });
+      });
+      $('#toaccode').blur( function(){
+      var ac_codepost = $('#toaccode').val();
+        var type = "";
+        if(ac_codepost.includes('/')){
+          ac_code = ac_codepost.split('/');
+          type = "slash";
+        }else{
+          ac_code = ac_codepost.split('-');
+          type = "dash";
+        }
+        firstpart = ac_code[0];
+        lastpart = ac_code[1];
+        $('#toac_code').load('ac_name.php', {
+          FirstPart : firstpart,
+          LastPart: JSON.stringify(lastpart),
+          Type: type
+        });
+      });
+    });
+    </script>
     <?php
     if(isset($_POST['addbtn'])){
       $code_no = $_POST['code_no'];
@@ -49,6 +105,13 @@ $query = new Query();
 
       $query->deleteacname($id);
 
+    }
+
+    if(isset($_POST['replaceform'])){
+      $fromaccode = $_POST['from_accode'];
+      $toaccode = $_POST['to_accode'];
+
+      $query->replaceaccode($fromaccode, $toaccode);
     }
      ?>
     <div class="row">
@@ -95,6 +158,7 @@ $query = new Query();
               </select>
                <button type="submit" name="searchbtn" class="btn btn-success btn-sm">Search</button>
             </form>
+            <button type="button" class="btn btn-primary btn-sm float-end text-light ms-2" data-bs-toggle="modal" data-bs-target="#replacemodal">Replace A/C</button>
             <button type="button" class="btn btn-secondary btn-sm float-end text-light" data-bs-toggle="modal" data-bs-target="#addmodal">Add A/C Name</button>
             <?php
             if (!empty($_GET['fromtransaction'])) {
@@ -237,12 +301,51 @@ $query = new Query();
               <div class="modal-dialog" role="document">
                 <div class="modal-content p-5">
                   <div class="modal-body text-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="75" height="75" style="color: #ffc107;" fill="currentColor" class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="75" height="75" fill="currentColor" class="text-warning bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
                       <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
                     </svg>
                     <h2 class="text-center">Can't Update!</h2>
                     <p style="font-size: 17px;">Must go to supplier to edit <b>Supplier</b> IDs</p>
                     <a href="supplier.php" class="btn btn-success btn-lg">Go Edit</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal fade" id="replacemodal" tabindex="-1" role="dialog" style="margin-left:auto !important; margin-right: auto !important;">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header bg-success">
+                    <h3 class="text-light">Replace Account Code</h3>
+                  </div>
+                  <div class="modal-body text-center p-5">
+                  <form action="" method="POST" id="myForm">
+                    <h4>From A/C Code</h4>
+                    <div class="d-flex">
+                      <div class="col m-2">
+                        <input type="text" name="from_accode" class="form-control inpv2" id="fromaccode" placeholder="Add AC Code">
+                      </div>
+                      
+                      <div class="col m-2" id="fromac_code">
+                        <input type="text" class="form-control inpv2" disabled>
+                      </div>
+                    </div>
+                    <p class="mt-3"><svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="text-primary bi bi-arrow-down-up" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5m-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5"/>
+                      </svg>
+                    </p>
+                    <h4>To A/C Code</h4>
+                    <div class="d-flex">
+                      <div class="col m-2">
+                        <input type="text" name="to_accode" class="form-control inpv2" id="toaccode" placeholder="Add AC Code">
+                      </div>
+                      
+                      <div class="col m-2" id="toac_code">
+                        <input type="text" class="form-control inpv2" disabled>
+                      </div>
+                    </div>
+                    <input type="hidden" name="replaceform" value="true">
+                    <button class="btn btn-success mt-3" name="replacebtn" onclick="sweetConfirm(event, 'Are you sure?', 'This replace cannot be undone!', function(confirmed) { if (confirmed) { document.querySelector('#myForm').submit(); } });">Submit</button>
+                  </form>
                   </div>
                 </div>
               </div>

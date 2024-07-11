@@ -28,11 +28,12 @@ $query = new Query();
       $particular = $_POST['particular'];
       $commondity_id = $_POST['commondity_id'];
       $size = $_POST['size'];
+      $fish_type = $_POST['fish_type1'];
       $kg = $_POST['kg'];
       $mc = $_POST['mc'];
       $country = $_POST['country'];
 
-      $query->addgfcmcstock($date, $particular, $country, $commondity_id, $size, $kg, $mc);
+      $query->addgfcmcstock($date, $particular, $country, $commondity_id, $fish_type, $size, $kg, $mc);
     }
 
     if(isset($_POST['exportbtn'])){
@@ -179,7 +180,7 @@ $query = new Query();
                 $totalmc = $totalmcnotsub['total_mc'] - $totalmcsubnum['total_mc'];
                ?>
               <tr style="<?php if($totalmc > 200){echo 'background-color:rgba(0, 255, 0, 0.4) !important;';} ?>">
-                <td><?php echo $commonditydata['item_name']; ?></td>
+                <td><?php if(!empty($gfcstockdata['fish_type'])){ echo $commonditydata['item_name'].' ('.$gfcstockdata['fish_type'].')'; }else{ echo $commonditydata['item_name']; } ?></td>
                 <td><?php echo $countrydata['country']; ?></td>
                 <td><?php echo $gfcstockdata['size']; ?></td>
                 <td><?php echo $totalmc; ?></td>
@@ -241,20 +242,31 @@ $query = new Query();
                 <label>Date</label>
                 <input type="date" name="date" class="form-control inpv2 mb-2">
                 <label>Commondity</label>
-                <select class="form-control inpv2 mb-2" name="commondity_id">
-                          <?php
-                            $commonditydatastmt = $pdo->prepare("SELECT * FROM item");
-                            $commonditydatastmt->execute();
-                            $commonditydatas = $commonditydatastmt->fetchAll();
-                            foreach ($commonditydatas as $commonditydata) {
-                              $item_id = $commonditydata['item_id'];
-                              $commonditydata = $query->select('item', $item_id, 'item_id');
-                              ?>
-                              <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
-                              <?php
-                            }
+                <div class="d-flex">
+                  <div class="col">
+                    <select class="form-control inpv2 mb-2" name="commondity_id">
+                      <?php
+                        $commonditydatastmt = $pdo->prepare("SELECT * FROM item");
+                        $commonditydatastmt->execute();
+                        $commonditydatas = $commonditydatastmt->fetchAll();
+                        foreach ($commonditydatas as $commonditydata) {
+                          $item_id = $commonditydata['item_id'];
+                          $commonditydata = $query->select('item', $item_id, 'item_id');
                           ?>
-                        </select>
+                          <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                          <?php
+                        }
+                      ?>
+                    </select>
+                  </div>
+                  <div class="col ms-2">
+                    <select name="fish_type1" id="commondityid3" class="form-control inpv2">
+                      <option value="G">G</option>
+                      <option value="W">W</option>
+                      <option value="Cut_piece">Cut Piece</option>
+                    </select>
+                  </div>
+                </div>
               </div>
               <div class="col">
                 <label>Particular</label>
@@ -304,21 +316,32 @@ $query = new Query();
               <div class="col">
                 <label>Date</label>
                 <input type="date" name="exportdate" class="form-control inpv2 mb-2">
-                <label>Commondity</label>
-                <select class="form-control inpv2 mb-2" name="exportcommondity_id">
-                  <?php
-                  $form7commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM gfcmcstock");
-                  $form7commonditystmt->execute();
-                  $form7commonditydatas = $form7commonditystmt->fetchall();
-                  foreach ($form7commonditydatas as $form7commonditydata) {
-                    $item_id = $form7commonditydata['commondity_id'];
-                    $commonditydata = $query->select('item', $item_id, 'item_id');
-                    ?>
-                    <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
-                    <?php
-                  }
-                  ?>
-                </select>
+                <div class="d-flex">
+                  <div class="col">
+                    <label>Commondity</label>
+                    <select class="form-control inpv2 mb-2" name="exportcommondity_id">
+                      <?php
+                      $form7commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM gfcmcstock");
+                      $form7commonditystmt->execute();
+                      $form7commonditydatas = $form7commonditystmt->fetchall();
+                      foreach ($form7commonditydatas as $form7commonditydata) {
+                        $item_id = $form7commonditydata['commondity_id'];
+                        $commonditydata = $query->select('item', $item_id, 'item_id');
+                        ?>
+                        <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                        <?php
+                      }
+                      ?>
+                    </select>
+                  </div>
+                  <div class="col ms-2">
+                    <select name="fish_type1" id="commondityid3" class="form-control inpv2">
+                      <option value="G">G</option>
+                      <option value="W">W</option>
+                      <option value="Cut_piece">Cut Piece</option>
+                    </select>
+                  </div>
+                </div>
               </div>
               <div class="col">
                 <label>Particular</label>

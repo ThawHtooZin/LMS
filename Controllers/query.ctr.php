@@ -2980,7 +2980,7 @@ Class Query{
     }
   }
 
-  function addgfcmcstock($date, $particular, $country, $commondity_id, $size, $kg, $mc){
+  function addgfcmcstock($date, $particular, $country, $commondity_id, $fish_type, $size, $kg, $mc){
     global $pdo;
 
     $mcstmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE kg='$kg' AND size='$size' AND commondity_id='$commondity_id' AND country='$country' ORDER BY id DESC");
@@ -2992,7 +2992,7 @@ Class Query{
     }else{
       $balance_mc = $mc;
     }
-    $addmcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc) VALUES('$date', '$country', '$particular', '$commondity_id', '$size', '$kg', '$mc', '$balance_mc')");
+    $addmcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc, fish_type) VALUES('$date', '$country', '$particular', '$commondity_id', '$size', '$kg', '$mc', '$balance_mc', '$fish_type')");
     $addmcstmt->execute();
 
     if(!empty($addmcstmt)){
@@ -4001,27 +4001,63 @@ Class Query{
       $voucher_no = $transactiondata['voucher_no'];
       $description = $transactiondata['description'];
       if (empty($transactiondata['debit'])) {
-        $debit = 0;
-        $credit = $transactiondata['credit'];
-        // $balance = $credit;
+        $dollarratestmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='credit' AND transactionid='$transactionid'");
+        $dollarratestmt->execute([
+          ':voucher_no' => $voucher_no
+        ]);
+        $dollarrate = $dollarratestmt->fetch(PDO::FETCH_ASSOC);
+        if(empty($dollarrate['dollar_rate']) || $dollarrate['dollar_rate'] == 0){
+          $dollarrate = 1;
+        }else{
+          $dollarrate = $dollarrate['dollar_rate'];
+        }
+
+        if(!str_contains($transactiondata['ac_code'], '3600/')){
+          if($transactiondata['bank_charges'] != 0){
+            $credit = ($transactiondata['credit'] / $dollarrate) - ($transactiondata['bank_charges'] * $dollarrate);
+            $debit = 0;
+          }else{
+            $credit = ($transactiondata['credit'] / $dollarrate);
+            $debit = 0;
+          }
+        }else{
+          if($transactiondata['bank_charges'] != 0){
+            $credit = $transactiondata['credit'] - ($transactiondata['bank_charges'] * $dollarrate);
+            $debit = 0;
+          }else{
+            $credit = $transactiondata['credit'];
+            $debit = 0;
+          }
+        }
       }else{
 
-        if($transactiondata['bank_charges'] != 0){
-          $bankchargesstmt = $pdo->prepare("SELECT bank_charges FROM transaction WHERE ac_code='3300%'");
-          $bankchargesstmt->execute();
-          $bankchargesdata = $bankchargesstmt->fetch(PDO::FETCH_ASSOC);
-          $dollarratestmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='debit' AND transactionid='$transactionid'");
-          $dollarratestmt->execute([
-            ':voucher_no' => $voucher_no
-          ]);
-          $dollarrate = $dollarratestmt->fetch(PDO::FETCH_ASSOC);
-          $debit = $transactiondata['debit'] - ($transactiondata['bank_charges'] * $dollarrate['dollar_rate']);
-          $credit = 0;
+        $dollarratestmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='debit' AND transactionid='$transactionid'");
+        $dollarratestmt->execute([
+          ':voucher_no' => $voucher_no
+        ]);
+        $dollarrate = $dollarratestmt->fetch(PDO::FETCH_ASSOC);
+        if(empty($dollarrate['dollar_rate']) || $dollarrate['dollar_rate'] == 0){
+          $dollarrate = 1;
         }else{
-          $debit = $transactiondata['debit'];
-          $credit = 0;
+          $dollarrate = $dollarrate['dollar_rate'];
         }
-        // $balance = $debit;
+        if(!str_contains($transactiondata['ac_code'], '3600/')){
+          if($transactiondata['bank_charges'] != 0){
+            $debit = ($transactiondata['debit'] / $dollarrate) - ($transactiondata['bank_charges'] * $dollarrate);
+            $credit = 0;
+          }else{
+            $debit = ($transactiondata['debit'] / $dollarrate);
+            $credit = 0;
+          }
+        }else{
+          if($transactiondata['bank_charges'] != 0){
+            $debit = $transactiondata['debit'] - ($transactiondata['bank_charges'] * $dollarrate);
+            $credit = 0;
+          }else{
+            $debit = $transactiondata['debit'];
+            $credit = 0;
+          }
+        }
       }
       $sr_no = $transactiondata['sr_no'];
       $container_no = $transactiondata['container_no'];
@@ -4229,7 +4265,7 @@ Class Query{
       //   $crossacname = $oldcrossdata['crossac_name'];
       // }else{
         $beforetransactionid = $transactionid - 1;
-        $oldcrossstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND ac_code NOT LIKE '3600%' OR LIKE '3600/002' OR LIKE '3600/004' ORDER BY id DESC");
+        $oldcrossstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND ac_code NOT LIKE '3600%' ORDER BY id DESC");
         $oldcrossstmt->execute(
           array(':voucher_no' => $voucher_no)
         );
@@ -5274,5 +5310,70 @@ Class Query{
       }else{
         return $status = false;
       }
-  }
+
+    }
+
+    function replaceaccode($fromaccode, $toaccode)
+    {
+      global $pdo;
+
+      // Transaction 
+      $stmt = $pdo->prepare("UPDATE `transaction` SET ac_code='$toaccode' WHERE ac_code='$fromaccode'");
+      $stmt->execute();
+      // General Ledger
+      $glstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$fromaccode'");
+      $glstmt->execute();
+      $gldatas = $glstmt->fetchAll();
+      foreach ($gldatas as $gldata) {
+        $id = $gldata['id'];
+        $glbalancestmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$fromaccode' ORDER BY id DESC");
+        $glbalancestmt->execute();
+        $glbalancedata = $glbalancestmt->fetch(PDO::FETCH_ASSOC);
+        
+        $stmt = $pdo->prepare("UPDATE general_ledger SET ac_code='$toaccode' WHERE id='$id'");
+        $stmt->execute();
+        
+        $debit = $gldata['debit'];
+        $credit = $gldata['credit'];
+
+        $balance = (floatval($glbalancedata['balance']) + floatval($debit)) - floatval($credit);
+
+        $stmt = $pdo->prepare("UPDATE general_ledger SET balance='$balance' WHERE id='$id'");
+        $stmt->execute();
+      }
+
+
+
+      // Cash Book
+      $stmt = $pdo->prepare("UPDATE cashbook SET ac_name='$toaccode' WHERE ac_name='$fromaccode'");
+      $stmt->execute();
+      $stmt = $pdo->prepare("UPDATE cashbook SET crossac_name='$toaccode' WHERE crossac_name='$fromaccode'");
+      $stmt->execute();
+      // Receivable
+      $stmt = $pdo->prepare("UPDATE receivable SET ac_code='$toaccode' WHERE ac_code='$fromaccode'");
+      $stmt->execute();
+      // Payable
+      $stmt = $pdo->prepare("UPDATE payable SET supplier_id='$toaccode' WHERE supplier_id='$fromaccode'");
+      $stmt->execute();
+      // Purchase
+      $stmt = $pdo->prepare("UPDATE purchase SET supplier_id='$toaccode' WHERE supplier_id='$fromaccode'");
+      $stmt->execute();
+      // Form 7 Frozen
+      $stmt = $pdo->prepare("UPDATE form7stock SET supplier_name='$toaccode' WHERE supplier_name='$fromaccode'");
+      $stmt->execute();
+      // Form 7 TCL
+      $stmt = $pdo->prepare("UPDATE form7stocktcl SET supplier_name='$toaccode' WHERE supplier_name='$fromaccode'");
+      $stmt->execute();
+      // Form 10 Frozen
+      $stmt = $pdo->prepare("UPDATE form10stock SET supplier_id='$toaccode' WHERE supplier_id='$fromaccode'");
+      $stmt->execute();
+      // Form 10 TCL
+      $stmt = $pdo->prepare("UPDATE form10stocktcl SET supplier_id='$toaccode' WHERE supplier_id='$fromaccode'");
+      $stmt->execute();
+      // Packing List
+      $stmt = $pdo->prepare("UPDATE packingliststock SET customer_id='$toaccode' WHERE customer_id='$fromaccode'");
+      $stmt->execute();
+
+      echo "<script>swal('Account Code Replaced!', 'All Account Code from all the tables have been replaced!', 'success');</script>";
+    }
 }
