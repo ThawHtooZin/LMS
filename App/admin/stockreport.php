@@ -171,7 +171,18 @@ $query = new Query();
                   // echo "<pre>";
                   // print_r($datas);
                 }else{
-                  $stmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id='$commondity_id' AND country='$country' AND particular NOT LIKE '%to%' ");
+                  $stmt = $pdo->prepare("SELECT id, commondity_id, country, particular, kg, size FROM hhkmcstock 
+                                        WHERE commondity_id = '$commondity_id' 
+                                          AND country = '$country' 
+                                          AND particular NOT LIKE '%to%'
+
+                                        UNION ALL
+
+                                        SELECT id, commondity_id, country, particular, kg, size FROM gfcmcstock 
+                                        WHERE commondity_id = '$commondity_id' 
+                                          AND country = '$country' 
+                                          AND particular NOT LIKE '%to%'
+                                      ");
                   $stmt->execute();
                   $datas = $stmt->fetchall();
                 }
@@ -213,7 +224,9 @@ $query = new Query();
                 // $gfcmcstockstmt->execute();
                 // $gfcmcstockdata = $gfcmcstockstmt->fetch(PDO::FETCH_ASSOC);
 
-
+                  if(empty($fetchalldata['balance_mc'])){
+                    $fetchalldata['balance_mc'] = 0;  
+                  }
                ?>
                <tr style="text-align:center !important;">
               <!-- <tr style="text-align:center !important; <?php if($fetchalldata['balance_mc'] == 0 && empty($fetchallgfcdata['balance_mc'])){ echo "display:none;";} ?>"> -->

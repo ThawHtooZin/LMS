@@ -132,14 +132,17 @@ $query = new Query();
                     $ac_code = $gldata['ac_code'];
                     $gldata['transactionid'];
                     $acname = $query->select('acname', $ac_code, 'code_no');
-
-
+                    
+                    
                     // acnamechange
                     $voucher_no = $gldata['voucherno'];
+                    $description = $gldata['narration'];
+                    // echo "<br>";
                     $ac_code = $gldata['ac_code'];
-                    $acselectstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND ac_code!='$ac_code'");
+                    // echo "<br>";
+                    $acselectstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND ac_code!='$ac_code' AND description=:description");
                     $acselectstmt->execute(
-                      array(':voucher_no' => $voucher_no)
+                      array(':voucher_no' => $voucher_no, ':description' => $description)
                     );
                     $acselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
                     $accode = $acselect['ac_code'];
