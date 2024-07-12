@@ -260,8 +260,9 @@ $query = new Query();
                 }else{
                   $dorc = 'credit';
                 }
+                $transaction_id = $data['id'];
                 $voucher_no = $data['voucher_no'];
-                $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$dorc'");
+                $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$dorc' AND transactionid='$transaction_id'");
                 $currencystmt->execute(
                   array(':voucher_no' => $voucher_no )
                 );

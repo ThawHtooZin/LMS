@@ -177,7 +177,7 @@ $query = new Query();
                 if(str_contains($gfcstockdata['particular'], 'balance')){
                   $totalmc = $totalmcsubnum['total_mc'];
                 }
-                $totalmc = $totalmcnotsub['total_mc'] - $totalmcsubnum['total_mc'];
+                $totalmc = $totalmcnotsub['total_mc'] - $totalmcsubnum['total_mc'] + $totalbalancemcsubnum['total_mc'];
                ?>
               <tr style="<?php if($totalmc > 200){echo 'background-color:rgba(0, 255, 0, 0.4) !important;';} ?>">
                 <td><?php if(!empty($gfcstockdata['fish_type'])){ echo $commonditydata['item_name'].' ('.$gfcstockdata['fish_type'].')'; }else{ echo $commonditydata['item_name']; } ?></td>
