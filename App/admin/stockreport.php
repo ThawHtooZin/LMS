@@ -81,7 +81,10 @@ $query = new Query();
               $countrydatas = $countrystmt->fetchall();
 
               echo $country = $_SESSION['tabs'];
-              $hhkcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country='$country'");
+              $hhkcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country = '$country'
+                                                  UNION
+                                                  SELECT DISTINCT commondity_id FROM gfcmcstock WHERE country = '$country'
+                                                ");
               $hhkcommonditystmt->execute();
               $hhkcommonditydatas = $hhkcommonditystmt->fetchall();
               foreach ($hhkcommonditydatas as $hhkcommonditydata) {
@@ -143,7 +146,14 @@ $query = new Query();
               $id = 0;
               if(isset($_POST['commonditybtn']) && !empty($_POST['commondity_id'])){
                 $searchcommondity = $_POST['commondity_id'];
-                $hhkmcstockcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE commondity_id='$searchcommondity' AND country='$country'");
+                $hhkmcstockcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id 
+                                                          FROM hhkmcstock 
+                                                          WHERE commondity_id = '$searchcommondity' AND country = '$country'
+                                                          UNION
+                                                          SELECT DISTINCT commondity_id 
+                                                          FROM gfcmcstock 
+                                                          WHERE commondity_id = '$searchcommondity' AND country = '$country'
+                                                        ");
                 $hhkmcstockcommonditystmt->execute();
                 $hhkmcstockcommonditydatas = $hhkmcstockcommonditystmt->rowCount();
             }else{
@@ -164,7 +174,18 @@ $query = new Query();
 
                 if(isset($_POST['commonditybtn']) && !empty($_POST['commondity_id'])){
                   $searchcommondity_id = $_POST['commondity_id'];
-                  $searchstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id='$searchcommondity_id' AND country='$country' AND particular LIKE '%from%'");
+                  $searchstmt = $pdo->prepare("SELECT * 
+                                              FROM hhkmcstock 
+                                              WHERE commondity_id='$searchcommondity_id' 
+                                              AND country='$country' 
+
+                                              UNION
+
+                                              SELECT * 
+                                              FROM gfcmcstock 
+                                              WHERE commondity_id='$searchcommondity_id' 
+                                              AND country='$country' 
+                                              ");
                   $searchstmt->execute();
                   $datas = $searchstmt->fetchall();
                   //
