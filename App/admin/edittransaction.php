@@ -38,8 +38,8 @@ $query = new Query();
           callback(confirmed && confirmed.value == true);
       });
   }
-    $(document).ready(function(){
-      $('#addac_code').on('keyup', function(){
+  $(document).ready(function(){
+      $('#addac_code').blur( function(){
         var ac_codepost = $('#addac_code').val();
         var type = "";
         if(ac_codepost.includes('/')){
@@ -57,21 +57,14 @@ $query = new Query();
           Type: type
         });
         if(ac_codepost.includes('3300')){
-          $('#normal').hide();
-          $('#receive').show();
           $('#receive2').show();
+          $('#bankcharges').hide();
         }else{
-          $('#receive').hide();
           $('#receive2').hide();
-          $('#normal').show();
           if(ac_codepost.includes('3600')){
-            $('#bankchargesdesc').show();
             $('#bankcharges').show();
-            $('#normal').hide();
           }else{
-            $('#bankchargesdesc').hide();
             $('#bankcharges').hide();
-            $('#normal').show();
           }
         }
       });
@@ -317,25 +310,19 @@ $query = new Query();
                           </div>
                       </div>
                       <div class="row">
-                        <div id="upreceive<?php echo $data['id']; ?>" class="<?php if(!str_contains($updata['ac_code'], 3600) && !str_contains($updata['ac_code'], 3300)){ echo "hide";} ?> col-4">
-                           <label>Description</label>
-                           <textarea name="bankdescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(str_contains($updata['ac_code'], '3600')){echo $updata['description'];} ?></textarea>
-                        </div>
-                         <div id="upreceive2<?php echo $data['id']; ?>" class="<?php if(!str_contains($updata['ac_code'], 3300)){ echo "hide";} ?> col-2">
-                           <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="sr_no" placeholder="Sr No." value="<?php echo $updata['sr_no']; ?>">
-                           <input type="text" class="form-control inpv2 mb-2" style="padding-top: 2px; padding-bottom: 2px;" name="container_no" placeholder="Container No." value="<?php echo $updata['container_no']; ?>">
-                         </div>
-                         <div id="upnormal<?php echo $data['id']; ?>" class="<?php if(str_contains($updata['ac_code'], 3300) || str_contains($updata['ac_code'], 3600)){ echo "hide";} ?> col-6">
-                           <label>Description</label>
-                           <textarea name="description" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php  if(!str_contains($updata['ac_code'], '3600') && !str_contains($updata['ac_code'], '3300')){echo $updata['description'];}?></textarea>
-                         </div>
-                          <div id="bankchargesdesc<?php echo $data['id']; ?>" class="hide col-4">
+                        <div id="normal" class="col-6 d-flex" style="width: 50%;">
+                          <div class="col-9">
                             <label>Description</label>
-                            <textarea name="recdescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(str_contains($updata['ad_code'], '3300')){ echo $updata['description']; } ?></textarea>
+                            <textarea name="adddescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php echo $updata['description']; ?></textarea>
                           </div>
-                          <div id="bankcharges<?php echo $data['id']; ?>" class="<?php if(!str_contains($updata['ac_code'], 3600)){ echo "hide";} ?>" style="width: 16.66666667%">
-                            <input type="number" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="bank_charges" placeholder="Bank Charges" value="<?php if($updata['bank_charges'] != "0"){ echo $updata['bank_charges'];} ?>">
+                          <div id="upreceive2<?php echo $data['id']; ?>" class="<?php if(!str_contains($updata['ac_code'], 3300)){ echo "hide";} ?> col-2">
+                            <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="addsr_no" placeholder="Sr No." value="<?php echo $updata['sr_no']; ?>">
+                            <input type="text" class="form-control inpv2 mb-2" style="padding-top: 2px; padding-bottom: 2px;" name="addcontainer_no" placeholder="Container No." value="<?php echo $updata['container_no']; ?>">
                           </div>
+                          <div id="bankcharges<?php echo $data['id']; ?>" class="<?php if(!str_contains($updata['ac_code'], 3600)){ echo "hide";} ?>">
+                            <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="bank_charges" placeholder="Bank Charges" value="<?php if($updata['bank_charges'] != "0"){ echo $updata['bank_charges'];} ?>">
+                          </div>
+                        </div>
                         <div class="col-3">
                           <label>Currency</label>
                           <select class="form-control inpv2" name="currency" onchange="check<?php echo $data['id']; ?>rate();" id="selectcurrecy<?php echo $data['id']; ?>" style="padding-top: 2px; padding-bottom: 2px;">

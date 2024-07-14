@@ -57,21 +57,14 @@ $query = new Query();
           Type: type
         });
         if(ac_codepost.includes('3300')){
-          $('#normal').hide();
-          $('#receive').show();
           $('#receive2').show();
+          $('#bankcharges').hide();
         }else{
-          $('#receive').hide();
           $('#receive2').hide();
-          $('#normal').show();
           if(ac_codepost.includes('3600')){
-            $('#bankchargesdesc').show();
             $('#bankcharges').show();
-            $('#normal').hide();
           }else{
-            $('#bankchargesdesc').hide();
             $('#bankcharges').hide();
-            $('#normal').show();
           }
         }
       });
@@ -85,22 +78,8 @@ $query = new Query();
         $date = $_POST['adddate'];
         $voucher_no = $_POST['addvoucher_no'];
         $ac_code = $_POST['addac_code'];
-        if(str_contains($ac_code, '3600')){
-          $description = $_POST['adddescriptionbank'];
-          $_SESSION['description'] = '';
-          $_SESSION['descriptionrec'] = '';
-          $_SESSION['descriptionbank'] = $_POST['adddescriptionbank'];
-        }elseif(str_contains($ac_code, '3300')){
-          $description = $_POST['adddescriptionrec'];
-          $_SESSION['description'] = '';
-          $_SESSION['descriptionbank'] = '';
-          $_SESSION['descriptionrec'] = $_POST['adddescriptionrec'];
-        }else{
-          $description = $_POST['adddescription'];
-          $_SESSION['descriptionrec'] = '';
-          $_SESSION['descriptionbank'] = '';
-          $_SESSION['description'] = $_POST['adddescription'];
-        }
+        $description = $_POST['adddescription'];
+        $_SESSION['description'] = $_POST['adddescription'];
         $currency = $_POST['addcurrency'];
         $bank_charges = $_POST['bank_charges'];
         if(!empty($_POST['addrate'])){
@@ -279,25 +258,19 @@ $query = new Query();
             </div>
             <!-- <button type="submit" style="display:none;"></button> -->
             <div class="row">
-              <div id="receive" class="hide col-4">
-                 <label>Description</label>
-                 <textarea name="adddescriptionrec" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(!empty($_SESSION['descriptionrec'])){echo $_SESSION['descriptionrec']; } ?></textarea>
+              <div id="normal" class="col-6 d-flex" style="width: 50%;">
+                <div class="col-9">
+                  <label>Description</label>
+                  <textarea name="adddescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(!empty($_SESSION['description'])){echo $_SESSION['description']; } ?></textarea>
+                </div>
+                <div id="receive2" class="hide ms-3">
+                  <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="addsr_no" placeholder="Sr No.">
+                  <input type="text" class="form-control inpv2 mb-2" style="padding-top: 2px; padding-bottom: 2px;" name="addcontainer_no" placeholder="Container No.">
+                </div>
+                <div id="bankcharges" class="hide ms-3">
+                  <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="bank_charges" placeholder="Bank Charges">
+                </div>
               </div>
-               <div id="receive2" class="hide" style="width: 16.66666667%">
-                 <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="addsr_no" placeholder="Sr No.">
-                 <input type="text" class="form-control inpv2 mb-2" style="padding-top: 2px; padding-bottom: 2px;" name="addcontainer_no" placeholder="Container No.">
-               </div>
-               <div id="normal" class="col-6">
-                 <label>Description</label>
-                 <textarea name="adddescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(!empty($_SESSION['description'])){echo $_SESSION['description']; } ?></textarea>
-               </div>
-               <div id="bankchargesdesc" class="hide col-4">
-                 <label>Description</label>
-                 <textarea name="adddescriptionbank" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(!empty($_SESSION['descriptionbank'])){echo $_SESSION['descriptionbank']; } ?></textarea>
-               </div>
-               <div id="bankcharges" class="hide" style="width: 16.66666667%">
-                 <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="bank_charges" placeholder="Bank Charges">
-               </div>
               <div class="col-3">
                 <label>Currency</label>
                 <select class="form-control inpv2" name="addcurrency" onchange="addcheckrate();" id="addselectcurrecy" style="padding-top: 2px; padding-bottom: 2px;">
@@ -406,25 +379,19 @@ $query = new Query();
                           </div>
                       </div>
                       <div class="row">
-                        <div id="upreceive<?php echo $data['id']; ?>" class="<?php if(!str_contains($updata['ac_code'], 3300)){ echo "hide";} ?> col-4">
-                           <label>Description</label>
-                           <textarea name="recdescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(str_contains($updata['ac_code'], '3300')){echo $updata['description'];} ?></textarea>
-                        </div>
-                         <div id="upreceive2<?php echo $data['id']; ?>" class="<?php if(!str_contains($updata['ac_code'], 3300)){ echo "hide";} ?> col-2">
-                           <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="sr_no" placeholder="Sr No." value="<?php echo $updata['sr_no']; ?>">
-                           <input type="text" class="form-control inpv2 mb-2" style="padding-top: 2px; padding-bottom: 2px;" name="container_no" placeholder="Container No." value="<?php echo $updata['container_no']; ?>">
-                         </div>
-                         <div id="upnormal<?php echo $data['id']; ?>" class="<?php if(str_contains($updata['ac_code'], 3300) || str_contains($updata['ac_code'], 3600)){ echo "hide";} ?> col-6">
-                           <label>Description</label>
-                           <textarea name="description" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php  if(!str_contains($updata['ac_code'], '3600') && !str_contains($updata['ac_code'], '3300')){echo $updata['description'];}?></textarea>
-                         </div>
-                          <div id="bankchargesdesc<?php echo $data['id']; ?>" class="<?php if(!str_contains($updata['ac_code'], 3600)){ echo "hide";} ?> col-4">
+                        <div id="normal" class="col-6 d-flex" style="width: 50%;">
+                          <div class="col-9">
                             <label>Description</label>
-                            <textarea name="bankdescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(str_contains($updata['ac_code'], '3600')){ echo $updata['description']; } ?></textarea>
+                            <textarea name="adddescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php echo $updata['description']; ?></textarea>
                           </div>
-                          <div id="bankcharges<?php echo $data['id']; ?>" class="<?php if(!str_contains($updata['ac_code'], 3600)){ echo "hide";} ?>" style="width: 16.66666667%">
-                            <input type="number" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="bank_charges" placeholder="Bank Charges" value="<?php if($updata['bank_charges'] != "0"){ echo $updata['bank_charges'];} ?>">
+                          <div id="upreceive2<?php echo $data['id']; ?>" class="<?php if(!str_contains($updata['ac_code'], 3300)){ echo "hide";} ?> col-2">
+                            <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="addsr_no" placeholder="Sr No." value="<?php echo $updata['sr_no']; ?>">
+                            <input type="text" class="form-control inpv2 mb-2" style="padding-top: 2px; padding-bottom: 2px;" name="addcontainer_no" placeholder="Container No." value="<?php echo $updata['container_no']; ?>">
                           </div>
+                          <div id="bankcharges<?php echo $data['id']; ?>" class="<?php if(!str_contains($updata['ac_code'], 3600)){ echo "hide";} ?>">
+                            <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="bank_charges" placeholder="Bank Charges" value="<?php if($updata['bank_charges'] != "0"){ echo $updata['bank_charges'];} ?>">
+                          </div>
+                        </div>
                         <div class="col-3">
                           <label>Currency</label>
                           <select class="form-control inpv2" name="currency" onchange="check<?php echo $data['id']; ?>rate();" id="selectcurrecy<?php echo $data['id']; ?>" style="padding-top: 2px; padding-bottom: 2px;">
