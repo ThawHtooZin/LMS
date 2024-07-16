@@ -3089,6 +3089,22 @@ Class Query{
     $addsizestmt->execute();
   }
 
+  function addsizetcl($id, $size){
+    global $pdo;
+
+    $sizestmt = $pdo->prepare("SELECT * FROM form7stocktcl WHERE id='$id'");
+    $sizestmt->execute();
+    $sizedata = $sizestmt->fetch(PDO::FETCH_ASSOC);
+
+    $item_id = $sizedata['item_id'];
+    $country = $sizedata['country'];
+    $type = $sizedata['type'];
+    $supplier_name = $sizedata['supplier_name'];
+    $link_id = $sizedata['link_id'];
+    $addsizestmt = $pdo->prepare("INSERT INTO form7stocktcl(item_id, supplier_name, country, type, size, link_id) VALUES('$item_id', '$supplier_name', '$country', '$type', '$size', '$link_id')");
+    $addsizestmt->execute();
+  }
+
   function addform7($date, $commondity_id, $supplier_name, $type, $size, $viss){
     global $pdo;
 
