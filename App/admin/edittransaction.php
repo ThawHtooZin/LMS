@@ -100,22 +100,7 @@ $query = new Query();
       $date = $_POST['adddate'];
       $voucher_no = $_POST['addvoucher_no'];
       $ac_code = $_POST['addac_code'];
-      if(str_contains($ac_code, '3600')){
-        $description = $_POST['adddescriptionbank'];
-        $_SESSION['description'] = '';
-        $_SESSION['descriptionrec'] = '';
-        $_SESSION['descriptionbank'] = $_POST['adddescriptionbank'];
-      }elseif(str_contains($ac_code, '3300')){
-        $description = $_POST['adddescriptionrec'];
-        $_SESSION['description'] = '';
-        $_SESSION['descriptionbank'] = '';
-        $_SESSION['descriptionrec'] = $_POST['adddescriptionrec'];
-      }else{
-        $description = $_POST['adddescription'];
-        $_SESSION['descriptionrec'] = '';
-        $_SESSION['descriptionbank'] = '';
-        $_SESSION['description'] = $_POST['adddescription'];
-      }
+      $_SESSION['description'] = $_POST['adddescription'];
       $currency = $_POST['addcurrency'];
       $bank_charges = $_POST['bank_charges'];
       if(!empty($_POST['addrate'])){
@@ -153,7 +138,7 @@ $query = new Query();
       $date = $_POST['date'];
       $voucher_no = $_POST['voucher_no'];
       $ac_code = $_POST['ac_code'];
-      $description = $_POST['description'];
+      $description = $_POST['adddescription'];
 
       $currency = $_POST['currency'];
       if(!empty($_POST['rate'])){
