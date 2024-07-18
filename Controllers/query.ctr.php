@@ -3836,8 +3836,8 @@ Class Query{
       $oldgeneralledgerdata = $oldgeneralledgerstmt->fetch(PDO::FETCH_ASSOC);
       $oldgeneralledgerbalance = $oldgeneralledgerdata['balance'];
 
-      $balance = ($oldgeneralledgerbalance + $mmkdebit) - $mmkcredit;
-      $cashbookstmt = $pdo->prepare("UPDATE general_ledger SET date='$date', voucherno=:voucher_no, ac_code='$ac_code', narration=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no', container_no='$container_no', bank_charges='$bank_charges', balance='$balance' WHERE transactionid='$id'");
+      $balance = ($oldgeneralledgerbalance + $debit) - $credit;
+      $cashbookstmt = $pdo->prepare("UPDATE general_ledger SET date='$date', voucherno=:voucher_no, ac_code='$ac_code', narration=:description, debit='$debit', credit='$credit', sr_no='$sr_no', container_no='$container_no', bank_charges='$bank_charges', balance='$balance' WHERE transactionid='$id'");
       $cashbookstmt->execute(
         [
           ':voucher_no' => $voucher_no,
@@ -3877,7 +3877,7 @@ Class Query{
 
       $oldcashbalance = $oldcashdata['balance'];
 
-      $balance = ($oldcashbalance + $mmkdebit) - $mmkcredit;
+      $balance = ($oldcashbalance + $debit) - $credit;
 
       // Cross acname process
       $oldcrossstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND description LIKE '%***%'");
@@ -3891,7 +3891,7 @@ Class Query{
         $crossacname = '';
       }
       // Cross asname process
-      $cashbookstmt = $pdo->prepare("UPDATE cashbook SET date='$date', voucher_no=:voucher_no, crossac_name='$crossacname', particular=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no', balance='$balance' WHERE transactionid='$id'");
+      $cashbookstmt = $pdo->prepare("UPDATE cashbook SET date='$date', voucher_no=:voucher_no, crossac_name='$crossacname', particular=:description, debit='$debit', credit='$credit', sr_no='$sr_no', balance='$balance' WHERE transactionid='$id'");
       $cashbookstmt->execute(
         [
           ':voucher_no' => $voucher_no,

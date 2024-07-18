@@ -133,15 +133,7 @@ $query = new Query();
       $date = $_POST['date'];
       $voucher_no = $_POST['voucher_no'];
       $ac_code = $_POST['ac_code'];
-      if(str_contains($ac_code, '3600')){
-        $description = $_POST['bankdescription'];
-      }
-      if(str_contains($ac_code, '3300')){
-        $description = $_POST['recdescription'];
-      }
-      if(!str_contains($ac_code, '3600') && !str_contains($ac_code, '3300')){
-        $description = $_POST['description'];
-      }
+      $description = $_POST['adddescription'];
       $currency = $_POST['currency'];
       if(!empty($_POST['rate'])){
         $rate = $_POST['rate'];
