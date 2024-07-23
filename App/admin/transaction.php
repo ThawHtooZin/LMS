@@ -151,9 +151,10 @@ $query = new Query();
         $credit = 0;
       }
 
-      if(!empty($_POST['sr_no']) && !empty($_POST['container_no'])){
-        $sr_no = $_POST['sr_no'];
-        $container_no = $_POST['container_no'];
+
+      if(!empty($_POST['updatesr_no']) && !empty($_POST['updatecontainer_no'])){
+        $sr_no = $_POST['updatesr_no'];
+        $container_no = $_POST['updatecontainer_no'];
       }else{
         $sr_no = '';
         $container_no = '';
@@ -220,7 +221,7 @@ $query = new Query();
                 </div>
                 <div class="col">
                   <label>Vr. No</label>
-                  <input type="text" name="addvoucher_no" style="<?php if(!empty($adddateerror) && $adddateerror == 'error'){ echo 'border: 1px solid red !important;'; } ?>" class="form-control inpv2 mb-1" value="<?php if(!empty($_SESSION['addvoucher_no'])){echo $_SESSION['addvoucher_no']; } ?>" style="padding-top: 2px; padding-bottom: 2px;">
+                  <input type="text" name="addvoucher_no" style="<?php if(!empty($adddateerror) && $adddateerror == 'error'){ echo 'border: 1px solid red !important;'; } ?>" class="form-control inpv2 mb-1" value="<?php if(!empty($_SESSION['addvoucher_no'])){echo $_SESSION['addvoucher_no']; } ?>" style="padding-top: 2px; padding-bottom: 2px;" id="voucher_no">
                 </div>
                 <div class="col">
                   <label>A/C Code</label>
@@ -257,7 +258,7 @@ $query = new Query();
                 </div>
                 <div id="receive2" class="hide ms-3">
                   <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="addsr_no" placeholder="Sr No.">
-                  <input type="text" class="form-control inpv2 mb-2" style="padding-top: 2px; padding-bottom: 2px;" name="addcontainer_no" placeholder="Container No.">
+                  <input type="text" class="form-control inpv2 mb-2" style="padding-top: 2px; padding-bottom: 2px;" name="addcontainer_no" placeholder="Container No." id="sr_no">
                 </div>
                 <div id="bankcharges" class="hide ms-3">
                   <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="bank_charges" placeholder="Bank Charges">
@@ -377,8 +378,8 @@ $query = new Query();
                             <textarea name="adddescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php echo $updata['description']; ?></textarea>
                           </div>
                           <div id="upreceive2<?php echo $data['id']; ?>" class="<?php if(!str_contains($updata['ac_code'], 3300)){ echo "hide";} ?> col-2">
-                            <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="addsr_no" placeholder="Sr No." value="<?php echo $updata['sr_no']; ?>">
-                            <input type="text" class="form-control inpv2 mb-2" style="padding-top: 2px; padding-bottom: 2px;" name="addcontainer_no" placeholder="Container No." value="<?php echo $updata['container_no']; ?>">
+                            <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="updatesr_no" placeholder="Sr No." value="<?php echo $updata['sr_no']; ?>">
+                            <input type="text" class="form-control inpv2 mb-2" style="padding-top: 2px; padding-bottom: 2px;" name="updatecontainer_no" placeholder="Container No." value="<?php echo $updata['container_no']; ?>">
                           </div>
                           <div id="bankcharges<?php echo $data['id']; ?>" class="<?php if(!str_contains($updata['ac_code'], 3600)){ echo "hide";} ?>">
                             <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="bank_charges" placeholder="Bank Charges" value="<?php if($updata['bank_charges'] != "0"){ echo $updata['bank_charges'];} ?>">
@@ -542,6 +543,39 @@ $query = new Query();
           addrateinp.disabled = false;
         }
       }
+      $(document).ready(function(){
+            $('#voucher_no').on('blur', function() {
+                var voucher_no = $(this).val();
+                $.ajax({
+                    url: 'vouchernocheck.php',
+                    type: 'POST',
+                    data: { 
+                      voucher_no: voucher_no,
+                     },
+                    success: function(response) {
+                        if (response == 1) {
+                          swal('Warning!', 'There are duplicated Voucher!', 'warning');
+                        }
+                    }
+                });
+            });
+            $('#sr_no').on('blur', function() {
+                var sr_no = $(this).val();
+
+                $.ajax({
+                    url: 'srnocheck.php',
+                    type: 'POST',
+                    data: { 
+                      sr_no: sr_no,
+                     },
+                    success: function(response) {
+                        if (response == 1) {
+                            swal('Warning!', 'There are duplicated Serial Number!', 'warning');
+                        }
+                    }
+                });
+            });
+        });
     </script>
     <?php
     $bootstrap->javascript();
