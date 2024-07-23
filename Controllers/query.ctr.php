@@ -3085,7 +3085,8 @@ Class Query{
     $type = $sizedata['type'];
     $supplier_name = $sizedata['supplier_name'];
     $link_id = $sizedata['link_id'];
-    $addsizestmt = $pdo->prepare("INSERT INTO form7stock(item_id, supplier_name, country, type, size, link_id) VALUES('$item_id', '$supplier_name', '$country', '$type', '$size', '$link_id')");
+    $date = $sizedata['date'];
+    $addsizestmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, country, type, size, link_id) VALUES('$date', '$item_id', '$supplier_name', '$country', '$type', '$size', '$link_id')");
     $addsizestmt->execute();
   }
 
@@ -3101,7 +3102,8 @@ Class Query{
     $type = $sizedata['type'];
     $supplier_name = $sizedata['supplier_name'];
     $link_id = $sizedata['link_id'];
-    $addsizestmt = $pdo->prepare("INSERT INTO form7stocktcl(item_id, supplier_name, country, type, size, link_id) VALUES('$item_id', '$supplier_name', '$country', '$type', '$size', '$link_id')");
+    $date = $sizedata['date'];
+    $addsizestmt = $pdo->prepare("INSERT INTO form7stocktcl(date, item_id, supplier_name, country, type, size, link_id) VALUES('$date', '$item_id', '$supplier_name', '$country', '$type', '$size', '$link_id')");
     $addsizestmt->execute();
   }
 

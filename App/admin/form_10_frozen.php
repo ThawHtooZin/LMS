@@ -21,6 +21,8 @@ $query = new Query();
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <body>
     <?php
 
@@ -81,36 +83,46 @@ $query = new Query();
 
                 <b>Link Mark Limited (F-10) Frozen</b>
               <button type="button" class="btn btn-success btn-sm float-end" data-bs-toggle="modal" data-bs-target="#addmodal">Add Form-10 Data</button>
-              <button type="submit" name="view" class="btn btn-secondary btn-sm float-end me-2">View</button>
-              <select name="commondity" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
-                <option value="">Select Commondity</option>
-                <?php
-                $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
-                $commonstmt->execute();
-                $commondatas = $commonstmt->fetchall();
-                foreach ($commondatas as $commondata) {
-                  $itemid = $commondata['item_id'];
-                  $item_name = $query->select('item', $itemid, 'item_id');
-                  ?>
-                  <option value="<?php echo $item_name['item_id']; ?>"><?php echo $item_name['item_name']; ?></option>
+              <p class="btn btn-primary btn-sm" id="filtertogglebtn" style="display:inline; float: right; margin-right: 10px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-binoculars" viewBox="0 0 16 16">
+                <path d="M3 2.5A1.5 1.5 0 0 1 4.5 1h1A1.5 1.5 0 0 1 7 2.5V5h2V2.5A1.5 1.5 0 0 1 10.5 1h1A1.5 1.5 0 0 1 13 2.5v2.382a.5.5 0 0 0 .276.447l.895.447A1.5 1.5 0 0 1 15 7.118V14.5a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 14.5v-3a.5.5 0 0 1 .146-.354l.854-.853V9.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v.793l.854.853A.5.5 0 0 1 7 11.5v3A1.5 1.5 0 0 1 5.5 16h-3A1.5 1.5 0 0 1 1 14.5V7.118a1.5 1.5 0 0 1 .83-1.342l.894-.447A.5.5 0 0 0 3 4.882zM4.5 2a.5.5 0 0 0-.5.5V3h2v-.5a.5.5 0 0 0-.5-.5zM6 4H4v.882a1.5 1.5 0 0 1-.83 1.342l-.894.447A.5.5 0 0 0 2 7.118V13h4v-1.293l-.854-.853A.5.5 0 0 1 5 10.5v-1A1.5 1.5 0 0 1 6.5 8h3A1.5 1.5 0 0 1 11 9.5v1a.5.5 0 0 1-.146.354l-.854.853V13h4V7.118a.5.5 0 0 0-.276-.447l-.895-.447A1.5 1.5 0 0 1 12 4.882V4h-2v1.5a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5zm4-1h2v-.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zm4 11h-4v.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5zm-8 0H2v.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5z"/>
+              </svg>
+              </p>
+              <div id="filterdiv" style="display: none;">
+                <button type="submit" name="view" class="btn btn-secondary btn-sm float-end me-2">View</button>
+                <select name="commondity" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
+                  <option value="">Select Commondity</option>
                   <?php
-                }
-                 ?>
-              </select>
-              <select name="country" class="form-control inpv2 d-inline float-end me-2" style=" width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
-                <option value="">Select Country</option>
-                <?php
-                $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock");
-                $countrystmt->execute();
-                $countrydatas = $countrystmt->fetchall();
-                foreach ($countrydatas as $countrydata) {
+                  $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
+                  $commonstmt->execute();
+                  $commondatas = $commonstmt->fetchall();
+                  foreach ($commondatas as $commondata) {
+                    $itemid = $commondata['item_id'];
+                    $item_name = $query->select('item', $itemid, 'item_id');
+                    ?>
+                    <option value="<?php echo $item_name['item_id']; ?>"><?php echo $item_name['item_name']; ?></option>
+                    <?php
+                  }
                   ?>
-                  <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
+                </select>
+                <select name="country" class="form-control inpv2 d-inline float-end me-2" style=" width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
+                  <option value="">Select Country</option>
                   <?php
-                }
-                 ?>
-              </select>
-              <input type="date"  name="searchdate" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
+                  $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock");
+                  $countrystmt->execute();
+                  $countrydatas = $countrystmt->fetchall();
+                  foreach ($countrydatas as $countrydata) {
+                    ?>
+                    <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
+                    <?php
+                  }
+                  ?>
+                </select>
+                <input type="date"  name="searchdate" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
+                <label class="float-end">Form10Date:</label>
+                <input type="text" readonly data-id="multiple" id="dateselector" name="form7date" class="form-control inpv2 w-25 d-inline float-end me-2" style="width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
+                <label class="float-end">Form7Date:</label>
+              </div>
               <?php
               if(isset($_POST['view']) && !empty($_POST['commondity']) && !empty($_POST['country']) && !empty($_POST['searchdate'])){
                 ?>
@@ -138,7 +150,7 @@ $query = new Query();
                   <th rowspan="2" style="padding-top:25px;">Action</th>
                   <?php
                 }
-                 ?>
+                ?>
                 <?php
                 if (isset($_POST['view'])) {
                   ?>
@@ -159,10 +171,11 @@ $query = new Query();
                 <th>Kg</th>
               </tr>
               <?php
-              if(isset($_POST['view']) && !empty($_POST['commondity']) && !empty($_POST['country']) && !empty($_POST['searchdate'])){
+              if(isset($_POST['view']) && !empty($_POST['commondity']) && !empty($_POST['country']) && !empty($_POST['searchdate']) && !empty($_POST['form7date'])){
                 $commondity_id = $_POST['commondity'];
                 $country = $_POST['country'];
                 $searchdate = $_POST['searchdate'];
+                $form7date = $_POST['form7date'];
                 $stmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
                 $stmt->execute();
                 $datas = $stmt->fetchall();
@@ -204,16 +217,31 @@ $query = new Query();
                 $supplieridstmt->execute();
                 $supplierdata = $supplieridstmt->fetch(PDO::FETCH_ASSOC);
                 $supplier_id = $supplierdata['supplier_id'];
+                
+                // Get POST data
+                $form7date = $_POST['form7date'];
 
-                $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id'");
+                // Convert searchdate (which comes from Flatpickr) to an array of dates
+                $datesArray = explode(', ', $form7date);
+
+                // Quote each date for SQL
+                $quotedDates = array_map(function($date) {
+                    return "'" . $date . "'";
+                }, $datesArray);
+
+                // Join the quoted dates with commas
+                $datesList = implode(', ', $quotedDates);
+
+                $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id' AND date IN ($datesList)");
                 $totalf7kgstmt->execute();
                 $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
-
+                print_r($totalf7kgdata);
+                
                 $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
                 $totalkgstmt->execute();
                 $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
                 $result1 = round($totalkgdata['total_kg'], 2) - round($totalf7kgdata['total_kg'], 2);
-                if(round($totalf7kgdata['total_kg']) == 0){
+                if(empty($totalf7kgdata['total_kg'])){
                   $percentage = "";
                 }else{
                   $result2 = $result1 / round($totalf7kgdata['total_kg'], 2);
@@ -222,19 +250,20 @@ $query = new Query();
 
 
 
-                $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+                $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_id='$supplier_id' AND date='$searchdate'");
                 $form10pcsstmt->execute();
                 $form10pcsdata = $form10pcsstmt->fetch(PDO::FETCH_ASSOC);
 
-                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+                
+                $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_id='$supplier_id' AND date='$searchdate'");
                 $totalkgstmt->execute();
                 $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
 
-                $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+                $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_id='$supplier_id' AND date='$searchdate'");
                 $mcstmt->execute();
                 $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
 
-                $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+                $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_id='$supplier_id' AND date='$searchdate'");
                 $kgstmt->execute();
                 $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
                 ?>
@@ -264,7 +293,7 @@ $query = new Query();
                 <?php
                 if (isset($_POST['view'])) {
                   ?>
-                  <td style="font-weight:bold; <?php if(strpos(round($percentage, 2), '-') !== false){echo 'color:red;';} ?>"><?php echo round($percentage, 2). "%"; ?></td>
+                  <td style="font-weight:bold; <?php if($percentage != ""){if(strpos(round($percentage, 2), '-') !== false){echo 'color:red;';}} ?>"><?php if($percentage != ""){ echo round($percentage, 2). "%"; }else{ echo '-'; } ?></td>
                   <?php
                 }
                  ?>
@@ -592,6 +621,23 @@ $query = new Query();
         </div>
       </div>
     </div>
+    <script>
+      $('#filtertogglebtn').click(function() {
+          var filterDiv = $('#filterdiv');
+          if (filterDiv.css('display') === 'none') {
+              filterDiv.css('display', 'inline');
+          } else {
+              filterDiv.css('display', 'none');
+          }
+      });
+      flatpickr("#dateselector", {
+        mode: "multiple",
+        dateFormat: "Y-m-d",
+        onChange: function(selectedDates, dateStr, instance) {
+          console.log('Selected dates:', selectedDates.map(date => date.toISOString().split('T')[0]));
+        }
+      });
+    </script>
     <?php
     $bootstrap->javascript();
     ?>

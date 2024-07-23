@@ -61,16 +61,16 @@ $query = new Query();
       $query->waterkg($waterkgid, $waterkg);
     }
 
-    if(isset($_POST['searchbtncommondity'])){
+    if(isset($_POST['searchbtn'])){
       $_SESSION['search']['searchcommondity'] = $_POST['commondity_id'];
-    }
-
-    if(isset($_POST['date'])){
       $_SESSION['search']['searchdate'] = $_POST['date'];
+      $_SESSION['search']['searchsize'] = $_POST['size'];
     }
 
-    if(isset($_POST['size'])){
-      $_SESSION['search']['searchsize'] = $_POST['size'];
+    if(isset($_POST['clearfilter'])){
+      $_SESSION['search']['searchcommondity'] = '';
+      $_SESSION['search']['searchdate'] = '';
+      $_SESSION['search']['searchsize'] = '';
     }
      ?>
     <div class="row">
@@ -86,8 +86,11 @@ $query = new Query();
             <div class="card-header bg-info text-light pb-3">
               <b class="h5">Link Mark Limited (F-7) Frozen</b>
               <button type="button" class="btn btn-success btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#addmodal">Add Data</button>
-              <button type="submit" name="searchbtncommondity" class="btn btn-secondary btn-sm float-end" style="border-top-left-radius:0px; border-bottom-left-radius:0px;">View/Clear</button>
-              <select name="commondity_id" class="form-control inpv2 d-inline float-end" style="border-top-right-radius:0px; border-bottom-right-radius:0px; width: 10%; height:26px !important; padding:0px 2px;">
+
+              <button type="submit" name="clearfilter" class="btn btn-secondary btn-sm float-end me-2" style="border-top-left-radius:0px; border-bottom-left-radius:0px;">Clear Filter</button>
+              <button type="submit" name="searchbtn" class="btn btn-primary btn-sm float-end me-2" style="border-top-left-radius:0px; border-bottom-left-radius:0px;">View</button>
+
+              <select name="commondity_id" class="form-control inpv2 d-inline float-end" style="margin-left:5px; width: 10%; height:26px !important; padding:0px 2px;">
                 <option value="">Select Commondity</option>
                 <?php
                 $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
@@ -98,17 +101,13 @@ $query = new Query();
                   $item_id = $commondata['item_id'];
                   $commonditydata = $query->select('item', $item_id, 'item_id');
                   ?>
-                  <option value="<?php echo $commondata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                  <option value="<?php echo $commondata['item_id']; ?>" <?php if(!empty($_SESSION['search']['searchcommondity'])){ if($_SESSION['search']['searchcommondity'] == $commondata['item_id']) {echo "selected"; }} ?>><?php echo $commonditydata['item_name']; ?></option>
                   <?php
                 }
                  ?>
               </select>
-
-              <button type="submit" name="searchbtndate" class="btn btn-secondary btn-sm float-end me-2" style="border-top-left-radius:0px; border-bottom-left-radius:0px;">View</button>
-              <input type="date" name="date" class="form-control inpv2 d-inline float-end" style="border-top-right-radius:0px; border-bottom-right-radius:0px; width: 14%; height:26px !important; padding:0px 2px;">
-
-              <button type="submit" name="searchbtnsize" class="btn btn-secondary btn-sm float-end me-2" style="border-top-left-radius:0px; border-bottom-left-radius:0px;">View</button>
-              <select name="size" class="form-control inpv2 d-inline float-end" style="border-top-right-radius:0px; border-bottom-right-radius:0px; width: 10%; height:26px !important; padding:0px 2px;">
+              <input type="date" name="date" value="<?php if(!empty($_SESSION['search']['searchdate'])){echo $_SESSION['search']['searchdate'];} ?>" class="form-control inpv2 d-inline float-end" style="margin-left:5px; width: 14%; height:26px !important; padding:0px 2px;">
+              <select name="size" class="form-control inpv2 d-inline float-end" style="margin-left:5px; width: 10%; height:26px !important; padding:0px 2px;">
                 <option value="">Select Size</option>
                 <?php
                 $sizestmt = $pdo->prepare("SELECT DISTINCT size FROM form7stock");
@@ -117,7 +116,7 @@ $query = new Query();
 
                 foreach ($sizedatas as $sizedata) {
                   ?>
-                  <option value="<?php echo $sizedata['size']; ?>"><?php echo $sizedata['size']; ?></option>
+                  <option value="<?php echo $sizedata['size']; ?>" <?php if(!empty($_SESSION['search']['searchsize'])){if($_SESSION['search']['searchsize'] == $sizedata['size']){echo "selected";}} ?>><?php echo $sizedata['size']; ?></option>
                   <?php
                 }
                  ?>
@@ -142,11 +141,57 @@ $query = new Query();
                 <th>Action</th>
               </tr>
               <?php
-              if (!empty($_SESSION['search']['searchcommondity']) && $_SESSION['search']['searchcommondity'] != '') {
-                $commondity_id = $_SESSION['search']['searchcommondity'];
-                  $stmt = $pdo->prepare("SELECT * FROM form7stock WHERE item_id='$commondity_id'");
+                // Initialize variables
+              $commondity_id = !empty($_SESSION['search']['searchcommondity']) ? $_SESSION['search']['searchcommondity'] : '';
+              $searchdate = !empty($_SESSION['search']['searchdate']) ? $_SESSION['search']['searchdate'] : '';
+              $searchsize = !empty($_SESSION['search']['searchsize']) ? $_SESSION['search']['searchsize'] : '';
+              $nodata = false;
+
+              // Initialize the base query and an array for the conditions
+              $sql = "SELECT * FROM form7stock";
+              $conditions = [];
+
+              // Add conditions based on the session variables
+              if ($commondity_id != '') {
+                  $conditions[] = "item_id = :commondity_id";
+              }
+              if ($searchdate != '') {
+                  $conditions[] = "date = :searchdate";
+              }
+              if ($searchsize != '') {
+                  $conditions[] = "size = :searchsize";
+              }
+
+              // If there are conditions, append them to the base sql
+              if (count($conditions) > 0) {
+                  $sql .= " WHERE " . implode(" AND ", $conditions);
+              } else {
+                  $nodata = true;
+              }
+
+              // Prepare the statement
+              $stmt = $pdo->prepare($sql);
+
+              // Bind parameters if they are set
+              if ($commondity_id != '') {
+                  $stmt->bindParam(':commondity_id', $commondity_id, PDO::PARAM_STR);
+              }
+              if ($searchdate != '') {
+                  $stmt->bindParam(':searchdate', $searchdate, PDO::PARAM_STR);
+              }
+              if ($searchsize != '') {
+                  $stmt->bindParam(':searchsize', $searchsize, PDO::PARAM_STR);
+              }
+
+              // Execute the statement
+              $stmt->execute();
+
+                if($nodata === true){
+                  $datas = [];
+                }else{
                   $stmt->execute();
                   $datas = $stmt->fetchall();
+                }
 
                 foreach ($datas as $form7data) {
                   $item_id = $form7data['item_id'];
@@ -155,19 +200,19 @@ $query = new Query();
                   $supplierdata = $query->select('acname', $supplier_id, 'code_no');
 
                   ?>
-                  <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>">
+                  <tr>
                     <td><?php if($form7data['date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($form7data['date']));}; ?></td>
                     <td><?php echo $commonditydata['item_name']; ?></td>
                     <td><?php echo $supplierdata['ac_name']; ?></td>
                     <td><?php echo $form7data['type']; ?></td>
-                    <td><?php echo $form7data['country']; ?></td>
-                    <td data-bs-target="#updatesizemodal<?php echo $form7data['id']; ?>" data-bs-toggle="modal"><?php echo $form7data['size']; ?></td>
+                    <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>"><?php echo $form7data['country']; ?></td>
+                    <td data-bs-toggle="modal" data-bs-target="#updatesizemodal<?php echo $form7data['id']; ?>"><?php echo $form7data['size']; ?></td>
                     <td><?php echo $form7data['viss']; ?></td>
                     <td><?php echo floatval($form7data['viss']) * 1.634; ?></td>
-                    <td><?php echo $form7data['kg']; ?></td>
                     <td data-bs-toggle="modal" data-bs-target="#waterkgmodal<?php echo $form7data['id']; ?>"><?php if(!empty($form7data['water_kg'])){ echo $form7data['water_kg'];} ?></td>
+                    <td><?php echo $form7data['kg']; ?></td>
                     <td><?php echo $form7data['pcspervr']; ?></td>
-                    <td><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
+                    <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>"><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
                     <td>
                       <form action="form_7_frozen.php" method="post">
                         <input type="hidden" name="deleteid" value="<?php echo $form7data['id']; ?>">
@@ -177,6 +222,33 @@ $query = new Query();
                       </form>
                     </td>
                   </tr>
+                  <div class="modal fade" id="waterkgmodal<?php echo $form7data['id']; ?>">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+                        <div class="modal-header bg-warning text-light">
+                          <h1 class="modal-title fs-5">Add WaterKg</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <form action="form_7_frozen.php" method="post">
+                            <input type="hidden" name="waterkgid" value="<?php echo $form7data['id']; ?>">
+                            <div class="modal-body">
+                              <?php
+                              $idd = $form7data['id'];
+                              $updata = $query->select('form7stock', $idd, 'id');
+                              ?>
+                                <label>Water Kg</label>
+                                <input type="text" name="waterkg" class="form-control inpv2 mt-1" value="<?php echo $updata['water_kg']; ?>">
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-warning" name="waterkgupdate">Update</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
                   <div class="modal fade" id="updatemodal<?php echo $form7data['id']; ?>">
                     <div class="modal-dialog" role="document">
                       <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
@@ -260,7 +332,9 @@ $query = new Query();
                 $totalpcsf7stmt = $pdo->prepare("SELECT SUM(pcsperf7) AS total_pcsf7 FROM form7stock WHERE item_id='$item_id'");
                 $totalpcsf7stmt->execute();
                 $totalpcsf7data = $totalpcsf7stmt->fetch(PDO::FETCH_ASSOC);
-                ?>
+                if($nodata !== true){
+                  
+                  ?>
                 <tr style="font-weight: bold !important;">
                   <td></td>
                   <td>Total</td>
@@ -277,275 +351,7 @@ $query = new Query();
                   <td></td>
                 </tr>
                 <?php
-            }elseif(!empty($_SESSION['search']['searchdate']) && $_SESSION['search']['searchdate'] != ''){
-                $date = $_SESSION['search']['searchdate'];
-
-                $stmt = $pdo->prepare("SELECT * FROM form7stock WHERE date='$date'");
-                $stmt->execute();
-                $datas = $stmt->fetchall();
-
-              foreach ($datas as $form7data) {
-                $item_id = $form7data['item_id'];
-                $commonditydata = $query->select('item', $item_id, 'item_id');
-                $supplier_id = $form7data['supplier_name'];
-                $supplierdata = $query->select('acname', $supplier_id, 'code_no');
-                ?>
-                <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>">
-                  <td><?php if($form7data['date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($form7data['date']));}; ?></td>
-                  <td><?php echo $commonditydata['item_name']; ?></td>
-                  <td><?php echo $supplierdata['ac_name']; ?></td>
-                  <td><?php echo $form7data['type']; ?></td>
-                  <td><?php echo $form7data['country']; ?></td>
-                  <td data-bs-target="#updatesizemodal<?php echo $form7data['id']; ?>" data-bs-toggle="modal"><?php echo $form7data['size']; ?></td>
-                  <td><?php echo $form7data['viss']; ?></td>
-                  <td><?php echo $form7data['viss'] * 1.634; ?></td>
-                    <td data-bs-toggle="modal" data-bs-target="#waterkgmodal<?php echo $form7data['id']; ?>"><?php if(!empty($form7data['water_kg'])){ echo $form7data['water_kg'];} ?></td>
-                  <td><?php echo $form7data['kg']; ?></td>
-                  <td><?php echo $form7data['pcspervr']; ?></td>
-                  <td><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
-                  <td>
-                    <form action="form_7_frozen.php" method="post">
-                      <input type="hidden" name="deleteid" value="<?php echo $form7data['id']; ?>">
-                      <button type="submit" name="deleteform7" class="btn btn-danger btn-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
-                      </button>
-                    </form>
-                  </td>
-                </tr>
-                <div class="modal fade" id="updatemodal<?php echo $form7data['id']; ?>">
-                  <div class="modal-dialog" role="document">
-                    <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
-                      <div class="modal-header bg-warning text-light">
-                        <h1 class="modal-title fs-5">Update Data</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body">
-                        <form action="form_7_frozen.php" method="post">
-                          <input type="hidden" name="id" value="<?php echo $form7data['id']; ?>">
-                          <div class="modal-body">
-                            <?php
-                            $idd = $form7data['id'];
-                            $updata = $query->select('form7stock', $idd, 'id');
-                            ?>
-                            <div class="row">
-                              <div class="col">
-                                <label>Country</label>
-                                <input type="text" name="country" class="form-control inpv2 mt-1" value="<?php echo $updata['country']; ?>">
-                              </div>
-                              <div class="col">
-                                <label>Pcs Per F7</label>
-                                <input type="text" name="pcsperf7" class="form-control inpv2 mt-1" value="<?php echo $updata['pcsperf7']; ?>">
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                          <button type="submit" class="btn btn-warning" name="update">Update</button>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-                <div class="modal fade" id="updatesizemodal<?php echo $form7data['id']; ?>">
-                    <div class="modal-dialog" role="document">
-                      <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
-                        <div class="modal-header bg-info text-light">
-                          <h1 class="modal-title fs-5">Add Size</h1>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                          <form action="form_7_frozen.php" method="post">
-                            <input type="hidden" name="id" value="<?php echo $form7data['id']; ?>">
-                            <div class="modal-body">
-                              <?php
-                              $idd = $form7data['id'];
-                              $updata = $query->select('form7stock', $idd, 'id');
-                              ?>
-                              <div class="row">
-                                <div class="col">
-                                  <label>Size</label>
-                                  <input type="text" name="size" class="form-control inpv2 mt-1" value="<?php echo $updata['size']; ?>">
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-warning" name="addsize">Update</button>
-                          </div>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-                <?php
-                $date = $_SESSION['search']['searchdate'];
-                $item_id = $form7data['item_id'];
-                $country = $form7data['country'];
-              }
-              $totalvissstmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM form7stock WHERE date='$date'");
-              $totalvissstmt->execute();
-              $totalvissdata = $totalvissstmt->fetch(PDO::FETCH_ASSOC);
-              $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE date='$date'");
-              $totalkgstmt->execute();
-              $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
-              $totalpcsstmt = $pdo->prepare("SELECT SUM(pcspervr) AS total_pcs FROM form7stock WHERE date='$date'");
-              $totalpcsstmt->execute();
-              $totalpcsdata = $totalpcsstmt->fetch(PDO::FETCH_ASSOC);
-              $totalpcsf7stmt = $pdo->prepare("SELECT SUM(pcsperf7) AS total_pcsf7 FROM form7stock WHERE date='$date'");
-              $totalpcsf7stmt->execute();
-              $totalpcsf7data = $totalpcsf7stmt->fetch(PDO::FETCH_ASSOC);
-              ?>
-              <tr style="font-weight: bold !important;">
-                <td></td>
-                <td>Total</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><?php echo round($totalvissdata['total_viss'], 3); ?></td>
-                <td><?php echo round($totalkgdata['total_kg'], 2); ?></td>
-                <td></td>
-                <td></td>
-                <td><?php if(!empty($totalpcsdata['total_pcs'])){ echo $totalpcsdata['total_pcs']; }; ?></td>
-                <td><?php if(!empty($totalpcsf7data['total_pcsf7'])){ echo $totalpcsf7data['total_pcsf7']; }; ?></td>
-              </tr>
-              <?php
-            }elseif(!empty($_SESSION['search']['searchsize']) && $_SESSION['search']['searchsize'] != ''){
-              $size = $_SESSION['search']['searchsize'];
-
-              $stmt = $pdo->prepare("SELECT * FROM form7stock WHERE size='$size'");
-              $stmt->execute();
-              $datas = $stmt->fetchall();
-
-            foreach ($datas as $form7data) {
-              $item_id = $form7data['item_id'];
-              $commonditydata = $query->select('item', $item_id, 'item_id');
-              $supplier_id = $form7data['supplier_name'];
-              $supplierdata = $query->select('acname', $supplier_id, 'code_no');
-              ?>
-              <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>">
-                <td><?php if($form7data['date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($form7data['date']));}; ?></td>
-                <td><?php echo $commonditydata['item_name']; ?></td>
-                <td><?php echo $supplierdata['ac_name']; ?></td>
-                <td><?php echo $form7data['type']; ?></td>
-                <td><?php echo $form7data['country']; ?></td>
-                <td data-bs-toggle="modal" data-bs-target="#updatesizemodal<?php echo $form7data['id']; ?>"><?php echo $form7data['size']; ?></td>
-                <td><?php echo $form7data['viss']; ?></td>
-                <td><?php echo floatval($form7data['viss']) * 1.634; ?></td>
-                  <td data-bs-toggle="modal" data-bs-target="#waterkgmodal<?php echo $form7data['id']; ?>"><?php if(!empty($form7data['water_kg'])){ echo $form7data['water_kg'];} ?></td>
-                <td><?php echo $form7data['kg']; ?></td>
-                <td><?php echo $form7data['pcspervr']; ?></td>
-                <td><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
-                <td>
-                  <form action="form_7_frozen.php" method="post">
-                    <input type="hidden" name="deleteid" value="<?php echo $form7data['id']; ?>">
-                    <button type="submit" name="deleteform7" class="btn btn-danger btn-sm">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
-                    </button>
-                  </form>
-                </td>
-              </tr>
-              <div class="modal fade" id="updatemodal<?php echo $form7data['id']; ?>">
-                <div class="modal-dialog" role="document">
-                  <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
-                    <div class="modal-header bg-warning text-light">
-                      <h1 class="modal-title fs-5">Update Data</h1>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                      <form action="form_7_frozen.php" method="post">
-                        <input type="hidden" name="id" value="<?php echo $form7data['id']; ?>">
-                        <div class="modal-body">
-                          <?php
-                          $idd = $form7data['id'];
-                          $updata = $query->select('form7stock', $idd, 'id');
-                          ?>
-                          <div class="row">
-                            <div class="col">
-                              <label>Country</label>
-                              <input type="text" name="country" class="form-control inpv2 mt-1" value="<?php echo $updata['country']; ?>">
-                            </div>
-                            <div class="col">
-                              <label>Pcs Per F7</label>
-                              <input type="text" name="pcsperf7" class="form-control inpv2 mt-1" value="<?php echo $updata['pcsperf7']; ?>">
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-warning" name="update">Update</button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-              <div class="modal fade" id="updatesizemodal<?php echo $form7data['id']; ?>">
-                    <div class="modal-dialog" role="document">
-                      <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
-                        <div class="modal-header bg-warning text-light">
-                          <h1 class="modal-title fs-5">Add Size</h1>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                          <form action="form_7_frozen.php" method="post">
-                            <input type="hidden" name="id" value="<?php echo $form7data['id']; ?>">
-                            <div class="modal-body">
-                              <?php
-                              $idd = $form7data['id'];
-                              $updata = $query->select('form7stock', $idd, 'id');
-                              ?>
-                              <div class="row">
-                                <div class="col">
-                                  <label>Size</label>
-                                  <input type="text" name="size" class="form-control inpv2 mt-1" value="<?php echo $updata['size']; ?>">
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-warning" name="addsize">Update</button>
-                          </div>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-              <?php
-              $item_id = $form7data['item_id'];
-              $country = $form7data['country'];
-            }
-            $totalvissstmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM form7stock WHERE size='$size'");
-            $totalvissstmt->execute();
-            $totalvissdata = $totalvissstmt->fetch(PDO::FETCH_ASSOC);
-            $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE size='$size'");
-            $totalkgstmt->execute();
-            $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
-            $totalpcsstmt = $pdo->prepare("SELECT SUM(pcspervr) AS total_pcs FROM form7stock WHERE size='$size'");
-            $totalpcsstmt->execute();
-            $totalpcsdata = $totalpcsstmt->fetch(PDO::FETCH_ASSOC);
-            $totalpcsf7stmt = $pdo->prepare("SELECT SUM(pcsperf7) AS total_pcsf7 FROM form7stock WHERE size='$size'");
-            $totalpcsf7stmt->execute();
-            $totalpcsf7data = $totalpcsf7stmt->fetch(PDO::FETCH_ASSOC);
-            ?>
-            <tr style="font-weight: bold !important;">
-              <td></td>
-              <td>Total</td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td><?php echo round($totalvissdata['total_viss'], 3); ?></td>
-              <td><?php echo round($totalkgdata['total_kg'], 2); ?></td>
-              <td></td>
-              <td></td>
-              <td><?php if(!empty($totalpcsdata['total_pcs'])){ echo $totalpcsdata['total_pcs']; }; ?></td>
-              <td><?php if(!empty($totalpcsf7data['total_pcsf7'])){ echo $totalpcsf7data['total_pcsf7']; }; ?></td>
-            </tr>
-            <?php
-          }
-
+                }
                 ?>
             </table>
         </div>

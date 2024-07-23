@@ -22,6 +22,9 @@ $query = new Query();
 
 <body>
     <?php
+    $_SESSION['search']['acnamesearch'] = '';
+    $_SESSION['search']['enddate'] = '';
+    $_SESSION['search']['startdate'] = '';
       if(isset($_POST['addbalance'])){
         $balanceamount = $_POST['balanceamount'];
         $ac_code = $_POST['balanceac'];
