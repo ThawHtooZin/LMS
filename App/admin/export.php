@@ -945,30 +945,52 @@ if($_GET['table_name'] == 'mcstockreport'){
     $id = 0;
     if(!empty($_GET['commondity_id'])){
       $searchcommondity = $_GET['commondity_id'];
-      $hhkmcstockcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE commondity_id='$searchcommondity' AND country='$country'");
+      $hhkmcstockcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id 
+                                                          FROM hhkmcstock 
+                                                          WHERE commondity_id = '$searchcommondity' AND country = '$country'
+                                                          UNION
+                                                          SELECT DISTINCT commondity_id 
+                                                          FROM gfcmcstock 
+                                                          WHERE commondity_id = '$searchcommondity' AND country = '$country'");
       $hhkmcstockcommonditystmt->execute();
       $hhkmcstockcommonditydatas = $hhkmcstockcommonditystmt->rowCount();
     }else{
-      $hhkmcstockcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country='$country'");
+      $hhkmcstockcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country = '$country'
+                UNION
+                SELECT DISTINCT commondity_id FROM gfcmcstock WHERE country = '$country';");
       $hhkmcstockcommonditystmt->execute();
       $hhkmcstockcommonditydatas = $hhkmcstockcommonditystmt->rowCount();
     }
     for ($i=0; $i < $hhkmcstockcommonditydatas; $i++) {
-      $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country='$country'");
+      $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country = '$country'
+                UNION
+                SELECT DISTINCT commondity_id FROM gfcmcstock WHERE country = '$country'");
       $commonditystmt->execute();
       $commonditydata = $commonditystmt->fetchall();
       $commondity_id = $commonditydata[$i]['commondity_id'];
 
       if(isset($_POST['commonditybtn']) && !empty($_POST['commondity_id'])){
         $searchcommondity_id = $_POST['commondity_id'];
-        $searchstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id='$searchcommondity_id' AND country='$country' AND particular LIKE '%from%'");
+        $searchstmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country = '$country'
+                UNION
+                SELECT DISTINCT commondity_id FROM gfcmcstock WHERE country = '$country'");
         $searchstmt->execute();
         $datas = $searchstmt->fetchall();
         //
         // echo "<pre>";
         // print_r($datas);
       }else{
-        $stmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id='$commondity_id' AND country='$country' AND particular NOT LIKE '%to%' ");
+        $stmt = $pdo->prepare("SELECT id, commondity_id, country, particular, kg, size FROM hhkmcstock 
+                                        WHERE commondity_id = '$commondity_id' 
+                                          AND country = '$country' 
+                                          AND particular NOT LIKE '%to%'
+
+                                        UNION ALL
+
+                                        SELECT id, commondity_id, country, particular, kg, size FROM gfcmcstock 
+                                        WHERE commondity_id = '$commondity_id' 
+                                          AND country = '$country' 
+                                          AND particular NOT LIKE '%to%'");
         $stmt->execute();
         $datas = $stmt->fetchall();
       }
@@ -1010,9 +1032,12 @@ if($_GET['table_name'] == 'mcstockreport'){
       // $gfcmcstockstmt->execute();
       // $gfcmcstockdata = $gfcmcstockstmt->fetch(PDO::FETCH_ASSOC);
 
-
-      ?>
-    <tr style="text-align:center !important;">
+        if(empty($fetchalldata['balance_mc'])){
+          $fetchalldata['balance_mc'] = 0;  
+        }
+     ?>
+     <tr style="text-align:center !important;">
+    <!-- <tr style="text-align:center !important; <?php if($fetchalldata['balance_mc'] == 0 && empty($fetchallgfcdata['balance_mc'])){ echo "display:none;";} ?>"> -->
       <td><?php if(empty($lastcommondity)){ echo $id;} ?></td>
       <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name'];} ?></td>
       <td><?php if(empty($lastcommondity)){ echo $country; } ?></td>
