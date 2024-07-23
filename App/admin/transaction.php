@@ -257,8 +257,8 @@ $query = new Query();
                   <textarea name="adddescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php if(!empty($_SESSION['description'])){echo $_SESSION['description']; } ?></textarea>
                 </div>
                 <div id="receive2" class="hide ms-3">
-                  <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="addsr_no" placeholder="Sr No.">
-                  <input type="text" class="form-control inpv2 mb-2" style="padding-top: 2px; padding-bottom: 2px;" name="addcontainer_no" placeholder="Container No." id="sr_no">
+                  <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="addsr_no" placeholder="Sr No." id="sr_no">
+                  <input type="text" class="form-control inpv2 mb-2" style="padding-top: 2px; padding-bottom: 2px;" name="addcontainer_no" placeholder="Container No.">
                 </div>
                 <div id="bankcharges" class="hide ms-3">
                   <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="bank_charges" placeholder="Bank Charges">
@@ -554,7 +554,9 @@ $query = new Query();
                      },
                     success: function(response) {
                         if (response == 1) {
-                          swal('Warning!', 'There are duplicated Voucher!', 'warning');
+                          $('#voucher_no').addClass('redborder');
+                        }else{
+                          $('#voucher_no').removeClass('redborder');
                         }
                     }
                 });
@@ -570,7 +572,9 @@ $query = new Query();
                      },
                     success: function(response) {
                         if (response == 1) {
-                            swal('Warning!', 'There are duplicated Serial Number!', 'warning');
+                          $('#sr_no').addClass('redborder');
+                        }else{
+                          $('#sr_no').removeClass('redborder');
                         }
                     }
                 });

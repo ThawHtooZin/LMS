@@ -245,6 +245,9 @@ class Bootstrap
             width: 4.8% !important;
           }
         }
+        .redborder{
+          border: 1px solid red !important;
+        }
       </style>
       <script src="../../Resources/sweetalert.js" charset="utf-8"></script>
       <link rel="stylesheet" href="../../Resources/chosenselect/jquery-ui.css">
@@ -258,7 +261,17 @@ class Bootstrap
         $(".chzn-select").chosen();
       });
       </script>
-      
+      <div class="modal" style="display:block;" id="loadingmodal">
+        <div class="modal-dialog" style="width: 100px !important; margin: 0px auto !important;margin-top:300px !important;">
+          <div class="modal-content">
+            <div class="modal-body text-center">
+              <div class="spinner-border border-5 text-primary" role="status" style="width: 5rem; height: 5rem;">
+                  <span class="visually-hidden" >Loading...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     ';
   }
   function javascript()
