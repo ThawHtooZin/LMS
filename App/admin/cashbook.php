@@ -7,7 +7,7 @@ include '../../Controllers/query.ctr.php';
 $auth = new auth();
 $auth->checkadmin();
 $bootstrap = new Bootstrap();
-$query = new Query();   
+$query = new Query();
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -180,13 +180,13 @@ $query = new Query();
                                         <th>Balance</th>
                                         <th>Action</th>
                                     </tr>
-                                    <?php 
+                                    <?php
                                         if(!empty($_SESSION['search']['acnamesearch']) && $_SESSION['search']['acnamesearch'] != ''){
                                             $acnamesearch = $_SESSION['search']['acnamesearch'];
                                             if (empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'ks') {
                                                 $cashbookstmt = $pdo->prepare("SELECT *
                                                     FROM cashbook
-                                                    ORDER BY 
+                                                    ORDER BY
                                                         -- Extract the year from voucher_no
                                                         CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(voucher_no, '/', -1), ' ', 1) AS UNSIGNED),
 
@@ -200,7 +200,7 @@ $query = new Query();
                                             }else{
                                                 $cashbookstmt = $pdo->prepare("SELECT *
                                                     FROM cashbook
-                                                    ORDER BY 
+                                                    ORDER BY
                                                         -- Extract the year from voucher_no
                                                         CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(voucher_no, '/', -1), ' ', 1) AS UNSIGNED),
 
@@ -210,7 +210,7 @@ $query = new Query();
                                                         -- Extract the sequence number from voucher_no
                                                         CAST(SUBSTRING_INDEX(voucher_no, '/', -1) AS UNSIGNED);
                                                 ");
-                                            } 
+                                            }
                                         }elseif(!empty($_SESSION['search']['startdate']) && !empty($_SESSION['search']['enddate']) && $_SESSION['search']['startdate'] != '' && $_SESSION['search']['enddate'] != ''){
                                             $startdate = $_SESSION['search']['startdate'];
                                             $enddate = $_SESSION['search']['enddate'];
@@ -218,15 +218,15 @@ $query = new Query();
                                                 $cashbookstmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/001' AND date BETWEEN '$startdate' AND '$enddate' ORDER BY date ASC");
                                             }else{
                                                 $cashbookstmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/002' AND date BETWEEN '$startdate' AND '$enddate' ORDER BY date ASC");
-                                            } 
+                                            }
                                         }else{
                                             if (empty($_SESSION['cashbooktype']) || $_SESSION['cashbooktype'] == 'ks') {
                                                 $cashbookstmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/001' ORDER BY date ASC");
                                             }else{
                                                 $cashbookstmt = $pdo->prepare("SELECT * FROM cashbook WHERE ac_name='3600/002' ORDER BY date ASC");
-                                            } 
+                                            }
 
-                                            
+
                                         }
                                         $cashbookstmt->execute();
                                         $cashbookdatas = $cashbookstmt->fetchAll();
@@ -244,7 +244,7 @@ $query = new Query();
                                                 $debitorcredit = 'credit';
                                             }
                                             $voucher_no = $cashbookdata['voucher_no'];
-                        
+
                                             if(!empty($_SESSION['search']['acnamesearch']) && $_SESSION['search']['acnamesearch'] != ''){
                                                 $balance = $cashbookdata['balance'];
                                             }elseif(!empty($_SESSION['search']['startdate']) && !empty($_SESSION['search']['enddate']) && $_SESSION['search']['startdate'] != '' && $_SESSION['search']['enddate'] != ''){
@@ -264,7 +264,7 @@ $query = new Query();
                                                 if($rowname != 'balance'){
                                                     $debit = $cashbookdata['debit'];
                                                     $credit = $cashbookdata['credit'];
-                                                    
+
                                                     $balance += intval($debit) - intval($credit);
                                                     // Calculate balance
                                                     $balanceupdatestmt = $pdo->prepare("UPDATE cashbook SET balance='$balance' WHERE id='$rowid'");
@@ -279,7 +279,7 @@ $query = new Query();
                                             //         ':voucher_no' => $voucher_no
                                             //     ]);
                                             //     $rateselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
-                            
+
                                             //     if(!empty($rateselect['dollar_rate'])){
                                             //         if($cashbookdata['debit'] != 0){
                                             //         $debit = $cashbookdata['debit'] / $rateselect['dollar_rate'];
@@ -289,14 +289,14 @@ $query = new Query();
                                             //     }else{
                                             //         if($cashbookdata['debit'] != 0){
                                             //         $debit = $cashbookdata['debit'];
-                            
+
                                             //         }else{
                                             //         $credit = $cashbookdata['credit'];
                                             //         }
                                             //     }
-                            
-                            
-                            
+
+
+
                                             //     if(!empty($rateselect['dollar_rate'])){
                                             //         $balance = $cashbookdata['balance'];
                                             //     }
@@ -422,8 +422,8 @@ $query = new Query();
                                             $opening_amountstmt = $pdo->prepare("SELECT * FROM cashbook ORDER BY id asc");
                                             $opening_amountstmt->execute();
                                             $opening_amount = $opening_amountstmt->fetch(PDO::FETCH_ASSOC);
-                        
-                        
+
+
                                             // Dollor Change
                                             ?>
                                             <tr style="font-weight: bold;">

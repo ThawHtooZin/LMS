@@ -10,10 +10,10 @@ Class Query{
     global $pdo;
     $nowdate = new DateTime();
     $nowdate->modify('-6 months');
-    
+
     $deletedate = $nowdate->format('d-m-Y');
 
-    
+
   }
 
   function login($username, $password){
@@ -4364,7 +4364,7 @@ Class Query{
       }
 
     }
-    
+
     $stmt = $pdo->prepare("UPDATE transaction SET status='accepted' WHERE status LIKE '%selected%'");
     $stmt->execute();
   }
@@ -5325,7 +5325,7 @@ Class Query{
       $general_ledgercheckstmt->execute();
       $general_ledgercheckdata = $general_ledgercheckstmt->fetch(PDO::FETCH_ASSOC);
 
-      if(!empty($transactioncheckdata) || !empty($cashbookcheckdata) || !empty($receivablecheckdata) || !empty($payablecheckdata) || !empty($general_ledgercheckdata)){ 
+      if(!empty($transactioncheckdata) || !empty($cashbookcheckdata) || !empty($receivablecheckdata) || !empty($payablecheckdata) || !empty($general_ledgercheckdata)){
         return $status = true;
       }else{
         return $status = false;
@@ -5337,7 +5337,7 @@ Class Query{
     {
       global $pdo;
 
-      // Transaction 
+      // Transaction
       $stmt = $pdo->prepare("UPDATE `transaction` SET ac_code='$toaccode' WHERE ac_code='$fromaccode'");
       $stmt->execute();
       // General Ledger
@@ -5349,10 +5349,10 @@ Class Query{
         $glbalancestmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$fromaccode' ORDER BY id DESC");
         $glbalancestmt->execute();
         $glbalancedata = $glbalancestmt->fetch(PDO::FETCH_ASSOC);
-        
+
         $stmt = $pdo->prepare("UPDATE general_ledger SET ac_code='$toaccode' WHERE id='$id'");
         $stmt->execute();
-        
+
         $debit = $gldata['debit'];
         $credit = $gldata['credit'];
 
