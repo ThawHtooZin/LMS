@@ -11,7 +11,7 @@ $bootstrap = new Bootstrap();
 $query = new Query();
 
 $sr_no = $_POST['sr_no'];
-$stmt = $pdo->prepare("SELECT * FROM transaction WHERE sr_no='$sr_no' AND sr_no!=''");
+$stmt = $pdo->prepare("SELECT * FROM transaction WHERE sr_no LIKE '%$sr_no%' AND sr_no!=''");
 $stmt->execute();
 $sr_no = $stmt->fetchAll();
 

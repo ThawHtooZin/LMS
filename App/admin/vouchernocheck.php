@@ -11,7 +11,7 @@ $bootstrap = new Bootstrap();
 $query = new Query();
 
 $voucher_no = $_POST['voucher_no'];
-$stmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$voucher_no'");
+$stmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no LIKE '%$voucher_no%'");
 $stmt->execute();
 $voucher_no = $stmt->fetchAll();
 
