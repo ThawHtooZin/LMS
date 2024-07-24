@@ -351,7 +351,7 @@ $query = new Query();
                           </div>
                           <div class="col">
                             <label>Vr. No</label>
-                            <input type="text" name="voucher_no" class="form-control inpv2 mb-1" value="<?php echo $updata['voucher_no']; ?>" style="padding-top: 2px; padding-bottom: 2px;">
+                            <input type="text" name="voucher_no" class="form-control inpv2 mb-1" value="<?php echo $updata['voucher_no']; ?>" style="padding-top: 2px; padding-bottom: 2px;" id="editvoucher_no">
                           </div>
                           <div class="col">
                             <label>A/C Code</label>
@@ -378,7 +378,7 @@ $query = new Query();
                             <textarea name="adddescription" rows="3" style="padding-bottom:10px; height:75px;" cols="80" class="form-control inpv2 mb-2"><?php echo $updata['description']; ?></textarea>
                           </div>
                           <div id="upreceive2<?php echo $data['id']; ?>" class="<?php if(!str_contains($updata['ac_code'], 3300)){ echo "hide";} ?> col-2">
-                            <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="updatesr_no" placeholder="Sr No." value="<?php echo $updata['sr_no']; ?>">
+                            <input type="text" class="form-control inpv2 mb-3 mt-4" style="padding-top: 2px; padding-bottom: 2px;" name="updatesr_no" placeholder="Sr No." value="<?php echo $updata['sr_no']; ?>" id="editsr_no">
                             <input type="text" class="form-control inpv2 mb-2" style="padding-top: 2px; padding-bottom: 2px;" name="updatecontainer_no" placeholder="Container No." value="<?php echo $updata['container_no']; ?>">
                           </div>
                           <div id="bankcharges<?php echo $data['id']; ?>" class="<?php if(!str_contains($updata['ac_code'], 3600)){ echo "hide";} ?>">
@@ -575,6 +575,41 @@ $query = new Query();
                           $('#sr_no').addClass('redborder');
                         }else{
                           $('#sr_no').removeClass('redborder');
+                        }
+                    }
+                });
+            });
+            $('#editvoucher_no').on('blur', function() {
+                var voucher_no = $(this).val();
+                $.ajax({
+                    url: 'vouchernocheck.php',
+                    type: 'POST',
+                    data: { 
+                      voucher_no: voucher_no,
+                     },
+                    success: function(response) {
+                        if (response == 1) {
+                          $('#editvoucher_no').addClass('redborder');
+                        }else{
+                          $('#editvoucher_no').removeClass('redborder');
+                        }
+                    }
+                });
+            });
+            $('#editsr_no').on('blur', function() {
+                var sr_no = $(this).val();
+
+                $.ajax({
+                    url: 'srnocheck.php',
+                    type: 'POST',
+                    data: { 
+                      sr_no: sr_no,
+                     },
+                    success: function(response) {
+                        if (response == 1) {
+                          $('#editsr_no').addClass('redborder');
+                        }else{
+                          $('#editsr_no').removeClass('redborder');
                         }
                     }
                 });

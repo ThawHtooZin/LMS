@@ -220,7 +220,7 @@ $query = new Query();
                 
                 // Get POST data
                 $form7date = $_POST['form7date'];
-
+                $_SESSION['form7date'] = $form7date;
                 // Convert searchdate (which comes from Flatpickr) to an array of dates
                 $datesArray = explode(', ', $form7date);
 
@@ -235,7 +235,6 @@ $query = new Query();
                 $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id' AND date IN ($datesList)");
                 $totalf7kgstmt->execute();
                 $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
-                print_r($totalf7kgdata);
                 
                 $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
                 $totalkgstmt->execute();

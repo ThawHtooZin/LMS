@@ -2467,7 +2467,21 @@ if ($_GET['table_name'] == "form10frozen") {
       $supplierdata = $supplieridstmt->fetch(PDO::FETCH_ASSOC);
       $supplier_id = $supplierdata['supplier_id'];
 
-      $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id'");
+      // Get POST data
+      $form7date = $_SESSION['form7date'];
+
+      // Convert searchdate (which comes from Flatpickr) to an array of dates
+      $datesArray = explode(', ', $form7date);
+
+      // Quote each date for SQL
+      $quotedDates = array_map(function($date) {
+          return "'" . $date . "'";
+      }, $datesArray);
+
+      // Join the quoted dates with commas
+      $datesList = implode(', ', $quotedDates);
+
+      $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id' AND date IN ($datesList)");
       $totalf7kgstmt->execute();
       $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
 
