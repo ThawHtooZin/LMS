@@ -2355,10 +2355,10 @@ if ($_GET['table_name'] == "form10frozen") {
   $commondity_id = $_GET['commondity'];
   $country = $_GET['country'];
   $searchdate = $_GET['searchdate'];
-  header("Content-Type: application/xls");
-  header("Content-Disposition: attachment; filename=percentage{$searchdate}.xls");
-  header("Pragma: no-cache");
-  header("Expires: 0");
+  // header("Content-Type: application/xls");
+  // header("Content-Disposition: attachment; filename=percentage{$searchdate}.xls");
+  // header("Pragma: no-cache");
+  // header("Expires: 0");
   ?>
   <table>
     <tr>
@@ -2410,20 +2410,42 @@ if ($_GET['table_name'] == "form10frozen") {
         $lastid = $data['id'];
         $country = $data['country'];
         $size = $data['size'];
-        $date = $data['date'];
+        // Get POST data
+        $form7date = $_SESSION['form7date'];
+
+        // Convert searchdate (which comes from Flatpickr) to an array of dates
+        $datesArray = explode(', ', $form7date);
+
+        // Quote each date for SQL
+        $quotedDates = array_map(function($date) {
+            return "'" . $date . "'";
+        }, $datesArray);
+
+        // Join the quoted dates with commas
+        echo $datesList = implode(', ', $quotedDates);
+
+      
         $commonditydata = $query->select('item', $item_id, 'item_id');
         $supplierid = $data['supplier_id'];
         $supplier_name = $query->select('acname', $supplierid, 'code_no');
 
-        $form7datastmt = $pdo->prepare("SELECT * FROM form7stock WHERE item_id='$item_id' AND country='$country' AND size='$size' AND supplier_name='$supplierid' AND date<'$date'");
+        $form7datastmt = $pdo->prepare("SELECT * FROM form7stock WHERE item_id='$item_id' AND country='$country' AND date IN ($datesList)");
         $form7datastmt->execute();
-        $form7datas = $form7datastmt->fetch(PDO::FETCH_ASSOC);
-        $itemid = $form7datas['item_id'];
-        $supplierid = $form7datas['supplier_name'];
-        $commonditydata2 = $query->select('item', $itemid, 'item_id');
-        $supplier_name2 = $query->select('acname', $supplierid, 'code_no');
 
-        $checklast = $pdo->prepare("SELECT * FROM form10stock WHERE id < $lastid AND item_id='$item_id' AND size='$size'");
+        $form7datas = $form7datastmt->fetchall();
+        // print_r($form7datastmt);
+        // exit();
+        foreach($form7datas as $form7data){ 
+          $itemid = $form7data['item_id'];
+          $supplierid = $form7data['supplier_name'];
+          $commonditydata2 = $query->select('item', $itemid, 'item_id');
+          $supplier_name2 = $query->select('acname', $supplierid, 'code_no');
+        }
+        $form7datastmt = $pdo->prepare("SELECT * FROM form7stock WHERE supplier_name = '$supplierid' AND item_id='$item_id' AND country='$country'");
+        $form7datastmt->execute();
+
+        $form7 = $form7datastmt->fetch(PDO::FETCH_ASSOC);
+          $checklast = $pdo->prepare("SELECT * FROM form10stock WHERE id < $lastid AND item_id='$item_id' AND size='$size'");
         $checklast->execute();
         $checklastavaliable = $checklast->fetch(PDO::FETCH_ASSOC);
         $lastcommondity = $pdo->prepare("SELECT * FROM form10stock WHERE id < $lastid AND item_id='$item_id'");
@@ -2438,15 +2460,15 @@ if ($_GET['table_name'] == "form10frozen") {
         $lastcommondity2 = $lastcommondity2->fetch(PDO::FETCH_ASSOC);
       ?>
       <tr>
-        <td><?php if(empty($lastcommondity)){if($form7datas['date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($form7datas['date'])); }} ?></td>
+        <td><?php if(empty($lastcommondity)){if($form7['date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($form7['date'])); }} ?></td>
         <td><?php if(empty($lastcommondity)){  echo $commonditydata2['item_name']; } ?></td>
         <td><?php if(empty($lastcommondity)){ echo $supplier_name2['ac_name']; } ?></td>
-        <td><?php if(empty($lastcommondity)){ echo $form7datas['country']; } ?></td>
-        <td><?php echo $form7datas['size']; ?></td>
-        <td><?php echo $form7datas['viss']; ?></td>
-        <td><?php echo $form7datas['kg']; ?></td>
-        <td><?php echo $form7datas['pcspervr']; ?></td>
-        <td><?php echo $form7datas['pcsperf7']; ?></td>
+        <td><?php if(empty($lastcommondity)){ echo $form7['country']; } ?></td>
+        <td><?php echo $form7['size']; ?></td>
+        <td><?php echo $form7['viss']; ?></td>
+        <td><?php echo $form7['kg']; ?></td>
+        <td><?php echo $form7['pcspervr']; ?></td>
+        <td><?php echo $form7['pcsperf7']; ?></td>
         <td><?php if(empty($lastcommondity)){ echo $data['date']; } ?></td>
         <td><?php echo $data['pcsform10']; ?></td>
         <td><?php echo $data['mc']; ?></td>
@@ -2460,26 +2482,13 @@ if ($_GET['table_name'] == "form10frozen") {
         <td></td>
       </tr>
       <?php
-      }
+    }
 
       $supplieridstmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
       $supplieridstmt->execute();
       $supplierdata = $supplieridstmt->fetch(PDO::FETCH_ASSOC);
       $supplier_id = $supplierdata['supplier_id'];
 
-      // Get POST data
-      $form7date = $_SESSION['form7date'];
-
-      // Convert searchdate (which comes from Flatpickr) to an array of dates
-      $datesArray = explode(', ', $form7date);
-
-      // Quote each date for SQL
-      $quotedDates = array_map(function($date) {
-          return "'" . $date . "'";
-      }, $datesArray);
-
-      // Join the quoted dates with commas
-      $datesList = implode(', ', $quotedDates);
 
       $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id' AND date IN ($datesList)");
       $totalf7kgstmt->execute();
