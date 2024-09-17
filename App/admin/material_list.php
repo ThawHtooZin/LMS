@@ -29,31 +29,35 @@ $query = new Query();
         <?php require 'navbar.php'; ?>
         <div class="card">
           <div class="card-header bg-warning text-light"  style="padding:-10px;">
-            <h5>Manage Stock Item</h5>
+            <h5>Manage Material List</h5>
             <button type="button" class="btn btn-success btn-sm float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
-              Add Item
+              Add Material
             </button>
           </div>
           <div class="card-body">
             <?php
             if(isset($_POST['deletebutton'])){
               $deleteid = $_POST['deleteid'];
-              $message = $query->deleteitem('item', $deleteid);
+              $message = $query->delete_material($deleteid);
             }
             if(isset($_POST['updatebutton'])){
-              $item_name = $_POST['item_name'];
-              // $item_code = $_POST['item_code'];
-              $item_id = $_POST['item_id'];
+              $name = $_POST['name'];
+              $description = $_POST['description'];
+              $quantity = $_POST['quantity'];
+              $unit = $_POST['unit'];
+              $price = $_POST['price'];
+              $id = $_POST['id'];
 
-              // $message = $query->updateitem('item', $item_name, $item_code, $item_id);
-              $message = $query->updateitem('item', $item_name, $item_id);
+              $message = $query->update_material($name, $description, $quantity, $unit, $price, $id);
             }
             if(isset($_POST['addbutton'])){
-              // $item_code = $_POST['item_id'];
-              $item_name = $_POST['item_name'];
+              $name = $_POST['name'];
+              $description = $_POST['description'];
+              $quantity = $_POST['quantity'];
+              $unit = $_POST['unit'];
+              $price = $_POST['price'];
 
-              // $message = $query->additem('item', $item_code,  $item_name);
-              $message = $query->additem('item', $item_name);
+              $message = $query->create_material($name, $description, $quantity, $unit, $price);
             }
             ?>
             <?php
@@ -74,33 +78,6 @@ $query = new Query();
             ?>
 
             <?php
-              if(!empty($errormessage)){
-              ?>
-              <div class="alert alert-danger alert-dismissible fade show">
-                <strong>Error! </strong> <?php echo $errormessage; ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-              </div>
-              <?php
-            }
-            if(!empty($errmessage)){
-              ?>
-              <div class="alert alert-danger alert-dismissible fade show">
-                <strong>Error! </strong> <?php echo $errmessage; ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-              </div>
-              <?php
-            }
-            if(!empty($successmessage)){
-              ?>
-              <div class="alert alert-success alert-dismissible fade show">
-                <strong>Success! </strong> <?php echo $successmessage; ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-              </div>
-              <?php
-            }
-            ?>
-
-            <?php
 
             if (!empty($_GET['pageno'])) {
               $pageno = $_GET['pageno'];
@@ -114,41 +91,46 @@ $query = new Query();
               <tr>
                 <!-- <th>Category Name</th> -->
                 <th>Id</th>
-                <th>Item Name</th>
+                <th>Material Name</th>
+                <th>Description</th>
+                <th>Quantity</th>
+                <th>Unit</th>
+                <th>Price</th>
                 <th>Action</th>
               </tr>
 
               <?php
-              $stmt = $pdo->prepare("SELECT * FROM item ORDER BY item_id");
+              $stmt = $pdo->prepare("SELECT * FROM materials ORDER BY id");
               $stmt->execute();
               $rawResult = $stmt->fetchAll();
               $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-              $stmt = $pdo->prepare("SELECT * FROM item ORDER BY item_id LIMIT $offset,$numOfrecs ");
+              $stmt = $pdo->prepare("SELECT * FROM materials ORDER BY id LIMIT $offset,$numOfrecs ");
               $stmt->execute();
               $itemdatas = $stmt->fetchAll();
               ?>
               <?php
               $no = 1;
               foreach ($itemdatas as $itemdata) {
-                // $category_id = $itemdata['category_id'];
-                // $category_name = $query->select('category', $category_id, 'category_id');
               ?>
 
               <tr>
-                <!-- <td><?php echo $category_name['category_name']; ?></td> -->
                 <td><?php echo $no; ?></td>
-                <td><?php echo $itemdata['item_name']; ?></td>
+                <td><?php echo $itemdata['name']; ?></td>
+                <td><?php echo $itemdata['description']; ?></td>
+                <td><?php echo $itemdata['quantity']; ?></td>
+                <td><?php echo $itemdata['unit']; ?></td>
+                <td><?php echo $itemdata['price']; ?></td>
                 <td>
-                  <input type="hidden" name="updateid" value="<?php echo $itemdata['item_id']; ?>">
-                  <button type="submit" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $itemdata['item_id']; ?>">
+                  <input type="hidden" name="updateid" value="<?php echo $itemdata['id']; ?>">
+                  <button type="submit" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $itemdata['id']; ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
   <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
   <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
 </svg>
                   </button>
-                <form action="item.php" method="post" style="display: inline !important;">
-                  <input type="hidden" name="deleteid" value="<?php echo $itemdata['item_id']; ?>">
+                <form action="material_list.php" method="post" style="display: inline !important;">
+                  <input type="hidden" name="deleteid" value="<?php echo $itemdata['id']; ?>">
                   <button type="submit" name="deletebutton" class="btn btn-danger btn-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
                   </button>
@@ -156,11 +138,11 @@ $query = new Query();
               </td>
               </tr>
               <!-- Data Update Modal -->
-              <div class="modal fade" id="updatemodal<?php echo $itemdata['item_id']; ?>" tabindex="-1" role="dialog" >
+              <div class="modal fade" id="updatemodal<?php echo $itemdata['id']; ?>" tabindex="-1" role="dialog" >
                 <div class="modal-dialog" role="document">
                   <div class="modal-content">
                     <div class="modal-header bg-warning text-light">
-                      <h5 class="modal-title" id="updatemodallabel">Update An Item</h5>
+                      <h5 class="modal-title" id="updatemodallabel">Update An Material</h5>
                       <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true" class="h3">&times;</span>
                       </button>
@@ -168,25 +150,20 @@ $query = new Query();
                     <form action="" method="post" autocomplete="off">
                       <div class="modal-body">
                         <?php
-                          $id = $itemdata['item_id'];
-                          $updatedata = $query->select('item', $id, 'item_id');
+                          $id = $itemdata['id'];
+                          $updatedata = $query->select('materials', $id, 'id');
                         ?>
-                        <input type="hidden" name="item_id" value="<?php echo $itemdata['item_id']; ?>">
-                        <!-- <label>Category Name</label>
-                        <select class="form-control" name="category_id">
-                          <?php
-                          $categoryiddatas = $query->selectall('category');
-                          foreach ($categoryiddatas as $categoryiddata) {
-                            ?>
-                            <option value="<?php echo $categoryiddata['category_id']; ?>" <?php if($categoryiddata['category_id'] == $updatedata['category_id']){ echo 'selected';} ?>><?php echo $categoryiddata['category_name']; ?></option>
-                            <?php
-                          }
-                          ?>
-                        </select> -->
-                        <!-- <label>Item Code</label>
-                        <input type="text" name="item_code" class="form-control" placeholder="Item Code" value="<?php echo $updatedata['item_id']; ?>"> -->
-                        <label>Item Name</label>
-                        <input type="text" name="item_name" class="form-control" placeholder="Item Name" value="<?php echo $updatedata['item_name']; ?>">
+                        <input type="hidden" name="id" value="<?php echo $itemdata['id']; ?>">
+                        <label>Material Name</label>
+                        <input type="text" name="name" class="form-control" placeholder="Name" value="<?php echo $updatedata['name']; ?>">
+                        <label>Description</label>
+                        <textarea name="description" class="form-control" placeholder="Description"><?php echo $updatedata['description']; ?></textarea>
+                        <label>Quantity</label>
+                        <input type="number" name="quantity" class="form-control" placeholder="Quantity" value="<?php echo $updatedata['quantity']; ?>">
+                        <label>Unit</label>
+                        <input type="text" name="unit" class="form-control" placeholder="Unit" value="<?php echo $updatedata['unit']; ?>">
+                        <label>Price</label>
+                        <input type="number" name="price" class="form-control" placeholder="Price" value="<?php echo $updatedata['price']; ?>">
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -227,32 +204,27 @@ $query = new Query();
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header bg-secondary text-light">
-          <h5 class="modal-title" id="addmodellabel">Create New Item</h5>
+          <h5 class="modal-title" id="addmodellabel">Create New Material</h5>
           <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true" class="h3">&times;</span>
           </button>
         </div>
-        <form action="item.php" method="post" autocomplete="off">
+        <form action="material_list.php" method="post" autocomplete="off">
           <div class="modal-body">
-            <!-- <label>Category Name</label>
-            <select class="form-control" name="category_id">
-              <?php
-              $categoryiddatas = $query->selectall('category');
-              foreach ($categoryiddatas as $categoryiddata) {
-                ?>
-                <option value="<?php echo $categoryiddata['category_id']; ?>"><?php echo $categoryiddata['category_name']; ?></option>
-                <?php
-              }
-              ?>
-            </select> -->
-            <!-- <label>Item Code</label>
-            <input type="text" name="item_id" class="form-control" placeholder="Item Code"> -->
-            <label>Item Name</label>
-            <input type="text" name="item_name" class="form-control" placeholder="Item Name">
+            <label>Material Name</label>
+            <input type="text" name="name" class="form-control" placeholder="Name">
+            <label>Description</label>
+            <textarea name="description" class="form-control" placeholder="Description"></textarea>
+            <label>Quantity</label>
+            <input type="number" name="quantity" class="form-control" placeholder="Quantity">
+            <label>Unit</label>
+            <input type="text" name="unit" class="form-control" placeholder="Unit">
+            <label>Price</label>
+            <input type="number" name="price" class="form-control" placeholder="Price">
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-success" name="addbutton">Add Item</button>
+            <button type="submit" class="btn btn-success" name="addbutton">Add Material</button>
           </div>
         </form>
       </div>

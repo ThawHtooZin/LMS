@@ -293,20 +293,6 @@ Class Query{
       return $errmessage = "Error accors when deleted Category";
     }
   }
-
-  // function additem($table, $item_code, $item_name){
-  //   global $pdo;
-  //   $stmt = $pdo->prepare("INSERT INTO $table(item_name, item_id) VALUES('$item_name', :item_code);");
-  //   $stmt->execute([
-  //     ":item_code" => $item_code
-  //   ]);
-  //   if($stmt){
-  //     return $successmessage = "Item Added Successfully";
-  //   }else{
-  //     return $errmessage = "Error accors when adding Item";
-  //   }
-  // }
-
     function additem($table, $item_name){
       global $pdo;
       $checkstmt = $pdo->prepare("SELECT * FROM $table");
@@ -325,19 +311,6 @@ Class Query{
         return $errmessage = "Error accors when adding Item";
       }
     }
-
-  // function updateitem($table, $item_name, $item_code ,$item_id){
-  //   global $pdo;
-  //   $stmt = $pdo->prepare("UPDATE $table SET item_name='$item_name', item_id=:item_code WHERE item_id='$item_id'");
-  //   $stmt->execute([
-  //     ":item_code" => $item_code
-  //   ]);
-  //   if($stmt){
-  //     return $successmessage = "Item Update Successfully";
-  //   }else{
-  //     return $errmessage = "Error accors when updating Item";
-  //   }
-  // }
 
   function updateitem($table, $item_name, $item_id){
     global $pdo;
@@ -5145,6 +5118,53 @@ Class Query{
           $updatestmt->execute();
         }
         echo "<script>window.location.href=\"?sizeinfo=$newsize&commondity=$newcommondity_id&country=$newcountry\"</script>";
+    }
+
+    function create_material($name, $description, $quantity, $unit, $price)
+    {
+      global $pdo;
+      $stmt = $pdo->prepare("INSERT INTO materials(name, description, quantity, unit, price) VALUES('$name', '$description', '$quantity', '$unit', '$price');");
+      $stmt->execute();
+      if($stmt){
+        return $successmessage = "Material Added Successfully";
+      }else{
+        return $errmessage = "Error accors when adding Material";
+      }
+    }
+
+    function update_material($name, $description, $quantity, $unit, $price, $id)
+    {
+      global $pdo;
+      $checkstmt = $pdo->prepare("SELECT * FROM materials");
+      $checkstmt->execute();
+      $checkdata = $checkstmt->fetchall();
+      if(!empty($checkdata)){
+        $stmt = $pdo->prepare("UPDATE materials SET name='$name', description='$description', quantity='$quantity', unit='$unit', price='$price' WHERE id='$id'");
+        $stmt->execute();
+      }
+      if(!empty($stmt)){
+        return $successmessage = "material updated Successfully";
+      }else{
+        return $errmessage = "Error accors when Updating material";
+      }
+    }
+
+    function delete_material($id){
+      global $pdo;
+      $checkstmt = $pdo->prepare("SELECT * FROM materials WHERE id='$id'");
+      $checkstmt->execute();
+      $checkdata = $checkstmt->fetchall();
+
+      if(!empty($checkdata)){
+        $stmt = $pdo->prepare("DELETE FROM materials WHERE id='$id'");
+        $stmt->execute();
+      }
+
+      if(!empty($stmt)){
+        return $successmessage = "material Deleted Successfully";
+      }else{
+        return $errmessage = "Error accors when Deleted material";
+      }
     }
 
 
