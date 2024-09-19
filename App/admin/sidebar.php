@@ -126,6 +126,18 @@ $permissions = $permission['permission'];
             }
             ?>
             <?php
+            if(str_contains($permissions, 'manage_material_purchase')){
+              ?>
+            <li class="nav-item">
+              <a href="material_purchase.php" class="nav-link h text-light"  style="font-size:14px !important; ">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - Material Purchase
+              </a>
+            </li>
+            <?php
+            }
+            ?>
+            <?php
             if(str_contains($permissions, 'manage_cashbook')){
               ?>
             <li class="nav-item" style="cursor: not-allowed !important;">
@@ -437,6 +449,18 @@ $permissions = $permission['permission'];
               <a href="stockreport.php" class="nav-link h text-light"  style="font-size:14px !important; ">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Mc Report
+              </a>
+            </li>
+            <?php
+            }
+            ?>
+            <?php
+            if(str_contains($permissions, ',material_store_house')){
+              ?>
+            <li class="nav-item">
+              <a href="material_store_house.php" class="nav-link h text-light"  style="font-size:14px !important; ">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - Material Store House
               </a>
             </li>
             <?php

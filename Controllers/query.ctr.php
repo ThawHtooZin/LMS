@@ -5120,10 +5120,10 @@ Class Query{
         echo "<script>window.location.href=\"?sizeinfo=$newsize&commondity=$newcommondity_id&country=$newcountry\"</script>";
     }
 
-    function create_material($name, $description, $quantity, $unit, $price)
+    function create_material($name, $description, $unit)
     {
       global $pdo;
-      $stmt = $pdo->prepare("INSERT INTO materials(name, description, quantity, unit, price) VALUES('$name', '$description', '$quantity', '$unit', '$price');");
+      $stmt = $pdo->prepare("INSERT INTO materials(name, description, unit) VALUES('$name', '$description', '$unit');");
       $stmt->execute();
       if($stmt){
         return $successmessage = "Material Added Successfully";
@@ -5132,14 +5132,14 @@ Class Query{
       }
     }
 
-    function update_material($name, $description, $quantity, $unit, $price, $id)
+    function update_material($name, $description, $unit, $id)
     {
       global $pdo;
       $checkstmt = $pdo->prepare("SELECT * FROM materials");
       $checkstmt->execute();
       $checkdata = $checkstmt->fetchall();
       if(!empty($checkdata)){
-        $stmt = $pdo->prepare("UPDATE materials SET name='$name', description='$description', quantity='$quantity', unit='$unit', price='$price' WHERE id='$id'");
+        $stmt = $pdo->prepare("UPDATE materials SET name='$name', description='$description', unit='$unit' WHERE id='$id'");
         $stmt->execute();
       }
       if(!empty($stmt)){
@@ -5167,6 +5167,99 @@ Class Query{
       }
     }
 
+    function addmaterialpurchase($table, $date, $voucher_no, $supplier_name, $material, $quantity, $rate){
+      global $pdo;
+      $amount = $quantity * $rate;
+      $idstmt = $pdo->prepare("SELECT id FROM $table ORDER BY id DESC");
+      $idstmt->execute();
+      $iddata = $idstmt->fetch(PDO::FETCH_ASSOC);
+      $stmt = $pdo->prepare("INSERT INTO $table(date, voucher_no, supplier_id, material_id, quantity, rate) VALUES('$date', '$voucher_no', '$supplier_name', '$material', '$quantity', '$rate')");
+      $stmt->execute();
+      $balstmt = $pdo->prepare("SELECT balance FROM payable WHERE supplier_id = '$supplier_name' ORDER BY id DESC");
+      $balstmt->execute();
+      $baldata = $balstmt->fetch(PDO::FETCH_ASSOC);
+      if(!empty($baldata['balance'])){
+        $balance = $baldata['balance'];
+      }else{
+        $balance = 0;
+      }
+      if($balance != 1){
+         $total_balance = $balance + $amount;
+      }else{
+        $total_balance = $balance;
+      }
+      $idstmt = $pdo->prepare("SELECT * FROM $table ORDER BY id DESC");
+      $idstmt->execute();
+      $iddata = $idstmt->fetch(PDO::FETCH_ASSOC);
+      $id = $iddata['id'];
+      $payablestmt = $pdo->prepare("INSERT INTO payable(date, supplier_id, purchase_voucher_no, purchase_amount, balance, link_id) VALUES('$date', '$supplier_name', '$voucher_no', '$amount', '$total_balance', '$id')");
+      $payablestmt->execute();
+
+      if($stmt){
+        echo '<script>swal("Success!", "Purchase Voucher Added Successfully", "success");</script>';
+      }else{
+        echo '<script>swal("Error!", "Error accors when added Purchase Voucher", "error");</script>';
+      }
+
+      // Store House Add
+
+      $storehousestmt = $pdo->prepare("INSERT INTO material_store_house(date, voucher_no, supplier_id, material_id, `in`) VALUES('$date', '$voucher_no', '$supplier_name', '$material', '$quantity')");
+      $storehousestmt->execute();
+  
+      // // General Ledger Add
+      // $vouchercheckstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE voucherno='$voucher_no' AND ac_code LIKE '4000%'");
+      // $vouchercheckstmt->execute();
+      // $vouchercheck = $vouchercheckstmt->fetch(PDO::FETCH_ASSOC);
+      // if(empty($vouchercheck)){
+      //   $balancecheckstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code LIKE '4000%' ORDER BY id DESC");
+      //   $balancecheckstmt->execute();
+      //   $balancecheck = $balancecheckstmt->fetch(PDO::FETCH_ASSOC);
+      //   $balance = $amount + $balancecheck['balance'];
+      //   $glstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, credit, balance) VALUES('$date', '$voucher_no', '6100/008', '$amount', '$balance')");
+      //   $glstmt->execute();
+      // }else{
+      //   $vouchercheckstmt = $pdo->prepare("SELECT SUM(credit) AS credit FROM general_ledger WHERE voucherno='$voucher_no' AND ac_code='6100/008'");
+      //   $vouchercheckstmt->execute();
+      //   $creditdata = $vouchercheckstmt->fetch(PDO::FETCH_ASSOC);
+      //   $total_credit = $creditdata['credit'] + $amount;
+  
+      //   $nowid = $vouchercheck['id'];
+      //   $balancestmt = $pdo->prepare("SELECT * FROM general_ledger WHERE id<'$nowid' AND ac_code LIKE '4000%' ORDER BY id DESC");
+      //   $balancestmt->execute();
+      //   $balancecheck = $balancestmt->fetch(PDO::FETCH_ASSOC);
+  
+      //   if(!empty($balancecheck)){
+      //     $balance = ($balancecheck['balance'] + floatval($vouchercheck['debit'])) - $total_credit;
+      //   }else {
+      //     $balance = (0 + floatval($vouchercheck['debit'])) - $total_credit;
+      //   }
+  
+      //   $updatestmt = $pdo->prepare("UPDATE general_ledger SET credit='$total_credit', balance='$balance' WHERE voucherno='$voucher_no' AND ac_code LIKE '4000%'");
+      //   $updatestmt->execute();
+      // }
+  
+    }
+
+    function outputmaterial($stockto, $groupname, $material, $quantity, $voucher_no)
+    {
+      global $pdo;
+
+      $stmt = $pdo->prepare("INSERT INTO stock_output_group(stock_to, voucher_no, group_name, material_id, quantity) VALUES('$stockto', '$voucher_no', '$groupname', '$material', '$quantity')");
+      $stmt->execute();
+      $groupstmt = $pdo->prepare("SELECT * FROM stock_output_group ORDER BY id DESC");
+      $groupstmt->execute();
+      $groupdata = $groupstmt->fetch(PDO::FETCH_ASSOC);
+
+      $materialstmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id='$material'");
+      $materialstmt->execute();
+      $materialdata = $materialstmt->fetch(PDO::FETCH_ASSOC);
+      $supplier = $materialdata['supplier_id'];
+
+      $groupid = $groupdata['id'];
+      $storehousestmt = $pdo->prepare("INSERT INTO material_store_house(voucher_no, material_id, supplier_id, `out`, output_group) VALUES('$voucher_no', '$material', '$supplier', '$quantity', '$groupid')");
+      $storehousestmt->execute();
+      
+    }
 
   // MORE Functions
 
