@@ -324,56 +324,91 @@ $permissions = $permission['permission'];
             <?php
             }
             ?>
-            <?php
-            if(str_contains($permissions, 'material_list')){
-              ?>
-            <li class="nav-item">
-              <a href="material_list.php" class="nav-link h text-light"  style="font-size:14px !important; ">
-                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
-                - Mateiral List
-              </a>
-            </li>
-            <?php
-            }
-            ?>
           </ul>
         </div>
       </li>
       <?php
       }
-      if(str_contains($permissions, 'manage_coldstorecharges') == 1){
+      if(str_contains($permissions, 'manage_coldstorecharges  ') == 1){
        ?>
-      <li class=" p-1" style=" font-weight:bold; border-bottom: 1px solid rgb(255,255,255,0.2); " >
-        <a href="#" class="nav-link text-white" id="sidebarlink" data-bs-toggle="collapse" data-bs-target="#production-collapse" aria-expanded="false">
+      <li class="p-1" style=" font-weight:bold; border-bottom: 1px solid rgb(255,255,255,0.2); " >
+        <a href="#" class="nav-link text-white" id="sidebarlink" data-bs-toggle="collapse" data-bs-target="#material-collapse" aria-expanded="false">
           <svg fill="#fff" height="20" width="20" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <g> <path d="M128.141,365.695c1.555,0.762,3.231,1.136,4.9,1.136c2.422,0,4.826-0.79,6.815-2.328l44.815-34.689 c15.521,14.668,53.91,45.82,99.99,45.82c58.985,0,105.37-51.044,107.316-53.217c3.784-4.226,3.784-10.624,0-14.85 c-1.946-2.173-48.331-53.218-107.316-53.218c-46.08,0-84.47,31.151-99.99,45.82l-44.815-34.689 c-3.358-2.598-7.9-3.059-11.715-1.191c-3.812,1.871-6.229,5.747-6.229,9.994v81.419 C121.913,359.947,124.329,363.824,128.141,365.695z M284.661,276.609c36.63,0,69.043,25.425,83.197,38.397 c-14.11,12.976-46.421,38.367-83.197,38.367c-36.636,0-69.052-25.432-83.197-38.397 C215.572,302.001,247.884,276.609,284.661,276.609z M144.174,296.972l23.278,18.019l-23.278,18.018V296.972z"></path> <path d="M334.338,422.957h-3.896c-6.147,0-11.13,4.984-11.13,11.13c0,6.146,4.983,11.13,11.13,11.13h3.896 c6.147,0,11.13-4.984,11.13-11.13C345.469,427.941,340.486,422.957,334.338,422.957z"></path> <path d="M467.478,0H44.522c-6.147,0-11.13,4.984-11.13,11.13v111.304c0,6.146,4.983,11.13,11.13,11.13h22.261V500.87 c0,6.146,4.983,11.13,11.13,11.13h356.174c6.147,0,11.13-4.984,11.13-11.13V133.565h22.261c6.147,0,11.13-4.984,11.13-11.13 V11.13C478.609,4.984,473.626,0,467.478,0z M357.763,22.261h38.162v89.044h-38.162V22.261z M297.342,22.261h38.162v89.044 h-38.162V22.261z M236.919,22.261h38.162v89.044h-38.162V22.261z M176.496,22.261h38.162v89.044h-38.162V22.261z M116.074,22.261 h38.162v89.044h-38.162V22.261z M55.652,111.304V22.261h38.162v89.044H55.652z M422.957,422.957h-42.985 c-6.147,0-11.13,4.984-11.13,11.13c0,6.146,4.983,11.13,11.13,11.13h42.985v44.522H89.044v-44.522h189.641 c6.147,0,11.13-4.984,11.13-11.13c0-6.146-4.983-11.13-11.13-11.13H89.044V200.348h333.913V422.957z M422.957,178.087H89.044 v-44.522h333.913V178.087z M456.348,111.304h-38.162V22.261h38.162V111.304z"></path> </g> </g> </g> </g></svg>
           <span id="navname">Production</span> <i class="text-light arrow arrdown"></i>
         </a>
-        <div class="collapse" id="production-collapse" data-bs-parent="#accordionsidebar">
+        <div class="collapse" id="material-collapse" data-bs-parent="#accordionsidebar">
           <ul class="btn-toggle-nav list-unstyled fw-normal ms-2">
             <?php
-            if(str_contains($permissions, 'manage_coldstorecharges')){
+              if(str_contains($permissions, 'manage_coldstorecharges')){
+                ?>
+              <li class="nav-item">
+                <a href="coldstorecharges.php" class="nav-link h text-light"  style="font-size:14px !important; ">
+                  <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                  - Cold Store Charges
+                </a>
+              </li>
+              <?php
+              }
               ?>
-            <li class="nav-item">
-              <a href="coldstorecharges.php" class="nav-link h text-light"  style="font-size:14px !important; ">
-                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
-                - Cold Store Charges
-              </a>
-            </li>
-            <?php
-            }
-            ?>
-            <!-- <li class="nav-item">
-              <a href="container.php" class="nav-link h text-light"  style="font-size:14px !important; ">
-                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
-                - Container
-              </a>
-            </li> -->
           </ul>
         </div>
       </li>
       <?php
       }
-      if(str_contains($permissions, 'manage_form7') == 1 || str_contains($permissions, 'manage_form10') == 1 ||str_contains($permissions, 'hhkmcstock') == 1 ||str_contains($permissions, 'manage_gfcmcstock') == 1){
+      if(str_contains($permissions, 'material_list') == 1 || str_contains($permissions, 'material_store_house') == 1 || str_contains($permissions, 'material_output') == 1){
+        ?>
+       <li class=" p-1" style=" font-weight:bold; border-bottom: 1px solid rgb(255,255,255,0.2); " >
+         <a href="#" class="nav-link text-white" id="sidebarlink" data-bs-toggle="collapse" data-bs-target="#production-collapse" aria-expanded="false">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-seam" viewBox="0 0 16 16">
+            <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2zm3.564 1.426L5.596 5 8 5.961 14.154 3.5zm3.25 1.7-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464z"/>
+          </svg>
+           <span id="navname">Packing Material</span> <i class="text-light arrow arrdown"></i>
+         </a>
+         <div class="collapse" id="production-collapse" data-bs-parent="#accordionsidebar">
+           <ul class="btn-toggle-nav list-unstyled fw-normal ms-2">
+             
+             <?php
+              if(str_contains($permissions, 'material_list')){
+                ?>
+              <li class="nav-item">
+                <a href="material_list.php" class="nav-link h text-light"  style="font-size:14px !important; ">
+                  <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                  - Mateiral List
+                </a>
+              </li>
+              <?php
+              }
+              ?>
+              <?php
+              if(str_contains($permissions, ',material_store_house')){
+                ?>
+              <li class="nav-item">
+                <a href="material_store_house.php" class="nav-link h text-light"  style="font-size:14px !important; ">
+                  <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                  - Material Store House
+                </a>
+              </li>
+              <?php
+              }
+              ?>
+              <?php
+              if(str_contains($permissions, ',material_output')){
+                ?>
+              <li class="nav-item">
+                <a href="material_output.php" class="nav-link h text-light"  style="font-size:14px !important; ">
+                  <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                  - Material Output
+                </a>
+              </li>
+              <?php
+              }
+              ?>
+           </ul>
+         </div>
+       </li>
+       <?php
+       }
+      if(str_contains($permissions, 'manage_form7') == 1 || str_contains($permissions, 'manage_form10') == 1 ||str_contains($permissions, 'hhkmcstock') == 1 || str_contains($permissions, 'manage_gfcmcstock') == 1){
        ?>
       <li class=" p-1" style=" font-weight:bold; border-bottom: 1px solid rgb(255,255,255,0.2); " >
         <a href="#" class="nav-link text-white report" id="sidebarlink" data-bs-toggle="collapse" data-bs-target="#stock-collapse" aria-expanded="false">
@@ -449,18 +484,6 @@ $permissions = $permission['permission'];
               <a href="stockreport.php" class="nav-link h text-light"  style="font-size:14px !important; ">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Mc Report
-              </a>
-            </li>
-            <?php
-            }
-            ?>
-            <?php
-            if(str_contains($permissions, ',material_store_house')){
-              ?>
-            <li class="nav-item">
-              <a href="material_store_house.php" class="nav-link h text-light"  style="font-size:14px !important; ">
-                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
-                - Material Store House
               </a>
             </li>
             <?php
