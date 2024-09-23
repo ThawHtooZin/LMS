@@ -136,6 +136,9 @@ $query = new Query();
       if(!empty($_POST['material_output'])){
         $permission .= ",material_output";
       }
+      if(!empty($_POST['packing_material_report'])){
+        $permission .= ",packing_material_report";
+      }
       $permission;
       $role_id = $_GET['role_id'];
 
@@ -288,7 +291,10 @@ $query = new Query();
                 <tr>
                   <td>Material Output</td>
                   <td><input type="checkbox" name="material_output" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'material_output') == 1){echo "checked";}} ?>></td>
+                  <td>Packing Material Report</td>
+                  <td><input type="checkbox" name="packing_material_report" <?php if(!empty($permissionshow)){if(str_contains($permissionshow, 'packing_material_report') == 1){echo "checked";}} ?>></td>
                 </tr>
+                
                 
                 <tr>
                   <td></td>

@@ -613,6 +613,18 @@ $permissions = $permission['permission'];
             <?php
             }
             ?>
+            <?php
+            if(str_contains($permissions, 'packing_material_report')){
+              ?>
+            <li class="nav-item">
+              <a href="packing_material_report.php" class="nav-link h text-light"  style="font-size:14px !important; ">
+                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                - Packing Material Report
+              </a>
+            </li>
+            <?php
+            }
+            ?>
           </ul>
         </div>
       </li>

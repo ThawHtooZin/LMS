@@ -29,9 +29,33 @@ $query = new Query();
         <?php require 'navbar.php'; ?>
         <div class="card">
           <div class="card-header bg-primary text-light"  style="padding:-10px;">
-            <h5>Material Output</h5>
+            <?php
+                $id = $_GET['id'];
+                $materialstmt = $pdo->prepare("SELECT * FROM materials WHERE id='$id'");
+                $materialstmt->execute();
+                $material = $materialstmt->fetch(PDO::FETCH_ASSOC);
+            ?>
+                <h5>Manage Store {<?= $material['name']; ?>} Detail</h5>
+                <a href="packing_material_report.php" class="float-end btn btn-secondary btn-sm">Back</a>
           </div>
           <div class="card-body">
+            <?php
+            if(!empty($message)){
+              if(strpos($message, 'Successfully')){
+                $successmessage = $message;
+              }
+
+              if(strpos($message, 'Error')){
+                $errmessage = $message;
+              }
+
+              if(strpos($message, 'following')){
+                $errormessage = $message;
+              }
+            }
+
+            ?>
+
             <?php
 
             if (!empty($_GET['pageno'])) {
@@ -46,43 +70,55 @@ $query = new Query();
               <tr>
                 <!-- <th>Category Name</th> -->
                 <th>Id</th>
-                <th>Stock to</th>
-                <th>Group Name</th>
-                <th>Total Materials</th>
-                <th>Action</th>
+                <th>Date</th>
+                <th>Voucher No</th>
+                <th>Supplier</th>
+                <th>Unit</th>
+                <th>In</th>
+                <th>Out</th>
+                <th>Balance</th>
               </tr>
 
               <?php
-              $stmt = $pdo->prepare("SELECT * FROM stock_output_group GROUP BY voucher_no ORDER BY id");
+              $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id='$id' ORDER BY id");
               $stmt->execute();
               $rawResult = $stmt->fetchAll();
               $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-              $stmt = $pdo->prepare("SELECT * FROM stock_output_group GROUP BY voucher_no ORDER BY id LIMIT $offset,$numOfrecs ");
+              $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id='$id' ORDER BY id LIMIT $offset,$numOfrecs ");
               $stmt->execute();
               $datas = $stmt->fetchAll();
               ?>
               <?php
               $no = 1;
+              $balance = 0;
               foreach ($datas as $data) {
                 $material_id = $data['material_id'];
-                $voucher_no = $data['voucher_no'];
+                $supplier_id = $data['supplier_id'];
 
                 $stmt = $pdo->prepare("SELECT * FROM materials WHERE id='$material_id'");
                 $stmt->execute();
                 $material = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                $materialstmt = $pdo->prepare("SELECT COUNT(material_id) AS material_count FROM stock_output_group WHERE voucher_no='$voucher_no' GROUP BY material_id");
-                $materialstmt->execute();
-                $totalmaterial = $materialstmt->fetch(PDO::FETCH_ASSOC);
+                $supplierstmt = $pdo->prepare("SELECT * FROM supplier WHERE supplier_id='$supplier_id'");
+                $supplierstmt->execute();
+                $supplier = $supplierstmt->fetch(PDO::FETCH_ASSOC);
+                
+                $in = $data['in'];
+                $out = $data['out'];
+                $balance += $in - $out;
+
               ?>
 
               <tr>
                 <td><?php echo $no; ?></td>
+                <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
                 <td><?php echo $data['voucher_no']; ?></td>
-                <td><?php echo $data['group_name']; ?></td>
-                <td><?php echo $totalmaterial['material_count'] ?></td>
-                <td><a href="material_output_detail.php?voucher_no=<?= $data['voucher_no']; ?>" class="btn btn-primary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-check" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/></svg></a></td>
+                <td><?php echo $supplier['supplier_name']; ?></td>
+                <td><?php echo $material['unit']; ?></td>
+                <td style="color: green; font-weight: bolder;"><?php if($in == ''){echo '-';}else{echo $in;}; ?></td>
+                <td style="color: red; font-weight: bolder;"><?php if($out == ''){echo '-';}else{echo $out;}; ?></td>
+                <td style="color: blue; font-weight: bolder;"><?php if($balance == ''){echo '-';}else{echo $balance;}; ?></td>
               </tr>
               <!-- Data Update Modal -->
               <div class="modal fade" id="updatemodal<?php echo $itemdata['id']; ?>" tabindex="-1" role="dialog" >
