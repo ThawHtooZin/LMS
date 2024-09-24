@@ -98,25 +98,43 @@ $query = new Query();
                   unset($_SESSION['in']);
                 }
             ?>
-                <h1 class="merriweather-light text-center">*Link Mark WareHouse Report*</h1>
-                <button data-bs-toggle="modal" data-bs-target="#filter" class="ms-2 btn btn-warning btn-sm float-end ">Filter</button>
+                <h1 class="merriweather-light text-center">*Packing Material (Link Mark WareHouse) Report*</h1>
+                <button data-bs-toggle="modal" data-bs-target="#filter" class="ms-2 btn btn-warning float-end " style="font-weight:bold;">Select Report</button>
           </div>
 
           <div class="modal" id="filter">
             <div class="modal-dialog">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title">Filter Box</h5>
+                  <h5 class="modal-title">SELECT REPORT</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="" method="POST">
                 <div class="modal-body">
-                  <label for="filtertypes">Type of Filters</label>
-                  <select name="filterinp" class="form-control inpv2 mt-2" id="filtertypes">
-                    <option value="all" style="font-weight: bold;">All</option>
+                  
+                  <div class="row">
+                    <div class="col">
+                      <label>Start Date:</label>
+                      <input type="date" name="startdate" class="form-control inpv2" value="<?= $_SESSION['startdate']; ?>">
+                    </div>
+                    <div class="col">
+                      <label>End Date:</label>
+                      <input type="date" name="enddate" class="form-control inpv2" value="<?= $_SESSION['enddate']; ?>">
+                    </div>
+                  </div>
+                  
+                  <label>Type of Reports</label>
+                  <select name="filterinp" class="form-control inpv2 mt-2" id="filterinp">
+                    <option value="all" style="font-weight: bold;">All Data</option>
                     <option value="totalin" style="font-weight: bold;">Total In</option>
                     <option value="totalout" style="font-weight: bold;">Total Out</option>
-                    <option value="" disabled style="font-weight: bold;">Each Material In/Out</option>
+                    <option value="eachmaterialtotalinout" style="font-weight: bold;">Each Material Total In/Out</option>
+                    <option value="eachmaterialbalance" style="font-weight: bold;">Each Material Balance</option>
+                    <option value="eachmaterialbalanceamount" style="font-weight: bold;">Each Material Balance Amount</option>
+                  </select>
+
+                  <label id="packingmateriallabel" style="display: none;">Packing Material</label>
+                  <select name="" class="form-control inpv2" style="display: none;" id="packingmaterialinp">
                     <?php
                       $stmt = $pdo->prepare("SELECT * FROM material_store_house GROUP BY material_id");
                       $stmt->execute();
@@ -127,55 +145,7 @@ $query = new Query();
                         $stmt->execute();
                         $material = $stmt->fetch(PDO::FETCH_ASSOC);
                         ?>
-                        <option value="eachmaterialinout-<?= $material['id']; ?>" style="padding-left:20px !important;">- <?= $material['name']; ?></option>
-                        <?php
-                      }
-                      ?>
-                  <option value="" disabled style="font-weight: bold;"></option>
-                  <option value="" disabled style="font-weight: bold;">- Each Material Total In/Out</option>
-                    <?php
-                      $stmt = $pdo->prepare("SELECT * FROM material_store_house GROUP BY material_id");
-                      $stmt->execute();
-                      $datas = $stmt->fetchAll();
-                      foreach($datas as $data){
-                        $material_id = $data['material_id'];
-                        $stmt = $pdo->prepare("SELECT * FROM materials WHERE id='$material_id'");
-                        $stmt->execute();
-                        $material = $stmt->fetch(PDO::FETCH_ASSOC);
-                        ?>
-                        <option value="eachmaterialtotalinout-<?= $material['id']; ?>" style="padding-left:20px !important;">- <?= $material['name']; ?></option>
-                        <?php
-                      }
-                    ?>
-                  <option value="" disabled style="font-weight: bold;"></option>
-                  <option value="" disabled style="font-weight: bold;">Each Material Balance</option>
-                    <?php
-                      $stmt = $pdo->prepare("SELECT * FROM material_store_house GROUP BY material_id");
-                      $stmt->execute();
-                      $datas = $stmt->fetchAll();
-                      foreach($datas as $data){
-                        $material_id = $data['material_id'];
-                        $stmt = $pdo->prepare("SELECT * FROM materials WHERE id='$material_id'");
-                        $stmt->execute();
-                        $material = $stmt->fetch(PDO::FETCH_ASSOC);
-                        ?>
-                        <option value="eachmaterialbalance-<?= $material['id']; ?>" style="padding-left:20px !important;">- <?= $material['name']; ?></option>
-                        <?php
-                      }
-                    ?>
-                  <option value="" disabled style="font-weight: bold;"></option>
-                  <option value="" disabled style="font-weight: bold;">Each Material Balance Amount</option>
-                    <?php
-                      $stmt = $pdo->prepare("SELECT * FROM material_store_house GROUP BY material_id");
-                      $stmt->execute();
-                      $datas = $stmt->fetchAll();
-                      foreach($datas as $data){
-                        $material_id = $data['material_id'];
-                        $stmt = $pdo->prepare("SELECT * FROM materials WHERE id='$material_id'");
-                        $stmt->execute();
-                        $material = $stmt->fetch(PDO::FETCH_ASSOC);
-                        ?>
-                        <option value="eachmaterialbalanceamount-<?= $material['id']; ?>" style="padding-left:20px !important;">- <?= $material['name']; ?></option>
+                        <option value="eachmaterialinout-<?= $material['id']; ?>" style="padding-left:20px !important;"><?= $material['name']; ?></option>
                         <?php
                       }
                     ?>
@@ -183,12 +153,29 @@ $query = new Query();
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="submit" name="savefilter" class="btn btn-primary">Save Changes</button>
+                  <button type="submit" name="savefilter" class="btn btn-primary">Show</button>
                 </div>
                 </form>
               </div>
             </div>
           </div>
+          <script>
+            document.getElementById('filterinp').addEventListener('change', function() {
+                
+                var filterValue = document.getElementById('filterinp').value;
+                var packingMaterialInp = document.getElementById('packingmaterialinp');
+                var packingMaterialLabel = document.getElementById('packingmateriallabel');
+
+                if (filterValue === 'all' || filterValue === 'totalin' || filterValue === 'totalout') {
+                    packingMaterialInp.style.display = 'none';
+                    packingMaterialLabel.style.display = 'none';
+                } else {
+                    packingMaterialInp.style.display = 'block';
+                    packingMaterialLabel.style.display = 'block';
+                }
+            });
+
+          </script>
           <div class="card-body">
 
             <?php
@@ -201,16 +188,6 @@ $query = new Query();
             $numOfrecs = 13;
             $offset = ($pageno -1) * $numOfrecs;
             ?>
-            <form action="" method="POST" class="d-flex justify-content-between align-items-center">
-              <div class="d-flex align-items-center">
-                <label class="me-2">Start Date:</label>
-                <input type="date" name="startdate" class="form-control me-3" value="<?php if(!empty($_SESSION['startdate'])){ echo $_SESSION['startdate']; } ?>">
-                <label class="me-2">End Date:</label>
-                <input type="date" name="enddate" class="form-control" value="<?php if(!empty($_SESSION['enddate'])){ echo $_SESSION['enddate']; } ?>">
-              </div>
-              <button class="btn btn-success btn-sm ms-3" name="search">Search</button>
-            </form>
-
             <?php
               if(isset($_POST['savefilter'])){
                 $_SESSION['filtertype'] = $_POST['filterinp'];
@@ -335,7 +312,7 @@ $query = new Query();
               ?>
 
               <?php
-              if(isset($_POST['search'])){
+              if(isset($_POST['savefilter'])){
                 $_SESSION['startdate'] = $_POST['startdate'];
                 $_SESSION['enddate'] = $_POST['enddate'];
               }

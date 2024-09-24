@@ -248,6 +248,9 @@ class Bootstrap
         .redborder{
           border: 1px solid red !important;
         }
+        .btn-warning{
+          color: black !important;
+        }
       </style>
       <script src="../../Resources/sweetalert.js" charset="utf-8"></script>
       <link rel="stylesheet" href="../../Resources/chosenselect/jquery-ui.css">

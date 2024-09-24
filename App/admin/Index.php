@@ -22,6 +22,10 @@ $query = new Query();
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
   <body>
+    <?php
+      $_SESSION['startdate'] = '2012-01-01';
+      $_SESSION['enddate'] = date('Y-m-d');
+    ?>
     <div class="row">
       <div class="sidebarcol" id="sidebar">
         <?php
