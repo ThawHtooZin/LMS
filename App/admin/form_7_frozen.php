@@ -61,16 +61,16 @@ $query = new Query();
       $query->waterkg($waterkgid, $waterkg);
     }
 
-    if(isset($_POST['searchbtncommondity'])){
+    if(isset($_POST['searchbtn'])){
       $_SESSION['search']['searchcommondity'] = $_POST['commondity_id'];
-    }
-
-    if(isset($_POST['date'])){
       $_SESSION['search']['searchdate'] = $_POST['date'];
+      $_SESSION['search']['searchsize'] = $_POST['size'];
     }
 
-    if(isset($_POST['size'])){
-      $_SESSION['search']['searchsize'] = $_POST['size'];
+    if(isset($_POST['clearfilter'])){
+      $_SESSION['search']['searchcommondity'] = '';
+      $_SESSION['search']['searchdate'] = '';
+      $_SESSION['search']['searchsize'] = '';
     }
      ?>
     <div class="row">
@@ -86,8 +86,11 @@ $query = new Query();
             <div class="card-header bg-info text-light pb-3">
               <b class="h5">Link Mark Limited (F-7) Frozen</b>
               <button type="button" class="btn btn-success btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#addmodal">Add Data</button>
-              <button type="submit" name="searchbtncommondity" class="btn btn-secondary btn-sm float-end" style="border-top-left-radius:0px; border-bottom-left-radius:0px;">View/Clear</button>
-              <select name="commondity_id" class="form-control inpv2 d-inline float-end" style="border-top-right-radius:0px; border-bottom-right-radius:0px; width: 10%; height:26px !important; padding:0px 2px;">
+
+              <button type="submit" name="clearfilter" class="btn btn-secondary btn-sm float-end me-2" style="border-top-left-radius:0px; border-bottom-left-radius:0px;">Clear Filter</button>
+              <button type="submit" name="searchbtn" class="btn btn-primary btn-sm float-end me-2" style="border-top-left-radius:0px; border-bottom-left-radius:0px;">View</button>
+
+              <select name="commondity_id" class="form-control inpv2 d-inline float-end" style="margin-left:5px; width: 10%; height:26px !important; padding:0px 2px;">
                 <option value="">Select Commondity</option>
                 <?php
                 $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
@@ -98,17 +101,13 @@ $query = new Query();
                   $item_id = $commondata['item_id'];
                   $commonditydata = $query->select('item', $item_id, 'item_id');
                   ?>
-                  <option value="<?php echo $commondata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                  <option value="<?php echo $commondata['item_id']; ?>" <?php if(!empty($_SESSION['search']['searchcommondity'])){ if($_SESSION['search']['searchcommondity'] == $commondata['item_id']) {echo "selected"; }} ?>><?php echo $commonditydata['item_name']; ?></option>
                   <?php
                 }
                  ?>
               </select>
-
-              <button type="submit" name="searchbtndate" class="btn btn-secondary btn-sm float-end me-2" style="border-top-left-radius:0px; border-bottom-left-radius:0px;">View</button>
-              <input type="date" name="date" class="form-control inpv2 d-inline float-end" style="border-top-right-radius:0px; border-bottom-right-radius:0px; width: 14%; height:26px !important; padding:0px 2px;">
-
-              <button type="submit" name="searchbtnsize" class="btn btn-secondary btn-sm float-end me-2" style="border-top-left-radius:0px; border-bottom-left-radius:0px;">View</button>
-              <select name="size" class="form-control inpv2 d-inline float-end" style="border-top-right-radius:0px; border-bottom-right-radius:0px; width: 10%; height:26px !important; padding:0px 2px;">
+              <input type="date" name="date" value="<?php if(!empty($_SESSION['search']['searchdate'])){echo $_SESSION['search']['searchdate'];} ?>" class="form-control inpv2 d-inline float-end" style="margin-left:5px; width: 14%; height:26px !important; padding:0px 2px;">
+              <select name="size" class="form-control inpv2 d-inline float-end" style="margin-left:5px; width: 10%; height:26px !important; padding:0px 2px;">
                 <option value="">Select Size</option>
                 <?php
                 $sizestmt = $pdo->prepare("SELECT DISTINCT size FROM form7stock");
@@ -117,7 +116,7 @@ $query = new Query();
 
                 foreach ($sizedatas as $sizedata) {
                   ?>
-                  <option value="<?php echo $sizedata['size']; ?>"><?php echo $sizedata['size']; ?></option>
+                  <option value="<?php echo $sizedata['size']; ?>" <?php if(!empty($_SESSION['search']['searchsize'])){if($_SESSION['search']['searchsize'] == $sizedata['size']){echo "selected";}} ?>><?php echo $sizedata['size']; ?></option>
                   <?php
                 }
                  ?>
@@ -142,11 +141,57 @@ $query = new Query();
                 <th>Action</th>
               </tr>
               <?php
-              if (!empty($_SESSION['search']['searchcommondity']) && $_SESSION['search']['searchcommondity'] != '') {
-                $commondity_id = $_SESSION['search']['searchcommondity'];
-                  $stmt = $pdo->prepare("SELECT * FROM form7stock WHERE item_id='$commondity_id'");
+                // Initialize variables
+              $commondity_id = !empty($_SESSION['search']['searchcommondity']) ? $_SESSION['search']['searchcommondity'] : '';
+              $searchdate = !empty($_SESSION['search']['searchdate']) ? $_SESSION['search']['searchdate'] : '';
+              $searchsize = !empty($_SESSION['search']['searchsize']) ? $_SESSION['search']['searchsize'] : '';
+              $nodata = false;
+
+              // Initialize the base query and an array for the conditions
+              $sql = "SELECT * FROM form7stock";
+              $conditions = [];
+
+              // Add conditions based on the session variables
+              if ($commondity_id != '') {
+                  $conditions[] = "item_id = :commondity_id";
+              }
+              if ($searchdate != '') {
+                  $conditions[] = "date = :searchdate";
+              }
+              if ($searchsize != '') {
+                  $conditions[] = "size = :searchsize";
+              }
+
+              // If there are conditions, append them to the base sql
+              if (count($conditions) > 0) {
+                  $sql .= " WHERE " . implode(" AND ", $conditions);
+              } else {
+                  $nodata = true;
+              }
+
+              // Prepare the statement
+              $stmt = $pdo->prepare($sql);
+
+              // Bind parameters if they are set
+              if ($commondity_id != '') {
+                  $stmt->bindParam(':commondity_id', $commondity_id, PDO::PARAM_STR);
+              }
+              if ($searchdate != '') {
+                  $stmt->bindParam(':searchdate', $searchdate, PDO::PARAM_STR);
+              }
+              if ($searchsize != '') {
+                  $stmt->bindParam(':searchsize', $searchsize, PDO::PARAM_STR);
+              }
+
+              // Execute the statement
+              $stmt->execute();
+
+                if($nodata === true){
+                  $datas = [];
+                }else{
                   $stmt->execute();
                   $datas = $stmt->fetchall();
+                }
 
                 foreach ($datas as $form7data) {
                   $item_id = $form7data['item_id'];
@@ -155,19 +200,19 @@ $query = new Query();
                   $supplierdata = $query->select('acname', $supplier_id, 'code_no');
 
                   ?>
-                  <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>">
+                  <tr>
                     <td><?php if($form7data['date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($form7data['date']));}; ?></td>
                     <td><?php echo $commonditydata['item_name']; ?></td>
                     <td><?php echo $supplierdata['ac_name']; ?></td>
                     <td><?php echo $form7data['type']; ?></td>
-                    <td><?php echo $form7data['country']; ?></td>
-                    <td data-bs-target="#updatesizemodal<?php echo $form7data['id']; ?>" data-bs-toggle="modal"><?php echo $form7data['size']; ?></td>
+                    <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>"><?php echo $form7data['country']; ?></td>
+                    <td data-bs-toggle="modal" data-bs-target="#updatesizemodal<?php echo $form7data['id']; ?>"><?php echo $form7data['size']; ?></td>
                     <td><?php echo $form7data['viss']; ?></td>
                     <td><?php echo floatval($form7data['viss']) * 1.634; ?></td>
-                    <td><?php echo $form7data['kg']; ?></td>
                     <td data-bs-toggle="modal" data-bs-target="#waterkgmodal<?php echo $form7data['id']; ?>"><?php if(!empty($form7data['water_kg'])){ echo $form7data['water_kg'];} ?></td>
+                    <td><?php echo $form7data['kg']; ?></td>
                     <td><?php echo $form7data['pcspervr']; ?></td>
-                    <td><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
+                    <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>"><?php if(!empty($form7data['pcsperf7'])){ echo $form7data['pcsperf7']; }; ?></td>
                     <td>
                       <form action="form_7_frozen.php" method="post">
                         <input type="hidden" name="deleteid" value="<?php echo $form7data['id']; ?>">
@@ -177,6 +222,33 @@ $query = new Query();
                       </form>
                     </td>
                   </tr>
+                  <div class="modal fade" id="waterkgmodal<?php echo $form7data['id']; ?>">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+                        <div class="modal-header bg-warning text-light">
+                          <h1 class="modal-title fs-5">Add WaterKg</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <form action="form_7_frozen.php" method="post">
+                            <input type="hidden" name="waterkgid" value="<?php echo $form7data['id']; ?>">
+                            <div class="modal-body">
+                              <?php
+                              $idd = $form7data['id'];
+                              $updata = $query->select('form7stock', $idd, 'id');
+                              ?>
+                                <label>Water Kg</label>
+                                <input type="text" name="waterkg" class="form-control inpv2 mt-1" value="<?php echo $updata['water_kg']; ?>">
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-warning" name="waterkgupdate">Update</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
                   <div class="modal fade" id="updatemodal<?php echo $form7data['id']; ?>">
                     <div class="modal-dialog" role="document">
                       <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
@@ -291,7 +363,9 @@ $query = new Query();
                 $totalpcsf7stmt = $pdo->prepare("SELECT SUM(pcsperf7) AS total_pcsf7 FROM form7stock WHERE item_id='$item_id'");
                 $totalpcsf7stmt->execute();
                 $totalpcsf7data = $totalpcsf7stmt->fetch(PDO::FETCH_ASSOC);
-                ?>
+                if($nodata !== true){
+
+                  ?>
                 <tr style="font-weight: bold !important;">
                   <td></td>
                   <td>Total</td>
@@ -308,6 +382,7 @@ $query = new Query();
                   <td></td>
                 </tr>
                 <?php
+<<<<<<< HEAD
             }elseif(!empty($_SESSION['search']['searchdate']) && $_SESSION['search']['searchdate'] != ''){
                 $date = $_SESSION['search']['searchdate'];
 
@@ -639,6 +714,9 @@ $query = new Query();
             <?php
           }
 
+=======
+                }
+>>>>>>> 32283ab725631860acb4dfa0d32b072c8aae6678
                 ?>
             </table>
         </div>

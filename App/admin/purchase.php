@@ -546,7 +546,7 @@ $query = new Query();
                 <div class="row">
                   <div style="width: 40%;">
                     <input type="text" id="addac_code" name="supplier_code_no" <?php if(!empty($supplier_name_error)){ echo "class=\"form-control is-invalid\""; }else{ echo "class=\"form-control inpv2\""; } ?> style="padding-top: 2px; padding-bottom: 2px;" value="<?php if(!empty($_SESSION['purchase_supplier_name'])){echo $_SESSION['purchase_supplier_name']; }; ?>">
-                    </div>
+                  </div>
                   <div style="width: 10%;">
                     <a href="supplier.php" target="_blank" style="width: 10%; padding: 2.5px; color:black; text-align: center;">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">

@@ -245,6 +245,15 @@ class Bootstrap
             width: 4.8% !important;
           }
         }
+        .redborder{
+          border: 1px solid red !important;
+        }
+        .btn-warning{
+          color: black !important;
+        }
+        table th{
+          font-size: 14px;
+        }
       </style>
       <script src="../../Resources/sweetalert.js" charset="utf-8"></script>
       <link rel="stylesheet" href="../../Resources/chosenselect/jquery-ui.css">

@@ -79,18 +79,16 @@ $query = new Query();
           <div class="card-header bg-info">
             <?php
             $invoice_no = $_GET['invoice_no'];
-            if(!empty($_SESSION)){
-              if(empty($_SESSION['tabs']) && $_SESSION['tabs'] != 'actualinvoice' && $_SESSION['tabs'] != 'actualpackinglist' && $_SESSION['tabs'] != 'foambox' && $_SESSION['tabs'] != 'declare'){
-                $_SESSION['tabs'] = 'default';
-              }elseif(isset($_POST['actualinvoicebtn'])){
-                $_SESSION['tabs'] = 'actualinvoice';
-              }elseif(isset($_POST['actualinvoiceback'])){
-                $_SESSION['tabs'] = 'actualpackinglist';
-              }elseif(isset($_POST['foamboxbtn'])){
-                $_SESSION['tabs'] = 'foambox';
-              }elseif(isset($_POST['declarebtn'])){
-                $_SESSION['tabs'] = 'declare';
-              }
+            if(empty($_SESSION['tabs'])){
+              $_SESSION['tabs'] = 'default';
+            }elseif(isset($_POST['actualinvoicebtn'])){
+              $_SESSION['tabs'] = 'actualinvoice';
+            }elseif(isset($_POST['actualinvoiceback'])){
+              $_SESSION['tabs'] = 'actualpackinglist';
+            }elseif(isset($_POST['foamboxbtn'])){
+              $_SESSION['tabs'] = 'foambox';
+            }elseif(isset($_POST['declarebtn'])){
+              $_SESSION['tabs'] = 'declare';
             }
              ?>
                 <span class=" text-light" id="fbtext" style="font-size:20px; font-weight:bold;">Foam Box</span>
@@ -356,7 +354,7 @@ $query = new Query();
                                     <label>Commondity</label>
                                     <select class="form-control inpv2 mb-2" name="upitem_id">
                                       <?php
-                                      $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
+                                      $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stocktcl");
                                       $form7commonditystmt->execute();
                                       $form7commonditydatas = $form7commonditystmt->fetchall();
                                       foreach ($form7commonditydatas as $form7commonditydata) {
