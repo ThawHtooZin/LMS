@@ -243,6 +243,37 @@ $query = new Query();
                       </div>
                     </div>
                   </div>
+                  <div class="modal fade" id="waterkgmodal<?php echo $form7data['id']; ?>">
+                        <div class="modal-dialog" role="document">
+                          <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                            <div class="modal-header bg-warning text-light">
+                              <h1 class="modal-title fs-5">Add Waterkg</h1>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <form action="form_7_frozen.php" method="post">
+                                <input type="hidden" name="waterkgid" value="<?php echo $form7data['id']; ?>">
+                                <div class="modal-body">
+                                  <?php
+                                  $idd = $form7data['id'];
+                                  $updata = $query->select('form7stock', $idd, 'id');
+                                  ?>
+                                  <div class="row">
+                                    <div class="col">
+                                      <label>Waterkg</label>
+                                      <input type="text" name="waterkg" class="form-control inpv2 mt-1" value="">
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-warning" name="waterkgupdate">Update</button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
                   <?php
                   $date = $form7data['date'];
                   $item_id = $form7data['item_id'];
@@ -298,7 +329,7 @@ $query = new Query();
                   <td><?php echo $form7data['country']; ?></td>
                   <td data-bs-target="#updatesizemodal<?php echo $form7data['id']; ?>" data-bs-toggle="modal"><?php echo $form7data['size']; ?></td>
                   <td><?php echo $form7data['viss']; ?></td>
-                  <td><?php echo $form7data['viss'] * 1.634; ?></td>
+                  <td><?php echo floatval($form7data['viss']) * 1.634; ?></td>
                     <td data-bs-toggle="modal" data-bs-target="#waterkgmodal<?php echo $form7data['id']; ?>"><?php if(!empty($form7data['water_kg'])){ echo $form7data['water_kg'];} ?></td>
                   <td><?php echo $form7data['kg']; ?></td>
                   <td><?php echo $form7data['pcspervr']; ?></td>
@@ -378,6 +409,37 @@ $query = new Query();
                       </div>
                     </div>
                   </div>
+                  <div class="modal fade" id="waterkgmodal<?php echo $form7data['id']; ?>">
+                        <div class="modal-dialog" role="document">
+                          <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                            <div class="modal-header bg-warning text-light">
+                              <h1 class="modal-title fs-5">Add Waterkg</h1>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <form action="form_7_frozen.php" method="post">
+                                <input type="hidden" name="waterkgid" value="<?php echo $form7data['id']; ?>">
+                                <div class="modal-body">
+                                  <?php
+                                  $idd = $form7data['id'];
+                                  $updata = $query->select('form7stock', $idd, 'id');
+                                  ?>
+                                  <div class="row">
+                                    <div class="col">
+                                      <label>Waterkg</label>
+                                      <input type="text" name="waterkg" class="form-control inpv2 mt-1" value="">
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-warning" name="waterkgupdate">Update</button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
                 <?php
                 $date = $_SESSION['search']['searchdate'];
                 $item_id = $form7data['item_id'];
@@ -512,6 +574,37 @@ $query = new Query();
                       </div>
                     </div>
                   </div>
+                  <div class="modal fade" id="waterkgmodal<?php echo $form7data['id']; ?>">
+                        <div class="modal-dialog" role="document">
+                          <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                            <div class="modal-header bg-warning text-light">
+                              <h1 class="modal-title fs-5">Add Waterkg</h1>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <form action="form_7_frozen.php" method="post">
+                                <input type="hidden" name="waterkgid" value="<?php echo $form7data['id']; ?>">
+                                <div class="modal-body">
+                                  <?php
+                                  $idd = $form7data['id'];
+                                  $updata = $query->select('form7stock', $idd, 'id');
+                                  ?>
+                                  <div class="row">
+                                    <div class="col">
+                                      <label>Waterkg</label>
+                                      <input type="text" name="waterkg" class="form-control inpv2 mt-1" value="">
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-warning" name="waterkgupdate">Update</button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
               <?php
               $item_id = $form7data['item_id'];
               $country = $form7data['country'];
@@ -626,6 +719,37 @@ $query = new Query();
         </div>
       </div>
     </div>
+    <div class="modal fade" id="waterkgmodal<?php echo $form7data['id']; ?>">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+              <div class="modal-header bg-warning text-light">
+                <h1 class="modal-title fs-5">Add Waterkg</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form action="form_7_frozen.php" method="post">
+                  <input type="hidden" name="waterkgid" value="<?php echo $form7data['id']; ?>">
+                  <div class="modal-body">
+                    <?php
+                    $idd = $form7data['id'];
+                    $updata = $query->select('form7stock', $idd, 'id');
+                    ?>
+                    <div class="row">
+                      <div class="col">
+                        <label>Waterkg</label>
+                        <input type="text" name="waterkg" class="form-control inpv2 mt-1" value="">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-warning" name="waterkgupdate">Update</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
     <?php
     $bootstrap->javascript();
     ?>

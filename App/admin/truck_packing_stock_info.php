@@ -100,7 +100,7 @@ $query = new Query();
                 <a href="truck_packing_stock.php" class="btn btn-danger float-end ms-2 btn-sm" id="back">Back</a>
 
                 <a href="export.php?table_name=truckactualpackinglist&invoice_no=<?= $_GET['invoice_no']; ?>&infoid=<?= $_GET['infoid']; ?>" class="btn btn-success float-end btn-sm <?php if(!empty($_SESSION['tabs']) && $_SESSION['tabs'] == 'actualpackinglist'){}else{echo 'hide';} ?> ms-2">Excel Report</a>
-                
+
                 <button type="submit" class="btn btn-warning float-end btn-sm" id="actualinvoice" name="actualinvoicebtn">Actual Invoice</button>
                 <button type="submit" class="btn btn-secondary float-end btn-sm me-2" id="foambox" name="foamboxbtn">Foam Box</button>
 
@@ -108,13 +108,13 @@ $query = new Query();
 
                 <button type="submit" class="btn btn-danger float-end btn-sm hide" id="actualinvoiceback" name="actualinvoiceback">Back</button>
 
-                
+
                 <a href="export.php?table_name=actualtruckinvoice&invoice_no=<?= $_GET['invoice_no']; ?>" class="btn btn-success float-end btn-sm <?php if(!empty($_SESSION['tabs']) && $_SESSION['tabs'] == 'actualinvoice'){}else{echo 'hide';} ?> me-2" id="actualinvoiceback">Excel Report</a>
 
                 <a href="export.php?table_name=declarepacking&invoice_no=<?= $_GET['invoice_no']; ?>&infoid=<?= $_GET['infoid']; ?>" class="btn btn-success float-end btn-sm <?php if(!empty($_SESSION['tabs']) && $_SESSION['tabs'] == 'declare'){}else{echo 'hide';} ?> me-2">Excel Report</a>
-                
+
                 <a href="export.php?table_name=foambox&invoice_no=<?= $_GET['invoice_no']; ?>" class="btn btn-success float-end btn-sm <?php if(!empty($_SESSION['tabs']) && $_SESSION['tabs'] == 'foambox'){}else{echo 'hide';} ?> me-2" id="foambox">Excel Report</a>
-                
+
                 <button type="button" class="btn btn-success float-end me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#add" id="addpackingstockbtn">Add Packing Stock</button>
                 <form action="" method="post">
                   <button type="submit" name="searchcommonditybtn" class="btn btn-sm btn-dark float-end me-2">View</button>
@@ -1399,7 +1399,7 @@ $query = new Query();
                            <label>Commondity</label>
                            <select class="form-control inpv2 mb-2" name="item_id">
                              <?php
-                             $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
+                             $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stocktcl");
                              $form7commonditystmt->execute();
                              $form7commonditydatas = $form7commonditystmt->fetchall();
                              foreach ($form7commonditydatas as $form7commonditydata) {

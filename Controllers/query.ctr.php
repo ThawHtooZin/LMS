@@ -10,10 +10,10 @@ Class Query{
     global $pdo;
     $nowdate = new DateTime();
     $nowdate->modify('-6 months');
-    
+
     $deletedate = $nowdate->format('d-m-Y');
 
-    
+
   }
 
   function login($username, $password){
@@ -3083,9 +3083,26 @@ Class Query{
     $item_id = $sizedata['item_id'];
     $country = $sizedata['country'];
     $type = $sizedata['type'];
+    $date = $sizedata['date'];
     $supplier_name = $sizedata['supplier_name'];
     $link_id = $sizedata['link_id'];
-    $addsizestmt = $pdo->prepare("INSERT INTO form7stock(item_id, supplier_name, country, type, size, link_id) VALUES('$item_id', '$supplier_name', '$country', '$type', '$size', '$link_id')");
+    $addsizestmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, country, type, size, link_id) VALUES('$date', '$item_id', '$supplier_name', '$country', '$type', '$size', '$link_id')");
+    $addsizestmt->execute();
+  }
+
+  function addsizetcl($id, $size){
+    global $pdo;
+
+    $sizestmt = $pdo->prepare("SELECT * FROM form7stocktcl WHERE id='$id'");
+    $sizestmt->execute();
+    $sizedata = $sizestmt->fetch(PDO::FETCH_ASSOC);
+
+    $item_id = $sizedata['item_id'];
+    $country = $sizedata['country'];
+    $type = $sizedata['type'];
+    $supplier_name = $sizedata['supplier_name'];
+    $link_id = $sizedata['link_id'];
+    $addsizestmt = $pdo->prepare("INSERT INTO form7stocktcl(item_id, supplier_name, country, type, size, link_id) VALUES('$item_id', '$supplier_name', '$country', '$type', '$size', '$link_id')");
     $addsizestmt->execute();
   }
 
@@ -4346,7 +4363,7 @@ Class Query{
       }
 
     }
-    
+
     $stmt = $pdo->prepare("UPDATE transaction SET status='accepted' WHERE status LIKE '%selected%'");
     $stmt->execute();
   }
@@ -5307,7 +5324,7 @@ Class Query{
       $general_ledgercheckstmt->execute();
       $general_ledgercheckdata = $general_ledgercheckstmt->fetch(PDO::FETCH_ASSOC);
 
-      if(!empty($transactioncheckdata) || !empty($cashbookcheckdata) || !empty($receivablecheckdata) || !empty($payablecheckdata) || !empty($general_ledgercheckdata)){ 
+      if(!empty($transactioncheckdata) || !empty($cashbookcheckdata) || !empty($receivablecheckdata) || !empty($payablecheckdata) || !empty($general_ledgercheckdata)){
         return $status = true;
       }else{
         return $status = false;
@@ -5319,7 +5336,7 @@ Class Query{
     {
       global $pdo;
 
-      // Transaction 
+      // Transaction
       $stmt = $pdo->prepare("UPDATE `transaction` SET ac_code='$toaccode' WHERE ac_code='$fromaccode'");
       $stmt->execute();
       // General Ledger
@@ -5331,10 +5348,10 @@ Class Query{
         $glbalancestmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$fromaccode' ORDER BY id DESC");
         $glbalancestmt->execute();
         $glbalancedata = $glbalancestmt->fetch(PDO::FETCH_ASSOC);
-        
+
         $stmt = $pdo->prepare("UPDATE general_ledger SET ac_code='$toaccode' WHERE id='$id'");
         $stmt->execute();
-        
+
         $debit = $gldata['debit'];
         $credit = $gldata['credit'];
 
