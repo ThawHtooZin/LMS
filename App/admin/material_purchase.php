@@ -125,12 +125,12 @@ $query = new Query();
 
             if(isset($_POST['total'])){
               $supplier_id = $_POST['supplier_id'];
-              $purchasedatas = $query->search('purchase', 'supplier_id', $supplier_id);
+              $purchasedatas = $query->search('material_purchase', 'supplier_id', $supplier_id);
             }
 
             if(isset($_POST['commoditybtn'])){
-              $item_id = $_POST['item_id'];
-              $purchasedatas = $query->search('purchase', 'commodity', $item_id);
+              $material_id = $_POST['material_id'];
+              $purchasedatas = $query->search('material_purchase', 'material_id', $material_id);
             }
 
             if(!empty($message)){
@@ -179,7 +179,7 @@ $query = new Query();
               <span>Supplier Name:</span>
               <select class="chzn-select" name="supplier_id" style="width:15%;" data-placeholder="Supplier Name">
                 <?php
-                $supplierdatastmt = $pdo->prepare("SELECT * FROM purchase GROUP BY supplier_id");
+                $supplierdatastmt = $pdo->prepare("SELECT * FROM material_purchase GROUP BY supplier_id");
                 $supplierdatastmt->execute();
                 $supplierdatas = $supplierdatastmt->fetchall();
                 foreach ($supplierdatas as $supplierdata) {
@@ -229,10 +229,8 @@ $query = new Query();
               <?php
               if(isset($_POST['total'])){
                 $supplier_id = $_POST['supplier_id'];
-                $total_amount = $query->selectsum('material_purchase', $supplier_id, 'supplier_id');
               }elseif(isset($_POST['commoditybtn'])){
-                $item_id = $_POST['item_id'];
-                $total_amount = $query->selectsum('material_purchase', $item_id, 'material_id');
+                $material_id = $_POST['material_id'];
               }else{
                 $stmt = $pdo->prepare("SELECT * FROM material_purchase ORDER BY id");
                 $stmt->execute();
@@ -268,7 +266,14 @@ $query = new Query();
               <?php
               if (isset($_POST['total']) ) {
                 $supplier_id = $_POST['supplier_id'];
-                $total_amount = $query->selectsum('purchase', $supplier_id, 'supplier_id');
+                $purchasestmt = $pdo->prepare("SELECT * FROM material_purchase WHERE supplier_id='$supplier_id'");
+                $purchasestmt->execute();
+                $purchasedatas = $purchasestmt->fetchAll();
+                $total_amount = 0;
+
+                foreach($purchasedatas as $purchasedata){
+                  $total_amount += $purchasedata['quantity'] * $purchasedata['rate'];
+                }
                 ?>
                 <tr>
                   <td></td>
@@ -276,21 +281,24 @@ $query = new Query();
                   <td></td>
                   <td></td>
                   <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
                   <td>Total Amount:</td>
-                  <td></td>
-                  <td><?php echo $total_amount['total_amount'];  ?></td>
+                  <td><?php echo $total_amount;  ?></td>
                 </tr>
                 <?php
               }
               ?>
               <?php
               if (isset($_POST['commoditybtn'])) {
-                $id = $_POST['item_id'];
-                $total_amount = $query->selectsum('purchase', $id, 'commodity');
+                $material_id = $_POST['material_id'];
+                $purchasestmt = $pdo->prepare("SELECT * FROM material_purchase WHERE material_id='$material_id'");
+                $purchasestmt->execute();
+                $purchasedatas = $purchasestmt->fetchAll();
+                $total_amount = 0;
+
+                foreach($purchasedatas as $purchasedata){
+                  $total_amount += $purchasedata['quantity'] * $purchasedata['rate'];
+                }
+
                 ?>
                 <tr>
                   <td></td>
@@ -298,34 +306,8 @@ $query = new Query();
                   <td></td>
                   <td></td>
                   <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
                   <td>Total Amount:</td>
-                  <td><?php echo $total_amount['total_amount'];  ?></td>
-                  <td></td>
-                </tr>
-                <?php
-              }
-              ?>
-              <?php
-              if(!$_POST && !empty($_GET['pageno']) && $_GET['pageno'] == $total_pages){
-                $total_amount = $query->selectallsum('purchase', 'amount', 'total_amount');
-                ?>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td>Total Amount:</td>
-                  <td><?php echo $total_amount['total_amount'];  ?></td>
-                  <td></td>
+                  <td><?php echo $total_amount;  ?></td>
                 </tr>
                 <?php
               }

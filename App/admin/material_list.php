@@ -28,10 +28,10 @@ $query = new Query();
       <div class="contentcol" id="content">
         <?php require 'navbar.php'; ?>
         <div class="card">
-          <div class="card-header bg-warning text-light"  style="padding:-10px;">
-            <h5>Manage Material List</h5>
-            <button type="button" class="btn btn-success btn-sm float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
-              Add Material
+          <div class="card-header bg-primary text-light"  style="padding:-10px;">
+          <p style="font-size: 26px;font-weight: bold;margin-left:450px; display:inline;">Manage Packing Material Items</p>
+            <button type="button" class="btn btn-warning  btn-sm float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
+              Add Packing Material Item
             </button>
           </div>
           <div class="card-body">
@@ -86,8 +86,8 @@ $query = new Query();
             <table class="mt-3 table table-bordered table-striped rounded">
               <tr>
                 <!-- <th>Category Name</th> -->
-                <th>Id</th>
-                <th>Material Name</th>
+                <th>No.</th>
+                <th>Packing Material Name</th>
                 <th>Unit</th>
                 <th>Description</th>
                 <th>Action</th>
@@ -146,7 +146,7 @@ $query = new Query();
                           $updatedata = $query->select('materials', $id, 'id');
                         ?>
                         <input type="hidden" name="id" value="<?php echo $itemdata['id']; ?>">
-                        <label>Material Name</label>
+                        <label>Packing Material Name</label>
                         <input type="text" name="name" class="form-control" placeholder="Name" value="<?php echo $updatedata['name']; ?>">
                         <label>Unit</label>
                         <input type="text" name="unit" class="form-control" placeholder="Unit" value="<?php echo $updatedata['unit']; ?>">
@@ -190,8 +190,8 @@ $query = new Query();
   <!-- Data Add Modal -->
   <div class="modal fade" id="addmodal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header bg-secondary text-light">
+      <div class="modal-content" style="margin-top:100px;">
+        <div class="modal-header bg-primary text-light">
           <h5 class="modal-title" id="addmodellabel">Create New Material</h5>
           <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true" class="h3">&times;</span>
@@ -199,10 +199,10 @@ $query = new Query();
         </div>
         <form action="material_list.php" method="post" autocomplete="off">
           <div class="modal-body">
-            <label>Material Name</label>
+            <label>Packing Material Item Name</label>
             <input type="text" name="name" class="form-control" placeholder="Name">
             <label>Unit</label>
-            <input type="text" name="unit" class="form-control" placeholder="Unit">
+            <input type="text" name="unit" class="form-control" placeholder="Unit" value="pcs">
             <label>Description</label>
             <textarea name="description" class="form-control" placeholder="Description"></textarea>
           </div>

@@ -11,7 +11,7 @@ $permissions = $permission['permission'];
         </svg>
       </button>
     <div style="width:85%; padding-right:28px; text-align:center;">
-      <span style="font-size: 27px; line-height: auto !important; color: lightblue; font-style: italic; font-weight:bold; text-shadow: 4px 4px 4px #1F51FF;" id="navtitle">Link Mark System</span>
+      <span style="font-size: 33px; line-height: auto !important; color: lightblue; font-style: italic; font-weight:bold; text-shadow: 4px 4px 4px #1F51FF;" id="navtitle">Link Mark System</span>
     </div>
   </div>
     <ul class="nav nav-pills flex-column mt-2">
@@ -120,18 +120,6 @@ $permissions = $permission['permission'];
               <a href="purchase.php" class="nav-link h text-light"  style="font-size:14px !important; ">
                 <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
                 - Purchase
-              </a>
-            </li>
-            <?php
-            }
-            ?>
-            <?php
-            if(str_contains($permissions, 'manage_material_purchase')){
-              ?>
-            <li class="nav-item">
-              <a href="material_purchase.php" class="nav-link h text-light"  style="font-size:14px !important; ">
-                <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
-                - Material Purchase
               </a>
             </li>
             <?php
@@ -355,7 +343,7 @@ $permissions = $permission['permission'];
       </li>
       <?php
       }
-      if(str_contains($permissions, 'material_list') == 1 || str_contains($permissions, 'material_store_house') == 1 || str_contains($permissions, 'material_output') == 1){
+      if(str_contains($permissions, 'material_list') == 1 || str_contains($permissions, 'material_store_house') == 1 || str_contains($permissions, 'material_output') == 1 || str_contains($permissions, 'manage_material_purchase') == 1){
         ?>
        <li class=" p-1" style=" font-weight:bold; border-bottom: 1px solid rgb(255,255,255,0.2); " >
          <a href="#" class="nav-link text-white" id="sidebarlink" data-bs-toggle="collapse" data-bs-target="#production-collapse" aria-expanded="false">
@@ -373,7 +361,19 @@ $permissions = $permission['permission'];
               <li class="nav-item">
                 <a href="material_list.php" class="nav-link h text-light"  style="font-size:14px !important; ">
                   <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
-                  - Mateiral List
+                  - Packing Material Items
+                </a>
+              </li>
+              <?php
+              }
+              ?>
+              <?php
+              if(str_contains($permissions, 'manage_material_purchase')){
+                ?>
+              <li class="nav-item">
+                <a href="material_purchase.php" class="nav-link h text-light"  style="font-size:14px !important; ">
+                  <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                  - Material Purchase
                 </a>
               </li>
               <?php
@@ -385,7 +385,7 @@ $permissions = $permission['permission'];
               <li class="nav-item">
                 <a href="material_store_house.php" class="nav-link h text-light"  style="font-size:14px !important; ">
                   <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
-                  - Material Store House
+                  - Packing Material W/H
                 </a>
               </li>
               <?php
@@ -397,7 +397,7 @@ $permissions = $permission['permission'];
               <li class="nav-item">
                 <a href="material_output.php" class="nav-link h text-light"  style="font-size:14px !important; ">
                   <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
-                  - Material Output
+                  - Packing Material G/P
                 </a>
               </li>
               <?php

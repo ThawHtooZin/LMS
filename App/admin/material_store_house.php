@@ -56,13 +56,13 @@ $query = new Query();
         <?php require 'navbar.php'; ?>
         <div class="card">
           <div class="card-header bg-primary text-light"  style="padding:-10px;">
-            <h5>Manage Store House</h5>
+            <p style="font-size: 26px;font-weight: bold;margin-left:450px; display:inline;">Manage Packing Material (WareHouse)</p>
             <button class="btn btn-warning float-end" data-bs-toggle="modal" data-bs-target="#outputmodal">Output</button>
-            <div class="modal fade" id="outputmodal" tabindex="-1" aria-hidden="true">
+            <div class="modal fade" style="margin-top: 75px;" id="outputmodal" tabindex="-1" aria-hidden="true">
               <div class="modal-dialog">
                 <div class="modal-content text-dark">
                   <form action="material_store_house.php" method="POST">
-                    <div class="modal-header">
+                    <div class="modal-header bg-primary">
                       <h1 class="modal-title fs-5" id="exampleModalLabel">Output Stock</h1>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -74,10 +74,7 @@ $query = new Query();
                         <option value="tcl">TCL</option>
                       </select>
 
-                      <label>Group Name</label>
-                      <input type="text" name="group_name" class="form-control" required>
-
-                      <label>Material</label>
+                      <label>Packing Material Item</label>
                       <select name="material" id="" class="form-control">
                         <?php
                           $materialstmt = $pdo->prepare("SELECT material_id FROM material_store_house GROUP BY material_id");
@@ -96,7 +93,7 @@ $query = new Query();
                         ?>
                       </select>
 
-                      <label>Voucher No</label>
+                      <label>GatePass Voucher No</label>
                       <input type="number" name="voucher_no" class="form-control" required>
 
                       <label>Quantity</label>
@@ -134,8 +131,8 @@ $query = new Query();
             <table class="mt-3 table table-bordered table-striped rounded">
               <tr>
                 <!-- <th>Category Name</th> -->
-                <th>Id</th>
-                <th>Material Name</th>
+                <th style="width: 20px;">No.</th>
+                <th>Packing Material Item</th>
                 <th>In</th>
                 <th>Out</th>
                 <th>Balance</th>
