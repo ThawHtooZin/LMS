@@ -1,7 +1,8 @@
 <?php
-function copyDirectory($source, $destination) {
+function copyDirectory($source, $destination)
+{
 
-  if (!is_dir($destination)) {
+   if (!is_dir($destination)) {
       mkdir($destination . '/lms', 0755, true);
    }
 
@@ -22,4 +23,3 @@ $sourceDirectory = __DIR__ . '/../../../../mysql/data/lms';
 $destinationDirectory = __DIR__ . '/../../../../DataBackup/lms';
 copyDirectory($sourceDirectory, $destinationDirectory);
 header('location:backupandrestore.php?status=success');
- ?>

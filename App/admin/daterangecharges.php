@@ -11,247 +11,249 @@ $query = new Query();
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>Admin | Dashboard</title>
-  </head>
+
+<head>
+  <meta charset="utf-8">
+  <title>Admin | Dashboard</title>
+</head>
+<?php
+$bootstrap->css();
+?>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
+
+<body>
   <?php
-  $bootstrap->css();
+  if (isset($_POST['add'])) {
+    $indate = $_POST['indate'];
+    $outdate = $_POST['outdate'];
+    $commondity_id = $_POST['commondity_id'];
+    $mc = $_POST['mc'];
+    $kg = $_POST['kg'];
+    $coldstorerate = $_POST['coldstorerate'];
+    $labourrate = $_POST['labourrate'];
+    $processingrate = $_POST['processingrate'];
+    if (empty($_POST['processingcharges'])) {
+      $pcharges = 0;
+    } else {
+      $pcharges = $_POST['processingcharges'];
+    }
+    $mccheckstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+    $mccheckstmt->execute();
+    $mccheck = $mccheckstmt->fetch(PDO::FETCH_ASSOC);
+    if (!empty($mc)) {
+      if ($mccheck['total_mc'] >= $mc) {
+        $query->addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $pcharges);
+      } else {
+        echo "<script>swal('Sorry!', 'Mc not enough, Please check the stock and try again', 'warning');</script>";
+      }
+    } else {
+      $mc = 0;
+      if ($mccheck['total_mc'] >= $mc) {
+        $query->addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $pcharges);
+      } else {
+        echo "<script>swal('Sorry!', 'Mc not enough, Please check the stock and try again', 'warning');</script>";
+      }
+    }
+  }
+
+  if (isset($_POST['balance_kgbtn'])) {
+    $id = $_POST['balance_kgid'];
+    $balance_kg = $_POST['balance_kginp'];
+    $balance_mc = $_POST['balance_mcinp'];
+
+    $query->updatebalancekg($id, $balance_kg, $balance_mc);
+  }
+
+  if (isset($_POST['updatetotalcharges'])) {
+    $id = $_POST['id'];
+    $repacking_charges = $_POST['repacking_charges'];
+    $ice_charges = $_POST['ice_charges'];
+    $ot_charges = $_POST['ot_charges'];
+    $total_processing_charges = $_POST['total_processing_charges'];
+    $extra_charges = $_POST['extra_charges'];
+    $query->updatecoldstoretotal($id, $repacking_charges, $ice_charges, $ot_charges, $total_processing_charges, $extra_charges);
+  }
+
+  if (isset($_POST['paymentbtn'])) {
+    $payment_date = $_POST['payment_date'];
+    $payment_amount = $_POST['payment_amount'];
+
+    $query->paytotalcharges($payment_date, $payment_amount);
+  }
+
+  if (isset($_POST['repackingadd'])) {
+    $date = $_POST['date'];
+    $in_mc = $_POST['in_mc'];
+    $in_kg = $_POST['in_kg'];
+    $out_mc = $_POST['out_mc'];
+    $out_kg = $_POST['out_kg'];
+    $rate = $_POST['rate'];
+
+    $query->addrepacking($date, $in_mc, $in_kg, $out_mc, $out_kg, $rate);
+  }
+
+  if (isset($_POST['addstockbtn'])) {
+    $indate = $_POST['indate'];
+    $commondity_id = $_POST['commondity_id'];
+    $mc = $_POST['mc'];
+    $kg = $_POST['kg'];
+
+    $query->addnewstock($indate, $commondity_id, $mc, $kg);
+  }
+
+  if (isset($_POST['update'])) {
+    $indate = $_POST['indate'];
+    $outdate = $_POST['outdate'];
+    $commondity_id = $_POST['commondity_id'];
+    $mc = $_POST['mc'];
+    $kg = $_POST['kg'];
+    $coldstorerate = $_POST['coldstorerate'];
+    $labourrate = $_POST['labourrate'];
+    $processingrate = $_POST['upprocessingrate'];
+    $updateid = $_POST['updateid'];
+    $query->updatecoldstore($indate, $outdate, $commondity_id,  $mc, $kg, $coldstorerate, $labourrate, $processingrate, $updateid);
+  }
+
+  if (isset($_POST['addremarkbtn'])) {
+    $remark = $_POST['remark'];
+    $remarkid = $_POST['remarkid'];
+
+    $query->addhhkremark($remark, $remarkid);
+  }
+
+  if (isset($_POST['updatestockbtn'])) {
+    $indate = $_POST['upindate'];
+    $commondity_id = $_POST['upcommondity'];
+    $mc = $_POST['upmc'];
+    $kg = $_POST['upkg'];
+    $updateid = $_POST['upidstock'];
+
+    $query->updatehhkstock($indate, $commondity_id, $mc, $kg, $updateid);
+  }
+
+  if (isset($_POST['deletestockbtn'])) {
+    $updateid = $_POST['upidstock'];
+
+    $query->deletehhkstock($updateid);
+  }
+
+  if (isset($_POST['kgimportbtn'])) {
+    $importkg = $_POST['importkg'];
+    $rowid = $_POST['rowid'];
+
+    $query->kgimport($importkg, $rowid);
+  }
+
+  if (isset($_POST['chargesimportbtn'])) {
+    $charges = $_POST['importcharges'];
+    $rowid = $_POST['rowid'];
+
+    $query->chargesimport($charges, $rowid);
+  }
   ?>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
-  <body>
-    <?php
-    if(isset($_POST['add'])){
-      $indate = $_POST['indate'];
-      $outdate = $_POST['outdate'];
-      $commondity_id = $_POST['commondity_id'];
-      $mc = $_POST['mc'];
-      $kg = $_POST['kg'];
-      $coldstorerate = $_POST['coldstorerate'];
-      $labourrate = $_POST['labourrate'];
-      $processingrate = $_POST['processingrate'];
-      if (empty($_POST['processingcharges'])) {
-        $pcharges = 0;
-      }else{
-        $pcharges = $_POST['processingcharges'];
-      }
-      $mccheckstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE commondity_id='$commondity_id' ORDER BY id DESC");
-      $mccheckstmt->execute();
-      $mccheck = $mccheckstmt->fetch(PDO::FETCH_ASSOC);
-      if (!empty($mc)) {
-        if($mccheck['total_mc'] >= $mc){
-          $query->addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $pcharges);
-        }else{
-          echo "<script>swal('Sorry!', 'Mc not enough, Please check the stock and try again', 'warning');</script>";
-        }
-      }else{
-        $mc = 0;
-        if($mccheck['total_mc'] >= $mc){
-          $query->addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $pcharges);
-        }else{
-          echo "<script>swal('Sorry!', 'Mc not enough, Please check the stock and try again', 'warning');</script>";
-        }
-      }
-
-    }
-
-    if(isset($_POST['balance_kgbtn'])){
-      $id = $_POST['balance_kgid'];
-      $balance_kg = $_POST['balance_kginp'];
-      $balance_mc = $_POST['balance_mcinp'];
-
-      $query->updatebalancekg($id, $balance_kg, $balance_mc);
-    }
-
-    if(isset($_POST['updatetotalcharges'])){
-      $id = $_POST['id'];
-      $repacking_charges = $_POST['repacking_charges'];
-      $ice_charges = $_POST['ice_charges'];
-      $ot_charges = $_POST['ot_charges'];
-      $total_processing_charges = $_POST['total_processing_charges'];
-      $extra_charges = $_POST['extra_charges'];
-      $query->updatecoldstoretotal($id, $repacking_charges, $ice_charges, $ot_charges, $total_processing_charges, $extra_charges);
-    }
-
-    if(isset($_POST['paymentbtn'])){
-      $payment_date = $_POST['payment_date'];
-      $payment_amount = $_POST['payment_amount'];
-
-      $query->paytotalcharges($payment_date, $payment_amount);
-    }
-
-    if(isset($_POST['repackingadd'])){
-      $date = $_POST['date'];
-      $in_mc = $_POST['in_mc'];
-      $in_kg = $_POST['in_kg'];
-      $out_mc = $_POST['out_mc'];
-      $out_kg = $_POST['out_kg'];
-      $rate = $_POST['rate'];
-
-      $query->addrepacking($date, $in_mc, $in_kg, $out_mc, $out_kg, $rate);
-    }
-
-    if(isset($_POST['addstockbtn'])){
-      $indate = $_POST['indate'];
-      $commondity_id = $_POST['commondity_id'];
-      $mc = $_POST['mc'];
-      $kg = $_POST['kg'];
-
-      $query->addnewstock($indate, $commondity_id, $mc, $kg);
-    }
-
-    if(isset($_POST['update'])){
-      $indate = $_POST['indate'];
-      $outdate = $_POST['outdate'];
-      $commondity_id = $_POST['commondity_id'];
-      $mc = $_POST['mc'];
-      $kg = $_POST['kg'];
-      $coldstorerate = $_POST['coldstorerate'];
-      $labourrate = $_POST['labourrate'];
-      $processingrate = $_POST['upprocessingrate'];
-      $updateid = $_POST['updateid'];
-      $query->updatecoldstore($indate, $outdate, $commondity_id,  $mc, $kg, $coldstorerate, $labourrate, $processingrate, $updateid);
-    }
-
-    if (isset($_POST['addremarkbtn'])) {
-      $remark = $_POST['remark'];
-      $remarkid = $_POST['remarkid'];
-
-      $query->addhhkremark($remark, $remarkid);
-    }
-
-    if (isset($_POST['updatestockbtn'])) {
-      $indate = $_POST['upindate'];
-      $commondity_id = $_POST['upcommondity'];
-      $mc = $_POST['upmc'];
-      $kg = $_POST['upkg'];
-      $updateid = $_POST['upidstock'];
-
-      $query->updatehhkstock($indate, $commondity_id, $mc, $kg, $updateid);
-    }
-
-    if (isset($_POST['deletestockbtn'])) {
-      $updateid = $_POST['upidstock'];
-
-      $query->deletehhkstock($updateid);
-    }
-
-    if(isset($_POST['kgimportbtn'])){
-      $importkg = $_POST['importkg'];
-      $rowid = $_POST['rowid'];
-
-      $query->kgimport($importkg, $rowid);
-    }
-
-    if(isset($_POST['chargesimportbtn'])){
-      $charges = $_POST['importcharges'];
-      $rowid = $_POST['rowid'];
-
-      $query->chargesimport($charges, $rowid);
-    }
-     ?>
-    <div class="row">
-      <div class="sidebarcol" id="sidebar">
-        <?php
-        include 'sidebar.php';
-        ?>
-      </div>
-      <div class="contentcol" id="content">
-        <?php require 'navbar.php'; ?>
-        <div class="card">
-          <div class="card-header bg-info text-light">
-            <h4 class="d-inline">HHK Date Range Cold Store Charges</h4>
-            <button type="submit" class="btn btn-success float-end addnewstock" data-bs-toggle="modal" data-bs-target="#newstock">Add New Stock</button>
-            <button type="submit" class="btn btn-success float-end addnewcharges" data-bs-toggle="modal" data-bs-target="#newcharges">Add New Charges</button>
-            <button type="submit" class="btn btn-success float-end hide addrepackingcharges" data-bs-toggle="modal" data-bs-target="#repackingcharges">Add Repacking Charges</button>
-            <button type="submit" class="btn btn-dark text-light float-end hide addtotalcharges ms-2" data-bs-toggle="modal" data-bs-target="#addpayment">Add Payment</button>
-            <a href="export.php?table_name=daterangecharges&date=" class="btn btn-success text-light export float-end">Export to Excel</a>
+  <div class="row">
+    <div class="sidebarcol" id="sidebar">
+      <?php
+      include 'sidebar.php';
+      ?>
+    </div>
+    <div class="contentcol" id="content">
+      <?php require 'navbar.php'; ?>
+      <div class="card">
+        <div class="card-header bg-info text-light">
+          <h4 class="d-inline">HHK Date Range Cold Store Charges</h4>
+          <button type="submit" class="btn btn-success float-end addnewstock" data-bs-toggle="modal" data-bs-target="#newstock">Add New Stock</button>
+          <button type="submit" class="btn btn-success float-end addnewcharges" data-bs-toggle="modal" data-bs-target="#newcharges">Add New Charges</button>
+          <button type="submit" class="btn btn-success float-end hide addrepackingcharges" data-bs-toggle="modal" data-bs-target="#repackingcharges">Add Repacking Charges</button>
+          <button type="submit" class="btn btn-dark text-light float-end hide addtotalcharges ms-2" data-bs-toggle="modal" data-bs-target="#addpayment">Add Payment</button>
+          <a href="export.php?table_name=daterangecharges&date=" class="btn btn-success text-light export float-end">Export to Excel</a>
+        </div>
+        <div class="card-body">
+          <div class="text-center">
+            <?php
+            if (empty($_SESSION['tabs'])) {
+              $_SESSION['tabs'] = "remainingstock";
+            } elseif (isset($_POST['coldstorebtn'])) {
+              $_SESSION['tabs'] = "coldstore";
+            } elseif (isset($_POST['labourbtn'])) {
+              $_SESSION['tabs'] = "labour";
+            } elseif (isset($_POST['processingbtn'])) {
+              $_SESSION['tabs'] = "processing";
+            } elseif (isset($_POST['repackingbtn'])) {
+              $_SESSION['tabs'] = "repacking";
+            } elseif (isset($_POST['totalchargesbtn'])) {
+              $_SESSION['tabs'] = "totalcharges";
+            } elseif (isset($_POST['remainingstockbtn'])) {
+              $_SESSION['tabs'] = "remainingstock";
+            }
+            ?>
+            <form action="" method="post">
+              <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark remainingstocklink" style="text-decoration:none; border:none;" name="remainingstockbtn">Remaining Stock</button>
+              <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark coldstorelink" style="text-decoration:none; border:none;" name="coldstorebtn">Cold Store Charges</button>
+              <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark labourlink" style="text-decoration:none; border:none;" name="labourbtn">Labour Charges</button>
+              <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark processinglink" style="text-decoration:none; border:none;" name="processingbtn">Processing Charges</button>
+              <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark repackinglink" style="text-decoration:none; border:none;" name="repackingbtn">Repacking Charges</button>
+              <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark totallink" style="text-decoration:none; border:none;" name="totalchargesbtn">Total Charges</button>
+            </form>
           </div>
-          <div class="card-body">
-            <div class="text-center">
+          <hr>
+          <div class="coldstorecharges hide">
+            <table class="table table-striped table-bordered table-hover">
+              <tr>
+                <th>Id</th>
+                <th>In Date</th>
+                <th>Out Date</th>
+                <th>Commondity</th>
+                <th style="text-align:center;">Mc</th>
+                <th style="text-align:center;">Total Mc</th>
+                <th style="text-align:center;">Kg</th>
+                <th style="text-align:center;">Total Kg</th>
+                <th style="text-align:center;">Day</th>
+                <th style="text-align:center;">Rate</th>
+                <th style="text-align:center;">Charges</th>
+                <th style="text-align:center;">Total Charges</th>
+                <th>Action</th>
+              </tr>
               <?php
-              if(empty($_SESSION['tabs'])){
-                $_SESSION['tabs'] = "remainingstock";
-              }elseif(isset($_POST['coldstorebtn'])){
-                $_SESSION['tabs'] = "coldstore";
-              }elseif(isset($_POST['labourbtn'])){
-                $_SESSION['tabs'] = "labour";
-              }elseif(isset($_POST['processingbtn'])){
-                $_SESSION['tabs'] = "processing";
-              }elseif(isset($_POST['repackingbtn'])){
-                $_SESSION['tabs'] = "repacking";
-              }elseif(isset($_POST['totalchargesbtn'])){
-                $_SESSION['tabs'] = "totalcharges";
-              }elseif(isset($_POST['remainingstockbtn'])){
-                $_SESSION['tabs'] = "remainingstock";
-              }
-               ?>
-              <form action="" method="post">
-                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark remainingstocklink" style="text-decoration:none; border:none;" name="remainingstockbtn">Remaining Stock</button>
-                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark coldstorelink" style="text-decoration:none; border:none;" name="coldstorebtn">Cold Store Charges</button>
-                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark labourlink" style="text-decoration:none; border:none;" name="labourbtn">Labour Charges</button>
-                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark processinglink" style="text-decoration:none; border:none;" name="processingbtn">Processing Charges</button>
-                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark repackinglink" style="text-decoration:none; border:none;" name="repackingbtn">Repacking Charges</button>
-                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark totallink" style="text-decoration:none; border:none;" name="totalchargesbtn">Total Charges</button>
-              </form>
-            </div>
-            <hr>
-            <div class="coldstorecharges hide">
-                <table class="table table-striped table-bordered table-hover">
-                  <tr>
-                    <th>Id</th>
-                    <th>In Date</th>
-                    <th>Out Date</th>
-                    <th>Commondity</th>
-                    <th style="text-align:center;">Mc</th>
-                    <th style="text-align:center;">Total Mc</th>
-                    <th style="text-align:center;">Kg</th>
-                    <th style="text-align:center;">Total Kg</th>
-                    <th style="text-align:center;">Day</th>
-                    <th style="text-align:center;">Rate</th>
-                    <th style="text-align:center;">Charges</th>
-                    <th style="text-align:center;">Total Charges</th>
-                    <th>Action</th>
-                  </tr>
-                  <?php
 
-                  $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM coldstore");
-                  $commonditycountstmt->execute();
-                  $commonditycountdatas = $commonditycountstmt->fetchColumn();
-                  $idd = 0;
-                  for ($i=0; $i < $commonditycountdatas; $i++) {
-                    $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM coldstore");
-                    $commonditystmt->execute();
-                    $commonditydata = $commonditystmt->fetchall();
-                    $commondity_id = $commonditydata[$i]['commondity_id'];
-                    $commonditydata = $query->select('category', $commondity_id, 'category_id');
-                  $stmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='$commondity_id'");
-                  $stmt->execute();
-                  $datas = $stmt->fetchall();
+              $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM coldstore");
+              $commonditycountstmt->execute();
+              $commonditycountdatas = $commonditycountstmt->fetchColumn();
+              $idd = 0;
+              for ($i = 0; $i < $commonditycountdatas; $i++) {
+                $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM coldstore");
+                $commonditystmt->execute();
+                $commonditydata = $commonditystmt->fetchall();
+                $commondity_id = $commonditydata[$i]['commondity_id'];
+                $commonditydata = $query->select('category', $commondity_id, 'category_id');
+                $stmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='$commondity_id'");
+                $stmt->execute();
+                $datas = $stmt->fetchall();
 
-                  ?>
-                  <tr style="font-weight:bold;">
-                    <td><?= $commonditydata['category_name']; ?></td>
-                    <td colspan="12"></td>
-                  </tr>
-                  <?php
+              ?>
+                <tr style="font-weight:bold;">
+                  <td><?= $commonditydata['category_name']; ?></td>
+                  <td colspan="12"></td>
+                </tr>
+                <?php
 
-                  foreach ($datas as $data) {
-                    $idd++;
-                    $item_id = $data['commondity_id'];
-                    $commonditydata = $query->select('category', $item_id, 'category_id');
+                foreach ($datas as $data) {
+                  $idd++;
+                  $item_id = $data['commondity_id'];
+                  $commonditydata = $query->select('category', $item_id, 'category_id');
 
-                    $comstmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='$commondity_id' GROUP BY commondity_id");
-                    $comstmt->execute();
-                    $comdatas = $comstmt->fetch(PDO::FETCH_ASSOC);
-                    $item_id = $comdatas['commondity_id'];
-                    $commonstmt = $pdo->prepare("SELECT id FROM coldstore WHERE commondity_id='$item_id'");
-                    $commonstmt->execute();
-                    $commondata = $commonstmt->fetch(PDO::FETCH_ASSOC);
-                  ?>
-                  <!-- <tr style="<?php //if($commonditydata['category_name'] == "IQF"){echo "background-color: #6ef757 !important;";}elseif($commonditydata['category_name'] == "Block"){echo "background-color: #f5764c !important;";}elseif($commonditydata['category_name'] == "Pujanut"){echo "background-color: lightblue !important;";} ?>"> -->
+                  $comstmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='$commondity_id' GROUP BY commondity_id");
+                  $comstmt->execute();
+                  $comdatas = $comstmt->fetch(PDO::FETCH_ASSOC);
+                  $item_id = $comdatas['commondity_id'];
+                  $commonstmt = $pdo->prepare("SELECT id FROM coldstore WHERE commondity_id='$item_id'");
+                  $commonstmt->execute();
+                  $commondata = $commonstmt->fetch(PDO::FETCH_ASSOC);
+                ?>
+                  <!-- <tr style="<?php //if($commonditydata['category_name'] == "IQF"){echo "background-color: #6ef757 !important;";}elseif($commonditydata['category_name'] == "Block"){echo "background-color: #f5764c !important;";}elseif($commonditydata['category_name'] == "Pujanut"){echo "background-color: lightblue !important;";} 
+                                  ?>"> -->
                   <tr>
                     <td><?php echo $idd; ?></td>
                     <td><?php echo date('d-m-Y', strtotime($data['indate'])); ?></td>
@@ -266,11 +268,11 @@ $query = new Query();
                     <td style="text-align:right;"><?php echo $data['charges']; ?></td>
                     <td style="text-align:right;"><?php echo $data['total_charges']; ?></td>
                     <td><a href="daterangecharges.php" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#coldstoreupdatemodal<?php echo $data['id']; ?>">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-  </svg></a>
-                    <!-- <button type="submit" name="deletebutton" class="btn btn-danger">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                          <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                        </svg></a>
+                      <!-- <button type="submit" name="deletebutton" class="btn btn-danger">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
                     </button> -->
                     </td>
@@ -284,135 +286,137 @@ $query = new Query();
                         </div>
                         <div class="modal-body">
                           <form action="daterangecharges.php" method="post">
-                          <div class="modal-body">
-                            <div class="row" style="margin-bottom: 10px !important;">
-                              <input type="hidden" name="updateid" value="<?php echo $data['id']; ?>">
-                              <?php
+                            <div class="modal-body">
+                              <div class="row" style="margin-bottom: 10px !important;">
+                                <input type="hidden" name="updateid" value="<?php echo $data['id']; ?>">
+                                <?php
                                 $id = $data['id'];
                                 $coldstoredataup = $query->select('coldstore', $id, 'id');
                                 $labourdataup = $query->select('labour', $id, 'id');
                                 $processingdataup = $query->select('processing', $id, 'id');
-                               ?>
-                              <div class="col">
-                                <label style="font-weight: bold;">In Date</label>
-                                <input type="date" name="indate" class="form-control inpv2" value="<?php echo $coldstoredataup['indate'];  ?>">
+                                ?>
+                                <div class="col">
+                                  <label style="font-weight: bold;">In Date</label>
+                                  <input type="date" name="indate" class="form-control inpv2" value="<?php echo $coldstoredataup['indate'];  ?>">
+                                </div>
+                                <div class="col">
+                                  <label style="font-weight: bold;">Out Date</label>
+                                  <input type="date" name="outdate" class="form-control inpv2" value="<?php echo $coldstoredataup['outdate'];  ?>">
+                                </div>
                               </div>
-                              <div class="col">
-                                <label style="font-weight: bold;">Out Date</label>
-                                <input type="date" name="outdate" class="form-control inpv2" value="<?php echo $coldstoredataup['outdate'];  ?>">
+                              <div class="row" style="margin-bottom: 10px !important;">
+                                <div class="col">
+                                  <label style="font-weight: bold;">Mc</label>
+                                  <input type="number" name="mc" class="form-control inpv2" value="<?php echo $coldstoredataup['mc'];  ?>">
+                                </div>
+                                <div class="col">
+                                  <label style="font-weight: bold;">Kg</label>
+                                  <input type="text" name="kg" class="form-control inpv2" value="<?php echo $coldstoredataup['kg'];  ?>">
+                                </div>
                               </div>
-                            </div>
-                            <div class="row" style="margin-bottom: 10px !important;">
-                              <div class="col">
-                                <label style="font-weight: bold;">Mc</label>
-                                <input type="number" name="mc" class="form-control inpv2" value="<?php echo $coldstoredataup['mc'];  ?>">
-                              </div>
-                              <div class="col">
-                                <label style="font-weight: bold;">Kg</label>
-                                <input type="text" name="kg" class="form-control inpv2" value="<?php echo $coldstoredataup['kg'];  ?>">
-                              </div>
-                            </div>
-                            <div class="row" style="margin-bottom: 10px !important;">
-                              <div class="col">
-                                <label>Commondity</label>
-                                <select class="form-control inpv2" name="commondity_id" id="upcommondity<?= $id; ?>">
-                                  <?php
-                                  $commonditydatas = $query->selectall('category');
-                                  foreach ($commonditydatas as $commonditydata) {
-                                    ?>
-                                    <option value="<?php echo $commonditydata['category_id']; ?>" <?php if($commonditydata['category_id'] == $data['commondity_id']){ echo "selected"; } ?>><?php echo $commonditydata['category_name']; ?></option>
+                              <div class="row" style="margin-bottom: 10px !important;">
+                                <div class="col">
+                                  <label>Commondity</label>
+                                  <select class="form-control inpv2" name="commondity_id" id="upcommondity<?= $id; ?>">
                                     <?php
-                                  }
-                                  ?>
-                                </select>
+                                    $commonditydatas = $query->selectall('category');
+                                    foreach ($commonditydatas as $commonditydata) {
+                                    ?>
+                                      <option value="<?php echo $commonditydata['category_id']; ?>" <?php if ($commonditydata['category_id'] == $data['commondity_id']) {
+                                                                                                      echo "selected";
+                                                                                                    } ?>><?php echo $commonditydata['category_name']; ?></option>
+                                    <?php
+                                    }
+                                    ?>
+                                  </select>
+                                </div>
+                                <div class="col">
+                                  <label style="font-weight: bold;">Cold Store Rate</label>
+                                  <input type="text" name="coldstorerate" class="form-control inpv2" value="<?php echo $coldstoredataup['rate'];  ?>">
+                                </div>
                               </div>
-                              <div class="col">
-                                <label style="font-weight: bold;">Cold Store Rate</label>
-                                <input type="text" name="coldstorerate" class="form-control inpv2" value="<?php echo $coldstoredataup['rate'];  ?>">
+                              <div class="row">
+                                <div class="col">
+                                  <label style="font-weight: bold;">Labour Rate</label>
+                                  <input type="text" name="labourrate" class="form-control inpv2" value="<?php echo $labourdataup['rate'];  ?>">
+                                </div>
+                                <div class="col">
+                                  <div class="upprocessingratediv<?= $id; ?>">
+                                    <label style="font-weight: bold;">Processing Rate</label>
+                                    <input type="hidden" name="upprocessingrate" value="<?php echo $processingdataup['rate'];  ?>">
+                                    <input type="text" disabled class="form-control inpv2" value="<?php echo $processingdataup['rate'];  ?>">
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                            <div class="row">
-                              <div class="col">
-                                <label style="font-weight: bold;">Labour Rate</label>
-                                <input type="text" name="labourrate" class="form-control inpv2" value="<?php echo $labourdataup['rate'];  ?>">
-                              </div>
-                            <div class="col">
-                              <div class="upprocessingratediv<?= $id; ?>">
-                                <label style="font-weight: bold;">Processing Rate</label>
-                                <input type="hidden" name="upprocessingrate" value="<?php echo $processingdataup['rate'];  ?>">
-                                <input type="text" disabled class="form-control inpv2" value="<?php echo $processingdataup['rate'];  ?>">
-                              </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                              <button type="submit" class="btn btn-warning" name="update">Update</button>
                             </div>
-                            </div>
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-warning" name="update">Update</button>
-                          </div>
-                        </form>
+                          </form>
                         </div>
                       </div>
                     </div>
                   </div>
                   <?php
-                    $blockid = $query->selectoncecontain('category', 'category_name', 'Block');
+                  $blockid = $query->selectoncecontain('category', 'category_name', 'Block');
 
-                   ?>
+                  ?>
                   <script type="text/javascript">
                     var upcommondity<?= $id; ?> = $("#upcommondity<?= $id; ?>").val();
-                    $("#upcommondity<?= $id; ?>").change(function(){
+                    $("#upcommondity<?= $id; ?>").change(function() {
                       upcommondity<?= $id; ?> = $("#upcommondity<?= $id; ?>").val();
-                      if(upcommondity<?= $id; ?> == <?= $blockid['category_id']; ?>){
+                      if (upcommondity<?= $id; ?> == <?= $blockid['category_id']; ?>) {
                         $(".upprocessingratediv<?= $id; ?>").hide();
                         $(".upprocessingchargesdiv<?= $id; ?>").show();
-                      }else{
+                      } else {
                         $(".upprocessingratediv<?= $id; ?>").show();
                         $(".upprocessingchargesdiv<?= $id; ?>").hide();
                       }
                     });
-                    if(upcommondity<?= $id; ?> == <?= $blockid['category_id']; ?>){
-                        $(".upprocessingratediv<?= $id; ?>").hide();
-                        $(".upprocessingchargesdiv<?= $id; ?>").show();
-                      }
+                    if (upcommondity<?= $id; ?> == <?= $blockid['category_id']; ?>) {
+                      $(".upprocessingratediv<?= $id; ?>").hide();
+                      $(".upprocessingchargesdiv<?= $id; ?>").show();
+                    }
                   </script>
-                  <?php
-                  }
+              <?php
                 }
-                 ?>
-                </table>
-            </div>
-            <div class="labourcharges hide">
-              <table class="table table-striped table-bordered table-hover">
-                <tr>
-                  <th>Id</th>
-                  <th>In Date</th>
-                  <th>Out Date</th>
-                  <th>Commondity</th>
-                  <th style="text-align:center;">Mc</th>
-                  <th style="text-align:center;">Total Mc</th>
-                  <th style="text-align:center;">Kg</th>
-                  <th style="text-align:center;">Total Kg</th>
-                  <th style="text-align:center;">Rate</th>
-                  <th style="text-align:center;">Charges</th>
-                  <th style="text-align:center;">Total Charges</th>
-                </tr>
-                <?php
-                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM labour");
-                $commonditycountstmt->execute();
-                $commonditycountdatas = $commonditycountstmt->fetchColumn();
-                $idd = 0;
-                for ($i=0; $i < $commonditycountdatas; $i++) {
-                  $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM labour");
-                  $commonditystmt->execute();
-                  $commonditydata = $commonditystmt->fetchall();
-                  $commondity_id = $commonditydata[$i]['commondity_id'];
+              }
+              ?>
+            </table>
+          </div>
+          <div class="labourcharges hide">
+            <table class="table table-striped table-bordered table-hover">
+              <tr>
+                <th>Id</th>
+                <th>In Date</th>
+                <th>Out Date</th>
+                <th>Commondity</th>
+                <th style="text-align:center;">Mc</th>
+                <th style="text-align:center;">Total Mc</th>
+                <th style="text-align:center;">Kg</th>
+                <th style="text-align:center;">Total Kg</th>
+                <th style="text-align:center;">Rate</th>
+                <th style="text-align:center;">Charges</th>
+                <th style="text-align:center;">Total Charges</th>
+              </tr>
+              <?php
+              $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM labour");
+              $commonditycountstmt->execute();
+              $commonditycountdatas = $commonditycountstmt->fetchColumn();
+              $idd = 0;
+              for ($i = 0; $i < $commonditycountdatas; $i++) {
+                $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM labour");
+                $commonditystmt->execute();
+                $commonditydata = $commonditystmt->fetchall();
+                $commondity_id = $commonditydata[$i]['commondity_id'];
 
                 $labourstmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id'");
                 $labourstmt->execute();
                 $labourdatas = $labourstmt->fetchall();
 
                 $commonditydata = $query->select('category', $commondity_id, 'category_id');
-                ?>
+              ?>
                 <tr style="font-weight:bold;">
                   <td><?= $commonditydata['category_name']; ?></td>
                   <td colspan="12"></td>
@@ -424,54 +428,54 @@ $query = new Query();
                   $item_id = $labourdata['commondity_id'];
                   $commonditydata = $query->select('category', $item_id, 'category_id');
                 ?>
-                <tr>
-                  <td><?php echo $idd; ?></td>
-                  <td><?php echo date('d-m-Y', strtotime($labourdata['indate']));  ?></td>
-                  <td><?php echo date('d-m-Y', strtotime($labourdata['outdate'])); ?></td>
-                  <td><?php echo $commonditydata['category_name']; ?></td>
-                  <td style="text-align:right;"><?php echo $labourdata['mc']; ?></td>
-                  <td style="text-align:right;"><?php echo $labourdata['total_mc']; ?></td>
-                  <td style="text-align:right;"><?php echo $labourdata['kg']; ?></td>
-                  <td style="text-align:right;"><?php echo $labourdata['total_kg']; ?></td>
-                  <td style="text-align:right;"><?php echo $labourdata['rate']; ?></td>
-                  <td style="text-align:right;"><?php echo $labourdata['charges']; ?></td>
-                  <td style="text-align:right;"><?php echo $labourdata['total_charges']; ?></td>
-                  <!-- <button type="submit" name="deletebutton" class="btn btn-danger">
+                  <tr>
+                    <td><?php echo $idd; ?></td>
+                    <td><?php echo date('d-m-Y', strtotime($labourdata['indate']));  ?></td>
+                    <td><?php echo date('d-m-Y', strtotime($labourdata['outdate'])); ?></td>
+                    <td><?php echo $commonditydata['category_name']; ?></td>
+                    <td style="text-align:right;"><?php echo $labourdata['mc']; ?></td>
+                    <td style="text-align:right;"><?php echo $labourdata['total_mc']; ?></td>
+                    <td style="text-align:right;"><?php echo $labourdata['kg']; ?></td>
+                    <td style="text-align:right;"><?php echo $labourdata['total_kg']; ?></td>
+                    <td style="text-align:right;"><?php echo $labourdata['rate']; ?></td>
+                    <td style="text-align:right;"><?php echo $labourdata['charges']; ?></td>
+                    <td style="text-align:right;"><?php echo $labourdata['total_charges']; ?></td>
+                    <!-- <button type="submit" name="deletebutton" class="btn btn-danger">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
                   </button> -->
-                  </td>
-                </tr>
-                <?php
+                    </td>
+                  </tr>
+              <?php
                 }
               }
-                 ?>
-              </table>
-            </div>
-            <div class="processingcharges hide">
-              <table class="table table-striped table-bordered table-hover">
-                <tr>
-                  <th>Id</th>
-                  <th>In Date</th>
-                  <th>Out Date</th>
-                  <th>Commondity</th>
-                  <th style="text-align:center;">Mc</th>
-                  <th style="text-align:center;">Total Mc</th>
-                  <th style="text-align:center;">Kg</th>
-                  <th style="text-align:center;">Total Kg</th>
-                  <th style="text-align:center;">Rate</th>
-                  <th style="text-align:center;">Charges</th>
-                  <th style="text-align:center;">Total Charges</th>
-                </tr>
-                <?php
-                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM processing");
-                $commonditycountstmt->execute();
-                $commonditycountdatas = $commonditycountstmt->fetchColumn();
-                $idd = 0;
-                for ($i=0; $i < $commonditycountdatas; $i++) {
-                  $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM processing");
-                  $commonditystmt->execute();
-                  $commonditydata = $commonditystmt->fetchall();
-                  $commondity_id = $commonditydata[$i]['commondity_id'];
+              ?>
+            </table>
+          </div>
+          <div class="processingcharges hide">
+            <table class="table table-striped table-bordered table-hover">
+              <tr>
+                <th>Id</th>
+                <th>In Date</th>
+                <th>Out Date</th>
+                <th>Commondity</th>
+                <th style="text-align:center;">Mc</th>
+                <th style="text-align:center;">Total Mc</th>
+                <th style="text-align:center;">Kg</th>
+                <th style="text-align:center;">Total Kg</th>
+                <th style="text-align:center;">Rate</th>
+                <th style="text-align:center;">Charges</th>
+                <th style="text-align:center;">Total Charges</th>
+              </tr>
+              <?php
+              $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM processing");
+              $commonditycountstmt->execute();
+              $commonditycountdatas = $commonditycountstmt->fetchColumn();
+              $idd = 0;
+              for ($i = 0; $i < $commonditycountdatas; $i++) {
+                $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM processing");
+                $commonditystmt->execute();
+                $commonditydata = $commonditystmt->fetchall();
+                $commondity_id = $commonditydata[$i]['commondity_id'];
 
                 $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id'");
                 $processingstmt->execute();
@@ -480,7 +484,7 @@ $query = new Query();
 
 
 
-                ?>
+              ?>
                 <tr style="font-weight:bold;">
                   <td><?= $commonditydata['category_name']; ?></td>
                   <td colspan="12"></td>
@@ -491,14 +495,14 @@ $query = new Query();
                   $lastid = $processingdata['id'];
                   $commondity_id = $processingdata['commondity_id'];
                   $commonditydata = $query->select('category', $commondity_id, 'category_id');
-                  if(str_contains(strtolower($commonditydata['category_name']), 'block')){
+                  if (str_contains(strtolower($commonditydata['category_name']), 'block')) {
                     $lastrowstmt = $pdo->prepare("SELECT * FROM processing WHERE id<'$lastid' AND commondity_id='$commondity_id' ORDER BY id DESC ");
                     $lastrowstmt->execute();
                     $lastrowdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
-                    if(!empty($lastrowdata)){
+                    if (!empty($lastrowdata)) {
                       $totalkg = intval($processingdata['kg']) + $lastrowdata['total_kg'];
                       $total_charges = intval($processingdata['charges']) + $lastrowdata['total_charges'];
-                    }else {
+                    } else {
                       $totalkg = intval($processingdata['kg']);
                       $total_charges = intval($processingdata['charges']);
                     }
@@ -513,152 +517,188 @@ $query = new Query();
                   $item_id = $processingdata['commondity_id'];
                   $commonditydata = $query->select('category', $item_id, 'category_id');
                 ?>
-                <tr>
-                  <td><?php echo $idd; ?></td>
-                  <td><?php echo date('d-m-Y', strtotime($processingdata['indate']));  ?></td>
-                  <td><?php echo date('d-m-Y', strtotime($processingdata['outdate'])); ?></td>
-                  <td><?php echo $commonditydata['category_name']; ?></td>
-                  <td style="text-align:right;"><?php echo $processingdata['mc']; ?></td>
-                  <td style="text-align:right;"><?php echo $processingdata['total_mc']; ?></td>
-                  <td style="text-align:right;" <?php if(str_contains(strtolower($commonditydata['category_name']), 'block')){echo 'data-bs-toggle="modal" data-bs-target="#importkg' . $processingdata["id"] . '"';} ?>><?php echo $processingdata['kg']; ?></td>
-                  <td style="text-align:right;"><?php echo $processingdata['total_kg']; ?></td>
-                  <td style="text-align:right;"><?php echo $processingdata['rate']; ?></td>
-                  <td style="text-align:right;" <?php if(str_contains(strtolower($commonditydata['category_name']), 'block')){echo 'data-bs-toggle="modal" data-bs-target="#importcharges' . $processingdata["id"] . '"';} ?>><?php if($processingdata['charges'] != 0){ echo $processingdata['charges'];} ?></td>
-                  <td style="text-align:right;"><?php echo $processingdata['total_charges']; ?></td>
-                  <!-- <button type="submit" name="deletebutton" class="btn btn-danger">
+                  <tr>
+                    <td><?php echo $idd; ?></td>
+                    <td><?php echo date('d-m-Y', strtotime($processingdata['indate']));  ?></td>
+                    <td><?php echo date('d-m-Y', strtotime($processingdata['outdate'])); ?></td>
+                    <td><?php echo $commonditydata['category_name']; ?></td>
+                    <td style="text-align:right;"><?php echo $processingdata['mc']; ?></td>
+                    <td style="text-align:right;"><?php echo $processingdata['total_mc']; ?></td>
+                    <td style="text-align:right;" <?php if (str_contains(strtolower($commonditydata['category_name']), 'block')) {
+                                                    echo 'data-bs-toggle="modal" data-bs-target="#importkg' . $processingdata["id"] . '"';
+                                                  } ?>><?php echo $processingdata['kg']; ?></td>
+                    <td style="text-align:right;"><?php echo $processingdata['total_kg']; ?></td>
+                    <td style="text-align:right;"><?php echo $processingdata['rate']; ?></td>
+                    <td style="text-align:right;" <?php if (str_contains(strtolower($commonditydata['category_name']), 'block')) {
+                                                    echo 'data-bs-toggle="modal" data-bs-target="#importcharges' . $processingdata["id"] . '"';
+                                                  } ?>><?php if ($processingdata['charges'] != 0) {
+                                                          echo $processingdata['charges'];
+                                                        } ?></td>
+                    <td style="text-align:right;"><?php echo $processingdata['total_charges']; ?></td>
+                    <!-- <button type="submit" name="deletebutton" class="btn btn-danger">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
                   </button> -->
-                  </td>
-                </tr>
-                <div class="modal fade" id="importkg<?= $processingdata['id']; ?>">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title">Import Kg</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </td>
+                  </tr>
+                  <div class="modal fade" id="importkg<?= $processingdata['id']; ?>">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title">Import Kg</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form action="" method="post">
+                          <input type="hidden" name="rowid" value="<?= $processingdata['id']; ?>">
+                          <div class="modal-body">
+                            <label>Kg</label>
+                            <input type="text" name="importkg" class="form-control inpv2 mb-2" value="<?= $processingdata['kg']; ?>">
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" name="kgimportbtn">Add</button>
+                          </div>
+                        </form>
                       </div>
-                      <form action="" method="post">
-                        <input type="hidden" name="rowid" value="<?= $processingdata['id']; ?>">
-                        <div class="modal-body">
-                          <label>Kg</label>
-                          <input type="text" name="importkg" class="form-control inpv2 mb-2" value="<?= $processingdata['kg']; ?>">
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                          <button type="submit" class="btn btn-primary" name="kgimportbtn">Add</button>
-                        </div>
-                      </form>
                     </div>
                   </div>
-                </div>
-                <div class="modal fade" id="importcharges<?= $processingdata['id']; ?>">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title">Import Charges</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  <div class="modal fade" id="importcharges<?= $processingdata['id']; ?>">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title">Import Charges</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form action="" method="post">
+                          <input type="hidden" name="rowid" value="<?= $processingdata['id']; ?>">
+                          <div class="modal-body">
+                            <label>Charges</label>
+                            <input type="text" name="importcharges" class="form-control inpv2 mb-2" value="<?= $processingdata['charges']; ?>">
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" name="chargesimportbtn">Add</button>
+                          </div>
+                        </form>
                       </div>
-                      <form action="" method="post">
-                        <input type="hidden" name="rowid" value="<?= $processingdata['id']; ?>">
-                        <div class="modal-body">
-                          <label>Charges</label>
-                          <input type="text" name="importcharges" class="form-control inpv2 mb-2" value="<?= $processingdata['charges']; ?>">
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                          <button type="submit" class="btn btn-primary" name="chargesimportbtn">Add</button>
-                        </div>
-                      </form>
                     </div>
                   </div>
-                </div>
-                <?php
+              <?php
                 }
-                }
-                 ?>
-              </table>
-            </div>
-            <div class="totalcharges hide">
-              <table class="table table-striped table-bordered table-hover">
-                <tr style="font-size:13px;">
-                  <th>Date</th>
-                  <th>Commondity</th>
-                  <th style="text-align:center;">Total Cold Store Charges</th>
-                  <th style="text-align:center;">Total Labour Charges</th>
-                  <th style="text-align:center;">Total Processing Charges</th>
-                  <th style="text-align:center;">Repacking Charges</th>
-                  <th style="text-align:center;">Ice Charges</th>
-                  <th style="text-align:center;">OT Charges</th>
-                  <th style="text-align:center;">Extra Charges</th>
-                  <th style="text-align:center;">Total Charges</th>
-                  <th style="text-align:center;">Grand Total Charges</th>
-                  <th style="text-align:center;">Payment Date</th>
-                  <th style="text-align:center;">Payment Amount</th>
-                  <th style="text-align:center;">Balance Amount</th>
-                  <th style="text-align: center; width: 150px;">Remark</th>
-                </tr>
-                <?php
-                $totalstmt = $pdo->prepare("SELECT * FROM total_charges");
-                $totalstmt->execute();
-                $totaldatas = $totalstmt->fetchall();
-                $idd = 0;
-                foreach ($totaldatas as $total_charges_data) {
-                  $idd++;
-                  $item_id = $total_charges_data['commondity_id'];
-                  $commonditydata = $query->select('category', $item_id, 'category_id');
+              }
+              ?>
+            </table>
+          </div>
+          <div class="totalcharges hide">
+            <table class="table table-striped table-bordered table-hover">
+              <tr style="font-size:13px;">
+                <th>Date</th>
+                <th>Commondity</th>
+                <th style="text-align:center;">Total Cold Store Charges</th>
+                <th style="text-align:center;">Total Labour Charges</th>
+                <th style="text-align:center;">Total Processing Charges</th>
+                <th style="text-align:center;">Repacking Charges</th>
+                <th style="text-align:center;">Ice Charges</th>
+                <th style="text-align:center;">OT Charges</th>
+                <th style="text-align:center;">Extra Charges</th>
+                <th style="text-align:center;">Total Charges</th>
+                <th style="text-align:center;">Grand Total Charges</th>
+                <th style="text-align:center;">Payment Date</th>
+                <th style="text-align:center;">Payment Amount</th>
+                <th style="text-align:center;">Balance Amount</th>
+                <th style="text-align: center; width: 150px;">Remark</th>
+              </tr>
+              <?php
+              $totalstmt = $pdo->prepare("SELECT * FROM total_charges");
+              $totalstmt->execute();
+              $totaldatas = $totalstmt->fetchall();
+              $idd = 0;
+              foreach ($totaldatas as $total_charges_data) {
+                $idd++;
+                $item_id = $total_charges_data['commondity_id'];
+                $commonditydata = $query->select('category', $item_id, 'category_id');
 
-                  $nowid = $total_charges_data['id'];
-                  $laststmt = $pdo->prepare("SELECT * FROM total_charges WHERE id < '$nowid' ORDER BY id DESC");
-                  $laststmt->execute();
-                  $lastdata = $laststmt->fetch(PDO::FETCH_ASSOC);
+                $nowid = $total_charges_data['id'];
+                $laststmt = $pdo->prepare("SELECT * FROM total_charges WHERE id < '$nowid' ORDER BY id DESC");
+                $laststmt->execute();
+                $lastdata = $laststmt->fetch(PDO::FETCH_ASSOC);
 
-                  if(!empty($lastdata)){
-                    // grand_total_charges
-                    $grand_total_charges = $total_charges_data['total_charges'] + $lastdata['balance_amount'];
-                    if($grand_total_charges != $total_charges_data['grand_total_charges']){
-                      $updatestmt = $pdo->prepare("UPDATE total_charges SET grand_total_charges='$grand_total_charges' WHERE id='$nowid'");
-                      $updatestmt->execute();
-                    }
-
-                    // balance_amount
-                    $balance_amount = $grand_total_charges - $total_charges_data['payment_amount'];
-                    if($balance_amount != $total_charges_data['balance_amount']){
-                      $balanceupdatestmt = $pdo->prepare("UPDATE total_charges SET balance_amount='$balance_amount' WHERE id='$nowid'");
-                      $balanceupdatestmt->execute();
-                    }
-                  }else{
-                    // grand_total_charges
-                    $grand_total_charges = $total_charges_data['total_charges'] + 0;
-                    if($grand_total_charges != $total_charges_data['grand_total_charges']){
-                      $updatestmt = $pdo->prepare("UPDATE total_charges SET grand_total_charges='$grand_total_charges' WHERE id='$nowid'");
-                      $updatestmt->execute();
-                    }
-
-                    // balance_amount
-                    $balance_amount = $grand_total_charges - $total_charges_data['payment_amount'];
-                    if($balance_amount != $total_charges_data['balance_amount']){
-                      $balanceupdatestmt = $pdo->prepare("UPDATE total_charges SET balance_amount='$balance_amount' WHERE id='$nowid'");
-                      $balanceupdatestmt->execute();
-                    }
+                if (!empty($lastdata)) {
+                  // grand_total_charges
+                  $grand_total_charges = $total_charges_data['total_charges'] + $lastdata['balance_amount'];
+                  if ($grand_total_charges != $total_charges_data['grand_total_charges']) {
+                    $updatestmt = $pdo->prepare("UPDATE total_charges SET grand_total_charges='$grand_total_charges' WHERE id='$nowid'");
+                    $updatestmt->execute();
                   }
-                ?>
+
+                  // balance_amount
+                  $balance_amount = $grand_total_charges - $total_charges_data['payment_amount'];
+                  if ($balance_amount != $total_charges_data['balance_amount']) {
+                    $balanceupdatestmt = $pdo->prepare("UPDATE total_charges SET balance_amount='$balance_amount' WHERE id='$nowid'");
+                    $balanceupdatestmt->execute();
+                  }
+                } else {
+                  // grand_total_charges
+                  $grand_total_charges = $total_charges_data['total_charges'] + 0;
+                  if ($grand_total_charges != $total_charges_data['grand_total_charges']) {
+                    $updatestmt = $pdo->prepare("UPDATE total_charges SET grand_total_charges='$grand_total_charges' WHERE id='$nowid'");
+                    $updatestmt->execute();
+                  }
+
+                  // balance_amount
+                  $balance_amount = $grand_total_charges - $total_charges_data['payment_amount'];
+                  if ($balance_amount != $total_charges_data['balance_amount']) {
+                    $balanceupdatestmt = $pdo->prepare("UPDATE total_charges SET balance_amount='$balance_amount' WHERE id='$nowid'");
+                    $balanceupdatestmt->execute();
+                  }
+                }
+              ?>
                 <tr>
                   <!-- <td><?php echo $idd; ?></td> -->
-                  <td style="width: 80px;"><?php if($total_charges_data['date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($total_charges_data['date']));} ; ?></td>
-                  <td><?php if(!empty($commonditydata['category_name'])){ echo $commonditydata['category_name'];} ; ?></td>
-                  <td style="text-align:center;"><?php if($total_charges_data['total_coldstore_charges'] != "0"){ echo $total_charges_data['total_coldstore_charges'];} ; ?></td>
-                  <td style="text-align:center;"><?php if($total_charges_data['total_labour_charges'] != "0"){ echo $total_charges_data['total_labour_charges'];} ; ?></td>
-                  <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['total_processing_charges'] != "0"){ echo $total_charges_data['total_processing_charges'];} ; ?></td>
-                  <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['repacking_charges'] != "0"){ echo $total_charges_data['repacking_charges'];} ; ?></td>
-                  <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['ice_charges'] != "0"){ echo $total_charges_data['ice_charges'];} ; ?></td>
-                  <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['ot_charges'] != "0"){ echo $total_charges_data['ot_charges'];} ; ?></td>
-                  <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if($total_charges_data['extra_charges'] != "0"){ echo $total_charges_data['extra_charges'];} ; ?></td>
-                  <td style="text-align:center;"><?php if($total_charges_data['total_charges'] != "0"){ echo $total_charges_data['total_charges'];} ; ?></td>
-                  <td style="text-align:center;"><?php if($total_charges_data['grand_total_charges'] != "0"){ echo $grand_total_charges;} ; ?></td>
-                  <td style="text-align:center;"><?php if($total_charges_data['payment_date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($total_charges_data['payment_date'])); } ; ?></td>
-                  <td style="text-align:center;"><?php if($total_charges_data['payment_amount'] != "0"){ echo $total_charges_data['payment_amount']; }; ?></td>
-                  <td style="text-align:center;"><?php if($total_charges_data['balance_amount'] != "0"){ echo $total_charges_data['balance_amount'];}; ?></td>
-                  <td data-bs-toggle="modal" data-bs-target="#remark<?php echo $total_charges_data['id']; ?>" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px;"><?php if($total_charges_data['remark'] != "0"){ echo $total_charges_data['remark'];}; ?></td>
+                  <td style="width: 80px;"><?php if ($total_charges_data['date'] != "0000-00-00") {
+                                              echo date('d-m-Y', strtotime($total_charges_data['date']));
+                                            }; ?></td>
+                  <td><?php if (!empty($commonditydata['category_name'])) {
+                        echo $commonditydata['category_name'];
+                      }; ?></td>
+                  <td style="text-align:center;"><?php if ($total_charges_data['total_coldstore_charges'] != "0") {
+                                                    echo $total_charges_data['total_coldstore_charges'];
+                                                  }; ?></td>
+                  <td style="text-align:center;"><?php if ($total_charges_data['total_labour_charges'] != "0") {
+                                                    echo $total_charges_data['total_labour_charges'];
+                                                  }; ?></td>
+                  <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if ($total_charges_data['total_processing_charges'] != "0") {
+                                                                                                                                                        echo $total_charges_data['total_processing_charges'];
+                                                                                                                                                      }; ?></td>
+                  <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if ($total_charges_data['repacking_charges'] != "0") {
+                                                                                                                                                        echo $total_charges_data['repacking_charges'];
+                                                                                                                                                      }; ?></td>
+                  <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if ($total_charges_data['ice_charges'] != "0") {
+                                                                                                                                                        echo $total_charges_data['ice_charges'];
+                                                                                                                                                      }; ?></td>
+                  <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if ($total_charges_data['ot_charges'] != "0") {
+                                                                                                                                                        echo $total_charges_data['ot_charges'];
+                                                                                                                                                      }; ?></td>
+                  <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if ($total_charges_data['extra_charges'] != "0") {
+                                                                                                                                                        echo $total_charges_data['extra_charges'];
+                                                                                                                                                      }; ?></td>
+                  <td style="text-align:center;"><?php if ($total_charges_data['total_charges'] != "0") {
+                                                    echo $total_charges_data['total_charges'];
+                                                  }; ?></td>
+                  <td style="text-align:center;"><?php if ($total_charges_data['grand_total_charges'] != "0") {
+                                                    echo $grand_total_charges;
+                                                  }; ?></td>
+                  <td style="text-align:center;"><?php if ($total_charges_data['payment_date'] != "0000-00-00") {
+                                                    echo date('d-m-Y', strtotime($total_charges_data['payment_date']));
+                                                  }; ?></td>
+                  <td style="text-align:center;"><?php if ($total_charges_data['payment_amount'] != "0") {
+                                                    echo $total_charges_data['payment_amount'];
+                                                  }; ?></td>
+                  <td style="text-align:center;"><?php if ($total_charges_data['balance_amount'] != "0") {
+                                                    echo $total_charges_data['balance_amount'];
+                                                  }; ?></td>
+                  <td data-bs-toggle="modal" data-bs-target="#remark<?php echo $total_charges_data['id']; ?>" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px;"><?php if ($total_charges_data['remark'] != "0") {
+                                                                                                                                                                                                          echo $total_charges_data['remark'];
+                                                                                                                                                                                                        }; ?></td>
                 </tr>
                 <!-- Add updatetotalcharges -->
                 <div class="modal fade" id="updatetotalcharges<?php echo $total_charges_data['id']; ?>">
@@ -669,47 +709,57 @@ $query = new Query();
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <form action="daterangecharges.php" method="post">
-                      <div class="modal-body">
-                        <input type="hidden" name="id" value="<?php echo $total_charges_data['id']; ?>">
-                        <?php
-                        $updateid = $total_charges_data['id'];
+                        <div class="modal-body">
+                          <input type="hidden" name="id" value="<?php echo $total_charges_data['id']; ?>">
+                          <?php
+                          $updateid = $total_charges_data['id'];
 
-                        $updatestmt = $pdo->prepare("SELECT * FROM total_charges WHERE id='$updateid'");
-                        $updatestmt->execute();
-                        $updatedata = $updatestmt->fetch(PDO::FETCH_ASSOC);
-                        ?>
-                        <div class="row">
-                          <div class="col">
-                            <label>Repacking Charges</label>
-                            <input type="text" name="repacking_charges" class="form-control inpv2 mb-2" value="<?php if(!empty($updatedata['repacking_charges'])){ echo $updatedata['repacking_charges']; } ?>">
+                          $updatestmt = $pdo->prepare("SELECT * FROM total_charges WHERE id='$updateid'");
+                          $updatestmt->execute();
+                          $updatedata = $updatestmt->fetch(PDO::FETCH_ASSOC);
+                          ?>
+                          <div class="row">
+                            <div class="col">
+                              <label>Repacking Charges</label>
+                              <input type="text" name="repacking_charges" class="form-control inpv2 mb-2" value="<?php if (!empty($updatedata['repacking_charges'])) {
+                                                                                                                    echo $updatedata['repacking_charges'];
+                                                                                                                  } ?>">
+                            </div>
+                            <div class="col">
+                              <label>Ice Charges</label>
+                              <input type="number" name="ice_charges" class="form-control inpv2 mb-2" value="<?php if (!empty($updatedata['ice_charges'])) {
+                                                                                                                echo $updatedata['ice_charges'];
+                                                                                                              } ?>">
+                            </div>
                           </div>
-                          <div class="col">
-                            <label>Ice Charges</label>
-                            <input type="number" name="ice_charges" class="form-control inpv2 mb-2" value="<?php if(!empty($updatedata['ice_charges'])){ echo $updatedata['ice_charges']; } ?>">
+                          <div class="row">
+                            <div class="col">
+                              <label>Ot Charges</label>
+                              <input type="number" name="ot_charges" class="form-control inpv2 mb-2" value="<?php if (!empty($updatedata['ot_charges'])) {
+                                                                                                              echo $updatedata['ot_charges'];
+                                                                                                            } ?>">
+                            </div>
+                            <div class="col">
+                              <label>Processing Charges</label>
+                              <input type="number" name="total_processing_charges" class="form-control inpv2 mb-2" value="<?php if (!empty($updatedata['total_processing_charges'])) {
+                                                                                                                            echo $updatedata['total_processing_charges'];
+                                                                                                                          } ?>">
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col">
+                              <label>Extra Charges</label>
+                              <input type="number" name="extra_charges" class="form-control inpv2 mb-2" value="<?php if (!empty($updatedata['extra_charges'])) {
+                                                                                                                  echo $updatedata['extra_charges'];
+                                                                                                                } ?>">
+                            </div>
+                            <div class="col mt-4">
+                              <button type="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
+                              <button type="submit" name="updatetotalcharges" class="btn btn-warning">Update</button>
+                            </div>
                           </div>
                         </div>
-                        <div class="row">
-                          <div class="col">
-                            <label>Ot Charges</label>
-                            <input type="number" name="ot_charges" class="form-control inpv2 mb-2" value="<?php if(!empty($updatedata['ot_charges'])){ echo $updatedata['ot_charges']; } ?>">
-                          </div>
-                          <div class="col">
-                            <label>Processing Charges</label>
-                            <input type="number" name="total_processing_charges" class="form-control inpv2 mb-2" value="<?php if(!empty($updatedata['total_processing_charges'])){ echo $updatedata['total_processing_charges']; } ?>">
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col">
-                          <label>Extra Charges</label>
-                            <input type="number" name="extra_charges" class="form-control inpv2 mb-2" value="<?php if(!empty($updatedata['extra_charges'])){ echo $updatedata['extra_charges']; } ?>">
-                          </div>
-                          <div class="col mt-4">
-                            <button type="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
-                            <button type="submit" name="updatetotalcharges" class="btn btn-warning">Update</button>
-                          </div>
-                        </div>
-                      </div>
-                    </form>
+                      </form>
                     </div>
                   </div>
                 </div>
@@ -724,103 +774,103 @@ $query = new Query();
                       </div>
                       <form action="" method="post">
                         <input type="hidden" name="remarkid" value="<?php echo $total_charges_data['id']; ?>">
-                      <div class="modal-body">
-                        <div class="">
-                          <label>Remark</label>
-                          <input type="text" name="remark" value="<?= $total_charges_data['remark']; ?>" class="form-control inpv2 mt-2 mb-3">
+                        <div class="modal-body">
+                          <div class="">
+                            <label>Remark</label>
+                            <input type="text" name="remark" value="<?= $total_charges_data['remark']; ?>" class="form-control inpv2 mt-2 mb-3">
+                          </div>
                         </div>
-                      </div>
                         <div class="card-footer p-3">
                           <div class="float-end">
                             <button type="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
                             <button type="submit" name="addremarkbtn" class="btn btn-success">Add Remark</button>
                           </div>
                         </div>
-                      </div>
-                    </form>
                     </div>
+                    </form>
                   </div>
+                </div>
                 <!--Add Remark-->
-                <?php
-                }
-                 ?>
-              </table>
-            </div>
-            <div class="repackingcharges hide">
-              <table class="table table-striped table-bordered table-hover">
-                <tr>
-                  <th>Id</th>
-                  <th>Date</th>
-                  <th style="text-align:center;">In MC</th>
-                  <th style="text-align:center;">In Kg</th>
-                  <th style="text-align:center;">Out MC</th>
-                  <th style="text-align:center;">Out Kg</th>
-                  <th style="text-align:center;">Diff MC</th>
-                  <th style="text-align:center;">Diff Kg</th>
-                  <th style="text-align:center;">Rate</th>
-                  <th style="text-align:center;">Charges</th>
-                  <th style="text-align:center;">Total Charges</th>
+              <?php
+              }
+              ?>
+            </table>
+          </div>
+          <div class="repackingcharges hide">
+            <table class="table table-striped table-bordered table-hover">
+              <tr>
+                <th>Id</th>
+                <th>Date</th>
+                <th style="text-align:center;">In MC</th>
+                <th style="text-align:center;">In Kg</th>
+                <th style="text-align:center;">Out MC</th>
+                <th style="text-align:center;">Out Kg</th>
+                <th style="text-align:center;">Diff MC</th>
+                <th style="text-align:center;">Diff Kg</th>
+                <th style="text-align:center;">Rate</th>
+                <th style="text-align:center;">Charges</th>
+                <th style="text-align:center;">Total Charges</th>
+              </tr>
+              <?php
+              $repackingdatas = $query->selectall('repacking');
+              $idd = 0;
+              foreach ($repackingdatas as $repackingdata) {
+                $idd++;
+              ?>
+                <tr style="text-align:right;">
+                  <td><?php echo $idd; ?></td>
+                  <td><?php echo date('d-m-Y', strtotime($repackingdata['date'])); ?></td>
+                  <td style="text-align:right;"><?php echo $repackingdata['in_mc']; ?></td>
+                  <td style="text-align:right;"><?php echo $repackingdata['in_kg']; ?></td>
+                  <td style="text-align:right;"><?php echo $repackingdata['out_mc']; ?></td>
+                  <td style="text-align:right;"><?php echo $repackingdata['out_kg']; ?></td>
+                  <td style="text-align:right;"><?php echo $repackingdata['diff_mc']; ?></td>
+                  <td style="text-align:right;"><?php echo $repackingdata['diff_kg']; ?></td>
+                  <td style="text-align:right;"><?php echo $repackingdata['rate']; ?></td>
+                  <td style="text-align:right;"><?php echo $repackingdata['charges']; ?></td>
+                  <td style="text-align:right;"><?php echo $repackingdata['total_charges']; ?></td>
+                </tr>
+              <?php
+              }
+              ?>
+            </table>
+          </div>
+          <div class="remainingstock hide">
+            <table class="table table-hover table-striped table-bordered">
+              <tr>
+                <th>In Date</th>
+                <th>Out Date</th>
+                <th>Commondity</th>
+                <th style="text-align:center;">Mc</th>
+                <th style="text-align:center;">Total Mc</th>
+                <th style="text-align:center;">Kg</th>
+                <th style="text-align:center;">Total Kg</th>
+                <th style="text-align:center;">Balance Mc</th>
+                <th style="text-align:center;">Balance Kg</th>
+                <th>Action</th>
+              </tr>
+              <?php
+              $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM hhkstock");
+              $commonditycountstmt->execute();
+              $commonditycountdatas = $commonditycountstmt->fetchColumn();
+              $idd = 0;
+              for ($i = 0; $i < $commonditycountdatas; $i++) {
+                $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkstock");
+                $commonditystmt->execute();
+                $commonditydata = $commonditystmt->fetchall();
+                $commondity_id = $commonditydata[$i]['commondity_id'];
+
+                $commonditydata = $query->select('category', $commondity_id, 'category_id');
+
+                // Edit Check
+                $commondity_id = $commonditydata['category_id'];
+
+              ?>
+                <tr style="font-weight:bold;">
+                  <td><?= $commonditydata['category_name']; ?></td>
+                  <td colspan="12"></td>
                 </tr>
                 <?php
-                $repackingdatas = $query->selectall('repacking');
-                $idd = 0;
-                foreach ($repackingdatas as $repackingdata) {
-                  $idd++;
-                 ?>
-                 <tr style="text-align:right;">
-                   <td><?php echo $idd; ?></td>
-                   <td><?php echo date('d-m-Y', strtotime($repackingdata['date'])); ?></td>
-                   <td style="text-align:right;"><?php echo $repackingdata['in_mc']; ?></td>
-                   <td style="text-align:right;"><?php echo $repackingdata['in_kg']; ?></td>
-                   <td style="text-align:right;"><?php echo $repackingdata['out_mc']; ?></td>
-                   <td style="text-align:right;"><?php echo $repackingdata['out_kg']; ?></td>
-                   <td style="text-align:right;"><?php echo $repackingdata['diff_mc']; ?></td>
-                   <td style="text-align:right;"><?php echo $repackingdata['diff_kg']; ?></td>
-                   <td style="text-align:right;"><?php echo $repackingdata['rate']; ?></td>
-                   <td style="text-align:right;"><?php echo $repackingdata['charges']; ?></td>
-                   <td style="text-align:right;"><?php echo $repackingdata['total_charges']; ?></td>
-                 </tr>
-                <?php
-                }
-                ?>
-              </table>
-            </div>
-            <div class="remainingstock hide">
-              <table class="table table-hover table-striped table-bordered">
-                <tr>
-                  <th>In Date</th>
-                  <th>Out Date</th>
-                  <th>Commondity</th>
-                  <th style="text-align:center;">Mc</th>
-                  <th style="text-align:center;">Total Mc</th>
-                  <th style="text-align:center;">Kg</th>
-                  <th style="text-align:center;">Total Kg</th>
-                  <th style="text-align:center;">Balance Mc</th>
-                  <th style="text-align:center;">Balance Kg</th>
-                  <th>Action</th>
-                </tr>
-                <?php
-                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM hhkstock");
-                $commonditycountstmt->execute();
-                $commonditycountdatas = $commonditycountstmt->fetchColumn();
-                $idd = 0;
-                for ($i=0; $i < $commonditycountdatas; $i++) {
-                  $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkstock");
-                  $commonditystmt->execute();
-                  $commonditydata = $commonditystmt->fetchall();
-                  $commondity_id = $commonditydata[$i]['commondity_id'];
-
-                  $commonditydata = $query->select('category', $commondity_id, 'category_id');
-
-                  // Edit Check
-                  $commondity_id = $commonditydata['category_id'];
-
-                  ?>
-                  <tr style="font-weight:bold;">
-                    <td><?= $commonditydata['category_name']; ?></td>
-                    <td colspan="12"></td>
-                  </tr>
-                  <?php
                 $hhkstockstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE commondity_id='$commondity_id'");
                 $hhkstockstmt->execute();
                 $hhkstockdatas = $hhkstockstmt->fetchall();
@@ -845,8 +895,8 @@ $query = new Query();
                   $lastrowstmt->execute();
                   $lastrowdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
 
-                  if(!empty($lastrowdata)){
-                    if($hhkstockdata['outdate'] != '0000-00-00'){
+                  if (!empty($lastrowdata)) {
+                    if ($hhkstockdata['outdate'] != '0000-00-00') {
                       if ($lastrowdata['total_mc'] - $hhkstockdata['mc'] != $hhkstockdata['total_mc']) {
                         $totalmc = $lastrowdata['total_mc'] - $hhkstockdata['mc'];
                         $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$totalmc' WHERE id='$nowid'");
@@ -857,7 +907,7 @@ $query = new Query();
                         $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_kg='$totalkg' WHERE id='$nowid'");
                         $updatestmt->execute();
                       }
-                    }else{
+                    } else {
                       if ($lastrowdata['total_mc'] + $hhkstockdata['mc'] != $hhkstockdata['total_mc']) {
                         $totalmc = $lastrowdata['total_mc'] + $hhkstockdata['mc'];
                         $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$totalmc' WHERE id='$nowid'");
@@ -871,123 +921,134 @@ $query = new Query();
                     }
                   }
 
-                  ?>
-                <tr style="<?php if($hhkstockdata['balance_mc'] == 0 && $hhkstockdata['balance_kg'] == 0){echo 'background-color: #ffa590 !important;';} ?>">
-                  <td><?php if($hhkstockdata['indate'] != "0000-00-00"){ echo date('d-m-Y', strtotime($hhkstockdata['indate'])); }; ?></td>
-                  <td><?php if($hhkstockdata['outdate'] != "0000-00-00"){ echo date('d-m-Y', strtotime($hhkstockdata['outdate'])); }; ?></td>
-                  <td><?php echo $commonditydata['category_name']; ?></td>
-                  <td style="text-align:right;"><?php echo $hhkstockdata['mc']; ?></td>
-                  <td style="text-align:right;"><?php echo $hhkstockdata['total_mc']; ?></td>
-                  <td style="text-align:right;"><?php echo $hhkstockdata['kg']; ?></td>
-                  <td style="text-align:right;"><?php echo $hhkstockdata['total_kg']; ?></td>
-                  <td style="text-align:right;" <?php if($outdatecheckdata['outdate'] == '0000-00-00'):?>data-bs-toggle="modal"<?php endif; ?> data-bs-target="#updatebalancekg<?= $hhkstockdata['id']; ?>"><?php echo $hhkstockdata['balance_mc']; ?></td>
-                  <td style="text-align:right;" <?php if($outdatecheckdata['outdate'] == '0000-00-00'):?>data-bs-toggle="modal"<?php endif; ?> data-bs-target="#updatebalancekg<?= $hhkstockdata['id']; ?>"><?php echo $hhkstockdata['balance_kg']; ?></td>
-                  <td><?php if($outdatecheckdata['outdate'] == '0000-00-00'): ?>
-                    <button type="button" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#stockupdatemodal<?= $hhkstockdata['id']; ?>">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                          <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-                      </svg>
-                    </button>
-                  <?php endif; ?>
-                </td>
-                </tr>
-                <!-- Edit Stock Modal -->
-                <div class="modal fade" id="stockupdatemodal<?= $hhkstockdata['id']; ?>">
-                  <div class="modal-dialog">
-                    <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
-                      <div class="modal-header bg-secondary text-light">
-                        <h1 class="modal-title fs-5">Edit Remaining Stock</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <form action="daterangecharges.php" method="post">
-                        <input type="hidden" name="upidstock" value="<?= $hhkstockdata['id']; ?>">
-                        <div class="modal-body">
-                          <div class="row">
-                            <div class="col">
-                              <label>In Date</label>
-                              <input type="date" name="upindate" value="<?= $hhkstockdata['indate']; ?>" class="form-control inpv2 mb-2">
-                            </div>
-                            <div class="col">
-                              <label>Commondity</label>
-                              <select class="form-control inpv2" name="upcommondity">
-                                <?php
-                                $commonditydatas = $query->selectall('category');
-                                foreach ($commonditydatas as $commonditydata) {
+                ?>
+                  <tr style="<?php if ($hhkstockdata['balance_mc'] == 0 && $hhkstockdata['balance_kg'] == 0) {
+                                echo 'background-color: #ffa590 !important;';
+                              } ?>">
+                    <td><?php if ($hhkstockdata['indate'] != "0000-00-00") {
+                          echo date('d-m-Y', strtotime($hhkstockdata['indate']));
+                        }; ?></td>
+                    <td><?php if ($hhkstockdata['outdate'] != "0000-00-00") {
+                          echo date('d-m-Y', strtotime($hhkstockdata['outdate']));
+                        }; ?></td>
+                    <td><?php echo $commonditydata['category_name']; ?></td>
+                    <td style="text-align:right;"><?php echo $hhkstockdata['mc']; ?></td>
+                    <td style="text-align:right;"><?php echo $hhkstockdata['total_mc']; ?></td>
+                    <td style="text-align:right;"><?php echo $hhkstockdata['kg']; ?></td>
+                    <td style="text-align:right;"><?php echo $hhkstockdata['total_kg']; ?></td>
+                    <td style="text-align:right;" <?php if ($outdatecheckdata['outdate'] == '0000-00-00'): ?>data-bs-toggle="modal" <?php endif; ?> data-bs-target="#updatebalancekg<?= $hhkstockdata['id']; ?>"><?php echo $hhkstockdata['balance_mc']; ?></td>
+                    <td style="text-align:right;" <?php if ($outdatecheckdata['outdate'] == '0000-00-00'): ?>data-bs-toggle="modal" <?php endif; ?> data-bs-target="#updatebalancekg<?= $hhkstockdata['id']; ?>"><?php echo $hhkstockdata['balance_kg']; ?></td>
+                    <td><?php if ($outdatecheckdata['outdate'] == '0000-00-00'): ?>
+                        <button type="button" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#stockupdatemodal<?= $hhkstockdata['id']; ?>">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                          </svg>
+                        </button>
+                      <?php endif; ?>
+                    </td>
+                  </tr>
+                  <!-- Edit Stock Modal -->
+                  <div class="modal fade" id="stockupdatemodal<?= $hhkstockdata['id']; ?>">
+                    <div class="modal-dialog">
+                      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+                        <div class="modal-header bg-secondary text-light">
+                          <h1 class="modal-title fs-5">Edit Remaining Stock</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form action="daterangecharges.php" method="post">
+                          <input type="hidden" name="upidstock" value="<?= $hhkstockdata['id']; ?>">
+                          <div class="modal-body">
+                            <div class="row">
+                              <div class="col">
+                                <label>In Date</label>
+                                <input type="date" name="upindate" value="<?= $hhkstockdata['indate']; ?>" class="form-control inpv2 mb-2">
+                              </div>
+                              <div class="col">
+                                <label>Commondity</label>
+                                <select class="form-control inpv2" name="upcommondity">
+                                  <?php
+                                  $commonditydatas = $query->selectall('category');
+                                  foreach ($commonditydatas as $commonditydata) {
                                   ?>
-                                  <option value="<?php echo $commonditydata['category_id']; ?>" <?php if($commonditydata['category_id'] == $hhkstockdata['commondity_id']): echo "selected"; endif; ?>><?php echo $commonditydata['category_name']; ?></option>
+                                    <option value="<?php echo $commonditydata['category_id']; ?>" <?php if ($commonditydata['category_id'] == $hhkstockdata['commondity_id']): echo "selected";
+                                                                                                  endif; ?>><?php echo $commonditydata['category_name']; ?></option>
                                   <?php
                                   }
-                                 ?>
-                              </select>
+                                  ?>
+                                </select>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col">
+                                <label>Mc</label>
+                                <input type="number" name="upmc" value="<?= $hhkstockdata['mc']; ?>" class="form-control inpv2 mb-2">
+                              </div>
+                              <div class="col">
+                                <label>Kg</label>
+                                <input type="text" name="upkg" value="<?= $hhkstockdata['kg']; ?>" class="form-control inpv2 mb-2">
+                              </div>
                             </div>
                           </div>
-                          <div class="row">
-                            <div class="col">
-                              <label>Mc</label>
-                              <input type="number" name="upmc" value="<?= $hhkstockdata['mc']; ?>" class="form-control inpv2 mb-2">
-                            </div>
-                            <div class="col">
-                              <label>Kg</label>
-                              <input type="text" name="upkg" value="<?= $hhkstockdata['kg']; ?>" class="form-control inpv2 mb-2">
-                            </div>
+                          <div class="modal-footer">
+                            <button type="submit" class="btn btn-danger" name="deletestockbtn" style="<?php if (!empty($editcheckdata)) {
+                                                                                                        echo 'display:none;';
+                                                                                                      } ?>">Delete</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="<?php if (empty($editcheckdata)) {
+                                                                                                              echo 'display:none;';
+                                                                                                            } ?>">Cancel</button>
+                            <button type="submit" class="btn btn-success text-light" name="updatestockbtn">Update</button>
                           </div>
-                        </div>
-                        <div class="modal-footer">
-                          <button type="submit" class="btn btn-danger" name="deletestockbtn" style="<?php if(!empty($editcheckdata)){ echo 'display:none;'; } ?>">Delete</button>
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="<?php if(empty($editcheckdata)){ echo 'display:none;'; } ?>">Cancel</button>
-                          <button type="submit" class="btn btn-success text-light" name="updatestockbtn">Update</button>
-                        </div>
-                      </form>
+                        </form>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div class="modal fade" id="updatebalancekg<?= $hhkstockdata['id']; ?>">
-                  <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header bg-warning text-light">
-                        <h5 class="modal-title">Edit Balance Kg</h5>
-                      </div>
-                      <div class="modal-body">
-                        <form method="post">
-                          <input type="hidden" name="balance_kgid" value="<?= $hhkstockdata['id']; ?>">
-                          <div class="form-group">
-                            <label for="balance_mc">Balance Mc:</label>
-                            <input type="text" class="form-control" id="balance_mc" name="balance_mcinp" value="<?= $hhkstockdata['balance_mc']; ?>">
-                          </div>
-                          <div class="form-group mt-4">
-                            <label for="balance_kg">Balance Kg:</label>
-                            <input type="text" class="form-control" id="balance_kg" name="balance_kginp" value="<?= $hhkstockdata['balance_kg']; ?>">
-                          </div>
+                  <div class="modal fade" id="updatebalancekg<?= $hhkstockdata['id']; ?>">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header bg-warning text-light">
+                          <h5 class="modal-title">Edit Balance Kg</h5>
+                        </div>
+                        <div class="modal-body">
+                          <form method="post">
+                            <input type="hidden" name="balance_kgid" value="<?= $hhkstockdata['id']; ?>">
+                            <div class="form-group">
+                              <label for="balance_mc">Balance Mc:</label>
+                              <input type="text" class="form-control" id="balance_mc" name="balance_mcinp" value="<?= $hhkstockdata['balance_mc']; ?>">
+                            </div>
+                            <div class="form-group mt-4">
+                              <label for="balance_kg">Balance Kg:</label>
+                              <input type="text" class="form-control" id="balance_kg" name="balance_kginp" value="<?= $hhkstockdata['balance_kg']; ?>">
+                            </div>
                         </div>
                         <div class="modal-footer">
                           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                           <button type="submit" class="btn btn-primary" name="balance_kgbtn">Update</button>
                         </div>
-                      </form>
+                        </form>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <!-- Edit Stock Modal -->
-                <?php
-                    }
-                  }
-                 ?>
-              </table>
-            </div>
+                  <!-- Edit Stock Modal -->
+              <?php
+                }
+              }
+              ?>
+            </table>
           </div>
         </div>
       </div>
     </div>
-    <!-- Add Modal -->
-    <div class="modal fade" id="newcharges" aria-labelledby="newcharges">
-      <div class="modal-dialog">
-        <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
-          <div class="modal-header bg-secondary text-light">
-            <h1 class="modal-title fs-5">New Charges</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <form action="daterangecharges.php" method="post">
+  </div>
+  <!-- Add Modal -->
+  <div class="modal fade" id="newcharges" aria-labelledby="newcharges">
+    <div class="modal-dialog">
+      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+        <div class="modal-header bg-secondary text-light">
+          <h1 class="modal-title fs-5">New Charges</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="daterangecharges.php" method="post">
           <div class="modal-body">
             <div class="row" style="margin-bottom: 10px !important;">
               <div class="col">
@@ -1008,11 +1069,11 @@ $query = new Query();
                   foreach ($commonditydatas as $commonditydata) {
                     $item_id = $commonditydata['commondity_id'];
                     $item = $query->select('category', $item_id, 'category_id');
-                    ?>
+                  ?>
                     <option value="<?php echo $item['category_id']; ?>"><?php echo $item['category_name']; ?></option>
-                    <?php
-                    }
-                   ?>
+                  <?php
+                  }
+                  ?>
                 </select>
               </div>
               <div class="col">
@@ -1040,30 +1101,30 @@ $query = new Query();
                   <label style="font-weight: bold;">Processing Rate</label>
                   <input type="hidden" name="upprocessingrate" value="<?php echo $processingdataup['rate'];  ?>">
                   <div id="processingrate">
-                    <input type="text" name="processingrate"  disabled class="form-control inpv2">
+                    <input type="text" name="processingrate" disabled class="form-control inpv2">
                   </div>
                 </div>
               </div>
-          </div>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             <button type="submit" class="btn btn-success" name="add">Add</button>
           </div>
         </form>
-        </div>
       </div>
     </div>
-    <!-- Add Modal -->
-    <!-- Add Payment -->
-    <div class="modal fade" id="addpayment">
-      <div class="modal-dialog">
-        <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
-          <div class="modal-header bg-secondary text-light">
-            <h1 class="modal-title fs-5">Add Payment</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <form action="daterangecharges.php" method="post">
+  </div>
+  <!-- Add Modal -->
+  <!-- Add Payment -->
+  <div class="modal fade" id="addpayment">
+    <div class="modal-dialog">
+      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+        <div class="modal-header bg-secondary text-light">
+          <h1 class="modal-title fs-5">Add Payment</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="daterangecharges.php" method="post">
           <div class="modal-body">
             <div class="row">
               <div class="col">
@@ -1081,19 +1142,19 @@ $query = new Query();
             <button type="submit" name="paymentbtn" class="btn btn-success">Add</button>
           </div>
         </form>
-        </div>
       </div>
     </div>
-    <!-- Add Payment -->
-    <!-- Add repackingcharges -->
-    <div class="modal fade" id="repackingcharges">
-      <div class="modal-dialog">
-        <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
-          <div class="modal-header bg-secondary text-light">
-            <h1 class="modal-title fs-5">Repacking Charges</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <form action="daterangecharges.php" method="post">
+  </div>
+  <!-- Add Payment -->
+  <!-- Add repackingcharges -->
+  <div class="modal fade" id="repackingcharges">
+    <div class="modal-dialog">
+      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+        <div class="modal-header bg-secondary text-light">
+          <h1 class="modal-title fs-5">Repacking Charges</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="daterangecharges.php" method="post">
           <div class="modal-body">
             <label>Date</label>
             <input type="date" name="date" class="form-control inpv2 mb-2">
@@ -1129,19 +1190,19 @@ $query = new Query();
             </div>
           </div>
         </form>
-        </div>
       </div>
     </div>
-    <!-- Add Modal -->
-    <!-- Add Stock Modal -->
-    <div class="modal fade" id="newstock">
-      <div class="modal-dialog">
-        <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
-          <div class="modal-header bg-secondary text-light">
-            <h1 class="modal-title fs-5">Add New Stock</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <form action="daterangecharges.php" method="post">
+  </div>
+  <!-- Add Modal -->
+  <!-- Add Stock Modal -->
+  <div class="modal fade" id="newstock">
+    <div class="modal-dialog">
+      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+        <div class="modal-header bg-secondary text-light">
+          <h1 class="modal-title fs-5">Add New Stock</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="daterangecharges.php" method="post">
           <div class="modal-body">
             <div class="row">
               <div class="col">
@@ -1154,11 +1215,11 @@ $query = new Query();
                   <?php
                   $commonditydatas = $query->selectall('category');
                   foreach ($commonditydatas as $commonditydata) {
-                    ?>
+                  ?>
                     <option value="<?php echo $commonditydata['category_id']; ?>"><?php echo $commonditydata['category_name']; ?></option>
-                    <?php
-                    }
-                   ?>
+                  <?php
+                  }
+                  ?>
                 </select>
               </div>
             </div>
@@ -1178,66 +1239,67 @@ $query = new Query();
             <button type="submit" name="addstockbtn" class="btn btn-success">Add</button>
           </div>
         </form>
-        </div>
       </div>
     </div>
-    <!-- Add Stock Modal -->
-    <script type="text/javascript">
-      $(document).ready(()=>{
-        var commondity = $("#commondity").val();
-        // alert(commondity);
-        <?php
-        $blockidstmt = $pdo->prepare("SELECT category_id FROM category WHERE category_name='Block'");
-        $blockidstmt->execute();
-        $blockiddata = $blockidstmt->fetch(PDO::FETCH_ASSOC);
-        $blockid = $blockiddata['category_id'];
-        ?>
-        $("#commondity").click(function(){
-          commondityid = $("#commondity").val();
-          $("#processingrate").load('chargescommondity.php', {
-            commondityid : commondityid,
-          });
-          var commondity = $("#commondity").val();
-          if(commondity === '<?php echo $blockid; ?>'){
-            $(".processingratediv").hide();
-            $(".processingchargesdiv").show();
-          }else{
-            $(".processingratediv").show();
-            $(".processingchargesdiv").hide();
-          }
-        });
+  </div>
+  <!-- Add Stock Modal -->
+  <script type="text/javascript">
+    $(document).ready(() => {
+      var commondity = $("#commondity").val();
+      // alert(commondity);
+      <?php
+      $blockidstmt = $pdo->prepare("SELECT category_id FROM category WHERE category_name='Block'");
+      $blockidstmt->execute();
+      $blockiddata = $blockidstmt->fetch(PDO::FETCH_ASSOC);
+      $blockid = $blockiddata['category_id'];
+      ?>
+      $("#commondity").click(function() {
         commondityid = $("#commondity").val();
-          $("#processingrate").load('changecommondity.php', {
-            commondityid : commondityid,
-          });
-        if(commondity === '<?php echo $blockid; ?>'){
+        $("#processingrate").load('chargescommondity.php', {
+          commondityid: commondityid,
+        });
+        var commondity = $("#commondity").val();
+        if (commondity === '<?php echo $blockid; ?>') {
           $(".processingratediv").hide();
           $(".processingchargesdiv").show();
-        }else{
+        } else {
           $(".processingratediv").show();
           $(".processingchargesdiv").hide();
         }
       });
-    </script>
-    <script type="text/javascript">
-    <?php
-      if($_SESSION['tabs'] == "coldstore"){
-        echo "showcoldstore();";
-      }elseif($_SESSION['tabs'] == "labour"){
-        echo "showlabour();";
-      }elseif($_SESSION['tabs'] == "processing"){
-        echo "showprocessing();";
-      }elseif($_SESSION['tabs'] == "repacking"){
-        echo "showrepacking();";
-      }elseif($_SESSION['tabs'] == "totalcharges"){
-        echo "showtotal();";
-      }elseif($_SESSION['tabs'] == "remainingstock"){
-        echo "showstock();";
-      }else{
-        echo "showcoldstore();";
+      commondityid = $("#commondity").val();
+      $("#processingrate").load('changecommondity.php', {
+        commondityid: commondityid,
+      });
+      if (commondity === '<?php echo $blockid; ?>') {
+        $(".processingratediv").hide();
+        $(".processingchargesdiv").show();
+      } else {
+        $(".processingratediv").show();
+        $(".processingchargesdiv").hide();
       }
+    });
+  </script>
+  <script type="text/javascript">
+    <?php
+    if ($_SESSION['tabs'] == "coldstore") {
+      echo "showcoldstore();";
+    } elseif ($_SESSION['tabs'] == "labour") {
+      echo "showlabour();";
+    } elseif ($_SESSION['tabs'] == "processing") {
+      echo "showprocessing();";
+    } elseif ($_SESSION['tabs'] == "repacking") {
+      echo "showrepacking();";
+    } elseif ($_SESSION['tabs'] == "totalcharges") {
+      echo "showtotal();";
+    } elseif ($_SESSION['tabs'] == "remainingstock") {
+      echo "showstock();";
+    } else {
+      echo "showcoldstore();";
+    }
     ?>
-    function showtotal(){
+
+    function showtotal() {
       document.querySelector(".export").classList.remove("hide");
       document.querySelector(".addtotalcharges").classList.remove("hide");
       document.querySelector(".addnewcharges").classList.add("hide");
@@ -1254,7 +1316,8 @@ $query = new Query();
       document.querySelector(".repackinglink").classList.remove('color');
       document.querySelector(".repackingcharges").classList.add('hide');
     }
-    function showcoldstore(){
+
+    function showcoldstore() {
       document.querySelector(".export").classList.add("hide");
       document.querySelector(".addtotalcharges").classList.add("hide");
       document.querySelector(".addnewcharges").classList.remove("hide");
@@ -1271,7 +1334,8 @@ $query = new Query();
       document.querySelector(".repackinglink").classList.remove('color');
       document.querySelector(".repackingcharges").classList.add('hide');
     }
-    function showlabour(){
+
+    function showlabour() {
       document.querySelector(".export").classList.add("hide");
       document.querySelector(".addtotalcharges").classList.add("hide");
       document.querySelector(".addnewcharges").classList.remove("hide");
@@ -1288,7 +1352,8 @@ $query = new Query();
       document.querySelector(".repackinglink").classList.remove('color');
       document.querySelector(".repackingcharges").classList.add('hide');
     }
-    function showprocessing(){
+
+    function showprocessing() {
       document.querySelector(".export").classList.add("hide");
       document.querySelector(".addtotalcharges").classList.add("hide");
       document.querySelector(".addnewcharges").classList.remove("hide");
@@ -1305,7 +1370,8 @@ $query = new Query();
       document.querySelector(".repackinglink").classList.remove('color');
       document.querySelector(".repackingcharges").classList.add('hide');
     }
-    function showrepacking(){
+
+    function showrepacking() {
       document.querySelector(".export").classList.add("hide");
       document.querySelector(".addtotalcharges").classList.add("hide");
       document.querySelector(".addnewcharges").classList.add("hide");
@@ -1322,7 +1388,8 @@ $query = new Query();
       document.querySelector(".repackinglink").classList.add('color');
       document.querySelector(".repackingcharges").classList.remove('hide');
     }
-    function showstock(){
+
+    function showstock() {
       document.querySelector(".export").classList.add("hide");
       document.querySelector(".addtotalcharges").classList.add("hide");
       document.querySelector(".addnewcharges").classList.add("hide");
@@ -1341,9 +1408,10 @@ $query = new Query();
       document.querySelector(".remainingstocklink").classList.add('color');
       document.querySelector(".remainingstock").classList.remove('hide');
     }
-    </script>
-    <?php
-    $bootstrap->javascript();
-    ?>
-  </body>
+  </script>
+  <?php
+  $bootstrap->javascript();
+  ?>
+</body>
+
 </html>
