@@ -28,6 +28,7 @@ $bootstrap->css();
   $_SESSION['startdate'] = '2012-01-01';
   $_SESSION['enddate'] = date('Y-m-d');
   $_SESSION['stock_to'] = 'hhk';
+  $_SESSION['rate'] = 0;
   ?>
   <div class="row">
     <div class="sidebarcol" id="sidebar">
