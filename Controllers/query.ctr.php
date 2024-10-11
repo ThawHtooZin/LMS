@@ -675,7 +675,7 @@ class Query
 
   // HHK QUERIES
 
-  function updatehhkmcstock($newdate, $newparticular, $newcommondity_id, $newsize, $newkg, $newmc, $newcountry, $updateid)
+  function updatehhkmcstock($newdate, $newparticular, $newcommondity_id, $newfish_type, $newsize, $newkg, $newmc, $newcountry, $updateid)
   {
     global $pdo;
     // echo $updateid;
@@ -693,7 +693,7 @@ class Query
       $balance_mc = $newmc;
     }
 
-    $stmt = $pdo->prepare("UPDATE hhkmcstock SET date='$newdate', particular='$newparticular', commondity_id='$newcommondity_id', size='$newsize', kg='$newkg', mc='$newmc', country='$newcountry', balance_mc='$balance_mc' WHERE id='$updateid'");
+    $stmt = $pdo->prepare("UPDATE hhkmcstock SET date='$newdate', particular='$newparticular', commondity_id='$newcommondity_id', fish_type='$newfish_type', size='$newsize', kg='$newkg', mc='$newmc', country='$newcountry', balance_mc='$balance_mc' WHERE id='$updateid'");
     $stmt->execute();
 
     $updatedatastmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id = '$newcommondity_id' AND size = '$newsize' AND kg='$newkg' AND id > '$updateid'");
@@ -739,7 +739,7 @@ class Query
         } else {
           $balance_mc = $newmc;
         }
-        $stmt = $pdo->prepare("UPDATE gfcmcstock SET date='$newdate', particular='$newparticular', commondity_id='$newcommondity_id', size='$newsize', kg='$newkg', mc='$newmc', country='$newcountry', mc='$newmc', balance_mc='$balance_mc' WHERE hhk_id='$updateid'");
+        $stmt = $pdo->prepare("UPDATE gfcmcstock SET date='$newdate', particular='$newparticular', commondity_id='$newcommondity_id', fish_type='$newfish_type', size='$newsize', kg='$newkg', mc='$newmc', country='$newcountry', mc='$newmc', balance_mc='$balance_mc' WHERE hhk_id='$updateid'");
         $stmt->execute();
 
         $updatedatastmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id = '$newcommondity_id' AND size = '$newsize' AND kg='$newkg' AND id > '$gfc_id'");
@@ -5184,7 +5184,7 @@ class Query
     $glstmt->execute();
   }
 
-  function updategfcmcstock($newdate, $newparticular, $newcommondity_id, $newsize, $newkg, $newmc, $newcountry, $updateid)
+  function updategfcmcstock($newdate, $newparticular, $newcommondity_id, $newfish_type, $newsize, $newkg, $newmc, $newcountry, $updateid)
   {
     global $pdo;
 
@@ -5202,7 +5202,7 @@ class Query
       $balance_mc = $newmc;
     }
 
-    $stmt = $pdo->prepare("UPDATE gfcmcstock SET date='$newdate', particular='$newparticular', commondity_id='$newcommondity_id', size='$newsize', kg='$newkg', mc='$newmc', country='$newcountry', balance_mc='$balance_mc' WHERE id='$updateid'");
+    $stmt = $pdo->prepare("UPDATE gfcmcstock SET date='$newdate', particular='$newparticular', commondity_id='$newcommondity_id', fish_type='$newfish_type', size='$newsize', kg='$newkg', mc='$newmc', country='$newcountry', balance_mc='$balance_mc' WHERE id='$updateid'");
     $stmt->execute();
 
     $updatedatastmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id = '$newcommondity_id' AND size = '$newsize' AND kg='$newkg' AND id > '$updateid'");
@@ -5367,6 +5367,13 @@ class Query
     $groupid = $groupdata['id'];
     $storehousestmt = $pdo->prepare("INSERT INTO material_store_house(voucher_no, material_id, supplier_id, `out`, output_group) VALUES('$voucher_no', '$material', '$supplier', '$quantity', '$groupid')");
     $storehousestmt->execute();
+  }
+
+  public function stockout($stock_to, $date, $voucher_no, $packingmaterial, $quantity)
+  {
+    global $pdo;
+    $stmt = $pdo->prepare("INSERT INTO stock_output_group(stock_to, date, voucher_no, material_id, `out`) VALUES('$stock_to', '$date', '$voucher_no', '$packingmaterial', '$quantity');");
+    $stmt->execute();
   }
 
   // MORE Functions

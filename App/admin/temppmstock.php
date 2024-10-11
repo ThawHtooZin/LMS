@@ -53,7 +53,10 @@ $bootstrap->css();
                 <div class="card-header bg-primary text-light" style="padding:-10px;">
 
                     <h1 class="merriweather-light text-center">*Packing Material Temp Stock*</h1>
-                    <h4 style="text-transform: capitalize;" class="d-inline"><span style="font-size: 16px;">From <?= date('d-m-Y', strtotime($_SESSION['startdate'])) . ' to ' . date('d-m-Y', strtotime($_SESSION['enddate'])) ?></span></h4>
+                    <h4 style="text-transform: capitalize;" class="d-inline">
+                        <span style="font-size: 16px;">From <?= date('d-m-Y', strtotime($_SESSION['startdate'])) . ' to ' . date('d-m-Y', strtotime($_SESSION['enddate'])) ?></span>
+                    </h4>
+                    <button data-bs-toggle="modal" data-bs-target="#out" class="ms-2 btn btn-danger float-end d-inline" style="font-weight:bold;">Stock Out</button>
                     <button data-bs-toggle="modal" data-bs-target="#filter" class="ms-2 btn btn-warning float-end d-inline" style="font-weight:bold;">Select Filter</button>
 
                     <div class="modal" id="filter">
@@ -79,15 +82,12 @@ $bootstrap->css();
 
                                         <label>Type of Reports</label>
                                         <select name="filterinp" class="form-control inpv2 mt-2" id="filterinp" required>
-                                            <option value="all" <?php if ($_SESSION['filtertype'] == 'all') {
-                                                                    echo "selected";
-                                                                } ?> style="font-weight: bold;">All Material Balance</option>
-                                            <option value="eachmaterialinout" <?php if ($_SESSION['filtertype'] == 'eachmaterialinout') {
-                                                                                    echo "selected";
-                                                                                } ?> style="font-weight: bold;">Each Material In/Out</option>
-                                            <option value="eachmaterialclosingamount" <?php if ($_SESSION['filtertype'] == 'eachmaterialclosingamount') {
-                                                                                            echo "selected";
-                                                                                        } ?> style="font-weight: bold;">Each Material Closing Amount</option>
+                                            <option value="all" style="font-weight: bold;">All Packing Material Balance</option>
+                                            <option value="eachmaterialin" style="font-weight: bold;">Each Packing Material In</option>
+                                            <option value="eachmaterialout" style="font-weight: bold;">Each Packing Material Out</option>
+                                            <option value="eachmaterialinout" style="font-weight: bold;">Each Packing Material In/Out</option>
+                                            <option value="eachmaterialoutamount" style="font-weight: bold;">Each Packing Material Out Amount</option>
+                                            <option value="eachmaterialclosingamount" style="font-weight: bold;">Each Packing Material Closing Amount</option>
                                         </select>
 
                                         <label id="packingmateriallabel" style="display: none;">Packing Material</label>
@@ -116,6 +116,56 @@ $bootstrap->css();
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                         <button type="submit" name="savefilter" class="btn btn-primary">Show</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal" id="out">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-dark">Stock Out</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form action="" method="POST">
+                                    <div class="modal-body text-dark">
+
+                                        <label>Date</label>
+                                        <input type="date" name="date" class="form-control inpv2" value="<?= $_SESSION['enddate']; ?>">
+
+                                        <label>Voucher No</label>
+                                        <input type="number" name="voucher_no" class="form-control inpv2">
+
+                                        <label id="packingmateriallabel">Packing Material</label>
+                                        <select name="material" class="form-control inpv2" id="packingmaterialinp">
+                                            <?php
+                                            $stock_to = $_SESSION['stock_to'];
+                                            $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to='$stock_to' GROUP BY material_id");
+                                            $stmt->execute();
+                                            $datas = $stmt->fetchAll();
+                                            foreach ($datas as $data) {
+                                                $material_id = $data['material_id'];
+                                                $stmt = $pdo->prepare("SELECT * FROM materials WHERE id='$material_id'");
+                                                $stmt->execute();
+                                                $material = $stmt->fetch(PDO::FETCH_ASSOC);
+                                            ?>
+                                                <option value="<?= $material['id']; ?>" <?php if ($_SESSION['material_id'] == $material['id']) {
+                                                                                            echo "selected";
+                                                                                        } ?> style="padding-left:20px !important;"><?= $material['name']; ?></option>
+                                            <?php
+                                            }
+                                            ?>
+                                        </select>
+
+                                        <label>Quantity</label>
+                                        <input type="number" name="quantity" class="form-control inpv2" value="">
+
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" name="outbtn" class="btn btn-primary">Stock Out</button>
                                     </div>
                                 </form>
                             </div>
@@ -153,6 +203,15 @@ $bootstrap->css();
 
                     <table class="mt-3 table table-bordered table-striped rounded">
                         <?php
+                        if (isset($_POST['outbtn'])) {
+                            $stock_to = $_SESSION['stock_to'];
+                            $date = $_POST['date'];
+                            $voucher_no = $_POST['voucher_no'];
+                            $packingmaterial = $_POST['material'];
+                            $quantity = $_POST['quantity'];
+
+                            $query->stockout($stock_to, $date, $voucher_no, $packingmaterial, $quantity);
+                        }
                         if (isset($_POST['savefilter'])) {
                             $_SESSION['startdate'] = $_POST['startdate'];
                             $_SESSION['enddate'] = $_POST['enddate'];
@@ -176,6 +235,26 @@ $bootstrap->css();
                                 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
                                 $stmt->bindValue(':numOfrecs', $numOfrecs, PDO::PARAM_INT);
                                 $stmt->execute();
+                            } elseif ($filtertype == 'eachmaterialin') {
+                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$stock_to' AND material_id='$material_id' AND `out` IS null AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY stock_to");
+                                $stmt->execute();
+                                $rawResult = $stmt->fetchAll();
+                                $total_pages = ceil(count($rawResult) / $numOfrecs);
+
+                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$stock_to' AND material_id='$material_id' AND `out` IS null AND `date` BETWEEN '$startdate' AND '$enddate' LIMIT :offset, :numOfrecs");
+                                $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+                                $stmt->bindValue(':numOfrecs', $numOfrecs, PDO::PARAM_INT);
+                                $stmt->execute();
+                            } elseif ($filtertype == 'eachmaterialout') {
+                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$stock_to' AND material_id='$material_id' AND `in` IS null AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY stock_to");
+                                $stmt->execute();
+                                $rawResult = $stmt->fetchAll();
+                                $total_pages = ceil(count($rawResult) / $numOfrecs);
+
+                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$stock_to' AND material_id='$material_id' AND `in` IS null AND `date` BETWEEN '$startdate' AND '$enddate' LIMIT :offset, :numOfrecs");
+                                $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+                                $stmt->bindValue(':numOfrecs', $numOfrecs, PDO::PARAM_INT);
+                                $stmt->execute();
                             } elseif ($filtertype == 'eachmaterialinout') {
                                 $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$stock_to' AND material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY stock_to");
                                 $stmt->execute();
@@ -186,13 +265,24 @@ $bootstrap->css();
                                 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
                                 $stmt->bindValue(':numOfrecs', $numOfrecs, PDO::PARAM_INT);
                                 $stmt->execute();
-                            } elseif ($filtertype == 'eachmaterialclosingamount') {
-                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$stock_to' AND material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY stock_to");
+                            } elseif ($filtertype == 'eachmaterialoutamount') {
+                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$stock_to' AND material_id='$material_id' AND `out` IS NOT NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY stock_to");
                                 $stmt->execute();
                                 $rawResult = $stmt->fetchAll();
                                 $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$stock_to' AND material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' LIMIT :offset, :numOfrecs");
+
+                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$stock_to' AND material_id='$material_id' AND `out` IS NOT NULL AND `date` BETWEEN '$startdate' AND '$enddate' LIMIT :offset, :numOfrecs");
+                                $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+                                $stmt->bindValue(':numOfrecs', $numOfrecs, PDO::PARAM_INT);
+                                $stmt->execute();
+                            } elseif ($filtertype == 'eachmaterialclosingamount') {
+                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$stock_to' AND material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' GROUP BY material_id ORDER BY stock_to");
+                                $stmt->execute();
+                                $rawResult = $stmt->fetchAll();
+                                $total_pages = ceil(count($rawResult) / $numOfrecs);
+
+                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$stock_to' AND material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' GROUP BY material_id  LIMIT :offset, :numOfrecs");
                                 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
                                 $stmt->bindValue(':numOfrecs', $numOfrecs, PDO::PARAM_INT);
                                 $stmt->execute();
@@ -221,6 +311,26 @@ $bootstrap->css();
                                 <th>Out</th>
                                 <th>Balance</th>
                             <?php
+                            } elseif ($filtertype == 'eachmaterialin') {
+                            ?>
+                                <th>No.</th>
+                                <th>Date</th>
+                                <th>G/P Voucher</th>
+                                <th>Item Name</th>
+                                <th>Unit</th>
+                                <th>In</th>
+                                <th>Balance</th>
+                            <?php
+                            } elseif ($filtertype == 'eachmaterialout') {
+                            ?>
+                                <th>No.</th>
+                                <th>Date</th>
+                                <th>G/P Voucher</th>
+                                <th>Item Name</th>
+                                <th>Unit</th>
+                                <th>Out</th>
+                                <th>Balance</th>
+                            <?php
                             } elseif ($filtertype == 'eachmaterialinout') {
                             ?>
                                 <th>No.</th>
@@ -231,6 +341,17 @@ $bootstrap->css();
                                 <th>In</th>
                                 <th>Out</th>
                                 <th>Balance</th>
+                            <?php
+                            } elseif ($filtertype == 'eachmaterialoutamount') {
+                            ?>
+                                <th>No.</th>
+                                <th>Date</th>
+                                <th>Voucher No</th>
+                                <th>Item Name</th>
+                                <th>Unit</th>
+                                <th>Total Out Quantity</th>
+                                <th>Rate</th>
+                                <th>Total Amount</th>
                             <?php
                             } elseif ($filtertype == 'eachmaterialclosingamount') {
                             ?>
@@ -262,8 +383,15 @@ $bootstrap->css();
                                 $totalout = $outtotalstmt->fetch(PDO::FETCH_ASSOC);
 
                                 $balance = $totalin['totalin'] - $totalout['totalout'];
+                            } elseif ($filtertype == 'eachmaterialin') {
+                                $balance += $data['in'];
+                            } elseif ($filtertype == 'eachmaterialout') {
+                                $balance += $data['out'];
                             } elseif ($filtertype == 'eachmaterialinout') {
                                 $balance += $data['in'] - $data['out'];
+                            } elseif ($filtertype == 'eachmaterialoutamount') {
+                                $closingamount = $data['out'] * intval($_SESSION['rate']);
+                                $closingbalance = $data['out'];
                             } elseif ($filtertype == 'eachmaterialclosingamount') {
                                 $intotalstmt = $pdo->prepare("SELECT SUM(`in`) as totalin FROM stock_output_group WHERE material_id = '$material_id' AND stock_to = '$stock_to'");
                                 $intotalstmt->execute();
@@ -271,7 +399,7 @@ $bootstrap->css();
                                 $outtotalstmt = $pdo->prepare("SELECT SUM(`out`) as totalout FROM stock_output_group WHERE material_id = '$material_id' AND stock_to = '$stock_to'");
                                 $outtotalstmt->execute();
                                 $totalout = $outtotalstmt->fetch(PDO::FETCH_ASSOC);
-                                $closingamount = ($totalin['totalin'] - $totalout['totalout']) * $_SESSION['rate'];
+                                $closingamount = ($totalin['totalin'] - $totalout['totalout']) * intval($_SESSION['rate']);
                                 $closingbalance = $totalin['totalin'] - $totalout['totalout'];
                             }
                         ?>
@@ -286,6 +414,26 @@ $bootstrap->css();
                                     <td><?= $totalout['totalout']; ?></td>
                                     <td><?= $balance; ?></td>
                                 <?php
+                                } elseif ($filtertype == 'eachmaterialin') {
+                                ?>
+                                    <td><?= $no; ?></td>
+                                    <td><?= date('d-m-Y', strtotime($data['date'])); ?></td>
+                                    <td><?= $data['voucher_no']; ?></td>
+                                    <td><?= $material['name']; ?></td>
+                                    <td><?= $unit; ?></td>
+                                    <td><?= $data['in']; ?></td>
+                                    <td><?= $balance; ?></td>
+                                <?php
+                                } elseif ($filtertype == 'eachmaterialout') {
+                                ?>
+                                    <td><?= $no; ?></td>
+                                    <td><?= date('d-m-Y', strtotime($data['date'])); ?></td>
+                                    <td><?= $data['voucher_no']; ?></td>
+                                    <td><?= $material['name']; ?></td>
+                                    <td><?= $unit; ?></td>
+                                    <td><?= $data['out']; ?></td>
+                                    <td><?= $balance; ?></td>
+                                <?php
                                 } elseif ($filtertype == 'eachmaterialinout') {
                                 ?>
                                     <td><?= $no; ?></td>
@@ -296,6 +444,17 @@ $bootstrap->css();
                                     <td><?= $data['in']; ?></td>
                                     <td><?= $data['out']; ?></td>
                                     <td><?= $balance; ?></td>
+                                <?php
+                                } elseif ($filtertype == 'eachmaterialoutamount') {
+                                ?>
+                                    <td><?= $no; ?></td>
+                                    <td><?= date('d-m-Y', strtotime($data['date'])); ?></td>
+                                    <td><?= $data['voucher_no']; ?></td>
+                                    <td><?= $material['name']; ?></td>
+                                    <td><?= $unit; ?></td>
+                                    <td><?= $data['out']; ?></td>
+                                    <td><?= $_SESSION['rate']; ?></td>
+                                    <td><?= $closingamount; ?></td>
                                 <?php
                                 } elseif ($filtertype == 'eachmaterialclosingamount') {
                                 ?>
@@ -362,11 +521,26 @@ $bootstrap->css();
                 packingMaterialLabel.style.display = 'none';
                 packingMaterialRateLabel.style.display = 'none';
                 packingMaterialRateInp.style.display = 'none';
+            } else if (filterValue === 'eachmaterialin') {
+                packingMaterialInp.style.display = 'block';
+                packingMaterialLabel.style.display = 'block';
+                packingMaterialRateLabel.style.display = 'none';
+                packingMaterialRateInp.style.display = 'none';
+            } else if (filterValue === 'eachmaterialout') {
+                packingMaterialInp.style.display = 'block';
+                packingMaterialLabel.style.display = 'block';
+                packingMaterialRateLabel.style.display = 'none';
+                packingMaterialRateInp.style.display = 'none';
             } else if (filterValue === 'eachmaterialinout') {
                 packingMaterialInp.style.display = 'block';
                 packingMaterialLabel.style.display = 'block';
                 packingMaterialRateLabel.style.display = 'none';
                 packingMaterialRateInp.style.display = 'none';
+            } else if (filterValue === 'eachmaterialoutamount') {
+                packingMaterialRateLabel.style.display = 'block';
+                packingMaterialRateInp.style.display = 'block';
+                packingMaterialInp.style.display = 'block';
+                packingMaterialLabel.style.display = 'block';
             } else if (filterValue === 'eachmaterialclosingamount') {
                 packingMaterialRateLabel.style.display = 'block';
                 packingMaterialRateInp.style.display = 'block';

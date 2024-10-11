@@ -277,6 +277,8 @@ $bootstrap->css();
                       <option value="fillet">fillet</option>
                       <option value="W">W</option>
                       <option value="Cut_piece">Cut Piece</option>
+                      <option value="Scaless">Scaless</option>
+                      <option value="Bls">Bl's</option>
                     </select>
                   </div>
                 </div>
@@ -347,7 +349,7 @@ $bootstrap->css();
                       ?>
                     </select>
                   </div>
-                  <div class="col ms-2">
+                  <div class="col ms-2 mt-4">
                     <select name="fish_type1" id="commondityid3" class="form-control inpv2">
                       <option value="G">G</option>
                       <option value="egg">egg</option>
@@ -355,6 +357,8 @@ $bootstrap->css();
                       <option value="fillet">fillet</option>
                       <option value="W">W</option>
                       <option value="Cut_piece">Cut Piece</option>
+                      <option value="Scaless">Scaless</option>
+                      <option value="Bls">Bl's</option>
                     </select>
                   </div>
                 </div>

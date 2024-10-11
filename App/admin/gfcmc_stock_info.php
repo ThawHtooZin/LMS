@@ -48,13 +48,14 @@ $bootstrap->css();
     $newdate = $_POST['newdate'];
     $newparticular = $_POST['newparticular'];
     $newcommondity_id = $_POST['newcommondity_id'];
+    $newfish_type = $_POST['newfish_type'];
     $newsize = $_POST['newsize'];
     $newkg = $_POST['newkg'];
     $newmc = $_POST['newmc'];
     $newcountry = $_POST['newcountry'];
     $updateid = $_POST['upid'];
 
-    $query->updategfcmcstock($newdate, $newparticular, $newcommondity_id, $newsize, $newkg, $newmc, $newcountry, $updateid);
+    $query->updategfcmcstock($newdate, $newparticular, $newcommondity_id, $newfish_type,  $newsize, $newkg, $newmc, $newcountry, $updateid);
   }
   ?>
   <div class="row">
@@ -242,22 +243,40 @@ $bootstrap->css();
                             <label>Date</label>
                             <input type="date" name="newdate" class="form-control inpv2 mb-2" value="<?php echo $sizeinfodata['date']; ?>">
                             <label>Commondity</label>
-                            <select class="form-control inpv2 mb-2" name="newcommondity_id">
-                              <?php
-                              $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM item");
-                              $form7commonditystmt->execute();
-                              $form7commonditydatas = $form7commonditystmt->fetchall();
-                              foreach ($form7commonditydatas as $form7commonditydata) {
-                                $item_id = $form7commonditydata['item_id'];
-                                $commonditydata = $query->select('item', $item_id, 'item_id');
-                              ?>
-                                <option value="<?php echo $commonditydata['item_id']; ?>" <?php if ($sizeinfodata['commondity_id'] == $commonditydata['item_id']) {
-                                                                                            echo "selected";
-                                                                                          } ?>><?php echo $commonditydata['item_name']; ?></option>
-                              <?php
-                              }
-                              ?>
-                            </select>
+                            <div class="col">
+                              <div class="d-flex">
+                                <div class="col">
+                                  <select class="form-control inpv2 mb-2" name="newcommondity_id">
+                                    <?php
+                                    $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM item");
+                                    $form7commonditystmt->execute();
+                                    $form7commonditydatas = $form7commonditystmt->fetchall();
+                                    foreach ($form7commonditydatas as $form7commonditydata) {
+                                      $item_id = $form7commonditydata['item_id'];
+                                      $commonditydata = $query->select('item', $item_id, 'item_id');
+                                    ?>
+                                      <option value="<?php echo $commonditydata['item_id']; ?>" <?php if ($sizeinfodata['commondity_id'] == $commonditydata['item_id']) {
+                                                                                                  echo "selected";
+                                                                                                } ?>><?php echo $commonditydata['item_name']; ?></option>
+                                    <?php
+                                    }
+                                    ?>
+                                  </select>
+                                </div>
+                                <div class="col ms-2">
+                                  <select name="newfish_type" id="commondityid3" class="form-control inpv2">
+                                    <option value="G">G</option>
+                                    <option value="egg">egg</option>
+                                    <option value="ggs">ggs</option>
+                                    <option value="fillet">fillet</option>
+                                    <option value="W">W</option>
+                                    <option value="Cut_piece">Cut Piece</option>
+                                    <option value="Scaless">Scaless</option>
+                                    <option value="Bls">Bl's</option>
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                           <div class="col">
                             <label>Particular</label>
