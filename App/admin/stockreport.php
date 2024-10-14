@@ -25,24 +25,24 @@ $bootstrap->css();
 
 <body>
   <?php
-  if (isset($_POST['addbtn'])) {
-    $date = $_POST['date'];
-    $particular = $_POST['particular'];
-    $commondity_id = $_POST['commondity_id'];
-    $size = $_POST['size'];
-    $kg = $_POST['kg'];
-    $mc = $_POST['mc'];
-    $country = $_POST['country'];
+  // if (isset($_POST['addbtn'])) {
+  //   $date = $_POST['date'];
+  //   $particular = $_POST['particular'];
+  //   $commondity_id = $_POST['commondity_id'];
+  //   $size = $_POST['size'];
+  //   $kg = $_POST['kg'];
+  //   $mc = $_POST['mc'];
+  //   $country = $_POST['country'];
 
-    $query->addmcstock($date, $particular, $country, $commondity_id, $size, $kg, $mc);
-  }
+  //   $query->addmcstock($date, $particular, $country, $commondity_id, $size, $kg, $mc);
+  // }
 
   // if(isset($_POST['transferbtn'])){
   //   $transferdate = $_POST['transferdate'];
   //   $transferparticular = $_POST['transferparticular'];
   //   $transfercommondity_id = $_POST['transfercommondity_id'];
   //   $transfersize = $_POST['transfersize'];
-  //   $transferkg = $_POST['transferkg'];
+  //   $transferkg = $_POST['transferkg'];    
   //   $transfermc = $_POST['transfermc'];
   //   $transfercountry = $_POST['transfercountry'];
   //
@@ -166,6 +166,7 @@ $bootstrap->css();
                 $hhkmcstockcommonditystmt->execute();
                 $hhkmcstockcommonditydatas = $hhkmcstockcommonditystmt->rowCount();
               }
+
               for ($i = 0; $i < $hhkmcstockcommonditydatas; $i++) {
                 $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country = '$country' AND remark NOT LIKE '%packing%'
                 UNION
@@ -193,7 +194,7 @@ $bootstrap->css();
                   $searchstmt->execute();
                   $datas = $searchstmt->fetchall();
                 } else {
-                  $stmt = $pdo->prepare("SELECT id, commondity_id, country, particular, kg, size FROM hhkmcstock 
+                  $stmt = $pdo->prepare("SELECT id, commondity_id, country, particular, kg, size, fish_type FROM hhkmcstock 
                                         WHERE commondity_id = '$commondity_id' 
                                           AND country = '$country' 
                                           AND particular NOT LIKE '%to%'
@@ -201,7 +202,7 @@ $bootstrap->css();
 
                                         UNION ALL
 
-                                        SELECT id, commondity_id, country, particular, kg, size FROM gfcmcstock 
+                                        SELECT id, commondity_id, country, particular, kg, size, fish_type FROM gfcmcstock 
                                         WHERE commondity_id = '$commondity_id' 
                                           AND country = '$country' 
                                           AND particular NOT LIKE '%to%'
@@ -257,7 +258,7 @@ $bootstrap->css();
                           echo $id;
                         } ?></td>
                     <td><?php if (empty($lastcommondity)) {
-                          echo $commonditydata['item_name'];
+                          echo $commonditydata['item_name'] . "(" . $hhkdata['fish_type'] . ")";
                         } ?></td>
                     <td><?php if (empty($lastcommondity)) {
                           echo $country;

@@ -43,7 +43,6 @@ $bootstrap->css();
     $query->addmcstock($date, $particular, $country, $commondity_id, $fish_type, $size, $kg, $mc);
     $_SESSION['date'] = $_POST['date'];
     $_SESSION['particular'] = $_POST['particular'];
-    $_SESSION['commondity_id1'] = $_POST['commondity_id1'];
     $_SESSION['commondity_id2'] = $_POST['commondity_id2'];
     $_SESSION['size'] = $_POST['size'];
   }
@@ -398,7 +397,7 @@ $bootstrap->css();
       </div>
     </div>
   </div>
-  <!-- <div class="modal fade" id="add2">
+  <div class="modal fade" id="add2">
     <div class="modal-dialog" role="document">
       <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
         <div class="modal-header bg-secondary text-light">
@@ -412,33 +411,49 @@ $bootstrap->css();
                 <label>Date</label>
                 <input type="date" name="date" class="form-control inpv2 mb-2">
                 <label>Commondity</label>
-                <select class="form-control inpv2 mb-2" name="commondity_id" id="commondityid1">
-                  <?php
-                  if (!empty($form7commonditydatas)) {
-                    foreach ($form7commonditydatas as $form7commonditydata) {
-                      $item_id = $form7commonditydata['commondity_id'];
-                      $commonditydata = $query->select('item', $item_id, 'item_id');
-                  ?>
-                      <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
-                  <?php
-                    }
-                  }
-                  ?>
-                </select>
-                <select class="form-control inpv2 mb-2" name="commondity_id" id="commondityid2">
-                  <?php
-                  $commonditydatastmt = $pdo->prepare("SELECT * FROM item");
-                  $commonditydatastmt->execute();
-                  $commonditydatas = $commonditydatastmt->fetchAll();
-                  foreach ($commonditydatas as $commonditydata) {
-                    $item_id = $commonditydata['item_id'];
-                    $commonditydata = $query->select('item', $item_id, 'item_id');
-                  ?>
-                    <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
-                  <?php
-                  }
-                  ?>
-                </select>
+                <div class="row">
+                  <div class="col">
+                    <select class="form-control inpv2 mb-2" name="commondity_id1" id="commondityid1">
+                      <?php
+                      if (!empty($form7commonditydatas)) {
+                        foreach ($form7commonditydatas as $form7commonditydata) {
+                          $item_id = $form7commonditydata['commondity_id'];
+                          $commonditydata = $query->select('item', $item_id, 'item_id');
+                      ?>
+                          <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                      <?php
+                        }
+                      }
+                      ?>
+                    </select>
+                    <select class="form-control inpv2 mb-2" name="commondity_id2" id="commondityid2">
+                      <?php
+                      $commonditydatastmt = $pdo->prepare("SELECT * FROM item");
+                      $commonditydatastmt->execute();
+                      $commonditydatas = $commonditydatastmt->fetchAll();
+                      foreach ($commonditydatas as $commonditydata) {
+                        $item_id = $commonditydata['item_id'];
+                        $commonditydata = $query->select('item', $item_id, 'item_id');
+                      ?>
+                        <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                      <?php
+                      }
+                      ?>
+                    </select>
+                  </div>
+                  <div class="col">
+                    <select name="fish_type2" class="form-control inpv2">
+                      <option value="G">G</option>
+                      <option value="egg">egg</option>
+                      <option value="ggs">ggs</option>
+                      <option value="fillet">fillet</option>
+                      <option value="W">W</option>
+                      <option value="Cut_piece">Cut Piece</option>
+                      <option value="Scaless">Scaless</option>
+                      <option value="Bls">Bl's</option>
+                    </select>
+                  </div>
+                </div>
               </div>
               <div class="col">
                 <label>Particular</label>
@@ -484,7 +499,7 @@ $bootstrap->css();
         </form>
       </div>
     </div>
-  </div> -->
+  </div>
   <div class="modal fade" id="transfer">
     <div class="modal-dialog" role="document">
       <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
