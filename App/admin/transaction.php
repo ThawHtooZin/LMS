@@ -543,23 +543,13 @@ $bootstrap->css();
               }
               $totaldebitstmt = $pdo->prepare("
               SELECT SUM(debit) AS total
-              FROM transaction t
-              WHERE NOT EXISTS (
-                  SELECT 1
-                  FROM general_ledger g
-                  WHERE g.transactionid = t.id
-              )
+              FROM transaction WHERE status='selected'
           ");
               $totaldebitstmt->execute();
               $totaldebitdata = $totaldebitstmt->fetch(PDO::FETCH_ASSOC);
               $totalcreditstmt = $pdo->prepare("
               SELECT SUM(credit) AS total
-              FROM transaction t
-              WHERE NOT EXISTS (
-                  SELECT 1
-                  FROM general_ledger g
-                  WHERE g.transactionid = t.id
-              )
+              FROM transaction WHERE status='selected'
               ");
               $totalcreditstmt->execute();
               $totalcreditdata = $totalcreditstmt->fetch(PDO::FETCH_ASSOC);

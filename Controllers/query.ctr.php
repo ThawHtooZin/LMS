@@ -3894,8 +3894,8 @@ class Query
       $oldgeneralledgerdata = $oldgeneralledgerstmt->fetch(PDO::FETCH_ASSOC);
       $oldgeneralledgerbalance = $oldgeneralledgerdata['balance'];
 
-      $balance = ($oldgeneralledgerbalance + $debit) - $credit;
-      $cashbookstmt = $pdo->prepare("UPDATE general_ledger SET date='$date', voucherno=:voucher_no, ac_code='$ac_code', narration=:description, debit='$debit', credit='$credit', sr_no='$sr_no', container_no='$container_no', bank_charges='$bank_charges', balance='$balance' WHERE transactionid='$id'");
+      $balance = ($oldgeneralledgerbalance + $mmkdebit) - $mmkcredit;
+      $cashbookstmt = $pdo->prepare("UPDATE general_ledger SET date='$date', voucherno=:voucher_no, ac_code='$ac_code', narration=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no', container_no='$container_no', bank_charges='$bank_charges', balance='$balance' WHERE transactionid='$id'");
       $cashbookstmt->execute(
         [
           ':voucher_no' => $voucher_no,
@@ -3979,13 +3979,6 @@ class Query
       // Cashbook Update
 
     } elseif ($_GET['file'] == 'payable') {
-      echo $ac_code;
-      echo "<br>";
-      echo $mmkdebit;
-      echo "<br>";
-      echo $payableid;
-      echo "<br>";
-      echo $id;
 
       //Payable Update
       $total_closingstmt = $pdo->prepare("SELECT SUM(closing_balance) AS balance FROM payable WHERE supplier_id='$ac_code' AND purchase_voucher_no = '' AND paid_voucher = ''");
@@ -4084,7 +4077,7 @@ class Query
           $dollarrate = $dollarrate['dollar_rate'];
         }
 
-        if (!str_contains($transactiondata['ac_code'], '3600/')) {
+        if (!str_contains($transactiondata['ac_code'], '3600/') && !str_contains($transactiondata['ac_code'], '3700/003')) {
           if ($transactiondata['bank_charges'] != 0) {
             $credit = ($transactiondata['credit'] / $dollarrate) - ($transactiondata['bank_charges'] * $dollarrate);
             $debit = 0;
@@ -4113,7 +4106,7 @@ class Query
         } else {
           $dollarrate = $dollarrate['dollar_rate'];
         }
-        if (!str_contains($transactiondata['ac_code'], '3600/')) {
+        if (!str_contains($transactiondata['ac_code'], '3600/') && !str_contains($transactiondata['ac_code'], '3700/003')) {
           if ($transactiondata['bank_charges'] != 0) {
             $debit = ($transactiondata['debit'] / $dollarrate) - ($transactiondata['bank_charges'] * $dollarrate);
             $credit = 0;

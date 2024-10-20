@@ -155,7 +155,7 @@ $bootstrap->css();
                   }
                   // acnamechange
 
-                  $balance = $gldata['debit'] - $gldata['credit'];
+                  $balance = floatval($gldata['debit']) - floatval($gldata['credit']);
 
                   if ($gldata['debit'] == 0 && $gldata['credit'] == 0) {
                     $debitorcredit = 'balance';
@@ -182,12 +182,12 @@ $bootstrap->css();
                     <td><?php echo $gldata['narration']; ?></td>
                     <td><?php echo $gldata['debit']; ?></td>
                     <td><?php echo $gldata['credit']; ?></td>
-                    <td><?php if (empty($currencydata['usd_amount']) || $currencydata['usd_amount'] == 0 || str_contains($gldata['ac_code'], '3600/001')) {
+                    <td><?php if (empty($currencydata['usd_amount']) || $currencydata['usd_amount'] == 0 || str_contains($gldata['ac_code'], '3600/001') || str_contains($gldata['ac_code'], '3700/003')) {
                           echo 'MMK';
                         } else {
                           echo 'USD';
                         } ?></td>
-                    <td><?php echo round(floatval($gldata['balance']), 2); ?></td>
+                    <td><?php echo $gldata['balance']; ?></td>
                     <td>
                       <a href="edittransaction.php?voucher_no=<?= $gldata['voucherno']; ?>&file=general_ledger&transactionid=<?= $gldata['transactionid']; ?>&id=<?= $gldata['id']; ?>" style="<?php if (str_contains(strtolower($acname), 'purchase')) {
                                                                                                                                                                                                   echo "display:none;";

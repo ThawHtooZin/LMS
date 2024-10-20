@@ -198,7 +198,7 @@ $bootstrap->css();
                                         WHERE commondity_id = '$commondity_id' 
                                           AND country = '$country' 
                                           AND particular NOT LIKE '%to%'
-                                          AND remark NOT LIKE '%packing%'
+                                          AND remark NOT LIKE '%packing%'cd h
 
                                         UNION ALL
 
