@@ -3768,7 +3768,7 @@ class Query
         ':description' => $description
       ]
     );
-
+    // -----------------------------------------------------------
     if (!empty($debit)) {
       $debitorcredit = 'debit';
       if ($currency == 'usd') {
@@ -4010,26 +4010,8 @@ class Query
       //Payable Update
     }
 
-    // // receivable Update
-    // $oldreceivablestmt = $pdo->prepare("SELECT * FROM receivable WHERE ac_code='$ac_code' AND transactionid < '$id' ORDER BY id DESC");
-    // $oldreceivablestmt->execute();
-    // $oldreceivabledata = $oldreceivablestmt->fetch(PDO::FETCH_ASSOC);
-    // $oldreceivablebalance = $oldreceivabledata['balance'];
-    // $balance = ($oldreceivablebalance + $mmkdebit) - $mmkcredit;
-    // if (!empty($sr_no)) {
-    //
-    // }
-    // $cashbookstmt = $pdo->prepare("UPDATE receivable SET date='$date', sr_no=:voucher_no, ac_code='$ac_code', remark=:description, invoice_amount='$mmkdebit', balance='$balance' WHERE voucher_no='$voucher_no'");
-    // $cashbookstmt->execute(
-    //   [
-    //     ':voucher_no' => $voucher_no,
-    //     ':description' => $description
-    //   ]
-    // );
-
     // Star removal
-
-    if (str_contains($ac_code, '3600/')) {
+    if ($debitorcredit == 'debit') {
       $starstmt = $pdo->prepare("SELECT * FROM transaction WHERE description LIKE '%***%'");
       $starstmt->execute();
       $stardata = $starstmt->fetch(PDO::FETCH_ASSOC);
@@ -4057,7 +4039,7 @@ class Query
     global $pdo;
 
     // General Ledger
-    $transactionstmt = $pdo->prepare("SELECT * FROM transaction WHERE date='$date'");
+    $transactionstmt = $pdo->prepare("SELECT * FROM transaction WHERE date='$date' AND status != 'accepted'");
     $transactionstmt->execute();
     $transactiondatas = $transactionstmt->fetchall();
     foreach ($transactiondatas as $transactiondata) {
