@@ -299,7 +299,7 @@ $bootstrap->css();
                   </div>
                   <div class="col-3">
                     <label>Rate</label>
-                    <input type="number" name="addrate" class="form-control inpv2" disabled id="addrate" style="padding-top: 2px; padding-bottom: 2px;">
+                    <input type="text" name="addrate" class="form-control inpv2" disabled id="addrate" style="padding-top: 2px; padding-bottom: 2px;">
                     <button type="submit" class="btn btn-success mt-3 btn-sm" style="width: 100%;" name="save">Save</button>
                   </div>
                 </div>
