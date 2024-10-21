@@ -3894,6 +3894,11 @@ class Query
       $oldgeneralledgerdata = $oldgeneralledgerstmt->fetch(PDO::FETCH_ASSOC);
       $oldgeneralledgerbalance = $oldgeneralledgerdata['balance'];
 
+      if (!str_contains($ac_code, '3700/003')) {
+        $mmkdebit = $debit;
+        $mmkcredit = $credit;
+      }
+
       $balance = ($oldgeneralledgerbalance + $mmkdebit) - $mmkcredit;
       $cashbookstmt = $pdo->prepare("UPDATE general_ledger SET date='$date', voucherno=:voucher_no, ac_code='$ac_code', narration=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no', container_no='$container_no', bank_charges='$bank_charges', balance='$balance' WHERE transactionid='$id'");
       $cashbookstmt->execute(

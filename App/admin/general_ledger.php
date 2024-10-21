@@ -128,6 +128,8 @@ $bootstrap->css();
                   <td colspan="8"><b><u><?php echo "Account No. : " . $ac_code . " - " . $acnametoshow['ac_name']; ?></u></b></td>
                 </tr>
                 <?php
+                $balance = 0;
+                $realbalance = 0;
                 foreach ($gldatas as $gldata) : ?>
                   <?php
                   $ac_code = $gldata['ac_code'];
@@ -173,7 +175,13 @@ $bootstrap->css();
                   $currencystmt->execute(
                     array(':voucher_no' => $voucher_no)
                   );
-                  $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
+                  $balance = $gldata['debit'] - $gldata['credit'];
+                  $realbalance += $balance;
+                  if ($realbalance != $gldata['balance']) {
+                    $nowid = $gldata['id'];
+                    $balancestmt = $pdo->prepare("UPDATE general_ledger SET balance = '$realbalance' WHERE id = '$nowid' ");
+                    $balancestmt->execute();
+                  }
                   ?>
                   <tr>
                     <td><?php echo date('d/m/Y', strtotime($gldata['date'])); ?></td>
