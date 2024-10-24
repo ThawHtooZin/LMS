@@ -177,36 +177,70 @@ $bootstrap->css();
 
                 if (isset($_POST['commonditybtn']) && !empty($_POST['commondity_id'])) {
                   $searchcommondity_id = $_POST['commondity_id'];
-                  $searchstmt = $pdo->prepare("SELECT * 
-                                              FROM hhkmcstock 
-                                              WHERE commondity_id='$searchcommondity_id' 
-                                              AND country='$country' 
-                                              AND remark NOT LIKE '%packing%'
+                  $searchstmt = $pdo->prepare("SELECT 
+                                          id, 
+                                          commondity_id, 
+                                          country, 
+                                          particular, 
+                                          kg,
+                                          size, 
+                                          fish_type 
+                                      FROM (
+                                          SELECT id, commondity_id, country, particular, kg, size, fish_type 
+                                          FROM hhkmcstock 
+                                          WHERE commondity_id = '$commondity_id' 
+                                            AND country = '$country' 
+                                            AND particular NOT LIKE '%to%' 
+                                            AND remark NOT LIKE '%packing%'
 
-                                              UNION
+                                          UNION ALL
 
-                                              SELECT * 
-                                              FROM gfcmcstock 
-                                              WHERE commondity_id='$searchcommondity_id' 
-                                              AND country='$country' 
-                                              AND remark NOT LIKE '%packing%'
+                                          SELECT id, commondity_id, country, particular, kg, size, fish_type 
+                                          FROM gfcmcstock 
+                                          WHERE commondity_id = '$commondity_id' 
+                                            AND country = '$country' 
+                                            AND particular NOT LIKE '%to%' 
+                                            AND remark NOT LIKE '%packing%'
+                                      ) AS combined_results
+                                      GROUP BY 
+                                          country, 
+                                          size, 
+                                          kg, 
+                                          fish_type;
                                               ");
                   $searchstmt->execute();
                   $datas = $searchstmt->fetchall();
                 } else {
-                  $stmt = $pdo->prepare("SELECT id, commondity_id, country, particular, kg, size, fish_type FROM hhkmcstock 
-                                        WHERE commondity_id = '$commondity_id' 
-                                          AND country = '$country' 
-                                          AND particular NOT LIKE '%to%'
-                                          AND remark NOT LIKE '%packing%'cd h
+                  $stmt = $pdo->prepare("SELECT 
+                                          id, 
+                                          commondity_id, 
+                                          country, 
+                                          particular, 
+                                          kg,
+                                          size, 
+                                          fish_type 
+                                      FROM (
+                                          SELECT id, commondity_id, country, particular, kg, size, fish_type 
+                                          FROM hhkmcstock 
+                                          WHERE commondity_id = '$commondity_id' 
+                                            AND country = '$country' 
+                                            AND particular NOT LIKE '%to%' 
+                                            AND remark NOT LIKE '%packing%'
 
-                                        UNION ALL
+                                          UNION ALL
 
-                                        SELECT id, commondity_id, country, particular, kg, size, fish_type FROM gfcmcstock 
-                                        WHERE commondity_id = '$commondity_id' 
-                                          AND country = '$country' 
-                                          AND particular NOT LIKE '%to%'
-                                          AND remark NOT LIKE '%packing%'
+                                          SELECT id, commondity_id, country, particular, kg, size, fish_type 
+                                          FROM gfcmcstock 
+                                          WHERE commondity_id = '$commondity_id' 
+                                            AND country = '$country' 
+                                            AND particular NOT LIKE '%to%' 
+                                            AND remark NOT LIKE '%packing%'
+                                      ) AS combined_results
+                                      GROUP BY 
+                                          country, 
+                                          size, 
+                                          kg, 
+                                          fish_type;
                                       ");
                   $stmt->execute();
                   $datas = $stmt->fetchall();
