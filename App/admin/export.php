@@ -729,10 +729,10 @@ if ($_GET['table_name'] == 'actualinvoice') {
           $customerdata = $query->select('customers', $customer_id, 'customer_id');
           echo $acnamedata['ac_name'];
           ?><br><?php
-              echo $customerdata['customer_detail'];
-              ?><br><?php
-              echo $customerdata['customer_address'];
-              ?>
+                echo $customerdata['customer_detail'];
+                ?><br><?php
+                      echo $customerdata['customer_address'];
+                      ?>
         </td>
         <td colspan="6"></td>
         <td class="float-end" style="font-weight: bold;">
@@ -811,8 +811,8 @@ if ($_GET['table_name'] == 'actualinvoice') {
           <td <?php if (str_contains(strtolower($commonditydata['item_name']), 'bala')) {
                 echo 'data-bs-toggle="modal"';
               } ?> data-bs-target="#updatetotalusd<?php echo $packingstockinfodata['id']; ?>"><?php if ($packingstockinfodata['total_usd'] != 0) {
-                                                                                                                                                                                                          echo $packingstockinfodata['total_usd'];
-                                                                                                                                                                                                        } ?></td>
+                                                                                                echo $packingstockinfodata['total_usd'];
+                                                                                              } ?></td>
         </tr>
       <?php
       }
@@ -881,10 +881,10 @@ if ($_GET['table_name'] == 'actualpackinglist') {
           $customerdata = $query->select('customers', $customer_id, 'customer_id');
           echo $acnamedata['ac_name'];
           ?><br><?php
-              echo $customerdata['customer_detail'];
-              ?><br><?php
-              echo $customerdata['customer_address'];
-              ?>
+                echo $customerdata['customer_detail'];
+                ?><br><?php
+                      echo $customerdata['customer_address'];
+                      ?>
         </td>
         <td colspan="6"></td>
         <td class="float-end" style="font-weight: bold;">
@@ -963,8 +963,8 @@ if ($_GET['table_name'] == 'actualpackinglist') {
           <td <?php if (str_contains(strtolower($commonditydata['item_name']), 'bala')) {
                 echo 'data-bs-toggle="modal"';
               } ?> data-bs-target="#updatetotalusd<?php echo $packingstockinfodata['id']; ?>"><?php if ($packingstockinfodata['total_usd'] != 0) {
-                                                                                                                                                                                                          echo $packingstockinfodata['total_usd'];
-                                                                                                                                                                                                        } ?></td>
+                                                                                                echo $packingstockinfodata['total_usd'];
+                                                                                              } ?></td>
         </tr>
       <?php
       }
@@ -1074,17 +1074,36 @@ if ($_GET['table_name'] == 'mcstockreport') {
         // echo "<pre>";
         // print_r($datas);
       } else {
-        $stmt = $pdo->prepare("SELECT id, commondity_id, country, particular, kg, size FROM hhkmcstock 
-                                        WHERE commondity_id = '$commondity_id' 
-                                          AND country = '$country' 
-                                          AND particular NOT LIKE '%to%'
+        $stmt = $pdo->prepare("SELECT 
+                                          id, 
+                                          commondity_id, 
+                                          country, 
+                                          particular, 
+                                          kg,
+                                          size, 
+                                          fish_type 
+                                      FROM (
+                                          SELECT id, commondity_id, country, particular, kg, size, fish_type 
+                                          FROM hhkmcstock 
+                                          WHERE commondity_id = '$commondity_id' 
+                                            AND country = '$country' 
+                                            AND particular NOT LIKE '%to%' 
+                                            AND remark NOT LIKE '%packing%'
 
-                                        UNION ALL
+                                          UNION ALL
 
-                                        SELECT id, commondity_id, country, particular, kg, size FROM gfcmcstock 
-                                        WHERE commondity_id = '$commondity_id' 
-                                          AND country = '$country' 
-                                          AND particular NOT LIKE '%to%'");
+                                          SELECT id, commondity_id, country, particular, kg, size, fish_type 
+                                          FROM gfcmcstock 
+                                          WHERE commondity_id = '$commondity_id' 
+                                            AND country = '$country' 
+                                            AND particular NOT LIKE '%to%' 
+                                            AND remark NOT LIKE '%packing%'
+                                      ) AS combined_results
+                                      GROUP BY 
+                                          country, 
+                                          size, 
+                                          kg, 
+                                          fish_type;");
         $stmt->execute();
         $datas = $stmt->fetchall();
       }
