@@ -87,7 +87,7 @@ $bootstrap->css();
             $typestmt->execute();
             $searchtype = $typestmt->fetchall();
             ?>
-            <select class="inpv2 form-control w-25 d-inline me-2 float-end" name="searchtype">
+            <select class="inpv2 form-control d-inline me-2 float-end" name="searchtype" style="width: 10%;">
               <?php foreach ($searchtype as $type):
               ?>
                 <option value="<?php echo $type['fish_type']; ?>"><?php echo $type['fish_type']; ?></option>
@@ -99,7 +99,7 @@ $bootstrap->css();
             $commonditystmt->execute();
             $searchcommon = $commonditystmt->fetchall();
             ?>
-            <select class="inpv2 form-control w-25 d-inline me-2 float-end" name="search">
+            <select class="inpv2 form-control d-inline me-2 float-end" name="search" style="width: 10%;">
               <?php foreach ($searchcommon as $commondity_id):
                 $item_id = $commondity_id['commondity_id'];
                 $commonditydata = $query->select('item', $item_id, 'item_id');

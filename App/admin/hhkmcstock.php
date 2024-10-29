@@ -147,17 +147,29 @@ $bootstrap->css();
           <form class="d-inline" action="hhkmcstock.php" method="post">
             <button type="submit" class="btn btn-primary float-end me-2" name="searchcommonditybtn">View</button>
             <?php
-            $commonditystmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country = :country AND remark NOT LIKE '%packing%' GROUP BY commondity_id");
+            $typestmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country = :country GROUP BY fish_type");
+            $typestmt->bindParam(':country', $_SESSION['tabs']);
+            $typestmt->execute();
+            $searchtype = $typestmt->fetchall();
+            ?>
+            <select class="inpv2 form-control d-inline me-2 float-end" name="searchtype" style="width: 10%;">
+              <?php foreach ($searchtype as $type):
+              ?>
+                <option value="<?php echo $type['fish_type']; ?>"><?php echo $type['fish_type']; ?></option>
+              <?php endforeach; ?>
+            </select>
+            <?php
+            $commonditystmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country = :country GROUP BY commondity_id");
             $commonditystmt->bindParam(':country', $_SESSION['tabs']);
             $commonditystmt->execute();
             $searchcommon = $commonditystmt->fetchall();
             ?>
-            <select class="inpv2 form-control w-25 d-inline me-2 float-end" name="search">
+            <select class="inpv2 form-control d-inline me-2 float-end" name="search" style="width: 10%;">
               <?php foreach ($searchcommon as $commondity_id):
                 $item_id = $commondity_id['commondity_id'];
                 $commonditydata = $query->select('item', $item_id, 'item_id');
               ?>
-                <?php if (!empty($commondity_id['country'])): ?>
+                <?php if (!empty($commondity_id)): ?>
                   <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
                 <?php else: ?>
                   <option value=""></option>
@@ -196,7 +208,8 @@ $bootstrap->css();
               $country = $countrydata['country'];
               if (isset($_POST['searchcommonditybtn']) && !empty($_POST['search'])) {
                 $searchcommondity = $_POST['search'];
-                $searchcommonditystmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country = :country AND commondity_id='$searchcommondity' AND remark NOT LIKE '%packing%' GROUP BY commondity_id,size");
+                $searchtype = $_POST['searchtype'];
+                $searchcommonditystmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country = :country AND commondity_id='$searchcommondity' AND fish_type = '$searchtype' AND remark NOT LIKE '%packing%' GROUP BY commondity_id,size");
                 $searchcommonditystmt->bindParam(':country', $_SESSION['tabs']);
                 $searchcommonditystmt->execute();
                 $datas = $searchcommonditystmt->fetchall();
