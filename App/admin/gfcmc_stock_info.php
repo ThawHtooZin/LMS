@@ -142,7 +142,7 @@ $bootstrap->css();
                                                 } ?>" data-bs-target="#update<?= $sizeinfodata['id']; ?>">
                 <td><?php echo date('d-m-Y', strtotime($sizeinfodata['date'])); ?></td>
                 <td><?php echo $sizeinfodata['particular']; ?></td>
-                <td><?php echo $commonditydata['item_name']; ?></td>
+                <td><?php echo $commonditydata['item_name'] . '(' . $sizeinfodata['fish_type'] . ')'; ?></td>
                 <td><?php echo $sizeinfodata['country']; ?></td>
                 <td><?php echo $sizeinfodata['size']; ?></td>
                 <td><?php echo $sizeinfodata['kg']; ?></td>

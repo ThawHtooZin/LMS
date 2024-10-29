@@ -51,6 +51,7 @@ $bootstrap->css();
     $transferdate = $_POST['transferdate'];
     $transferparticular = $_POST['transferparticular'];
     $transfercommondity_id = $_POST['transfercommondity_id'];
+    $transferfish_type = $_POST['transferfish_type'];
     $transfersize = $_POST['transfersize'];
     $transferkg = $_POST['transferkg'];
     $transfermc = $_POST['transfermc'];
@@ -60,7 +61,7 @@ $bootstrap->css();
     $transfercheckstmt->execute();
     $transfercheck = $transfercheckstmt->fetch(PDO::FETCH_ASSOC);
 
-    $query->transfermcstock($transferdate, $transferparticular, $transfercountry, $transfercommondity_id, $transfersize, $transferkg, $transfermc);
+    $query->transfermcstock($transferdate, $transferparticular, $transfercountry, $transfercommondity_id, $transferfish_type, $transfersize, $transferkg, $transfermc);
     // $validcheckstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE kg='$transferkg' AND size='$transfersize' AND country='$transfercountry' AND commondity_id='$transfercommondity_id' ORDER BY id DESC");
     // $validcheckstmt->execute();
     // $validcheck = $validcheckstmt->fetch(PDO::FETCH_ASSOC);
@@ -214,10 +215,10 @@ $bootstrap->css();
                 $sizestmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE size='$size' AND remark NOT LIKE '%packing%' ORDER BY id DESC");
                 $sizestmt->execute();
                 $sizedata = $sizestmt->fetch(PDO::FETCH_ASSOC);
-                $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND remark NOT LIKE '%packing%' AND particular NOT LIKE '%to%'");
+                $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular NOT LIKE '%out%' AND particular NOT LIKE '%to%'");
                 $totalmcstmt->execute();
                 $totalmcnotsub = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
-                $totalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND remark NOT LIKE '%packing%' AND particular LIKE '%to%'");
+                $totalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular NOT LIKE '%out%' AND particular LIKE '%to%'");
                 $totalmcsubnumstmt->execute();
                 $totalmcsubnum = $totalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
                 $totalmc = $totalmcnotsub['total_mc'] - $totalmcsubnum['total_mc'];
@@ -514,19 +515,35 @@ $bootstrap->css();
                 <label>Date</label>
                 <input type="date" name="transferdate" class="form-control inpv2 mb-2">
                 <label>Commondity</label>
-                <select class="form-control inpv2 mb-2" name="transfercommondity_id">
-                  <?php
-                  if (!empty($form7commonditydatas)) {
-                    foreach ($form7commonditydatas as $form7commonditydata) {
-                      $item_id = $form7commonditydata['commondity_id'];
-                      $commonditydata = $query->select('item', $item_id, 'item_id');
-                  ?>
-                      <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
-                  <?php
-                    }
-                  }
-                  ?>
-                </select>
+                <div class="row">
+                  <div class="col">
+                    <select class="form-control inpv2 mb-2" name="transfercommondity_id">
+                      <?php
+                      if (!empty($form7commonditydatas)) {
+                        foreach ($form7commonditydatas as $form7commonditydata) {
+                          $item_id = $form7commonditydata['commondity_id'];
+                          $commonditydata = $query->select('item', $item_id, 'item_id');
+                      ?>
+                          <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                      <?php
+                        }
+                      }
+                      ?>
+                    </select>
+                  </div>
+                  <div class="col">
+                    <select name="transferfish_type" id="commondityid3" class="form-control inpv2">
+                      <option value="G">G</option>
+                      <option value="egg">egg</option>
+                      <option value="ggs">ggs</option>
+                      <option value="fillet">fillet</option>
+                      <option value="W">W</option>
+                      <option value="Cut_piece">Cut Piece</option>
+                      <option value="Scaless">Scaless</option>
+                      <option value="Bls">Bl's</option>
+                    </select>
+                  </div>
+                </div>
               </div>
               <div class="col">
                 <label>Particular</label>

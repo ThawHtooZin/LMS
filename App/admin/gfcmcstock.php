@@ -42,6 +42,7 @@ $bootstrap->css();
     $exportdate = $_POST['exportdate'];
     $exportparticular = $_POST['exportparticular'];
     $exportcommondity_id = $_POST['exportcommondity_id'];
+    $exportfish_type = $_POST['exportfish_type'];
     $exportsize = $_POST['exportsize'];
     $exportkg = $_POST['exportkg'];
     $exportmc = $_POST['exportmc'];
@@ -51,9 +52,8 @@ $bootstrap->css();
     $exportcheckstmt->execute();
     $exportcheck = $exportcheckstmt->fetch(PDO::FETCH_ASSOC);
 
-    $query->exportmcstock($exportdate, $exportparticular, $exportcountry, $exportcommondity_id, $exportsize, $exportkg, $exportmc);
+    $query->exportmcstock($exportdate, $exportparticular, $exportcountry, $exportcommondity_id, $exportfish_type, $exportsize, $exportkg, $exportmc);
   }
-
   $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM gfcmcstock WHERE country IS NOT NULL");
   $countrystmt->execute();
   $countrydatas = $countrystmt->fetchall();
@@ -81,6 +81,18 @@ $bootstrap->css();
           <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#add2">Add Balance</button>
           <form class="d-inline" action="gfcmcstock.php" method="post">
             <button type="submit" class="btn btn-primary float-end me-2" name="searchcommonditybtn">View</button>
+            <?php
+            $typestmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE country = :country GROUP BY fish_type");
+            $typestmt->bindParam(':country', $_SESSION['tabs']);
+            $typestmt->execute();
+            $searchtype = $typestmt->fetchall();
+            ?>
+            <select class="inpv2 form-control w-25 d-inline me-2 float-end" name="searchtype">
+              <?php foreach ($searchtype as $type):
+              ?>
+                <option value="<?php echo $type['fish_type']; ?>"><?php echo $type['fish_type']; ?></option>
+              <?php endforeach; ?>
+            </select>
             <?php
             $commonditystmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE country = :country GROUP BY commondity_id");
             $commonditystmt->bindParam(':country', $_SESSION['tabs']);
@@ -137,7 +149,8 @@ $bootstrap->css();
               $country = $countrydata['country'];
               if (isset($_POST['searchcommonditybtn']) && !empty($_POST['search'])) {
                 $searchcommondity = $_POST['search'];
-                $searchcommonditystmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE country = :country AND commondity_id='$searchcommondity' GROUP BY commondity_id,size");
+                $searchtype = $_POST['searchtype'];
+                $searchcommonditystmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE country = :country AND commondity_id='$searchcommondity' AND fish_type='$searchtype' GROUP BY commondity_id,size");
                 $searchcommonditystmt->bindParam(':country', $_SESSION['tabs']);
                 $searchcommonditystmt->execute();
                 $datas = $searchcommonditystmt->fetchall();
@@ -180,6 +193,13 @@ $bootstrap->css();
                   $totalmc = $totalmcsubnum['total_mc'];
                 }
                 $totalmc = $totalmcnotsub['total_mc'] - $totalmcsubnum['total_mc'] + $totalbalancemcsubnum['total_mc'];
+
+                // Balance
+                $totalbalanceoutstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular LIKE '%out%' ");
+                $totalbalanceoutstmt->execute();
+                $totalbalanceout = $totalbalanceoutstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalmc = $totalmc - $totalbalanceout['total_mc'];
               ?>
                 <tr style="<?php if ($totalmc > 200) {
                               echo 'background-color:rgba(0, 255, 0, 0.4) !important;';
@@ -350,7 +370,7 @@ $bootstrap->css();
                     </select>
                   </div>
                   <div class="col ms-2 mt-4">
-                    <select name="fish_type1" id="commondityid3" class="form-control inpv2">
+                    <select name="exportfish_type" id="commondityid3" class="form-control inpv2">
                       <option value="G">G</option>
                       <option value="egg">egg</option>
                       <option value="ggs">ggs</option>
