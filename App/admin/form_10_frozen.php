@@ -32,6 +32,7 @@ $bootstrap->css();
     $updateid = $_POST['upid'];
     $newdate = $_POST['update'];
     $upitem_id = $_POST['upitem_id'];
+    $upfish_type = $_POST['upfish_type'];
     $upsupplier_id = $_POST['upsupplier_id'];
     $upcountry = $_POST['upcountry'];
     $uptype = $_POST['uptype'];
@@ -44,12 +45,13 @@ $bootstrap->css();
     $uplooseoutkg = $_POST['uploose_out_kg'];
     $uplooseoutpcs = $_POST['uploose_out_pcs'];
 
-    $query->updateform10($updateid, $newdate, $upitem_id, $upsupplier_id, $upcountry, $uptype, $upsize, $upmc, $upkg, $uppcs, $uplooseinkg, $uplooseinpcs, $uplooseoutkg, $uplooseoutpcs);
+    $query->updateform10($updateid, $newdate, $upitem_id, $upfish_type, $upsupplier_id, $upcountry, $uptype, $upsize, $upmc, $upkg, $uppcs, $uplooseinkg, $uplooseinpcs, $uplooseoutkg, $uplooseoutpcs);
   }
 
   if (isset($_POST['add'])) {
     $date = $_POST['date'];
     $item_id = $_POST['item_id'];
+    $fish_type = $_POST['fish_type'];
     $supplier_id = $_POST['supplier_id'];
     $country = $_POST['country'];
     $type = $_POST['type'];
@@ -62,7 +64,7 @@ $bootstrap->css();
     $looseoutkg = $_POST['loose_out_kg'];
     $looseoutpcs = $_POST['loose_out_pcs'];
 
-    $query->addform10($date, $item_id, $supplier_id, $country, $type, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs);
+    $query->addform10($date, $item_id,  $fish_type, $supplier_id, $country, $type, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs);
 
     $_SESSION['date'] = $date;
     $_SESSION['supplier_id'] = $supplier_id;
@@ -85,46 +87,9 @@ $bootstrap->css();
 
             <b>Link Mark Limited (F-10) Frozen</b>
             <button type="button" class="btn btn-success btn-sm float-end" data-bs-toggle="modal" data-bs-target="#addmodal">Add Form-10 Data</button>
-            <p class="btn btn-primary btn-sm" id="filtertogglebtn" style="display:inline; float: right; margin-right: 10px;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-binoculars" viewBox="0 0 16 16">
+            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#filtermodal" style="display:inline; float: right; margin-right: 10px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-binoculars" viewBox="0 0 16 16">
                 <path d="M3 2.5A1.5 1.5 0 0 1 4.5 1h1A1.5 1.5 0 0 1 7 2.5V5h2V2.5A1.5 1.5 0 0 1 10.5 1h1A1.5 1.5 0 0 1 13 2.5v2.382a.5.5 0 0 0 .276.447l.895.447A1.5 1.5 0 0 1 15 7.118V14.5a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 14.5v-3a.5.5 0 0 1 .146-.354l.854-.853V9.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v.793l.854.853A.5.5 0 0 1 7 11.5v3A1.5 1.5 0 0 1 5.5 16h-3A1.5 1.5 0 0 1 1 14.5V7.118a1.5 1.5 0 0 1 .83-1.342l.894-.447A.5.5 0 0 0 3 4.882zM4.5 2a.5.5 0 0 0-.5.5V3h2v-.5a.5.5 0 0 0-.5-.5zM6 4H4v.882a1.5 1.5 0 0 1-.83 1.342l-.894.447A.5.5 0 0 0 2 7.118V13h4v-1.293l-.854-.853A.5.5 0 0 1 5 10.5v-1A1.5 1.5 0 0 1 6.5 8h3A1.5 1.5 0 0 1 11 9.5v1a.5.5 0 0 1-.146.354l-.854.853V13h4V7.118a.5.5 0 0 0-.276-.447l-.895-.447A1.5 1.5 0 0 1 12 4.882V4h-2v1.5a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5zm4-1h2v-.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zm4 11h-4v.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5zm-8 0H2v.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5z" />
-              </svg>
-            </p>
-            <div id="filterdiv" style="display: none;">
-              <button type="submit" name="view" class="btn btn-secondary btn-sm float-end me-2">View</button>
-              <select name="commondity" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
-                <option value="">Select Commondity</option>
-                <?php
-                $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
-                $commonstmt->execute();
-                $commondatas = $commonstmt->fetchall();
-                foreach ($commondatas as $commondata) {
-                  $itemid = $commondata['item_id'];
-                  $item_name = $query->select('item', $itemid, 'item_id');
-                ?>
-                  <option value="<?php echo $item_name['item_id']; ?>"><?php echo $item_name['item_name']; ?></option>
-                <?php
-                }
-                ?>
-              </select>
-              <select name="country" class="form-control inpv2 d-inline float-end me-2" style=" width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
-                <option value="">Select Country</option>
-                <?php
-                $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock");
-                $countrystmt->execute();
-                $countrydatas = $countrystmt->fetchall();
-                foreach ($countrydatas as $countrydata) {
-                ?>
-                  <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
-                <?php
-                }
-                ?>
-              </select>
-              <input type="date" name="searchdate" class="form-control inpv2 w-25 d-inline float-end me-2" style=" width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
-              <label class="float-end">Form10Date:</label>
-              <input type="text" readonly data-id="multiple" id="dateselector" name="form7date" class="form-control inpv2 w-25 d-inline float-end me-2" style="width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
-              <label class="float-end">Form7Date:</label>
-            </div>
+              </svg></button>
             <?php
             if (isset($_POST['view']) && !empty($_POST['commondity']) && !empty($_POST['country']) && !empty($_POST['searchdate'])) {
             ?>
@@ -132,6 +97,85 @@ $bootstrap->css();
             <?php
             } ?>
           </form>
+        </div>
+        <div class="modal fade" id="filtermodal" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+              <div class="modal-header bg-info text-light">
+                <h1 class="modal-title fs-5">Percentage Report</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form action="" method="post">
+                  <input type="hidden" name="upid" value="<?php echo $form10data['id']; ?>">
+                  <div class="modal-body">
+                    <label>Form7Date:</label>
+                    <input type="text" readonly data-id="multiple" id="dateselector" name="form7date" class="form-control inpv2">
+                    <div class="row" style="margin-top: 10px !important;">
+                      <div class="col">
+                        <label>Form10Date:</label>
+                        <input type="date" name="searchdate" class="form-control inpv2">
+                      </div>
+                      <div class="col">
+                        <label>Country:</label>
+                        <select name="country" class="form-control inpv2">
+                          <option value="">Select Country</option>
+                          <?php
+                          $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock");
+                          $countrystmt->execute();
+                          $countrydatas = $countrystmt->fetchall();
+                          foreach ($countrydatas as $countrydata) {
+                          ?>
+                            <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
+                          <?php
+                          }
+                          ?>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px !important;">
+                      <div class="col">
+                        <label>Commondity:</label>
+                        <select name="commondity" class="form-control inpv2">
+                          <option value="">Select Commondity</option>
+                          <?php
+                          $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
+                          $commonstmt->execute();
+                          $commondatas = $commonstmt->fetchall();
+                          foreach ($commondatas as $commondata) {
+                            $itemid = $commondata['item_id'];
+                            $item_name = $query->select('item', $itemid, 'item_id');
+                          ?>
+                            <option value="<?php echo $item_name['item_id']; ?>"><?php echo $item_name['item_name']; ?></option>
+                          <?php
+                          }
+                          ?>
+                        </select>
+                      </div>
+                      <div class="col">
+                        <label>Fish Type:</label>
+                        <select name="fish_type" class="form-control inpv2">
+                          <option value="">No Fish Type</option>
+                          <option value="G">G</option>
+                          <option value="egg">egg</option>
+                          <option value="ggs">ggs</option>
+                          <option value="fillet">fillet</option>
+                          <option value="W">W</option>
+                          <option value="Cut_piece">Cut Piece</option>
+                          <option value="Scaless">Scaless</option>
+                          <option value="Bls">Bl's</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" name="view" class="btn btn-primary float-end me-2">View</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="card-body">
           <table class="table table-hover table-striped table-bordered">
@@ -178,18 +222,20 @@ $bootstrap->css();
               $country = $_POST['country'];
               $searchdate = $_POST['searchdate'];
               $form7date = $_POST['form7date'];
-              $stmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
+              $fishtype = $_POST['fish_type'];
+              $stmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate' AND fish_type='$fishtype'");
               $stmt->execute();
               $datas = $stmt->fetchall();
               foreach ($datas as $data) {
                 $item_id = $data['item_id'];
+                $fish_type = $data['fish_type'];
                 $commonditydata = $query->select('item', $item_id, 'item_id');
                 $supplierid = $data['supplier_id'];
                 $supplier_name = $query->select('acname', $supplierid, 'code_no');
             ?>
                 <tr>
                   <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
-                  <td><?php echo $commonditydata['item_name']; ?></td>
+                  <td><?php echo $commonditydata['item_name'] . '(' . $data['fish_type'] . ')'; ?></td>
                   <td><?php echo $supplier_name['ac_name']; ?></td>
                   <td><?php echo $data['country']; ?></td>
                   <td><?php echo $data['type']; ?></td>
@@ -251,20 +297,20 @@ $bootstrap->css();
 
 
 
-              $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_id='$supplier_id' AND date='$searchdate'");
+              $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_id='$supplier_id' AND fish_type='$fish_type' AND date='$searchdate'");
               $form10pcsstmt->execute();
               $form10pcsdata = $form10pcsstmt->fetch(PDO::FETCH_ASSOC);
 
 
-              $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_id='$supplier_id' AND date='$searchdate'");
+              $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_id='$supplier_id' AND fish_type='$fish_type' AND date='$searchdate'");
               $totalkgstmt->execute();
               $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
 
-              $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_id='$supplier_id' AND date='$searchdate'");
+              $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_id='$supplier_id' AND fish_type='$fish_type' AND date='$searchdate'");
               $mcstmt->execute();
               $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
 
-              $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_id='$supplier_id' AND date='$searchdate'");
+              $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_id='$supplier_id' AND fish_type='$fish_type' AND date='$searchdate'");
               $kgstmt->execute();
               $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
               ?>
@@ -344,7 +390,7 @@ $bootstrap->css();
               ?>
                   <tr>
                     <td><?php echo date('d-m-Y', strtotime($form10data['date'])); ?></td>
-                    <td><?php echo $commonditydata['item_name']; ?></td>
+                    <td><?php echo $commonditydata['item_name'] . '(' . $form10data['fish_type'] . ')'; ?></td>
                     <td><?php echo $supplier_name['ac_name']; ?></td>
                     <td><?php echo $form10data['country']; ?></td>
                     <td><?php echo $form10data['type']; ?></td>
@@ -441,22 +487,39 @@ $bootstrap->css();
                               <div class="row">
                                 <div class="col">
                                   <label>Commondity</label>
-                                  <select class="form-control inpv2 mb-2" name="upitem_id">
-                                    <?php
-                                    $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
-                                    $form7commonditystmt->execute();
-                                    $form7commonditydatas = $form7commonditystmt->fetchall();
-                                    foreach ($form7commonditydatas as $form7commonditydata) {
-                                      $item_id = $form7commonditydata['item_id'];
-                                      $commonditydata = $query->select('item', $item_id, 'item_id');
-                                    ?>
-                                      <option value="<?php echo $commonditydata['item_id']; ?>" <?php if ($updatedata['item_id'] == $commonditydata['item_id']) {
-                                                                                                  echo "selected";
-                                                                                                }; ?>><?php echo $commonditydata['item_name']; ?></option>
-                                    <?php
-                                    }
-                                    ?>
-                                  </select>
+                                  <div class="row">
+                                    <div class="col">
+                                      <select class="form-control inpv2 mb-2" name="upitem_id">
+                                        <?php
+                                        $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
+                                        $form7commonditystmt->execute();
+                                        $form7commonditydatas = $form7commonditystmt->fetchall();
+                                        foreach ($form7commonditydatas as $form7commonditydata) {
+                                          $item_id = $form7commonditydata['item_id'];
+                                          $commonditydata = $query->select('item', $item_id, 'item_id');
+                                        ?>
+                                          <option value="<?php echo $commonditydata['item_id']; ?>" <?php if ($updatedata['item_id'] == $commonditydata['item_id']) {
+                                                                                                      echo "selected";
+                                                                                                    }; ?>><?php echo $commonditydata['item_name']; ?></option>
+                                        <?php
+                                        }
+                                        ?>
+                                      </select>
+                                    </div>
+                                    <div class="col">
+                                      <select name="upfish_type" class="form-control inpv2">
+                                        <option value="G">G</option>
+                                        <option value="egg">egg</option>
+                                        <option value="ggs">ggs</option>
+                                        <option value="fillet">fillet</option>
+                                        <option value="W">W</option>
+                                        <option value="Cut_piece">Cut Piece</option>
+                                        <option value="Scaless">Scaless</option>
+                                        <option value="Bls">Bl's</option>
+                                      </select>
+                                    </div>
+                                  </div>
+
                                 </div>
                                 <div class="col">
                                   <label>Country</label>
@@ -574,24 +637,40 @@ $bootstrap->css();
               <div class="row">
                 <div class="col">
                   <label>Commondity</label>
-                  <select class="form-control inpv2 mb-2" name="item_id">
-                    <?php
-                    $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
-                    $form7commonditystmt->execute();
-                    $form7commonditydatas = $form7commonditystmt->fetchall();
-                    foreach ($form7commonditydatas as $form7commonditydata) {
-                      $item_id = $form7commonditydata['item_id'];
-                      $commonditydata = $query->select('item', $item_id, 'item_id');
-                    ?>
-                      <option value="<?php echo $commonditydata['item_id']; ?>" <?php if (!empty($_SESSION['item_id'])) {
-                                                                                  if ($_SESSION['item_id'] == $commonditydata['item_id']) {
-                                                                                    echo "selected";
-                                                                                  }
-                                                                                } ?>><?php echo $commonditydata['item_name']; ?></option>
-                    <?php
-                    }
-                    ?>
-                  </select>
+                  <div class="row">
+                    <div class="col">
+                      <select class="form-control inpv2 mb-2" name="item_id">
+                        <?php
+                        $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
+                        $form7commonditystmt->execute();
+                        $form7commonditydatas = $form7commonditystmt->fetchall();
+                        foreach ($form7commonditydatas as $form7commonditydata) {
+                          $item_id = $form7commonditydata['item_id'];
+                          $commonditydata = $query->select('item', $item_id, 'item_id');
+                        ?>
+                          <option value="<?php echo $commonditydata['item_id']; ?>" <?php if (!empty($_SESSION['item_id'])) {
+                                                                                      if ($_SESSION['item_id'] == $commonditydata['item_id']) {
+                                                                                        echo "selected";
+                                                                                      }
+                                                                                    } ?>><?php echo $commonditydata['item_name']; ?></option>
+                        <?php
+                        }
+                        ?>
+                      </select>
+                    </div>
+                    <div class="col">
+                      <select name="fish_type" class="form-control inpv2">
+                        <option value="G">G</option>
+                        <option value="egg">egg</option>
+                        <option value="ggs">ggs</option>
+                        <option value="fillet">fillet</option>
+                        <option value="W">W</option>
+                        <option value="Cut_piece">Cut Piece</option>
+                        <option value="Scaless">Scaless</option>
+                        <option value="Bls">Bl's</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
                 <div class="col">
                   <label>Country</label>

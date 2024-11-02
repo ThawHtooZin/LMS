@@ -135,6 +135,9 @@ $bootstrap->css();
     if (!empty($_POST['material_store_house'])) {
       $permission .= ",material_store_house";
     }
+    if (!empty($_POST['material_gatepass'])) {
+      $permission .= ",material_gatepass";
+    }
     if (!empty($_POST['material_output'])) {
       $permission .= ",material_output";
     }
@@ -450,6 +453,15 @@ $bootstrap->css();
                                                                     echo "checked";
                                                                   }
                                                                 } ?>></td>
+              </tr>
+
+              <tr>
+                <td>Packing Material Gate Pass</td>
+                <td><input type="checkbox" name="material_gatepass" <?php if (!empty($permissionshow)) {
+                                                                      if (str_contains($permissionshow, 'material_gatepass') == 1) {
+                                                                        echo "checked";
+                                                                      }
+                                                                    } ?>></td>
               </tr>
 
 

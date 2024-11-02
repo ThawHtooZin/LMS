@@ -29,6 +29,7 @@ $bootstrap->css();
     </div>
     <?php
     if (isset($_POST['outputbtn'])) {
+      $date = $_POST['date'];
       $stockto = $_POST['stock_to'];
       $voucher_no = $_POST['voucher_no'];
       $material = $_POST['material'];
@@ -48,7 +49,7 @@ $bootstrap->css();
         $quantity_error = "Not enough quantity";
         echo "<script>swal('Not enough quantity!', 'Only have " . $totalquantity . "', 'warning');</script>";
       } else {
-        $query->outputmaterial($stockto, $material, $quantity, $voucher_no);
+        $query->outputmaterial($date, $stockto, $material, $quantity, $voucher_no);
       }
     }
     ?>
@@ -67,6 +68,8 @@ $bootstrap->css();
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
+                    <label>Date</label>
+                    <input type="date" name="date" class="form-control">
                     <label>Stock To</label>
                     <select name="stock_to" class="form-control">
                       <option value="hhk">HHK</option>

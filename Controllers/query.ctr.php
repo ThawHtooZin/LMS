@@ -2774,7 +2774,7 @@ class Query
     }
   }
 
-  function addform10($date, $item_id, $supplier_id, $country, $type, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs)
+  function addform10($date, $item_id, $fish_type, $supplier_id, $country, $type, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs)
   {
     global $pdo;
 
@@ -2783,7 +2783,7 @@ class Query
     $form7data = $form7stmt->fetch(PDO::FETCH_ASSOC);
     $total_kg = (floatval($kg) + floatval($looseinkg)) - floatval($looseoutkg);
     $addform10 = (floatval($pcs) + floatval($looseinpcs)) - floatval($looseoutpcs);
-    $addform10stmt = $pdo->prepare("INSERT INTO form10stock(date, item_id, supplier_id, country, type, size, pcsform10, mc, kg, pcs, looseinkg, looseinpcs, looseoutkg, looseoutpcs, total_kg) VALUES('$date', '$item_id', '$supplier_id', '$country', '$type', '$size', '$addform10', '$mc', '$kg', '$pcs', '$looseinkg', '$looseinpcs', '$looseoutkg', '$looseoutpcs', '$total_kg')");
+    $addform10stmt = $pdo->prepare("INSERT INTO form10stock(date, item_id, supplier_id, country, type, size, pcsform10, mc, kg, pcs, looseinkg, looseinpcs, looseoutkg, looseoutpcs, total_kg, fish_type) VALUES('$date', '$item_id', '$supplier_id', '$country', '$type', '$size', '$addform10', '$mc', '$kg', '$pcs', '$looseinkg', '$looseinpcs', '$looseoutkg', '$looseoutpcs', '$total_kg', '$fish_type')");
     $addform10stmt->execute();
   }
 
@@ -4855,13 +4855,13 @@ class Query
     $stmt->execute();
   }
 
-  function updateform10($updateid, $newdate, $upitem_id, $upsupplier_id, $upcountry, $uptype, $upsize, $upmc, $upkg, $uppcs, $uplooseinkg, $uplooseinpcs, $uplooseoutkg, $uplooseoutpcs)
+  function updateform10($updateid, $newdate, $upitem_id, $upfish_type, $upsupplier_id, $upcountry, $uptype, $upsize, $upmc, $upkg, $uppcs, $uplooseinkg, $uplooseinpcs, $uplooseoutkg, $uplooseoutpcs)
   {
     global $pdo;
 
     $total_kg = (floatval($upkg) + floatval($uplooseinkg)) - floatval($uplooseoutkg);
     $updateform10pcs = (floatval($uppcs) + floatval($uplooseinpcs)) - floatval($uplooseoutpcs);
-    $updateform10stmt = $pdo->prepare("UPDATE form10stock SET date='$newdate', item_id='$upitem_id', supplier_id='$upsupplier_id', country='$upcountry', type='$uptype', size='$upsize',pcsform10='$updateform10pcs', mc='$upmc', kg='$upkg', pcs='$uppcs', looseinkg='$uplooseinkg', looseinpcs='$uplooseinpcs', looseoutkg='$uplooseoutkg', looseoutpcs='$uplooseoutpcs', total_kg='$total_kg' WHERE id='$updateid'");
+    $updateform10stmt = $pdo->prepare("UPDATE form10stock SET date='$newdate', item_id='$upitem_id', supplier_id='$upsupplier_id', country='$upcountry', type='$uptype', size='$upsize',pcsform10='$updateform10pcs', mc='$upmc', kg='$upkg', pcs='$uppcs', looseinkg='$uplooseinkg', looseinpcs='$uplooseinpcs', looseoutkg='$uplooseoutkg', looseoutpcs='$uplooseoutpcs', total_kg='$total_kg', fish_type='$upfish_type' WHERE id='$updateid'");
     $updateform10stmt->execute();
   }
 
@@ -5292,7 +5292,7 @@ class Query
 
     // Store House Add
 
-    $storehousestmt = $pdo->prepare("INSERT INTO material_store_house(date, voucher_no, material_id, `in`) VALUES('$date', '$voucher_no', '$material', '$quantity')");
+    $storehousestmt = $pdo->prepare("INSERT INTO material_store_house(date, voucher_no, supplier_id, material_id, `in`) VALUES('$date', '$voucher_no','$supplier_name', '$material', '$quantity')");
     $storehousestmt->execute();
 
     // // General Ledger Add
@@ -5329,11 +5329,11 @@ class Query
 
   }
 
-  function outputmaterial($stockto, $material, $quantity, $voucher_no)
+  function outputmaterial($date, $stockto, $material, $quantity, $voucher_no)
   {
     global $pdo;
 
-    $stmt = $pdo->prepare("INSERT INTO stock_output_group(stock_to, voucher_no, material_id, `in`) VALUES('$stockto', '$voucher_no', '$material', '$quantity')");
+    $stmt = $pdo->prepare("INSERT INTO stock_output_group(date, stock_to, voucher_no, material_id, `in`) VALUES('$date', '$stockto', '$voucher_no', '$material', '$quantity')");
     $stmt->execute();
     $groupstmt = $pdo->prepare("SELECT * FROM stock_output_group ORDER BY id DESC");
     $groupstmt->execute();
@@ -5345,8 +5345,16 @@ class Query
     $supplier = $materialdata['supplier_id'];
 
     $groupid = $groupdata['id'];
-    $storehousestmt = $pdo->prepare("INSERT INTO material_store_house(voucher_no, material_id, supplier_id, `out`, output_group) VALUES('$voucher_no', '$material', '$supplier', '$quantity', '$groupid')");
+    $storehousestmt = $pdo->prepare("INSERT INTO material_store_house(date, voucher_no, material_id, supplier_id, `out`, output_group) VALUES('$date', '$voucher_no', '$material', '$supplier', '$quantity', '$groupid')");
     $storehousestmt->execute();
+  }
+
+  function usematerial($date, $stockto, $material, $quantity, $voucher_no)
+  {
+    global $pdo;
+
+    $stmt = $pdo->prepare("INSERT INTO stock_output_group(date, stock_to, voucher_no, material_id, `out`) VALUES('$date', '$stockto', '$voucher_no', '$material', '$quantity')");
+    $stmt->execute();
   }
 
   public function stockout($stock_to, $date, $voucher_no, $packingmaterial, $quantity)

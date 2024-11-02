@@ -95,7 +95,7 @@ $bootstrap->css();
             </div>
 
             <label>Type of Reports</label>
-            <select name="filterinp" class="form-control inpv2 mt-2" id="filterinp" required>
+            <select name="filterinp" class="form-control inpv2 mt-2" id="filterinp">
               <option value="all" style="font-weight: bold;">All Data</option>
               <option value="totalin" style="font-weight: bold;">Total In</option>
               <option value="totalout" style="font-weight: bold;">Total Out</option>
@@ -144,6 +144,16 @@ $bootstrap->css();
           $materialstmt = $pdo->prepare("SELECT * FROM materials");
           $materialstmt->execute();
           $material = $materialstmt->fetch(PDO::FETCH_ASSOC);
+
+          if (isset($_POST['inbtn'])) {
+            $_SESSION['in'] = true;
+            unset($_SESSION['out']);
+          }
+
+          if (isset($_POST['outbtn'])) {
+            $_SESSION['out'] = true;
+            unset($_SESSION['in']);
+          }
           ?>
           <h1 class="merriweather-light text-center">*Packing Material (Link Mark WareHouse) Report*</h1>
           <h4>Report of Records</h4>
@@ -292,11 +302,7 @@ $bootstrap->css();
             if (isset($_POST['savefilter'])) {
               $_SESSION['startdate'] = $_POST['startdate'];
               $_SESSION['enddate'] = $_POST['enddate'];
-              if (!empty($_POST['material'])) {
-                $_SESSION['material'] = $_POST['material'];
-              } else {
-                echo "<script>swal('Error', 'No Material Added', 'error');</script>";
-              }
+              $_SESSION['material'] = $_POST['material'];
             }
 
             if (!empty($_SESSION['filtertype'])) {
