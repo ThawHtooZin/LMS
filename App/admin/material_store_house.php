@@ -72,9 +72,13 @@ $bootstrap->css();
                     <input type="date" name="date" class="form-control">
                     <label>Stock To</label>
                     <select name="stock_to" class="form-control">
-                      <option value="hhk">HHK</option>
-                      <option value="gfc">GFC</option>
-                      <option value="tcl">TCL</option>
+                      <?php
+                      $coldstorestmt = $pdo->prepare("SELECT * FROM config_coldstore");
+                      $coldstorestmt->execute();
+                      $coldstores = $coldstorestmt->fetchAll();
+                      foreach ($coldstores as $coldstore): ?>
+                        <option value="<?= $coldstore['name'] ?>" style="text-transform: uppercase;"><?= $coldstore['name'] ?></option>
+                      <?php endforeach; ?>
                     </select>
 
                     <label>Packing Material Item</label>

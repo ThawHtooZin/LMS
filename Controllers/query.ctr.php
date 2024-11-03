@@ -5255,6 +5255,39 @@ class Query
     }
   }
 
+  function create_coldstore($name)
+  {
+    global $pdo;
+    $stmt = $pdo->prepare("INSERT INTO config_coldstore(name) VALUES('$name');");
+    $stmt->execute();
+  }
+
+  function update_coldstore($name, $id)
+  {
+    global $pdo;
+    $checkstmt = $pdo->prepare("SELECT * FROM config_coldstore");
+    $checkstmt->execute();
+    $checkdata = $checkstmt->fetchall();
+    if (!empty($checkdata)) {
+      $stmt = $pdo->prepare("UPDATE config_coldstore SET name='$name' WHERE id='$id'");
+      $stmt->execute();
+    }
+  }
+
+  function delete_coldstore($id)
+  {
+    global $pdo;
+    $checkstmt = $pdo->prepare("SELECT * FROM config_coldstore WHERE id='$id'");
+    $checkstmt->execute();
+    $checkdata = $checkstmt->fetchall();
+
+    if (!empty($checkdata)) {
+      $stmt = $pdo->prepare("DELETE FROM config_coldstore WHERE id='$id'");
+      $stmt->execute();
+    }
+  }
+
+
   function addmaterialpurchase($table, $date, $voucher_no, $supplier_name, $material, $quantity, $rate)
   {
     global $pdo;

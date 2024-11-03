@@ -138,6 +138,9 @@ $bootstrap->css();
     if (!empty($_POST['material_gatepass'])) {
       $permission .= ",material_gatepass";
     }
+    if (!empty($_POST['configuration_coldstore'])) {
+      $permission .= ",configuration_coldstore";
+    }
     if (!empty($_POST['material_output'])) {
       $permission .= ",material_output";
     }
@@ -462,6 +465,12 @@ $bootstrap->css();
                                                                         echo "checked";
                                                                       }
                                                                     } ?>></td>
+                <td>Configuration Coldstore</td>
+                <td><input type="checkbox" name="configuration_coldstore" <?php if (!empty($permissionshow)) {
+                                                                            if (str_contains($permissionshow, 'configuration_coldstore') == 1) {
+                                                                              echo "checked";
+                                                                            }
+                                                                          } ?>></td>
               </tr>
 
 

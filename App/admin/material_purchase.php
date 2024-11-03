@@ -227,6 +227,7 @@ $bootstrap->css();
               <th>Name</th>
               <th>Quantity</th>
               <th>Rate</th>
+              <th>Total</th>
             </tr>
             <?php
             if (isset($_POST['total'])) {
@@ -261,6 +262,7 @@ $bootstrap->css();
                 <td><?php echo $material_name['name'] ?></td>
                 <td><?php echo $purchasedata['quantity'] ?></td>
                 <td><?php echo $purchasedata['rate'] ?></td>
+                <td><?php echo $purchasedata['quantity'] * $purchasedata['rate']; ?></td>
               </tr>
               <!-- Data Add Modal -->
               <div class="modal fade" id="updatemodal" style="margin-left:auto !important; margin-right: auto !important;">

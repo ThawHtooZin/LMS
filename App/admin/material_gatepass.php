@@ -90,7 +90,7 @@ $bootstrap->css();
                                             ?>
                                         </select>
 
-                                        <label>GatePass Voucher No</label>
+                                        <label>Form 10(Finished Goods)</label>
                                         <input type="number" name="voucher_no" class="form-control" required>
 
                                         <label>Quantity</label>
