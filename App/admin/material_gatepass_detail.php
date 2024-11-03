@@ -74,18 +74,21 @@ $bootstrap->css();
                             <th>Id</th>
                             <th>Date</th>
                             <th>Voucher No</th>
+                            <th>Description</th>
+                            <th>Action</th>
                             <th>In</th>
                             <th>Out</th>
                             <th>Balance</th>
                         </tr>
 
                         <?php
-                        $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE material_id='$id' ORDER BY id");
+                        $stock_to = $_SESSION['tabs'];
+                        $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE material_id='$id' AND stock_to = '$stock_to' ORDER BY id");
                         $stmt->execute();
                         $rawResult = $stmt->fetchAll();
                         $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-                        $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE material_id='$id' ORDER BY id LIMIT $offset,$numOfrecs ");
+                        $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE material_id='$id' AND stock_to = '$stock_to' ORDER BY id LIMIT $offset,$numOfrecs ");
                         $stmt->execute();
                         $datas = $stmt->fetchAll();
                         ?>
@@ -109,6 +112,8 @@ $bootstrap->css();
                                 <td><?php echo $no; ?></td>
                                 <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
                                 <td><?php echo $data['voucher_no']; ?></td>
+                                <td><?php echo $data['description']; ?></td>
+                                <td><?php echo $data['action']; ?></td>
                                 <td style="color: green; font-weight: bolder;"><?php if ($in == '') {
                                                                                     echo '-';
                                                                                 } else {

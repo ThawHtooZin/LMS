@@ -5382,12 +5382,32 @@ class Query
     $storehousestmt->execute();
   }
 
-  function usematerial($date, $stockto, $material, $quantity, $voucher_no)
+  function managestock($date, $stockto, $material, $quantity, $voucher_no, $action, $transfer_to, $description)
   {
     global $pdo;
 
-    $stmt = $pdo->prepare("INSERT INTO stock_output_group(date, stock_to, voucher_no, material_id, `out`) VALUES('$date', '$stockto', '$voucher_no', '$material', '$quantity')");
-    $stmt->execute();
+    if ($action == 'use') {
+      $stmt = $pdo->prepare("INSERT INTO stock_output_group(date, stock_to, voucher_no, description, material_id, `out`, action) VALUES('$date', '$stockto', '$voucher_no', '$description', '$material', '$quantity', '$action')");
+      $stmt->execute();
+    }
+    if ($action == 'transfer') {
+      $stmt = $pdo->prepare("INSERT INTO stock_output_group(date, stock_to, voucher_no, description, material_id, `out`, action) VALUES('$date', '$stockto', '$voucher_no', '$description', '$material', '$quantity', '$action')");
+      $stmt->execute();
+      $stmt = $pdo->prepare("INSERT INTO stock_output_group(date, stock_to, voucher_no, description, material_id, `in`, action) VALUES('$date', '$transfer_to', '$voucher_no', '$description', '$material', '$quantity', '$action')");
+      $stmt->execute();
+    }
+
+    if ($action == 'return') {
+      $stmt = $pdo->prepare("INSERT INTO stock_output_group(date, stock_to, voucher_no, description, material_id, `out`, action) VALUES('$date', '$stockto', '$voucher_no', '$description', '$material', '$quantity', '$action')");
+      $stmt->execute();
+      $stmt = $pdo->prepare("INSERT INTO material_store_house(date, voucher_no, material_id, description, `in`, action) VALUES('$date', '$voucher_no', '$material', '$description', '$quantity', '$action')");
+      $stmt->execute();
+    }
+
+    if ($action == 'damaged') {
+      $stmt = $pdo->prepare("INSERT INTO stock_output_group(date, stock_to, voucher_no, description, material_id, `out`, action) VALUES('$date', '$stockto', '$voucher_no', '$description', '$material', '$quantity', '$action')");
+      $stmt->execute();
+    }
   }
 
   public function stockout($stock_to, $date, $voucher_no, $packingmaterial, $quantity)

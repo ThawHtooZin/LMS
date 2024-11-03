@@ -28,12 +28,15 @@ $bootstrap->css();
             ?>
         </div>
         <?php
-        if (isset($_POST['outputbtn'])) {
+        if (isset($_POST['managebtn'])) {
             $date = $_POST['date'];
             $stockto = $_SESSION['tabs'];
+            $action = $_POST['action'];
+            $transfer_to = $_POST['transfer_to'];
             $voucher_no = $_POST['voucher_no'];
             $material = $_POST['material'];
             $quantity = $_POST['quantity'];
+            $description = $_POST['description'];
 
             $incheckstmt = $pdo->prepare("SELECT SUM(`in`) AS totalin FROM stock_output_group WHERE material_id = '$material'");
             $incheckstmt->execute();
@@ -49,7 +52,7 @@ $bootstrap->css();
                 $quantity_error = "Not enough quantity";
                 echo "<script>swal('Not enough quantity!', 'Only have " . $totalquantity . "', 'warning');</script>";
             } else {
-                $query->usematerial($date, $stockto, $material, $quantity, $voucher_no);
+                $query->managestock($date, $stockto, $material, $quantity, $voucher_no, $action, $transfer_to, $description);
             }
         }
         ?>
@@ -58,16 +61,37 @@ $bootstrap->css();
             <div class="card">
                 <div class="card-header bg-primary text-light" style="padding:-10px;">
                     <p style="font-size: 26px;font-weight: bold;margin-left:450px; display:inline;">Manage Packing Material (Gate Pass)</p>
-                    <button class="btn btn-warning float-end" data-bs-toggle="modal" data-bs-target="#usemodal">Use</button>
-                    <div class="modal fade" style="margin-top: 75px;" id="usemodal" tabindex="-1" aria-hidden="true">
+                    <button class="btn btn-warning float-end" data-bs-toggle="modal" data-bs-target="#stockmanagemodal">Manage</button>
+                    <div class="modal fade" style="margin-top: 75px;" id="stockmanagemodal" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content text-dark">
                                 <form action="material_gatepass.php" method="POST">
                                     <div class="modal-header bg-primary">
-                                        <h1 class="modal-title fs-5 text-light" id="exampleModalLabel">Use Stock</h1>
+                                        <h1 class="modal-title fs-5 text-light" id="exampleModalLabel">Manage Stock</h1>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
+                                        <label>Action Type</label>
+                                        <select name="action" class="form-control" id="actioninp">
+                                            <option value="use">Use</option>
+                                            <option value="transfer">Transfer</option>
+                                            <option value="return">Return</option>
+                                            <option value="damaged">Damaged</option>
+                                        </select>
+
+                                        <div id="transftertodiv" style="display:none;">
+                                            <label>Transfer To</label>
+                                            <select name="transfer_to" class="form-control">
+                                                <?php
+                                                $coldstorestmt = $pdo->prepare("SELECT * FROM config_coldstore");
+                                                $coldstorestmt->execute();
+                                                $coldstores = $coldstorestmt->fetchAll();
+                                                foreach ($coldstores as $coldstore): ?>
+                                                    <option value="<?= $coldstore['name'] ?>" style="text-transform: uppercase;"><?= $coldstore['name'] ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+
                                         <label>Date</label>
                                         <input type="date" name="date" class="form-control">
 
@@ -82,7 +106,6 @@ $bootstrap->css();
                                                 $materialstmt = $pdo->prepare("SELECT * FROM materials WHERE id='$materialid'");
                                                 $materialstmt->execute();
                                                 $materialdata = $materialstmt->fetch(PDO::FETCH_ASSOC);
-
                                             ?>
                                                 <option value="<?= $material['material_id']; ?>"><?= $materialdata['name']; ?></option>
                                             <?php
@@ -90,13 +113,13 @@ $bootstrap->css();
                                             ?>
                                         </select>
 
-                                        <label>Form 10(Finished Goods)</label>
+                                        <label>Voucher No</label>
                                         <input type="number" name="voucher_no" class="form-control" required>
 
                                         <label>Quantity</label>
                                         <input type="number" name="quantity" class="form-control" required>
                                         <?php
-                                        if (isset($_POST['outputbtn'])) {
+                                        if (isset($_POST['managebtn'])) {
                                             if (!empty($quantity_error)) {
                                         ?>
                                                 <p class="text-danger"><?= $quantity_error; ?></p>
@@ -104,10 +127,13 @@ $bootstrap->css();
                                             }
                                         }
                                         ?>
+
+                                        <label>Description</label>
+                                        <textarea name="description" class="form-control"></textarea>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <button type="submit" name="outputbtn" class="btn btn-primary">Use</button>
+                                        <button type="submit" name="managebtn" class="btn btn-primary">Manage</button>
                                     </div>
                                 </form>
                             </div>
@@ -160,7 +186,7 @@ $bootstrap->css();
                             <th>In</th>
                             <th>Out</th>
                             <th>Balance</th>
-                            <th>Action</th>
+                            <th>Detail</th>
                         </tr>
 
                         <?php
@@ -311,6 +337,18 @@ $bootstrap->css();
     </div>
     <!-- Add Modal -->
 
+    <script>
+        var actioninp = document.getElementById("actioninp");
+
+        actioninp.addEventListener('change', function() {
+            var transftertodiv = document.getElementById("transftertodiv");
+            if (actioninp.value == 'transfer') {
+                transftertodiv.style.display = 'block';
+            } else {
+                transftertodiv.style.display = 'none';
+            }
+        });
+    </script>
     <?php
     $bootstrap->javascript();
     ?>

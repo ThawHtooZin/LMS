@@ -77,6 +77,7 @@ $bootstrap->css();
               <th>Stock To</th>
               <th>G/P Voucher No</th>
               <th>Supplier</th>
+              <th>Description</th>
               <th>Unit</th>
               <th>In</th>
               <th>Out</th>
@@ -108,6 +109,10 @@ $bootstrap->css();
               $supplierstmt->execute();
               $supplier = $supplierstmt->fetch(PDO::FETCH_ASSOC);
 
+              if (empty($supplier)) {
+                $supplier['supplier_name'] = '';
+              }
+
               $in = $data['in'];
               $out = $data['out'];
               $balance += $in - $out;
@@ -133,6 +138,7 @@ $bootstrap->css();
                 <td><?php if (empty($outdata['stock_to'])) {
                       echo $supplier['supplier_name'];
                     } ?></td>
+                <td><?= $data['description']; ?></td>
                 <td><?php echo $material['unit']; ?></td>
                 <td style="color: green; font-weight: bolder;"><?php if ($in == '') {
                                                                   echo '-';
