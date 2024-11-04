@@ -360,7 +360,7 @@ $permissions = $permission['permission'];
               ?>
                 <li class="nav-item">
                   <a href="coldstorecharges.php" class="nav-link h text-light" style="font-size:14px !important; ">
-                    <svg class="bi" style="padding-right: 15px !important;" width="16" height="16"><i class="bi bi-box"></i></svg>
+                    <svg class="bi" style="padding-right: 15px !importFant;" width="16" height="16"><i class="bi bi-box"></i></svg>
                     - Cold Store Charges
                   </a>
                 </li>
@@ -372,7 +372,7 @@ $permissions = $permission['permission'];
         </li>
       <?php
       }
-      if (str_contains($permissions, 'material_list') == 1 || str_contains($permissions, 'material_store_house') == 1 || str_contains($permissions, 'material_output') == 1 || str_contains($permissions, 'manage_material_purchase') == 1 || str_contains($permission, 'material_gatepass') == 1) {
+      if (str_contains($permissions, 'material_list') == 1 || str_contains($permissions, 'material_store_house') == 1 || str_contains($permissions, 'material_output') == 1 || str_contains($permissions, 'manage_material_purchase') == 1 || str_contains($permissions, 'material_gatepass') == 1) {
       ?>
         <li class=" p-1" style=" font-weight:bold; border-bottom: 1px solid rgb(255,255,255,0.2); ">
           <a href="#" class="nav-link text-white" id="sidebarlink" data-bs-toggle="collapse" data-bs-target="#production-collapse" aria-expanded="false">
