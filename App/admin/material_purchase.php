@@ -58,37 +58,7 @@ $bootstrap->css();
 
         </div>
         <div class="card-body" style="margin-top:-8px !important;">
-          <?php
-          if (isset($_POST['deletebutton'])) {
-            $deleteid = $_POST['deleteid'];
-
-            $data = $query->select('purchase', $deleteid, 'id');
-            if (!empty($data['tclfrozen'])) {
-              $tclorfrozen = $data['tclfrozen'];
-            } else {
-              $tclorfrozen = '';
-            }
-            $query->deletepurchase('purchase', $deleteid);
-            $query->deletepayable('payable', $deleteid);
-            if ($tclorfrozen == 'tcl') {
-              $query->deleteform7('form7stocktcl', $deleteid);
-            } else {
-              $query->deleteform7('form7stock', $deleteid);
-            }
-          }
-          if (isset($_POST['updatebutton'])) {
-            $date = $_POST['date'];
-            $voucher_no = $_POST['voucher_no'];
-            $supplier_name = $_POST['upsupplier_code_no'];
-            $commodity = $_POST['commodity'];
-            $size = $_POST['size'];
-            $viss = $_POST['viss'];
-            $pcs = $_POST['pcs'];
-            $price = $_POST['price'];
-            $no = $_POST['updateid'];
-
-            $message = $query->updatepurchase('purchase', $date, $voucher_no, $supplier_name, $tclfrozen, $commodity, $size, $viss, $pcs, $price, $no);
-          }
+        <?php
           $date_error = '';
           $voucher_no_error = '';
           $type_error = '';
@@ -96,6 +66,8 @@ $bootstrap->css();
           $quantity_error = '';
           $rate_error = '';
           if (isset($_POST['addbutton'])) {
+
+            echo "<script>alert('Ahhhhhhhhhhhhh');</script>";
             $date = $_POST['date'];
             $voucher_no = $_POST['voucher_no'];
             $supplier_name = $_POST['supplier_code_no'];
@@ -125,9 +97,26 @@ $bootstrap->css();
             }
           }
 
-          if (isset($_POST['total'])) {
-            $supplier_id = $_POST['supplier_id'];
-            $purchasedatas = $query->search('material_purchase', 'supplier_id', $supplier_id);
+          if (isset($_POST['updatebtn'])) {
+            $up_id = $_POST['up_id'];
+            $up_date = $_POST['up_date'];
+            $up_voucher_no = $_POST['up_voucher_no'];
+            $up_supplier_name = $_POST['up_supplier_code_no'];
+            $up_material = $_POST['up_material'];
+            $up_quantity = $_POST['up_quantity'];
+            $up_rate = $_POST['up_rate'];
+
+            $query->updatematerialpurchase('material_purchase', $up_date, $up_voucher_no, $up_supplier_name, $up_material, $up_quantity, $up_rate, $up_id);
+            $query->updatematerial_warehouse('material_store_house', $up_date, $up_supplier_name, $up_voucher_no, $up_material, $up_quantity);
+          }
+
+          if (isset($_POST['deletebtn'])) {
+            $deleteid = $_POST['up_id'];
+            $deletevoucher_no = $_POST['deletevoucher_no'];
+
+            $query->deletematerialpurchase('material_purchase', $deleteid);
+            $query->deletepayable('payable', $deleteid);
+            $query->deletematerial_warehouse('material_store_house', $deletevoucher_no);
           }
 
           if (isset($_POST['commoditybtn'])) {
@@ -240,7 +229,7 @@ $bootstrap->css();
               $rawResult = $stmt->fetchAll();
               $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-              $stmt = $pdo->prepare("SELECT * FROM material_purchase ORDER BY id LIMIT $offset,$numOfrecs ");
+              $stmt = $pdo->prepare("SELECT * FROM material_purchase ORDER BY id LIMIT $offset,$numOfrecs");
               $stmt->execute();
               $purchasedatas = $stmt->fetchAll();
             }
@@ -252,8 +241,6 @@ $bootstrap->css();
               $materialid = $purchasedata['material_id'];
               $material_name = $query->select('materials', $materialid, 'id');
             ?>
-              <input type="hidden" name="updateid" value="<?php echo $purchasedata['id']; ?>">
-
               <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $purchasedata['id'];  ?>" style="cursor: pointer !important;">
                 <td><?php echo $idd; ?></td>
                 <td><?php echo date('d-m-Y', strtotime($purchasedata['date'])); ?></td>
@@ -264,39 +251,45 @@ $bootstrap->css();
                 <td><?php echo $purchasedata['rate'] ?></td>
                 <td><?php echo $purchasedata['quantity'] * $purchasedata['rate']; ?></td>
               </tr>
-              <!-- Data Add Modal -->
-              <div class="modal fade" id="updatemodal" style="margin-left:auto !important; margin-right: auto !important;">
+              <!-- Update Modal -->
+              <div class="modal fade" id="updatemodal<?php echo $purchasedata['id']; ?>" style="margin-left:auto !important; margin-right: auto !important;">
                 <div class="modal-dialog" role="document">
                   <div class="modal-content" style="width: 750px !important; margin-top:70px !important;">
-                    <div class="modal-header bg-secondary text-light">
-                      <h5 class="modal-title" id="addmodellabel">Create New Purchase Voucher</h5>
-                      <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true" class="h3">&times;</span>
-                      </button>
+                    <div class="modal-header bg-warning text-light d-flex">
+                      <div class="col-10">
+                        <h4 class="modal-title">Edit Packing Material Purchase</h4>
+                      </div>
+                      <form method="post" autocomplete="off">
+                        <input type="hidden" name="up_id" value="<?php echo $purchasedata['id']; ?>">
+                        <input type="hidden" name="deletevoucher_no" value="<?php echo $purchasedata['voucher_no']; ?>">
+                      <div class="col">
+                        <button type="submit" name="updatebtn" class="btn btn-success ps-2 pe-2 pb-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                              <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                              <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                          </svg>
+                        </button>
+                        <button type="submit" name="deletebtn" class="btn btn-danger ps-2 pe-2 pb-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                            <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z" />
+                          </svg>
+                        </button>
+                        <button type="button" class="btn btn-primary ps-2 pe-2 pb-1 pt-0" data-bs-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true" class="h3">&times;</span>
+                        </button>
+                      </div>
                     </div>
-                    <form action="material_purchase.php" method="post" autocomplete="off">
-                      <div class="modal-body">
+                      <div class="modal-body pt-4 pb-5 ps-4 pe-4">
                         <div class="row">
+                          <input type="hidden" name="up_id" value="<?php echo $purchasedata['id']; ?>">
                           <div class="col">
                             <label style="font-weight: bold;">Date</label>
-                            <input type="date" name="date" <?php if (!empty($date_error)) {
-                                                              echo "class=\"form-control is-invalid\"";
-                                                            } else {
-                                                              echo "class=\"form-control inpv2\"";
-                                                            } ?> value="<?php if (!empty($_SESSION['purchase_date'])) {
-                                                                          echo $_SESSION['purchase_date'];
-                                                                        }; ?>">
+                            <input type="date" name="up_date" class="form-control inpv2" value="<?php echo $purchasedata['date']; ?>">
                             <span class="text-danger" style="font-size:12px; font-weight:bold;" style="font-weight:bold !important;"><?php echo $date_error; ?></span>
                           </div>
                           <div class="col">
                             <label style="font-weight: bold;">Voucher No</label>
-                            <input type="number" name="voucher_no" <?php if (!empty($voucher_no_error)) {
-                                                                      echo "class=\"form-control is-invalid\"";
-                                                                    } else {
-                                                                      echo "class=\"form-control inpv2\"";
-                                                                    } ?> value="<?php if (!empty($_SESSION['purchase_voucher_no'])) {
-                                                                                  echo $_SESSION['purchase_voucher_no'];
-                                                                                }; ?>">
+                            <input type="number" name="up_voucher_no" class="form-control inpv2" value="<?php echo $purchasedata['voucher_no']; ?>">
                             <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;" style="font-weight:bold !important;"><?php echo $voucher_no_error; ?></span>
                           </div>
                         </div>
@@ -305,13 +298,7 @@ $bootstrap->css();
                             <label style="font-weight: bold;">Supplier A/C Code</label>
                             <div class="row">
                               <div style="width: 40%;">
-                                <input type="text" id="addac_code" name="supplier_code_no" <?php if (!empty($supplier_name_error)) {
-                                                                                              echo "class=\"form-control is-invalid\"";
-                                                                                            } else {
-                                                                                              echo "class=\"form-control inpv2\"";
-                                                                                            } ?> style="padding-top: 2px; padding-bottom: 2px;" value="<?php if (!empty($_SESSION['purchase_supplier_name'])) {
-                                                                                                                                                          echo $_SESSION['purchase_supplier_name'];
-                                                                                                                                                        }; ?>">
+                                <input type="text" id="addac_code" name="up_supplier_code_no" class="form-control inpv2" value="<?php echo $purchasedata['supplier_id']; ?>">
                               </div>
                               <div style="width: 10%;">
                                 <a href="supplier.php" target="_blank" style="width: 10%; padding: 2.5px; color:black; text-align: center;">
@@ -330,12 +317,12 @@ $bootstrap->css();
                           </div>
                           <div class="col-6">
                             <label style="font-weight: bold;">Material</label>
-                            <select class="form-control inpv2 mb-2" name="material">
+                            <select class="form-control inpv2 mb-2" name="up_material">
                               <?php
                               $materialdatas = $query->selectall('materials');
                               foreach ($materialdatas as $materialdata) {
                               ?>
-                                <option value="<?php echo $materialdata['id']; ?>"><?php echo $materialdata['name']; ?></option>
+                                <option value="<?php echo $materialdata['id']; ?>" <?php if($materialdata['id'] == $purchasedata['material_id']){ echo "selected"; } ?>><?php echo $materialdata['name']; ?></option>
                               <?php
                               }
                               ?>
@@ -345,26 +332,14 @@ $bootstrap->css();
                         <div class="row">
                           <div class="col">
                             <label style="font-weight: bold;">Quantity</label>
-                            <input type="number" name="quantity" <?php if (!empty($quantity_error)) {
-                                                                    echo "class=\"form-control is-invalid\"";
-                                                                  } else {
-                                                                    echo "class=\"form-control inpv2\"";
-                                                                  } ?>>
+                            <input type="number" name="up_quantity" class="form-control inpv2" value="<?php echo $purchasedata['quantity']; ?>">
                             <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;"><?php echo $quantity_error; ?></span>
                           </div>
                           <div class="col">
                             <label style="font-weight: bold;">Rate</label>
-                            <input type="text" name="rate" <?php if (!empty($rate_error)) {
-                                                              echo "class=\"form-control is-invalid\"";
-                                                            } else {
-                                                              echo "class=\"form-control inpv2\"";
-                                                            } ?>>
+                            <input type="text" name="up_rate" class="form-control inpv2" value="<?php echo $purchasedata['rate']; ?>">
                             <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;"><?php echo $rate_error; ?></span>
                           </div>
-                        </div>
-                        <div class="mt-2">
-                          <button class="btn btn-secondary" data-bs-dismiss="model">Cancel</button>
-                          <button class="btn btn-success" name="addbutton">Add Voucher</button>
                         </div>
                       </div>
                     </form>
@@ -465,7 +440,7 @@ $bootstrap->css();
             <span aria-hidden="true" class="h3">&times;</span>
           </button>
         </div>
-        <form action="material_purchase.php" method="post" autocomplete="off">
+        <form action="" method="post" autocomplete="off">
           <div class="modal-body">
             <div class="row">
               <div class="col">
@@ -553,7 +528,7 @@ $bootstrap->css();
                 <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;"><?php echo $rate_error; ?></span>
               </div>
             </div>
-            <div class="mt-2">
+            <div class="mt-2 float-end mb-3 mt-3">
               <button class="btn btn-secondary" data-bs-dismiss="model">Cancel</button>
               <button class="btn btn-success" name="addbutton">Add Voucher</button>
             </div>

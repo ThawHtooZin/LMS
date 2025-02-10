@@ -113,8 +113,8 @@ $bootstrap->css();
                 $supplier['supplier_name'] = '';
               }
 
-              $in = $data['in'];
-              $out = $data['out'];
+              $in = $data['in_quantity'];
+              $out = $data['out_quantity'];
               $balance += $in - $out;
 
               $outgroupid = $data['output_group'];

@@ -35,11 +35,11 @@ $bootstrap->css();
       $material = $_POST['material'];
       $quantity = $_POST['quantity'];
 
-      $incheckstmt = $pdo->prepare("SELECT SUM(`in`) AS totalin FROM material_store_house WHERE material_id = '$material'");
+      $incheckstmt = $pdo->prepare("SELECT SUM(`in_quantity`) AS totalin FROM material_store_house WHERE material_id = '$material'");
       $incheckstmt->execute();
       $incheckdata = $incheckstmt->fetch(PDO::FETCH_ASSOC);
 
-      $outcheckstmt = $pdo->prepare("SELECT SUM(`out`) AS totalout FROM material_store_house WHERE material_id = '$material'");
+      $outcheckstmt = $pdo->prepare("SELECT SUM(`out_quantity`) AS totalout FROM material_store_house WHERE material_id = '$material'");
       $outcheckstmt->execute();
       $outcheckdata = $outcheckstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -74,7 +74,7 @@ $bootstrap->css();
                     <select name="stock_to" class="form-control">
                       <?php
                       $coldstorestmt = $pdo->prepare("SELECT * FROM config_coldstore");
-                      $coldstorestmt->execute();
+                      // $coldstorestmt->execute();
                       $coldstores = $coldstorestmt->fetchAll();
                       foreach ($coldstores as $coldstore): ?>
                         <option value="<?= $coldstore['name'] ?>" style="text-transform: uppercase;"><?= $coldstore['name'] ?></option>
@@ -165,11 +165,11 @@ $bootstrap->css();
               $stmt->execute();
               $material = $stmt->fetch(PDO::FETCH_ASSOC);
 
-              $insumstmt = $pdo->prepare("SELECT SUM(`in`) as totalin FROM material_store_house WHERE material_id='$material_id'");
+              $insumstmt = $pdo->prepare("SELECT SUM(`in_quantity`) as totalin FROM material_store_house WHERE material_id='$material_id'");
               $insumstmt->execute();
               $totalin = $insumstmt->fetch(PDO::FETCH_ASSOC);
 
-              $outsumstmt = $pdo->prepare("SELECT SUM(`out`) as totalout FROM material_store_house WHERE material_id='$material_id'");
+              $outsumstmt = $pdo->prepare("SELECT SUM(`out_quantity`) as totalout FROM material_store_house WHERE material_id='$material_id'");
               $outsumstmt->execute();
               $totalout = $outsumstmt->fetch(PDO::FETCH_ASSOC);
 

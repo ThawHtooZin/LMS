@@ -5291,6 +5291,7 @@ class Query
   function addmaterialpurchase($table, $date, $voucher_no, $supplier_name, $material, $quantity, $rate)
   {
     global $pdo;
+
     $amount = $quantity * $rate;
     $idstmt = $pdo->prepare("SELECT id FROM $table ORDER BY id DESC");
     $idstmt->execute();
@@ -5361,6 +5362,68 @@ class Query
     // }
 
   }
+
+  function updatematerialpurchase($table, $up_date, $up_voucher_no, $up_supplier_name, $up_material, $up_quantity, $up_rate, $up_id)
+  {
+    global $pdo;
+
+    $amount = $up_quantity * $up_rate;
+    $stmt = $pdo->prepare("UPDATE $table SET date='$up_date', voucher_no='$up_voucher_no', supplier_id='$up_supplier_name', material_id='$up_material', quantity='$up_quantity', rate='$up_rate' WHERE id='$up_id'");
+    $stmt->execute();
+
+
+    $balstmt = $pdo->prepare("SELECT balance FROM payable WHERE supplier_id = '$up_supplier_name' ORDER BY id DESC");
+    $balstmt->execute();
+    $baldata = $balstmt->fetch(PDO::FETCH_ASSOC);
+    if (!empty($baldata['balance'])) {
+      $balance = $baldata['balance'];
+    } else {
+      $balance = 0;
+    }
+    if ($balance != 1) {
+      $total_balance = $balance + $amount;
+    } else {
+      $total_balance = $balance;
+    }
+
+    $stmt = $pdo->prepare("UPDATE payable SET date='$up_date', supplier_id='$up_supplier_name', purchase_voucher_no='$up_voucher_no', purchase_amount='$amount', balance='$total_balance' WHERE link_id='$up_id'");
+    // $stmt->execute();
+
+  }
+
+  function updatematerial_warehouse($table, $up_date, $up_supplier_name, $up_voucher_no, $up_material, $up_quantity)
+  {
+    global $pdo;
+
+    $stmt = $pdo->prepare("UPDATE $table SET date='$up_date', supplier_id='$up_supplier_name', voucher_no='$up_voucher_no', material_id='$up_material', in_quantity='$up_quantity' WHERE voucher_no='$up_voucher_no'");
+    $stmt->execute();
+
+  }
+
+  function deletematerialpurchase($table, $deleteid)
+  {
+    global $pdo;
+    $stmt = $pdo->prepare("DELETE FROM $table WHERE id='$deleteid'");
+    $stmt->execute();
+    if ($stmt) {
+      return $successmessage = "Purchase Voucher Deleted Successfully";
+    } else {
+      return $errmessage = "Error accors when deleted Purchase Voucher";
+    }
+  }
+
+  function deletematerial_warehouse($table, $deletevoucher_no)
+  {
+    global $pdo;
+    $stmt = $pdo->prepare("DELETE FROM $table WHERE voucher_no='$deletevoucher_no'");
+    $stmt->execute();
+    if ($stmt) {
+      return $successmessage = "Purchase Voucher Deleted Successfully";
+    } else {
+      return $errmessage = "Error accors when deleted Purchase Voucher";
+    }
+  }
+
 
   function outputmaterial($date, $stockto, $material, $quantity, $voucher_no)
   {
