@@ -5386,8 +5386,8 @@ class Query
       $total_balance = $balance;
     }
 
-    $stmt = $pdo->prepare("UPDATE payable SET date='$up_date', supplier_id='$up_supplier_name', purchase_voucher_no='$up_voucher_no', purchase_amount='$amount', balance='$total_balance' WHERE link_id='$up_id'");
-    // $stmt->execute();
+    $stmt = $pdo->prepare("UPDATE payable SET date='$up_date', supplier_id='$up_supplier_name', purchase_voucher_no='$up_voucher_no', purchase_amount='$amount', balance='$total_balance' WHERE link_id='$up_id' AND supplier_id = '$up_supplier_name'");
+    $stmt->execute();
 
   }
 
@@ -5409,6 +5409,18 @@ class Query
       return $successmessage = "Purchase Voucher Deleted Successfully";
     } else {
       return $errmessage = "Error accors when deleted Purchase Voucher";
+    }
+  }
+
+  function deletematerial_payable($table, $deletesupplier_id, $deleteid)
+  {
+    global $pdo;
+    $stmt = $pdo->prepare("DELETE FROM $table WHERE supplier_id = '$deletesupplier_id' AND link_id='$deleteid'");
+    $stmt->execute();
+    if ($stmt) {
+      return $successmessage = "Payable Voucher Deleted Successfully";
+    } else {
+      return $errmessage = "Error accors when deleted Payable Voucher";
     }
   }
 

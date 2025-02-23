@@ -65,9 +65,9 @@ $bootstrap->css();
           $supplier_name_error = '';
           $quantity_error = '';
           $rate_error = '';
+          
           if (isset($_POST['addbutton'])) {
-
-            echo "<script>alert('Ahhhhhhhhhhhhh');</script>";
+          
             $date = $_POST['date'];
             $voucher_no = $_POST['voucher_no'];
             $supplier_name = $_POST['supplier_code_no'];
@@ -113,9 +113,10 @@ $bootstrap->css();
           if (isset($_POST['deletebtn'])) {
             $deleteid = $_POST['up_id'];
             $deletevoucher_no = $_POST['deletevoucher_no'];
+            $deletesupplier_id = $_POST['deletesupplier_id'];
 
             $query->deletematerialpurchase('material_purchase', $deleteid);
-            $query->deletepayable('payable', $deleteid);
+            $query->deletematerial_payable('payable', $deletesupplier_id, $deleteid);
             $query->deletematerial_warehouse('material_store_house', $deletevoucher_no);
           }
 
@@ -262,6 +263,7 @@ $bootstrap->css();
                       <form method="post" autocomplete="off">
                         <input type="hidden" name="up_id" value="<?php echo $purchasedata['id']; ?>">
                         <input type="hidden" name="deletevoucher_no" value="<?php echo $purchasedata['voucher_no']; ?>">
+                        <input type="hidden" name="deletesupplier_id" value="<?php echo $purchasedata['supplier_id']; ?>">
                       <div class="col">
                         <button type="submit" name="updatebtn" class="btn btn-success ps-2 pe-2 pb-2">
                           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
