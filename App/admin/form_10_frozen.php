@@ -93,7 +93,7 @@ $bootstrap->css();
             <?php
             if (isset($_POST['view']) && !empty($_POST['commondity']) && !empty($_POST['country']) && !empty($_POST['searchdate'])) {
             ?>
-              <a href="export.php?table_name=form10frozen&searchdate=<?php echo $_POST['searchdate'] ?>&country=<?php echo $_POST['country'] ?>&commondity=<?php echo $_POST['commondity'] ?>" type="" class="btn btn-primary btn-sm me-2 float-end">Export Excel</a>
+              <a href="testing_export_two.php?table_name=form10frozen&searchdate=<?php echo $_POST['searchdate'] ?>&country=<?php echo $_POST['country'] ?>&commondity=<?php echo $_POST['commondity'] ?>" type="" class="btn btn-primary btn-sm me-2 float-end">Export Excel</a>
             <?php
             } ?>
           </form>
@@ -280,7 +280,7 @@ $bootstrap->css();
               // Join the quoted dates with commas
               $datesList = implode(', ', $quotedDates);
 
-              $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id' AND date IN ($datesList)");
+              $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND date IN ($datesList)");
               $totalf7kgstmt->execute();
               $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -297,20 +297,40 @@ $bootstrap->css();
 
 
 
-              $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_id='$supplier_id' AND fish_type='$fish_type' AND date='$searchdate'");
+              $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date='$searchdate'");
               $form10pcsstmt->execute();
               $form10pcsdata = $form10pcsstmt->fetch(PDO::FETCH_ASSOC);
 
 
-              $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_id='$supplier_id' AND fish_type='$fish_type' AND date='$searchdate'");
+              $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date='$searchdate'");
               $totalkgstmt->execute();
               $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
 
-              $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_id='$supplier_id' AND fish_type='$fish_type' AND date='$searchdate'");
+              $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date='$searchdate'");
               $mcstmt->execute();
               $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
 
-              $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_id='$supplier_id' AND fish_type='$fish_type' AND date='$searchdate'");
+              $pcsstmt = $pdo->prepare("SELECT SUM(pcs) AS total_pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date='$searchdate'");
+              $pcsstmt->execute();
+              $pcsdata = $pcsstmt->fetch(PDO::FETCH_ASSOC);
+
+              $loose_in_kgstmt = $pdo->prepare("SELECT SUM(looseinkg) AS total_loosein_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date='$searchdate'");
+              $loose_in_kgstmt->execute();
+              $loose_in_kgdata = $loose_in_kgstmt->fetch(PDO::FETCH_ASSOC);
+
+              $loose_in_pcsstmt = $pdo->prepare("SELECT SUM(looseinpcs) AS total_loosein_pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date='$searchdate'");
+              $loose_in_pcsstmt->execute();
+              $loose_in_pcsdata = $loose_in_pcsstmt->fetch(PDO::FETCH_ASSOC);
+
+              $loose_out_kgstmt = $pdo->prepare("SELECT SUM(looseoutkg) AS total_looseout_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date='$searchdate'");
+              $loose_out_kgstmt->execute();
+              $loose_out_kgdata = $loose_in_kgstmt->fetch(PDO::FETCH_ASSOC);
+
+              $loose_out_pcsstmt = $pdo->prepare("SELECT SUM(looseoutpcs) AS total_looseout_pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date='$searchdate'");
+              $loose_out_pcsstmt->execute();
+              $loose_out_pcsdata = $loose_in_pcsstmt->fetch(PDO::FETCH_ASSOC);
+
+              $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date='$searchdate'");
               $kgstmt->execute();
               $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
               ?>
@@ -324,11 +344,11 @@ $bootstrap->css();
                 <td style="font-weight:bold;"><?php echo round($form10pcsdata['total_form10_pcs'], 2); ?></td>
                 <td style="font-weight:bold;"><?php echo round($mcdata['total_mc'], 2); ?></td>
                 <td style="font-weight:bold;"><?php echo round($kgdata['kg'], 2); ?></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td style="font-weight:bold;"><?php echo round($pcsdata['total_pcs'], 2); ?></td>
+                <td style="font-weight:bold;"><?php if(!empty($loose_in_kgdata['total_loosein_kg'])){ echo round($loose_in_kgdata['total_loosein_kg'], 2); } ?></td>
+                <td style="font-weight:bold;"><?php if(!empty($loose_in_pcsdata['total_loosein_pcs'])){ echo round($loose_in_pcsdata['total_loosein_pcs'], 2); } ?></td>
+                <td style="font-weight:bold;"><?php if(!empty($loose_out_kgdata['total_looseout_kg'])){ echo round($loose_out_kgdata['total_looseout_kg'], 2); } ?></td>
+                <td style="font-weight:bold;"><?php if(!empty($loose_out_pcsdata['total_looseout_pcs'])){ echo round($loose_out_pcsdata['total_looseout_pcs'], 2); } ?></td>
                 <td style="font-weight:bold;"><?php echo round($totalkgdata['total_kg'], 2); ?></td>
                 <?php
                 if (!isset($_POST['view'])) {

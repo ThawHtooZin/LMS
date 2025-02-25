@@ -2793,95 +2793,79 @@ if ($_GET['table_name'] == "form10frozen") {
       <th>Kg</th>
     </tr>
     <?php
-    $stmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
+    // Get POST data
+    $form7date = $_SESSION['form7date'];
+
+    // Convert searchdate (which comes from Flatpickr) to an array of dates
+    $datesArray = explode(', ', $form7date);
+
+    // Quote each date for SQL
+    $quotedDates = array_map(function ($date) {
+      return "'" . $date . "'";
+    }, $datesArray);
+
+    // Join the quoted dates with commas
+    $datesList = implode(', ', $quotedDates);
+
+    $stmt = $pdo->prepare("SELECT * FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND date IN ($datesList) ORDER BY date");
     $stmt->execute();
-    $datas = $stmt->fetchall();
-    foreach ($datas as $data) {
-      $item_id = $data['item_id'];
-      $lastid = $data['id'];
-      $country = $data['country'];
-      $size = $data['size'];
-      // Get POST data
-      $form7date = $_SESSION['form7date'];
-
-      // Convert searchdate (which comes from Flatpickr) to an array of dates
-      $datesArray = explode(', ', $form7date);
-
-      // Quote each date for SQL
-      $quotedDates = array_map(function ($date) {
-        return "'" . $date . "'";
-      }, $datesArray);
-
-      // Join the quoted dates with commas
-      echo $datesList = implode(', ', $quotedDates);
-
+    $form7datas = $stmt->fetchall();
+    foreach ($form7datas as $form7data) {
+      $lastid = $form7data['id'];
+      $item_id = $form7data['item_id'];
+      $country = $form7data['country'];
+      $size = $form7data['size'];
+      $date = $form7data['date'];
 
       $commonditydata = $query->select('item', $item_id, 'item_id');
-      $supplierid = $data['supplier_id'];
-      $supplier_name = $query->select('acname', $supplierid, 'code_no');
+      $supplier_id = $form7data['supplier_name'];
+      $supplier_name = $query->select('acname', $supplier_id, 'code_no');
 
-      $form7datastmt = $pdo->prepare("SELECT * FROM form7stock WHERE item_id='$item_id' AND country='$country' AND date IN ($datesList)");
-      $form7datastmt->execute();
+      $form10datastmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$item_id' AND country='$country' AND size='$size' AND date='$searchdate'");
+      $form10datastmt->execute();
+      $form10data = $form10datastmt->fetch(PDO::FETCH_ASSOC);
 
-      $form7datas = $form7datastmt->fetchall();
-      // print_r($form7datastmt);
-      // exit();
-      foreach ($form7datas as $form7data) {
-        $itemid = $form7data['item_id'];
-        $supplierid = $form7data['supplier_name'];
-        $commonditydata2 = $query->select('item', $itemid, 'item_id');
-        $supplier_name2 = $query->select('acname', $supplierid, 'code_no');
-      }
-      $form7datastmt = $pdo->prepare("SELECT * FROM form7stock WHERE supplier_name = '$supplierid' AND item_id='$item_id' AND country='$country'");
-      $form7datastmt->execute();
 
-      $form7 = $form7datastmt->fetch(PDO::FETCH_ASSOC);
-      $checklast = $pdo->prepare("SELECT * FROM form10stock WHERE id < $lastid AND item_id='$item_id' AND size='$size'");
-      $checklast->execute();
-      $checklastavaliable = $checklast->fetch(PDO::FETCH_ASSOC);
-      $lastcommondity = $pdo->prepare("SELECT * FROM form10stock WHERE id < $lastid AND item_id='$item_id'");
+      $lastcommondity = $pdo->prepare("SELECT * FROM form7stock WHERE id < $lastid AND item_id='$item_id' AND supplier_name='$supplier_id' AND date = '$date'");
       $lastcommondity->execute();
       $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
-
-      $checklast2 = $pdo->prepare("SELECT * FROM form7stock WHERE id < $lastid AND item_id='$item_id' AND size='$size'");
-      $checklast2->execute();
-      $checklastavaliable2 = $checklast2->fetch(PDO::FETCH_ASSOC);
-      $lastcommondity2 = $pdo->prepare("SELECT * FROM form7stock WHERE id < $lastid AND item_id='$item_id'");
-      $lastcommondity2->execute();
-      $lastcommondity2 = $lastcommondity2->fetch(PDO::FETCH_ASSOC);
     ?>
       <tr>
         <td><?php if (empty($lastcommondity)) {
-              if ($form7['date'] != "0000-00-00") {
-                echo date('d-m-Y', strtotime($form7['date']));
+              if ($form7data['date'] != "0000-00-00") {
+                echo date('d-m-Y', strtotime($form7data['date']));
               }
             } ?></td>
         <td><?php if (empty($lastcommondity)) {
-              echo $commonditydata2['item_name'];
+              echo $commonditydata['item_name'] . "(" . $form10data['fish_type'] . ")";
             } ?></td>
         <td><?php if (empty($lastcommondity)) {
-              echo $supplier_name2['ac_name'];
+              echo $supplier_name['ac_name'];
             } ?></td>
         <td><?php if (empty($lastcommondity)) {
-              echo $form7['country'];
+              echo $form7data['country'];
             } ?></td>
-        <td><?php echo $form7['size']; ?></td>
-        <td><?php echo $form7['viss']; ?></td>
-        <td><?php echo $form7['kg']; ?></td>
-        <td><?php echo $form7['pcspervr']; ?></td>
-        <td><?php echo $form7['pcsperf7']; ?></td>
-        <td><?php if (empty($lastcommondity)) {
-              echo $data['date'];
-            } ?></td>
-        <td><?php echo $data['pcsform10']; ?></td>
-        <td><?php echo $data['mc']; ?></td>
-        <td><?php echo $data['kg']; ?></td>
-        <td><?php echo $data['pcs']; ?></td>
-        <td><?php echo $data['looseinkg']; ?></td>
-        <td><?php echo $data['looseinpcs']; ?></td>
-        <td><?php echo $data['looseoutkg']; ?></td>
-        <td><?php echo $data['looseoutpcs']; ?></td>
-        <td><?php echo round($data['total_kg'], 2); ?></td>
+        <td><?php echo $form7data['size']; ?></td>
+        <td><?php echo $form7data['viss']; ?></td>
+        <td><?php echo $form7data['kg']; ?></td>
+        <td><?php echo $form7data['pcspervr']; ?></td>
+        <td><?php echo $form7data['pcsperf7']; ?></td>
+        <td>
+          <?php
+           if (empty($lastcommondity)) {
+                echo date('d-m-Y', strtotime($searchdate));
+            }
+          ?>
+        </td>
+        <td><?php if(!empty($form10data['pcsform10'])){ echo $form10data['pcsform10']; } ?></td>
+        <td><?php if(!empty($form10data['mc'])){ echo $form10data['mc']; } ?></td>
+        <td><?php if(!empty($form10data['kg'])){ echo $form10data['kg']; } ?></td>
+        <td><?php if(!empty($form10data['pcs'])){ echo $form10data['pcs']; } ?></td>
+        <td><?php if(!empty($form10data['looseinkg'])){ echo $form10data['looseinkg']; } ?></td>
+        <td><?php if(!empty($form10data['looseinpcs'])){ echo $form10data['looseinpcs']; } ?></td>
+        <td><?php if(!empty($form10data['looseoutkg'])){ echo $form10data['looseoutkg']; } ?></td>
+        <td><?php if(!empty($form10data['looseoutpcs'])){ echo $form10data['looseoutpcs']; } ?></td>
+        <td><?php if(!empty($form10data['total_kg'])){ echo round($form10data['total_kg'], 2); } ?></td>
         <td></td>
       </tr>
     <?php
@@ -2892,26 +2876,25 @@ if ($_GET['table_name'] == "form10frozen") {
     $supplierdata = $supplieridstmt->fetch(PDO::FETCH_ASSOC);
     $supplier_id = $supplierdata['supplier_id'];
 
-
-    $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id' AND date IN ($datesList)");
-    $totalf7kgstmt->execute();
-    $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
-
-    $totalform7pcs = $pdo->prepare("SELECT SUM(pcsperf7) AS totalform7pcs FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id'");
-    $totalform7pcs->execute();
-    $totalform7pcsdata = $totalform7pcs->fetch(PDO::FETCH_ASSOC);
-
-    $totalform7viss = $pdo->prepare("SELECT SUM(viss) AS totalform7viss FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id'");
+    $totalform7viss = $pdo->prepare("SELECT SUM(viss) AS totalform7viss FROM form7stock WHERE item_id='$commondity_id' AND country='$country'");
     $totalform7viss->execute();
     $totalform7vissdata = $totalform7viss->fetch(PDO::FETCH_ASSOC);
 
-    $totalform7kg = $pdo->prepare("SELECT SUM(kg) AS totalform7kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id'");
+    $totalform7kg = $pdo->prepare("SELECT SUM(kg) AS totalform7kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country'");
     $totalform7kg->execute();
     $totalform7kgdata = $totalform7kg->fetch(PDO::FETCH_ASSOC);
 
-    $totalform7pcsvr = $pdo->prepare("SELECT SUM(pcspervr) AS totalform7pcs FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id'");
+    $totalform7pcsvr = $pdo->prepare("SELECT SUM(pcspervr) AS totalform7pcs FROM form7stock WHERE item_id='$commondity_id' AND country='$country'");
     $totalform7pcsvr->execute();
     $totalform7pcsvrdata = $totalform7pcsvr->fetch(PDO::FETCH_ASSOC);
+
+    $totalform7pcs = $pdo->prepare("SELECT SUM(pcsperf7) AS totalform7pcs FROM form7stock WHERE item_id='$commondity_id' AND country='$country'");
+    $totalform7pcs->execute();
+    $totalform7pcsdata = $totalform7pcs->fetch(PDO::FETCH_ASSOC);
+
+    $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND date IN ($datesList)");
+    $totalf7kgstmt->execute();
+    $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
 
     $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
     $totalkgstmt->execute();
@@ -2925,31 +2908,27 @@ if ($_GET['table_name'] == "form10frozen") {
     }
 
 
-    $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+    $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
     $form10pcsstmt->execute();
     $form10pcsdata = $form10pcsstmt->fetch(PDO::FETCH_ASSOC);
 
-    $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
-    $totalkgstmt->execute();
-    $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
-
-    $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+    $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
     $mcstmt->execute();
     $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
 
-    $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+    $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
     $kgstmt->execute();
     $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
 
-    $form10pcs = $pdo->prepare("SELECT SUM(pcs) AS pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+    $form10pcs = $pdo->prepare("SELECT SUM(pcs) AS pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
     $form10pcs->execute();
     $form10dbpcsdata = $form10pcs->fetch(PDO::FETCH_ASSOC);
 
-    $form10looseinkg = $pdo->prepare("SELECT SUM(looseinkg) AS kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+    $form10looseinkg = $pdo->prepare("SELECT SUM(looseinkg) AS kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
     $form10looseinkg->execute();
     $form10looseinkgdata = $form10looseinkg->fetch(PDO::FETCH_ASSOC);
 
-    $form10looseinpcs = $pdo->prepare("SELECT SUM(looseinpcs) AS pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
+    $form10looseinpcs = $pdo->prepare("SELECT SUM(looseinpcs) AS pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
     $form10looseinpcs->execute();
     $form10looseinpcsdata = $form10looseinpcs->fetch(PDO::FETCH_ASSOC);
 
@@ -2960,6 +2939,10 @@ if ($_GET['table_name'] == "form10frozen") {
     $form10looseoutpcs = $pdo->prepare("SELECT SUM(looseoutpcs) AS pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country'");
     $form10looseoutpcs->execute();
     $form10looseoutpcsdata = $form10looseoutpcs->fetch(PDO::FETCH_ASSOC);
+
+    $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
+    $totalkgstmt->execute();
+    $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
     ?>
     <tr>
       <td style="font-weight:bold; text-align:center;" colspan="5">Total</td>
