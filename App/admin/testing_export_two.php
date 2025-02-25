@@ -2746,10 +2746,10 @@ if ($_GET['table_name'] == "form10frozen") {
   $commondity_id = $_GET['commondity'];
   $country = $_GET['country'];
   $searchdate = $_GET['searchdate'];
-  // header("Content-Type: application/xls");
-  // header("Content-Disposition: attachment; filename=percentage{$searchdate}.xls");
-  // header("Pragma: no-cache");
-  // header("Expires: 0");
+  header("Content-Type: application/xls");
+  header("Content-Disposition: attachment; filename=percentage{$searchdate}.xls");
+  header("Pragma: no-cache");
+  header("Expires: 0");
 ?>
   <table>
     <tr>
