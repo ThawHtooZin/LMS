@@ -2837,7 +2837,11 @@ if ($_GET['table_name'] == "form10frozen") {
               }
             } ?></td>
         <td><?php if (empty($lastcommondity)) {
-              echo $commonditydata['item_name'] . "(" . $form10data['fish_type'] . ")";
+          if (!empty($form10data['fish_type'])) {
+            echo $commonditydata['item_name'] . "(" . $form10data['fish_type'] . ")";
+          }else{
+            echo $commonditydata['item_name'];
+          }
             } ?></td>
         <td><?php if (empty($lastcommondity)) {
               echo $supplier_name['ac_name'];
