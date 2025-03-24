@@ -135,6 +135,7 @@ $bootstrap->css();
                   paid_date");
                 $balanceamountstmt->execute();
                 $balanceamount = $balanceamountstmt->fetch(PDO::FETCH_ASSOC);
+
                 $totalpurchaseamount['total_purchase_amount'] = 0;
               } else {
                 $paidamount = $payabledata['paid_amount'];
@@ -311,7 +312,8 @@ $bootstrap->css();
                   <td><?php if (!empty($thebalanceamount)) {
                         echo $thebalanceamount;
                       } else {
-                        echo $balanceamount['closing_balance'];
+                        // echo $balanceamount['closing_balance'];
+                        echo 0;
                       } ?></td>
                 <?php
                 }
