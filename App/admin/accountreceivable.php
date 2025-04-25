@@ -141,126 +141,56 @@ $bootstrap->css();
                   }
                 }
               endforeach;
-              if (empty($receivabledatas)) {
-                $receivabledatas = [];
-              }
-              foreach ($receivabledatas as $receivabledata) :
-                $ac_name = $query->select('acname', $receivabledata['ac_code'], 'code_no');
+
+              if (!empty($receivabledatas)) { // Add this check
+                foreach ($receivabledatas as $receivabledata) :
+                  $ac_name = $query->select('acname', $receivabledata['ac_code'], 'code_no');
               ?>
-                <!-- <tr <?php // if($receivabledata['sr_no']){ 
-                          ?>data-bs-toggle="modal" data-bs-target="#paymentmodal<?php // echo $receivabledata['id']; 
-                                                                                ?>"<?php //} 
-                                                                                    ?>> -->
-                <tr>
-                  <td><?php if ($receivabledata['date'] != '0000-00-00') {
-                        echo date('d-m-Y', strtotime($receivabledata['date']));
-                      }; ?></td>
-                  <!-- <td><?php //if(!empty($receivabledata['invoice_amount'])){ if(!empty($ac_name['ac_name'])){ echo $ac_name['ac_name'];} } 
-                            ?></td> -->
-                  <td><?php echo $receivabledata['sr_no']; ?></td>
-                  <td><?php echo $receivabledata['container_no']; ?></td>
-                  <td><?php echo $receivabledata['invoice_amount']; ?></td>
-                  <td><?php if ($receivabledata['paid_date'] != '0000-00-00') {
-                        echo date('d-m-Y', strtotime($receivabledata['paid_date']));
-                      } ?></td>
-                  <td><?php echo $receivabledata['payment_no']; ?></td>
-                  <td><?php echo $receivabledata['particulars']; ?></td>
-                  <td><?php if ($receivabledata['paid_amount'] != 0) {
-                        echo $receivabledata['paid_amount'];
-                      } ?></td>
-                  <td><?php echo round($receivabledata['balance'], 2); ?></td>
-                  <td>
-                    <?php
-                    if (!empty($receivabledata['sr_no']) || !empty($receivabledata['payment_no'])) {
-                    ?>
-                      <a href="edittransaction.php?voucher_no=<?= $receivabledata['payment_no']; ?>&sr_no=<?= $receivabledata['sr_no']; ?>&file=receivable&transactionid=<?= $receivabledata['transactionid'] ?>">
-                        <button type="submit" class="btn btn-warning btn-sm text-light" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                  <tr>
+                    <td><?php if ($receivabledata['date'] != '0000-00-00') {
+                          echo date('d-m-Y', strtotime($receivabledata['date']));
+                        }; ?></td>
+                    <!-- <td><?php //if(!empty($receivabledata['invoice_amount'])){ if(!empty($ac_name['ac_name'])){ echo $ac_name['ac_name'];} } 
+                              ?></td> -->
+                    <td><?php echo $receivabledata['sr_no']; ?></td>
+                    <td><?php echo $receivabledata['container_no']; ?></td>
+                    <td><?php echo $receivabledata['invoice_amount']; ?></td>
+                    <td><?php if ($receivabledata['paid_date'] != '0000-00-00') {
+                          echo date('d-m-Y', strtotime($receivabledata['paid_date']));
+                        } ?></td>
+                    <td><?php echo $receivabledata['payment_no']; ?></td>
+                    <td><?php echo $receivabledata['particulars']; ?></td>
+                    <td><?php if ($receivabledata['paid_amount'] != 0) {
+                          echo $receivabledata['paid_amount'];
+                        } ?></td>
+                    <td><?php echo round($receivabledata['balance'], 2); ?></td>
+                    <td>
+                      <?php
+                      if (!empty($receivabledata['sr_no']) || !empty($receivabledata['payment_no'])) {
+                      ?>
+                        <a href="edittransaction.php?voucher_no=<?= $receivabledata['payment_no']; ?>&sr_no=<?= $receivabledata['sr_no']; ?>&file=receivable&transactionid=<?= $receivabledata['transactionid'] ?>">
+                          <button type="submit" class="btn btn-warning btn-sm text-light" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                              <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                              <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                            </svg>
+                          </button>
+                        </a>
+                      <?php
+                      } else {
+                      ?>
+                        <button class="btn btn-warning btn-sm text-light" data-bs-toggle="modal" data-bs-target="#updatebalance"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                             <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
                             <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
                           </svg>
                         </button>
-                      </a>
-                    <?php
-                    } else {
-                    ?>
-                      <button class="btn btn-warning btn-sm text-light" data-bs-toggle="modal" data-bs-target="#updatebalance"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                          <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
-                        </svg>
-                      </button>
-                    <?php
-                    }
+                      <?php
+                      }
 
-                    ?>
-                  </td>
-                </tr>
-                <!-- <div class="modal fade" id="paymentmodal<?php echo $receivabledata['id']; ?>">
-                <div class="modal-dialog">
-                  <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
-                    <div class="modal-header bg-secondary text-light">
-                      <h1 class="modal-title fs-5">Add Payment</h1>
-                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                     </div>
-                     <form action="" method="post">
-                     <input type="hidden" name="id" value="<?php echo $receivabledata['id']; ?>">
-                     <div class="modal-body">
-                       <div class="row">
-                         <div class="col">
-                           <label>Paid Date</label>
-                           <input type="date" name="paid_date" class="form-control inpv2 mb-2">
-                         </div>
-                         <div class="col">
-                           <label>Payment No</label>
-                           <input type="text" name="payment_no" class="form-control inpv2 mb-2">
-                         </div>
-                       </div>
-                       <div class="row">
-                         <div class="col">
-                           <label>Particular</label>
-                           <input type="text" name="particular" class="form-control inpv2 mb-2">
-                         </div>
-                         <div class="col">
-                           <label>Paid Amount</label>
-                           <input type="number" name="paid_amount" class="form-control inpv2 mb-2">
-                         </div>
-                       </div>
-                     </div>
-                     <div class="modal-footer">
-                       <button type="button" name="button" class="btn btn-secondary" data-bs-toggle="modal">Cancel</button>
-                       <button type="submit" name="addpaymentbtn" class="btn btn-success">Update</button>
-                     </div>
-                   </form>
-                   </div>
-                 </div>
-               </div> -->
+                      ?>
+                    </td>
+                  </tr>
               <?php
-                $ac_code = $receivabledata['ac_code'];
-              endforeach;
-              ?>
-
-              <?php
-              if (isset($_POST['search'])) {
-                $total_invoice_amount = $query->selectallsumreceivable('receivable', 'invoice_amount', 'total_invoice_amount', $ac_code);
-
-                $total_paid_amount = $query->selectallsumreceivable('receivable', 'paid_amount', 'total_paid_amount', $ac_code);
-
-
-              ?>
-                <tr style="font-weight: bold;">
-                  <td>Total:</td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td><?php echo $total_invoice_amount['total_invoice_amount'] ?></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td><?php if ($total_paid_amount['total_paid_amount'] != 0) {
-                        echo $total_paid_amount['total_paid_amount'];
-                      } ?></td>
-                  <td><?php echo $total_invoice_amount['total_invoice_amount'] - $total_paid_amount['total_paid_amount']; ?></td>
-                </tr>
-              <?php
+                endforeach;
               }
               ?>
             </table>
