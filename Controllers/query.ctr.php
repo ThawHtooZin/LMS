@@ -3141,7 +3141,7 @@ class Query
   {
     global $pdo;
 
-    $kg = $viss * 1.634;
+    $kg = floatval($viss) * 1.634;
 
     $addstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, type, size, viss, kg) VALUES('$date', '$commondity_id', '$supplier_name', '$type', '$size', '$viss', '$kg')");
     $addstmt->execute();
