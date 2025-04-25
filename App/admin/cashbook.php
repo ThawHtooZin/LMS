@@ -414,7 +414,8 @@ $bootstrap->css();
                             $openingamtstmt = $pdo->prepare("SELECT * FROM cashbook ORDER BY id ASC");
                             $openingamtstmt->execute();
                             $openingbalance = $openingamtstmt->fetch(PDO::FETCH_ASSOC);
-                            $balance = ($total_debit['total_debit'] + $openingbalance['balance']) - $total_credit['total_credit'];
+                            $opening_balance_value = $openingbalance ? $openingbalance['balance'] : 0; // Default to 0 if no result
+                            $balance = ($total_debit['total_debit'] + $opening_balance_value) - $total_credit['total_credit'];
                         ?>
                             <tr style="font-weight: bold;">
                                 <td>Total:</td>
