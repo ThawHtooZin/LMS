@@ -369,18 +369,23 @@ $bootstrap->css();
                 $item_id = $form7data['item_id'];
                 $country = $form7data['country'];
               }
-              $totalvissstmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM form7stock WHERE item_id='$item_id'");
-              $totalvissstmt->execute();
-              $totalvissdata = $totalvissstmt->fetch(PDO::FETCH_ASSOC);
-              $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$item_id'");
-              $totalkgstmt->execute();
-              $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
-              $totalpcsstmt = $pdo->prepare("SELECT SUM(pcspervr) AS total_pcs FROM form7stock WHERE item_id='$item_id'");
-              $totalpcsstmt->execute();
-              $totalpcsdata = $totalpcsstmt->fetch(PDO::FETCH_ASSOC);
-              $totalpcsf7stmt = $pdo->prepare("SELECT SUM(pcsperf7) AS total_pcsf7 FROM form7stock WHERE item_id='$item_id'");
-              $totalpcsf7stmt->execute();
-              $totalpcsf7data = $totalpcsf7stmt->fetch(PDO::FETCH_ASSOC);
+              if (isset($item_id)) {
+                $totalvissstmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM form7stock WHERE item_id='$item_id'");
+                $totalvissstmt->execute();
+                $totalvissdata = $totalvissstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$item_id'");
+                $totalkgstmt->execute();
+                $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalpcsstmt = $pdo->prepare("SELECT SUM(pcspervr) AS total_pcs FROM form7stock WHERE item_id='$item_id'");
+                $totalpcsstmt->execute();
+                $totalpcsdata = $totalpcsstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalpcsf7stmt = $pdo->prepare("SELECT SUM(pcsperf7) AS total_pcsf7 FROM form7stock WHERE item_id='$item_id'");
+                $totalpcsf7stmt->execute();
+                $totalpcsf7data = $totalpcsf7stmt->fetch(PDO::FETCH_ASSOC);
+              }
               if ($nodata !== true) {
 
                 ?>
