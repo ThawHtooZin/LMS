@@ -3115,10 +3115,6 @@ class Query
     $date = $sizedata['date'];
     $supplier_name = $sizedata['supplier_name'];
     $link_id = $sizedata['link_id'];
-<<<<<<< HEAD
-=======
-    $date = $sizedata['date'];
->>>>>>> 32283ab725631860acb4dfa0d32b072c8aae6678
     $addsizestmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, country, type, size, link_id) VALUES('$date', '$item_id', '$supplier_name', '$country', '$type', '$size', '$link_id')");
     $addsizestmt->execute();
   }
@@ -3136,12 +3132,7 @@ class Query
     $type = $sizedata['type'];
     $supplier_name = $sizedata['supplier_name'];
     $link_id = $sizedata['link_id'];
-<<<<<<< HEAD
     $addsizestmt = $pdo->prepare("INSERT INTO form7stocktcl(item_id, supplier_name, country, type, size, link_id) VALUES('$item_id', '$supplier_name', '$country', '$type', '$size', '$link_id')");
-=======
-    $date = $sizedata['date'];
-    $addsizestmt = $pdo->prepare("INSERT INTO form7stocktcl(date, item_id, supplier_name, country, type, size, link_id) VALUES('$date', '$item_id', '$supplier_name', '$country', '$type', '$size', '$link_id')");
->>>>>>> 32283ab725631860acb4dfa0d32b072c8aae6678
     $addsizestmt->execute();
   }
 
@@ -5396,7 +5387,6 @@ class Query
 
     $stmt = $pdo->prepare("UPDATE payable SET date='$up_date', supplier_id='$up_supplier_name', purchase_voucher_no='$up_voucher_no', purchase_amount='$amount', balance='$total_balance' WHERE link_id='$up_id' AND supplier_id = '$up_supplier_name'");
     $stmt->execute();
-
   }
 
   function updatematerial_warehouse($table, $up_date, $up_supplier_name, $up_voucher_no, $up_material, $up_quantity)
@@ -5405,7 +5395,6 @@ class Query
 
     $stmt = $pdo->prepare("UPDATE $table SET date='$up_date', supplier_id='$up_supplier_name', voucher_no='$up_voucher_no', material_id='$up_material', in_quantity='$up_quantity' WHERE voucher_no='$up_voucher_no'");
     $stmt->execute();
-
   }
 
   function deletematerialpurchase($table, $deleteid)
