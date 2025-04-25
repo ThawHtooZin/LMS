@@ -11,39 +11,45 @@ $query = new Query();
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>Admin | Dashboard</title>
-  </head>
+
+<head>
+  <meta charset="utf-8">
+  <title>Admin | Dashboard</title>
+</head>
+<?php
+$bootstrap->css();
+?>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
+
+<body>
   <?php
-  $bootstrap->css();
+  $_SESSION['startdate'] = '2012-01-01';
+  $_SESSION['enddate'] = date('Y-m-d');
+  $_SESSION['stock_to'] = 'hhk';
+  $_SESSION['rate'] = 0;
+  $_SESSION['tabs'] = '';
   ?>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
-  <body>
-    <?php
-      $_SESSION['startdate'] = '2012-01-01';
-      $_SESSION['enddate'] = date('Y-m-d');
-    ?>
-    <div class="row">
-      <div class="sidebarcol" id="sidebar">
-        <?php
-        include 'sidebar.php';
-        ?>
-      </div>
-      <div class="contentcol" id="content">
-        <?php require 'navbar.php'; ?>
-        <h1 class="p-3 pt-4 text-center text-primary" style="font-family: 'Caprasimo', cursive;font-family: 'Cormorant Garamond', serif;font-family: 'Teko', sans-serif; font-size: 65px; text-shadow:-7px 7px 10px gray;"> <span style="font-size:70px;">LINK MARK </span> <br> COMPANY LIMITED</h1>
-        <div class="container text-center w-50" style="margin-top:50px; margin-left:auto; margin-right:auto;">
-          <img src="../../Images/Personal-computer.jpg" alt="" width="50%">
-          <br><br><br>
-          <h3 data-num="1">LINK MARK SYSTEM</h3>
-        </div>
+  <div class="row">
+    <div class="sidebarcol" id="sidebar">
+      <?php
+      include 'sidebar.php';
+      ?>
+    </div>
+    <div class="contentcol" id="content">
+      <?php require 'navbar.php'; ?>
+      <h1 class="p-3 pt-4 text-center text-primary" style="font-family: 'Caprasimo', cursive;font-family: 'Cormorant Garamond', serif;font-family: 'Teko', sans-serif; font-size: 65px; text-shadow:-7px 7px 10px gray;"> <span style="font-size:70px;">LINK MARK </span> <br> COMPANY LIMITED</h1>
+      <div class="container text-center w-50" style="margin-top:50px; margin-left:auto; margin-right:auto;">
+        <img src="../../Images/Personal-computer.jpg" alt="" width="50%">
+        <br><br><br>
+        <h3 data-num="1">LINK MARK SYSTEM</h3>
       </div>
     </div>
-    <?php
-    $bootstrap->javascript();
-    ?>
-  </body>
+  </div>
+  <?php
+  $bootstrap->javascript();
+  ?>
+</body>
+
 </html>

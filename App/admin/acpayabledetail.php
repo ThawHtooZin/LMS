@@ -11,30 +11,33 @@ $query = new Query();
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>Document</title>
-  </head>
+
+<head>
+  <meta charset="utf-8">
+  <title>Document</title>
+</head>
+<?php
+$bootstrap->css();
+?>
+
+<body>
   <?php
-  $bootstrap->css();
   ?>
-  <body>
-    <?php
-     ?>
-    <div class="row">
-      <div class="sidebarcol" id="sidebar">
-        <?php
-        include 'sidebar.php';
-        ?>
-      </div>
-      <div class="contentcol" id="content">
-        <?php require 'navbar.php'; ?>
-        <div class="card">
-          <div class="card-header bg-info text-light">
-            <a href="acpayable.php" class="btn btn-secondary btn-sm float-end">Back</a>
-            <a href="export.php?table_name=payabledetail&supplier_id=<?= $_GET['supplier_id']; ?>" class="btn btn-success btn-sm float-end me-2">Excel Report</a>
-            <h5><?php $supplier_name = $query->select('acname', $_GET['supplier_id'], 'code_no'); echo $supplier_name['ac_name']; ?> Payable Detail Info</h5>
-            <!-- <form class="float-end" action="" method="post">
+  <div class="row">
+    <div class="sidebarcol" id="sidebar">
+      <?php
+      include 'sidebar.php';
+      ?>
+    </div>
+    <div class="contentcol" id="content">
+      <?php require 'navbar.php'; ?>
+      <div class="card">
+        <div class="card-header bg-info text-light">
+          <a href="acpayable.php" class="btn btn-secondary btn-sm float-end">Back</a>
+          <a href="export.php?table_name=payabledetail&supplier_id=<?= $_GET['supplier_id']; ?>" class="btn btn-success btn-sm float-end me-2">Excel Report</a>
+          <h5><?php $supplier_name = $query->select('acname', $_GET['supplier_id'], 'code_no');
+              echo $supplier_name['ac_name']; ?> Payable Detail Info</h5>
+          <!-- <form class="float-end" action="" method="post">
 
               <select class="chzn-select" name="supplier_id" style="width:100%;" data-placeholder="Supplier name">
                 <option value=""></option>
@@ -44,144 +47,145 @@ $query = new Query();
                 $supplierdatas = $supplierdatastmt->fetchall();
                 foreach ($supplierdatas as $supplierdata) {
                   $supplier_name = $query->select('acname', $supplierdata['supplier_id'], 'code_no');
-                  ?>
+                ?>
                   <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplier_name['ac_name']; ?> - <?php echo $supplierdata['supplier_id']; ?></option>
                   <?php
                 }
-                ?>
+                  ?>
               </select>
               <button type="submit" name="search" class="btn btn-primary btn-sm">Search</button> -->
-            </form>
-          </div>
-          <div class="card-body">
-            <?php
-            // if(isset($_POST['updatebutton'])){
-            //   $paid_date = $_POST['paid_date'];
-            //   $paid_voucher = $_POST['paid_voucher'];
-            //   $paid_amount = $_POST['paid_amount'];
-            //   $updateid = $_POST['updateid'];
-            //
-            //   $message = $query->updatepayable($paid_date, $paid_voucher, $paid_amount, $updateid);
-            // }
-            // if(isset($_POST['addbutton'])){
-            //   $supplier_id = $_POST['supplier_id'];
-            //   $paid_date = $_POST['paid_date'];
-            //   $paid_voucher = $_POST['paid_voucher'];
-            //   $paid_amount = $_POST['paid_amount'];
-            //
-            //   $message = $query->addpayable('payable',$supplier_id, $paid_date, $paid_voucher, $paid_amount);
-            // }
-            // if(isset($_POST['search'])){
-            //   $supplier_id = $_POST['supplier_id'];
-            //   $purchasedatas = $query->search('purchase', 'supplier_id', $supplier_id);
-            // }
-            ?>
-            <?php include 'message.php'; ?>
-            <?php
+          </form>
+        </div>
+        <div class="card-body">
+          <?php
+          // if(isset($_POST['updatebutton'])){
+          //   $paid_date = $_POST['paid_date'];
+          //   $paid_voucher = $_POST['paid_voucher'];
+          //   $paid_amount = $_POST['paid_amount'];
+          //   $updateid = $_POST['updateid'];
+          //
+          //   $message = $query->updatepayable($paid_date, $paid_voucher, $paid_amount, $updateid);
+          // }
+          // if(isset($_POST['addbutton'])){
+          //   $supplier_id = $_POST['supplier_id'];
+          //   $paid_date = $_POST['paid_date'];
+          //   $paid_voucher = $_POST['paid_voucher'];
+          //   $paid_amount = $_POST['paid_amount'];
+          //
+          //   $message = $query->addpayable('payable',$supplier_id, $paid_date, $paid_voucher, $paid_amount);
+          // }
+          // if(isset($_POST['search'])){
+          //   $supplier_id = $_POST['supplier_id'];
+          //   $purchasedatas = $query->search('purchase', 'supplier_id', $supplier_id);
+          // }
+          ?>
+          <?php include 'message.php'; ?>
+          <?php
 
-            if (!empty($_GET['pageno'])) {
-              $pageno = $_GET['pageno'];
-            }else{
-              $pageno = 1;
-            }
-            $numOfrecs = 2;
-            $offset = ($pageno -1) * $numOfrecs;
-            ?>
-            <?php
-              $supplier_id = $_GET['supplier_id'];
-              $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' GROUP BY purchase_voucher_no ORDER BY
+          if (!empty($_GET['pageno'])) {
+            $pageno = $_GET['pageno'];
+          } else {
+            $pageno = 1;
+          }
+          $numOfrecs = 2;
+          $offset = ($pageno - 1) * $numOfrecs;
+          ?>
+          <?php
+          $supplier_id = $_GET['supplier_id'];
+          $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' GROUP BY purchase_voucher_no ORDER BY
               CASE
                   WHEN date = '0000-00-00' THEN paid_date
                   ELSE date
               END,
               paid_date;");
-              $payablestmt->execute();
-              $payabledatas = $payablestmt->fetchall();
-              // print_r($payabledatas);
-            ?>
-            <table class="mt-1 table table-bordered table-striped rounded">
-              <tr>
-                <th class="pt-3">Date</th>
-                <th>Purchase <br> Voucher No</th>
-                <th>Purchase <br> Amount</th>
-                <th class="pt-3">Paid Date</th>
-                <th class="pt-3">Paid Voucher</th>
-                <th class="pt-3">Particular</th>
-                <th class="pt-3">Paid Amount</th>
-                <th class="pt-3">Balance</th>
-                <th>Action</th>
-              </tr>
-              <?php
-              $idd = 0;
-              foreach ($payabledatas as $payabledata) {
-                $purchase_voucher_no = $payabledata['purchase_voucher_no'];
-                $totalpurchaseamountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS total_purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no='$purchase_voucher_no'ORDER BY
+          $payablestmt->execute();
+          $payabledatas = $payablestmt->fetchall();
+          // print_r($payabledatas);
+          ?>
+          <table class="mt-1 table table-bordered table-striped rounded">
+            <tr>
+              <th class="pt-3">Date</th>
+              <th>Purchase <br> Voucher No</th>
+              <th>Purchase <br> Amount</th>
+              <th class="pt-3">Paid Date</th>
+              <th class="pt-3">Paid Voucher</th>
+              <th class="pt-3">Particular</th>
+              <th class="pt-3">Paid Amount</th>
+              <th class="pt-3">Balance</th>
+              <th>Action</th>
+            </tr>
+            <?php
+            $idd = 0;
+            foreach ($payabledatas as $payabledata) {
+              $purchase_voucher_no = $payabledata['purchase_voucher_no'];
+              $totalpurchaseamountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS total_purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no='$purchase_voucher_no'ORDER BY
                 CASE
                     WHEN date = '0000-00-00' THEN paid_date
                     ELSE date
                 END,
                 paid_date");
-                $totalpurchaseamountstmt->execute();
-                $totalpurchaseamount = $totalpurchaseamountstmt->fetch(PDO::FETCH_ASSOC);
-                if($payabledata['purchase_voucher_no'] == ''){
-                  $balanceamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id'ORDER BY
+              $totalpurchaseamountstmt->execute();
+              $totalpurchaseamount = $totalpurchaseamountstmt->fetch(PDO::FETCH_ASSOC);
+              if ($payabledata['purchase_voucher_no'] == '') {
+                $balanceamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id'ORDER BY
                   CASE
                       WHEN date = '0000-00-00' THEN paid_date
                       ELSE date
                   END,
                   paid_date");
+                $balanceamountstmt->execute();
+                $balanceamount = $balanceamountstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalpurchaseamount['total_purchase_amount'] = 0;
+              } else {
+                $paidamount = $payabledata['paid_amount'];
+                if ($payabledata['paid_amount'] != '0') {
+
+                  $nowid = $payabledata['id'];
+                  $paid_date = $payabledata['paid_date'];
+                  $purchase_voucher_no = $payabledata['purchase_voucher_no'];
+                  // total purchase amount
+                  $balanceamountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS total_purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no!='$purchase_voucher_no' AND date<'$paid_date'");
                   $balanceamountstmt->execute();
-                  $balanceamount = $balanceamountstmt->fetch(PDO::FETCH_ASSOC);
-                  $totalpurchaseamount['total_purchase_amount'] = 0;
-                }else{
-                  $paidamount = $payabledata['paid_amount'];
-                  if($payabledata['paid_amount'] != '0'){
+                  $balanceamountdata = $balanceamountstmt->fetch(PDO::FETCH_ASSOC);
 
-                    $nowid = $payabledata['id'];
-                    $paid_date = $payabledata['paid_date'];
-                    $purchase_voucher_no = $payabledata['purchase_voucher_no'];
-                    // total purchase amount
-                    $balanceamountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS total_purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no!='$purchase_voucher_no' AND date<'$paid_date'");
-                    $balanceamountstmt->execute();
-                    $balanceamountdata = $balanceamountstmt->fetch(PDO::FETCH_ASSOC);
+                  $balanceamountstmt2 = $pdo->prepare("SELECT SUM(purchase_amount) AS total_purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no!='$purchase_voucher_no' AND date='$paid_date'");
+                  $balanceamountstmt2->execute();
+                  $balanceamountdata2 = $balanceamountstmt2->fetch(PDO::FETCH_ASSOC);
 
-                    $balanceamountstmt2 = $pdo->prepare("SELECT SUM(purchase_amount) AS total_purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no!='$purchase_voucher_no' AND date='$paid_date'");
-                    $balanceamountstmt2->execute();
-                    $balanceamountdata2 = $balanceamountstmt2->fetch(PDO::FETCH_ASSOC);
+                  $total_purchase = $balanceamountdata['total_purchase_amount'] + $balanceamountdata2['total_purchase_amount'];
 
-                    $total_purchase = $balanceamountdata['total_purchase_amount'] + $balanceamountdata2['total_purchase_amount'];
-
-                    // total purchase amount
-                    $closingbalanceamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id' AND closing_balance != 0 ORDER BY
+                  // total purchase amount
+                  $closingbalanceamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id' AND closing_balance != 0 ORDER BY
                     CASE
                         WHEN date = '0000-00-00' THEN paid_date
                         ELSE date
                     END,
                     paid_date;");
-                    $closingbalanceamountstmt->execute();
-                    $closingbalanceamount = $closingbalanceamountstmt->fetch(PDO::FETCH_ASSOC);
+                  $closingbalanceamountstmt->execute();
+                  $closingbalanceamount = $closingbalanceamountstmt->fetch(PDO::FETCH_ASSOC);
 
-                    if(empty($closingbalanceamount['closing_balance'])){
-                      $closingbalanceamount['closing_balance'] = 0;
-                    }
+                  if (empty($closingbalanceamount['closing_balance'])) {
+                    $closingbalanceamount['closing_balance'] = 0;
+                  }
 
-                    // total paid_amount
-                    $totalpaidamountstmt = $pdo->prepare("SELECT SUM(paid_amount) AS total_paid_amount FROM payable WHERE supplier_id='$supplier_id' AND paid_voucher != '' AND paid_date='$paid_date'");
-                    $totalpaidamountstmt->execute();
-                    $totalpaidamount = $totalpaidamountstmt->fetch(PDO::FETCH_ASSOC);
+                  // total paid_amount
+                  $totalpaidamountstmt = $pdo->prepare("SELECT SUM(paid_amount) AS total_paid_amount FROM payable WHERE supplier_id='$supplier_id' AND paid_voucher != '' AND paid_date='$paid_date'");
+                  $totalpaidamountstmt->execute();
+                  $totalpaidamount = $totalpaidamountstmt->fetch(PDO::FETCH_ASSOC);
 
-                    $totalpaidamountstmt2 = $pdo->prepare("SELECT SUM(paid_amount) AS total_paid_amount FROM payable WHERE supplier_id='$supplier_id' AND paid_voucher != '' AND paid_date<'$paid_date'");
-                    $totalpaidamountstmt2->execute();
-                    $totalpaidamount2 = $totalpaidamountstmt2->fetch(PDO::FETCH_ASSOC);
-                    $total_paid_amount = $totalpaidamount['total_paid_amount'] + $totalpaidamount2['total_paid_amount'];
-                    // total paid_amount
+                  $totalpaidamountstmt2 = $pdo->prepare("SELECT SUM(paid_amount) AS total_paid_amount FROM payable WHERE supplier_id='$supplier_id' AND paid_voucher != '' AND paid_date<'$paid_date'");
+                  $totalpaidamountstmt2->execute();
+                  $totalpaidamount2 = $totalpaidamountstmt2->fetch(PDO::FETCH_ASSOC);
+                  $total_paid_amount = $totalpaidamount['total_paid_amount'] + $totalpaidamount2['total_paid_amount'];
+                  // total paid_amount
 
-                    // $total_paid_amount = $total_paid_amount + $payabledata['paid_amount'];
-                    $thebalanceamount = ($total_purchase + $closingbalanceamount['closing_balance'] + $totalpurchaseamount['total_purchase_amount']) - $total_paid_amount;
-                  }else{
-                    if($idd <= 1){
-                      $nowid = $payabledata['id'];
-                      $paid_date = $payabledata['paid_date'];
+                  // $total_paid_amount = $total_paid_amount + $payabledata['paid_amount'];
+                  $thebalanceamount = ($total_purchase + $closingbalanceamount['closing_balance'] + $totalpurchaseamount['total_purchase_amount']) - $total_paid_amount;
+                } else {
+                  if ($idd <= 1) {
+                    $nowid = $payabledata['id'];
+                    $paid_date = $payabledata['paid_date'];
                     $closingbalanceamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id' AND closing_balance != 0 ORDER BY id DESC");
                     $closingbalanceamountstmt->execute();
                     $closingbalanceamount = $closingbalanceamountstmt->fetch(PDO::FETCH_ASSOC);
@@ -196,13 +200,12 @@ $query = new Query();
                     $total_paid_amount = $totalpaidamount['total_paid_amount'] + $totalpaidamount2['total_paid_amount'];
                     // $total_paid_amount = $total_paid_amount + $payabledata['paid_amount'];
 
-                    if(!empty($closingbalanceamount['closing_balance'])){
+                    if (!empty($closingbalanceamount['closing_balance'])) {
                       $thebalanceamount = $totalpurchaseamount['total_purchase_amount'] + $closingbalanceamount['closing_balance'] - $total_paid_amount;
-                    }else{
+                    } else {
                       $thebalanceamount = $totalpurchaseamount['total_purchase_amount'] - $total_paid_amount;
                     }
-
-                  }else{
+                  } else {
                     $nowid = $payabledata['id'];
                     // echo "<br>";
                     $date = $payabledata['date'];
@@ -244,7 +247,7 @@ $query = new Query();
                     paid_date;");
                     $closingbalanceamountstmt->execute();
                     $closingbalanceamount = $closingbalanceamountstmt->fetch(PDO::FETCH_ASSOC);
-                    if(empty($closingbalanceamount['closing_balance'])){
+                    if (empty($closingbalanceamount['closing_balance'])) {
                       $closingbalanceamount['closing_balance'] = 0;
                     }
                     // print_r($closingbalanceamount);
@@ -274,44 +277,63 @@ $query = new Query();
                     // $total_paid_amount = $total_paid_amount + $payabledata['paid_amount'];
                     $thebalanceamount = $total_purchase + $closingbalanceamount['closing_balance'] - $total_paid_amount;
                   }
-                  }
                 }
+              }
 
-                $idd++;
-              ?>
+              $idd++;
+            ?>
               <tr>
-                <td><?php if($payabledata['date'] != '0000-00-00'){echo date('d-m-Y', strtotime($payabledata['date'])); }; ?></td>
-                <td><?php if($payabledata['paid_voucher'] == ''){echo $payabledata['purchase_voucher_no'];} ?></td>
-                <td><?php if($totalpurchaseamount['total_purchase_amount'] != 0){ echo $totalpurchaseamount['total_purchase_amount']; }; ?></td>
-                <td><?php if($payabledata['paid_date'] != "0000-00-00"){ echo date('d-m-Y', strtotime($payabledata['paid_date'])); }; ?></td>
+                <td><?php if ($payabledata['date'] != '0000-00-00') {
+                      echo date('d-m-Y', strtotime($payabledata['date']));
+                    }; ?></td>
+                <td><?php if ($payabledata['paid_voucher'] == '') {
+                      echo $payabledata['purchase_voucher_no'];
+                    } ?></td>
+                <td><?php if ($totalpurchaseamount['total_purchase_amount'] != 0) {
+                      echo $totalpurchaseamount['total_purchase_amount'];
+                    }; ?></td>
+                <td><?php if ($payabledata['paid_date'] != "0000-00-00") {
+                      echo date('d-m-Y', strtotime($payabledata['paid_date']));
+                    }; ?></td>
                 <td><?php echo $payabledata['paid_voucher']; ?></td>
                 <td><?php echo $payabledata['remark']; ?></td>
-                <td><?php if(!empty($payabledata['paid_amount'])){ echo $payabledata['paid_amount'];}; ?></td>
+                <td><?php if (!empty($payabledata['paid_amount'])) {
+                      echo $payabledata['paid_amount'];
+                    }; ?></td>
                 <?php
                 if ($payabledata['paid_date'] != "0000-00-00") {
                 ?>
-                <td><?php if(!empty($thebalanceamount) || $thebalanceamount == '0'){ echo $thebalanceamount; }?></td>
+                  <td><?php if (!empty($thebalanceamount) || $thebalanceamount == '0') {
+                        echo $thebalanceamount;
+                      } ?></td>
                 <?php
-              }else{
+                } else {
                 ?>
-                <td><?php if(!empty($thebalanceamount)){ echo $thebalanceamount; }else{ echo $balanceamount['closing_balance'];} ?></td>
+                  <td><?php if (!empty($thebalanceamount)) {
+                        echo $thebalanceamount;
+                      } else {
+                        // echo $balanceamount['closing_balance'];
+                        echo 0;
+                      } ?></td>
                 <?php
-              }
-                  $voucher_no = $payabledata['paid_voucher'];
-                  $ac_code = $payabledata['supplier_id'];
-                  $description = $payabledata['remark'];
-                  $transactionidstmt = $pdo->prepare("SELECT * FROM `transaction` WHERE voucher_no=:voucher_no AND ac_code='$ac_code' AND `description`=:description");
-                  $transactionidstmt->execute([
-                    ':voucher_no' => $voucher_no,
-                    ':description' => $description,
-                  ]);
-                  $transactioniddata = $transactionidstmt->fetch(PDO::FETCH_ASSOC);
-                 ?>
+                }
+                $voucher_no = $payabledata['paid_voucher'];
+                $ac_code = $payabledata['supplier_id'];
+                $description = $payabledata['remark'];
+                $transactionidstmt = $pdo->prepare("SELECT * FROM `transaction` WHERE voucher_no=:voucher_no AND ac_code='$ac_code' AND `description`=:description");
+                $transactionidstmt->execute([
+                  ':voucher_no' => $voucher_no,
+                  ':description' => $description,
+                ]);
+                $transactioniddata = $transactionidstmt->fetch(PDO::FETCH_ASSOC);
+                ?>
                 <td>
-                  <a href="edittransaction.php?voucher_no=<?= $payabledata['paid_voucher']; ?>&file=payable&payableid=<?php echo $payabledata['id']; ?>&transactionid=<?= $transactioniddata['id'];?>" style="<?php if(empty($payabledata['paid_amount'])){ echo "display:none;"; } ?>">
+                  <a href="edittransaction.php?voucher_no=<?= $payabledata['paid_voucher']; ?>&file=payable&payableid=<?php echo $payabledata['id']; ?>&transactionid=<?= $transactioniddata['id']; ?>" style="<?php if (empty($payabledata['paid_amount'])) {
+                                                                                                                                                                                                                  echo "display:none;";
+                                                                                                                                                                                                                } ?>">
                     <button type="submit" class="btn btn-warning btn-sm text-light" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                        <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                        <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
                       </svg>
                     </button>
                   </a>
@@ -331,8 +353,8 @@ $query = new Query();
                     <form action="" method="post" autocomplete="off">
                       <div class="modal-body">
                         <?php
-                          $id = $payabledata['id'];
-                          $updatedata = $query->select('payable', $id, 'id');
+                        $id = $payabledata['id'];
+                        $updatedata = $query->select('payable', $id, 'id');
                         ?>
                         <input type="hidden" name="updateid" value="<?php echo $payabledata['id']; ?>">
                         <label>Paid Date</label>
@@ -351,41 +373,43 @@ $query = new Query();
                 </div>
               </div> -->
               <!-- Update Modal -->
-              <?php
+            <?php
               $voucher_no = $payabledata['purchase_voucher_no'];
               $supplier_id = $payabledata['supplier_id'];
-              };
-              ?>
+            };
+            ?>
 
-              <?php
-                  $total_purchase_amount = $query->selectallsumpayable('payable', 'purchase_amount', 'total_purchase_amount', $supplier_id);
-                  $total_paid_amount = $query->selectallsumpayable('payable', 'paid_amount', 'total_paid_amount', $supplier_id);
+            <?php
+            $total_purchase_amount = $query->selectallsumpayable('payable', 'purchase_amount', 'total_purchase_amount', $supplier_id);
+            $total_paid_amount = $query->selectallsumpayable('payable', 'paid_amount', 'total_paid_amount', $supplier_id);
 
-                  $balanceamountstmt = $pdo->prepare("SELECT SUM(closing_balance) AS closing_balance FROM payable WHERE supplier_id='$supplier_id'");
-                  $balanceamountstmt->execute();
-                  $balanceamount = $balanceamountstmt->fetch(PDO::FETCH_ASSOC);
+            $balanceamountstmt = $pdo->prepare("SELECT SUM(closing_balance) AS closing_balance FROM payable WHERE supplier_id='$supplier_id'");
+            $balanceamountstmt->execute();
+            $balanceamount = $balanceamountstmt->fetch(PDO::FETCH_ASSOC);
 
 
-                  ?>
-                  <tr style="font-weight: bold;">
-                    <td>Total:</td>
-                    <td></td>
-                    <td><?php echo $total_purchase_amount['total_purchase_amount'] ?></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td><?php if($total_paid_amount['total_paid_amount'] != 0){ echo $total_paid_amount['total_paid_amount'];} ?></td>
-                    <td><?php echo ($balanceamount['closing_balance'] + $total_purchase_amount['total_purchase_amount']) - $total_paid_amount['total_paid_amount']; ?></td>
-                    <td></td>
-                  </tr>
-                  <?php
-                ?>
+            ?>
+            <tr style="font-weight: bold;">
+              <td>Total:</td>
+              <td></td>
+              <td><?php echo $total_purchase_amount['total_purchase_amount'] ?></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td><?php if ($total_paid_amount['total_paid_amount'] != 0) {
+                    echo $total_paid_amount['total_paid_amount'];
+                  } ?></td>
+              <td><?php echo ($balanceamount['closing_balance'] + $total_purchase_amount['total_purchase_amount']) - $total_paid_amount['total_paid_amount']; ?></td>
+              <td></td>
+            </tr>
+            <?php
+            ?>
 
-            </table>
-          </div>
+          </table>
         </div>
       </div>
     </div>
+  </div>
 
   <!-- Data Add Modal -->
   <!-- <div class="modal fade" id="addmodal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -398,7 +422,8 @@ $query = new Query();
           </button>
         </div>
         <form action="accountpayable.php" method="post" autocomplete="off">
-          <input type="hidden" name="supplier_id" value="<?php //echo $supplier_id; ?>">
+          <input type="hidden" name="supplier_id" value="<?php //echo $supplier_id; 
+                                                          ?>">
           <div class="modal-body">
             <label>Paid Date</label>
             <input type="date" name="paid_date" class="form-control">
@@ -420,5 +445,6 @@ $query = new Query();
   <?php
   $bootstrap->javascript();
   ?>
-  </body>
+</body>
+
 </html>
