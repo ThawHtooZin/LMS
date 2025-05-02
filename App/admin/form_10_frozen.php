@@ -110,7 +110,7 @@ $bootstrap->css();
                   <input type="hidden" name="upid" value="<?php echo $form10data['id']; ?>">
                   <div class="modal-body">
                     <label>Form7Date:</label>
-                    <input type="text" readonly data-id="multiple" id="dateselector" name="form7date" class="form-control inpv2">
+                    <input type="date" id="dateselector" name="form7date" class="form-control inpv2">
                     <div class="row" style="margin-top: 10px !important;">
                       <div class="col">
                         <label>Form10Date:</label>

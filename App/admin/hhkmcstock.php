@@ -35,7 +35,7 @@ $bootstrap->css();
     } else {
       $commondity_id = $_POST['commondity_id1'];
       $fish_type = $_POST['fish_type1'];
-      $country = $_POST['country1'];
+      $country = $_POST['country'];
     }
     $size = $_POST['size'];
     $kg = $_POST['kg'];
@@ -291,6 +291,7 @@ $bootstrap->css();
                                   foreach ($form7commonditydatas as $form7commonditydata) {
                                     $item_id = $form7commonditydata['item_id'];
                                     $commonditydata = $query->select('item', $item_id, 'item_id');
+                                    print_r($commonditydat);
                                 ?>
                                     <option value="<?php echo $commonditydata['item_id']; ?>" <?php if (!empty($_SESSION['commondity_id1'])) {
                                                                                                 if ($_SESSION['commondity_id1'] == $commonditydata['item_id']) {
@@ -357,7 +358,7 @@ $bootstrap->css();
                       <div class="row">
                         <div class="col">
                           <label>Country</label>
-                          <select class="form-control inpv2 mb-2" name="country1" id="country1">
+                          <select class="form-control inpv2 mb-2" name="country" id="country1">
                             <?php
                             if (!empty($countrydatas)) {
                               foreach ($countrydatas as $countrydata) {
@@ -400,10 +401,10 @@ $bootstrap->css();
             </div>
           <?php
           }
-          $form7commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock");
+          $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
           $form7commonditystmt->execute();
           $form7commonditydatas = $form7commonditystmt->fetchall();
-          $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM hhkmcstock WHERE country IS NOT NULL");
+          $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
           $countrystmt->execute();
           $countrydatas = $countrystmt->fetchall();
           ?>
@@ -431,7 +432,7 @@ $bootstrap->css();
                       <?php
                       if (!empty($form7commonditydatas)) {
                         foreach ($form7commonditydatas as $form7commonditydata) {
-                          $item_id = $form7commonditydata['commondity_id'];
+                          $item_id = $form7commonditydata['item_id'];
                           $commonditydata = $query->select('item', $item_id, 'item_id');
                       ?>
                           <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
@@ -606,7 +607,11 @@ $bootstrap->css();
 
   <script type="text/javascript">
     <?php
-    foreach ($countrydatas as $countrydata) {
+    $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM hhkmcstock WHERE country IS NOT NULL");
+    $countrystmt->execute();
+    $hhkcountrydatas = $countrystmt->fetchall();
+
+    foreach ($hhkcountrydatas as $countrydata) {
       if ($_SESSION['tabs'] == $countrydata['country']) {
         $escapedTabs = str_replace('/', '_', $_SESSION['tabs']);
         echo "show" . $escapedTabs . "();";
