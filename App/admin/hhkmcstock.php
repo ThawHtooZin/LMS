@@ -533,9 +533,12 @@ $bootstrap->css();
                   <div class="col">
                     <select class="form-control inpv2 mb-2" name="transfercommondity_id">
                       <?php
-                      if (!empty($form7commonditydatas)) {
-                        foreach ($form7commonditydatas as $form7commonditydata) {
-                          $item_id = $form7commonditydata['commondity_id'];
+                      $hhkmcdata = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock");
+                      $hhkmcdata->execute();
+                      $hhkmcdatas = $hhkmcdata->fetchall();
+                      if (!empty($hhkmcdatas)) {
+                        foreach ($hhkmcdatas as $hhkmcdata) {
+                          $item_id = $hhkmcdata['commondity_id'];
                           $commonditydata = $query->select('item', $item_id, 'item_id');
                       ?>
                           <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
