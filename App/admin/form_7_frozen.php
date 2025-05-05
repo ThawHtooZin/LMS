@@ -335,7 +335,7 @@ $bootstrap->css();
                   </div>
                   <div class="modal fade" id="waterkgmodal<?php echo $form7data['id']; ?>">
                     <div class="modal-dialog" role="document">
-                      <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
                         <div class="modal-header bg-warning text-light">
                           <h1 class="modal-title fs-5">Add Waterkg</h1>
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -366,10 +366,108 @@ $bootstrap->css();
                   </div>
                 <?php
                 $date = $form7data['date'];
-                $item_id = $form7data['item_id'];
                 $country = $form7data['country'];
+                $item_id = $_SESSION['search']['searchcommondity'];
+                $date = $_SESSION['search']['searchdate'];
+                $size = $_SESSION['search']['searchsize'];
               }
-              if (isset($item_id)) {
+              if (!empty($item_id) && !empty($date) && !empty($size)) {
+                $totalvissstmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM form7stock WHERE item_id='$item_id' AND date='$date' AND size='$size'");
+                $totalvissstmt->execute();
+                $totalvissdata = $totalvissstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$item_id' AND date='$date' AND size='$size'");
+                $totalkgstmt->execute();
+                $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalpcsstmt = $pdo->prepare("SELECT SUM(pcspervr) AS total_pcs FROM form7stock WHERE item_id='$item_id' AND date='$date' AND size='$size'");
+                $totalpcsstmt->execute();
+                $totalpcsdata = $totalpcsstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalpcsf7stmt = $pdo->prepare("SELECT SUM(pcsperf7) AS total_pcsf7 FROM form7stock WHERE item_id='$item_id' AND date='$date' AND size='$size'");
+                $totalpcsf7stmt->execute();
+                $totalpcsf7data = $totalpcsf7stmt->fetch(PDO::FETCH_ASSOC);
+              }elseif (!empty($date) && !empty($item_id) && empty($size)) {
+                $totalvissstmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM form7stock WHERE item_id='$item_id' AND date='$date'");
+                $totalvissstmt->execute();
+                $totalvissdata = $totalvissstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$item_id' AND date='$date'");
+                $totalkgstmt->execute();
+                $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalpcsstmt = $pdo->prepare("SELECT SUM(pcspervr) AS total_pcs FROM form7stock WHERE item_id='$item_id' AND date='$date'");
+                $totalpcsstmt->execute();
+                $totalpcsdata = $totalpcsstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalpcsf7stmt = $pdo->prepare("SELECT SUM(pcsperf7) AS total_pcsf7 FROM form7stock WHERE item_id='$item_id' AND date='$date'");
+                $totalpcsf7stmt->execute();
+                $totalpcsf7data = $totalpcsf7stmt->fetch(PDO::FETCH_ASSOC);
+              }elseif (!empty($date) && !empty($size) && empty($item_id)) {
+                $totalvissstmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM form7stock WHERE date='$date' AND size='$size'");
+                $totalvissstmt->execute();
+                $totalvissdata = $totalvissstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE date='$date' AND size='$size'");
+                $totalkgstmt->execute();
+                $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalpcsstmt = $pdo->prepare("SELECT SUM(pcspervr) AS total_pcs FROM form7stock WHERE date='$date' AND size='$size'");
+                $totalpcsstmt->execute();
+                $totalpcsdata = $totalpcsstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalpcsf7stmt = $pdo->prepare("SELECT SUM(pcsperf7) AS total_pcsf7 FROM form7stock WHERE date='$date' AND size='$size'");
+                $totalpcsf7stmt->execute();
+                $totalpcsf7data = $totalpcsf7stmt->fetch(PDO::FETCH_ASSOC);
+              }elseif(!empty($size) && !empty($item_id)){
+                $totalvissstmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM form7stock WHERE item_id='$item_id' AND size='$size'");
+                $totalvissstmt->execute();
+                $totalvissdata = $totalvissstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$item_id' AND size='$size'");
+                $totalkgstmt->execute();
+                $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalpcsstmt = $pdo->prepare("SELECT SUM(pcspervr) AS total_pcs FROM form7stock WHERE item_id='$item_id' AND size='$size'");
+                $totalpcsstmt->execute();
+                $totalpcsdata = $totalpcsstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalpcsf7stmt = $pdo->prepare("SELECT SUM(pcsperf7) AS total_pcsf7 FROM form7stock WHERE item_id='$item_id' AND size='$size'");
+                $totalpcsf7stmt->execute();
+                $totalpcsf7data = $totalpcsf7stmt->fetch(PDO::FETCH_ASSOC);
+              }elseif(!empty($size)){
+                $totalvissstmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM form7stock WHERE size='$size'");
+                $totalvissstmt->execute();
+                $totalvissdata = $totalvissstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE size='$size'");
+                $totalkgstmt->execute();
+                $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalpcsstmt = $pdo->prepare("SELECT SUM(pcspervr) AS total_pcs FROM form7stock WHERE size='$size'");
+                $totalpcsstmt->execute();
+                $totalpcsdata = $totalpcsstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalpcsf7stmt = $pdo->prepare("SELECT SUM(pcsperf7) AS total_pcsf7 FROM form7stock WHERE date='$date'");
+                $totalpcsf7stmt->execute();
+                $totalpcsf7data = $totalpcsf7stmt->fetch(PDO::FETCH_ASSOC);
+              }elseif(!empty($date)){
+                $totalvissstmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM form7stock WHERE date='$date'");
+                $totalvissstmt->execute();
+                $totalvissdata = $totalvissstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE date='$date'");
+                $totalkgstmt->execute();
+                $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalpcsstmt = $pdo->prepare("SELECT SUM(pcspervr) AS total_pcs FROM form7stock WHERE date='$date'");
+                $totalpcsstmt->execute();
+                $totalpcsdata = $totalpcsstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalpcsf7stmt = $pdo->prepare("SELECT SUM(pcsperf7) AS total_pcsf7 FROM form7stock WHERE date='$date'");
+                $totalpcsf7stmt->execute();
+                $totalpcsf7data = $totalpcsf7stmt->fetch(PDO::FETCH_ASSOC);
+              }elseif(!empty($item_id)){
                 $totalvissstmt = $pdo->prepare("SELECT SUM(viss) AS total_viss FROM form7stock WHERE item_id='$item_id'");
                 $totalvissstmt->execute();
                 $totalvissdata = $totalvissstmt->fetch(PDO::FETCH_ASSOC);
@@ -386,6 +484,7 @@ $bootstrap->css();
                 $totalpcsf7stmt->execute();
                 $totalpcsf7data = $totalpcsf7stmt->fetch(PDO::FETCH_ASSOC);
               }
+
               if ($nodata !== true) {
 
                 ?>
@@ -397,7 +496,7 @@ $bootstrap->css();
                     <td></td>
                     <td></td>
                     <td><?php echo round($totalvissdata['total_viss'], 3); ?></td>
-                    <td><?php echo round($totalkgdata['total_kg'], 2); ?></td>
+                    <td><?php echo round($totalkgdata['total_kg'], 4); ?></td>
                     <td></td>
                     <td></td>
                     <td><?php if (!empty($totalpcsdata['total_pcs'])) {

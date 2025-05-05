@@ -164,6 +164,7 @@ $bootstrap->css();
                           <option value="Cut_piece">Cut Piece</option>
                           <option value="Scaless">Scaless</option>
                           <option value="Bls">Bl's</option>
+                          <option value="iqf">IQF</option>
                         </select>
                       </div>
                     </div>
@@ -536,6 +537,7 @@ $bootstrap->css();
                                         <option value="Cut_piece">Cut Piece</option>
                                         <option value="Scaless">Scaless</option>
                                         <option value="Bls">Bl's</option>
+                                        <option value="iqf">IQF</option>
                                       </select>
                                     </div>
                                   </div>
@@ -688,6 +690,7 @@ $bootstrap->css();
                         <option value="Cut_piece">Cut Piece</option>
                         <option value="Scaless">Scaless</option>
                         <option value="Bls">Bl's</option>
+                        <option value="iqf">IQF</option>
                       </select>
                     </div>
                   </div>

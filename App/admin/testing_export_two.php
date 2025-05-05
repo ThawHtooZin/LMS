@@ -2746,10 +2746,10 @@ if ($_GET['table_name'] == "form10frozen") {
   $commondity_id = $_GET['commondity'];
   $country = $_GET['country'];
   $searchdate = $_GET['searchdate'];
-  header("Content-Type: application/xls");
-  header("Content-Disposition: attachment; filename=percentage{$searchdate}.xls");
-  header("Pragma: no-cache");
-  header("Expires: 0");
+  // header("Content-Type: application/xls");
+  // header("Content-Disposition: attachment; filename=percentage{$searchdate}.xls");
+  // header("Pragma: no-cache");
+  // header("Expires: 0");
 ?>
   <table>
     <tr>
@@ -2825,7 +2825,6 @@ if ($_GET['table_name'] == "form10frozen") {
       $form10datastmt->execute();
       $form10data = $form10datastmt->fetch(PDO::FETCH_ASSOC);
 
-
       $lastcommondity = $pdo->prepare("SELECT * FROM form7stock WHERE id < $lastid AND item_id='$item_id' AND supplier_name='$supplier_id' AND date = '$date'");
       $lastcommondity->execute();
       $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
@@ -2880,7 +2879,7 @@ if ($_GET['table_name'] == "form10frozen") {
     $supplierdata = $supplieridstmt->fetch(PDO::FETCH_ASSOC);
     $supplier_id = $supplierdata['supplier_id'];
 
-    $totalform7viss = $pdo->prepare("SELECT SUM(viss) AS totalform7viss FROM form7stock WHERE item_id='$commondity_id' AND country='$country'");
+    $totalform7viss = $pdo->prepare("SELECT SUM(viss) AS totalform7viss FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND date=''");
     $totalform7viss->execute();
     $totalform7vissdata = $totalform7viss->fetch(PDO::FETCH_ASSOC);
 
