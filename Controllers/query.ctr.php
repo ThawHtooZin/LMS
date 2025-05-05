@@ -3012,8 +3012,10 @@ class Query
   {
     global $pdo;
 
-    $mcstmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE kg='$kg' AND size='$size' AND commondity_id='$commondity_id' AND country='$country' ORDER BY id DESC");
-    $mcstmt->execute();
+    $mcstmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE kg=:kg AND size=:size AND commondity_id='$commondity_id' AND country='$country' ORDER BY id DESC");
+    $mcstmt->execute(
+      array(':kg' => $kg, ':size' => $size)
+    );
     $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
 
     if (!empty($mcdata)) {
@@ -3021,8 +3023,10 @@ class Query
     } else {
       $balance_mc = $mc;
     }
-    $addmcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc, fish_type) VALUES('$date', '$country', '$particular', '$commondity_id', '$size', '$kg', '$mc', '$balance_mc', '$fish_type')");
-    $addmcstmt->execute();
+    $addmcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc, fish_type) VALUES('$date', '$country', :particular, '$commondity_id', :size, '$kg', '$mc', '$balance_mc', '$fish_type')");
+    $addmcstmt->execute(
+       array(':size' => $size, ':particular' => $particular)
+    );
 
     if (!empty($addmcstmt)) {
       echo '<script>swal("Success!", "Mc Added Successfully!", "success");</script>';

@@ -165,22 +165,30 @@ $bootstrap->css();
                 $size = $gfcstockdata['size'];
                 $kg = $gfcstockdata['kg'];
                 $commondity_id = $gfcstockdata['commondity_id'];
-                $sizestmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE size='$size' ORDER BY id DESC");
-                $sizestmt->execute();
+                $sizestmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE size=:size ORDER BY id DESC");
+                $sizestmt->execute(
+                 array(':size'=>$size)
+                );
                 $sizedata = $sizestmt->fetch(PDO::FETCH_ASSOC);
                 // IN
-                $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular='HHK to GFC'");
-                $totalmcstmt->execute();
+                $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND particular='HHK to GFC'");
+                $totalmcstmt->execute(
+                 array(':size'=>$size)
+                );
                 $totalmcnotsub = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
 
                 // Ship
-                $totalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular='ship'");
-                $totalmcsubnumstmt->execute();
+                $totalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND particular='ship'");
+                $totalmcsubnumstmt->execute(
+                 array(':size'=>$size)
+                );
                 $totalmcsubnum = $totalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
 
                 // Balance
-                $totalbalancemcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular LIKE '%balance%' ");
-                $totalbalancemcsubnumstmt->execute();
+                $totalbalancemcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND particular LIKE '%balance%' ");
+                $totalbalancemcsubnumstmt->execute(
+                 array(':size'=>$size)
+                );
                 $totalbalancemcsubnum = $totalbalancemcsubnumstmt->fetch(PDO::FETCH_ASSOC);
 
                 // if($gfcstockdata['particular'] == 'balance' || $gfcstockdata['particular'] == 'Balance' && $totalmcnotsub['total_mc'] != 0){
@@ -195,8 +203,10 @@ $bootstrap->css();
                 $totalmc = $totalmcnotsub['total_mc'] - $totalmcsubnum['total_mc'] + $totalbalancemcsubnum['total_mc'];
 
                 // Balance
-                $totalbalanceoutstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular LIKE '%out%' ");
-                $totalbalanceoutstmt->execute();
+                $totalbalanceoutstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND particular LIKE '%out%' ");
+                $totalbalanceoutstmt->execute(
+                 array(':size'=>$size)
+                );
                 $totalbalanceout = $totalbalanceoutstmt->fetch(PDO::FETCH_ASSOC);
 
                 $totalmc = $totalmc - $totalbalanceout['total_mc'];
