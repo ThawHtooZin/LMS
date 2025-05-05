@@ -5497,6 +5497,14 @@ class Query
     $stmt->execute();
   }
 
+  public function fish_type($fish_type, $fish_type_id)
+  {
+    global $pdo;
+    $stmt = $pdo->prepare("UPDATE form7stock SET fish_type='$fish_type' WHERE id='$fish_type_id'");
+    $stmt->execute();
+  }
+
+
   // MORE Functions
 
   function selectsum($table, $id, $selectwhat)

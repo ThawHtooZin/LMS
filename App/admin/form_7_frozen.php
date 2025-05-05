@@ -63,6 +63,13 @@ $bootstrap->css();
     $query->waterkg($waterkgid, $waterkg);
   }
 
+  if (isset($_POST['fish_typebtn'])) {
+    $fish_typeid = $_POST['fish_typeid'];
+    $fish_type = $_POST['fish_type'];
+
+    $query->fish_type( $fish_type,$fish_typeid);
+  }
+
   if (isset($_POST['searchbtn'])) {
     $_SESSION['search']['searchcommondity'] = $_POST['commondity_id'];
     $_SESSION['search']['searchdate'] = $_POST['date'];
@@ -216,7 +223,7 @@ $bootstrap->css();
                 <td><?php if ($form7data['date'] != "0000-00-00") {
                       echo date('d-m-Y', strtotime($form7data['date']));
                     }; ?></td>
-                <td><?php echo $commonditydata['item_name']; ?></td>
+                <td data-bs-toggle="modal" data-bs-target="#fish_typemodal<?php echo $form7data['id']; ?>"><?php echo $commonditydata['item_name'] . "(" . $form7data['fish_type'] . ")"; ?></td>
                 <td><?php echo $supplierdata['ac_name']; ?></td>
                 <td><?php echo $form7data['type']; ?></td>
                 <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>"><?php echo $form7data['country']; ?></td>
@@ -242,6 +249,39 @@ $bootstrap->css();
                   </form>
                 </td>
               </tr>
+              <div class="modal fade" id="fish_typemodal<?php echo $form7data['id']; ?>">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+                        <div class="modal-header bg-info text-light">
+                          <h1 class="modal-title fs-5">Add Fish Type</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <form action="form_7_frozen.php" method="post">
+                            <input type="hidden" name="fish_typeid" value="<?php echo $form7data['id']; ?>">
+                            <div class="modal-body">
+                              <label>Fish Type</label>
+                              <select name="fish_type" id="" class="form-control inpv2 mt-2">
+                                <option value="G">G</option>
+                                <option value="egg">egg</option>
+                                <option value="ggs">ggs</option>
+                                <option value="fillet">fillet</option>
+                                <option value="W">W</option>
+                                <option value="Cut_piece">Cut Piece</option>
+                                <option value="Scaless">Scaless</option>
+                                <option value="Bls">Bl's</option>
+                                <option value="iqf">IQF</option>
+                              </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="submit" class="btn btn-primary" name="fish_typebtn">Update</button>
+                        </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
               <div class="modal fade" id="waterkgmodal<?php echo $form7data['id']; ?>">
                 <div class="modal-dialog" role="document">
                   <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">

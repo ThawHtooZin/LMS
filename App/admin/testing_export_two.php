@@ -2746,6 +2746,7 @@ if ($_GET['table_name'] == "form10frozen") {
   $commondity_id = $_GET['commondity'];
   $country = $_GET['country'];
   $searchdate = $_GET['searchdate'];
+  $fish_type = $_GET['fish_type'];
   // header("Content-Type: application/xls");
   // header("Content-Disposition: attachment; filename=percentage{$searchdate}.xls");
   // header("Pragma: no-cache");
@@ -2879,27 +2880,27 @@ if ($_GET['table_name'] == "form10frozen") {
     $supplierdata = $supplieridstmt->fetch(PDO::FETCH_ASSOC);
     $supplier_id = $supplierdata['supplier_id'];
 
-    $totalform7viss = $pdo->prepare("SELECT SUM(viss) AS totalform7viss FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND date=''");
+    $totalform7viss = $pdo->prepare("SELECT SUM(viss) AS totalform7viss FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND date IN ($datesList)");
     $totalform7viss->execute();
     $totalform7vissdata = $totalform7viss->fetch(PDO::FETCH_ASSOC);
 
-    $totalform7kg = $pdo->prepare("SELECT SUM(kg) AS totalform7kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country'");
+    $totalform7kg = $pdo->prepare("SELECT SUM(kg) AS totalform7kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND date IN ($datesList)");
     $totalform7kg->execute();
     $totalform7kgdata = $totalform7kg->fetch(PDO::FETCH_ASSOC);
 
-    $totalform7pcsvr = $pdo->prepare("SELECT SUM(pcspervr) AS totalform7pcs FROM form7stock WHERE item_id='$commondity_id' AND country='$country'");
+    $totalform7pcsvr = $pdo->prepare("SELECT SUM(pcspervr) AS totalform7pcs FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND date IN ($datesList)");
     $totalform7pcsvr->execute();
     $totalform7pcsvrdata = $totalform7pcsvr->fetch(PDO::FETCH_ASSOC);
 
-    $totalform7pcs = $pdo->prepare("SELECT SUM(pcsperf7) AS totalform7pcs FROM form7stock WHERE item_id='$commondity_id' AND country='$country'");
+    $totalform7pcs = $pdo->prepare("SELECT SUM(pcsperf7) AS totalform7pcs FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date IN ($datesList)");
     $totalform7pcs->execute();
     $totalform7pcsdata = $totalform7pcs->fetch(PDO::FETCH_ASSOC);
 
-    $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND date IN ($datesList)");
+    $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND fish_type='$fish_type' AND country='$country' AND date IN ($datesList)");
     $totalf7kgstmt->execute();
     $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
 
-    $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
+    $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND fish_type='$fish_type' AND country='$country' AND date='$searchdate'");
     $totalkgstmt->execute();
     $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
     $result1 = round($totalkgdata['total_kg'], 2) - round($totalf7kgdata['total_kg'], 2);
