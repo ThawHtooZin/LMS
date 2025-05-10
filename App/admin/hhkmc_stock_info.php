@@ -55,6 +55,7 @@ $bootstrap->css();
     $newcountry = $_POST['newcountry'];
     $updateid = $_POST['upid'];
 
+    // echo "<script>alert('hello World');</script>";
     $query->updatehhkmcstock($newdate, $newparticular, $newcommondity_id, $newfish_type, $newsize, $newkg, $newmc, $newcountry, $updateid);
   }
   ?>
@@ -77,7 +78,10 @@ $bootstrap->css();
             $size = $_GET['sizeinfo'];
             $commondity_id = $_GET['commondity'];
             $country = $_GET['country'];
-            $kgstmt = $pdo->prepare("SELECT DISTINCT kg FROM hhkmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country'");
+            if (!empty($_GET['fish_type'])) {
+              $fish_type = $_GET['fish_type'];
+            }
+            $kgstmt = $pdo->prepare("SELECT DISTINCT kg FROM hhkmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country' AND fish_type='$fish_type'");
             $kgstmt->execute();
             $kgdatas = $kgstmt->fetchall();
             ?>
@@ -122,11 +126,11 @@ $bootstrap->css();
 
             if (isset($_POST['view']) && !empty($_POST['kgsearch'])) {
               $kgsearch = $_POST['kgsearch'];
-              $sizeinfostmt2 = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country' AND kg='$kgsearch' AND remark NOT LIKE '%packing%'");
+              $sizeinfostmt2 = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country'AND fish_type='$fish_type' AND kg='$kgsearch' AND remark NOT LIKE '%packing%'");
               $sizeinfostmt2->execute();
               $sizeinfodatas = $sizeinfostmt2->fetchall();
             } else {
-              $sizeinfostmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country' AND remark NOT LIKE '%packing%'");
+              $sizeinfostmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country' AND fish_type='$fish_type' AND remark NOT LIKE '%packing%'");
               $sizeinfostmt->execute();
               $sizeinfodatas = $sizeinfostmt->fetchall();
             }
@@ -240,7 +244,7 @@ $bootstrap->css();
                       <h1 class="modal-title fs-5">Update Data</h1>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form action="" method="post">
+                    <form action="hhkmc_stock_info.php?sizeinfo=3up&commondity=1031&country=Canfish_type=Scaless" method="post">
                       <input type="hidden" name="upid" value="<?php echo $sizeinfodata['id']; ?>">
                       <div class="modal-body">
                         <div class="row">
@@ -269,14 +273,15 @@ $bootstrap->css();
                               </div>
                               <div class="col ms-2">
                                 <select name="newfish_type" id="commondityid3" class="form-control inpv2">
-                                  <option value="G">G</option>
-                                  <option value="egg">egg</option>
-                                  <option value="ggs">ggs</option>
-                                  <option value="fillet">fillet</option>
-                                  <option value="W">W</option>
-                                  <option value="Cut_piece">Cut Piece</option>
-                                  <option value="Scaless">Scaless</option>
-                                  <option value="Bls">Bl's</option>
+                                  <option value="G" <?php if ($sizeinfodata['fish_type'] == 'G') { echo "selected"; } ?>>G</option>
+                                  <option value="egg" <?php if ($sizeinfodata['fish_type'] == 'egg') { echo "selected"; } ?>>egg</option>
+                                  <option value="ggs" <?php if ($sizeinfodata['fish_type'] == 'ggs') { echo "selected"; } ?>>ggs</option>
+                                  <option value="fillet"<?php if ($sizeinfodata['fish_type'] == 'fillet') { echo "selected"; } ?>>fillet</option>
+                                  <option value="W"<?php if ($sizeinfodata['fish_type'] == 'W') { echo "selected"; } ?>>W</option>
+                                  <option value="Cut_piece"<?php if ($sizeinfodata['fish_type'] == 'Cut_piece') { echo "selected"; } ?>>Cut Piece</option>
+                                  <option value="Scaless"<?php if ($sizeinfodata['fish_type'] == 'Scaless') { echo "selected"; } ?>>Scaless</option>
+                                  <option value="Bls"<?php if ($sizeinfodata['fish_type'] == 'Bls') { echo "selected"; } ?>>Bl's</option>
+                                  <option value="iqf"<?php if ($sizeinfodata['fish_type'] == 'iqf') { echo "selected"; } ?>>IQF</option>
                                 </select>
                               </div>
                             </div>
