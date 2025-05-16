@@ -49,6 +49,7 @@ $bootstrap->css();
     $newparticular = $_POST['newparticular'];
     $newcommondity_id = $_POST['newcommondity_id'];
     $newfish_type = $_POST['newfish_type'];
+
     $newsize = $_POST['newsize'];
     $newkg = $_POST['newkg'];
     $newmc = $_POST['newmc'];
@@ -78,9 +79,8 @@ $bootstrap->css();
             $size = $_GET['sizeinfo'];
             $commondity_id = $_GET['commondity'];
             $country = $_GET['country'];
-            if (!empty($_GET['fish_type'])) {
-              $fish_type = $_GET['fish_type'];
-            }
+            $fish_type = $_GET['fish_type'];
+
             $kgstmt = $pdo->prepare("SELECT DISTINCT kg FROM hhkmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country' AND fish_type='$fish_type'");
             $kgstmt->execute();
             $kgdatas = $kgstmt->fetchall();
@@ -244,7 +244,7 @@ $bootstrap->css();
                       <h1 class="modal-title fs-5">Update Data</h1>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form action="hhkmc_stock_info.php?sizeinfo=3up&commondity=1031&country=Canfish_type=Scaless" method="post">
+                    <form action="" method="post">
                       <input type="hidden" name="upid" value="<?php echo $sizeinfodata['id']; ?>">
                       <div class="modal-body">
                         <div class="row">

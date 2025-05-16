@@ -763,7 +763,7 @@ class Query
         }
       }
     }
-    echo "<script>window.location.href=\"?sizeinfo=$newsize&commondity=$newcommondity_id&country=$newcountry\"</script>";
+    echo "<script>window.location.href=\"?sizeinfo=$newsize&commondity=$newcommondity_id&country=$newcountry\&fish_type=$newfish_type\"</script>";
   }
 
 
@@ -3043,33 +3043,33 @@ class Query
 
     if (!empty($hhkmcdata['balance_mc'])) {
       $balance_mc = $hhkmcdata['balance_mc'] - $transfermc;
-    } else {
-      $balance_mc = 0 - $transfermc;
-    }
-    $transfermcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, fish_type, size, kg, mc, balance_mc) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transferfish_type', '$transfersize', '$transferkg', '$transfermc', '$balance_mc')");
-    $transfermcstmt->execute();
-
-
-    $gfcmcstmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE kg='$transferkg' AND size='$transfersize' AND commondity_id='$transfercommondity_id' AND fish_type='$transferfish_type' AND country='$transfercountry' ORDER BY id DESC");
-    $gfcmcstmt->execute();
-    $gfcmcdata = $gfcmcstmt->fetch(PDO::FETCH_ASSOC);
-
-    $hhk_idstmt = $pdo->prepare("SELECT id FROM hhkmcstock ORDER BY id DESC");
-    $hhk_idstmt->execute();
-    $hhk_id = $hhk_idstmt->fetch(PDO::FETCH_ASSOC);
-    $id = $hhk_id['id'];
-    if (!empty($gfcmcdata)) {
-      $balance_mc_for_gfc = $gfcmcdata['balance_mc'] + $transfermc;
-      $transfertogfcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, fish_type, size, kg, mc, balance_mc, hhk_id) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transferfish_type', '$transfersize', '$transferkg', '$transfermc', '$balance_mc_for_gfc', '$id')");
-      $transfertogfcstmt->execute();
-    } else {
-      $balance_mc_for_gfc = $transfermc;
-      $transfertogfcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, fish_type, size, kg, mc, balance_mc, hhk_id) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transferfish_type', '$transfersize', '$transferkg', '$transfermc', '$balance_mc_for_gfc', '$id')");
-      $transfertogfcstmt->execute();
-    }
-
-    if (!empty($transfermcstmt)) {
-      echo '<script>swal("Success!", "Transfered Successfully!", "success");</script>';
+      $transfermcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, fish_type, size, kg, mc, balance_mc) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transferfish_type', '$transfersize', '$transferkg', '$transfermc', '$balance_mc')");
+      $transfermcstmt->execute();
+  
+  
+      $gfcmcstmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE kg='$transferkg' AND size='$transfersize' AND commondity_id='$transfercommondity_id' AND fish_type='$transferfish_type' AND country='$transfercountry' ORDER BY id DESC");
+      $gfcmcstmt->execute();
+      $gfcmcdata = $gfcmcstmt->fetch(PDO::FETCH_ASSOC);
+  
+      $hhk_idstmt = $pdo->prepare("SELECT id FROM hhkmcstock ORDER BY id DESC");
+      $hhk_idstmt->execute();
+      $hhk_id = $hhk_idstmt->fetch(PDO::FETCH_ASSOC);
+      $id = $hhk_id['id'];
+      if (!empty($gfcmcdata)) {
+        $balance_mc_for_gfc = $gfcmcdata['balance_mc'] + $transfermc;
+        $transfertogfcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, fish_type, size, kg, mc, balance_mc, hhk_id) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transferfish_type', '$transfersize', '$transferkg', '$transfermc', '$balance_mc_for_gfc', '$id')");
+        $transfertogfcstmt->execute();
+      } else {
+        $balance_mc_for_gfc = $transfermc;
+        $transfertogfcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, fish_type, size, kg, mc, balance_mc, hhk_id) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transferfish_type', '$transfersize', '$transferkg', '$transfermc', '$balance_mc_for_gfc', '$id')");
+        $transfertogfcstmt->execute();
+      }
+  
+      if (!empty($transfermcstmt)) {
+        echo '<script>swal("Success!", "Transfered Successfully!", "success");</script>';
+      }
+    }else{
+      echo '<script>swal("Error!", "Invalid Data", "error");</script>';
     }
   }
 

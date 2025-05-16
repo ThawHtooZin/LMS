@@ -165,52 +165,45 @@ $bootstrap->css();
                 $size = $gfcstockdata['size'];
                 $kg = $gfcstockdata['kg'];
                 $commondity_id = $gfcstockdata['commondity_id'];
+                $fish_type = $gfcstockdata['fish_type'];
                 $sizestmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE size=:size ORDER BY id DESC");
                 $sizestmt->execute(
                  array(':size'=>$size)
                 );
                 $sizedata = $sizestmt->fetch(PDO::FETCH_ASSOC);
-                // IN
-                $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND particular='HHK to GFC'");
-                $totalmcstmt->execute(
+                // IN (hhk)
+                $totalmcfromhhkstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%GFC%'");
+                $totalmcfromhhkstmt->execute(
                  array(':size'=>$size)
                 );
-                $totalmcnotsub = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
-
-                // Ship
-                $totalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND particular='ship'");
-                $totalmcsubnumstmt->execute(
+                $totalmcfromhhk = $totalmcfromhhkstmt->fetch(PDO::FETCH_ASSOC);
+                // Ship (export)
+                $totalmcexportstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%ship%'");
+                $totalmcexportstmt->execute(
                  array(':size'=>$size)
                 );
-                $totalmcsubnum = $totalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
+                $totalmcexport = $totalmcexportstmt->fetch(PDO::FETCH_ASSOC);
 
                 // Balance
-                $totalbalancemcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND particular LIKE '%balance%' ");
-                $totalbalancemcsubnumstmt->execute(
+                $totalmcbalancestmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%balance%' ");
+                $totalmcbalancestmt->execute(
                  array(':size'=>$size)
                 );
-                $totalbalancemcsubnum = $totalbalancemcsubnumstmt->fetch(PDO::FETCH_ASSOC);
+                $totalmcbalance = $totalmcbalancestmt->fetch(PDO::FETCH_ASSOC);
 
-                // if($gfcstockdata['particular'] == 'balance' || $gfcstockdata['particular'] == 'Balance' && $totalmcnotsub['total_mc'] != 0){
-                //   $totalmc = $totalmcsubnum['total_mc'];
-                // }else{
-                //   echo $gfcstockdata['particular'];
-                //   echo $totalmcnotsub['total_mc'];
-                // }
                 if (str_contains($gfcstockdata['particular'], 'balance')) {
                   $totalmc = $totalmcsubnum['total_mc'];
                 }
-                $totalmc = $totalmcnotsub['total_mc'] - $totalmcsubnum['total_mc'] + $totalbalancemcsubnum['total_mc'];
-
-                // Balance
-                $totalbalanceoutstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND particular LIKE '%out%' ");
-                $totalbalanceoutstmt->execute(
+                // take out
+                $totaltakeoutstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%out%' ");
+                $totaltakeoutstmt->execute(
                  array(':size'=>$size)
                 );
-                $totalbalanceout = $totalbalanceoutstmt->fetch(PDO::FETCH_ASSOC);
+                $totaltakeout = $totaltakeoutstmt->fetch(PDO::FETCH_ASSOC);
 
-                $totalmc = $totalmc - $totalbalanceout['total_mc'];
-              ?>
+                $totalmc = ($totalmcfromhhk['total_mc'] + $totalmcbalance['total_mc']) - $totalmcexport['total_mc'];
+
+                ?>
                 <tr style="<?php if ($totalmc > 200) {
                               echo 'background-color:rgba(0, 255, 0, 0.4) !important;';
                             } ?>">

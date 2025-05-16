@@ -31,10 +31,10 @@ $bootstrap->css();
     if (str_contains($particular, 'balance') || str_contains($particular, 'Balance')) {
       $commondity_id = $_POST['commondity_id2'];
       $fish_type = $_POST['fish_type2'];
-      $country = $_POST['country2'];
+      $country = $_POST['balance_country'];
     } else {
       $commondity_id = $_POST['commondity_id1'];
-      $fish_type = $_POST['fish_type1'];
+      $fish_type = $_POST['fish_type'];
       $country = $_POST['country'];
     }
     $size = $_POST['size'];
@@ -305,7 +305,9 @@ $bootstrap->css();
                               </select>
                             </div>
                             <div class="col">
-                              <select name="fish_type1" id="commondityid3" class="form-control inpv2">
+                              <select name="fish_type" id="commondityid3" class="form-control inpv2">
+                                <option value="G">Hello</option>
+                                <option value="G">World</option>
                                 <option value="G">G</option>
                                 <option value="egg">egg</option>
                                 <option value="ggs">ggs</option>
@@ -373,7 +375,7 @@ $bootstrap->css();
                             }
                             ?>
                           </select>
-                          <input type="text" name="country2" id="country2" class="hide form-control inpv2" value="<?php if (!empty($_SESSION['country'])) {
+                          <input type="text" name="balance_country" id="country2" class="hide form-control inpv2" value="<?php if (!empty($_SESSION['country'])) {
                                                                                                                     echo $_SESSION['country'];
                                                                                                                   } ?>">
                         </div>
@@ -461,7 +463,7 @@ $bootstrap->css();
                     </select>
                   </div>
                   <div class="col">
-                    <select name="fish_type2" class="form-control inpv2">
+                    <select name="fish_type" class="form-control inpv2">
                       <option value="G">G</option>
                       <option value="egg">egg</option>
                       <option value="ggs">ggs</option>
