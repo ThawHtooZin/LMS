@@ -33,7 +33,7 @@ $bootstrap->css();
     <div class="contentcol" id="content">
       <?php require 'navbar.php'; ?>
       <div class="card">
-        <form class="" action="" method="post">
+        <form action="" method="post">
           <div class="card-header bg-success">
             <?php
               $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM hhkmcstock WHERE country IS NOT NULL
@@ -56,11 +56,11 @@ $bootstrap->css();
               $searchfish_typestmt->execute();
               $searchfish_typedatas = $searchfish_typestmt->fetchall();
               foreach ($searchfish_typedatas as $searchfish_typedata) {
-              ?>
+                ?>
               <option value="<?php echo $searchfish_typedata['fish_type']; ?>"><?php echo $searchfish_typedata['fish_type']; ?></option>
               <?php  
                 }
-              ?>
+                ?>
             </select>
             <select class="form-control d-inline float-end me-2" style="height:26px; width:170px; padding-left:10px; padding-top:2px;" name="commondity_id">
               <option value="">View Each Commondity</option>
@@ -75,14 +75,13 @@ $bootstrap->css();
               foreach ($searchcommonditydatas as $searchcommonditydata) {
                 $item_id = $searchcommonditydata['commondity_id'];
                 $commonditydata = $query->select('item', $item_id, 'item_id');
-              ?>
+                ?>
                 <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
-              <?php
+                <?php
               }
               ?>
             </select>
-            <?php
-            ?>
+            <button type="button" name="date" class="btn btn-warning text-dark btn-sm float-end me-3" data-bs-toggle="modal" data-bs-target="#datesearch">Date Search</button>
           </div>
         </form>
         <div class="card-body">
@@ -142,10 +141,19 @@ $bootstrap->css();
                                                         ");
                 $hhkmcstockcommonditystmt->execute();
                 $hhkmcstockcommonditydatas = $hhkmcstockcommonditystmt->rowCount();
-              } else {
+              } elseif (isset($_POST['searchbtn']) && !empty($_POST['datefrom']) && !empty($_POST['dateto'])) {
+                $datefrom = $_POST['datefrom'];
+                $dateto = $_POST['dateto'];
+                $hhkmcstockcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country = '$country' AND date BETWEEN '$datefrom' AND '$dateto'
+                UNION
+                SELECT DISTINCT commondity_id FROM gfcmcstock WHERE country = '$country'
+                                                        ");
+                $hhkmcstockcommonditystmt->execute();
+                $hhkmcstockcommonditydatas = $hhkmcstockcommonditystmt->rowCount();
+              }else {
                 $hhkmcstockcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country = '$country'
                 UNION
-                SELECT DISTINCT commondity_id FROM gfcmcstock WHERE country = '$country';
+                SELECT DISTINCT commondity_id FROM gfcmcstock WHERE country = '$country'
                 ");
                 $hhkmcstockcommonditystmt->execute();
                 $hhkmcstockcommonditydatas = $hhkmcstockcommonditystmt->rowCount();
@@ -338,6 +346,45 @@ $bootstrap->css();
             </table>
             <?php
             ?>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Date Modal -->
+
+  <div class="modal fade" id="datesearch">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-light">
+          <h1 class="modal-title fs-5">Report With Date</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="stockreport.php" method="post">
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-3 pt-2 ps-5">
+                  <label for="">Date From : </label>
+                </div>
+                <div class="col-9">
+                  <input type="date" name="datefrom" class="form-control inpv2 mb-3 mt-1">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-3 pt-2 ps-5">
+                  <label for="">Date To : </label>
+                </div>
+                <div class="col-9">
+                  <input type="date" name="dateto" class="form-control inpv2 mt-1">
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-success" name="searchbtn">Search</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
