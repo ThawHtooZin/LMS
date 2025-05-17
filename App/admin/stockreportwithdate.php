@@ -28,6 +28,22 @@ $bootstrap->css();
     <div class="sidebarcol" id="sidebar">
       <?php
       include 'sidebar.php';
+
+      if(isset($_POST['clear'])){
+          unset($_SESSION['country']);
+          unset($_SESSION['datefrom']);
+          unset($_SESSION['dateto']);
+        }
+
+        if (isset($_POST['searchdatebtn']) && !empty($_POST['datefrom']) && !empty($_POST['dateto']) && !empty($_POST['country'])) {
+                $datefrom = $_POST['datefrom'];
+                $dateto = $_POST['dateto'];
+                $country = $_POST['country'];
+                $_SESSION['country'] = $country;
+                $_SESSION['datefrom'] = $datefrom;
+                $_SESSION['dateto'] = $dateto;
+        }
+        
       ?>
     </div>
     <div class="contentcol" id="content">
@@ -45,29 +61,38 @@ $bootstrap->css();
             ?>
             <h4 style="font-weight:bold;" class="text-light d-inline">Mc Reports With Date</h4>
             <a href="stockreport.php" class="btn btn-danger btn-sm float-end ms-2">Back</a>
-            <a href="export.php?table_name=mcstockreport" class="btn btn-primary btn-sm float-end ms-2">Excel Report</a>
-            <button type="button" name="date" class="btn btn-secondary text-light btn-sm float-end me-1" data-bs-toggle="modal" data-bs-target="#datesearch">Filter With Date</button>
+            <?php 
+            if (isset($_POST['searchdatebtn']) && !empty($_POST['datefrom']) && !empty($_POST['dateto']) && !empty($_POST['country'])) {
+             ?>
+            <a href="export.php?table_name=mcstockreportwithdate&country=<?php echo $_SESSION['country']; ?>&datefrom=<?php echo $_SESSION['datefrom']; ?>&dateto=<?php echo $_SESSION['dateto']; ?>" class="btn btn-primary btn-sm float-end ms-2">Excel Report</a>
+             <?php   
+            }
+            ?>
+            <button type="submit" name="clear" class="btn btn-danger text-light btn-sm float-end">Clear</button>
+            <button type="button" name="date" class="btn btn-secondary text-light btn-sm float-end me-2" data-bs-toggle="modal" data-bs-target="#datesearch">Filter With Date</button>
           </div>
         </form>
         <div class="card-body">
-          <?php
+        <?php            
+        if (isset($_SESSION['country']) && $_SESSION['country'] != '' && $_SESSION['datefrom'] != '' && $_SESSION['dateto'] != '') {
+            ?>
+            <div class="row">
+              <div class="col text-center">
+                <h5><?php echo $_SESSION['country'] . " - Stock"; ?></h5>
+              </div>
+              <div class="col text-center">
+                <span class="h5 me-5">From : <?php echo date('d-m-Y', strtotime($_SESSION['datefrom'])); ?></span>
+                <span class="h5">To : <?php echo date('d-m-Y', strtotime($_SESSION['dateto'])); ?></span>
+              </div>
+            </div>
+            <?php
+          }
           ?>
-          
           <hr>
-          <?php
-          foreach ($countrydatas as $countrydata) {
-
-            $country = $countrydata['country'];
-
-            $hhkmcstockkgstmt = $pdo->prepare("SELECT commondity_id FROM hhkmcstock WHERE country='$country'");
-            $hhkmcstockkgstmt->execute();
-            $hhkmcstockkgdatas = $hhkmcstockkgstmt->fetchall();
-          ?>
-            <table class="table table-hover table-bordered table-striped hide" id="<?php echo $countrydata['country']; ?>table">
+            <table class="table table-hover table-bordered table-striped" id="table">
               <tr class="text-center">
                 <th rowspan="2" style="padding-top:30px;">No</th>
                 <th rowspan="2" style="padding-top:30px;">Fish Name</th>
-                <th rowspan="2" style="padding-top:30px;">Country</th>
                 <th rowspan="2" style="padding-top:30px;">Size</th>
                 <th rowspan="2" style="padding-top:30px;">Kg</th>
                 <th>HHK</th>
@@ -81,9 +106,11 @@ $bootstrap->css();
               </tr>
               <?php
               $id = 0;
-              if (isset($_POST['searchdatebtn']) && !empty($_POST['datefrom']) && !empty($_POST['dateto'])) {
-                $datefrom = $_POST['datefrom'];
-                $dateto = $_POST['dateto'];
+              if (isset($_SESSION['country']) && $_SESSION['country'] != '' && $_SESSION['datefrom'] != '' && $_SESSION['dateto'] != '') {
+                
+                $country = $_SESSION['country'];
+                $datefrom = $_SESSION['datefrom'];
+                $dateto = $_SESSION['dateto'];
 
                 $hhkmcstockcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country = '$country' AND date BETWEEN '$datefrom' AND '$dateto'
                 UNION
@@ -92,21 +119,13 @@ $bootstrap->css();
                 $hhkmcstockcommonditystmt->execute();
                 $hhkmcstockcommonditydatas = $hhkmcstockcommonditystmt->rowCount();
 
-              }else {
-                $hhkmcstockcommonditydatas = [];
-              }
-
-              for ($i = 0; $i < $hhkmcstockcommonditydatas; $i++) {
+                for ($i = 0; $i < $hhkmcstockcommonditydatas; $i++) {
                 $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country = '$country' AND remark NOT LIKE '%packing%'                UNION
                 SELECT DISTINCT commondity_id FROM gfcmcstock WHERE country = '$country' AND remark NOT LIKE '%packing%'");
                 $commonditystmt->execute();
                 $commonditydata = $commonditystmt->fetchall();
                 $commondity_id = $commonditydata[$i]['commondity_id'];
                 
-                if (isset($_POST['searchdatebtn']) && !empty($_POST['datefrom']) && !empty($_POST['dateto'])) {
-                  $datefrom = $_POST['datefrom'];
-                  $dateto = $_POST['dateto'];
-
                   $stmt = $pdo->prepare("SELECT 
                                           id, 
                                           commondity_id,
@@ -136,9 +155,6 @@ $bootstrap->css();
                                       ");
                   $stmt->execute();
                   $datas = $stmt->fetchall();
-                }else {
-                  $datas = [];
-                }
 
                 $totalgfcmc = 0;
                 $totalhhkmc = 0;
@@ -185,9 +201,6 @@ $bootstrap->css();
                     <td><?php if (empty($lastcommondity)) {
                           echo $commonditydata['item_name'] . "(" . $hhkdata['fish_type'] . ")";
                         } ?></td>
-                    <td><?php if (empty($lastcommondity)) {
-                          echo $country;
-                        } ?></td>
                     <td><?php if (empty($checklastavaliable)) {
                           echo $size;
                         } ?></td>
@@ -217,7 +230,6 @@ $bootstrap->css();
                   <td style="font-weight: bold;"></td>
                   <td style="font-weight: bold;"></td>
                   <td style="font-weight: bold;"></td>
-                  <td style="font-weight: bold;"></td>
                   <td style="font-weight: bold;"><?php if ($totalgfcmc != 0) {
                                                     echo $totalhhkmc;
                                                   } else {
@@ -239,8 +251,6 @@ $bootstrap->css();
               }
                 ?>
             </table>
-            <?php
-            ?>
         </div>
       </div>
     </div>
@@ -256,7 +266,7 @@ $bootstrap->css();
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form action="stockreport.php" method="post">
+          <form action="stockreportwithdate.php" method="post">
             <div class="modal-body">
               <div class="row">
                 <div class="col-3 pt-2 text-center">
