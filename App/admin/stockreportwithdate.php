@@ -34,7 +34,7 @@ $bootstrap->css();
       <?php require 'navbar.php'; ?>
       <div class="card">
         <form action="" method="post">
-          <div class="card-header bg-success">
+          <div class="card-header bg-info">
             <?php
               $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM hhkmcstock WHERE country IS NOT NULL
               UNION
@@ -43,63 +43,16 @@ $bootstrap->css();
               $countrystmt->execute();
               $countrydatas = $countrystmt->fetchall();
             ?>
-            <h4 style="font-weight:bold;" class="text-light d-inline">Mc Reports</h4>
+            <h4 style="font-weight:bold;" class="text-light d-inline">Mc Reports With Date</h4>
+            <a href="stockreport.php" class="btn btn-danger btn-sm float-end ms-2">Back</a>
             <a href="export.php?table_name=mcstockreport" class="btn btn-primary btn-sm float-end ms-2">Excel Report</a>
-            <button type="submit" name="commonditybtn" class="btn btn-info text-light btn-sm float-end ms-2">View</button>
-            <select name="fish_type" class="form-control d-inline float-end inpv2" style="height:26px; width: 100px; padding-left:10px; padding-top:2px;">
-              <?php
-              $country = $_SESSION['tabs'];
-              $searchfish_typestmt = $pdo->prepare("SELECT DISTINCT fish_type FROM hhkmcstock WHERE country = '$country'
-              UNION
-              SELECT DISTINCT fish_type FROM gfcmcstock WHERE country = '$country'
-              ");
-              $searchfish_typestmt->execute();
-              $searchfish_typedatas = $searchfish_typestmt->fetchall();
-              foreach ($searchfish_typedatas as $searchfish_typedata) {
-                ?>
-              <option value="<?php echo $searchfish_typedata['fish_type']; ?>"><?php echo $searchfish_typedata['fish_type']; ?></option>
-              <?php  
-                }
-                ?>
-            </select>
-            <select class="form-control d-inline float-end me-2" style="height:26px; width:170px; padding-left:10px; padding-top:2px;" name="commondity_id">
-              <option value="">View Each Commondity</option>
-              <?php  
-              $country = $_SESSION['tabs'];
-              $searchcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country = '$country'
-                                                  UNION
-                                                  SELECT DISTINCT commondity_id FROM gfcmcstock WHERE country = '$country'
-                                                ");
-              $searchcommonditystmt->execute();
-              $searchcommonditydatas = $searchcommonditystmt->fetchall();
-              foreach ($searchcommonditydatas as $searchcommonditydata) {
-                $item_id = $searchcommonditydata['commondity_id'];
-                $commonditydata = $query->select('item', $item_id, 'item_id');
-                ?>
-                <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
-                <?php
-              }
-              ?>
-            </select>
-            <a href="stockreportwithdate.php" name="date" class="btn btn-warning text-dark btn-sm float-end me-3">Date Search</a>
+            <button type="button" name="date" class="btn btn-secondary text-light btn-sm float-end me-1" data-bs-toggle="modal" data-bs-target="#datesearch">Filter With Date</button>
           </div>
         </form>
         <div class="card-body">
           <?php
           ?>
-          <form action="" method="post" class="text-center">
-            <?php
-            foreach ($countrydatas as $countrydata) {
-              $btnname = $countrydata['country'] . "btn";
-              if (isset($_POST[$btnname])) {
-                $_SESSION['tabs'] = $countrydata['country'];
-              }
-            ?>
-              <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark rounded <?php echo $countrydata['country']; ?>link" style="text-decoration:none; border:none;" name="<?php echo $btnname; ?>"><?php echo $countrydata['country'] . " Stock"; ?></button>
-            <?php
-            }
-            ?>
-          </form>
+          
           <hr>
           <?php
           foreach ($countrydatas as $countrydata) {
@@ -128,20 +81,7 @@ $bootstrap->css();
               </tr>
               <?php
               $id = 0;
-              if (isset($_POST['commonditybtn']) && !empty($_POST['commondity_id'])) {
-                $searchcommondity = $_POST['commondity_id'];
-                $searchfish_type = $_POST['fish_type'];
-                $hhkmcstockcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id 
-                                                          FROM hhkmcstock 
-                                                          WHERE commondity_id = '$searchcommondity' AND fish_type = '$searchfish_type' AND country = '$country'
-                                                          UNION
-                                                          SELECT DISTINCT commondity_id 
-                                                          FROM gfcmcstock 
-                                                          WHERE commondity_id = '$searchcommondity' AND fish_type = '$searchfish_type' AND country = '$country'
-                                                        ");
-                $hhkmcstockcommonditystmt->execute();
-                $hhkmcstockcommonditydatas = $hhkmcstockcommonditystmt->rowCount();
-              } elseif (isset($_POST['searchdatebtn']) && !empty($_POST['datefrom']) && !empty($_POST['dateto'])) {
+              if (isset($_POST['searchdatebtn']) && !empty($_POST['datefrom']) && !empty($_POST['dateto'])) {
                 $datefrom = $_POST['datefrom'];
                 $dateto = $_POST['dateto'];
 
@@ -153,12 +93,7 @@ $bootstrap->css();
                 $hhkmcstockcommonditydatas = $hhkmcstockcommonditystmt->rowCount();
 
               }else {
-                $hhkmcstockcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country = '$country'
-                UNION
-                SELECT DISTINCT commondity_id FROM gfcmcstock WHERE country = '$country'
-                ");
-                $hhkmcstockcommonditystmt->execute();
-                $hhkmcstockcommonditydatas = $hhkmcstockcommonditystmt->rowCount();
+                $hhkmcstockcommonditydatas = [];
               }
 
               for ($i = 0; $i < $hhkmcstockcommonditydatas; $i++) {
@@ -167,47 +102,8 @@ $bootstrap->css();
                 $commonditystmt->execute();
                 $commonditydata = $commonditystmt->fetchall();
                 $commondity_id = $commonditydata[$i]['commondity_id'];
-                if (isset($_POST['commonditybtn']) && !empty($_POST['commondity_id'])) {
-                  $searchcommondity_id = $_POST['commondity_id'];
-                  $searchfish_type = $_POST['fish_type'];
-
-                  $searchstmt = $pdo->prepare("SELECT 
-                                          id, 
-                                          commondity_id, 
-                                          country, 
-                                          particular, 
-                                          kg,
-                                          size, 
-                                          fish_type 
-                                      FROM (
-                                          SELECT id, commondity_id, country, particular, kg, size, fish_type 
-                                          FROM hhkmcstock 
-                                          WHERE commondity_id = '$searchcommondity_id' 
-                                            AND country = '$country' 
-                                            AND fish_type = '$searchfish_type' 
-                                            AND particular NOT LIKE '%to%' 
-                                            AND remark NOT LIKE '%packing%'
-
-                                          UNION ALL
-
-                                          SELECT id, commondity_id, country, particular, kg, size, fish_type 
-                                          FROM gfcmcstock 
-                                          WHERE commondity_id = '$searchcommondity_id' 
-                                            AND country = '$country' 
-                                            AND fish_type = '$searchfish_type' 
-                                            AND particular NOT LIKE '%to%' 
-                                            AND remark NOT LIKE '%packing%'
-                                      ) AS combined_results
-                                      GROUP BY 
-                                          country, 
-                                          size, 
-                                          kg, 
-                                          fish_type;
-                                              ");
-                  $searchstmt->execute();
-                  $datas = $searchstmt->fetchall();
-
-                }elseif (isset($_POST['searchdatebtn']) && !empty($_POST['datefrom']) && !empty($_POST['dateto'])) {
+                
+                if (isset($_POST['searchdatebtn']) && !empty($_POST['datefrom']) && !empty($_POST['dateto'])) {
                   $datefrom = $_POST['datefrom'];
                   $dateto = $_POST['dateto'];
 
@@ -241,39 +137,7 @@ $bootstrap->css();
                   $stmt->execute();
                   $datas = $stmt->fetchall();
                 }else {
-                  $stmt = $pdo->prepare("SELECT 
-                                          id, 
-                                          commondity_id, 
-                                          country, 
-                                          particular, 
-                                          kg,
-                                          size, 
-                                          fish_type 
-                                      FROM (
-                                          SELECT id, commondity_id, country, particular, kg, size, fish_type 
-                                          FROM hhkmcstock 
-                                          WHERE commondity_id = '$commondity_id' 
-                                            AND country = '$country'
-                                            AND particular NOT LIKE '%to%' 
-                                            AND remark NOT LIKE '%packing%'
-
-                                          UNION ALL
-
-                                          SELECT id, commondity_id, country, particular, kg, size, fish_type 
-                                          FROM gfcmcstock 
-                                          WHERE commondity_id = '$commondity_id' 
-                                            AND country = '$country' 
-                                            AND particular NOT LIKE '%to%' 
-                                            AND remark NOT LIKE '%packing%'
-                                      ) AS combined_results
-                                      GROUP BY 
-                                          country, 
-                                          size, 
-                                          kg, 
-                                          fish_type;
-                                      ");
-                  $stmt->execute();
-                  $datas = $stmt->fetchall();
+                  $datas = [];
                 }
 
                 $totalgfcmc = 0;
@@ -377,6 +241,67 @@ $bootstrap->css();
             </table>
             <?php
             ?>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Date Modal -->
+
+  <div class="modal fade" id="datesearch">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-light">
+          <h1 class="modal-title fs-5">Report With Date</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="stockreport.php" method="post">
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-3 pt-2 text-center">
+                  <label for="">Country :</label>
+                </div>
+                <div class="col-9">
+                  <select name="country" id="" class="form-control mb-3 inpv2">
+                  <?php
+                    $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM hhkmcstock WHERE country IS NOT NULL
+                    UNION
+                    SELECT DISTINCT country FROM gfcmcstock WHERE country IS NOT NULL;
+                    ");
+                    $countrystmt->execute();
+                    $countrydatas = $countrystmt->fetchall();
+                    foreach ($countrydatas as $countrydata) {
+                      ?>
+                      <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
+                      <?php
+                    }
+                  ?>
+                  </select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-3 pt-2 text-center">
+                  <label for="">Date From : </label>
+                </div>
+                <div class="col-9">
+                  <input type="date" name="datefrom" class="form-control inpv2 mb-3 mt-1">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-3 pt-2 text-center">
+                  <label for="">Date To : </label>
+                </div>
+                <div class="col-9">
+                  <input type="date" name="dateto" class="form-control inpv2 mt-1">
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-success" name="searchdatebtn">Search</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
