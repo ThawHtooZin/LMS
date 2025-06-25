@@ -137,7 +137,7 @@ $bootstrap->css();
             ?>
               <tr style="<?php if (str_contains($sizeinfodata['particular'], 'Ship')) {
                             echo 'background-color:rgba(255, 0, 0, 0.3) !important;';
-                          } ?>" data-bs-toggle="<?php if (!str_contains($sizeinfodata['particular'], "GFC")) {
+                          } ?>" data-bs-toggle="<?php if (!str_contains($sizeinfodata['particular'], "HHK") || !str_contains($sizeinfodata['particular'], "hhk")) {
                                                   echo "modal";
                                                 } ?>" data-bs-target="#update<?= $sizeinfodata['id']; ?>">
                 <td><?php echo date('d-m-Y', strtotime($sizeinfodata['date'])); ?></td>

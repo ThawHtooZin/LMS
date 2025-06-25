@@ -5180,7 +5180,7 @@ class Query
     $olddata = $olddatastmt->fetch(PDO::FETCH_ASSOC);
 
     if (!empty($olddata)) {
-      if (str_contains($newparticular, "GFC") || str_contains($newparticular, "gfc")) {
+      if (str_contains($newparticular, "balance") || str_contains($newparticular, "Balance")) {
         $balance_mc = $olddata['balance_mc'] + $newmc;
       } else {
         $balance_mc = $olddata['balance_mc'] - $newmc;
@@ -5202,7 +5202,7 @@ class Query
       $datasstmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id = '$newcommondity_id' AND size = '$newsize' AND kg = '$newkg' AND id < '$id' ORDER BY id DESC");
       $datasstmt->execute();
       $datas = $datasstmt->fetch(PDO::FETCH_ASSOC);
-      if (str_contains($updatedata['particular'], "GFC") || str_contains($updatedata['particular'], "gfc")) {
+      if (str_contains($updatedata['particular'], "Balance") || str_contains($updatedata['particular'], "balance")) {
         $balance_mc = $datas['balance_mc'] + $mc;
       } else {
         $balance_mc = $datas['balance_mc'] - $mc;
