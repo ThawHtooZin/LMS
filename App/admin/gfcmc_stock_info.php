@@ -77,7 +77,8 @@ $bootstrap->css();
             $size = $_GET['sizeinfo'];
             $commondity_id = $_GET['commondity'];
             $country = $_GET['country'];
-            $kgstmt = $pdo->prepare("SELECT DISTINCT kg FROM gfcmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country'");
+            $fish_type = $_GET['fish_type'];
+            $kgstmt = $pdo->prepare("SELECT DISTINCT kg FROM gfcmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country' AND fish_type='$fish_type'");
             $kgstmt->execute();
             $kgdatas = $kgstmt->fetchall();
             ?>
