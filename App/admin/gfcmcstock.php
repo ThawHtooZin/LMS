@@ -178,14 +178,14 @@ $bootstrap->css();
                  array(':size'=>$size)
                 );
                 $totalmcfromhhk = $totalmcfromhhkstmt->fetch(PDO::FETCH_ASSOC);
-                
+
                 // Balance
                 $totalmcbalancestmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%balance%'");
                 $totalmcbalancestmt->execute(
                  array(':size'=>$size)
                 );
                 $totalmcbalance = $totalmcbalancestmt->fetch(PDO::FETCH_ASSOC);
-                
+
                 // Ship (export)
                 $totalmcexportstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%ship%'");
                 $totalmcexportstmt->execute(
@@ -271,7 +271,7 @@ $bootstrap->css();
     <div class="modal-dialog" role="document">
       <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
         <div class="modal-header bg-secondary text-light">
-          <h1 class="modal-title fs-5">Add Data HHEHEHHEH</h1>
+          <h1 class="modal-title fs-5">Add Data</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <form action="gfcmcstock.php" method="post">
