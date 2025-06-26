@@ -136,7 +136,7 @@ $bootstrap->css();
               $item_id = $sizeinfodata['commondity_id'];
               $commonditydata = $query->select('item', $item_id, 'item_id');
             ?>
-              <tr style="<?php if (str_contains($sizeinfodata['particular'], 'Ship')) {
+              <tr style="<?php if (str_contains($sizeinfodata['particular'], 'Ship') || str_contains($sizeinfodata['particular'], 'T/O') || str_contains($sizeinfodata['particular'], 't/o')) {
                             echo 'background-color:rgba(255, 0, 0, 0.3) !important;';
                           } ?>" data-bs-toggle="<?php if (!str_contains($sizeinfodata['particular'], "HHK") || !str_contains($sizeinfodata['particular'], "hhk")) {
                                                   echo "modal";
@@ -233,7 +233,7 @@ $bootstrap->css();
                 <div class="modal-dialog" role="document">
                   <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
                     <div class="modal-header bg-secondary text-light">
-                      <h1 class="modal-title fs-5">Update Data</h1>
+                      <h1 class="modal-title fs-5">Update Datauuuuuuuuuuuuuuuuu</h1>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <form action="" method="post">
@@ -266,14 +266,14 @@ $bootstrap->css();
                                 </div>
                                 <div class="col ms-2">
                                   <select name="newfish_type" id="commondityid3" class="form-control inpv2">
-                                    <option value="G">G</option>
-                                    <option value="egg">egg</option>
-                                    <option value="ggs">ggs</option>
-                                    <option value="fillet">fillet</option>
-                                    <option value="W">W</option>
-                                    <option value="Cut_piece">Cut Piece</option>
-                                    <option value="Scaless">Scaless</option>
-                                    <option value="Bls">Bl's</option>
+                                    <option <?php if($sizeinfodata['fish_type'] == 'G'){ echo "selected"; } ?> value="G">G</option>
+                                    <option <?php if($sizeinfodata['fish_type'] == 'egg'){ echo "selected"; } ?> value="egg">egg</option>
+                                    <option <?php if($sizeinfodata['fish_type'] == 'ggs'){ echo "selected"; } ?> value="ggs">ggs</option>
+                                    <option <?php if($sizeinfodata['fish_type'] == 'fillet'){ echo "selected"; } ?> value="fillet">fillet</option>
+                                    <option <?php if($sizeinfodata['fish_type'] == 'W'){ echo "selected"; } ?> value="W">W</option>
+                                    <option <?php if($sizeinfodata['fish_type'] == 'Cut_piece'){ echo "selected"; } ?> value="Cut_piece">Cut Piece</option>
+                                    <option <?php if($sizeinfodata['fish_type'] == 'Scaless'){ echo "selected"; } ?> value="Scaless">Scaless</option>
+                                    <option <?php if($sizeinfodata['fish_type'] == 'Bls'){ echo "selected"; } ?> value="Bls">Bl's</option>
                                   </select>
                                 </div>
                               </div>

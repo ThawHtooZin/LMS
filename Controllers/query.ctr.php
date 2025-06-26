@@ -3012,7 +3012,7 @@ class Query
   {
     global $pdo;
 
-    $mcstmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE kg=:kg AND size=:size AND commondity_id='$commondity_id' AND country='$country' ORDER BY id DESC");
+    $mcstmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE kg=:kg AND size=:size AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND country='$country' ORDER BY id DESC");
     $mcstmt->execute(
       array(':kg' => $kg, ':size' => $size)
     );
@@ -3077,7 +3077,7 @@ class Query
   {
     global $pdo;
 
-    $gfcmcstmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE kg='$exportkg' AND size='$exportsize' AND commondity_id='$exportcommondity_id' AND country='$exportcountry' ORDER BY id DESC");
+    $gfcmcstmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE kg='$exportkg' AND size='$exportsize' AND commondity_id='$exportcommondity_id' AND fish_type='$exportfish_type' AND country='$exportcountry' ORDER BY id DESC");
     $gfcmcstmt->execute();
     $gfcmcdata = $gfcmcstmt->fetch(PDO::FETCH_ASSOC);
 

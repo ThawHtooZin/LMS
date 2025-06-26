@@ -171,12 +171,21 @@ $bootstrap->css();
                  array(':size'=>$size)
                 );
                 $sizedata = $sizestmt->fetch(PDO::FETCH_ASSOC);
+
                 // IN (hhk)
-                $totalmcfromhhkstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%GFC%'");
+                $totalmcfromhhkstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%HHK%'");
                 $totalmcfromhhkstmt->execute(
                  array(':size'=>$size)
                 );
                 $totalmcfromhhk = $totalmcfromhhkstmt->fetch(PDO::FETCH_ASSOC);
+                
+                // Balance
+                $totalmcbalancestmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%balance%'");
+                $totalmcbalancestmt->execute(
+                 array(':size'=>$size)
+                );
+                $totalmcbalance = $totalmcbalancestmt->fetch(PDO::FETCH_ASSOC);
+                
                 // Ship (export)
                 $totalmcexportstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%ship%'");
                 $totalmcexportstmt->execute(
@@ -184,24 +193,21 @@ $bootstrap->css();
                 );
                 $totalmcexport = $totalmcexportstmt->fetch(PDO::FETCH_ASSOC);
 
-                // Balance
-                $totalmcbalancestmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%balance%' ");
-                $totalmcbalancestmt->execute(
-                 array(':size'=>$size)
-                );
-                $totalmcbalance = $totalmcbalancestmt->fetch(PDO::FETCH_ASSOC);
-
-                if (str_contains($gfcstockdata['particular'], 'balance')) {
-                  $totalmc = $totalmcsubnum['total_mc'];
-                }
                 // take out
-                $totaltakeoutstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%out%' ");
+                $totaltakeoutstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%t/o%'");
                 $totaltakeoutstmt->execute(
                  array(':size'=>$size)
                 );
                 $totaltakeout = $totaltakeoutstmt->fetch(PDO::FETCH_ASSOC);
 
-                $totalmc = ($totalmcfromhhk['total_mc'] + $totalmcbalance['total_mc']) - $totalmcexport['total_mc'];
+                // // Repacking Out (T/o)
+                // $totalrepackingoutstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%t/o%'");
+                // $totalrepackingoutstmt->execute(
+                //  array(':size'=>$size)
+                // );
+                // $totalrepackingout = $totalrepackingoutstmt->fetch(PDO::FETCH_ASSOC);
+
+                $totalmc = ($totalmcfromhhk['total_mc'] + $totalmcbalance['total_mc']) - ($totalmcexport['total_mc'] + $totaltakeout['total_mc']);
 
                 ?>
                 <tr style="<?php if ($totalmc > 200) {
@@ -265,7 +271,7 @@ $bootstrap->css();
     <div class="modal-dialog" role="document">
       <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
         <div class="modal-header bg-secondary text-light">
-          <h1 class="modal-title fs-5">Add Data</h1>
+          <h1 class="modal-title fs-5">Add Data HHEHEHHEH</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <form action="gfcmcstock.php" method="post">
