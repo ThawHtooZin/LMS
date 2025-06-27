@@ -123,11 +123,11 @@ $bootstrap->css();
 
             if (isset($_POST['view']) && !empty($_POST['kgsearch'])) {
               $kgsearch = $_POST['kgsearch'];
-              $sizeinfostmt2 = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country' AND kg='$kgsearch'");
+              $sizeinfostmt2 = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country' AND kg='$kgsearch' AND fish_type='$fish_type'");
               $sizeinfostmt2->execute();
               $sizeinfodatas = $sizeinfostmt2->fetchall();
             } else {
-              $sizeinfostmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country'");
+              $sizeinfostmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country' AND fish_type='$fish_type'");
               $sizeinfostmt->execute();
               $sizeinfodatas = $sizeinfostmt->fetchall();
             }

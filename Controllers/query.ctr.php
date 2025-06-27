@@ -5175,15 +5175,18 @@ class Query
   {
     global $pdo;
 
-    $olddatastmt = $pdo->prepare("SELECT balance_mc FROM gfcmcstock WHERE commondity_id='$newcommondity_id' AND size='$newsize' AND kg='$newkg' AND id < '$updateid' ORDER BY id DESC");
+    $olddatastmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id='$newcommondity_id' AND fish_type='$newfish_type' AND country='$newcountry' AND size='$newsize' AND kg='$newkg' AND id < '$updateid' ORDER BY id DESC");
     $olddatastmt->execute();
     $olddata = $olddatastmt->fetch(PDO::FETCH_ASSOC);
-
+    // print_r($olddata);
+    // echo "<br>";
+    // echo $updateid;
+    // die();
     if (!empty($olddata)) {
-      if (str_contains($newparticular, "balance") || str_contains($newparticular, "Balance")) {
-        $balance_mc = $olddata['balance_mc'] + $newmc;
-      } else {
+      if (str_contains($newparticular, "ship") || str_contains($newparticular, "Ship") || str_contains($newparticular, "t/o") || str_contains($newparticular, "T/O") || str_contains($newparticular, "T/o")) {
         $balance_mc = $olddata['balance_mc'] - $newmc;
+      } else {
+        $balance_mc = $olddata['balance_mc'] + $newmc;
       }
     } else {
       $balance_mc = $newmc;
@@ -5192,20 +5195,22 @@ class Query
     $stmt = $pdo->prepare("UPDATE gfcmcstock SET date='$newdate', particular='$newparticular', commondity_id='$newcommondity_id', fish_type='$newfish_type', size='$newsize', kg='$newkg', mc='$newmc', country='$newcountry', balance_mc='$balance_mc' WHERE id='$updateid'");
     $stmt->execute();
 
-    $updatedatastmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id = '$newcommondity_id' AND size = '$newsize' AND kg='$newkg' AND id > '$updateid'");
+    $updatedatastmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id='$newcommondity_id' AND fish_type='$newfish_type' AND country='$newcountry' AND size='$newsize' AND kg='$newkg' AND id > '$updateid'");
     $updatedatastmt->execute();
     $updatedatas = $updatedatastmt->fetchAll();
     //update gfcmc for more rows
     foreach ($updatedatas as $updatedata) {
       $id = $updatedata['id'];
       $mc = $updatedata['mc'];
-      $datasstmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id = '$newcommondity_id' AND size = '$newsize' AND kg = '$newkg' AND id < '$id' ORDER BY id DESC");
+      $particular = $updatedata['particular'];
+
+      $datasstmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id = '$newcommondity_id' AND fish_type='$newfish_type' AND country='$newcountry' AND size = '$newsize' AND kg = '$newkg' AND id < '$id' ORDER BY id DESC");
       $datasstmt->execute();
       $datas = $datasstmt->fetch(PDO::FETCH_ASSOC);
-      if (str_contains($updatedata['particular'], "Balance") || str_contains($updatedata['particular'], "balance")) {
-        $balance_mc = $datas['balance_mc'] + $mc;
-      } else {
+      if (str_contains($particular, "ship") || str_contains($particular, "Ship") || str_contains($particular, "t/o") || str_contains($particular, "T/O") || str_contains($particular, "T/o")) {
         $balance_mc = $datas['balance_mc'] - $mc;
+      } else {
+        $balance_mc = $datas['balance_mc'] + $mc;
       }
 
       $updatestmt = $pdo->prepare("UPDATE gfcmcstock SET balance_mc='$balance_mc' WHERE id='$id'");

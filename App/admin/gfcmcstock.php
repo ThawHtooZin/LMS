@@ -172,12 +172,12 @@ $bootstrap->css();
                 );
                 $sizedata = $sizestmt->fetch(PDO::FETCH_ASSOC);
 
-                // IN (hhk)
-                $totalmcfromhhkstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%HHK%'");
-                $totalmcfromhhkstmt->execute(
+                // IN (HHK, NT, others)
+                $totalmcreceivestmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%to%'");
+                $totalmcreceivestmt->execute(
                  array(':size'=>$size)
                 );
-                $totalmcfromhhk = $totalmcfromhhkstmt->fetch(PDO::FETCH_ASSOC);
+                $totalmcreceive = $totalmcreceivestmt->fetch(PDO::FETCH_ASSOC);
 
                 // Balance
                 $totalmcbalancestmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%balance%'");
@@ -185,7 +185,7 @@ $bootstrap->css();
                  array(':size'=>$size)
                 );
                 $totalmcbalance = $totalmcbalancestmt->fetch(PDO::FETCH_ASSOC);
-
+                
                 // Ship (export)
                 $totalmcexportstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%ship%'");
                 $totalmcexportstmt->execute(
@@ -207,7 +207,7 @@ $bootstrap->css();
                 // );
                 // $totalrepackingout = $totalrepackingoutstmt->fetch(PDO::FETCH_ASSOC);
 
-                $totalmc = ($totalmcfromhhk['total_mc'] + $totalmcbalance['total_mc']) - ($totalmcexport['total_mc'] + $totaltakeout['total_mc']);
+                $totalmc = ($totalmcreceive['total_mc'] + $totalmcbalance['total_mc']) - ($totalmcexport['total_mc'] + $totaltakeout['total_mc']);
 
                 ?>
                 <tr style="<?php if ($totalmc > 200) {
