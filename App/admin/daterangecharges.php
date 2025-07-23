@@ -1243,44 +1243,53 @@ $bootstrap->css();
     </div>
   </div>
   <!-- Add Stock Modal -->
-  <script type="text/javascript">
+  <script>
     $(document).ready(() => {
-      var commondity = $("#commondity").val();
-      // alert(commondity);
-      <?php
-      $blockidstmt = $pdo->prepare("SELECT category_id FROM category WHERE category_name='Block'");
-      $blockidstmt->execute();
-      $blockiddata = $blockidstmt->fetch(PDO::FETCH_ASSOC);
-      $blockid = $blockiddata['category_id'];
-      ?>
-      $("#commondity").click(function() {
-        commondityid = $("#commondity").val();
-        $("#processingrate").load('chargescommondity.php', {
-          commondityid: commondityid,
-        });
-        var commondity = $("#commondity").val();
-        if (commondity === '<?php echo $blockid; ?>') {
-          $(".processingratediv").hide();
-          $(".processingchargesdiv").show();
-        } else {
-          $(".processingratediv").show();
-          $(".processingchargesdiv").hide();
-        }
-      });
-      commondityid = $("#commondity").val();
-      $("#processingrate").load('changecommondity.php', {
+    let commondity = $("#commondity").val();
+
+    <?php
+    $blockidstmt = $pdo->prepare("SELECT category_id FROM category WHERE category_name='Block'");
+    $blockidstmt->execute();
+    $blockiddata = $blockidstmt->fetch(PDO::FETCH_ASSOC);
+    $blockid = '';
+    if (!empty($blockiddata['category_id'])) {
+        $blockid = $blockiddata['category_id'];
+    }
+    ?>
+
+    // On change/click of commondity dropdown
+    $("#commondity").click(function () {
+      let commondityid = $("#commondity").val();
+
+      // Load charges dynamically
+      $("#processingrate").load('chargescommondity.php', {
         commondityid: commondityid,
       });
-      if (commondity === '<?php echo $blockid; ?>') {
+
+      // Update UI based on commondity type
+      toggleProcessingVisibility(commondityid);
+    });
+
+    // Initial load
+    let initialCommondityId = $("#commondity").val();
+    $("#processingrate").load('changecommondity.php', {
+      commondityid: initialCommondityId,
+    });
+    toggleProcessingVisibility(initialCommondityId);
+
+    // Reusable function to toggle views
+    function toggleProcessingVisibility(commondityId) {
+      if (commondityId === '<?php echo $blockid; ?>') {
         $(".processingratediv").hide();
         $(".processingchargesdiv").show();
       } else {
         $(".processingratediv").show();
         $(".processingchargesdiv").hide();
       }
-    });
+    }
+  });
   </script>
-  <script type="text/javascript">
+  <script>
     <?php
     if ($_SESSION['tabs'] == "coldstore") {
       echo "showcoldstore();";
@@ -1413,5 +1422,4 @@ $bootstrap->css();
   $bootstrap->javascript();
   ?>
 </body>
-
 </html>
