@@ -2747,10 +2747,10 @@ if ($_GET['table_name'] == "form10frozen") {
   $country = $_GET['country'];
   $searchdate = $_GET['searchdate'];
   $fish_type = $_GET['fish_type'];
-  // header("Content-Type: application/xls");
-  // header("Content-Disposition: attachment; filename=percentage{$searchdate}.xls");
-  // header("Pragma: no-cache");
-  // header("Expires: 0");
+  header("Content-Type: application/xls");
+  header("Content-Disposition: attachment; filename=percentage{$searchdate}.xls");
+  header("Pragma: no-cache");
+  header("Expires: 0");
 ?>
   <table>
     <tr>

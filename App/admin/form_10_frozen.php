@@ -294,8 +294,6 @@ $bootstrap->css();
                 $percentage = $result2 * 100;
               }
 
-
-
               $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date='$searchdate'");
               $form10pcsstmt->execute();
               $form10pcsdata = $form10pcsstmt->fetch(PDO::FETCH_ASSOC);
@@ -359,15 +357,24 @@ $bootstrap->css();
                 <?php
                 if (isset($_POST['view'])) {
                 ?>
-                  <td style="font-weight:bold; <?php if ($percentage != "") {
-                                                  if (strpos(round($percentage, 2), '-') !== false) {
-                                                    echo 'color:red;';
-                                                  }
-                                                } ?>"><?php if ($percentage != "") {
-                                                        echo "+" . round($percentage, 2) . "%";
-                                                      } else {
-                                                        echo '-';
-                                                      } ?></td>
+                  <?php 
+                    if ($percentage != "") {
+                      if(strpos(round($percentage, 2), '-') !== false){
+                        ?>
+                        <!-- Percentage is minus -->
+                          <td style="font-weight:bold; color: red;"><?php echo round($percentage, 2); ?> %</td>
+                        <?php
+                      }else{
+                        ?>
+                        <!-- Percentage is Plus -->
+                          <td style="font-weight:bold;"><?php echo "+" . round($percentage, 2); ?> %</td>
+                        <?php
+                      }
+                    }else{
+                      echo '-';
+                    }
+                  ?>
+                  
                 <?php
                 }
                 ?>
