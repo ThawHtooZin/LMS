@@ -311,10 +311,7 @@ $bootstrap->css();
                   $totalhhkmc += !empty($fetchalldata['balance_mc']) ? $fetchalldata['balance_mc'] : 0;
 
                   ?>
-                  <tr style="text-align:center !important;">
-                    <!-- <tr style="text-align:center !important; <?php if ($fetchalldata['balance_mc'] == 0 && empty($fetchallgfcdata['balance_mc'])) {
-                                                                    echo "display:none;";
-                                                                  } ?>"> -->
+                  <tr style="text-align:center !important; <?php if($fetchalldata['balance_mc'] == 0 && $fetchallgfcdata['balance_mc'] == 0){ echo "display: none !important;"; } ?>">
                     <td><?php if (empty($lastcommondity)) {
                           echo $id;
                         } ?></td>
