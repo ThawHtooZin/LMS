@@ -175,28 +175,28 @@ $bootstrap->css();
                 // IN (HHK, NT, others)
                 $totalmcreceivestmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%to%'");
                 $totalmcreceivestmt->execute(
-                 array(':size'=>$size)
+                  array(':size'=>$size)
                 );
                 $totalmcreceive = $totalmcreceivestmt->fetch(PDO::FETCH_ASSOC);
-
+                
                 // Balance
                 $totalmcbalancestmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%balance%'");
                 $totalmcbalancestmt->execute(
-                 array(':size'=>$size)
+                  array(':size'=>$size)
                 );
                 $totalmcbalance = $totalmcbalancestmt->fetch(PDO::FETCH_ASSOC);
                 
                 // Ship (export)
                 $totalmcexportstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%ship%'");
                 $totalmcexportstmt->execute(
-                 array(':size'=>$size)
+                  array(':size'=>$size)
                 );
                 $totalmcexport = $totalmcexportstmt->fetch(PDO::FETCH_ASSOC);
-
+                
                 // take out
                 $totaltakeoutstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%t/o%'");
                 $totaltakeoutstmt->execute(
-                 array(':size'=>$size)
+                  array(':size'=>$size)
                 );
                 $totaltakeout = $totaltakeoutstmt->fetch(PDO::FETCH_ASSOC);
 

@@ -2808,7 +2808,7 @@ if ($_GET['table_name'] == "form10frozen") {
     // Join the quoted dates with commas
     $datesList = implode(', ', $quotedDates);
 
-    $stmt = $pdo->prepare("SELECT * FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND date IN ($datesList) ORDER BY date");
+    $stmt = $pdo->prepare("SELECT * FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date IN ($datesList) ORDER BY date");
     $stmt->execute();
     $form7datas = $stmt->fetchall();
     foreach ($form7datas as $form7data) {
@@ -2817,16 +2817,17 @@ if ($_GET['table_name'] == "form10frozen") {
       $country = $form7data['country'];
       $size = $form7data['size'];
       $date = $form7data['date'];
+      $fish_type = $form7data['fish_type'];
 
       $commonditydata = $query->select('item', $item_id, 'item_id');
       $supplier_id = $form7data['supplier_name'];
       $supplier_name = $query->select('acname', $supplier_id, 'code_no');
 
-      $form10datastmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$item_id' AND country='$country' AND size='$size' AND date='$searchdate'");
+      $form10datastmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$item_id' AND country='$country' AND size='$size' AND fish_type='$fish_type' AND date='$searchdate'");
       $form10datastmt->execute();
       $form10data = $form10datastmt->fetch(PDO::FETCH_ASSOC);
 
-      $lastcommondity = $pdo->prepare("SELECT * FROM form7stock WHERE id < $lastid AND item_id='$item_id' AND supplier_name='$supplier_id' AND date = '$date'");
+      $lastcommondity = $pdo->prepare("SELECT * FROM form7stock WHERE id < $lastid AND item_id='$item_id' AND supplier_name='$supplier_id' AND fish_type='$fish_type' AND date = '$date'");
       $lastcommondity->execute();
       $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
     ?>
