@@ -200,13 +200,6 @@ $bootstrap->css();
                 );
                 $totaltakeout = $totaltakeoutstmt->fetch(PDO::FETCH_ASSOC);
 
-                // // Repacking Out (T/o)
-                // $totalrepackingoutstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%t/o%'");
-                // $totalrepackingoutstmt->execute(
-                //  array(':size'=>$size)
-                // );
-                // $totalrepackingout = $totalrepackingoutstmt->fetch(PDO::FETCH_ASSOC);
-
                 $totalmc = ($totalmcreceive['total_mc'] + $totalmcbalance['total_mc']) - ($totalmcexport['total_mc'] + $totaltakeout['total_mc']);
 
                 ?>
@@ -350,7 +343,7 @@ $bootstrap->css();
 
   <div class="modal fade" id="export">
     <div class="modal-dialog" role="document">
-      <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
         <div class="modal-header bg-secondary text-light">
           <h1 class="modal-title fs-5">Export Mc</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

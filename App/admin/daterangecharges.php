@@ -26,34 +26,58 @@ $bootstrap->css();
 <body>
   <?php
   if (isset($_POST['add'])) {
-    $indate = $_POST['indate'];
-    $outdate = $_POST['outdate'];
-    $commondity_id = $_POST['commondity_id'];
-    $mc = $_POST['mc'];
-    $kg = $_POST['kg'];
-    $coldstorerate = $_POST['coldstorerate'];
-    $labourrate = $_POST['labourrate'];
-    $processingrate = $_POST['processingrate'];
-    if (empty($_POST['processingcharges'])) {
-      $pcharges = 0;
-    } else {
-      $pcharges = $_POST['processingcharges'];
-    }
-    $mccheckstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE commondity_id='$commondity_id' ORDER BY id DESC");
-    $mccheckstmt->execute();
-    $mccheck = $mccheckstmt->fetch(PDO::FETCH_ASSOC);
-    if (!empty($mc)) {
-      if ($mccheck['total_mc'] >= $mc) {
-        $query->addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $pcharges);
-      } else {
-        echo "<script>swal('Sorry!', 'Mc not enough, Please check the stock and try again', 'warning');</script>";
+    if(empty($_POST['indate']) || empty($_POST['outdate']) || empty($_POST['commondity_id']) || empty($_POST['mc']) || empty($_POST['kg'])) {
+      if(empty($_POST['indate'])){
+        echo "<script>swal('Error!', 'Please select In Date', 'error');</script>";
       }
-    } else {
-      $mc = 0;
-      if ($mccheck['total_mc'] >= $mc) {
-        $query->addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $pcharges);
+      if(empty($_POST['outdate'])){
+        echo "<script>swal('Error!', 'Please select Out Date', 'error');</script>";
+      }
+      if(empty($_POST['commondity_id'])){
+        echo "<script>swal('Error!', 'Please select Commondity', 'error');</script>";
+      }
+      if(empty($_POST['mc'])){
+        echo "<script>swal('Error!', 'Please enter Mc', 'error');</script>";
+      }
+      if(empty($_POST['kg'])){
+        echo "<script>swal('Error!', 'Please enter Kg', 'error');</script>";
+      }
+      if(empty($_POST['coldstorerate'])){
+        echo "<script>swal('Error!', 'Please enter Cold Store Rate', 'error');</script>";
+      }
+      if(empty($_POST['labourrate'])){
+        echo "<script>swal('Error!', 'Please enter Labour Rate', 'error');</script>";
+      }
+    }else{
+      $indate = $_POST['indate'];
+      $outdate = $_POST['outdate'];
+      $commondity_id = $_POST['commondity_id'];
+      $mc = $_POST['mc'];
+      $kg = $_POST['kg'];
+      $coldstorerate = $_POST['coldstorerate'];
+      $labourrate = $_POST['labourrate'];
+      $processingrate = $_POST['processingrate'];
+      if (empty($_POST['processingcharges'])) {
+        $pcharges = 0;
       } else {
-        echo "<script>swal('Sorry!', 'Mc not enough, Please check the stock and try again', 'warning');</script>";
+        $pcharges = $_POST['processingcharges'];
+      }
+      $mccheckstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+      $mccheckstmt->execute();
+      $mccheck = $mccheckstmt->fetch(PDO::FETCH_ASSOC);
+      if (!empty($mc)) {
+        if ($mccheck['total_mc'] >= $mc) {
+          $query->addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $pcharges);
+        } else {
+          echo "<script>swal('Sorry!', 'Mc not enough, Please check the stock and try again', 'error');</script>";
+        }
+      } else {
+        $mc = 0;
+        if ($mccheck['total_mc'] >= $mc) {
+          $query->addcoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $pcharges);
+        } else {
+          echo "<script>swal('Sorry!', 'Mc not enough, Please check the stock and try again', 'error');</script>";
+        }
       }
     }
   }
@@ -77,30 +101,76 @@ $bootstrap->css();
   }
 
   if (isset($_POST['paymentbtn'])) {
-    $payment_date = $_POST['payment_date'];
-    $payment_amount = $_POST['payment_amount'];
-
-    $query->paytotalcharges($payment_date, $payment_amount);
+    if(empty($_POST['payment_date']) || empty($_POST['payment_amount'])) {
+      if(empty($_POST['payment_date'])){
+        echo "<script>swal('Error!', 'Please select Payment Date', 'error');</script>";
+      }
+      if(empty($_POST['payment_amount'])){
+        echo "<script>swal('Error!', 'Please enter Payment Amount', 'error');</script>";
+      }
+    }else{
+      $payment_date = $_POST['payment_date'];
+      $payment_amount = $_POST['payment_amount'];
+  
+      $query->paytotalcharges($payment_date, $payment_amount);
+    }
   }
 
   if (isset($_POST['repackingadd'])) {
-    $date = $_POST['date'];
-    $in_mc = $_POST['in_mc'];
-    $in_kg = $_POST['in_kg'];
-    $out_mc = $_POST['out_mc'];
-    $out_kg = $_POST['out_kg'];
-    $rate = $_POST['rate'];
+    if(empty($_POST['date']) || empty($_POST['in_mc']) || empty($_POST['in_kg']) || empty($_POST['out_mc']) || empty($_POST['out_kg']) || empty($_POST['rate'])) {
+      if(empty($_POST['date'])){
+        echo "<script>swal('Error!', 'Please select Date', 'error');</script>";
+      }
+      if(empty($_POST['in_mc'])){
+        echo "<script>swal('Error!', 'Please enter In Mc', 'error');</script>";
+      }
+      if(empty($_POST['in_kg'])){
+        echo "<script>swal('Error!', 'Please enter In Kg', 'error');</script>";
+      }
+      if(empty($_POST['out_mc'])){
+        echo "<script>swal('Error!', 'Please enter Out Mc', 'error');</script>";
+      }
+      if(empty($_POST['out_kg'])){
+        echo "<script>swal('Error!', 'Please enter Out Kg', 'error');</script>";
+      }
+      if(empty($_POST['rate'])){
+        echo "<script>swal('Error!', 'Please enter Rate', 'error');</script>";
+      }
 
-    $query->addrepacking($date, $in_mc, $in_kg, $out_mc, $out_kg, $rate);
+    }else{
+      $date = $_POST['date'];
+      $in_mc = $_POST['in_mc'];
+      $in_kg = $_POST['in_kg'];
+      $out_mc = $_POST['out_mc'];
+      $out_kg = $_POST['out_kg'];
+      $rate = $_POST['rate'];
+  
+      $query->addrepacking($date, $in_mc, $in_kg, $out_mc, $out_kg, $rate);
+    }
   }
 
   if (isset($_POST['addstockbtn'])) {
-    $indate = $_POST['indate'];
-    $commondity_id = $_POST['commondity_id'];
-    $mc = $_POST['mc'];
-    $kg = $_POST['kg'];
+    if(empty($_POST['indate']) || empty($_POST['commondity_id']) || empty($_POST['mc']) || empty($_POST['kg'])) {
+      if(empty($_POST['indate'])){
+        echo "<script>swal('Error!', 'Please select In Date', 'error');</script>";
+      }
+      if(empty($_POST['commondity_id'])){
+        echo "<script>swal('Error!', 'Please select Commondity', 'error');</script>";
+      }
+      if(empty($_POST['mc'])){
+        echo "<script>swal('Error!', 'Please enter Mc', 'error');</script>";
+      }
+      if(empty($_POST['kg'])){
+        echo "<script>swal('Error!', 'Please enter Kg', 'error');</script>";
+      }
+    }else{
+      $indate = $_POST['indate'];
+      $commondity_id = $_POST['commondity_id'];
+      $mc = $_POST['mc'];
+      $kg = $_POST['kg'];
+      $query->addnewstock($indate, $commondity_id, $mc, $kg);
+    }
 
-    $query->addnewstock($indate, $commondity_id, $mc, $kg);
   }
 
   if (isset($_POST['update'])) {
@@ -280,7 +350,7 @@ $bootstrap->css();
                   <div class="modal fade" id="coldstoreupdatemodal<?php echo $data['id']; ?>">
                     <div class="modal-dialog" role="document">
                       <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
-                        <div class="modal-header bg-warning text-light">
+                        <div class="modal-header bg-error text-light">
                           <h1 class="modal-title fs-5">Update Charges</h1>
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
@@ -1006,7 +1076,7 @@ $bootstrap->css();
                   <div class="modal fade" id="updatebalancekg<?= $hhkstockdata['id']; ?>">
                     <div class="modal-dialog" role="document">
                       <div class="modal-content">
-                        <div class="modal-header bg-warning text-light">
+                        <div class="modal-header bg-error text-light">
                           <h5 class="modal-title">Edit Balance Kg</h5>
                         </div>
                         <div class="modal-body">
