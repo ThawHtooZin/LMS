@@ -1272,7 +1272,7 @@ class Query
       $labourstmt = $pdo->prepare("UPDATE processing SET indate='$indate', outdate='$outdate',commondity_id='$commondity_id', mc='$mc', total_mc='$ptotal_mc', kg='$kg', total_kg='$ptotal_kg', rate='$processingrate', charges='$pcharges', total_charges='$totalprocessingcharges' WHERE id='$updateid'");
       $labourstmt->execute();
     }
-    $stockstmt = $pdo->prepare("UPDATE hhkstock SET indate='$indate', mc='$mc', total_mc='$stotal_mc', kg='$kg', total_kg='$stotal_kg' WHERE link_id='$updateid'");
+    $stockstmt = $pdo->prepare("UPDATE hhkstock SET indate='$indate', outdate='$outdate', mc='$mc', total_mc='$stotal_mc', kg='$kg', total_kg='$stotal_kg' WHERE link_id='$updateid'");
     $stockstmt->execute();
     $totalupdatestmt = $pdo->prepare("UPDATE total_charges SET commondity_id='$commondity_id', total_coldstore_charges='$total_coldstore_charges', total_labour_charges='$total_labour_charges', total_processing_charges='$total_processing_charges', total_charges='$total_charges_of_total' WHERE link_id='$updateid'");
     $totalupdatestmt->execute();
@@ -1928,6 +1928,7 @@ class Query
         $coldstorestmt = $pdo->prepare("INSERT INTO gfcdryfishcoldstore(date, ite, total_kg, rate, charges, total_charges) VALUES('$date', '$ite', '$total_kg', '$drycoldstorerate', '$charges', '$total_charges')");
         $coldstorestmt->execute();
       }
+      
     } else {
       $dryfishcoldstorestmt = $pdo->prepare("SELECT * FROM gfcdryfishcoldstore ORDER BY id DESC");
       $dryfishcoldstorestmt->execute();
@@ -3045,12 +3046,12 @@ class Query
       $balance_mc = $hhkmcdata['balance_mc'] - $transfermc;
       $transfermcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, fish_type, size, kg, mc, balance_mc) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transferfish_type', '$transfersize', '$transferkg', '$transfermc', '$balance_mc')");
       $transfermcstmt->execute();
-  
-  
+
+
       $gfcmcstmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE kg='$transferkg' AND size='$transfersize' AND commondity_id='$transfercommondity_id' AND fish_type='$transferfish_type' AND country='$transfercountry' ORDER BY id DESC");
       $gfcmcstmt->execute();
       $gfcmcdata = $gfcmcstmt->fetch(PDO::FETCH_ASSOC);
-  
+
       $hhk_idstmt = $pdo->prepare("SELECT id FROM hhkmcstock ORDER BY id DESC");
       $hhk_idstmt->execute();
       $hhk_id = $hhk_idstmt->fetch(PDO::FETCH_ASSOC);
@@ -3064,7 +3065,7 @@ class Query
         $transfertogfcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, fish_type, size, kg, mc, balance_mc, hhk_id) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transferfish_type', '$transfersize', '$transferkg', '$transfermc', '$balance_mc_for_gfc', '$id')");
         $transfertogfcstmt->execute();
       }
-  
+
       if (!empty($transfermcstmt)) {
         echo '<script>swal("Success!", "Transfered Successfully!", "success");</script>';
       }
@@ -4902,7 +4903,8 @@ class Query
     $mccheck->execute();
     $totalmc = $mccheck->fetch(PDO::FETCH_ASSOC);
 
-    if ($totalkg['kg'] <= $kg && $totalmc['mc'] <= $mc) {
+    // check mc
+    // if ($totalkg['kg'] <= $kg && $totalmc['mc'] <= $mc) {
       $oldstockstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id < '$updateid' AND commondity_id='$commondity_id' AND outdate='0000-00-00' ORDER BY id DESC");
       $oldstockstmt->execute();
       $oldstockdatas = $oldstockstmt->fetch(PDO::FETCH_ASSOC);
@@ -4932,9 +4934,10 @@ class Query
         $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$totalmc', total_kg='$totalkg' WHERE id='$id'");
         $updatestmt->execute();
       }
-    } else {
-      echo "<script>swal('Warning!', 'out kg and mc is more than changed kg and mc', 'warning');</script>";
-    }
+    // }
+    //  else {
+    //   echo "<script>swal('Warning!', 'out kg and mc is more than changed kg and mc', 'warning');</script>";
+    // }
   }
 
   function deletehhkstock($updateid)

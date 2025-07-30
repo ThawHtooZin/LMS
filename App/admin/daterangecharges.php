@@ -111,7 +111,7 @@ $bootstrap->css();
     }else{
       $payment_date = $_POST['payment_date'];
       $payment_amount = $_POST['payment_amount'];
-  
+
       $query->paytotalcharges($payment_date, $payment_amount);
     }
   }
@@ -144,7 +144,7 @@ $bootstrap->css();
       $out_mc = $_POST['out_mc'];
       $out_kg = $_POST['out_kg'];
       $rate = $_POST['rate'];
-  
+
       $query->addrepacking($date, $in_mc, $in_kg, $out_mc, $out_kg, $rate);
     }
   }
@@ -322,7 +322,7 @@ $bootstrap->css();
                   $commonstmt->execute();
                   $commondata = $commonstmt->fetch(PDO::FETCH_ASSOC);
                 ?>
-                  <!-- <tr style="<?php //if($commonditydata['category_name'] == "IQF"){echo "background-color: #6ef757 !important;";}elseif($commonditydata['category_name'] == "Block"){echo "background-color: #f5764c !important;";}elseif($commonditydata['category_name'] == "Pujanut"){echo "background-color: lightblue !important;";} 
+                  <!-- <tr style="<?php //if($commonditydata['category_name'] == "IQF"){echo "background-color: #6ef757 !important;";}elseif($commonditydata['category_name'] == "Block"){echo "background-color: #f5764c !important;";}elseif($commonditydata['category_name'] == "Pujanut"){echo "background-color: lightblue !important;";}
                                   ?>"> -->
                   <tr>
                     <td><?php echo $idd; ?></td>
@@ -686,6 +686,7 @@ $bootstrap->css();
                 $idd++;
                 $item_id = $total_charges_data['commondity_id'];
                 $commonditydata = $query->select('category', $item_id, 'category_id');
+                
 
                 $nowid = $total_charges_data['id'];
                 $laststmt = $pdo->prepare("SELECT * FROM total_charges WHERE id < '$nowid' ORDER BY id DESC");

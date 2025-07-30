@@ -36,7 +36,7 @@ $query = new Query();
     if(isset($_POST['addfishcharges'])){
       if(empty($_POST['date']) || empty($_POST['ite']) || empty($_POST['mc']) || empty($_POST['kg']) || empty($_POST['coldstorerate']) || empty($_POST['labourrate'])){
         if(empty($_POST['date'])){
-          echo "<script>swal('Error!', 'Please select a date.', 'error');</script>";  
+          echo "<script>swal('Error!', 'Please select a date.', 'error');</script>";
         }
         if(empty($_POST['ite'])){
           echo "<script>swal('Error!', 'Please select I.T.E.', 'error');</script>";
@@ -67,29 +67,29 @@ $query = new Query();
     }
 
     if(isset($_POST['adddryfishcharges'])){
-      if(empty($_POST['date']) || empty($_POST['ite']) || empty($_POST['kg']) || empty($_POST['drycoldstorerate']) || empty($_POST['labourrate'])){
+      if(empty($_POST['date']) || empty($_POST['ite']) || empty($_POST['drycoldstorerate'])){
         if(empty($_POST['date'])){
           echo "<script>swal('Error!', 'Please select a date.', 'error');</script>";
         }
         if(empty($_POST['ite'])){
           echo "<script>swal('Error!', 'Please select I.T.E.', 'error');</script>";
         }
-        if(empty($_POST['kg'])){
-          echo "<script>swal('Error!', 'Please enter Kg.', 'error');</script>";
-        }
+        // if(empty($_POST['kg'])){
+        //   echo "<script>swal('Error!', 'Please enter Kg.', 'error');</script>";
+        // }
         if(empty($_POST['drycoldstorerate'])){
           echo "<script>swal('Error!', 'Please enter Dry Cold Store Rate.', 'error');</script>";
         }
-        if(empty($_POST['labourrate'])){
-          echo "<script>swal('Error!', 'Please enter Labour Rate.', 'error');</script>";
-        }
+        // if(empty($_POST['labourrate'])){
+        //   echo "<script>swal('Error!', 'Please enter Labour Rate.', 'error');</script>";
+        // }
       }else{
         $date = $_POST['date'];
         $ite = $_POST['ite'];
         $kg = $_POST['kg'];
         $drycoldstorerate = $_POST['drycoldstorerate'];
         $labourrate = $_POST['labourrate'];
-        $outkg = $_POST['outkg'];
+        $outkg = $_POST['damagekg'];
         $query->adddryfishcharges($date, $ite, $kg, $drycoldstorerate, $labourrate, $outkg);
       }
     }
@@ -109,7 +109,7 @@ $query = new Query();
         $date = $_POST['date'];
         $outkg = $_POST['outkg'];
         $rate = $_POST['rate'];
-  
+
         $query->addrepackingout($date, $outkg, $rate);
       }
     }
@@ -122,7 +122,7 @@ $query = new Query();
       }else{
         $date = $_POST['date'];
         $plugoncharges = $_POST['plugoncharges'];
-  
+
         $query->addtotal($date, $plugoncharges);
       }
     }
@@ -147,7 +147,7 @@ $query = new Query();
       if(empty($_POST['openingamount'])){
         echo "<script>swal('Error!', 'Please enter opening amount.', 'error');</script>";
       }else{
-        $openingamount = $_POST['openingamount'];  
+        $openingamount = $_POST['openingamount'];
         $query->addopeningamount($openingamount);
       }
     }
