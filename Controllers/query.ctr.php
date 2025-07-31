@@ -880,94 +880,6 @@ class Query
       $charges = $day * floatval($coldstorerate) * floatval($kg);
       $total_charges = floatval($charges);
     }
-    // Labour ADD
-    $labourstmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
-    $labourstmt->execute();
-    $labour = $labourstmt->fetch(PDO::FETCH_ASSOC);
-    if (!empty($labour)) {
-      if (str_contains(strtolower($comname), 'iqf')) {
-        $iqfemptystmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
-        $iqfemptystmt->execute();
-        $iqfemptydata = $iqfemptystmt->fetch(PDO::FETCH_ASSOC);
-        if (!empty($iqfemptydata)) {
-          $iqfstmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
-          $iqfstmt->execute();
-          $iqfdata = $iqfstmt->fetch(PDO::FETCH_ASSOC);
-
-          $ltotal_mc = floatval($iqfdata['total_mc']) + floatval($mc);
-          $ltotal_kg = floatval($iqfdata['total_kg']) + floatval($kg);
-          $lcharges = floatval($labourrate) * floatval($kg);
-          $totallabourcharges = floatval($iqfdata['total_charges']) + floatval($lcharges);
-        } else {
-          $ltotal_mc = floatval($mc);
-          $ltotal_kg = floatval($kg);
-          $lcharges = floatval($labourrate) * floatval($kg);
-          $totallabourcharges = floatval($lcharges);
-        }
-      } elseif (str_contains(strtolower($comname), 'block')) {
-        $blockemptystmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
-        $blockemptystmt->execute();
-        $blockemptydata = $blockemptystmt->fetch(PDO::FETCH_ASSOC);
-        if (!empty($blockemptydata)) {
-          $blockstmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
-          $blockstmt->execute();
-          $blockdata = $blockstmt->fetch(PDO::FETCH_ASSOC);
-
-          $ltotal_mc = floatval($blockdata['total_mc']) + floatval($mc);
-          $ltotal_kg = floatval($blockdata['total_kg']) + floatval($kg);
-          $lcharges = floatval($labourrate) * floatval($kg);
-          $totallabourcharges = floatval($blockdata['total_charges']) + floatval($lcharges);
-        } else {
-          $ltotal_mc = floatval($mc);
-          $ltotal_kg = floatval($kg);
-          $lcharges = floatval($labourrate) * floatval($kg);
-          $totallabourcharges = floatval($lcharges);
-        }
-      } elseif (str_contains(strtolower($comname), 'pujanut')) {
-        $pjnemptystmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
-        $pjnemptystmt->execute();
-        $pjnemptydata = $pjnemptystmt->fetch(PDO::FETCH_ASSOC);
-        if (!empty($pjnemptydata)) {
-          $pjnstmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
-          $pjnstmt->execute();
-          $pjndata = $pjnstmt->fetch(PDO::FETCH_ASSOC);
-
-          $ltotal_mc = floatval($pjndata['total_mc']) + floatval($mc);
-          $ltotal_kg = floatval($pjndata['total_kg']) + floatval($kg);
-          $lcharges = floatval($labourrate) * floatval($kg);
-          $totallabourcharges = floatval($pjndata['total_charges']) + floatval($lcharges);
-        } else {
-          $ltotal_mc = floatval($mc);
-          $ltotal_kg = floatval($kg);
-          $lcharges = floatval($labourrate) * floatval($kg);
-          $totallabourcharges = floatval($lcharges);
-        }
-      } else {
-        $pjnemptystmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
-        $pjnemptystmt->execute();
-        $pjnemptydata = $pjnemptystmt->fetch(PDO::FETCH_ASSOC);
-        if (!empty($pjnemptydata)) {
-          $pjnstmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
-          $pjnstmt->execute();
-          $pjndata = $pjnstmt->fetch(PDO::FETCH_ASSOC);
-
-          $ltotal_mc = floatval($pjndata['total_mc']) + floatval($mc);
-          $ltotal_kg = floatval($pjndata['total_kg']) + floatval($kg);
-          $lcharges = floatval($labourrate) * floatval($kg);
-          $totallabourcharges = floatval($pjndata['total_charges']) + floatval($lcharges);
-        } else {
-          $ltotal_mc = floatval($mc);
-          $ltotal_kg = floatval($kg);
-          $lcharges = floatval($labourrate) * floatval($kg);
-          $totallabourcharges = floatval($lcharges);
-        }
-      }
-    } else {
-      $ltotal_mc = floatval($mc);
-      $ltotal_kg = floatval($kg);
-      $lcharges = floatval($labourrate) * floatval($kg);
-      $totallabourcharges = floatval($lcharges);
-    }
 
     // Processing ADD
     $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id' ORDER BY id DESC");
@@ -1083,8 +995,6 @@ class Query
 
     $coldstorestmt = $pdo->prepare("INSERT INTO coldstore(indate, outdate, commondity_id, mc, total_mc, kg, total_kg, day, rate, charges, total_charges) VALUES('$indate','$outdate','$commondity_id', '$mc','$dtotal_mc','$kg','$dtotal_kg','$day','$coldstorerate','$charges','$total_charges')");
     $coldstorestmt->execute();
-    $labourstmt = $pdo->prepare("INSERT INTO labour(indate, outdate, commondity_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$commondity_id', '$mc','$ltotal_mc','$kg','$ltotal_kg','$labourrate','$lcharges','$totallabourcharges')");
-    $labourstmt->execute();
     $item_id = $commondity_id;
     $commonditydata = $this->select('category', $item_id, 'category_id');
     if (str_contains(strtolower($commonditydata['category_name']), 'block')) {
@@ -1108,10 +1018,6 @@ class Query
     $totalcoldstorestmt->execute();
     $totalcoldstoredata = $totalcoldstorestmt->fetch(PDO::FETCH_ASSOC);
 
-    $totallabourstmt = $pdo->prepare("SELECT * FROM labour  ORDER BY id DESC");
-    $totallabourstmt->execute();
-    $totallabourdata = $totallabourstmt->fetch(PDO::FETCH_ASSOC);
-
     $totalprocessingstmt = $pdo->prepare("SELECT * FROM processing ORDER BY id DESC");
     $totalprocessingstmt->execute();
     $totalprocessingdata = $totalprocessingstmt->fetch(PDO::FETCH_ASSOC);
@@ -1122,24 +1028,128 @@ class Query
 
     if (!empty($totalchargesdata)) {
       $total_coldstore_charges = $totalcoldstoredata['charges'];
-      $total_labour_charges = $totallabourdata['charges'];
       $total_processing_charges = $totalprocessingdata['charges'];
       // $total_charges = $totalcoldstoredata['charges'] + $totallabourdata['charges'];
-      $total_charges = $totalcoldstoredata['charges'] + $totallabourdata['charges'] + $totalprocessingdata['charges'];
+      $total_charges = $totalcoldstoredata['charges'] + $totalprocessingdata['charges'];
       $grand_total_charges = $totalchargesdata['balance_amount'] + $total_charges;
       $balance_amount = floatval($grand_total_charges);
     } else {
       $total_coldstore_charges = $totalcoldstoredata['charges'];
-      $total_labour_charges = $totallabourdata['charges'];
       $total_processing_charges = $totalprocessingdata['charges'];
-      $total_charges = $totalcoldstoredata['charges'] + $totallabourdata['charges'] + $totalprocessingdata['charges'];
+      $total_charges = $totalcoldstoredata['charges'] + $totalprocessingdata['charges'];
       // $total_charges = $totalcoldstoredata['charges'] + $totallabourdata['charges'];
       $grand_total_charges = $total_charges;
       $balance_amount = $grand_total_charges;
     }
     // echo $total_processing_charges;
-    $stmt = $pdo->prepare("INSERT INTO total_charges(date, commondity_id, total_coldstore_charges, total_labour_charges, total_processing_charges, total_charges, grand_total_charges, balance_amount, link_id) VALUES('$outdate', '$commondity_id','$total_coldstore_charges', '$total_labour_charges', '$total_processing_charges', '$total_charges', '$grand_total_charges', '$balance_amount', '$coldstoreid')");
+    $stmt = $pdo->prepare("INSERT INTO total_charges(date, commondity_id, total_coldstore_charges, total_processing_charges, total_charges, grand_total_charges, balance_amount, link_id) VALUES('$outdate', '$commondity_id','$total_coldstore_charges', '$total_processing_charges', '$total_charges', '$grand_total_charges', '$balance_amount', '$coldstoreid')");
     $stmt->execute();
+  }
+
+  // Add HHK Labour Charges
+
+  function addlabour($indate, $outdate, $commondity_id, $mc, $kg, $labourrate)
+  {
+    global $pdo;
+
+    // Labour ADD
+    $labourstmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+    $labourstmt->execute();
+    $labour = $labourstmt->fetch(PDO::FETCH_ASSOC);
+
+    $commonditystmt = $pdo->prepare("SELECT * FROM category WHERE category_id='$commondity_id'");
+    $commonditystmt->execute();
+    $commondity_name = $commonditystmt->fetch(PDO::FETCH_ASSOC);
+
+    $comname = $commondity_name['category_name'];
+    if (!empty($labour)) {
+      if (str_contains(strtolower($comname), 'iqf')) {
+        $iqfemptystmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+        $iqfemptystmt->execute();
+        $iqfemptydata = $iqfemptystmt->fetch(PDO::FETCH_ASSOC);
+        if (!empty($iqfemptydata)) {
+          $iqfstmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+          $iqfstmt->execute();
+          $iqfdata = $iqfstmt->fetch(PDO::FETCH_ASSOC);
+
+          $ltotal_mc = floatval($iqfdata['total_mc']) + floatval($mc);
+          $ltotal_kg = floatval($iqfdata['total_kg']) + floatval($kg);
+          $lcharges = floatval($labourrate) * floatval($kg);
+          $totallabourcharges = floatval($iqfdata['total_charges']) + floatval($lcharges);
+        } else {
+          $ltotal_mc = floatval($mc);
+          $ltotal_kg = floatval($kg);
+          $lcharges = floatval($labourrate) * floatval($kg);
+          $totallabourcharges = floatval($lcharges);
+        }
+      } elseif (str_contains(strtolower($comname), 'block')) {
+        $blockemptystmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+        $blockemptystmt->execute();
+        $blockemptydata = $blockemptystmt->fetch(PDO::FETCH_ASSOC);
+        if (!empty($blockemptydata)) {
+          $blockstmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+          $blockstmt->execute();
+          $blockdata = $blockstmt->fetch(PDO::FETCH_ASSOC);
+
+          $ltotal_mc = floatval($blockdata['total_mc']) + floatval($mc);
+          $ltotal_kg = floatval($blockdata['total_kg']) + floatval($kg);
+          $lcharges = floatval($labourrate) * floatval($kg);
+          $totallabourcharges = floatval($blockdata['total_charges']) + floatval($lcharges);
+        } else {
+          $ltotal_mc = floatval($mc);
+          $ltotal_kg = floatval($kg);
+          $lcharges = floatval($labourrate) * floatval($kg);
+          $totallabourcharges = floatval($lcharges);
+        }
+      } elseif (str_contains(strtolower($comname), 'pujanut')) {
+        $pjnemptystmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+        $pjnemptystmt->execute();
+        $pjnemptydata = $pjnemptystmt->fetch(PDO::FETCH_ASSOC);
+        if (!empty($pjnemptydata)) {
+          $pjnstmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+          $pjnstmt->execute();
+          $pjndata = $pjnstmt->fetch(PDO::FETCH_ASSOC);
+
+          $ltotal_mc = floatval($pjndata['total_mc']) + floatval($mc);
+          $ltotal_kg = floatval($pjndata['total_kg']) + floatval($kg);
+          $lcharges = floatval($labourrate) * floatval($kg);
+          $totallabourcharges = floatval($pjndata['total_charges']) + floatval($lcharges);
+        } else {
+          $ltotal_mc = floatval($mc);
+          $ltotal_kg = floatval($kg);
+          $lcharges = floatval($labourrate) * floatval($kg);
+          $totallabourcharges = floatval($lcharges);
+        }
+      } else {
+        $pjnemptystmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+        $pjnemptystmt->execute();
+        $pjnemptydata = $pjnemptystmt->fetch(PDO::FETCH_ASSOC);
+        if (!empty($pjnemptydata)) {
+          $pjnstmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
+          $pjnstmt->execute();
+          $pjndata = $pjnstmt->fetch(PDO::FETCH_ASSOC);
+
+          $ltotal_mc = floatval($pjndata['total_mc']) + floatval($mc);
+          $ltotal_kg = floatval($pjndata['total_kg']) + floatval($kg);
+          $lcharges = floatval($labourrate) * floatval($kg);
+          $totallabourcharges = floatval($pjndata['total_charges']) + floatval($lcharges);
+        } else {
+          $ltotal_mc = floatval($mc);
+          $ltotal_kg = floatval($kg);
+          $lcharges = floatval($labourrate) * floatval($kg);
+          $totallabourcharges = floatval($lcharges);
+        }
+      }
+    } else {
+      $ltotal_mc = floatval($mc);
+      $ltotal_kg = floatval($kg);
+      $lcharges = floatval($labourrate) * floatval($kg);
+      $totallabourcharges = floatval($lcharges);
+    }
+    
+    
+    $labourstmt = $pdo->prepare("INSERT INTO labour(indate, outdate, commondity_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$commondity_id', '$mc','$ltotal_mc','$kg','$ltotal_kg','$labourrate','$lcharges','$totallabourcharges')");
+    $labourstmt->execute();
   }
 
   function updatecoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $updateid)
@@ -1350,7 +1360,7 @@ class Query
     }
   }
 
-  function updatecoldstoretotal($id, $repacking_charges, $ice_charges, $ot_charges, $total_processing_charges, $extra_charges)
+  function updatecoldstoretotal($id, $repacking_charges, $ice_charges, $ot_charges, $total_processing_charges, $extra_charges, $labour_charges)
   {
     global $pdo;
 
@@ -1364,16 +1374,11 @@ class Query
     $coldstorestmt->execute();
     $coldstoredata = $coldstorestmt->fetch(PDO::FETCH_ASSOC);
 
-    $labourstmt = $pdo->prepare("SELECT * FROM labour WHERE id='$link_id'");
-    $labourstmt->execute();
-    $labourdata = $labourstmt->fetch(PDO::FETCH_ASSOC);
-
-
     $balancestmt = $pdo->prepare("SELECT * FROM total_charges WHERE id<'$id' ORDER BY id DESC");
     $balancestmt->execute();
     $balancedata = $balancestmt->fetch(PDO::FETCH_ASSOC);
 
-    $total_charges = floatval($repacking_charges) + floatval($ice_charges) + floatval($ot_charges) + floatval($total_processing_charges) + floatval($extra_charges) + floatval($coldstoredata['charges']) + floatval($labourdata['charges']);
+    $total_charges = floatval($repacking_charges) + floatval($ice_charges) + floatval($ot_charges) + floatval($total_processing_charges) + floatval($extra_charges) + floatval($coldstoredata['charges']) + floatval($labour_charges);
 
     if (!empty($balancedata['balance_amount'])) {
       $grand_total_charges = $balancedata['balance_amount'] + $total_charges;
@@ -1381,7 +1386,7 @@ class Query
       $grand_total_charges = $total_charges;
     }
     $balance_amount = $grand_total_charges;
-    $updatestmt = $pdo->prepare("UPDATE total_charges SET repacking_charges='$repacking_charges', ice_charges='$ice_charges', ot_charges='$ot_charges', extra_charges='$extra_charges', total_processing_charges='$total_processing_charges', total_charges='$total_charges', grand_total_charges='$grand_total_charges', balance_amount='$balance_amount' WHERE id='$id'");
+    $updatestmt = $pdo->prepare("UPDATE total_charges SET total_labour_charges='$labour_charges', repacking_charges='$repacking_charges', ice_charges='$ice_charges', ot_charges='$ot_charges', extra_charges='$extra_charges', total_processing_charges='$total_processing_charges', total_charges='$total_charges', grand_total_charges='$grand_total_charges', balance_amount='$balance_amount' WHERE id='$id'");
     $updatestmt->execute();
   }
 

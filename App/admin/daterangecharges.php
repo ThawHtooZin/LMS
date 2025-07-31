@@ -82,6 +82,37 @@ $bootstrap->css();
     }
   }
 
+  if (isset($_POST['addlabour'])) {
+    if(empty($_POST['indate']) || empty($_POST['outdate']) || empty($_POST['commondity_id']) || empty($_POST['mc']) || empty($_POST['kg'])) {
+      if(empty($_POST['indate'])){
+        echo "<script>swal('Error!', 'Please select In Date', 'error');</script>";
+      }
+      if(empty($_POST['outdate'])){
+        echo "<script>swal('Error!', 'Please select Out Date', 'error');</script>";
+      }
+      if(empty($_POST['commondity_id'])){
+        echo "<script>swal('Error!', 'Please select Commondity', 'error');</script>";
+      }
+      if(empty($_POST['mc'])){
+        echo "<script>swal('Error!', 'Please enter Mc', 'error');</script>";
+      }
+      if(empty($_POST['kg'])){
+        echo "<script>swal('Error!', 'Please enter Kg', 'error');</script>";
+      }
+      if(empty($_POST['labourrate'])){
+        echo "<script>swal('Error!', 'Please enter Labour Rate', 'error');</script>";
+      }
+    }else{
+      $indate = $_POST['indate'];
+      $outdate = $_POST['outdate'];
+      $commondity_id = $_POST['commondity_id'];
+      $mc = $_POST['mc'];
+      $kg = $_POST['kg'];
+      $labourrate = $_POST['labourrate'];
+      $query->addlabour($indate, $outdate, $commondity_id, $mc, $kg, $labourrate);
+    }
+  }
+
   if (isset($_POST['balance_kgbtn'])) {
     $id = $_POST['balance_kgid'];
     $balance_kg = $_POST['balance_kginp'];
@@ -97,7 +128,8 @@ $bootstrap->css();
     $ot_charges = $_POST['ot_charges'];
     $total_processing_charges = $_POST['total_processing_charges'];
     $extra_charges = $_POST['extra_charges'];
-    $query->updatecoldstoretotal($id, $repacking_charges, $ice_charges, $ot_charges, $total_processing_charges, $extra_charges);
+    $labour_charges = $_POST['labour_charges'];
+    $query->updatecoldstoretotal($id, $repacking_charges, $ice_charges, $ot_charges, $total_processing_charges, $extra_charges, $labour_charges);
   }
 
   if (isset($_POST['paymentbtn'])) {
@@ -236,6 +268,7 @@ $bootstrap->css();
           <h4 class="d-inline">HHK Date Range Cold Store Charges</h4>
           <button type="submit" class="btn btn-success float-end addnewstock" data-bs-toggle="modal" data-bs-target="#newstock">Add New Stock</button>
           <button type="submit" class="btn btn-success float-end addnewcharges" data-bs-toggle="modal" data-bs-target="#newcharges">Add New Charges</button>
+          <button type="submit" class="btn btn-success float-end addnewlabourcharges" data-bs-toggle="modal" data-bs-target="#newlabourcharges">Add New Labour Charges</button>
           <button type="submit" class="btn btn-success float-end hide addrepackingcharges" data-bs-toggle="modal" data-bs-target="#repackingcharges">Add Repacking Charges</button>
           <button type="submit" class="btn btn-dark text-light float-end hide addtotalcharges ms-2" data-bs-toggle="modal" data-bs-target="#addpayment">Add Payment</button>
           <a href="export.php?table_name=daterangecharges&date=" class="btn btn-success text-light export float-end">Export to Excel</a>
@@ -734,7 +767,7 @@ $bootstrap->css();
                   <td style="text-align:center;"><?php if ($total_charges_data['total_coldstore_charges'] != "0") {
                                                     echo $total_charges_data['total_coldstore_charges'];
                                                   }; ?></td>
-                  <td style="text-align:center;"><?php if ($total_charges_data['total_labour_charges'] != "0") {
+                  <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if ($total_charges_data['total_labour_charges'] != "0") {
                                                     echo $total_charges_data['total_labour_charges'];
                                                   }; ?></td>
                   <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if ($total_charges_data['total_processing_charges'] != "0") {
@@ -818,6 +851,12 @@ $bootstrap->css();
                             </div>
                           </div>
                           <div class="row">
+                            <div class="col">
+                              <label>Labour Charges</label>
+                              <input type="number" name="labour_charges" class="form-control inpv2 mb-2" value="<?php if (!empty($updatedata['total_labour_charges'])) {
+                                                                                                                  echo $updatedata['total_labour_charges'];
+                                                                                                                } ?>">
+                            </div>
                             <div class="col">
                               <label>Extra Charges</label>
                               <input type="number" name="extra_charges" class="form-control inpv2 mb-2" value="<?php if (!empty($updatedata['extra_charges'])) {
@@ -1111,7 +1150,7 @@ $bootstrap->css();
       </div>
     </div>
   </div>
-  <!-- Add Modal -->
+  <!-- Add Coldstore And Processing Modal -->
   <div class="modal fade" id="newcharges" aria-labelledby="newcharges">
     <div class="modal-dialog">
       <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
@@ -1186,7 +1225,68 @@ $bootstrap->css();
       </div>
     </div>
   </div>
-  <!-- Add Modal -->
+  <!-- Add Coldstore And Processing Modal -->
+  <!-- Add Labour -->
+  <div class="modal fade" id="newlabourcharges" aria-labelledby="newlabourcharges">
+      <div class="modal-dialog">
+        <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+          <div class="modal-header bg-secondary text-light">
+            <h1 class="modal-title fs-5">New Labour Charges</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form action="daterangecharges.php" method="post">
+            <div class="modal-body">
+              <div class="row" style="margin-bottom: 10px !important;">
+                <div class="col">
+                  <label style="font-weight: bold;">In Date</label>
+                  <input type="date" name="indate" class="form-control inpv2">
+                </div>
+                <div class="col">
+                  <label style="font-weight: bold;">Out Date</label>
+                  <input type="date" name="outdate" class="form-control inpv2">
+                </div>
+              </div>
+              <div class="row" style="margin-bottom: 10px !important;">
+                <div class="col">
+                  <label>Commondity</label>
+                  <select class="form-control inpv2" name="commondity_id" id="commondity">
+                    <?php
+                    $commonditydatas = $query->selectdis('hhkstock', 'commondity_id');
+                    foreach ($commonditydatas as $commonditydata) {
+                      $item_id = $commonditydata['commondity_id'];
+                      $item = $query->select('category', $item_id, 'category_id');
+                    ?>
+                      <option value="<?php echo $item['category_id']; ?>"><?php echo $item['category_name']; ?></option>
+                    <?php
+                    }
+                    ?>
+                  </select>
+                </div>
+                <div class="col">
+                  <label style="font-weight: bold;">Mc</label>
+                  <input type="number" name="mc" class="form-control inpv2">
+                </div>
+              </div>
+              <div class="row" style="margin-bottom: 10px !important;">
+                <div class="col">
+                  <label style="font-weight: bold;">Kg</label>
+                  <input type="text" name="kg" class="form-control inpv2">
+                </div>
+                <div class="col">
+                  <label style="font-weight: bold;">Labour Rate</label>
+                  <input type="text" name="labourrate" class="form-control inpv2">
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-success" name="addlabour">Add</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  <!-- Add Labour Modal -->
   <!-- Add Payment -->
   <div class="modal fade" id="addpayment">
     <div class="modal-dialog">
@@ -1383,6 +1483,7 @@ $bootstrap->css();
       document.querySelector(".export").classList.remove("hide");
       document.querySelector(".addtotalcharges").classList.remove("hide");
       document.querySelector(".addnewcharges").classList.add("hide");
+      document.querySelector(".addnewlabourcharges").classList.add("hide");
       document.querySelector(".addrepackingcharges").classList.add('hide');
       document.querySelector(".addnewstock").classList.add("hide");
       document.querySelector(".totallink").classList.add('color');
@@ -1401,6 +1502,7 @@ $bootstrap->css();
       document.querySelector(".export").classList.add("hide");
       document.querySelector(".addtotalcharges").classList.add("hide");
       document.querySelector(".addnewcharges").classList.remove("hide");
+      document.querySelector(".addnewlabourcharges").classList.add("hide");
       document.querySelector(".addrepackingcharges").classList.add('hide');
       document.querySelector(".addnewstock").classList.add("hide");
       document.querySelector(".coldstorelink").classList.add('color');
@@ -1418,7 +1520,8 @@ $bootstrap->css();
     function showlabour() {
       document.querySelector(".export").classList.add("hide");
       document.querySelector(".addtotalcharges").classList.add("hide");
-      document.querySelector(".addnewcharges").classList.remove("hide");
+      document.querySelector(".addnewcharges").classList.add("hide");
+      document.querySelector(".addnewlabourcharges").classList.remove("hide");
       document.querySelector(".addrepackingcharges").classList.add('hide');
       document.querySelector(".addnewstock").classList.add("hide");
       document.querySelector(".coldstorelink").classList.remove('color');
@@ -1437,6 +1540,7 @@ $bootstrap->css();
       document.querySelector(".export").classList.add("hide");
       document.querySelector(".addtotalcharges").classList.add("hide");
       document.querySelector(".addnewcharges").classList.remove("hide");
+      document.querySelector(".addnewlabourcharges").classList.add("hide");
       document.querySelector(".addrepackingcharges").classList.add('hide');
       document.querySelector(".addnewstock").classList.add("hide");
       document.querySelector(".coldstorelink").classList.remove('color');
@@ -1455,6 +1559,7 @@ $bootstrap->css();
       document.querySelector(".export").classList.add("hide");
       document.querySelector(".addtotalcharges").classList.add("hide");
       document.querySelector(".addnewcharges").classList.add("hide");
+      document.querySelector(".addnewlabourcharges").classList.add("hide");
       document.querySelector(".addrepackingcharges").classList.remove('hide');
       document.querySelector(".addnewstock").classList.add("hide");
       document.querySelector(".coldstorelink").classList.remove('color');
@@ -1473,6 +1578,7 @@ $bootstrap->css();
       document.querySelector(".export").classList.add("hide");
       document.querySelector(".addtotalcharges").classList.add("hide");
       document.querySelector(".addnewcharges").classList.add("hide");
+      document.querySelector(".addnewlabourcharges").classList.add("hide");
       document.querySelector(".addrepackingcharges").classList.add('hide');
       document.querySelector(".addnewstock").classList.remove("hide");
       document.querySelector(".coldstorelink").classList.remove('color');
