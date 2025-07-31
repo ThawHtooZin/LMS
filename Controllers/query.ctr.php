@@ -3079,6 +3079,27 @@ class Query
     }
   }
 
+  function repackingout($repackingoutdate, $repackingoutparticular, $repackingoutcountry, $repackingoutcommondity_id, $repackingoutfish_type, $repackingoutsize, $repackingoutkg, $repackingoutmc)
+  {
+    global $pdo;
+
+    $hhkmcstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE kg='$repackingoutkg' AND size='$repackingoutsize' AND commondity_id='$repackingoutcommondity_id' AND fish_type='$repackingoutfish_type' AND country='$repackingoutcountry' ORDER BY id DESC");
+    $hhkmcstmt->execute();
+    $hhkmcdata = $hhkmcstmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!empty($hhkmcdata['balance_mc'])) {
+      $balance_mc = $hhkmcdata['balance_mc'] - $repackingoutmc;
+      $transfermcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, fish_type, size, kg, mc, balance_mc) VALUES('$repackingoutdate', '$repackingoutcountry', '$repackingoutparticular', '$repackingoutcommondity_id', '$repackingoutfish_type', '$repackingoutsize', '$repackingoutkg', '$repackingoutmc', '$balance_mc')");
+      $transfermcstmt->execute();
+
+      if (!empty($transfermcstmt)) {
+        echo '<script>swal("Success!", "Added Repacking Mc Successfully!", "success");</script>';
+      }
+    }else{
+      echo '<script>swal("Error!", "Invalid Data", "error");</script>';
+    }
+  }
+
   function exportmcstock($exportdate, $exportparticular, $exportcountry, $exportcommondity_id, $exportfish_type, $exportsize, $exportkg, $exportmc)
   {
     global $pdo;
