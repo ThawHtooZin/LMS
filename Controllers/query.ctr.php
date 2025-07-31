@@ -2453,11 +2453,11 @@ class Query
   // HHK QUERIES
 
   // MSL QUERIES
-  function addmslnewstock($indate, $item_id, $mc, $kg)
+  function addmslnewstock($indate, $item_id, $mc, $kg, $fish_type)
   {
     global $pdo;
 
-    $stockstmt = $pdo->prepare("SELECT * FROM mslstock WHERE item_id='$item_id' ORDER BY id DESC");
+    $stockstmt = $pdo->prepare("SELECT * FROM mslstock WHERE item_id='$item_id' AND fish_type='$fish_type' ORDER BY id DESC");
     $stockstmt->execute();
     $stockdata = $stockstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -2473,11 +2473,11 @@ class Query
       $balance = $kg;
     }
 
-    $newstockstmt = $pdo->prepare("INSERT INTO mslstock(indate, item_id, mc, total_mc, kg, total_kg, balance) VALUES('$indate', '$item_id', '$mc', '$total_mc', '$kg', '$total_kg', '$balance')");
+    $newstockstmt = $pdo->prepare("INSERT INTO mslstock(indate, item_id, mc, total_mc, kg, total_kg, balance, fish_type) VALUES('$indate', '$item_id', '$mc', '$total_mc', '$kg', '$total_kg', '$balance', '$fish_type')");
     $newstockstmt->execute();
   }
 
-  function addmslcoldstore($indate, $outdate, $item_id, $mc, $kg, $coldstorerate, $freezingrate, $exportrate, $loose_kg, $loose_mc)
+  function addmslcoldstore($indate, $outdate, $item_id, $mc, $kg, $coldstorerate, $freezingrate, $exportrate, $loose_kg, $loose_mc, $fish_type)
   {
     global $pdo;
 
@@ -2485,11 +2485,11 @@ class Query
     $datastmt->execute();
     $data = $datastmt->fetch(PDO::FETCH_ASSOC);
     if (!empty($data)) {
-      $emptystmt = $pdo->prepare("SELECT * FROM mslcoldstore WHERE item_id='$item_id' ORDER BY id DESC");
+      $emptystmt = $pdo->prepare("SELECT * FROM mslcoldstore WHERE item_id='$item_id' AND fish_type = '$fish_type' ORDER BY id DESC");
       $emptystmt->execute();
       $emptydata = $emptystmt->fetch(PDO::FETCH_ASSOC);
       if (!empty($emptydata)) {
-        $stmt = $pdo->prepare("SELECT * FROM mslcoldstore WHERE item_id='$item_id' ORDER BY id DESC");
+        $stmt = $pdo->prepare("SELECT * FROM mslcoldstore WHERE item_id='$item_id' AND fish_type = '$fish_type' ORDER BY id DESC");
         $stmt->execute();
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -2526,11 +2526,11 @@ class Query
     $labourstmt->execute();
     $labour = $labourstmt->fetch(PDO::FETCH_ASSOC);
     if (!empty($labour)) {
-      $emptystmt = $pdo->prepare("SELECT * FROM mslfreezing WHERE item_id='$item_id' ORDER BY id DESC");
+      $emptystmt = $pdo->prepare("SELECT * FROM mslfreezing WHERE item_id='$item_id' AND fish_type = '$fish_type' ORDER BY id DESC");
       $emptystmt->execute();
       $emptydata = $emptystmt->fetch(PDO::FETCH_ASSOC);
       if (!empty($emptydata)) {
-        $stmt = $pdo->prepare("SELECT * FROM mslfreezing WHERE item_id='$item_id' ORDER BY id DESC");
+        $stmt = $pdo->prepare("SELECT * FROM mslfreezing WHERE item_id='$item_id' AND fish_type = '$fish_type' ORDER BY id DESC");
         $stmt->execute();
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -2556,11 +2556,11 @@ class Query
     $exportstmt->execute();
     $export = $exportstmt->fetch(PDO::FETCH_ASSOC);
     if (!empty($export)) {
-      $exportemptystmt = $pdo->prepare("SELECT * FROM mslexportcharges WHERE item_id='$item_id' ORDER BY id DESC");
+      $exportemptystmt = $pdo->prepare("SELECT * FROM mslexportcharges WHERE item_id='$item_id' AND fish_type = '$fish_type' ORDER BY id DESC");
       $exportemptystmt->execute();
       $exportemptydata = $exportemptystmt->fetch(PDO::FETCH_ASSOC);
       if (!empty($exportemptydata)) {
-        $exportstmt = $pdo->prepare("SELECT * FROM mslexportcharges WHERE item_id='$item_id' ORDER BY id DESC");
+        $exportstmt = $pdo->prepare("SELECT * FROM mslexportcharges WHERE item_id='$item_id' AND fish_type = '$fish_type' ORDER BY id DESC");
         $exportstmt->execute();
         $exportdata = $exportstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -2582,7 +2582,7 @@ class Query
     }
 
     // Add Stock
-    $stockstmt = $pdo->prepare("SELECT * FROM mslstock WHERE item_id='$item_id' ORDER BY id DESC");
+    $stockstmt = $pdo->prepare("SELECT * FROM mslstock WHERE item_id='$item_id' AND fish_type = '$fish_type' ORDER BY id DESC");
     $stockstmt->execute();
     $stockdata = $stockstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -2591,13 +2591,13 @@ class Query
     $total_mc = $stockdata['total_mc'] - $mc;
     $total_kg = $stockdata['total_kg'] - $kg;
 
-    $coldstorestmt = $pdo->prepare("INSERT INTO mslcoldstore(indate, outdate, item_id, mc, total_mc, kg, total_kg, day, rate, charges, total_charges) VALUES('$indate','$outdate','$item_id', '$mc','$dtotal_mc','$kg','$dtotal_kg','$day','$coldstorerate','$charges','$total_charges')");
+    $coldstorestmt = $pdo->prepare("INSERT INTO mslcoldstore(indate, outdate, item_id, mc, total_mc, kg, total_kg, day, rate, charges, total_charges, fish_type) VALUES('$indate','$outdate','$item_id', '$mc','$dtotal_mc','$kg','$dtotal_kg','$day','$coldstorerate','$charges','$total_charges', '$fish_type')");
     $coldstorestmt->execute();
-    $labourstmt = $pdo->prepare("INSERT INTO mslfreezing(indate, outdate, item_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$item_id', '$mc','$ftotal_mc','$kg','$ftotal_kg','$freezingrate','$fcharges','$totalfreezingcharges')");
+    $labourstmt = $pdo->prepare("INSERT INTO mslfreezing(indate, outdate, item_id, mc, total_mc, kg, total_kg, rate, charges, total_charges, fish_type) VALUES('$indate','$outdate','$item_id', '$mc','$ftotal_mc','$kg','$ftotal_kg','$freezingrate','$fcharges','$totalfreezingcharges', '$fish_type')");
     $labourstmt->execute();
-    $processingstmt = $pdo->prepare("INSERT INTO mslexportcharges(indate, outdate, item_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$item_id', '$mc','$etotal_mc','$kg','$etotal_kg','$exportrate','$echarges','$totalexportcharges')");
+    $processingstmt = $pdo->prepare("INSERT INTO mslexportcharges(indate, outdate, item_id, mc, total_mc, kg, total_kg, rate, charges, total_charges, fish_type) VALUES('$indate','$outdate','$item_id', '$mc','$etotal_mc','$kg','$etotal_kg','$exportrate','$echarges','$totalexportcharges', '$fish_type')");
     $processingstmt->execute();
-    $stockstmt = $pdo->prepare("INSERT INTO mslstock(outdate, item_id, mc, total_mc, kg, total_kg) VALUES('$outdate', '$item_id', '$smc', '$total_mc', '$skg', '$total_kg')");
+    $stockstmt = $pdo->prepare("INSERT INTO mslstock(outdate, item_id, mc, total_mc, kg, total_kg, fish_type) VALUES('$outdate', '$item_id', '$smc', '$total_mc', '$skg', '$total_kg', '$fish_type')");
     $stockstmt->execute();
 
     $datastmt = $pdo->prepare("SELECT * FROM msl_total_charges ORDER BY id DESC");
@@ -2609,7 +2609,7 @@ class Query
       $totalcoldstorestmt->execute();
       $totalcoldstoredata = $totalcoldstorestmt->fetch(PDO::FETCH_ASSOC);
 
-      $totalfreezingstmt = $pdo->prepare("SELECT * FROM mslfreezing  ORDER BY id DESC");
+      $totalfreezingstmt = $pdo->prepare("SELECT * FROM mslfreezing ORDER BY id DESC");
       $totalfreezingstmt->execute();
       $totalfreezingdata = $totalfreezingstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -2631,11 +2631,11 @@ class Query
       $totalfreezingdatacharges = $totalfreezingdata['total_charges'] + $loosetotalfreezingcharges;
       $totalexportdatacharges = $totalexportdata['total_charges'] + $loosetotalexportcharges;
 
-      $coldstorestmt = $pdo->prepare("INSERT INTO mslcoldstore(indate, item_id, mc, total_mc, kg, total_kg, day, rate, charges, total_charges) VALUES('$indate','$item_id', '$loose_mc','$coldstoretotal_mc','$loose_kg','$coldstoretotal_kg','$day','$coldstorerate','$loose_total_charges','$totalcoldstorecharges')");
+      $coldstorestmt = $pdo->prepare("INSERT INTO mslcoldstore(indate, item_id, mc, total_mc, kg, total_kg, day, rate, charges, total_charges, fish_type) VALUES('$indate','$item_id', '$loose_mc','$coldstoretotal_mc','$loose_kg','$coldstoretotal_kg','$day','$coldstorerate','$loose_total_charges','$totalcoldstorecharges', '$fish_type')");
       $coldstorestmt->execute();
-      $labourstmt = $pdo->prepare("INSERT INTO mslfreezing(indate, item_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$item_id', '$loose_mc','$freezingtotal_mc','$loose_kg','$ftotal_kg','$freezingtotal_kg','$loosetotalfreezingcharges','$totalfreezingdatacharges')");
+      $labourstmt = $pdo->prepare("INSERT INTO mslfreezing(indate, item_id, mc, total_mc, kg, total_kg, rate, charges, total_charges, fish_type) VALUES('$indate','$item_id', '$loose_mc','$freezingtotal_mc','$loose_kg','$ftotal_kg','$freezingtotal_kg','$loosetotalfreezingcharges','$totalfreezingdatacharges', '$fish_type')");
       $labourstmt->execute();
-      $processingstmt = $pdo->prepare("INSERT INTO mslexportcharges(indate, item_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$item_id', '$loose_mc','$exporttotal_mc','$loose_kg','$etotal_kg','$exporttotal_kg','$loosetotalexportcharges','$totalexportdatacharges')");
+      $processingstmt = $pdo->prepare("INSERT INTO mslexportcharges(indate, item_id, mc, total_mc, kg, total_kg, rate, charges, total_charges, fish_type) VALUES('$indate','$item_id', '$loose_mc','$exporttotal_mc','$loose_kg','$etotal_kg','$exporttotal_kg','$loosetotalexportcharges','$totalexportdatacharges', '$fish_type')");
       $processingstmt->execute();
     }
 
@@ -2672,7 +2672,7 @@ class Query
       $balance_amount = $grand_total_charges;
     }
 
-    $stmt = $pdo->prepare("INSERT INTO msl_total_charges(item_id, total_coldstore_charges, total_freezing_charges, total_export_charges, total_charges, grand_total_charges, balance_amount) VALUES('$item_id','$total_coldstore_charges', '$total_freezing_charges', '$total_export_charges', '$total_charges', '$grand_total_charges', '$balance_amount')");
+    $stmt = $pdo->prepare("INSERT INTO msl_total_charges(item_id, total_coldstore_charges, total_freezing_charges, total_export_charges, total_charges, grand_total_charges, balance_amount, fish_type) VALUES('$item_id','$total_coldstore_charges', '$total_freezing_charges', '$total_export_charges', '$total_charges', '$grand_total_charges', '$balance_amount', '$fish_type')");
     $stmt->execute();
   }
 

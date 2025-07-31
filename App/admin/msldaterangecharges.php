@@ -44,7 +44,8 @@ $query = new Query();
       $exportrate = $_POST['exportrate'];
       $loose_mc = $_POST['loose_mc'];
       $loose_kg = $_POST['loose_kg'];
-      $query->addmslcoldstore($indate, $outdate, $item_id, $mc, $kg, $coldstorerate, $freezingrate, $exportrate, $loose_mc, $loose_kg);
+      $fish_type = $_POST['fish_type'];
+      $query->addmslcoldstore($indate, $outdate, $item_id, $mc, $kg, $coldstorerate, $freezingrate, $exportrate, $loose_mc, $loose_kg, $fish_type);
     }
 
     if(isset($_POST['updatetotalcharges'])){
@@ -76,8 +77,9 @@ $query = new Query();
       $item_id = $_POST['item_id'];
       $mc = $_POST['mc'];
       $kg = $_POST['kg'];
+      $fish_type = $_POST['fish_type'];
 
-      $query->addmslnewstock($indate, $item_id, $mc, $kg);
+      $query->addmslnewstock($indate, $item_id, $mc, $kg, $fish_type);
     }
 
     if(isset($_POST['update'])){
@@ -89,7 +91,7 @@ $query = new Query();
       $labourrate = $_POST['labourrate'];
       $processingrate = $_POST['processingrate'];
       $updateid = $_POST['updateid'];
-      $query->updatemslcoldstore($indate, $outdate, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $updateid);
+      // $query->updatemslcoldstore($indate, $outdate, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $updateid);
     }
 
      ?>
@@ -179,7 +181,7 @@ $query = new Query();
                     <td><?php echo $idd; ?></td>
                     <td><?php echo date("d-m-Y", strtotime($data['indate'])); ?></td>
                     <td><?php if($data['outdate'] != '0000-00-00'){ echo date("d-m-Y", strtotime($data['outdate']));}else{echo "Loose";}; ?></td>
-                    <td><?php echo $commonditydata['item_name']; ?></td>
+                    <td><?php echo $commonditydata['item_name'] . " (" . $data['fish_type'] . ")"; ?></td>
                     <td><?php echo $data['mc']; ?></td>
                     <td><?php echo $data['total_mc']; ?></td>
                     <td><?php echo $data['kg']; ?></td>
@@ -200,7 +202,7 @@ $query = new Query();
                   </tr>
                   <div class="modal fade" id="coldstoreupdatemodal<?php echo $data['id']; ?>">
                     <div class="modal-dialog" role="document">
-                      <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
                         <div class="modal-header bg-warning text-light">
                           <h1 class="modal-title fs-5">Update Charges</h1>
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -306,7 +308,7 @@ $query = new Query();
                   <td><?php echo $idd; ?></td>
                   <td><?php echo date('d-m-Y', strtotime($labourdata['indate'])); ?></td>
                   <td><?php echo date('d-m-Y', strtotime($labourdata['outdate'])); ?></td>
-                  <td><?php echo $commonditydata['item_name']; ?></td>
+                  <td><?php echo $commonditydata['item_name'] . " (" . $labourdata['fish_type'] . ")"; ?></td>
                   <td><?php echo $labourdata['mc']; ?></td>
                   <td><?php echo $labourdata['total_mc']; ?></td>
                   <td><?php echo $labourdata['kg']; ?></td>
@@ -369,7 +371,7 @@ $query = new Query();
                   <td><?php echo $idd; ?></td>
                   <td><?php echo date('d-m-Y', strtotime($processingdata['indate'])); ?></td>
                   <td><?php echo date('d-m-Y', strtotime($processingdata['outdate'])); ?></td>
-                  <td><?php echo $commonditydata['item_name']; ?></td>
+                  <td><?php echo $commonditydata['item_name'] . " (" . $processingdata['fish_type'] . ")"; ?></td>
                   <td><?php echo $processingdata['mc']; ?></td>
                   <td><?php echo $processingdata['total_mc']; ?></td>
                   <td><?php echo $processingdata['kg']; ?></td>
@@ -422,7 +424,7 @@ $query = new Query();
                 ?>
                 <tr data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>">
                   <td><?php echo $idd; ?></td>
-                  <td><?php if(!empty($commonditydata['item_name'])){ echo $commonditydata['item_name'];} ; ?></td>
+                  <td><?php if(!empty($commonditydata['item_name'])){ echo $commonditydata['item_name'] . " (" . $total_charges_data['fish_type'] . ")";} ; ?></td>
                   <td><?php if($total_charges_data['total_coldstore_charges'] != "0"){ echo $total_charges_data['total_coldstore_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['total_freezing_charges'] != "0"){ echo $total_charges_data['total_freezing_charges'];} ; ?></td>
                   <td><?php if($total_charges_data['total_export_charges'] != "0"){ echo $total_charges_data['total_export_charges'];} ; ?></td>
@@ -438,7 +440,7 @@ $query = new Query();
                 <!-- Add Modal -->
                 <div class="modal fade" id="updatetotalcharges<?php echo $total_charges_data['id']; ?>">
                   <div class="modal-dialog">
-                    <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                    <div class="modal-content" style="width: 650px important; margin-top:70px !important;">
                       <div class="modal-header bg-secondary text-light">
                         <h1 class="modal-title fs-5">Edit Total Charges</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -546,7 +548,7 @@ $query = new Query();
                 <tr>
                   <td><?php if($hhkstockdata['indate'] != "0000-00-00"){ echo date('d-m-Y', strtotime($hhkstockdata['indate'])); }; ?></td>
                   <td><?php if($hhkstockdata['outdate'] != "0000-00-00"){ echo date('d-m-Y', strtotime($hhkstockdata['outdate'])); }; ?></td>
-                  <td><?php echo $commonditydata['item_name']; ?></td>
+                  <td><?php echo $commonditydata['item_name'] . " (" . $hhkstockdata['fish_type'] . ")"; ?></td>
                   <td><?php echo $hhkstockdata['mc']; ?></td>
                   <td><?php echo $hhkstockdata['total_mc']; ?></td>
                   <td><?php echo $hhkstockdata['kg']; ?></td>
@@ -565,7 +567,7 @@ $query = new Query();
     <!-- Add Modal -->
     <div class="modal fade" id="newcharges" aria-labelledby="newcharges">
       <div class="modal-dialog">
-        <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+        <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
           <div class="modal-header bg-secondary text-light">
             <h1 class="modal-title fs-5">New Charges</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -583,7 +585,7 @@ $query = new Query();
                 </div>
               </div>
               <div class="row" style="margin-bottom: 10px !important;">
-                <div class="col">
+                <div class="col-3">
                   <label>Fish Name</label>
                   <select class="form-control inpv2" name="item_id">
                     <?php
@@ -594,6 +596,20 @@ $query = new Query();
                       <?php
                       }
                      ?>
+                  </select>
+                </div>
+                <div class="col-3 ms-2">
+                  <label>Fish Type</label>
+                  <select name="fish_type" class="form-control inpv2">
+                    <option value="G">G</option>
+                    <option value="egg">egg</option>
+                    <option value="ggs">ggs</option>
+                    <option value="fillet">fillet</option>
+                    <option value="W">W</option>
+                    <option value="Cut_piece">Cut Piece</option>
+                    <option value="Scaless">Scaless</option>
+                    <option value="Bls">Bl's</option>
+                    <option value="iqf">IQF</option>
                   </select>
                 </div>
                 <div class="col">
@@ -644,7 +660,7 @@ $query = new Query();
     <!-- Add Modal -->
     <div class="modal fade" id="addpayment">
       <div class="modal-dialog">
-        <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+        <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
           <div class="modal-header bg-secondary text-light">
             <h1 class="modal-title fs-5">Add Payment</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -674,7 +690,7 @@ $query = new Query();
     <!-- Add Modal -->
     <div class="modal fade" id="repackingcharges">
       <div class="modal-dialog">
-        <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+        <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
           <div class="modal-header bg-secondary text-light">
             <h1 class="modal-title fs-5">Repacking Charges</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -720,7 +736,7 @@ $query = new Query();
     <!-- Add Modal -->
     <div class="modal fade" id="newstock">
       <div class="modal-dialog">
-        <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+        <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
           <div class="modal-header bg-secondary text-light">
             <h1 class="modal-title fs-5">Add New Stock</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -743,6 +759,20 @@ $query = new Query();
                     <?php
                     }
                    ?>
+                </select>
+              </div>
+              <div class="col ms-2">
+                <label>Fish Type</label>
+                <select name="fish_type" class="form-control inpv2">
+                  <option value="G">G</option>
+                  <option value="egg">egg</option>
+                  <option value="ggs">ggs</option>
+                  <option value="fillet">fillet</option>
+                  <option value="W">W</option>
+                  <option value="Cut_piece">Cut Piece</option>
+                  <option value="Scaless">Scaless</option>
+                  <option value="Bls">Bl's</option>
+                  <option value="iqf">IQF</option>
                 </select>
               </div>
             </div>
