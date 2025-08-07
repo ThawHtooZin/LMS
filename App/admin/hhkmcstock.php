@@ -28,15 +28,25 @@ $bootstrap->css();
   if (isset($_POST['addbtn'])) {
     $date = $_POST['date'];
     $particular = $_POST['particular'];
-    if (str_contains($particular, 'balance') || str_contains($particular, 'Balance')) {
-      $commondity_id = $_POST['commondity_id2'];
-      $fish_type = $_POST['fish_type2'];
-      $country = $_POST['balance_country'];
-    } else {
-      $commondity_id = $_POST['commondity_id1'];
-      $fish_type = $_POST['fish_type'];
-      $country = $_POST['country'];
-    }
+    $commondity_id = $_POST['commondity_id1'];
+    $fish_type = $_POST['fish_type'];
+    $country = $_POST['country'];
+    $size = $_POST['size'];
+    $kg = $_POST['kg'];
+    $mc = $_POST['mc'];
+    $query->addmcstock($date, $particular, $country, $commondity_id, $fish_type, $size, $kg, $mc);
+    $_SESSION['date'] = $_POST['date'];
+    $_SESSION['particular'] = $_POST['particular'];
+    $_SESSION['commondity_id2'] = $_POST['commondity_id2'];
+    $_SESSION['size'] = $_POST['size'];
+  }
+
+  if (isset($_POST['addbtn2'])) {
+    $date = $_POST['date'];
+    $particular = $_POST['particular'];
+    $commondity_id = $_POST['commondity_id2'];
+    $fish_type = $_POST['fish_type2'];
+    $country = $_POST['country2'];
     $size = $_POST['size'];
     $kg = $_POST['kg'];
     $mc = $_POST['mc'];
@@ -339,8 +349,6 @@ $bootstrap->css();
                             </div>
                             <div class="col">
                               <select name="fish_type" id="commondityid3" class="form-control inpv2">
-                                <option value="G">Hello</option>
-                                <option value="G">World</option>
                                 <option value="G">G</option>
                                 <option value="egg">egg</option>
                                 <option value="ggs">ggs</option>
@@ -455,7 +463,7 @@ $bootstrap->css();
     <div class="modal-dialog" role="document">
       <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
         <div class="modal-header bg-secondary text-light">
-          <h1 class="modal-title fs-5">Add Data</h1>
+          <h1 class="modal-title fs-5">Add Data 2</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <form action="hhkmcstock.php" method="post">
@@ -496,7 +504,7 @@ $bootstrap->css();
                     </select>
                   </div>
                   <div class="col">
-                    <select name="fish_type" class="form-control inpv2">
+                    <select name="fish_type2" class="form-control inpv2">
                       <option value="G">G</option>
                       <option value="egg">egg</option>
                       <option value="ggs">ggs</option>
@@ -518,7 +526,7 @@ $bootstrap->css();
             <div class="row">
               <div class="col">
                 <label>Country</label>
-                <select class="form-control inpv2 mb-2" name="country" id="country1">
+                <select class="form-control inpv2 mb-2" name="country2" id="country1">
                   <?php
                   foreach ($countrydatas as $countrydata) {
                   ?>
@@ -549,7 +557,7 @@ $bootstrap->css();
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-success" name="addbtn">Add</button>
+            <button type="submit" class="btn btn-success" name="addbtn2">Add</button>
           </div>
         </form>
       </div>

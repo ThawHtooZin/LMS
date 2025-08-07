@@ -93,6 +93,8 @@ $bootstrap->css();
               $btnname = $countrydata['country'] . "btn";
               if (isset($_POST[$btnname])) {
                 $_SESSION['tabs'] = $countrydata['country'];
+                $country = $_SESSION['tabs'];
+                echo "<script>alert($country);</script>";
               }
             ?>
               <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark rounded <?php echo $countrydata['country']; ?>link" style="text-decoration:none; border:none;" name="<?php echo $btnname; ?>"><?php echo $countrydata['country'] . " Stock"; ?></button>
@@ -112,7 +114,8 @@ $bootstrap->css();
           ?>
             <table class="table table-hover table-bordered table-striped hide" id="<?php echo $countrydata['country']; ?>table">
               <tr class="text-center">
-                <th rowspan="2" style="padding-top:30px;">No</th>
+
+                <th rowspan="2" style="padding-top:30px;">No <?php echo $countrydata['country']; ?></th>
                 <th rowspan="2" style="padding-top:30px;">Fish Name</th>
                 <th rowspan="2" style="padding-top:30px;">Country</th>
                 <th rowspan="2" style="padding-top:30px;">Size</th>
@@ -288,11 +291,11 @@ $bootstrap->css();
 
                   $kg = $hhkdata['kg'];
 
-                  $fetchallstmt = $pdo->prepare("SELECT balance_mc FROM hhkmcstock WHERE size='$size' AND commondity_id='$item_id' AND kg='$kg' ORDER BY id DESC");
+                  $fetchallstmt = $pdo->prepare("SELECT balance_mc FROM hhkmcstock WHERE size='$size' AND commondity_id='$item_id' AND kg='$kg' AND country='$country' AND fish_type='$fish_type' ORDER BY id DESC");
                   $fetchallstmt->execute();
                   $fetchalldata = $fetchallstmt->fetch(PDO::FETCH_ASSOC);
 
-                  $fetchallgfcstmt = $pdo->prepare("SELECT balance_mc FROM gfcmcstock WHERE size='$size' AND commondity_id='$item_id' AND kg='$kg' ORDER BY id DESC");
+                  $fetchallgfcstmt = $pdo->prepare("SELECT balance_mc FROM gfcmcstock WHERE size='$size' AND commondity_id='$item_id' AND kg='$kg' AND country='$country' AND fish_type='$fish_type' ORDER BY id DESC");
                   $fetchallgfcstmt->execute();
                   $fetchallgfcdata = $fetchallgfcstmt->fetch(PDO::FETCH_ASSOC);
 
