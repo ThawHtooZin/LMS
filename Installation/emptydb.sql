@@ -183,6 +183,7 @@ CREATE TABLE `form10stock` (
   `looseoutpcs` int(11) NOT NULL,
   `total_kg` varchar(11) NOT NULL,
   `percentage` varchar(11) NOT NULL,
+  `fish_type` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=75 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -616,26 +617,41 @@ CREATE TABLE `packingmaterial` (
 
 
 
-
+CREATE TABLE `purchase_voucher` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `voucher_no` VARCHAR(50) NOT NULL,
+  `date` DATE NOT NULL,
+  `supplier_id` VARCHAR(255) NOT NULL,
+  `tclfrozen` VARCHAR(255) DEFAULT NULL,
+  `notes` TEXT,
+  `total_amount` DECIMAL(15,2) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_voucher_no` (`voucher_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
 CREATE TABLE `payable` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `date` date NOT NULL,
-  `supplier_id` varchar(15) NOT NULL,
-  `purchase_voucher_no` varchar(25) NOT NULL,
-  `purchase_amount` bigint(19) NOT NULL,
-  `paid_date` date NOT NULL,
-  `paid_voucher` varchar(25) NOT NULL,
-  `remark` varchar(255) NOT NULL,
-  `paid_amount` bigint(25) NOT NULL,
-  `balance` bigint(25) NOT NULL,
-  `link_id` int(11) NOT NULL,
-  `closing_balance` int(11) NOT NULL,
-  `report_date` date NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=246 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `purchase_voucher_id` INT(11) NOT NULL,
+  `date` DATE NOT NULL,
+  `supplier_id` VARCHAR(255) NOT NULL,
+  `purchase_voucher_no` VARCHAR(50) NOT NULL,
+  `purchase_amount` DECIMAL(15,2) NOT NULL DEFAULT 0,
+  `balance` DECIMAL(15,2) NOT NULL DEFAULT 0,
+  `paid_date` DATE DEFAULT NULL,
+  `paid_voucher` VARCHAR(50) DEFAULT NULL,
+  `paid_amount` DECIMAL(15,2) NOT NULL DEFAULT 0,
+  `remark` VARCHAR(255) DEFAULT NULL,
+  `closing_balance` DECIMAL(15,2) NOT NULL DEFAULT 0,
+  `report_date` DATE DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_payable_purchase_voucher_id` (`purchase_voucher_id`),
+  CONSTRAINT `fk_payable_purchase_voucher`
+    FOREIGN KEY (`purchase_voucher_id`)
+    REFERENCES `purchase_voucher`(`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
 
@@ -673,20 +689,22 @@ CREATE TABLE `processing` (
 
 
 CREATE TABLE `purchase` (
-  `no` int(11) NOT NULL AUTO_INCREMENT,
-  `date` date NOT NULL,
-  `voucher_no` int(11) NOT NULL,
-  `supplier_id` varchar(255) NOT NULL,
-  `tclfrozen` varchar(255) NOT NULL,
-  `commodity` varchar(255) NOT NULL,
-  `size` varchar(11) NOT NULL,
-  `viss` varchar(11) NOT NULL,
-  `pcs` int(11) NOT NULL,
-  `price` int(11) NOT NULL,
-  `amount` int(11) NOT NULL,
-  PRIMARY KEY (`no`)
-) ENGINE=InnoDB AUTO_INCREMENT=157 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
+  `no` INT(11) NOT NULL AUTO_INCREMENT,
+  `purchase_voucher_id` INT(11) NOT NULL,
+  `commodity` VARCHAR(255) NOT NULL,
+  `size` VARCHAR(11) NOT NULL,
+  `viss` VARCHAR(11) NOT NULL,
+  `pcs` INT(11) NOT NULL,
+  `price` DECIMAL(15,2) NOT NULL,
+  `amount` DECIMAL(15,2) NOT NULL,
+  PRIMARY KEY (`no`),
+  KEY `idx_purchase_voucher_id` (`purchase_voucher_id`),
+  CONSTRAINT `fk_purchase_voucher`
+    FOREIGN KEY (`purchase_voucher_id`)
+    REFERENCES `purchase_voucher`(`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
 

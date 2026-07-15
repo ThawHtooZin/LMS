@@ -511,40 +511,50 @@ class Query
     } else {
       $amount = 0;
     }
-    $idstmt = $pdo->prepare("SELECT no FROM $table ORDER BY no DESC");
-    $idstmt->execute();
-    $iddata = $idstmt->fetch(PDO::FETCH_ASSOC);
-    $stmt = $pdo->prepare("INSERT INTO $table(date, voucher_no, tclfrozen, supplier_id, commodity, size, viss, pcs, price, amount) VALUES('$date', '$voucher_no', '$tclfrozen', '$supplier_name', '$commodity', '$size', '$viss', '$pcs', '$price', '$amount')");
+
+    $voucherStmt = $pdo->prepare("SELECT * FROM purchase_voucher WHERE voucher_no='$voucher_no'");
+    $voucherStmt->execute();
+    $voucherData = $voucherStmt->fetch(PDO::FETCH_ASSOC);
+
+    if (empty($voucherData)) {
+      $voucherInsert = $pdo->prepare("INSERT INTO purchase_voucher(voucher_no, date, supplier_id, tclfrozen, total_amount) VALUES('$voucher_no', '$date', '$supplier_name', '$tclfrozen', '$amount')");
+      $voucherInsert->execute();
+      $purchase_voucher_id = $pdo->lastInsertId();
+    } else {
+      $purchase_voucher_id = $voucherData['id'];
+      $total_amount = floatval($voucherData['total_amount']) + $amount;
+      $voucherUpdate = $pdo->prepare("UPDATE purchase_voucher SET date='$date', supplier_id='$supplier_name', tclfrozen='$tclfrozen', total_amount='$total_amount' WHERE id='$purchase_voucher_id'");
+      $voucherUpdate->execute();
+    }
+
+    $stmt = $pdo->prepare("INSERT INTO $table(purchase_voucher_id, commodity, size, viss, pcs, price, amount) VALUES('$purchase_voucher_id', '$commodity', '$size', '$viss', '$pcs', '$price', '$amount')");
     $stmt->execute();
-    $balstmt = $pdo->prepare("SELECT balance FROM payable WHERE supplier_id = '$supplier_name' ORDER BY id DESC");
-    $balstmt->execute();
-    $baldata = $balstmt->fetch(PDO::FETCH_ASSOC);
-    if (!empty($baldata['balance'])) {
-      $balance = $baldata['balance'];
+    $link_id = $pdo->lastInsertId();
+
+    $payableStmt = $pdo->prepare("SELECT * FROM payable WHERE purchase_voucher_id='$purchase_voucher_id' ORDER BY id DESC");
+    $payableStmt->execute();
+    $payableData = $payableStmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!empty($payableData)) {
+      $newPurchaseAmount = floatval($payableData['purchase_amount']) + $amount;
+      $newBalance = floatval($payableData['balance']) + $amount;
+      $updatePayable = $pdo->prepare("UPDATE payable SET date='$date', supplier_id='$supplier_name', purchase_voucher_no='$voucher_no', purchase_amount='$newPurchaseAmount', balance='$newBalance' WHERE purchase_voucher_id='$purchase_voucher_id'");
+      $updatePayable->execute();
     } else {
-      $balance = 0;
+      $payablestmt = $pdo->prepare("INSERT INTO payable(purchase_voucher_id, date, supplier_id, purchase_voucher_no, purchase_amount, balance) VALUES('$purchase_voucher_id', '$date', '$supplier_name', '$voucher_no', '$amount', '$amount')");
+      $payablestmt->execute();
     }
-    if ($balance != 1) {
-      $total_balance = $balance + $amount;
-    } else {
-      $total_balance = $balance;
-    }
-    $idstmt = $pdo->prepare("SELECT * FROM $table ORDER BY no DESC");
-    $idstmt->execute();
-    $iddata = $idstmt->fetch(PDO::FETCH_ASSOC);
-    $id = $iddata['no'];
-    $payablestmt = $pdo->prepare("INSERT INTO payable(date, supplier_id, purchase_voucher_no, purchase_amount, balance, link_id) VALUES('$date', '$supplier_name', '$voucher_no', '$amount', '$total_balance', '$id')");
-    $payablestmt->execute();
+
     $kg = floatval($viss) * 1.634;
-    $link_id = $id;
 
     if ($tclfrozen === "tcl") {
-      $formstmt = $pdo->prepare("INSERT INTO form7stocktcl(date, item_id, supplier_name, country, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', 'DAKA',  'TCl', '$size', '$viss', '$kg', '$pcs', '$link_id')");
+      $formstmt = $pdo->prepare("INSERT INTO form7stocktcl(date, item_id, supplier_name, country, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', 'DAKA', 'TCl', '$size', '$viss', '$kg', '$pcs', '$link_id')");
       $formstmt->execute();
     } else {
       $formstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', 'Frozen', '$size', '$viss', '$kg', '$pcs', '$link_id')");
       $formstmt->execute();
     }
+
     if ($stmt) {
       echo '<script>swal("Success!", "Purchase Voucher Added Successfully", "success");</script>';
     } else {
@@ -584,35 +594,218 @@ class Query
     }
   }
 
+  /**
+   * Create or update a purchase voucher and insert multiple purchase lines atomically.
+   * $lines is an array of ['commodity'=>id, 'size'=>..., 'viss'=>..., 'pcs'=>..., 'price'=>...]
+   */
+  function addPurchaseVoucher($date, $voucher_no, $tclfrozen, $supplier_name, $lines = [])
+  {
+    global $pdo;
+    try {
+      $pdo->beginTransaction();
+
+      $totalAmount = 0;
+      foreach ($lines as $ln) {
+        $v = (float) $ln['viss'];
+        $p = (float) $ln['price'];
+        $totalAmount += $v * $p;
+      }
+
+      $voucherStmt = $pdo->prepare("SELECT * FROM purchase_voucher WHERE voucher_no='$voucher_no'");
+      $voucherStmt->execute();
+      $voucherData = $voucherStmt->fetch(PDO::FETCH_ASSOC);
+
+      if (empty($voucherData)) {
+        $voucherInsert = $pdo->prepare("INSERT INTO purchase_voucher(voucher_no, date, supplier_id, tclfrozen, total_amount) VALUES('$voucher_no', '$date', '$supplier_name', '$tclfrozen', '$totalAmount')");
+        $voucherInsert->execute();
+        $purchase_voucher_id = $pdo->lastInsertId();
+      } else {
+        $purchase_voucher_id = $voucherData['id'];
+        $newTotal = floatval($voucherData['total_amount']) + $totalAmount;
+        $voucherUpdate = $pdo->prepare("UPDATE purchase_voucher SET date='$date', supplier_id='$supplier_name', tclfrozen='$tclfrozen', total_amount='$newTotal' WHERE id='$purchase_voucher_id'");
+        $voucherUpdate->execute();
+      }
+
+      // Insert purchase lines
+      $linkIds = [];
+      $missingTables = [];
+      foreach ($lines as $ln) {
+        $commodity = $ln['commodity'];
+        $size = $ln['size'];
+        $viss = $ln['viss'];
+        $pcs = $ln['pcs'];
+        $price = $ln['price'];
+        $amount = floatval($price) * floatval($viss);
+
+        $stmt = $pdo->prepare("INSERT INTO purchase(purchase_voucher_id, commodity, size, viss, pcs, price, amount) VALUES('$purchase_voucher_id', '$commodity', '$size', '$viss', '$pcs', '$price', '$amount')");
+        $stmt->execute();
+        $lastPurchaseId = $pdo->lastInsertId();
+        $linkIds[] = $lastPurchaseId;
+
+        $kg = floatval($viss) * 1.634;
+        if ($tclfrozen === 'tcl') {
+          // only insert into form7stocktcl if the table exists
+          $chk = $pdo->prepare("SHOW TABLES LIKE 'form7stocktcl'");
+          $chk->execute();
+          if ($chk->fetch()) {
+            // check if form7stocktcl has a purchase_voucher_no column
+            $hasVoucherCol = false;
+            $colchk = $pdo->prepare("SHOW COLUMNS FROM form7stocktcl LIKE 'purchase_voucher_no'");
+            $colchk->execute();
+            if ($colchk->fetch()) {
+              $hasVoucherCol = true;
+            }
+            if ($hasVoucherCol) {
+              $formstmt = $pdo->prepare("INSERT INTO form7stocktcl(date, item_id, supplier_name, country, type, size, viss, kg, pcspervr, link_id, purchase_voucher_no) VALUES('$date', '$commodity', '$supplier_name', 'DAKA', 'TCl', '$size', '$viss', '$kg', '$pcs', '$lastPurchaseId', '$voucher_no')");
+            } else {
+              $formstmt = $pdo->prepare("INSERT INTO form7stocktcl(date, item_id, supplier_name, country, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', 'DAKA', 'TCl', '$size', '$viss', '$kg', '$pcs', '$lastPurchaseId')");
+            }
+            $formstmt->execute();
+          } else {
+            $missingTables[] = 'form7stocktcl';
+          }
+        } else {
+          // only insert into form7stock if the table exists
+          $chk2 = $pdo->prepare("SHOW TABLES LIKE 'form7stock'");
+          $chk2->execute();
+          if ($chk2->fetch()) {
+            // check if form7stock has a purchase_voucher_no column
+            $hasVoucherCol2 = false;
+            $colchk2 = $pdo->prepare("SHOW COLUMNS FROM form7stock LIKE 'purchase_voucher_no'");
+            $colchk2->execute();
+            if ($colchk2->fetch()) {
+              $hasVoucherCol2 = true;
+            }
+            if ($hasVoucherCol2) {
+              $formstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, type, size, viss, kg, pcspervr, link_id, purchase_voucher_no) VALUES('$date', '$commodity', '$supplier_name', 'Frozen', '$size', '$viss', '$kg', '$pcs', '$lastPurchaseId', '$voucher_no')");
+            } else {
+              $formstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', 'Frozen', '$size', '$viss', '$kg', '$pcs', '$lastPurchaseId')");
+            }
+            $formstmt->execute();
+          } else {
+            $missingTables[] = 'form7stock';
+          }
+        }
+      }
+
+      // Update or create payable for this voucher
+      $payableStmt = $pdo->prepare("SELECT * FROM payable WHERE purchase_voucher_id='$purchase_voucher_id' ORDER BY id DESC");
+      $payableStmt->execute();
+      $payableData = $payableStmt->fetch(PDO::FETCH_ASSOC);
+      if (!empty($payableData)) {
+        $newPurchaseAmount = floatval($payableData['purchase_amount']) + $totalAmount;
+        $newBalance = floatval($payableData['balance']) + $totalAmount;
+        $updatePayable = $pdo->prepare("UPDATE payable SET date='$date', supplier_id='$supplier_name', purchase_voucher_no='$voucher_no', purchase_amount='$newPurchaseAmount', balance='$newBalance' WHERE purchase_voucher_id='$purchase_voucher_id'");
+        $updatePayable->execute();
+      } else {
+        $payablestmt = $pdo->prepare("INSERT INTO payable(purchase_voucher_id, date, supplier_id, purchase_voucher_no, purchase_amount, balance) VALUES('$purchase_voucher_id', '$date', '$supplier_name', '$voucher_no', '$totalAmount', '$totalAmount')");
+        $payablestmt->execute();
+      }
+
+      $pdo->commit();
+      echo '<script>swal("Success!", "Purchase Voucher Added Successfully", "success");</script>';
+      if (!empty($missingTables)) {
+        $missing = implode(', ', array_unique($missingTables));
+        echo '<script>swal("Warning", "Some optional stock tables are missing: ' . addslashes($missing) . '", "warning");</script>';
+      }
+    } catch (Exception $e) {
+      $pdo->rollBack();
+      echo '<script>swal("Error!", "Error when adding Purchase Voucher: ' . addslashes($e->getMessage()) . '", "error");</script>';
+    }
+  }
+
   function updatepurchase($table, $date, $voucher_no, $supplier_name, $tclfrozen, $commodity, $size, $viss, $pcs, $price, $no)
   {
     global $pdo;
-    $amount = $price * floatval($viss);
-    $stmt = $pdo->prepare("UPDATE $table SET date='$date', voucher_no='$voucher_no', supplier_id='$supplier_name', commodity='$commodity', size='$size', viss='$viss', pcs='$pcs', price='$price', amount='$amount' WHERE no='$no'");
+    $amount = floatval($price) * floatval($viss);
+
+    $oldstmt = $pdo->prepare("SELECT * FROM $table WHERE no='$no'");
+    $oldstmt->execute();
+    $oldData = $oldstmt->fetch(PDO::FETCH_ASSOC);
+    if (empty($oldData)) {
+      echo '<script>swal("Warning!", "Purchase row not found.", "warning");</script>';
+      return;
+    }
+
+    $oldAmount = floatval($oldData['amount']);
+    $oldVoucherId = $oldData['purchase_voucher_id'];
+    $oldVoucherNo = $oldData['voucher_no'];
+
+    $voucherStmt = $pdo->prepare("SELECT * FROM purchase_voucher WHERE voucher_no='$voucher_no'");
+    $voucherStmt->execute();
+    $voucherData = $voucherStmt->fetch(PDO::FETCH_ASSOC);
+
+    if (empty($voucherData)) {
+      $voucherInsert = $pdo->prepare("INSERT INTO purchase_voucher(voucher_no, date, supplier_id, tclfrozen, total_amount) VALUES('$voucher_no', '$date', '$supplier_name', '$tclfrozen', '$amount')");
+      $voucherInsert->execute();
+      $newVoucherId = $pdo->lastInsertId();
+      $voucherTotal = $amount;
+    } else {
+      $newVoucherId = $voucherData['id'];
+      if ($newVoucherId === intval($oldVoucherId)) {
+        $voucherTotal = floatval($voucherData['total_amount']) - $oldAmount + $amount;
+      } else {
+        $voucherTotal = floatval($voucherData['total_amount']) + $amount;
+      }
+    }
+
+    if (!empty($voucherData)) {
+      $voucherUpdate = $pdo->prepare("UPDATE purchase_voucher SET date='$date', supplier_id='$supplier_name', tclfrozen='$tclfrozen', total_amount='$voucherTotal' WHERE id='$newVoucherId'");
+      $voucherUpdate->execute();
+    }
+
+    $stmt = $pdo->prepare("UPDATE $table SET purchase_voucher_id='$newVoucherId', commodity='$commodity', size='$size', viss='$viss', pcs='$pcs', price='$price', amount='$amount' WHERE no='$no'");
     $stmt->execute();
-    // $payablebalancestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_name', link_id<'$no' ORDER BY id DESC");
-    // $payablebalancestmt->execute();
-    // $payablebalancedata = $payablebalancestmt->fetch(PDO::FETCH_ASSOC);
-    //
-    // print_r($payablebalancedata['balance']);
-    // exit
-    $stmt = $pdo->prepare("UPDATE payable SET date='$date', purchase_voucher_no='$voucher_no', supplier_id='$supplier_name', purchase_amount='$amount' WHERE link_id='$no'");
-    $stmt->execute();
+
+    if ($oldVoucherId != $newVoucherId) {
+      $oldVoucherUpdate = $pdo->prepare("UPDATE purchase_voucher SET total_amount = total_amount - '$oldAmount' WHERE id='$oldVoucherId'");
+      $oldVoucherUpdate->execute();
+      $oldPayableStmt = $pdo->prepare("SELECT * FROM payable WHERE purchase_voucher_id='$oldVoucherId' ORDER BY id DESC");
+      $oldPayableStmt->execute();
+      $oldPayableData = $oldPayableStmt->fetch(PDO::FETCH_ASSOC);
+      if (!empty($oldPayableData)) {
+        $oldPurchaseAmount = floatval($oldPayableData['purchase_amount']) - $oldAmount;
+        $oldBalance = floatval($oldPayableData['balance']) - $oldAmount;
+        $oldUpdatePayable = $pdo->prepare("UPDATE payable SET purchase_amount='$oldPurchaseAmount', balance='$oldBalance' WHERE purchase_voucher_id='$oldVoucherId'");
+        $oldUpdatePayable->execute();
+      }
+      $oldCountStmt = $pdo->prepare("SELECT COUNT(*) AS cnt FROM $table WHERE purchase_voucher_id='$oldVoucherId'");
+      $oldCountStmt->execute();
+      $oldCount = $oldCountStmt->fetch(PDO::FETCH_ASSOC);
+      if ($oldCount['cnt'] == 0) {
+        $deleteOldVoucher = $pdo->prepare("DELETE FROM purchase_voucher WHERE id='$oldVoucherId'");
+        $deleteOldVoucher->execute();
+      }
+    }
+
+    $payableStmt = $pdo->prepare("SELECT * FROM payable WHERE purchase_voucher_id='$newVoucherId' ORDER BY id DESC");
+    $payableStmt->execute();
+    $payableData = $payableStmt->fetch(PDO::FETCH_ASSOC);
+    $amountDiff = $amount - $oldAmount;
+
+    if (!empty($payableData)) {
+      $newPurchaseAmount = floatval($payableData['purchase_amount']) + $amountDiff;
+      $newBalance = floatval($payableData['balance']) + $amountDiff;
+      $updatePayable = $pdo->prepare("UPDATE payable SET date='$date', supplier_id='$supplier_name', purchase_voucher_no='$voucher_no', purchase_amount='$newPurchaseAmount', balance='$newBalance' WHERE purchase_voucher_id='$newVoucherId'");
+      $updatePayable->execute();
+    } else {
+      $insertPayable = $pdo->prepare("INSERT INTO payable(purchase_voucher_id, date, supplier_id, purchase_voucher_no, purchase_amount, balance) VALUES('$newVoucherId', '$date', '$supplier_name', '$voucher_no', '$amount', '$amount')");
+      $insertPayable->execute();
+    }
 
     $kg = floatval($viss) * 1.634;
 
     if ($tclfrozen == 'tcl') {
-      $stmt = $pdo->prepare("UPDATE form7stocktcl SET date='$date', supplier_name='$supplier_name', item_id='$commodity', size='$size', viss='$viss', kg='$kg', pcspervr='$pcs' WHERE link_id='$no'");
-      $stmt->execute();
+      $formstmt = $pdo->prepare("UPDATE form7stocktcl SET date='$date', supplier_name='$supplier_name', item_id='$commodity', size='$size', viss='$viss', kg='$kg', pcspervr='$pcs' WHERE link_id='$no'");
+      $formstmt->execute();
     } else {
-      $stmt = $pdo->prepare("UPDATE form7stock SET date='$date', supplier_name='$supplier_name', item_id='$commodity', size='$size', viss='$viss', kg='$kg', pcspervr='$pcs' WHERE link_id='$no'");
-      $stmt->execute();
+      $formstmt = $pdo->prepare("UPDATE form7stock SET date='$date', supplier_name='$supplier_name', item_id='$commodity', size='$size', viss='$viss', kg='$kg', pcspervr='$pcs' WHERE link_id='$no'");
+      $formstmt->execute();
     }
 
     if ($stmt) {
       echo '<script>swal("Success!", "Updated Successfully!", "success");</script>';
     } else {
-      return $errmessage = "";
       echo '<script>swal("Warning!", "Error accors when updating Purchase Voucher", "warning");</script>';
     }
   }
@@ -620,9 +813,34 @@ class Query
   function deletepurchase($table, $deleteid)
   {
     global $pdo;
+    $rowStmt = $pdo->prepare("SELECT * FROM $table WHERE no='$deleteid'");
+    $rowStmt->execute();
+    $rowData = $rowStmt->fetch(PDO::FETCH_ASSOC);
+    if (empty($rowData)) {
+      return $errmessage = "Purchase row not found";
+    }
+
+    $purchase_voucher_id = $rowData['purchase_voucher_id'];
+    $amount = floatval($rowData['amount']);
+
     $stmt = $pdo->prepare("DELETE FROM $table WHERE no='$deleteid'");
     $stmt->execute();
+
     if ($stmt) {
+      $remainingStmt = $pdo->prepare("SELECT COUNT(*) AS cnt FROM $table WHERE purchase_voucher_id='$purchase_voucher_id'");
+      $remainingStmt->execute();
+      $remaining = $remainingStmt->fetch(PDO::FETCH_ASSOC);
+
+      if ($remaining['cnt'] == 0) {
+        $deleteVoucher = $pdo->prepare("DELETE FROM purchase_voucher WHERE id='$purchase_voucher_id'");
+        $deleteVoucher->execute();
+      } else {
+        $updateVoucher = $pdo->prepare("UPDATE purchase_voucher SET total_amount = total_amount - '$amount' WHERE id='$purchase_voucher_id'");
+        $updateVoucher->execute();
+
+        $payableUpdate = $pdo->prepare("UPDATE payable SET purchase_amount = purchase_amount - '$amount', balance = balance - '$amount' WHERE purchase_voucher_id='$purchase_voucher_id'");
+        $payableUpdate->execute();
+      }
       return $successmessage = "Purchase Voucher Deleted Successfully";
     } else {
       return $errmessage = "Error accors when deleted Purchase Voucher";
@@ -632,7 +850,7 @@ class Query
   function deletepayable($table, $deleteid)
   {
     global $pdo;
-    $stmt = $pdo->prepare("DELETE FROM $table WHERE link_id='$deleteid'");
+    $stmt = $pdo->prepare("DELETE FROM $table WHERE id='$deleteid' OR purchase_voucher_id='$deleteid' OR link_id='$deleteid'");
     $stmt->execute();
     if ($stmt) {
       return $successmessage = "Payable Voucher Deleted Successfully";
@@ -664,6 +882,7 @@ class Query
       return $errmessage = "Error accors when updaing Payable Voucher";
     }
   }
+
 
   function addcontainer($container_no, $country, $date)
   {
@@ -2988,7 +3207,7 @@ class Query
 
     $mcstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE kg='$kg' AND size=:size AND commondity_id='$commondity_id' AND country='$country' ORDER BY id DESC");
     $mcstmt->execute(
-      array(':size' => $size )
+      array(':size' => $size)
     );
     $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -2999,7 +3218,7 @@ class Query
     }
     $addmcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc, fish_type) VALUES('$date', '$country', '$particular', '$commondity_id', :size, '$kg', '$mc', '$balance_mc', '$fish_type')");
     $addmcstmt->execute(
-      array(':size' => $size )
+      array(':size' => $size)
     );
 
 

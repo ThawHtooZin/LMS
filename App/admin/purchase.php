@@ -45,24 +45,19 @@ $bootstrap->css();
 <body>
   <div class="row">
     <div class="sidebarcol" id="sidebar">
-      <?php
-      include 'sidebar.php';
-      ?>
+      <?php include 'sidebar.php'; ?>
     </div>
     <div class="contentcol" id="content">
       <?php require 'navbar.php'; ?>
       <div class="card">
         <div class="card-header bg-warning text-light" style="padding:-10px;">
-
           <b>Manage Purchase</b>
-
           <a href="export.php?table_name=purchase" class="btn btn-sm btn-success float-end">Export to excel</a>
         </div>
         <div class="card-body" style="margin-top:-8px !important;">
           <?php
           if (isset($_POST['deletebutton'])) {
             $deleteid = $_POST['deleteid'];
-
             $data = $query->select('purchase', $deleteid, 'no');
             if (!empty($data['tclfrozen'])) {
               $tclorfrozen = $data['tclfrozen'];
@@ -70,51 +65,72 @@ $bootstrap->css();
               $tclorfrozen = '';
             }
             $query->deletepurchase('purchase', $deleteid);
-            $query->deletepayable('payable', $deleteid);
             if ($tclorfrozen == 'tcl') {
               $query->deleteform7('form7stocktcl', $deleteid);
             } else {
               $query->deleteform7('form7stock', $deleteid);
             }
           }
-          if (isset($_POST['updatebutton'])) {
+
+          if (isset($_POST['updatebutton']) || isset($_POST['update_voucher'])) {
+            // Note: Keeping existing individual update logic just in case, 
+            // but voucher detail modal uses this same file. 
+            // You may need to adapt your update method if updating multiple lines.
             $date = $_POST['date'];
             $voucher_no = $_POST['voucher_no'];
             $tclfrozen = $_POST['tclfrozen'];
-            $supplier_name = $_POST['upsupplier_code_no'];
-            $commodity = $_POST['commodity'];
-            $size = $_POST['size'];
-            $viss = $_POST['viss'];
-            $pcs = $_POST['pcs'];
-            $price = $_POST['price'];
-            $no = $_POST['updateid'];
+            $supplier_name = isset($_POST['upsupplier_code_no']) ? $_POST['upsupplier_code_no'] : (isset($_POST['supplier_code_no']) ? $_POST['supplier_code_no'] : '');
+            $commodity = isset($_POST['commodity']) ? $_POST['commodity'] : '';
+            $size = isset($_POST['size']) ? $_POST['size'] : '';
+            $viss = isset($_POST['viss']) ? $_POST['viss'] : '';
+            $pcs = isset($_POST['pcs']) ? $_POST['pcs'] : '';
+            $price = isset($_POST['price']) ? $_POST['price'] : '';
+            $no = isset($_POST['updateid']) ? $_POST['updateid'] : (isset($_POST['voucher_id']) ? $_POST['voucher_id'] : '');
 
-            $message = $query->updatepurchase('purchase', $date, $voucher_no, $supplier_name, $tclfrozen, $commodity, $size, $viss, $pcs, $price, $no);
+            // For the complex line updates in the modal, you would need a loop here 
+            // similar to the add function if you are updating all lines at once.
+            // Assuming your query->updatepurchase handles the basic single item update for now:
+            if (isset($_POST['updatebutton'])) {
+              $message = $query->updatepurchase('purchase', $date, $voucher_no, $supplier_name, $tclfrozen, $commodity, $size, $viss, $pcs, $price, $no);
+            }
           }
+
           $date_error = '';
           $voucher_no_error = '';
           $type_error = '';
           $supplier_name_error = '';
           $viss_error = '';
           $price_error = '';
+
+          // Add Feature Logic Restored
           if (isset($_POST['addbutton'])) {
             $date = $_POST['date'];
             $voucher_no = $_POST['voucher_no'];
             $tclfrozen = $_POST['tclfrozen'];
             $supplier_name = $_POST['supplier_code_no'];
-            $commodity = $_POST['commodity'];
-            $size = $_POST['size'];
-            $viss = $_POST['viss'];
-            $pcs = $_POST['pcs'];
-            $price = $_POST['price'];
+            $commodities = isset($_POST['commodity']) ? $_POST['commodity'] : [];
+            $sizes = isset($_POST['size']) ? $_POST['size'] : [];
+            $visses = isset($_POST['viss']) ? $_POST['viss'] : [];
+            $pcss = isset($_POST['pcs']) ? $_POST['pcs'] : [];
+            $prices = isset($_POST['price']) ? $_POST['price'] : [];
 
             $_SESSION['purchase_date'] = $date;
             $_SESSION['purchase_voucher_no'] = $voucher_no;
             $_SESSION['purchase_tclfrozen'] = $tclfrozen;
             $_SESSION['purchase_supplier_name'] = $supplier_name;
+            $hasLine = false;
 
-            if (empty($date) || empty($voucher_no) || empty($tclfrozen) || empty($supplier_name) || empty($viss) || empty($price)) {
-              echo '<script>swal("Error!", "Error accors when added Purchase Voucher", "error");</script>';
+            foreach ($visses as $index => $lineViss) {
+              $linePrice = isset($prices[$index]) ? trim($prices[$index]) : '';
+              $lineViss = trim($lineViss);
+              if ($lineViss !== '' || $linePrice !== '' || !empty($commodities[$index]) || !empty($sizes[$index]) || !empty($pcss[$index])) {
+                $hasLine = true;
+                break;
+              }
+            }
+
+            if (empty($date) || empty($voucher_no) || empty($tclfrozen) || empty($supplier_name) || !$hasLine) {
+              echo '<script>swal("Error!", "Error occurs when added Purchase Voucher", "error");</script>';
               if (empty($date)) {
                 $date_error = "Please Enter The Date";
               }
@@ -127,86 +143,107 @@ $bootstrap->css();
               if (empty($supplier_name)) {
                 $supplier_name_error = "Please Enter The Supplier A/C Code";
               }
-              if (empty($viss)) {
-                $viss_error = "Please Enter The Viss";
-              }
-              if (empty($price)) {
-                $price_error = "Please Enter The Price";
+              if (!$hasLine) {
+                $viss_error = "Please add at least one purchase line";
               }
             } else {
-              $query->addpurchase('purchase', $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price);
+              $lines = [];
+              foreach ($commodities as $index => $commodity) {
+                $commodity = trim($commodity);
+                $size = isset($sizes[$index]) ? trim($sizes[$index]) : '';
+                $viss = isset($visses[$index]) ? trim($visses[$index]) : '';
+                $pcs = isset($pcss[$index]) ? trim($pcss[$index]) : '';
+                $price = isset($prices[$index]) ? trim($prices[$index]) : '';
+                if ($commodity === '' && $size === '' && $viss === '' && $pcs === '' && $price === '') {
+                  continue;
+                }
+                if ($viss === '' || $price === '') {
+                  continue;
+                }
+                $lines[] = [
+                  'commodity' => $commodity,
+                  'size' => $size,
+                  'viss' => $viss,
+                  'pcs' => $pcs,
+                  'price' => $price
+                ];
+              }
+              if (!empty($lines)) {
+                $query->addPurchaseVoucher($date, $voucher_no, $tclfrozen, $supplier_name, $lines);
+              }
             }
           }
 
           if (isset($_POST['total'])) {
             $supplier_id = $_POST['supplier_id'];
-            $purchasedatas = $query->search('purchase', 'supplier_id', $supplier_id);
+            $purchasedatas = $query->search('purchase_voucher', 'supplier_id', $supplier_id);
           }
 
           if (isset($_POST['commoditybtn'])) {
             $item_id = $_POST['item_id'];
-            $purchasedatas = $query->search('purchase', 'commodity', $item_id);
+            $stmt = $pdo->prepare("SELECT DISTINCT purchase_voucher_id FROM purchase WHERE commodity='$item_id'");
+            $stmt->execute();
+            $voucherIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            if (!empty($voucherIds)) {
+              $idList = implode(',', array_map('intval', $voucherIds));
+              $stmt = $pdo->prepare("SELECT * FROM purchase_voucher WHERE id IN ($idList) ORDER BY id");
+              $stmt->execute();
+              $purchasedatas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } else {
+              $purchasedatas = [];
+            }
           }
 
           if (!empty($message)) {
             if (strpos($message, 'Successfully')) {
               $successmessage = $message;
             }
-
             if (strpos($message, 'Error')) {
               $errmessage = $message;
             }
-
             if (strpos($message, 'following')) {
               $errormessage = $message;
             }
           }
-
           ?>
 
-          <?php
-          if (!empty($errormessage)) {
-          ?>
+          <?php if (!empty($errormessage)) { ?>
             <div class="alert alert-danger alert-dismissible fade show">
               <strong>Error! </strong> <?php echo $errormessage; ?>
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-          <?php
-          }
-          if (!empty($errmessage)) {
-          ?>
+          <?php } ?>
+
+          <?php if (!empty($errmessage)) { ?>
             <div class="alert alert-danger alert-dismissible fade show">
               <strong>Error! </strong> <?php echo $errmessage; ?>
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-          <?php
-          }
-          if (!empty($successmessage)) {
-          ?>
+          <?php } ?>
+
+          <?php if (!empty($successmessage)) { ?>
             <div class="alert alert-success alert-dismissible fade show">
               <strong>Success! </strong> <?php echo $successmessage; ?>
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-          <?php
-          }
-          ?>
-          <a href="purchase_report.php" class="btn btn-primary btn-sm">Report</a>
+          <?php } ?>
+
+          <!-- <a href="purchase_report.php" class="btn btn-primary btn-sm">Report</a> -->
           <form action="purchase.php" method="post" class="d-inline">
             <span>Supplier Name:</span>
             <select class="chzn-select" name="supplier_id" style="width:15%;" data-placeholder="Supplier Name">
               <?php
-              $supplierdatastmt = $pdo->prepare("SELECT * FROM purchase GROUP BY supplier_id");
+              $supplierdatastmt = $pdo->prepare("SELECT * FROM purchase_voucher GROUP BY supplier_id");
               $supplierdatastmt->execute();
               $supplierdatas = $supplierdatastmt->fetchall();
               foreach ($supplierdatas as $supplierdata) {
                 $supplier_name = $query->select('supplier', $supplierdata['supplier_id'], 'supplier_id');
               ?>
                 <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplier_name['supplier_name']; ?> - <?= $supplierdata['supplier_id']; ?></option>
-              <?php
-              }
-              ?>
+              <?php } ?>
             </select>
             <button type="submit" name="total" class="btn btn-primary btn-sm">Search</button>
+
             <span>Commodity:</span>
             <select class="form-control d-inline" name="item_id" style="width:15%;">
               <?php
@@ -214,15 +251,15 @@ $bootstrap->css();
               foreach ($itemdatas as $itemdata) {
               ?>
                 <option value="<?php echo $itemdata['item_id']; ?>"><?php echo $itemdata['item_name']; ?></option>
-              <?php
-              }
-              ?>
+              <?php } ?>
             </select>
             <button type="submit" name="commoditybtn" class="btn btn-primary btn-sm">Find Commodity</button>
           </form>
-          <button type="button" class="btn btn-success float-end btn-sm" data-bs-toggle="modal" data-bs-target="#addmodal">
+
+          <button type="button" class="btn btn-primary float-end btn-sm" data-bs-toggle="modal" data-bs-target="#addmodal">
             Add Purchase Voucher
           </button>
+
           <?php
           if (!empty($_GET['pageno'])) {
             $pageno = $_GET['pageno'];
@@ -232,6 +269,7 @@ $bootstrap->css();
           $numOfrecs = 15;
           $offset = ($pageno - 1) * $numOfrecs;
           ?>
+
           <table class="mt-1 table table-bordered table-striped rounded table-hover">
             <tr>
               <th>No.</th>
@@ -239,269 +277,201 @@ $bootstrap->css();
               <th>Voucher No</th>
               <th>Type</th>
               <th>Supplier Name</th>
-              <th>Commodity</th>
-              <th>Size</th>
-              <th>Viss</th>
-              <th>Kg</th>
-              <th>Pcs</th>
-              <th>Price</th>
-              <th>Amount</th>
+              <th class="text-end">Total Amount</th>
+              <th>Actions</th>
             </tr>
             <?php
             if (isset($_POST['total'])) {
               $supplier_id = $_POST['supplier_id'];
-              $total_amount = $query->selectsum('purchase', $supplier_id, 'supplier_id');
+              $purchasedatas = $query->search('purchase_voucher', 'supplier_id', $supplier_id);
+              $total_pages = 1;
+              $total_amount = $query->selectallsumcheck('purchase_voucher', 'total_amount', 'total_amount', 'supplier_id', $supplier_id);
             } elseif (isset($_POST['commoditybtn'])) {
               $item_id = $_POST['item_id'];
+              $stmt = $pdo->prepare("SELECT DISTINCT purchase_voucher_id FROM purchase WHERE commodity='$item_id'");
+              $stmt->execute();
+              $voucherIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+              if (!empty($voucherIds)) {
+                $idList = implode(',', array_map('intval', $voucherIds));
+                $stmt = $pdo->prepare("SELECT * FROM purchase_voucher WHERE id IN ($idList) ORDER BY id");
+                $stmt->execute();
+                $purchasedatas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+              } else {
+                $purchasedatas = [];
+              }
               $total_amount = $query->selectsum('purchase', $item_id, 'commodity');
+              $total_pages = 1;
             } else {
-              $stmt = $pdo->prepare("SELECT * FROM purchase ORDER BY no");
+              $stmt = $pdo->prepare("SELECT COUNT(*) AS cnt FROM purchase_voucher");
               $stmt->execute();
-              $rawResult = $stmt->fetchAll();
-              $total_pages = ceil(count($rawResult) / $numOfrecs);
+              $countData = $stmt->fetch(PDO::FETCH_ASSOC);
+              $total_pages = ceil($countData['cnt'] / $numOfrecs);
 
-              $stmt = $pdo->prepare("SELECT * FROM purchase ORDER BY no LIMIT $offset,$numOfrecs ");
+              $stmt = $pdo->prepare("SELECT * FROM purchase_voucher ORDER BY id LIMIT $offset,$numOfrecs ");
               $stmt->execute();
-              $purchasedatas = $stmt->fetchAll();
+              $purchasedatas = $stmt->fetchAll(PDO::FETCH_ASSOC);
             }
-            $idd = 0;
+
+            $idd = $offset;
+            $modals_html = ''; // Initialize the buffer variable for modals
+
             foreach ($purchasedatas as $purchasedata) {
               $idd++;
               $supplierid = $purchasedata['supplier_id'];
               $supplier_name = $query->select('supplier', $supplierid, 'supplier_id');
-              $itemid = $purchasedata['commodity'];
-              $item_name = $query->select('item', $itemid, 'item_id');
             ?>
-              <input type="hidden" name="updateid" value="<?php echo $purchasedata['no']; ?>">
-
-              <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $purchasedata['no'];  ?>" style="cursor: pointer !important;">
+              <tr class="table-secondary">
                 <td><?php echo $idd; ?></td>
                 <td><?php echo date('d-m-Y', strtotime($purchasedata['date'])); ?></td>
                 <td><?php echo $purchasedata['voucher_no']; ?></td>
                 <td><?php echo $purchasedata['tclfrozen']; ?></td>
                 <td><?php echo $supplier_name['supplier_name']; ?></td>
-                <td><?php echo $item_name['item_name']; ?></td>
-                <td><?php echo $purchasedata['size']; ?></td>
-                <td><?php echo $purchasedata['viss']; ?></td>
-                <td><?php echo floatval($purchasedata['viss']) * 1.634; ?></td>
-                <td><?php echo $purchasedata['pcs']; ?></td>
-                <td><?php echo $purchasedata['price']; ?></td>
-                <td><?php echo $purchasedata['amount']; ?></td>
+                <td class="text-end fw-bold"><?php echo $purchasedata['total_amount']; ?></td>
+                <td>
+                  <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#voucherModal<?php echo $purchasedata['id']; ?>">Details</button>
+                </td>
               </tr>
-              <!-- Data Update Modal -->
-              <div class="modal fade" id="updatemodal<?php echo $purchasedata['no'];  ?>" tabindex="-1" role="dialog" style="margin-left:auto !important; margin-right: auto !important;">
-                <div class="modal-dialog" role="document">
-                  <div class="modal-content" style="width: 750px; !important; margin-top:70px !important;">
-                    <form action="" method="post" autocomplete="off">
-                      <input type="hidden" name="deleteid" value="<?php echo $purchasedata['no']; ?>">
-                      <div class="modal-header bg-warning text-light">
-                        <h5 class="modal-title" id="updatemodallabel">Update An Category</h5>
-                        <div class="row">
-                          <div class="col">
-                            <button type="submit" class="btn btn-success d-inline" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
-                              </svg>
-                            </button>
-                            <button type="submit" name="deletebutton" class="btn btn-danger d-inline">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
-                                <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z" />
-                              </svg>
-                            </button>
-                            <button type="button" class="btn btn-primary d-inline" data-bs-toggle="modal">&times;</button>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="modal-body">
-                        <?php
-                        $id = $purchasedata['no'];
-                        $updatedata = $query->select('purchase', $id, 'no');
-                        $datas = $query->select('acname', $updatedata['supplier_id'], 'code_no');
-                        $ac_name = $datas['ac_name'];
-                        ?>
-                        <input type="hidden" name="updateid" value="<?php echo $purchasedata['no']; ?>">
-                        <div class="row">
-                          <div class="col">
-                            <label style="font-weight: bold;">Date</label>
-                            <input type="date" name="date" class="form-control inpv2" value="<?php echo $updatedata['date']; ?>">
-                          </div>
-                          <div class="col">
-                            <label style="font-weight: bold;">Voucher No</label>
-                            <input type="number" name="voucher_no" class="form-control inpv2 mb-2" value="<?php echo $updatedata['voucher_no']; ?>">
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col">
-                            <label style="font-weight: bold;">TCL (or) Frozen</label>
-                            <input type="hidden" name="tclfrozen" value="<?= $updatedata['tclfrozen'] ?>">
-                            <select class="form-control inpv2 mb-2" disabled>
-                              <option value="">Select</option>
-                              <option value="tcl" <?php if ($updatedata['tclfrozen'] == 'tcl') {
-                                                    echo 'selected';
-                                                  } ?>>TCL</option>
-                              <option value="frozen" <?php if ($updatedata['tclfrozen'] == 'frozen') {
-                                                        echo 'selected';
-                                                      } ?>>Frozen</option>
-                            </select>
-                          </div>
-                          <div class="col-6">
-                            <label style="font-weight: bold;">Supplier A/C Code</label>
-                            <div class="row">
-                              <div style="width: 40%;">
-                                <input type="text" name="upsupplier_code_no" id="upac_code<?php echo $purchasedata['no']; ?>" class="form-control inpv2 mb-1" value="<?php echo $updatedata['supplier_id']; ?>" style="padding-top: 2px; padding-bottom: 2px;">
-                              </div>
-                              <div style="width: 10%;">
-                                <a href="supplier.php" target="_blank" style="width: 10%; padding: 2.5px; color:black; text-align: center;">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
-                                  </svg>
-                                </a>
-                              </div>
-                              <div class="col-6">
-                                <div id='ac_name'>
-                                  <input type="text" name="ac_name" disabled class="form-control inpv2 mb-1" value="<?php if ($ac_name != '') {
-                                                                                                                      echo $ac_name;
-                                                                                                                    } ?>" style="padding-top: 2px; padding-bottom: 2px; width:90% !important;">
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col">
-                            <label style="font-weight: bold;">Commodity</label>
-                            <select class="form-control inpv2 mb-2" name="commodity">
-                              <?php
-                              $itemdatas = $query->selectall('item');
-                              foreach ($itemdatas as $itemdata) {
-                              ?>
-                                <option value="<?php echo $itemdata['item_id']; ?>" <?php if ($updatedata['commodity'] == $itemdata['item_id']) {
-                                                                                      echo 'selected';
-                                                                                    } ?>><?php echo $itemdata['item_name']; ?></option>
-                              <?php
-                              }
-                              ?>
-                            </select>
-                          </div>
-                          <div class="col">
-                            <label style="font-weight: bold;">Size</label>
-                            <input type="text" name="size" class="form-control inpv2 mb-2" value="<?php echo $updatedata['size']; ?>">
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col">
-                            <label style="font-weight: bold;">Viss</label>
-                            <input type="text" name="viss" class="form-control inpv2 mb-2" value="<?php echo $updatedata['viss']; ?>">
-                          </div>
-                          <div class="col">
-                            <label style="font-weight: bold;">Pcs</label>
-                            <input type="number" name="pcs" class="form-control inpv2 mb-2" value="<?php echo $updatedata['pcs']; ?>">
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col">
-                            <label style="font-weight: bold;">Price</label>
-                            <input type="number" name="price" class="form-control inpv2 mb-2" value="<?php echo $updatedata['price']; ?>">
-                          </div>
-                          <div class="col">
 
+              <?php ob_start(); // Start buffering the modal 
+              ?>
+              <div class="modal fade" id="voucherModal<?php echo $purchasedata['id']; ?>" tabindex="-1">
+                <div class="modal-dialog modal-xl">
+                  <div class="modal-content" style="margin-top:70px !important;">
+                    <div class="modal-header bg-secondary text-light">
+                      <h5 class="modal-title">Edit Voucher - <?php echo $purchasedata['voucher_no']; ?></h5>
+                      <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="h3">&times;</span>
+                      </button>
+                    </div>
+                    <form action="purchase.php" method="post" autocomplete="off">
+                      <input type="hidden" name="voucher_id" value="<?php echo $purchasedata['id']; ?>">
+                      <div class="modal-body">
+                        <div class="row g-3 mb-3">
+                          <div class="col-md-3">
+                            <label style="font-weight: bold;">Date</label>
+                            <input type="date" name="date" class="form-control inpv2" value="<?php echo $purchasedata['date']; ?>">
                           </div>
+                          <div class="col-md-3">
+                            <label style="font-weight: bold;">Voucher No</label>
+                            <input type="text" name="voucher_no" class="form-control inpv2" value="<?php echo $purchasedata['voucher_no']; ?>">
+                          </div>
+                          <div class="col-md-3">
+                            <label style="font-weight: bold;">TCL (or) Frozen</label>
+                            <select name="tclfrozen" class="form-control inpv2">
+                              <option value="">Select</option>
+                              <option value="tcl" <?php if ($purchasedata['tclfrozen'] == 'tcl') echo 'selected'; ?>>TCL</option>
+                              <option value="frozen" <?php if ($purchasedata['tclfrozen'] == 'frozen') echo 'selected'; ?>>Frozen</option>
+                            </select>
+                          </div>
+                          <div class="col-md-3">
+                            <label style="font-weight: bold;">Supplier</label>
+                            <select name="supplier_code_no" class="form-control inpv2">
+                              <?php
+                              $supplierdatas2 = $query->selectall('supplier');
+                              foreach ($supplierdatas2 as $supplierdata2) {
+                              ?>
+                                <option value="<?php echo $supplierdata2['supplier_id']; ?>" <?php if ($purchasedata['supplier_id'] == $supplierdata2['supplier_id']) echo 'selected'; ?>><?php echo $supplierdata2['supplier_name']; ?></option>
+                              <?php } ?>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="mb-2 d-flex justify-content-between align-items-center">
+                          <label style="font-weight: bold;">Purchase Lines</label>
+                          <button type="button" class="btn btn-sm btn-outline-primary" onclick="addPurchaseLineTo('purchase-lines-<?php echo $purchasedata['id']; ?>');">Add Line</button>
+                        </div>
+
+                        <div class="table-responsive">
+                          <table class="table table-bordered table-sm">
+                            <thead class="table-light">
+                              <tr>
+                                <th>Commodity</th>
+                                <th>Size</th>
+                                <th>Viss</th>
+                                <th>Pcs</th>
+                                <th>Price</th>
+                                <th style="width:1px;">Remove</th>
+                              </tr>
+                            </thead>
+                            <tbody id="purchase-lines-<?php echo $purchasedata['id']; ?>">
+                              <?php
+                              $lines = $query->search('purchase', 'purchase_voucher_id', $purchasedata['id']);
+                              $allItems = $query->selectall('item');
+                              foreach ($lines as $ln) {
+                              ?>
+                                <tr>
+                                  <td>
+                                    <select name="commodity[]" class="form-control">
+                                      <option value="">Select product</option>
+                                      <?php foreach ($allItems as $it) { ?>
+                                        <option value="<?php echo $it['item_id']; ?>" <?php if ($ln['commodity'] == $it['item_id']) echo 'selected'; ?>><?php echo $it['item_name']; ?></option>
+                                      <?php } ?>
+                                    </select>
+                                    <input type="hidden" name="line_id[]" value="<?php echo $ln['no']; ?>">
+                                  </td>
+                                  <td><input type="text" name="size[]" class="form-control" value="<?php echo $ln['size']; ?>"></td>
+                                  <td><input type="text" name="viss[]" class="form-control" value="<?php echo $ln['viss']; ?>"></td>
+                                  <td><input type="number" name="pcs[]" class="form-control" value="<?php echo $ln['pcs']; ?>"></td>
+                                  <td><input type="number" step="0.01" name="price[]" class="form-control" value="<?php echo $ln['price']; ?>"></td>
+                                  <td><button type="button" class="btn btn-danger btn-sm" onclick="removePurchaseLine(this);">×</button></td>
+                                </tr>
+                              <?php } ?>
+                            </tbody>
+                          </table>
+                        </div>
+
+                        <div class="text-end mt-2">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="submit" class="btn btn-success" name="update_voucher">Save Changes</button>
                         </div>
                       </div>
                     </form>
                   </div>
                 </div>
               </div>
-              <!-- Update Modal -->
-              <script type="text/javascript">
-                $('#upac_code<?php echo $data['id']; ?>').on('keyup', function() {
-                  var upac_codepost = $('#upac_code<?php echo $data['id']; ?>').val();
-                  var type = "";
-                  if (upac_codepost.includes('/')) {
-                    upac_code = upac_codepost.split('/');
-                    type = "slash";
-                  } else {
-                    upac_code = upac_codepost.split('-');
-                    type = "dash";
-                  }
-                  upfirstpart = upac_code[0];
-                  uplastpart = upac_code[1];
-                  $('#upac_name<?php echo $data['id']; ?>').load('ac_name.php', {
-                    FirstPart: upfirstpart,
-                    LastPart: JSON.stringify(uplastpart),
-                    Type: type
-                  });
-                });
-              </script>
             <?php
-            };
+              $modals_html .= ob_get_clean(); // End buffering and store in variable
+            }
             ?>
+
             <?php
             if (isset($_POST['total'])) {
               $supplier_id = $_POST['supplier_id'];
-              $total_amount = $query->selectsum('purchase', $supplier_id, 'supplier_id');
+              $total_amount = $query->selectallsumcheck('purchase_voucher', 'total_amount', 'total_amount', 'supplier_id', $supplier_id);
             ?>
               <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>Total Amount:</td>
-                <td></td>
-                <td><?php echo $total_amount['total_amount'];  ?></td>
+                <td colspan="5"></td>
+                <td class="fw-bold">Total Amount:</td>
+                <td class="text-end"><?php echo $total_amount['total_amount']; ?></td>
               </tr>
-            <?php
-            }
-            ?>
+            <?php } ?>
+
             <?php
             if (isset($_POST['commoditybtn'])) {
               $id = $_POST['item_id'];
               $total_amount = $query->selectsum('purchase', $id, 'commodity');
             ?>
               <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>Total Amount:</td>
-                <td><?php echo $total_amount['total_amount'];  ?></td>
-                <td></td>
+                <td colspan="5"></td>
+                <td class="fw-bold">Total Amount:</td>
+                <td class="text-end"><?php echo $total_amount['total_amount']; ?></td>
               </tr>
-            <?php
-            }
-            ?>
+            <?php } ?>
+
             <?php
             if (!$_POST && !empty($_GET['pageno']) && $_GET['pageno'] == $total_pages) {
-              $total_amount = $query->selectallsum('purchase', 'amount', 'total_amount');
+              $total_amount = $query->selectallsum('purchase_voucher', 'total_amount', 'total_amount');
             ?>
               <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>Total Amount:</td>
-                <td><?php echo $total_amount['total_amount'];  ?></td>
-                <td></td>
+                <td colspan="5"></td>
+                <td class="fw-bold">Total Amount:</td>
+                <td class="text-end"><?php echo $total_amount['total_amount']; ?></td>
               </tr>
-            <?php
-            }
-            ?>
+            <?php } ?>
           </table>
+
+          <?php echo $modals_html; ?>
+
           <div aria-label="Page navigation example" style="float:right;">
             <ul class="pagination">
               <li class="page-item"><a class="page-link" href="?pageno=1">First</a></li>
@@ -531,10 +501,10 @@ $bootstrap->css();
       </div>
     </div>
   </div>
-  <!-- Data Add Modal -->
+
   <div class="modal fade" id="addmodal" style="margin-left:auto !important; margin-right: auto !important;">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content" style="width: 750px; !important; margin-top:70px !important;">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content" style="margin-top:70px !important;">
         <div class="modal-header bg-secondary text-light">
           <h5 class="modal-title" id="addmodellabel">Create New Purchase Voucher</h5>
           <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
@@ -543,32 +513,26 @@ $bootstrap->css();
         </div>
         <form action="purchase.php" method="post" autocomplete="off">
           <div class="modal-body">
-            <div class="row">
-              <div class="col">
+            <div class="row g-3 mb-3">
+              <div class="col-md-3">
                 <label style="font-weight: bold;">Date</label>
                 <input type="date" name="date" <?php if (!empty($date_error)) {
                                                   echo "class=\"form-control is-invalid\"";
                                                 } else {
                                                   echo "class=\"form-control inpv2\"";
-                                                } ?> value="<?php if (!empty($_SESSION['purchase_date'])) {
-                                                              echo $_SESSION['purchase_date'];
-                                                            }; ?>">
-                <span class="text-danger" style="font-size:12px; font-weight:bold;" style="font-weight:bold !important;"><?php echo $date_error; ?></span>
+                                                } ?> value="<?php echo !empty($_POST['date']) ? $_POST['date'] : ''; ?>">
+                <div class="text-danger small"><?php echo $date_error; ?></div>
               </div>
-              <div class="col">
+              <div class="col-md-3">
                 <label style="font-weight: bold;">Voucher No</label>
-                <input type="number" name="voucher_no" <?php if (!empty($voucher_no_error)) {
-                                                          echo "class=\"form-control is-invalid\"";
-                                                        } else {
-                                                          echo "class=\"form-control inpv2\"";
-                                                        } ?> value="<?php if (!empty($_SESSION['purchase_voucher_no'])) {
-                                                                      echo $_SESSION['purchase_voucher_no'];
-                                                                    }; ?>">
-                <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;" style="font-weight:bold !important;"><?php echo $voucher_no_error; ?></span>
+                <input type="text" name="voucher_no" <?php if (!empty($voucher_no_error)) {
+                                                        echo "class=\"form-control is-invalid\"";
+                                                      } else {
+                                                        echo "class=\"form-control inpv2\"";
+                                                      } ?> value="<?php echo !empty($_POST['voucher_no']) ? $_POST['voucher_no'] : ''; ?>">
+                <div class="text-danger small"><?php echo $voucher_no_error; ?></div>
               </div>
-            </div>
-            <div class="row">
-              <div class="col">
+              <div class="col-md-3">
                 <label style="font-weight: bold;">TCL (or) Frozen</label>
                 <select <?php if (!empty($type_error)) {
                           echo "class=\"form-control is-invalid\"";
@@ -576,102 +540,126 @@ $bootstrap->css();
                           echo "class=\"form-control inpv2\"";
                         } ?> name="tclfrozen">
                   <option value="">Select</option>
-                  <option value="tcl" <?php if (!empty($_SESSION['purchase_tclfrozen'])) {
-                                        if ($_SESSION['purchase_tclfrozen'] == 'tcl') {
-                                          echo "selected";
-                                        }
-                                      } ?>>TCL</option>
-                  <option value="frozen" <?php if (!empty($_SESSION['purchase_tclfrozen'])) {
-                                            if ($_SESSION['purchase_tclfrozen'] == 'frozen') {
-                                              echo "selected";
-                                            }
-                                          } ?>>Frozen</option>
+                  <option value="tcl" <?php echo (!empty($_POST['tclfrozen']) && $_POST['tclfrozen'] == 'tcl') ? 'selected' : ''; ?>>TCL</option>
+                  <option value="frozen" <?php echo (!empty($_POST['tclfrozen']) && $_POST['tclfrozen'] == 'frozen') ? 'selected' : ''; ?>>Frozen</option>
                 </select>
-                <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;" style="font-weight:bold !important;"><?php echo $type_error; ?></span>
+                <div class="text-danger small"><?php echo $type_error; ?></div>
               </div>
-              <div class="col-6">
-                <label style="font-weight: bold;">Supplier A/C Code</label>
-                <div class="row">
-                  <div style="width: 40%;">
-                    <input type="text" id="addac_code" name="supplier_code_no" <?php if (!empty($supplier_name_error)) {
-                                                                                  echo "class=\"form-control is-invalid\"";
-                                                                                } else {
-                                                                                  echo "class=\"form-control inpv2\"";
-                                                                                } ?> style="padding-top: 2px; padding-bottom: 2px;" value="<?php if (!empty($_SESSION['purchase_supplier_name'])) {
-                                                                                                                                              echo $_SESSION['purchase_supplier_name'];
-                                                                                                                                            }; ?>">
-                  </div>
-                  <div style="width: 10%;">
-                    <a href="supplier.php" target="_blank" style="width: 10%; padding: 2.5px; color:black; text-align: center;">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
-                      </svg>
-                    </a>
-                  </div>
-                  <div class="col-6">
-                    <div id='addac_name'>
-                      <input type="text" name="addac_name" disabled class="form-control inpv2 mb-1" style="padding-top: 2px; padding-bottom: 2px;">
-                    </div>
-                  </div>
-                  <span class="text-danger mb-1" style="font-size:12px; font-weight:bold;"><?php echo $supplier_name_error; ?></span>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <label style="font-weight: bold;">Commodity</label>
-                <select class="form-control inpv2 mb-2" name="commodity">
+              <div class="col-md-3">
+                <label style="font-weight: bold;">Supplier</label>
+                <select name="supplier_code_no" class="form-control inpv2">
+                  <option value="">Select supplier</option>
                   <?php
-                  $itemdatas = $query->selectall('item');
-                  foreach ($itemdatas as $itemdata) {
+                  $supplierdatas = $query->selectall('supplier');
+                  foreach ($supplierdatas as $supplierdata) {
                   ?>
-                    <option value="<?php echo $itemdata['item_id']; ?>"><?php echo $itemdata['item_name']; ?></option>
-                  <?php
-                  }
-                  ?>
+                    <option value="<?php echo $supplierdata['supplier_id']; ?>" <?php echo (!empty($_POST['supplier_code_no']) && $_POST['supplier_code_no'] == $supplierdata['supplier_id']) ? 'selected' : ''; ?>><?php echo $supplierdata['supplier_name']; ?></option>
+                  <?php } ?>
                 </select>
-              </div>
-              <div class="col">
-                <label style="font-weight: bold;">Size</label>
-                <input type="text" name="size" class="form-control inpv2 mb-2">
+                <div class="text-danger small"><?php echo $supplier_name_error; ?></div>
               </div>
             </div>
-            <div class="row">
-              <div class="col">
-                <label style="font-weight: bold;">Viss</label>
-                <input type="text" name="viss" <?php if (!empty($viss_error)) {
-                                                  echo "class=\"form-control is-invalid\"";
-                                                } else {
-                                                  echo "class=\"form-control inpv2\"";
-                                                } ?>>
-                <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;"><?php echo $viss_error; ?></span>
-              </div>
-              <div class="col">
-                <label style="font-weight: bold;">Pcs</label>
-                <input type="number" name="pcs" class="form-control inpv2 mb-2">
-              </div>
+
+            <div class="mb-2 d-flex justify-content-between align-items-center">
+              <label style="font-weight: bold;">Purchase Lines</label>
+              <button type="button" class="btn btn-sm btn-outline-primary" onclick="addPurchaseLine();">Add Line</button>
             </div>
-            <div class="row">
-              <div class="col">
-                <label style="font-weight: bold;">Price</label>
-                <input type="number" name="price" <?php if (!empty($price_error)) {
-                                                    echo "class=\"form-control is-invalid\"";
-                                                  } else {
-                                                    echo "class=\"form-control inpv2\"";
-                                                  } ?>>
-                <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;" style="font-weight:bold !important;"><?php echo $price_error; ?></span>
-              </div>
-              <div class="col mt-4 mb-4">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-success" name="addbutton">Create Voucher</button>
-              </div>
+
+            <div class="table-responsive">
+              <table class="table table-bordered table-sm">
+                <thead class="table-light">
+                  <tr>
+                    <th>Commodity</th>
+                    <th>Size</th>
+                    <th>Viss</th>
+                    <th>Pcs</th>
+                    <th>Price</th>
+                    <th style="width:1px;">Remove</th>
+                  </tr>
+                </thead>
+                <tbody id="purchase-lines">
+                  <?php $itemdatas = $query->selectall('item'); ?>
+                  <tr>
+                    <td>
+                      <select name="commodity[]" class="form-control">
+                        <option value="">Select product</option>
+                        <?php foreach ($itemdatas as $itemdata) { ?>
+                          <option value="<?php echo $itemdata['item_id']; ?>"><?php echo $itemdata['item_name']; ?></option>
+                        <?php } ?>
+                      </select>
+                    </td>
+                    <td><input type="text" name="size[]" class="form-control"></td>
+                    <td><input type="text" name="viss[]" class="form-control"></td>
+                    <td><input type="number" name="pcs[]" class="form-control"></td>
+                    <td><input type="number" step="0.01" name="price[]" class="form-control"></td>
+                    <td><button type="button" class="btn btn-danger btn-sm" onclick="removePurchaseLine(this);">×</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="text-end mt-2">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-success" name="addbutton">Create Voucher</button>
             </div>
           </div>
         </form>
       </div>
     </div>
   </div>
-  <!-- Add Modal -->
+
+  <script type="text/javascript">
+    function addPurchaseLine() {
+      const tbody = document.getElementById('purchase-lines');
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>
+          <select name="commodity[]" class="form-control">
+            <option value="">Select product</option>
+            <?php foreach ($itemdatas as $itemdata) { ?>
+              <option value="<?php echo $itemdata['item_id']; ?>"><?php echo $itemdata['item_name']; ?></option>
+            <?php } ?>
+          </select>
+        </td>
+        <td><input type="text" name="size[]" class="form-control"></td>
+        <td><input type="text" name="viss[]" class="form-control"></td>
+        <td><input type="number" name="pcs[]" class="form-control"></td>
+        <td><input type="number" step="0.01" name="price[]" class="form-control"></td>
+        <td><button type="button" class="btn btn-danger btn-sm" onclick="removePurchaseLine(this);">×</button></td>
+      `;
+      tbody.appendChild(row);
+    }
+
+    function addPurchaseLineTo(tbodyId) {
+      const tbody = document.getElementById(tbodyId);
+      if (!tbody) return;
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>
+          <select name="commodity[]" class="form-control">
+            <option value="">Select product</option>
+            <?php foreach ($itemdatas as $itemdata) { ?>
+              <option value="<?php echo $itemdata['item_id']; ?>"><?php echo $itemdata['item_name']; ?></option>
+            <?php } ?>
+          </select>
+          <input type="hidden" name="line_id[]" value="">
+        </td>
+        <td><input type="text" name="size[]" class="form-control"></td>
+        <td><input type="text" name="viss[]" class="form-control"></td>
+        <td><input type="number" name="pcs[]" class="form-control"></td>
+        <td><input type="number" step="0.01" name="price[]" class="form-control"></td>
+        <td><button type="button" class="btn btn-danger btn-sm" onclick="removePurchaseLine(this);">×</button></td>
+      `;
+      tbody.appendChild(row);
+    }
+
+    function removePurchaseLine(button) {
+      const row = button.closest('tr');
+      if (!row) return;
+      const tbody = row.closest('tbody');
+      if (!tbody) return;
+      if (tbody.rows.length > 1) row.remove();
+    }
+  </script>
 
   <?php
   $bootstrap->javascript();

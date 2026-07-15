@@ -74,7 +74,7 @@ $bootstrap->css();
               $payabledata = $payablestmt->fetch(PDO::FETCH_ASSOC);
 
               $idofrow = $payabledata['id'];
-              $openingamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id'");
+              $openingamountstmt = $pdo->prepare("SELECT SUM(closing_balance) AS total_opening FROM payable WHERE supplier_id='$supplier_id'");
               $openingamountstmt->execute();
               $openingamount = $openingamountstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -87,8 +87,8 @@ $bootstrap->css();
               $paidamt = $paidamtstmt->fetch(PDO::FETCH_ASSOC);
 
               $id++;
-              if (!empty($openingamount['closing_balance'])) {
-                $openingamt = $openingamount['closing_balance'];
+              if (!empty($openingamount['total_opening'])) {
+                $openingamt = $openingamount['total_opening'];
               } else {
                 $openingamt = 0;
               }
@@ -106,7 +106,7 @@ $bootstrap->css();
                         } ?>><?php if (!empty($openingamount['closing_balance'])) {
                                 echo $openingamount['closing_balance'];
                               } ?></td> -->
-                <td><?= $payabledata['closing_balance']; ?></td>
+                <td><?= $openingamt; ?></td>
                 <td><?= $purchaseamt['purchase_amount']; ?></td>
                 <td><?= $paidamt['paid_amount']; ?></td>
                 <td><?= $balance; ?></td>

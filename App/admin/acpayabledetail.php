@@ -137,6 +137,8 @@ $bootstrap->css();
                 $balanceamount = $balanceamountstmt->fetch(PDO::FETCH_ASSOC);
 
                 $totalpurchaseamount['total_purchase_amount'] = 0;
+
+                $thebalanceamount = $payabledata['closing_balance'];
               } else {
                 $paidamount = $payabledata['paid_amount'];
                 if ($payabledata['paid_amount'] != '0') {
