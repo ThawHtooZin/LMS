@@ -165,42 +165,44 @@ $bootstrap->css();
                 $size = $gfcstockdata['size'];
                 $kg = $gfcstockdata['kg'];
                 $commondity_id = $gfcstockdata['commondity_id'];
-                $sizestmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE size='$size' ORDER BY id DESC");
-                $sizestmt->execute();
+                $fish_type = $gfcstockdata['fish_type'];
+                $sizestmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE size=:size ORDER BY id DESC");
+                $sizestmt->execute(
+                 array(':size'=>$size)
+                );
                 $sizedata = $sizestmt->fetch(PDO::FETCH_ASSOC);
-                // IN
-                $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular='HHK to GFC'");
-                $totalmcstmt->execute();
-                $totalmcnotsub = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
 
-                // Ship
-                $totalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular='ship'");
-                $totalmcsubnumstmt->execute();
-                $totalmcsubnum = $totalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
-
+                // IN (HHK, NT, others)
+                $totalmcreceivestmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%to%'");
+                $totalmcreceivestmt->execute(
+                  array(':size'=>$size)
+                );
+                $totalmcreceive = $totalmcreceivestmt->fetch(PDO::FETCH_ASSOC);
+                
                 // Balance
-                $totalbalancemcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular LIKE '%balance%' ");
-                $totalbalancemcsubnumstmt->execute();
-                $totalbalancemcsubnum = $totalbalancemcsubnumstmt->fetch(PDO::FETCH_ASSOC);
+                $totalmcbalancestmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%balance%'");
+                $totalmcbalancestmt->execute(
+                  array(':size'=>$size)
+                );
+                $totalmcbalance = $totalmcbalancestmt->fetch(PDO::FETCH_ASSOC);
+                
+                // Ship (export)
+                $totalmcexportstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%ship%'");
+                $totalmcexportstmt->execute(
+                  array(':size'=>$size)
+                );
+                $totalmcexport = $totalmcexportstmt->fetch(PDO::FETCH_ASSOC);
+                
+                // take out
+                $totaltakeoutstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%t/o%'");
+                $totaltakeoutstmt->execute(
+                  array(':size'=>$size)
+                );
+                $totaltakeout = $totaltakeoutstmt->fetch(PDO::FETCH_ASSOC);
 
-                // if($gfcstockdata['particular'] == 'balance' || $gfcstockdata['particular'] == 'Balance' && $totalmcnotsub['total_mc'] != 0){
-                //   $totalmc = $totalmcsubnum['total_mc'];
-                // }else{
-                //   echo $gfcstockdata['particular'];
-                //   echo $totalmcnotsub['total_mc'];
-                // }
-                if (str_contains($gfcstockdata['particular'], 'balance')) {
-                  $totalmc = $totalmcsubnum['total_mc'];
-                }
-                $totalmc = $totalmcnotsub['total_mc'] - $totalmcsubnum['total_mc'] + $totalbalancemcsubnum['total_mc'];
+                $totalmc = ($totalmcreceive['total_mc'] + $totalmcbalance['total_mc']) - ($totalmcexport['total_mc'] + $totaltakeout['total_mc']);
 
-                // Balance
-                $totalbalanceoutstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular LIKE '%out%' ");
-                $totalbalanceoutstmt->execute();
-                $totalbalanceout = $totalbalanceoutstmt->fetch(PDO::FETCH_ASSOC);
-
-                $totalmc = $totalmc - $totalbalanceout['total_mc'];
-              ?>
+                ?>
                 <tr style="<?php if ($totalmc > 200) {
                               echo 'background-color:rgba(0, 255, 0, 0.4) !important;';
                             } ?>">
@@ -213,7 +215,7 @@ $bootstrap->css();
                   <td><?php echo $gfcstockdata['size']; ?></td>
                   <td><?php echo $totalmc; ?></td>
                   <td>
-                    <a href="gfcmc_stock_info.php?sizeinfo=<?php echo $gfcstockdata['size']; ?>&commondity=<?php echo $gfcstockdata['commondity_id']; ?>&country=<?php echo $gfcstockdata['country']; ?>" class="btn btn-info btn-sm text-light">
+                    <a href="gfcmc_stock_info.php?sizeinfo=<?php echo $gfcstockdata['size']; ?>&commondity=<?php echo $gfcstockdata['commondity_id']; ?>&country=<?php echo $gfcstockdata['country']; ?>&fish_type=<?php echo $gfcstockdata['fish_type']; ?>" class="btn btn-info btn-sm text-light">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-check" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z" />
                       </svg></a>
@@ -299,6 +301,7 @@ $bootstrap->css();
                       <option value="Cut_piece">Cut Piece</option>
                       <option value="Scaless">Scaless</option>
                       <option value="Bls">Bl's</option>
+                      <option value="iqf">IQF</option>
                     </select>
                   </div>
                 </div>
@@ -340,7 +343,7 @@ $bootstrap->css();
 
   <div class="modal fade" id="export">
     <div class="modal-dialog" role="document">
-      <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
         <div class="modal-header bg-secondary text-light">
           <h1 class="modal-title fs-5">Export Mc</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -379,6 +382,7 @@ $bootstrap->css();
                       <option value="Cut_piece">Cut Piece</option>
                       <option value="Scaless">Scaless</option>
                       <option value="Bls">Bl's</option>
+                      <option value="iqf">IQF</option>
                     </select>
                   </div>
                 </div>

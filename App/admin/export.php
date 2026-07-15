@@ -1230,7 +1230,174 @@ if ($_GET['table_name'] == 'mcstockreport') {
   </table>
 <?php
 }
+?>
 
+<?php
+if ($_GET['table_name'] == 'mcstockreportwithdate') {
+
+  $country = $_GET['country'];
+  $datefrom = $_GET['datefrom'];
+  $dateto = $_GET['dateto'];
+
+  header("Content-Type: application/xls");
+  header("Content-Disposition: attachment; filename=mcstockreport{$country}-stock{$datefrom}to{$dateto}.xls");
+  header("Pragma: no-cache");
+  header("Expires: 0");
+
+  ?>
+  <table border="1" id="table">
+    <tr class="text-center">
+      <th rowspan="2" style="padding-top:30px;">No</th>
+      <th rowspan="2" style="padding-top:30px;">Fish Name</th>
+      <th rowspan="2" style="padding-top:30px;">Size</th>
+      <th rowspan="2" style="padding-top:30px;">Kg</th>
+      <th>HHK</th>
+      <th>GFC</th>
+      <th>Total</th>
+    </tr>
+    <tr class="text-center">
+      <th>Mc</th>
+      <th>Mc</th>
+      <th>Mc</th>
+    </tr>
+    <?php
+    $id = 0;
+      
+      $hhkmcstockcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country = '$country' AND date BETWEEN '$datefrom' AND '$dateto'
+      UNION
+      SELECT DISTINCT commondity_id FROM gfcmcstock WHERE country = '$country' AND date BETWEEN '$datefrom' AND '$dateto'
+                                              ");
+      $hhkmcstockcommonditystmt->execute();
+      $hhkmcstockcommonditydatas = $hhkmcstockcommonditystmt->rowCount();
+
+      for ($i = 0; $i < $hhkmcstockcommonditydatas; $i++) {
+      $commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE country = '$country' AND remark NOT LIKE '%packing%'                UNION
+      SELECT DISTINCT commondity_id FROM gfcmcstock WHERE country = '$country' AND remark NOT LIKE '%packing%'");
+      $commonditystmt->execute();
+      $commonditydata = $commonditystmt->fetchall();
+      $commondity_id = $commonditydata[$i]['commondity_id'];
+      
+        $stmt = $pdo->prepare("SELECT 
+                                id, 
+                                commondity_id,
+                                country, 
+                                particular, 
+                                kg,
+                                size, 
+                                fish_type 
+                            FROM (
+                                SELECT id, commondity_id, country, particular, kg, size, fish_type 
+                                FROM hhkmcstock 
+                                WHERE commondity_id = '$commondity_id' AND
+                                  country = '$country' AND date BETWEEN '$datefrom' AND '$dateto'
+
+                                UNION ALL
+
+                                SELECT id, commondity_id, country, particular, kg, size, fish_type 
+                                FROM gfcmcstock 
+                                WHERE commondity_id = '$commondity_id' AND
+                                  country = '$country' AND date BETWEEN '$datefrom' AND '$dateto'
+                            ) AS combined_results
+                            GROUP BY 
+                                country, 
+                                size, 
+                                kg, 
+                                fish_type;
+                            ");
+        $stmt->execute();
+        $datas = $stmt->fetchall();
+
+      $totalgfcmc = 0;
+      $totalhhkmc = 0;
+      foreach ($datas as $hhkdata) {
+        $id++;
+        $size = $hhkdata['size'];
+        $item_id = $hhkdata['commondity_id'];
+        $country = $hhkdata['country'];
+        $fish_type = $hhkdata['fish_type'];
+        $commonditydata = $query->select('item', $item_id, 'item_id');
+
+        $kg = $hhkdata['kg'];
+
+        $fetchallstmt = $pdo->prepare("SELECT balance_mc FROM hhkmcstock WHERE size='$size' AND commondity_id='$item_id' AND kg='$kg' ORDER BY id DESC");
+        $fetchallstmt->execute();
+        $fetchalldata = $fetchallstmt->fetch(PDO::FETCH_ASSOC);
+
+        $fetchallgfcstmt = $pdo->prepare("SELECT balance_mc FROM gfcmcstock WHERE size='$size' AND commondity_id='$item_id' AND kg='$kg' ORDER BY id DESC");
+        $fetchallgfcstmt->execute();
+        $fetchallgfcdata = $fetchallgfcstmt->fetch(PDO::FETCH_ASSOC);
+
+        if (empty($fetchalldata['balance_mc'])) {
+          $fetchalldata['balance_mc'] = 0;
+        }
+        $totalgfcmc += !empty($fetchallgfcdata['balance_mc']) ? $fetchallgfcdata['balance_mc'] : 0;
+        $totalhhkmc += !empty($fetchalldata['balance_mc']) ? $fetchalldata['balance_mc'] : 0;
+
+        ?>
+        <tr style="text-align:center !important;">
+          <!-- <tr style="text-align:center !important; <?php if ($fetchalldata['balance_mc'] == 0 && empty($fetchallgfcdata['balance_mc'])) {
+                                                          echo "display:none;";
+                                                        } ?>"> -->
+          <td><?php if (empty($lastcommondity)) {
+                echo $id;
+              } ?></td>
+          <td><?php if (empty($lastcommondity)) {
+                echo $commonditydata['item_name'] . "(" . $hhkdata['fish_type'] . ")";
+              } ?></td>
+          <td><?php if (empty($checklastavaliable)) {
+                echo $size;
+              } ?></td>
+          <td><?php echo $kg; ?></td>
+          <td><?php if ($fetchalldata['balance_mc'] != 0) {
+                echo $fetchalldata['balance_mc'];
+              } else {
+                echo "-";
+              }; ?></td>
+          <td><?php if (!empty($fetchallgfcdata['balance_mc'])) {
+                echo $fetchallgfcdata['balance_mc'];
+              } else {
+                echo "-";
+              };  ?></td>
+          <td><?php if (!empty($fetchallgfcdata['balance_mc'])) {
+                echo $fetchalldata['balance_mc'] + $fetchallgfcdata['balance_mc'];
+              } else {
+                echo $fetchalldata['balance_mc'];
+              };  ?></td>
+        </tr>
+      <?php
+      }
+      ?>
+      <!-- <tr style="background-color:#c1f5cf;"> -->
+      <tr class="text-center" style="background-color:#c1f5cf;">
+        <td style="font-weight: bold;">Total</td>
+        <td style="font-weight: bold;"></td>
+        <td style="font-weight: bold;"></td>
+        <td style="font-weight: bold;"></td>
+        <td style="font-weight: bold;"><?php if ($totalgfcmc != 0) {
+                                          echo $totalhhkmc;
+                                        } else {
+                                          echo "-";
+                                        }; ?></td>
+        <td style="font-weight: bold;"><?php if ($totalgfcmc != 0) {
+                                          echo $totalgfcmc;
+                                        } else {
+                                          echo "-";
+                                        }; ?></td>
+        <td style="font-weight: bold;"><?php if ($totalgfcmc != 0 || $totalhhkmc != 0) {
+                                          echo $totalhhkmc + $totalgfcmc;
+                                        } else {
+                                          echo "-";
+                                        }; ?></td>
+      </tr>
+      <?php
+      }
+      ?>
+  </table>
+
+<?php
+}
+?>
+<?php
 if ($_GET['table_name'] == "tclmcstock" && !empty($_GET['date'])) {
   $date = $_GET['date'];
   header("Content-Type: application/xls");

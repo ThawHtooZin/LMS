@@ -283,7 +283,7 @@ class Bootstrap
   function javascript()
   {
     echo '
-
+    <script src="jquery/jquery.min.js"></script>
     <script src="../../Resources\bootstrap-5.3.1-dist\js\bootstrap.min.js" charset="utf-8"></script>
     ';
     ?>

@@ -28,15 +28,25 @@ $bootstrap->css();
   if (isset($_POST['addbtn'])) {
     $date = $_POST['date'];
     $particular = $_POST['particular'];
-    if (str_contains($particular, 'balance') || str_contains($particular, 'Balance')) {
-      $commondity_id = $_POST['commondity_id2'];
-      $fish_type = $_POST['fish_type2'];
-      $country = $_POST['country2'];
-    } else {
-      $commondity_id = $_POST['commondity_id1'];
-      $fish_type = $_POST['fish_type1'];
-      $country = $_POST['country'];
-    }
+    $commondity_id = $_POST['commondity_id1'];
+    $fish_type = $_POST['fish_type'];
+    $country = $_POST['country'];
+    $size = $_POST['size'];
+    $kg = $_POST['kg'];
+    $mc = $_POST['mc'];
+    $query->addmcstock($date, $particular, $country, $commondity_id, $fish_type, $size, $kg, $mc);
+    $_SESSION['date'] = $_POST['date'];
+    $_SESSION['particular'] = $_POST['particular'];
+    $_SESSION['commondity_id2'] = $_POST['commondity_id2'];
+    $_SESSION['size'] = $_POST['size'];
+  }
+
+  if (isset($_POST['addbtn2'])) {
+    $date = $_POST['date'];
+    $particular = $_POST['particular'];
+    $commondity_id = $_POST['commondity_id2'];
+    $fish_type = $_POST['fish_type2'];
+    $country = $_POST['country2'];
     $size = $_POST['size'];
     $kg = $_POST['kg'];
     $mc = $_POST['mc'];
@@ -62,6 +72,31 @@ $bootstrap->css();
     $transfercheck = $transfercheckstmt->fetch(PDO::FETCH_ASSOC);
 
     $query->transfermcstock($transferdate, $transferparticular, $transfercountry, $transfercommondity_id, $transferfish_type, $transfersize, $transferkg, $transfermc);
+    // $validcheckstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE kg='$transferkg' AND size='$transfersize' AND country='$transfercountry' AND commondity_id='$transfercommondity_id' ORDER BY id DESC");
+    // $validcheckstmt->execute();
+    // $validcheck = $validcheckstmt->fetch(PDO::FETCH_ASSOC);
+
+    // if(!empty($validcheck)){
+    //   if($transfercheck['balance_mc'] >= $transfermc){
+    //   }else{
+    //     echo '<script>swal("Sorry!", "Not Enough Mc!", "warning");</script>';
+    //   }
+    // }else{
+    //   echo '<script>swal("Sorry!", "Not Valid data for transfering!", "warning");</script>';
+    // }
+  }
+
+  if (isset($_POST['repackingoutbtn'])) {
+    $repackingoutdate = $_POST['repackingoutdate'];
+    $repackingoutparticular = $_POST['repackingoutparticular'];
+    $repackingoutcommondity_id = $_POST['repackingoutcommondity_id'];
+    $repackingoutfish_type = $_POST['repackingoutfish_type'];
+    $repackingoutsize = $_POST['repackingoutsize'];
+    $repackingoutkg = $_POST['repackingoutkg'];
+    $repackingoutmc = $_POST['repackingoutmc'];
+    $repackingoutcountry = $_POST['repackingoutcountry'];
+
+    $query->repackingout($repackingoutdate, $repackingoutparticular, $repackingoutcountry, $repackingoutcommondity_id, $repackingoutfish_type, $repackingoutsize, $repackingoutkg, $repackingoutmc);
     // $validcheckstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE kg='$transferkg' AND size='$transfersize' AND country='$transfercountry' AND commondity_id='$transfercommondity_id' ORDER BY id DESC");
     // $validcheckstmt->execute();
     // $validcheck = $validcheckstmt->fetch(PDO::FETCH_ASSOC);
@@ -133,6 +168,7 @@ $bootstrap->css();
 
           <h5 style="font-weight:bold;" class="text-light d-inline">HHK MC STOCK</h5>
           <button type="button" class="btn btn-danger float-end ms-2" data-bs-toggle="modal" data-bs-target="#transfer">Transfer Mc</button>
+          <button type="button" class="btn btn-secondary float-end ms-2 text-light" data-bs-toggle="modal" data-bs-target="#repackingout">Repacking Out Mc</button>
           <?php
           if (!empty($countrydatas)) {
           ?>
@@ -228,13 +264,20 @@ $bootstrap->css();
                 $sizestmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE size='$size' AND remark NOT LIKE '%packing%' ORDER BY id DESC");
                 $sizestmt->execute();
                 $sizedata = $sizestmt->fetch(PDO::FETCH_ASSOC);
+                
                 $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular NOT LIKE '%out%' AND particular NOT LIKE '%to%'");
                 $totalmcstmt->execute();
                 $totalmcnotsub = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
+
                 $totalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular NOT LIKE '%out%' AND particular LIKE '%to%'");
                 $totalmcsubnumstmt->execute();
                 $totalmcsubnum = $totalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
-                $totalmc = $totalmcnotsub['total_mc'] - $totalmcsubnum['total_mc'];
+
+                // Repacking out
+                $totalrepackinoutstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular LIKE '%out%' AND particular NOT LIKE '%to%'");
+                $totalrepackinoutstmt->execute();
+                $totalrepackinout = $totalrepackinoutstmt->fetch(PDO::FETCH_ASSOC);
+                $totalmc = ($totalmcnotsub['total_mc'] - $totalmcsubnum['total_mc']) - $totalrepackinout['total_mc'];
               ?>
                 <tr style="<?php if ($totalmc > 200) {
                               echo 'background-color:rgba(0, 255, 0, 0.4) !important;';
@@ -248,7 +291,7 @@ $bootstrap->css();
                   <td><?php echo $hhkstockdata['size']; ?></td>
                   <td><?php echo $totalmc; ?></td>
                   <td>
-                    <a href="hhkmc_stock_info.php?sizeinfo=<?php echo $hhkstockdata['size']; ?>&commondity=<?php echo $hhkstockdata['commondity_id']; ?>&country=<?php echo $hhkstockdata['country']; ?>" class="btn btn-info btn-sm text-light">
+                    <a href="hhkmc_stock_info.php?sizeinfo=<?php echo $hhkstockdata['size']; ?>&commondity=<?php echo $hhkstockdata['commondity_id']; ?>&country=<?php echo $hhkstockdata['country']; ?>&fish_type=<?php echo $hhkstockdata['fish_type']; ?>" class="btn btn-info btn-sm text-light">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-check" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z" />
                       </svg></a>
@@ -269,7 +312,7 @@ $bootstrap->css();
             ?>
             <div class="modal fade" id="add">
               <div class="modal-dialog" role="document">
-                <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+                <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
                   <div class="modal-header bg-secondary text-light">
                     <h1 class="modal-title fs-5">Add Data</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -305,7 +348,7 @@ $bootstrap->css();
                               </select>
                             </div>
                             <div class="col">
-                              <select name="fish_type1" id="commondityid3" class="form-control inpv2">
+                              <select name="fish_type" id="commondityid3" class="form-control inpv2">
                                 <option value="G">G</option>
                                 <option value="egg">egg</option>
                                 <option value="ggs">ggs</option>
@@ -314,6 +357,7 @@ $bootstrap->css();
                                 <option value="Cut_piece">Cut Piece</option>
                                 <option value="Scaless">Scaless</option>
                                 <option value="Bls">Bl's</option>
+                                <option value="iqf">IQF</option>
                               </select>
                             </div>
                           </div>
@@ -342,6 +386,9 @@ $bootstrap->css();
                                 <option value="fillet">fillet</option>
                                 <option value="W">W</option>
                                 <option value="Cut_piece">Cut Piece</option>
+                                <option value="Scaless">Scaless</option>
+                                <option value="Bls">Bl's</option>
+                                <option value="iqf">IQF</option>
                               </select>
                             </div>
                           </div>
@@ -369,7 +416,7 @@ $bootstrap->css();
                             }
                             ?>
                           </select>
-                          <input type="text" name="country2" id="country2" class="hide form-control inpv2" value="<?php if (!empty($_SESSION['country'])) {
+                          <input type="text" name="balance_country" id="country2" class="hide form-control inpv2" value="<?php if (!empty($_SESSION['country'])) {
                                                                                                                     echo $_SESSION['country'];
                                                                                                                   } ?>">
                         </div>
@@ -414,9 +461,9 @@ $bootstrap->css();
   </div>
   <div class="modal fade" id="add2">
     <div class="modal-dialog" role="document">
-      <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
         <div class="modal-header bg-secondary text-light">
-          <h1 class="modal-title fs-5">Add Data</h1>
+          <h1 class="modal-title fs-5">Add Data 2</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <form action="hhkmcstock.php" method="post">
@@ -466,6 +513,7 @@ $bootstrap->css();
                       <option value="Cut_piece">Cut Piece</option>
                       <option value="Scaless">Scaless</option>
                       <option value="Bls">Bl's</option>
+                      <option value="iqf">IQF</option>
                     </select>
                   </div>
                 </div>
@@ -478,7 +526,7 @@ $bootstrap->css();
             <div class="row">
               <div class="col">
                 <label>Country</label>
-                <select class="form-control inpv2 mb-2" name="country" id="country1">
+                <select class="form-control inpv2 mb-2" name="country2" id="country1">
                   <?php
                   foreach ($countrydatas as $countrydata) {
                   ?>
@@ -509,7 +557,7 @@ $bootstrap->css();
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-success" name="addbtn">Add</button>
+            <button type="submit" class="btn btn-success" name="addbtn2">Add</button>
           </div>
         </form>
       </div>
@@ -517,7 +565,7 @@ $bootstrap->css();
   </div>
   <div class="modal fade" id="transfer">
     <div class="modal-dialog" role="document">
-      <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
         <div class="modal-header bg-warning text-light">
           <h1 class="modal-title fs-5">Tranfer Mc</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -558,6 +606,7 @@ $bootstrap->css();
                       <option value="Cut_piece">Cut Piece</option>
                       <option value="Scaless">Scaless</option>
                       <option value="Bls">Bl's</option>
+                      <option value="">IQF</option>
                     </select>
                   </div>
                 </div>
@@ -602,6 +651,100 @@ $bootstrap->css();
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             <button type="submit" class="btn btn-success" name="transferbtn">Move</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="repackingout">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+        <div class="modal-header bg-secondary text-light">
+          <h1 class="modal-title fs-5">Repacking Out Mc</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="hhkmcstock.php" method="post">
+          <div class="modal-body">
+            <div class="row">
+              <div class="col">
+                <label>Date</label>
+                <input type="date" name="repackingoutdate" class="form-control inpv2 mb-2">
+                <label>Commondity</label>
+                <div class="row">
+                  <div class="col">
+                    <select class="form-control inpv2 mb-2" name="repackingoutcommondity_id">
+                      <?php
+                      $hhkmcdata = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock");
+                      $hhkmcdata->execute();
+                      $hhkmcdatas = $hhkmcdata->fetchall();
+                      if (!empty($hhkmcdatas)) {
+                        foreach ($hhkmcdatas as $hhkmcdata) {
+                          $item_id = $hhkmcdata['commondity_id'];
+                          $commonditydata = $query->select('item', $item_id, 'item_id');
+                      ?>
+                          <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                      <?php
+                        }
+                      }
+                      ?>
+                    </select>
+                  </div>
+                  <div class="col">
+                    <select name="repackingoutfish_type" id="commondityid3" class="form-control inpv2">
+                      <option value="G">G</option>
+                      <option value="egg">egg</option>
+                      <option value="ggs">ggs</option>
+                      <option value="fillet">fillet</option>
+                      <option value="W">W</option>
+                      <option value="Cut_piece">Cut Piece</option>
+                      <option value="Scaless">Scaless</option>
+                      <option value="Bls">Bl's</option>
+                      <option value="">IQF</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <label>Particular</label>
+                <textarea name="repackingoutparticular" rows="4" class="form-control inpv2 mb-2">HHK To GFC</textarea>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>Country</label>
+                <select class="form-control inpv2 mb-2" name="repackingoutcountry">
+
+                  <?php
+                  if (!empty($countrydatas)) {
+                    foreach ($countrydatas as $countrydata) {
+                  ?>
+                      <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
+                  <?php
+                    }
+                  }
+                  ?>
+                </select>
+              </div>
+              <div class="col">
+                <label>Size</label>
+                <input type="text" name="repackingoutsize" class="form-control inpv2 mb-2">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>Kg</label>
+                <input type="text" name="repackingoutkg" class="form-control inpv2 mb-2">
+              </div>
+              <div class="col">
+                <label>Mc</label>
+                <input type="number" name="repackingoutmc" class="form-control inpv2 mb-2">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-success" name="repackingoutbtn">Add</button>
           </div>
         </form>
       </div>

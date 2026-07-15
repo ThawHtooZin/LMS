@@ -93,7 +93,7 @@ $bootstrap->css();
             <?php
             if (isset($_POST['view']) && !empty($_POST['commondity']) && !empty($_POST['country']) && !empty($_POST['searchdate'])) {
             ?>
-              <a href="testing_export_two.php?table_name=form10frozen&searchdate=<?php echo $_POST['searchdate'] ?>&country=<?php echo $_POST['country'] ?>&commondity=<?php echo $_POST['commondity'] ?>" type="" class="btn btn-primary btn-sm me-2 float-end">Export Excel</a>
+              <a href="testing_export_two.php?table_name=form10frozen&searchdate=<?php echo $_POST['searchdate'] ?>&country=<?php echo $_POST['country'] ?>&commondity=<?php echo $_POST['commondity'] ?>&fish_type=<?php echo $_POST['fish_type'] ?>" type="" class="btn btn-primary btn-sm me-2 float-end">Export Excel</a>
             <?php
             } ?>
           </form>
@@ -164,6 +164,7 @@ $bootstrap->css();
                           <option value="Cut_piece">Cut Piece</option>
                           <option value="Scaless">Scaless</option>
                           <option value="Bls">Bl's</option>
+                          <option value="iqf">IQF</option>
                         </select>
                       </div>
                     </div>
@@ -261,11 +262,9 @@ $bootstrap->css();
               <?php
               }
 
-              $supplieridstmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
+              $supplieridstmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fishtype' AND date='$searchdate'");
               $supplieridstmt->execute();
               $supplierdata = $supplieridstmt->fetch(PDO::FETCH_ASSOC);
-              $supplier_id = $supplierdata['supplier_id'];
-
               // Get POST data
               $form7date = $_POST['form7date'];
               $_SESSION['form7date'] = $form7date;
@@ -280,11 +279,11 @@ $bootstrap->css();
               // Join the quoted dates with commas
               $datesList = implode(', ', $quotedDates);
 
-              $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND date IN ($datesList)");
+              $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fishtype' AND date IN ($datesList)");
               $totalf7kgstmt->execute();
               $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
 
-              $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
+              $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND fish_type='$fishtype' AND country='$country' AND date='$searchdate'");
               $totalkgstmt->execute();
               $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
               $result1 = round($totalkgdata['total_kg'], 2) - round($totalf7kgdata['total_kg'], 2);
@@ -294,8 +293,6 @@ $bootstrap->css();
                 $result2 = $result1 / round($totalf7kgdata['total_kg'], 2);
                 $percentage = $result2 * 100;
               }
-
-
 
               $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date='$searchdate'");
               $form10pcsstmt->execute();
@@ -360,15 +357,24 @@ $bootstrap->css();
                 <?php
                 if (isset($_POST['view'])) {
                 ?>
-                  <td style="font-weight:bold; <?php if ($percentage != "") {
-                                                  if (strpos(round($percentage, 2), '-') !== false) {
-                                                    echo 'color:red;';
-                                                  }
-                                                } ?>"><?php if ($percentage != "") {
-                                                        echo round($percentage, 2) . "%";
-                                                      } else {
-                                                        echo '-';
-                                                      } ?></td>
+                  <?php 
+                    if ($percentage != "") {
+                      if(strpos(round($percentage, 2), '-') !== false){
+                        ?>
+                        <!-- Percentage is minus -->
+                          <td style="font-weight:bold; color: red;"><?php echo round($percentage, 2); ?> %</td>
+                        <?php
+                      }else{
+                        ?>
+                        <!-- Percentage is Plus -->
+                          <td style="font-weight:bold;"><?php echo "+" . round($percentage, 2); ?> %</td>
+                        <?php
+                      }
+                    }else{
+                      echo '-';
+                    }
+                  ?>
+                  
                 <?php
                 }
                 ?>
@@ -536,6 +542,7 @@ $bootstrap->css();
                                         <option value="Cut_piece">Cut Piece</option>
                                         <option value="Scaless">Scaless</option>
                                         <option value="Bls">Bl's</option>
+                                        <option value="iqf">IQF</option>
                                       </select>
                                     </div>
                                   </div>
@@ -688,6 +695,7 @@ $bootstrap->css();
                         <option value="Cut_piece">Cut Piece</option>
                         <option value="Scaless">Scaless</option>
                         <option value="Bls">Bl's</option>
+                        <option value="iqf">IQF</option>
                       </select>
                     </div>
                   </div>

@@ -77,7 +77,8 @@ $bootstrap->css();
             $size = $_GET['sizeinfo'];
             $commondity_id = $_GET['commondity'];
             $country = $_GET['country'];
-            $kgstmt = $pdo->prepare("SELECT DISTINCT kg FROM gfcmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country'");
+            $fish_type = $_GET['fish_type'];
+            $kgstmt = $pdo->prepare("SELECT DISTINCT kg FROM gfcmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country' AND fish_type='$fish_type'");
             $kgstmt->execute();
             $kgdatas = $kgstmt->fetchall();
             ?>
@@ -122,11 +123,11 @@ $bootstrap->css();
 
             if (isset($_POST['view']) && !empty($_POST['kgsearch'])) {
               $kgsearch = $_POST['kgsearch'];
-              $sizeinfostmt2 = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country' AND kg='$kgsearch'");
+              $sizeinfostmt2 = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country' AND kg='$kgsearch' AND fish_type='$fish_type'");
               $sizeinfostmt2->execute();
               $sizeinfodatas = $sizeinfostmt2->fetchall();
             } else {
-              $sizeinfostmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country'");
+              $sizeinfostmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country' AND fish_type='$fish_type'");
               $sizeinfostmt->execute();
               $sizeinfodatas = $sizeinfostmt->fetchall();
             }
@@ -135,9 +136,9 @@ $bootstrap->css();
               $item_id = $sizeinfodata['commondity_id'];
               $commonditydata = $query->select('item', $item_id, 'item_id');
             ?>
-              <tr style="<?php if (str_contains($sizeinfodata['particular'], 'Ship')) {
+              <tr style="<?php if (str_contains($sizeinfodata['particular'], 'Ship') || str_contains($sizeinfodata['particular'], 'T/O') || str_contains($sizeinfodata['particular'], 't/o')) {
                             echo 'background-color:rgba(255, 0, 0, 0.3) !important;';
-                          } ?>" data-bs-toggle="<?php if (!str_contains($sizeinfodata['particular'], "GFC")) {
+                          } ?>" data-bs-toggle="<?php if (!str_contains($sizeinfodata['particular'], "HHK") || !str_contains($sizeinfodata['particular'], "hhk")) {
                                                   echo "modal";
                                                 } ?>" data-bs-target="#update<?= $sizeinfodata['id']; ?>">
                 <td><?php echo date('d-m-Y', strtotime($sizeinfodata['date'])); ?></td>
@@ -265,14 +266,14 @@ $bootstrap->css();
                                 </div>
                                 <div class="col ms-2">
                                   <select name="newfish_type" id="commondityid3" class="form-control inpv2">
-                                    <option value="G">G</option>
-                                    <option value="egg">egg</option>
-                                    <option value="ggs">ggs</option>
-                                    <option value="fillet">fillet</option>
-                                    <option value="W">W</option>
-                                    <option value="Cut_piece">Cut Piece</option>
-                                    <option value="Scaless">Scaless</option>
-                                    <option value="Bls">Bl's</option>
+                                    <option <?php if($sizeinfodata['fish_type'] == 'G'){ echo "selected"; } ?> value="G">G</option>
+                                    <option <?php if($sizeinfodata['fish_type'] == 'egg'){ echo "selected"; } ?> value="egg">egg</option>
+                                    <option <?php if($sizeinfodata['fish_type'] == 'ggs'){ echo "selected"; } ?> value="ggs">ggs</option>
+                                    <option <?php if($sizeinfodata['fish_type'] == 'fillet'){ echo "selected"; } ?> value="fillet">fillet</option>
+                                    <option <?php if($sizeinfodata['fish_type'] == 'W'){ echo "selected"; } ?> value="W">W</option>
+                                    <option <?php if($sizeinfodata['fish_type'] == 'Cut_piece'){ echo "selected"; } ?> value="Cut_piece">Cut Piece</option>
+                                    <option <?php if($sizeinfodata['fish_type'] == 'Scaless'){ echo "selected"; } ?> value="Scaless">Scaless</option>
+                                    <option <?php if($sizeinfodata['fish_type'] == 'Bls'){ echo "selected"; } ?> value="Bls">Bl's</option>
                                   </select>
                                 </div>
                               </div>
