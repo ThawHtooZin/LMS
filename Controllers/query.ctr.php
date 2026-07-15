@@ -714,136 +714,124 @@ class Query
     }
   }
 
-  function updatepurchase($table, $date, $voucher_no, $supplier_name, $tclfrozen, $commodity, $size, $viss, $pcs, $price, $no)
+  function updatePurchaseVoucher($voucher_id, $date, $voucher_no, $tclfrozen, $supplier_name, $lines_data)
   {
     global $pdo;
-    $amount = floatval($price) * floatval($viss);
+    try {
+      $pdo->beginTransaction();
 
-    $oldstmt = $pdo->prepare("SELECT * FROM $table WHERE no='$no'");
-    $oldstmt->execute();
-    $oldData = $oldstmt->fetch(PDO::FETCH_ASSOC);
-    if (empty($oldData)) {
-      echo '<script>swal("Warning!", "Purchase row not found.", "warning");</script>';
-      return;
-    }
-
-    $oldAmount = floatval($oldData['amount']);
-    $oldVoucherId = $oldData['purchase_voucher_id'];
-    $oldVoucherNo = $oldData['voucher_no'];
-
-    $voucherStmt = $pdo->prepare("SELECT * FROM purchase_voucher WHERE voucher_no='$voucher_no'");
-    $voucherStmt->execute();
-    $voucherData = $voucherStmt->fetch(PDO::FETCH_ASSOC);
-
-    if (empty($voucherData)) {
-      $voucherInsert = $pdo->prepare("INSERT INTO purchase_voucher(voucher_no, date, supplier_id, tclfrozen, total_amount) VALUES('$voucher_no', '$date', '$supplier_name', '$tclfrozen', '$amount')");
-      $voucherInsert->execute();
-      $newVoucherId = $pdo->lastInsertId();
-      $voucherTotal = $amount;
-    } else {
-      $newVoucherId = $voucherData['id'];
-      if ($newVoucherId === intval($oldVoucherId)) {
-        $voucherTotal = floatval($voucherData['total_amount']) - $oldAmount + $amount;
-      } else {
-        $voucherTotal = floatval($voucherData['total_amount']) + $amount;
+      // 1. Calculate the new total amount across all updated/new lines
+      $totalAmount = 0;
+      foreach ($lines_data as $ln) {
+        $v = floatval($ln['viss']);
+        $p = floatval($ln['price']);
+        $totalAmount += ($v * $p);
       }
-    }
 
-    if (!empty($voucherData)) {
-      $voucherUpdate = $pdo->prepare("UPDATE purchase_voucher SET date='$date', supplier_id='$supplier_name', tclfrozen='$tclfrozen', total_amount='$voucherTotal' WHERE id='$newVoucherId'");
-      $voucherUpdate->execute();
-    }
+      // 2. Update the parent purchase_voucher
+      $vstmt = $pdo->prepare("UPDATE purchase_voucher SET date='$date', voucher_no='$voucher_no', supplier_id='$supplier_name', tclfrozen='$tclfrozen', total_amount='$totalAmount' WHERE id='$voucher_id'");
+      $vstmt->execute();
 
-    $stmt = $pdo->prepare("UPDATE $table SET purchase_voucher_id='$newVoucherId', commodity='$commodity', size='$size', viss='$viss', pcs='$pcs', price='$price', amount='$amount' WHERE no='$no'");
-    $stmt->execute();
+      // 3. Find and update the payable table
+      $pStmt = $pdo->prepare("SELECT purchase_amount, balance FROM payable WHERE purchase_voucher_id='$voucher_id'");
+      $pStmt->execute();
+      $payableRow = $pStmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($oldVoucherId != $newVoucherId) {
-      $oldVoucherUpdate = $pdo->prepare("UPDATE purchase_voucher SET total_amount = total_amount - '$oldAmount' WHERE id='$oldVoucherId'");
-      $oldVoucherUpdate->execute();
-      $oldPayableStmt = $pdo->prepare("SELECT * FROM payable WHERE purchase_voucher_id='$oldVoucherId' ORDER BY id DESC");
-      $oldPayableStmt->execute();
-      $oldPayableData = $oldPayableStmt->fetch(PDO::FETCH_ASSOC);
-      if (!empty($oldPayableData)) {
-        $oldPurchaseAmount = floatval($oldPayableData['purchase_amount']) - $oldAmount;
-        $oldBalance = floatval($oldPayableData['balance']) - $oldAmount;
-        $oldUpdatePayable = $pdo->prepare("UPDATE payable SET purchase_amount='$oldPurchaseAmount', balance='$oldBalance' WHERE purchase_voucher_id='$oldVoucherId'");
-        $oldUpdatePayable->execute();
+      if ($payableRow) {
+        $oldPurchaseAmt = floatval($payableRow['purchase_amount']);
+        $oldBalance = floatval($payableRow['balance']);
+
+        $diff = $totalAmount - $oldPurchaseAmt;
+        $newBalance = $oldBalance + $diff;
+
+        $updPayable = $pdo->prepare("UPDATE payable SET date='$date', supplier_id='$supplier_name', purchase_voucher_no='$voucher_no', purchase_amount='$totalAmount', balance='$newBalance' WHERE purchase_voucher_id='$voucher_id'");
+        $updPayable->execute();
       }
-      $oldCountStmt = $pdo->prepare("SELECT COUNT(*) AS cnt FROM $table WHERE purchase_voucher_id='$oldVoucherId'");
-      $oldCountStmt->execute();
-      $oldCount = $oldCountStmt->fetch(PDO::FETCH_ASSOC);
-      if ($oldCount['cnt'] == 0) {
-        $deleteOldVoucher = $pdo->prepare("DELETE FROM purchase_voucher WHERE id='$oldVoucherId'");
-        $deleteOldVoucher->execute();
+
+      // 4. Update the individual purchase lines and stock ledgers safely
+      foreach ($lines_data as $ln) {
+        $line_id = $ln['line_id'];
+        $commodity = $ln['commodity'];
+        $size = $ln['size'];
+        $viss = $ln['viss'];
+        $pcs = $ln['pcs'];
+        $price = $ln['price'];
+        $amount = floatval($viss) * floatval($price);
+        $kg = floatval($viss) * 1.634;
+
+        if (!empty($line_id)) {
+          // A. Always update the main purchase line with the NEW data
+          $updLine = $pdo->prepare("UPDATE purchase SET commodity='$commodity', size='$size', viss='$viss', pcs='$pcs', price='$price', amount='$amount' WHERE no='$line_id'");
+          $updLine->execute();
+
+          // B. BULLETPROOF SYNC: Only update the very first original row, ignore all splits
+          if ($tclfrozen == 'tcl') {
+            $pdo->exec("UPDATE form7stocktcl SET date='$date', supplier_name='$supplier_name', item_id='$commodity', size='$size', viss='$viss', kg='$kg', pcspervr='$pcs' WHERE link_id='$line_id' ORDER BY id ASC LIMIT 1");
+          } else {
+            $pdo->exec("UPDATE form7stock SET date='$date', supplier_name='$supplier_name', item_id='$commodity', size='$size', viss='$viss', kg='$kg', pcspervr='$pcs' WHERE link_id='$line_id' ORDER BY id ASC LIMIT 1");
+          }
+        } else {
+          // If the user added a brand new line inside the modal, insert it
+          $insLine = $pdo->prepare("INSERT INTO purchase(purchase_voucher_id, commodity, size, viss, pcs, price, amount) VALUES('$voucher_id', '$commodity', '$size', '$viss', '$pcs', '$price', '$amount')");
+          $insLine->execute();
+          $new_line_id = $pdo->lastInsertId();
+
+          if ($tclfrozen == 'tcl') {
+            $pdo->exec("INSERT INTO form7stocktcl(date, item_id, supplier_name, country, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', 'DAKA', 'TCl', '$size', '$viss', '$kg', '$pcs', '$new_line_id')");
+          } else {
+            $pdo->exec("INSERT INTO form7stock(date, item_id, supplier_name, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', 'Frozen', '$size', '$viss', '$kg', '$pcs', '$new_line_id')");
+          }
+        }
       }
-    }
 
-    $payableStmt = $pdo->prepare("SELECT * FROM payable WHERE purchase_voucher_id='$newVoucherId' ORDER BY id DESC");
-    $payableStmt->execute();
-    $payableData = $payableStmt->fetch(PDO::FETCH_ASSOC);
-    $amountDiff = $amount - $oldAmount;
-
-    if (!empty($payableData)) {
-      $newPurchaseAmount = floatval($payableData['purchase_amount']) + $amountDiff;
-      $newBalance = floatval($payableData['balance']) + $amountDiff;
-      $updatePayable = $pdo->prepare("UPDATE payable SET date='$date', supplier_id='$supplier_name', purchase_voucher_no='$voucher_no', purchase_amount='$newPurchaseAmount', balance='$newBalance' WHERE purchase_voucher_id='$newVoucherId'");
-      $updatePayable->execute();
-    } else {
-      $insertPayable = $pdo->prepare("INSERT INTO payable(purchase_voucher_id, date, supplier_id, purchase_voucher_no, purchase_amount, balance) VALUES('$newVoucherId', '$date', '$supplier_name', '$voucher_no', '$amount', '$amount')");
-      $insertPayable->execute();
-    }
-
-    $kg = floatval($viss) * 1.634;
-
-    if ($tclfrozen == 'tcl') {
-      $formstmt = $pdo->prepare("UPDATE form7stocktcl SET date='$date', supplier_name='$supplier_name', item_id='$commodity', size='$size', viss='$viss', kg='$kg', pcspervr='$pcs' WHERE link_id='$no'");
-      $formstmt->execute();
-    } else {
-      $formstmt = $pdo->prepare("UPDATE form7stock SET date='$date', supplier_name='$supplier_name', item_id='$commodity', size='$size', viss='$viss', kg='$kg', pcspervr='$pcs' WHERE link_id='$no'");
-      $formstmt->execute();
-    }
-
-    if ($stmt) {
-      echo '<script>swal("Success!", "Updated Successfully!", "success");</script>';
-    } else {
-      echo '<script>swal("Warning!", "Error accors when updating Purchase Voucher", "warning");</script>';
+      $pdo->commit();
+      return "Successfully updated Voucher.";
+    } catch (Exception $e) {
+      $pdo->rollBack();
+      return "Error: " . addslashes($e->getMessage());
     }
   }
 
-  function deletepurchase($table, $deleteid)
+  function deleteWholeVoucher($voucher_id)
   {
     global $pdo;
-    $rowStmt = $pdo->prepare("SELECT * FROM $table WHERE no='$deleteid'");
-    $rowStmt->execute();
-    $rowData = $rowStmt->fetch(PDO::FETCH_ASSOC);
-    if (empty($rowData)) {
-      return $errmessage = "Purchase row not found";
-    }
+    try {
+      $pdo->beginTransaction();
 
-    $purchase_voucher_id = $rowData['purchase_voucher_id'];
-    $amount = floatval($rowData['amount']);
+      // 1. Check voucher type for the correct stock ledger
+      $vStmt = $pdo->prepare("SELECT tclfrozen FROM purchase_voucher WHERE id='$voucher_id'");
+      $vStmt->execute();
+      $voucher = $vStmt->fetch(PDO::FETCH_ASSOC);
 
-    $stmt = $pdo->prepare("DELETE FROM $table WHERE no='$deleteid'");
-    $stmt->execute();
-
-    if ($stmt) {
-      $remainingStmt = $pdo->prepare("SELECT COUNT(*) AS cnt FROM $table WHERE purchase_voucher_id='$purchase_voucher_id'");
-      $remainingStmt->execute();
-      $remaining = $remainingStmt->fetch(PDO::FETCH_ASSOC);
-
-      if ($remaining['cnt'] == 0) {
-        $deleteVoucher = $pdo->prepare("DELETE FROM purchase_voucher WHERE id='$purchase_voucher_id'");
-        $deleteVoucher->execute();
-      } else {
-        $updateVoucher = $pdo->prepare("UPDATE purchase_voucher SET total_amount = total_amount - '$amount' WHERE id='$purchase_voucher_id'");
-        $updateVoucher->execute();
-
-        $payableUpdate = $pdo->prepare("UPDATE payable SET purchase_amount = purchase_amount - '$amount', balance = balance - '$amount' WHERE purchase_voucher_id='$purchase_voucher_id'");
-        $payableUpdate->execute();
+      if (empty($voucher)) {
+        $pdo->rollBack();
+        return $errmessage = "Voucher not found.";
       }
-      return $successmessage = "Purchase Voucher Deleted Successfully";
-    } else {
-      return $errmessage = "Error accors when deleted Purchase Voucher";
+      $tclfrozen = $voucher['tclfrozen'];
+
+      // 2. Fetch all related purchase lines to remove their stock ledger entries
+      $linesStmt = $pdo->prepare("SELECT no FROM purchase WHERE purchase_voucher_id='$voucher_id'");
+      $linesStmt->execute();
+      $lines = $linesStmt->fetchAll(PDO::FETCH_ASSOC);
+
+      foreach ($lines as $line) {
+        $link_id = $line['no'];
+        if ($tclfrozen === 'tcl') {
+          $pdo->exec("DELETE FROM form7stocktcl WHERE link_id='$link_id'");
+        } else {
+          $pdo->exec("DELETE FROM form7stock WHERE link_id='$link_id'");
+        }
+      }
+
+      // 3. Delete the parent voucher (Cascade constraint auto-deletes purchase lines & payables)
+      $delVoucher = $pdo->prepare("DELETE FROM purchase_voucher WHERE id='$voucher_id'");
+      $delVoucher->execute();
+
+      $pdo->commit();
+      return $successmessage = "Entire Purchase Voucher Deleted Successfully.";
+    } catch (Exception $e) {
+      $pdo->rollBack();
+      return $errmessage = "Error deleting voucher: " . addslashes($e->getMessage());
     }
   }
 
@@ -1365,8 +1353,8 @@ class Query
       $lcharges = floatval($labourrate) * floatval($kg);
       $totallabourcharges = floatval($lcharges);
     }
-    
-    
+
+
     $labourstmt = $pdo->prepare("INSERT INTO labour(indate, outdate, commondity_id, mc, total_mc, kg, total_kg, rate, charges, total_charges) VALUES('$indate','$outdate','$commondity_id', '$mc','$ltotal_mc','$kg','$ltotal_kg','$labourrate','$lcharges','$totallabourcharges')");
     $labourstmt->execute();
   }
@@ -2152,7 +2140,6 @@ class Query
         $coldstorestmt = $pdo->prepare("INSERT INTO gfcdryfishcoldstore(date, ite, total_kg, rate, charges, total_charges) VALUES('$date', '$ite', '$total_kg', '$drycoldstorerate', '$charges', '$total_charges')");
         $coldstorestmt->execute();
       }
-      
     } else {
       $dryfishcoldstorestmt = $pdo->prepare("SELECT * FROM gfcdryfishcoldstore ORDER BY id DESC");
       $dryfishcoldstorestmt->execute();
@@ -3250,7 +3237,7 @@ class Query
     }
     $addmcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc, fish_type) VALUES('$date', '$country', :particular, '$commondity_id', :size, '$kg', '$mc', '$balance_mc', '$fish_type')");
     $addmcstmt->execute(
-       array(':size' => $size, ':particular' => $particular)
+      array(':size' => $size, ':particular' => $particular)
     );
 
     if (!empty($addmcstmt)) {
@@ -3293,7 +3280,7 @@ class Query
       if (!empty($transfermcstmt)) {
         echo '<script>swal("Success!", "Transfered Successfully!", "success");</script>';
       }
-    }else{
+    } else {
       echo '<script>swal("Error!", "Invalid Data", "error");</script>';
     }
   }
@@ -3314,7 +3301,7 @@ class Query
       if (!empty($transfermcstmt)) {
         echo '<script>swal("Success!", "Added Repacking Mc Successfully!", "success");</script>';
       }
-    }else{
+    } else {
       echo '<script>swal("Error!", "Invalid Data", "error");</script>';
     }
   }
@@ -5150,35 +5137,35 @@ class Query
 
     // check mc
     // if ($totalkg['kg'] <= $kg && $totalmc['mc'] <= $mc) {
-      $oldstockstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id < '$updateid' AND commondity_id='$commondity_id' AND outdate='0000-00-00' ORDER BY id DESC");
-      $oldstockstmt->execute();
-      $oldstockdatas = $oldstockstmt->fetch(PDO::FETCH_ASSOC);
+    $oldstockstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id < '$updateid' AND commondity_id='$commondity_id' AND outdate='0000-00-00' ORDER BY id DESC");
+    $oldstockstmt->execute();
+    $oldstockdatas = $oldstockstmt->fetch(PDO::FETCH_ASSOC);
 
-      if (!empty($oldstockdatas)) {
-        $total_mc = $oldstockdatas['total_mc'] + $mc;
-        $total_kg = $oldstockdatas['total_kg'] + $kg;
-      } else {
-        $total_mc = $mc;
-        $total_kg = $kg;
-      }
+    if (!empty($oldstockdatas)) {
+      $total_mc = $oldstockdatas['total_mc'] + $mc;
+      $total_kg = $oldstockdatas['total_kg'] + $kg;
+    } else {
+      $total_mc = $mc;
+      $total_kg = $kg;
+    }
 
-      $stmt = $pdo->prepare("UPDATE hhkstock SET indate='$indate', commondity_id='$commondity_id', mc='$mc', kg='$kg', total_mc='$total_mc', total_kg='$total_kg' WHERE id='$updateid'");
+    $stmt = $pdo->prepare("UPDATE hhkstock SET indate='$indate', commondity_id='$commondity_id', mc='$mc', kg='$kg', total_mc='$total_mc', total_kg='$total_kg' WHERE id='$updateid'");
+    $stmt->execute();
+
+    //stock update
+    $stockupstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id > '$updateid' AND commondity_id='$commondity_id' AND outdate='0000-00-00'");
+    $stockupstmt->execute();
+    $stockupdatas = $stockupstmt->fetchall();
+    foreach ($stockupdatas as $stockupdata) {
+      $id = $stockupdata['id'];
+      $stmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id < '$id' ORDER BY id DESC");
       $stmt->execute();
-
-      //stock update
-      $stockupstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id > '$updateid' AND commondity_id='$commondity_id' AND outdate='0000-00-00'");
-      $stockupstmt->execute();
-      $stockupdatas = $stockupstmt->fetchall();
-      foreach ($stockupdatas as $stockupdata) {
-        $id = $stockupdata['id'];
-        $stmt = $pdo->prepare("SELECT * FROM hhkstock WHERE id < '$id' ORDER BY id DESC");
-        $stmt->execute();
-        $data = $stmt->fetch(PDO::FETCH_ASSOC);
-        $totalmc = $data['total_mc'] + $stockupdata['mc'];
-        $totalkg = $data['total_kg'] + $stockupdata['kg'];
-        $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$totalmc', total_kg='$totalkg' WHERE id='$id'");
-        $updatestmt->execute();
-      }
+      $data = $stmt->fetch(PDO::FETCH_ASSOC);
+      $totalmc = $data['total_mc'] + $stockupdata['mc'];
+      $totalkg = $data['total_kg'] + $stockupdata['kg'];
+      $updatestmt = $pdo->prepare("UPDATE hhkstock SET total_mc='$totalmc', total_kg='$totalkg' WHERE id='$id'");
+      $updatestmt->execute();
+    }
     // }
     //  else {
     //   echo "<script>swal('Warning!', 'out kg and mc is more than changed kg and mc', 'warning');</script>";

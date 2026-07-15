@@ -56,42 +56,58 @@ $bootstrap->css();
         </div>
         <div class="card-body" style="margin-top:-8px !important;">
           <?php
-          if (isset($_POST['deletebutton'])) {
-            $deleteid = $_POST['deleteid'];
-            $data = $query->select('purchase', $deleteid, 'no');
-            if (!empty($data['tclfrozen'])) {
-              $tclorfrozen = $data['tclfrozen'];
-            } else {
-              $tclorfrozen = '';
-            }
-            $query->deletepurchase('purchase', $deleteid);
-            if ($tclorfrozen == 'tcl') {
-              $query->deleteform7('form7stocktcl', $deleteid);
-            } else {
-              $query->deleteform7('form7stock', $deleteid);
-            }
+          if (isset($_POST['deletevoucherbtn'])) {
+            $delete_voucher_id = $_POST['delete_voucher_id'];
+            $message = $query->deleteWholeVoucher($delete_voucher_id);
           }
 
-          if (isset($_POST['updatebutton']) || isset($_POST['update_voucher'])) {
-            // Note: Keeping existing individual update logic just in case, 
-            // but voucher detail modal uses this same file. 
-            // You may need to adapt your update method if updating multiple lines.
+          // --- UPDATE ENTIRE VOUCHER LOGIC ---
+          if (isset($_POST['update_voucher'])) {
+            $voucher_id = $_POST['voucher_id'];
             $date = $_POST['date'];
             $voucher_no = $_POST['voucher_no'];
             $tclfrozen = $_POST['tclfrozen'];
-            $supplier_name = isset($_POST['upsupplier_code_no']) ? $_POST['upsupplier_code_no'] : (isset($_POST['supplier_code_no']) ? $_POST['supplier_code_no'] : '');
-            $commodity = isset($_POST['commodity']) ? $_POST['commodity'] : '';
-            $size = isset($_POST['size']) ? $_POST['size'] : '';
-            $viss = isset($_POST['viss']) ? $_POST['viss'] : '';
-            $pcs = isset($_POST['pcs']) ? $_POST['pcs'] : '';
-            $price = isset($_POST['price']) ? $_POST['price'] : '';
-            $no = isset($_POST['updateid']) ? $_POST['updateid'] : (isset($_POST['voucher_id']) ? $_POST['voucher_id'] : '');
+            $supplier_name = isset($_POST['supplier_code_no']) ? $_POST['supplier_code_no'] : '';
 
-            // For the complex line updates in the modal, you would need a loop here 
-            // similar to the add function if you are updating all lines at once.
-            // Assuming your query->updatepurchase handles the basic single item update for now:
-            if (isset($_POST['updatebutton'])) {
-              $message = $query->updatepurchase('purchase', $date, $voucher_no, $supplier_name, $tclfrozen, $commodity, $size, $viss, $pcs, $price, $no);
+            $commodities = isset($_POST['commodity']) ? $_POST['commodity'] : [];
+            $sizes = isset($_POST['size']) ? $_POST['size'] : [];
+            $visses = isset($_POST['viss']) ? $_POST['viss'] : [];
+            $pcss = isset($_POST['pcs']) ? $_POST['pcs'] : [];
+            $prices = isset($_POST['price']) ? $_POST['price'] : [];
+            $line_ids = isset($_POST['line_id']) ? $_POST['line_id'] : [];
+
+            $lines_data = [];
+            foreach ($commodities as $index => $commodity) {
+              $commodity = trim($commodity);
+              $size = isset($sizes[$index]) ? trim($sizes[$index]) : '';
+              $viss = isset($visses[$index]) ? trim($visses[$index]) : '';
+              $pcs = isset($pcss[$index]) ? trim($pcss[$index]) : '';
+              $price = isset($prices[$index]) ? trim($prices[$index]) : '';
+              $line_id = isset($line_ids[$index]) ? trim($line_ids[$index]) : '';
+
+              // Skip empty rows
+              if ($commodity === '' && $viss === '' && $price === '') continue;
+
+              $lines_data[] = [
+                'line_id' => $line_id,
+                'commodity' => $commodity,
+                'size' => $size,
+                'viss' => $viss,
+                'pcs' => $pcs,
+                'price' => $price
+              ];
+            }
+
+            if (!empty($lines_data) && !empty($voucher_id)) {
+              $message = $query->updatePurchaseVoucher($voucher_id, $date, $voucher_no, $tclfrozen, $supplier_name, $lines_data);
+
+              if (strpos($message, 'Successfully') !== false) {
+                echo '<script>swal("Success!", "Voucher Updated Successfully", "success");</script>';
+              } else {
+                echo '<script>swal("Error!", "' . $message . '", "error");</script>';
+              }
+            } else {
+              echo '<script>swal("Warning!", "Cannot save an empty voucher.", "warning");</script>';
             }
           }
 
@@ -329,6 +345,12 @@ $bootstrap->css();
                 <td class="text-end fw-bold"><?php echo $purchasedata['total_amount']; ?></td>
                 <td>
                   <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#voucherModal<?php echo $purchasedata['id']; ?>">Details</button>
+
+                  <form id="delete-voucher-form-<?php echo $purchasedata['id']; ?>" action="" method="post" class="d-inline">
+                    <input type="hidden" name="delete_voucher_id" value="<?php echo $purchasedata['id']; ?>">
+                    <input type="hidden" name="deletevoucherbtn" value="1">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmVoucherDelete(<?php echo $purchasedata['id']; ?>)">Delete</button>
+                  </form>
                 </td>
               </tr>
 
@@ -353,14 +375,14 @@ $bootstrap->css();
                           </div>
                           <div class="col-md-3">
                             <label style="font-weight: bold;">Voucher No</label>
-                            <input type="text" name="voucher_no" class="form-control inpv2" value="<?php echo $purchasedata['voucher_no']; ?>">
+                            <input type="text" name="voucher_no" class="form-control inpv2" value="<?php echo $purchasedata['voucher_no']; ?>" readonly>
                           </div>
                           <div class="col-md-3">
                             <label style="font-weight: bold;">TCL (or) Frozen</label>
-                            <select name="tclfrozen" class="form-control inpv2">
+                            <select name="tclfrozen" class="form-control inpv2" readonly>
                               <option value="">Select</option>
-                              <option value="tcl" <?php if ($purchasedata['tclfrozen'] == 'tcl') echo 'selected'; ?>>TCL</option>
                               <option value="frozen" <?php if ($purchasedata['tclfrozen'] == 'frozen') echo 'selected'; ?>>Frozen</option>
+                              <option value="tcl" <?php if ($purchasedata['tclfrozen'] == 'tcl') echo 'selected'; ?>>TCL</option>
                             </select>
                           </div>
                           <div class="col-md-3">
@@ -390,7 +412,7 @@ $bootstrap->css();
                                 <th>Viss</th>
                                 <th>Pcs</th>
                                 <th>Price</th>
-                                <th style="width:1px;">Remove</th>
+                                <!-- <th style="width:1px;">Remove</th> -->
                               </tr>
                             </thead>
                             <tbody id="purchase-lines-<?php echo $purchasedata['id']; ?>">
@@ -413,7 +435,7 @@ $bootstrap->css();
                                   <td><input type="text" name="viss[]" class="form-control" value="<?php echo $ln['viss']; ?>"></td>
                                   <td><input type="number" name="pcs[]" class="form-control" value="<?php echo $ln['pcs']; ?>"></td>
                                   <td><input type="number" step="0.01" name="price[]" class="form-control" value="<?php echo $ln['price']; ?>"></td>
-                                  <td><button type="button" class="btn btn-danger btn-sm" onclick="removePurchaseLine(this);">×</button></td>
+                                  <!-- <td><button type="button" class="btn btn-danger btn-sm" onclick="removePurchaseLine(this);">×</button></td> -->
                                 </tr>
                               <?php } ?>
                             </tbody>
@@ -540,8 +562,8 @@ $bootstrap->css();
                           echo "class=\"form-control inpv2\"";
                         } ?> name="tclfrozen">
                   <option value="">Select</option>
-                  <option value="tcl" <?php echo (!empty($_POST['tclfrozen']) && $_POST['tclfrozen'] == 'tcl') ? 'selected' : ''; ?>>TCL</option>
                   <option value="frozen" <?php echo (!empty($_POST['tclfrozen']) && $_POST['tclfrozen'] == 'frozen') ? 'selected' : ''; ?>>Frozen</option>
+                  <option value="tcl" <?php echo (!empty($_POST['tclfrozen']) && $_POST['tclfrozen'] == 'tcl') ? 'selected' : ''; ?>>TCL</option>
                 </select>
                 <div class="text-danger small"><?php echo $type_error; ?></div>
               </div>
@@ -658,6 +680,23 @@ $bootstrap->css();
       const tbody = row.closest('tbody');
       if (!tbody) return;
       if (tbody.rows.length > 1) row.remove();
+    }
+  </script>
+  <script type="text/javascript">
+    function confirmVoucherDelete(voucherId) {
+      swal({
+          title: "Are you sure?",
+          text: "This will permanently remove all items, stock entries, and supplier balances associated with this entire voucher.",
+          icon: "warning",
+          buttons: ["Cancel", "Yes, delete it!"],
+          dangerMode: true,
+        })
+        .then((willDelete) => {
+          if (willDelete) {
+            // If the user confirms, programmatically submit the specific form
+            document.getElementById('delete-voucher-form-' + voucherId).submit();
+          }
+        });
     }
   </script>
 
