@@ -2986,6 +2986,32 @@ class Query
     }
   }
 
+  function bulkUpdateForm7Frozen($ids, $country, $fish_type)
+  {
+    global $pdo;
+
+    // Sanitize the incoming IDs
+    $idArray = explode(',', $ids);
+    $idList = implode(',', array_map('intval', $idArray));
+
+    if (empty($idList)) return;
+
+    $updates = [];
+    if ($country !== '') {
+      $updates[] = "country='$country'";
+    }
+    if ($fish_type !== '') {
+      $updates[] = "fish_type='$fish_type'";
+    }
+
+    if (count($updates) > 0) {
+      $updateString = implode(', ', $updates);
+      $stmt = $pdo->prepare("UPDATE form7stock SET $updateString WHERE id IN ($idList)");
+      $stmt->execute();
+      echo '<script>swal("Success!", "Bulk update completed.", "success");</script>';
+    }
+  }
+
   function addform10($date, $item_id, $fish_type, $supplier_id, $country, $type, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs)
   {
     global $pdo;

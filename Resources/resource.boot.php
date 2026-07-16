@@ -49,6 +49,17 @@ class Bootstrap
   function css()
   {
     echo '
+    <style>
+  .modal-body {
+    overflow: visible !important;
+  }
+  .modal .chosen-container {
+    width: 100% !important;
+  }
+  .modal .chosen-container .chosen-drop {
+    z-index: 99999 !important;
+  }
+</style>
     <link rel="stylesheet" href="../../Resources\bootstrap-5.3.1-dist\css\bootstrap.min.css">
     <script type="text/javascript">
     setInterval(function() {
@@ -286,59 +297,59 @@ class Bootstrap
     <script src="jquery/jquery.min.js"></script>
     <script src="../../Resources\bootstrap-5.3.1-dist\js\bootstrap.min.js" charset="utf-8"></script>
     ';
-    ?>
+?>
     <script type="text/javascript">
-    var myVariable = false;
-    function toggleVariable() {
-      myVariable = !myVariable;
-      return myVariable;
-    }
-    $('#menu').on('click', function(){
-      var newValue = toggleVariable();
-      if(newValue === false){
-        setTimeout(function(){
-          $("#navtitle").animate({
-            opacity: "show",
-            padding: "show"
-          }, "normal");
-          $("span#navname").animate({
-            opacity: "show",
-            padding: "show"
-          }, "normal");
-          $('.arrow').show("slow");
-        }, 500);
-        $('#sidebar').toggleClass('sidebarcol sidebarnocol');
-        $('#thenavbar').slideToggle(800);
-        // $('#sidebarlink').removeAttr('disabled');
-      }else{
-        // $('#sidebarlink').attr('disabled', true);
-        $('#sidebar').toggleClass('sidebarcol sidebarnocol', 1000);
-        $("#navtitle").hide();
-        $('#menu').css('height', 82, '%');
-        $("span#navname").hide();
-        $('.arrow').hide();
-        $('#thenavbar').slideToggle(500);
-      }
-      $('#content').toggleClass('contentcol contentfullcol');
-    });
-    $('.table').removeClass('table-bordered');
-    $('th').css('background-color', 'black');
+      var myVariable = false;
 
-    $(document).keydown(function(event) {
-      // Check if Ctrl key and Enter key are pressed
-      if (event.ctrlKey && event.key === 'Enter') {
-        var filename = window.location.pathname.split('/').pop();;
-
-        window.location.href="linkpage.php?filename="+filename;
+      function toggleVariable() {
+        myVariable = !myVariable;
+        return myVariable;
       }
-    });
-    $(document).ready(function (){
-      $("#loadingmodal").hide();
-    });
+      $('#menu').on('click', function() {
+        var newValue = toggleVariable();
+        if (newValue === false) {
+          setTimeout(function() {
+            $("#navtitle").animate({
+              opacity: "show",
+              padding: "show"
+            }, "normal");
+            $("span#navname").animate({
+              opacity: "show",
+              padding: "show"
+            }, "normal");
+            $('.arrow').show("slow");
+          }, 500);
+          $('#sidebar').toggleClass('sidebarcol sidebarnocol');
+          $('#thenavbar').slideToggle(800);
+          // $('#sidebarlink').removeAttr('disabled');
+        } else {
+          // $('#sidebarlink').attr('disabled', true);
+          $('#sidebar').toggleClass('sidebarcol sidebarnocol', 1000);
+          $("#navtitle").hide();
+          $('#menu').css('height', 82, '%');
+          $("span#navname").hide();
+          $('.arrow').hide();
+          $('#thenavbar').slideToggle(500);
+        }
+        $('#content').toggleClass('contentcol contentfullcol');
+      });
+      $('.table').removeClass('table-bordered');
+      $('th').css('background-color', 'black');
+
+      $(document).keydown(function(event) {
+        // Check if Ctrl key and Enter key are pressed
+        if (event.ctrlKey && event.key === 'Enter') {
+          var filename = window.location.pathname.split('/').pop();;
+
+          window.location.href = "linkpage.php?filename=" + filename;
+        }
+      });
+      $(document).ready(function() {
+        $("#loadingmodal").hide();
+      });
     </script>
-    <?php
+<?php
   }
-
 }
 
 

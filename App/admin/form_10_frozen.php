@@ -49,55 +49,115 @@ $bootstrap->css();
   }
 
   if (isset($_POST['add'])) {
+    // Header Level Data
     $date = $_POST['date'];
-    $item_id = $_POST['item_id'];
-    $fish_type = $_POST['fish_type'];
     $supplier_id = $_POST['supplier_id'];
     $country = $_POST['country'];
     $type = $_POST['type'];
-    $size = $_POST['size'];
-    $mc = $_POST['mc'];
-    $kg = $_POST['kg'];
-    $pcs = $_POST['pcs'];
-    $looseinkg = $_POST['loose_in_kg'];
-    $looseinpcs = $_POST['loose_in_pcs'];
-    $looseoutkg = $_POST['loose_out_kg'];
-    $looseoutpcs = $_POST['loose_out_pcs'];
 
-    $query->addform10($date, $item_id,  $fish_type, $supplier_id, $country, $type, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs);
+    // Line Level Arrays
+    $item_ids = isset($_POST['item_id']) ? $_POST['item_id'] : [];
+    $fish_types = isset($_POST['fish_type']) ? $_POST['fish_type'] : [];
+    $sizes = isset($_POST['size']) ? $_POST['size'] : [];
+    $mcs = isset($_POST['mc']) ? $_POST['mc'] : [];
+    $kgs = isset($_POST['kg']) ? $_POST['kg'] : [];
+    $pcss = isset($_POST['pcs']) ? $_POST['pcs'] : [];
+    $loose_in_kgs = isset($_POST['loose_in_kg']) ? $_POST['loose_in_kg'] : [];
+    $loose_in_pcss = isset($_POST['loose_in_pcs']) ? $_POST['loose_in_pcs'] : [];
+    $loose_out_kgs = isset($_POST['loose_out_kg']) ? $_POST['loose_out_kg'] : [];
+    $loose_out_pcss = isset($_POST['loose_out_pcs']) ? $_POST['loose_out_pcs'] : [];
+
+    // Process each line
+    foreach ($item_ids as $index => $item_id) {
+      $item_id = trim($item_id);
+      if (empty($item_id)) continue;
+
+      $fish_type = isset($fish_types[$index]) ? trim($fish_types[$index]) : '';
+      $size = isset($sizes[$index]) ? trim($sizes[$index]) : '';
+      $mc = isset($mcs[$index]) ? trim($mcs[$index]) : '';
+      $kg = isset($kgs[$index]) ? trim($kgs[$index]) : '';
+      $pcs = isset($pcss[$index]) ? trim($pcss[$index]) : '';
+      $looseinkg = isset($loose_in_kgs[$index]) ? trim($loose_in_kgs[$index]) : '';
+      $looseinpcs = isset($loose_in_pcss[$index]) ? trim($loose_in_pcss[$index]) : '';
+      $looseoutkg = isset($loose_out_kgs[$index]) ? trim($loose_out_kgs[$index]) : '';
+      $looseoutpcs = isset($loose_out_pcss[$index]) ? trim($loose_out_pcss[$index]) : '';
+
+      $query->addform10($date, $item_id, $fish_type, $supplier_id, $country, $type, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs);
+    }
 
     $_SESSION['date'] = $date;
     $_SESSION['supplier_id'] = $supplier_id;
     $_SESSION['country'] = $country;
-    $_SESSION['item_id'] = $item_id;
   }
 
+  // Handle Main Table Header Filters
+  if (isset($_POST['searchbtn'])) {
+    $_SESSION['search']['searchcommondity'] = $_POST['commondity_id'];
+    $_SESSION['search']['searchdate'] = $_POST['date'];
+    $_SESSION['search']['searchsize'] = $_POST['size'];
+  }
+
+  if (isset($_POST['clearfilter'])) {
+    $_SESSION['search']['searchcommondity'] = '';
+    $_SESSION['search']['searchdate'] = '';
+    $_SESSION['search']['searchsize'] = '';
+  }
+
+  $isViewMode = isset($_POST['view']);
   ?>
   <div class="row">
     <div class="sidebarcol" id="sidebar">
-      <?php
-      include 'sidebar.php';
-      ?>
+      <?php include 'sidebar.php'; ?>
     </div>
     <div class="contentcol" id="content">
       <?php require 'navbar.php'; ?>
       <div class="card mt-1">
-        <div class="card-header bg-warning text-secondary" style="padding:-10px;">
+        <div class="card-header bg-warning text-secondary" style="padding-bottom: 10px;">
           <form action="" method="post">
+            <b class="h5">Link Mark Limited (F-10) Frozen</b>
 
-            <b>Link Mark Limited (F-10) Frozen</b>
-            <button type="button" class="btn btn-success btn-sm float-end" data-bs-toggle="modal" data-bs-target="#addmodal">Add Form-10 Data</button>
-            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#filtermodal" style="display:inline; float: right; margin-right: 10px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-binoculars" viewBox="0 0 16 16">
+            <button type="button" class="btn btn-success btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#addmodal">Add Form-10 Data</button>
+            <button type="button" class="btn btn-primary btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#filtermodal" title="Percentage Report">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-binoculars" viewBox="0 0 16 16">
                 <path d="M3 2.5A1.5 1.5 0 0 1 4.5 1h1A1.5 1.5 0 0 1 7 2.5V5h2V2.5A1.5 1.5 0 0 1 10.5 1h1A1.5 1.5 0 0 1 13 2.5v2.382a.5.5 0 0 0 .276.447l.895.447A1.5 1.5 0 0 1 15 7.118V14.5a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 14.5v-3a.5.5 0 0 1 .146-.354l.854-.853V9.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v.793l.854.853A.5.5 0 0 1 7 11.5v3A1.5 1.5 0 0 1 5.5 16h-3A1.5 1.5 0 0 1 1 14.5V7.118a1.5 1.5 0 0 1 .83-1.342l.894-.447A.5.5 0 0 0 3 4.882zM4.5 2a.5.5 0 0 0-.5.5V3h2v-.5a.5.5 0 0 0-.5-.5zM6 4H4v.882a1.5 1.5 0 0 1-.83 1.342l-.894.447A.5.5 0 0 0 2 7.118V13h4v-1.293l-.854-.853A.5.5 0 0 1 5 10.5v-1A1.5 1.5 0 0 1 6.5 8h3A1.5 1.5 0 0 1 11 9.5v1a.5.5 0 0 1-.146.354l-.854.853V13h4V7.118a.5.5 0 0 0-.276-.447l-.895-.447A1.5 1.5 0 0 1 12 4.882V4h-2v1.5a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5zm4-1h2v-.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zm4 11h-4v.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5zm-8 0H2v.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5z" />
-              </svg></button>
-            <?php
-            if (isset($_POST['view']) && !empty($_POST['commondity']) && !empty($_POST['country']) && !empty($_POST['searchdate'])) {
-            ?>
-              <a href="testing_export_two.php?table_name=form10frozen&searchdate=<?php echo $_POST['searchdate'] ?>&country=<?php echo $_POST['country'] ?>&commondity=<?php echo $_POST['commondity'] ?>&fish_type=<?php echo $_POST['fish_type'] ?>" type="" class="btn btn-primary btn-sm me-2 float-end">Export Excel</a>
-            <?php
-            } ?>
+              </svg>
+            </button>
+
+            <button type="submit" name="clearfilter" class="btn btn-secondary btn-sm float-end ms-2" style="border-top-left-radius:0px; border-bottom-left-radius:0px;">Clear Filter</button>
+            <button type="submit" name="searchbtn" class="btn btn-primary btn-sm float-end me-2" style="border-top-left-radius:0px; border-bottom-left-radius:0px;">View</button>
+
+            <select name="commondity_id" class="form-control inpv2 d-inline float-end" style="margin-left:5px; width: 10%; height:26px !important; padding:0px 2px;">
+              <option value="">Select Commondity</option>
+              <?php
+              $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
+              $commonstmt->execute();
+              $commondatas = $commonstmt->fetchAll();
+              foreach ($commondatas as $commondata) {
+                $item_id = $commondata['item_id'];
+                $commonditydata = $query->select('item', $item_id, 'item_id');
+              ?>
+                <option value="<?php echo $commondata['item_id']; ?>" <?php if (!empty($_SESSION['search']['searchcommondity']) && $_SESSION['search']['searchcommondity'] == $commondata['item_id']) echo "selected"; ?>><?php echo $commonditydata['item_name']; ?></option>
+              <?php } ?>
+            </select>
+            <input type="date" name="date" value="<?php echo !empty($_SESSION['search']['searchdate']) ? $_SESSION['search']['searchdate'] : ''; ?>" class="form-control inpv2 d-inline float-end" style="margin-left:5px; width: 14%; height:26px !important; padding:0px 2px;">
+            <select name="size" class="form-control inpv2 d-inline float-end" style="margin-left:5px; width: 10%; height:26px !important; padding:0px 2px;">
+              <option value="">Select Size</option>
+              <?php
+              $sizestmt = $pdo->prepare("SELECT DISTINCT size FROM form10stock");
+              $sizestmt->execute();
+              $sizedatas = $sizestmt->fetchAll();
+              foreach ($sizedatas as $sizedata) {
+              ?>
+                <option value="<?php echo $sizedata['size']; ?>" <?php if (!empty($_SESSION['search']['searchsize']) && $_SESSION['search']['searchsize'] == $sizedata['size']) echo "selected"; ?>><?php echo $sizedata['size']; ?></option>
+              <?php } ?>
+            </select>
+
+            <?php if ($isViewMode && !empty($_POST['commondity']) && !empty($_POST['country']) && !empty($_POST['searchdate'])) { ?>
+              <a href="testing_export_two.php?table_name=form10frozen&searchdate=<?php echo $_POST['searchdate'] ?>&country=<?php echo $_POST['country'] ?>&commondity=<?php echo $_POST['commondity'] ?>&fish_type=<?php echo $_POST['fish_type'] ?>" class="btn btn-dark btn-sm float-end me-2">Export Excel</a>
+            <?php } ?>
           </form>
         </div>
+
         <div class="modal fade" id="filtermodal" tabindex="-1" role="dialog">
           <div class="modal-dialog" role="document">
             <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
@@ -107,7 +167,6 @@ $bootstrap->css();
               </div>
               <div class="modal-body">
                 <form action="" method="post">
-                  <input type="hidden" name="upid" value="<?php echo $form10data['id']; ?>">
                   <div class="modal-body">
                     <label>Form7Date:</label>
                     <input type="date" id="dateselector" name="form7date" class="form-control inpv2">
@@ -127,9 +186,7 @@ $bootstrap->css();
                           foreach ($countrydatas as $countrydata) {
                           ?>
                             <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
-                          <?php
-                          }
-                          ?>
+                          <?php } ?>
                         </select>
                       </div>
                     </div>
@@ -147,9 +204,7 @@ $bootstrap->css();
                             $item_name = $query->select('item', $itemid, 'item_id');
                           ?>
                             <option value="<?php echo $item_name['item_id']; ?>"><?php echo $item_name['item_name']; ?></option>
-                          <?php
-                          }
-                          ?>
+                          <?php } ?>
                         </select>
                       </div>
                       <div class="col">
@@ -178,6 +233,7 @@ $bootstrap->css();
             </div>
           </div>
         </div>
+
         <div class="card-body">
           <table class="table table-hover table-striped table-bordered">
             <tr class="text-center">
@@ -191,20 +247,11 @@ $bootstrap->css();
               <th colspan="2">Loose In</th>
               <th colspan="2">Loose Out</th>
               <th>Total</th>
-              <?php
-              if (!isset($_POST['view'])) {
-              ?>
+              <?php if (!$isViewMode) { ?>
                 <th rowspan="2" style="padding-top:25px;">Action</th>
-              <?php
-              }
-              ?>
-              <?php
-              if (isset($_POST['view'])) {
-              ?>
+              <?php } else { ?>
                 <th rowspan="2" style="padding-top:25px;">%</th>
-              <?php
-              }
-              ?>
+              <?php } ?>
             </tr>
             <tr class="text-center">
               <th>PCS/Form-10</th>
@@ -217,476 +264,415 @@ $bootstrap->css();
               <th>Pcs</th>
               <th>Kg</th>
             </tr>
+
             <?php
-            if (isset($_POST['view']) && !empty($_POST['commondity']) && !empty($_POST['country']) && !empty($_POST['searchdate']) && !empty($_POST['form7date'])) {
-              $commondity_id = $_POST['commondity'];
-              $country = $_POST['country'];
-              $searchdate = $_POST['searchdate'];
-              $form7date = $_POST['form7date'];
-              $fishtype = $_POST['fish_type'];
-              $stmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate' AND fish_type='$fishtype'");
+            // Setup Unified Fetching
+            $sql = "SELECT * FROM form10stock";
+            $conditions = [];
+            $nodata = true; // Assume blank table
+
+            if ($isViewMode) {
+              // Percentage Report Logic
+              if (!empty($_POST['commondity'])) {
+                $conditions[] = "item_id = '" . $_POST['commondity'] . "'";
+              }
+              if (!empty($_POST['country'])) {
+                $conditions[] = "country = '" . $_POST['country'] . "'";
+              }
+              if (!empty($_POST['searchdate'])) {
+                $conditions[] = "date = '" . $_POST['searchdate'] . "'";
+              }
+              if (!empty($_POST['fish_type'])) {
+                $conditions[] = "fish_type = '" . $_POST['fish_type'] . "'";
+              }
+              if (count($conditions) > 0) {
+                $nodata = false;
+              }
+            } else {
+              // Main Table Filter Logic
+              $search_commondity = !empty($_SESSION['search']['searchcommondity']) ? $_SESSION['search']['searchcommondity'] : '';
+              $search_date = !empty($_SESSION['search']['searchdate']) ? $_SESSION['search']['searchdate'] : '';
+              $search_size = !empty($_SESSION['search']['searchsize']) ? $_SESSION['search']['searchsize'] : '';
+
+              if ($search_commondity != '') {
+                $conditions[] = "item_id = :commondity_id";
+              }
+              if ($search_date != '') {
+                $conditions[] = "date = :searchdate";
+              }
+              if ($search_size != '') {
+                $conditions[] = "size = :searchsize";
+              }
+              if (count($conditions) > 0) {
+                $nodata = false;
+              }
+            }
+
+            if ($nodata) {
+              $datas = [];
+            } else {
+              if (count($conditions) > 0) {
+                $sql .= " WHERE " . implode(" AND ", $conditions);
+              }
+              $stmt = $pdo->prepare($sql);
+
+              // Bind params specifically for standard filter
+              if (!$isViewMode) {
+                if ($search_commondity != '') {
+                  $stmt->bindParam(':commondity_id', $search_commondity, PDO::PARAM_STR);
+                }
+                if ($search_date != '') {
+                  $stmt->bindParam(':searchdate', $search_date, PDO::PARAM_STR);
+                }
+                if ($search_size != '') {
+                  $stmt->bindParam(':searchsize', $search_size, PDO::PARAM_STR);
+                }
+              }
               $stmt->execute();
               $datas = $stmt->fetchall();
-              foreach ($datas as $data) {
-                $item_id = $data['item_id'];
-                $fish_type = $data['fish_type'];
-                $commonditydata = $query->select('item', $item_id, 'item_id');
-                $supplierid = $data['supplier_id'];
-                $supplier_name = $query->select('acname', $supplierid, 'code_no');
-            ?>
-                <tr>
-                  <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
-                  <td><?php echo $commonditydata['item_name'] . '(' . $data['fish_type'] . ')'; ?></td>
-                  <td><?php echo $supplier_name['ac_name']; ?></td>
-                  <td><?php echo $data['country']; ?></td>
-                  <td><?php echo $data['type']; ?></td>
-                  <td><?php echo $data['size']; ?></td>
-                  <td><?php echo $data['pcsform10']; ?></td>
-                  <td><?php echo $data['mc']; ?></td>
-                  <td><?php echo $data['kg']; ?></td>
-                  <td><?php echo $data['pcs']; ?></td>
-                  <td><?php echo $data['looseinkg']; ?></td>
-                  <td><?php echo $data['looseinpcs']; ?></td>
-                  <td><?php echo $data['looseoutkg']; ?></td>
-                  <td><?php echo $data['looseoutpcs']; ?></td>
-                  <?php
-                  if (!isset($_POST['view'])) {
-                  ?>
-                    <td></td>
-                  <?php
-                  }
-                  ?>
-                  <td><?php echo round($data['total_kg'], 2); ?></td>
-                  <td></td>
-                </tr>
-              <?php
-              }
+            }
 
-              $supplieridstmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fishtype' AND date='$searchdate'");
-              $supplieridstmt->execute();
-              $supplierdata = $supplieridstmt->fetch(PDO::FETCH_ASSOC);
-              // Get POST data
+            // Initialize Dynamic Totals
+            $t_pcsform10 = 0;
+            $t_mc = 0;
+            $t_kg = 0;
+            $t_pcs = 0;
+            $t_looseinkg = 0;
+            $t_looseinpcs = 0;
+            $t_looseoutkg = 0;
+            $t_looseoutpcs = 0;
+            $t_total_kg = 0;
+
+            foreach ($datas as $data) {
+              $item_id = $data['item_id'];
+              $commonditydata = $query->select('item', $item_id, 'item_id');
+              $supplierid = $data['supplier_id'];
+              $supplier_name = $query->select('acname', $supplierid, 'code_no');
+
+              // Accumulate totals
+              $t_pcsform10 += floatval($data['pcsform10']);
+              $t_mc += floatval($data['mc']);
+              $t_kg += floatval($data['kg']);
+              $t_pcs += floatval($data['pcs']);
+              $t_looseinkg += floatval($data['looseinkg']);
+              $t_looseinpcs += floatval($data['looseinpcs']);
+              $t_looseoutkg += floatval($data['looseoutkg']);
+              $t_looseoutpcs += floatval($data['looseoutpcs']);
+              $t_total_kg += floatval($data['total_kg']);
+            ?>
+              <tr>
+                <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
+                <td><?php echo $commonditydata['item_name'] . '(' . $data['fish_type'] . ')'; ?></td>
+                <td><?php echo $supplier_name['ac_name']; ?></td>
+                <td><?php echo $data['country']; ?></td>
+                <td><?php echo $data['type']; ?></td>
+                <td><?php echo $data['size']; ?></td>
+                <td><?php echo $data['pcsform10']; ?></td>
+                <td><?php echo $data['mc']; ?></td>
+                <td><?php echo $data['kg']; ?></td>
+                <td><?php echo $data['pcs']; ?></td>
+                <td><?php echo $data['looseinkg']; ?></td>
+                <td><?php echo $data['looseinpcs']; ?></td>
+                <td><?php echo $data['looseoutkg']; ?></td>
+                <td><?php echo $data['looseoutpcs']; ?></td>
+                <td><?php echo round($data['total_kg'], 2); ?></td>
+
+                <?php if (!$isViewMode) { ?>
+                  <td>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#updatemodal<?= $data['id']; ?>" class="btn btn-warning text-light btn-sm d-inline">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                        <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                      </svg>
+                    </button>
+                  </td>
+                <?php } else { ?>
+                  <td>-</td> <?php } ?>
+              </tr>
+
+              <div class="modal fade" id="updatemodal<?= $data['id']; ?>" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+                    <div class="modal-header bg-warning text-light">
+                      <h1 class="modal-title fs-5">Update Form 10 Data</h1>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <form action="" method="post">
+                        <?php
+                        $updatedata = $query->select('form10stock', $data['id'], 'id');
+                        ?>
+                        <input type="hidden" name="upid" value="<?php echo $data['id']; ?>">
+                        <div class="modal-body">
+                          <label>Date</label>
+                          <input type="date" name="update" class="form-control inpv2 mb-2" value="<?php echo $updatedata['date']; ?>">
+                          <div class="row">
+                            <div class="col">
+                              <label>Type</label>
+                              <select class="form-control inpv2 mb-2" name="uptype">
+                                <option>Select Type</option>
+                                <option value="frozen" <?php if ($updatedata['type'] == 'frozen') echo "selected"; ?>>frozen</option>
+                                <option value="tcl" <?php if ($updatedata['type'] == 'tcl') echo "selected"; ?>>tcl</option>
+                              </select>
+                            </div>
+                            <div class="col">
+                              <label>Supplier Name</label>
+                              <select name="upsupplier_id" class="form-control inpv2">
+                                <?php
+                                $supplier_id_stmt = $pdo->prepare("SELECT DISTINCT supplier_name FROM form7stock");
+                                $supplier_id_stmt->execute();
+                                $supplier_id_datas = $supplier_id_stmt->fetchall();
+                                foreach ($supplier_id_datas as $supplier_id_data) {
+                                  $supplierid_opt = $supplier_id_data['supplier_name'];
+                                  $supplier_name_opt = $query->select('acname', $supplierid_opt, 'code_no');
+                                ?>
+                                  <option value="<?php echo $supplier_name_opt['code_no']; ?>" <?php if ($updatedata['supplier_id'] == $supplier_name_opt['code_no']) echo "selected"; ?>><?php echo $supplier_name_opt['ac_name']; ?></option>
+                                <?php } ?>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col">
+                              <label>Commodity</label>
+                              <div class="row">
+                                <div class="col">
+                                  <select class="form-control inpv2 mb-2" name="upitem_id">
+                                    <?php
+                                    $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
+                                    $form7commonditystmt->execute();
+                                    $form7commonditydatas = $form7commonditystmt->fetchall();
+                                    foreach ($form7commonditydatas as $form7commonditydata) {
+                                      $item_id_opt = $form7commonditydata['item_id'];
+                                      $commonditydata_opt = $query->select('item', $item_id_opt, 'item_id');
+                                    ?>
+                                      <option value="<?php echo $commonditydata_opt['item_id']; ?>" <?php if ($updatedata['item_id'] == $commonditydata_opt['item_id']) echo "selected"; ?>><?php echo $commonditydata_opt['item_name']; ?></option>
+                                    <?php } ?>
+                                  </select>
+                                </div>
+                                <div class="col">
+                                  <select name="upfish_type" class="form-control inpv2">
+                                    <option value="G" <?php if ($updatedata['fish_type'] == 'G') echo "selected"; ?>>G</option>
+                                    <option value="egg" <?php if ($updatedata['fish_type'] == 'egg') echo "selected"; ?>>egg</option>
+                                    <option value="ggs" <?php if ($updatedata['fish_type'] == 'ggs') echo "selected"; ?>>ggs</option>
+                                    <option value="fillet" <?php if ($updatedata['fish_type'] == 'fillet') echo "selected"; ?>>fillet</option>
+                                    <option value="W" <?php if ($updatedata['fish_type'] == 'W') echo "selected"; ?>>W</option>
+                                    <option value="Cut_piece" <?php if ($updatedata['fish_type'] == 'Cut_piece') echo "selected"; ?>>Cut Piece</option>
+                                    <option value="Scaless" <?php if ($updatedata['fish_type'] == 'Scaless') echo "selected"; ?>>Scaless</option>
+                                    <option value="Bls" <?php if ($updatedata['fish_type'] == 'Bls') echo "selected"; ?>>Bl's</option>
+                                    <option value="iqf" <?php if ($updatedata['fish_type'] == 'iqf') echo "selected"; ?>>IQF</option>
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col">
+                              <label>Country</label>
+                              <input type="text" name="upcountry" class="form-control inpv2 mb-2" value="<?php echo $updatedata['country']; ?>">
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col">
+                              <label>Size</label>
+                              <input type="text" name="upsize" class="form-control inpv2 mb-2" value="<?php echo $updatedata['size']; ?>">
+                            </div>
+                            <div class="col">
+                              <label>Mc</label>
+                              <input type="number" name="upmc" class="form-control inpv2 mb-2" value="<?php echo $updatedata['mc']; ?>">
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col">
+                              <label>Kg</label>
+                              <input type="text" name="upkg" class="form-control inpv2 mb-2" value="<?php echo $updatedata['kg']; ?>">
+                            </div>
+                            <div class="col">
+                              <label>Pcs</label>
+                              <input type="text" name="uppcs" class="form-control inpv2 mb-2" value="<?php echo $updatedata['pcs']; ?>">
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col">
+                              <label>Loose In Kg</label>
+                              <input type="text" name="uploose_in_kg" class="form-control inpv2 mb-2" value="<?php echo $updatedata['looseinkg']; ?>">
+                            </div>
+                            <div class="col">
+                              <label>Loose In Pcs</label>
+                              <input type="number" name="uploose_in_pcs" class="form-control inpv2 mb-2" value="<?php echo $updatedata['looseinpcs']; ?>">
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col">
+                              <label>Loose Out Kg</label>
+                              <input type="text" name="uploose_out_kg" class="form-control inpv2 mb-2" value="<?php echo $updatedata['looseoutkg']; ?>">
+                            </div>
+                            <div class="col">
+                              <label>Loose Out Pcs</label>
+                              <input type="number" name="uploose_out_pcs" class="form-control inpv2 mb-2" value="<?php echo $updatedata['looseoutpcs']; ?>">
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="submit" class="btn btn-success" name="updatebutton">Update</button>
+                    </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            <?php } ?>
+
+            <?php
+            // Calculate Form 7 Percentage if viewing report and provided form7date
+            $percentage = "";
+            if ($isViewMode && !empty($_POST['form7date']) && !empty($_POST['commondity']) && !empty($_POST['country']) && !empty($_POST['fish_type'])) {
               $form7date = $_POST['form7date'];
               $_SESSION['form7date'] = $form7date;
-              // Convert searchdate (which comes from Flatpickr) to an array of dates
               $datesArray = explode(', ', $form7date);
-
-              // Quote each date for SQL
               $quotedDates = array_map(function ($date) {
                 return "'" . $date . "'";
               }, $datesArray);
-
-              // Join the quoted dates with commas
               $datesList = implode(', ', $quotedDates);
+
+              $commondity_id = $_POST['commondity'];
+              $country = $_POST['country'];
+              $fishtype = $_POST['fish_type'];
 
               $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fishtype' AND date IN ($datesList)");
               $totalf7kgstmt->execute();
               $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
 
-              $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND fish_type='$fishtype' AND country='$country' AND date='$searchdate'");
-              $totalkgstmt->execute();
-              $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
-              $result1 = round($totalkgdata['total_kg'], 2) - round($totalf7kgdata['total_kg'], 2);
-              if (empty($totalf7kgdata['total_kg'])) {
-                $percentage = "";
-              } else {
-                $result2 = $result1 / round($totalf7kgdata['total_kg'], 2);
-                $percentage = $result2 * 100;
+              if (!empty($totalf7kgdata['total_kg'])) {
+                $result1 = $t_total_kg - round($totalf7kgdata['total_kg'], 2);
+                $percentage = ($result1 / round($totalf7kgdata['total_kg'], 2)) * 100;
               }
+            }
+            ?>
 
-              $form10pcsstmt = $pdo->prepare("SELECT SUM(pcsform10) AS total_form10_pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date='$searchdate'");
-              $form10pcsstmt->execute();
-              $form10pcsdata = $form10pcsstmt->fetch(PDO::FETCH_ASSOC);
-
-
-              $totalkgstmt = $pdo->prepare("SELECT SUM(total_kg) AS total_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date='$searchdate'");
-              $totalkgstmt->execute();
-              $totalkgdata = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
-
-              $mcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date='$searchdate'");
-              $mcstmt->execute();
-              $mcdata = $mcstmt->fetch(PDO::FETCH_ASSOC);
-
-              $pcsstmt = $pdo->prepare("SELECT SUM(pcs) AS total_pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date='$searchdate'");
-              $pcsstmt->execute();
-              $pcsdata = $pcsstmt->fetch(PDO::FETCH_ASSOC);
-
-              $loose_in_kgstmt = $pdo->prepare("SELECT SUM(looseinkg) AS total_loosein_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date='$searchdate'");
-              $loose_in_kgstmt->execute();
-              $loose_in_kgdata = $loose_in_kgstmt->fetch(PDO::FETCH_ASSOC);
-
-              $loose_in_pcsstmt = $pdo->prepare("SELECT SUM(looseinpcs) AS total_loosein_pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date='$searchdate'");
-              $loose_in_pcsstmt->execute();
-              $loose_in_pcsdata = $loose_in_pcsstmt->fetch(PDO::FETCH_ASSOC);
-
-              $loose_out_kgstmt = $pdo->prepare("SELECT SUM(looseoutkg) AS total_looseout_kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date='$searchdate'");
-              $loose_out_kgstmt->execute();
-              $loose_out_kgdata = $loose_in_kgstmt->fetch(PDO::FETCH_ASSOC);
-
-              $loose_out_pcsstmt = $pdo->prepare("SELECT SUM(looseoutpcs) AS total_looseout_pcs FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date='$searchdate'");
-              $loose_out_pcsstmt->execute();
-              $loose_out_pcsdata = $loose_in_pcsstmt->fetch(PDO::FETCH_ASSOC);
-
-              $kgstmt = $pdo->prepare("SELECT SUM(kg) AS kg FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND fish_type='$fish_type' AND date='$searchdate'");
-              $kgstmt->execute();
-              $kgdata = $kgstmt->fetch(PDO::FETCH_ASSOC);
-              ?>
-              <tr>
+            <?php if (count($datas) > 0) { ?>
+              <tr style="background-color: #f8f9fa;">
                 <td></td>
                 <td style="font-weight:bold;">Total</td>
                 <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
-                <td style="font-weight:bold;"><?php echo round($form10pcsdata['total_form10_pcs'], 2); ?></td>
-                <td style="font-weight:bold;"><?php echo round($mcdata['total_mc'], 2); ?></td>
-                <td style="font-weight:bold;"><?php echo round($kgdata['kg'], 2); ?></td>
-                <td style="font-weight:bold;"><?php echo round($pcsdata['total_pcs'], 2); ?></td>
-                <td style="font-weight:bold;"><?php if(!empty($loose_in_kgdata['total_loosein_kg'])){ echo round($loose_in_kgdata['total_loosein_kg'], 2); } ?></td>
-                <td style="font-weight:bold;"><?php if(!empty($loose_in_pcsdata['total_loosein_pcs'])){ echo round($loose_in_pcsdata['total_loosein_pcs'], 2); } ?></td>
-                <td style="font-weight:bold;"><?php if(!empty($loose_out_kgdata['total_looseout_kg'])){ echo round($loose_out_kgdata['total_looseout_kg'], 2); } ?></td>
-                <td style="font-weight:bold;"><?php if(!empty($loose_out_pcsdata['total_looseout_pcs'])){ echo round($loose_out_pcsdata['total_looseout_pcs'], 2); } ?></td>
-                <td style="font-weight:bold;"><?php echo round($totalkgdata['total_kg'], 2); ?></td>
-                <?php
-                if (!isset($_POST['view'])) {
-                ?>
+                <td style="font-weight:bold;"><?php echo round($t_pcsform10, 2); ?></td>
+                <td style="font-weight:bold;"><?php echo round($t_mc, 2); ?></td>
+                <td style="font-weight:bold;"><?php echo round($t_kg, 2); ?></td>
+                <td style="font-weight:bold;"><?php echo round($t_pcs, 2); ?></td>
+                <td style="font-weight:bold;"><?php echo round($t_looseinkg, 2); ?></td>
+                <td style="font-weight:bold;"><?php echo round($t_looseinpcs, 2); ?></td>
+                <td style="font-weight:bold;"><?php echo round($t_looseoutkg, 2); ?></td>
+                <td style="font-weight:bold;"><?php echo round($t_looseoutpcs, 2); ?></td>
+                <td style="font-weight:bold;"><?php echo round($t_total_kg, 2); ?></td>
+
+                <?php if (!$isViewMode) { ?>
                   <td></td>
-                <?php
-                }
-                ?>
-                <?php
-                if (isset($_POST['view'])) {
-                ?>
-                  <?php 
-                    if ($percentage != "") {
-                      if(strpos(round($percentage, 2), '-') !== false){
-                        ?>
-                        <!-- Percentage is minus -->
-                          <td style="font-weight:bold; color: red;"><?php echo round($percentage, 2); ?> %</td>
-                        <?php
-                      }else{
-                        ?>
-                        <!-- Percentage is Plus -->
-                          <td style="font-weight:bold;"><?php echo "+" . round($percentage, 2); ?> %</td>
-                        <?php
-                      }
-                    }else{
-                      echo '-';
-                    }
+                <?php } else { ?>
+                  <?php if ($percentage !== "") {
+                    $color = (strpos(round($percentage, 2), '-') !== false) ? 'color: red;' : '';
+                    $sign = (strpos(round($percentage, 2), '-') !== false) ? '' : '+';
                   ?>
-                  
-                <?php
-                }
-                ?>
+                    <td style="font-weight:bold; <?php echo $color; ?>"><?php echo $sign . round($percentage, 2); ?> %</td>
+                  <?php } else { ?>
+                    <td style="font-weight:bold;">-</td>
+                  <?php } ?>
+                <?php } ?>
               </tr>
-
-              <?php
-            } else {
-              if (isset($_POST['searchbtn2']) && !empty($_POST['type'])) {
-                $type = $_POST['type'];
-                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM form10stock WHERE type='$type'");
-              } else {
-                $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT item_id) FROM form10stock");
-              }
-              $commonditycountstmt->execute();
-              $commonditycountdatas = $commonditycountstmt->fetchColumn();
-              for ($i = 0; $i < $commonditycountdatas; $i++) {
-                if (isset($_POST['searchbtn2']) && !empty($_POST['type'])) {
-                  $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock WHERE type='$type'");
-                } else {
-                  $commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
-                }
-                $commonditystmt->execute();
-                $commonditydata = $commonditystmt->fetchall();
-                $commondity_id = $commonditydata[$i]['item_id'];
-                if (isset($_POST['searchbtn2']) && !empty($_POST['type'])) {
-                  $stmt = $pdo->prepare("SELECT * FROM form10stock WHERE type='$type' AND item_id='$commondity_id'");
-                  $stmt->execute();
-                  $datas = $stmt->fetchall();
-                } else {
-                  $stmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id'");
-                  $stmt->execute();
-                  $datas = $stmt->fetchall();
-                }
-                foreach ($datas as $form10data) {
-                  $item_id = $form10data['item_id'];
-                  $commonditydata = $query->select('item', $item_id, 'item_id');
-                  $supplierid = $form10data['supplier_id'];
-                  $supplier_name = $query->select('acname', $supplierid, 'code_no');
-              ?>
-                  <tr>
-                    <td><?php echo date('d-m-Y', strtotime($form10data['date'])); ?></td>
-                    <td><?php echo $commonditydata['item_name'] . '(' . $form10data['fish_type'] . ')'; ?></td>
-                    <td><?php echo $supplier_name['ac_name']; ?></td>
-                    <td><?php echo $form10data['country']; ?></td>
-                    <td><?php echo $form10data['type']; ?></td>
-                    <td><?php echo $form10data['size']; ?></td>
-                    <td><?php echo $form10data['pcsform10']; ?></td>
-                    <td><?php echo $form10data['mc']; ?></td>
-                    <td><?php echo $form10data['kg']; ?></td>
-                    <td><?php echo $form10data['pcs']; ?></td>
-                    <td><?php echo $form10data['looseinkg']; ?></td>
-                    <td><?php echo $form10data['looseinpcs']; ?></td>
-                    <td><?php echo $form10data['looseoutkg']; ?></td>
-                    <td><?php echo $form10data['looseoutpcs']; ?></td>
-                    <td><?php echo round($form10data['total_kg'], 2); ?></td>
-                    <?php
-                    if (!isset($_POST['view'])) {
-                    ?>
-                      <td>
-                        <button type="submit" data-bs-toggle="modal" data-bs-target="#updatemodal<?= $form10data['id']; ?>" tabindex="-1" role="dialog" class="btn btn-warning text-light btn-sm d-inline" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
-                          </svg>
-                        </button>
-                      </td>
-                    <?php
-                    }
-                    ?>
-                    <?php
-                    if (isset($_POST['view'])) {
-                    ?>
-                      <td><?php echo $form10data['percentage']; ?></td>
-                      <!-- <td></td> -->
-                    <?php
-                    }
-                    ?>
-                  </tr>
-                  <?php
-                  $country = $form10data['country'];
-                  $commondity_id = $form10data['item_id'];
-                  ?>
-                  <div class="modal fade" id="updatemodal<?= $form10data['id']; ?>" tabindex="-1" role="dialog">
-                    <div class="modal-dialog" role="document">
-                      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
-                        <div class="modal-header bg-warning text-light">
-                          <h1 class="modal-title fs-5">Add Form 10 Data</h1>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                          <form action="" method="post">
-                            <?php
-                            $id = $form10data['id'];
-                            $updatedata = $query->select('form10stock', $id, 'id');
-                            $datas = $query->select('acname', $updatedata['supplier_id'], 'code_no');
-                            $ac_name = $datas['ac_name'];
-                            ?>
-                            <input type="hidden" name="upid" value="<?php echo $form10data['id']; ?>">
-                            <div class="modal-body">
-                              <label>Date</label>
-                              <input type="date" name="update" class="form-control inpv2 mb-2" value="<?php echo $updatedata['date']; ?>">
-                              <div class="row">
-                                <div class="col">
-                                  <label>Type</label>
-                                  <select class="form-control inpv2 mb-2" name="uptype">
-                                    <option>Select Type</option>
-                                    <option value="frozen" <?php if ($updatedata['type'] == 'frozen') {
-                                                              echo "selected";
-                                                            } ?>>frozen</option>
-                                    <option value="tcl" <?php if ($updatedata['type'] == 'tcl') {
-                                                          echo "selected";
-                                                        } ?>>tcl</option>
-                                  </select>
-                                </div>
-                                <div class="col">
-                                  <label>Supplier Name</label>
-                                  <select name="upsupplier_id" class="form-control inpv2">
-                                    <?php
-                                    $supplier_id_stmt = $pdo->prepare("SELECT DISTINCT supplier_name FROM form7stock");
-                                    $supplier_id_stmt->execute();
-                                    $supplier_id_datas = $supplier_id_stmt->fetchall();
-                                    foreach ($supplier_id_datas as $supplier_id_data) {
-                                      $supplierid = $supplier_id_data['supplier_name'];
-                                      $supplier_name = $query->select('acname', $supplierid, 'code_no');
-                                    ?>
-                                      <option value="<?php echo $supplier_name['code_no']; ?>" <?php if ($updatedata['supplier_id'] == $supplier_name['code_no']) {
-                                                                                                  echo "selected";
-                                                                                                }; ?>><?php echo $supplier_name['ac_name']; ?></option>
-                                    <?php
-                                    }
-                                    ?>
-                                  </select>
-                                </div>
-                              </div>
-                              <div class="row">
-                              </div>
-                              <div class="row">
-                                <div class="col">
-                                  <label>Commondity</label>
-                                  <div class="row">
-                                    <div class="col">
-                                      <select class="form-control inpv2 mb-2" name="upitem_id">
-                                        <?php
-                                        $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
-                                        $form7commonditystmt->execute();
-                                        $form7commonditydatas = $form7commonditystmt->fetchall();
-                                        foreach ($form7commonditydatas as $form7commonditydata) {
-                                          $item_id = $form7commonditydata['item_id'];
-                                          $commonditydata = $query->select('item', $item_id, 'item_id');
-                                        ?>
-                                          <option value="<?php echo $commonditydata['item_id']; ?>" <?php if ($updatedata['item_id'] == $commonditydata['item_id']) {
-                                                                                                      echo "selected";
-                                                                                                    }; ?>><?php echo $commonditydata['item_name']; ?></option>
-                                        <?php
-                                        }
-                                        ?>
-                                      </select>
-                                    </div>
-                                    <div class="col">
-                                      <select name="upfish_type" class="form-control inpv2">
-                                        <option value="G">G</option>
-                                        <option value="egg">egg</option>
-                                        <option value="ggs">ggs</option>
-                                        <option value="fillet">fillet</option>
-                                        <option value="W">W</option>
-                                        <option value="Cut_piece">Cut Piece</option>
-                                        <option value="Scaless">Scaless</option>
-                                        <option value="Bls">Bl's</option>
-                                        <option value="iqf">IQF</option>
-                                      </select>
-                                    </div>
-                                  </div>
-
-                                </div>
-                                <div class="col">
-                                  <label>Country</label>
-                                  <input type="text" name="upcountry" class="form-control inpv2 mb-2" value="<?php echo $updatedata['country']; ?>">
-                                </div>
-                              </div>
-                              <div class="row">
-                                <div class="col">
-                                  <label>Size</label>
-                                  <input type="text" name="upsize" class="form-control inpv2 mb-2" value="<?php echo $updatedata['size']; ?>">
-                                </div>
-                                <div class="col">
-                                  <label>Mc</label>
-                                  <input type="number" name="upmc" class="form-control inpv2 mb-2" value="<?php echo $updatedata['mc']; ?>">
-                                </div>
-                              </div>
-                              <div class="row">
-                                <div class="col">
-                                  <label>Kg</label>
-                                  <input type="text" name="upkg" class="form-control inpv2 mb-2" value="<?php echo $updatedata['kg']; ?>">
-                                </div>
-                                <div class="col">
-                                  <label>Pcs</label>
-                                  <input type="text" name="uppcs" class="form-control inpv2 mb-2" value="<?php echo $updatedata['pcs']; ?>">
-                                </div>
-                              </div>
-                              <div class="row">
-                                <div class="col">
-                                  <label>Loose In Kg</label>
-                                  <input type="text" name="uploose_in_kg" class="form-control inpv2 mb-2" value="<?php echo $updatedata['looseinkg']; ?>">
-                                </div>
-                                <div class="col">
-                                  <label>Loose In Pcs</label>
-                                  <input type="number" name="uploose_in_pcs" class="form-control inpv2 mb-2" value="<?php echo $updatedata['looseinpcs']; ?>">
-                                </div>
-                              </div>
-                              <div class="row">
-                                <div class="col">
-                                  <label>Loose Out Kg</label>
-                                  <input type="text" name="uploose_out_kg" class="form-control inpv2 mb-2" value="<?php echo $updatedata['looseoutkg']; ?>">
-                                </div>
-                                <div class="col">
-                                  <label>Loose Out Pcs</label>
-                                  <input type="number" name="uploose_out_pcs" class="form-control inpv2 mb-2" value="<?php echo $updatedata['looseoutpcs']; ?>">
-                                </div>
-                              </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                          <button type="submit" class="btn btn-success" name="updatebutton">Update</button>
-                        </div>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-                <?php
-                }
-                ?>
-            <?php
-              }
-            }
-            ?>
+            <?php } ?>
           </table>
         </div>
       </div>
     </div>
   </div>
+
   <div class="modal fade" id="addmodal">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content" style="margin-top:70px !important;">
         <div class="modal-header bg-warning text-light">
           <h1 class="modal-title fs-5">Add Form 10 Data</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
-          <form action="form_10_frozen.php" method="post">
-            <div class="modal-body">
-              <label>Date</label>
-              <input type="date" name="date" class="form-control inpv2 mb-2" value="<?php if (!empty($_SESSION['date'])) {
-                                                                                      echo $_SESSION['date'];
-                                                                                    } ?>">
-              <div class="row">
-                <div class="col">
-                  <label>Type</label>
-                  <select class="form-control inpv2 mb-2" name="type">
-                    <option value="frozen">Frozen</option>
-                  </select>
-                </div>
-                <div class="col">
-                  <label>Supplier Name</label>
-                  <select name="supplier_id" class="form-control inpv2">
-                    <?php
-                    $supplier_id_stmt = $pdo->prepare("SELECT DISTINCT supplier_name FROM form7stock");
-                    $supplier_id_stmt->execute();
-                    $supplier_id_datas = $supplier_id_stmt->fetchall();
+        <form action="form_10_frozen.php" method="post" autocomplete="off">
+          <div class="modal-body">
+            <div class="row g-3 mb-3">
+              <div class="col-md-3">
+                <label style="font-weight: bold;">Date</label>
+                <input type="date" name="date" class="form-control inpv2" value="<?php echo !empty($_SESSION['date']) ? $_SESSION['date'] : ''; ?>">
+              </div>
+              <div class="col-md-3">
+                <label style="font-weight: bold;">Type</label>
+                <select class="form-control inpv2" name="type">
+                  <option value="frozen">Frozen</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label style="font-weight: bold;">Supplier</label>
+                <select name="supplier_id" class="form-control inpv2 chzn-select" data-placeholder="Select Supplier">
+                  <option value=""></option>
+                  <?php
+                  $supplier_id_stmt = $pdo->prepare("SELECT DISTINCT supplier_name FROM form7stock");
+                  $supplier_id_stmt->execute();
+                  $supplier_id_datas = $supplier_id_stmt->fetchall();
+                  foreach ($supplier_id_datas as $supplier_id_data) {
+                    $supplierid = $supplier_id_data['supplier_name'];
+                    $supplier_name = $query->select('acname', $supplierid, 'code_no');
+                  ?>
+                    <option value="<?php echo $supplier_name['code_no']; ?>" <?php echo (!empty($_SESSION['supplier_id']) && $_SESSION['supplier_id'] == $supplier_name['code_no']) ? 'selected' : ''; ?>>
+                      <?php echo $supplier_name['ac_name']; ?>
+                    </option>
+                  <?php } ?>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label style="font-weight: bold;">Country</label>
+                <input type="text" name="country" class="form-control inpv2" value="<?php echo !empty($_SESSION['country']) ? $_SESSION['country'] : ''; ?>">
+              </div>
+            </div>
 
-                    foreach ($supplier_id_datas as $supplier_id_data) {
-                      $supplierid = $supplier_id_data['supplier_name'];
-                      $supplier_name = $query->select('acname', $supplierid, 'code_no');
-                    ?>
-                      <option value="<?php echo $supplier_name['code_no']; ?>" <?php if (!empty($_SESSION['supplier_id'])) {
-                                                                                  if ($_SESSION['supplier_id'] == $supplier_name['code_no']) {
-                                                                                    echo "selected";
-                                                                                  }
-                                                                                } ?>><?php echo $supplier_name['ac_name']; ?></option>
-                    <?php
-                    }
-                    ?>
-                  </select>
-                </div>
-              </div>
-              <div class="row">
-              </div>
-              <div class="row">
-                <div class="col">
-                  <label>Commondity</label>
-                  <div class="row">
-                    <div class="col">
-                      <select class="form-control inpv2 mb-2" name="item_id">
+            <div class="mb-2 d-flex justify-content-between align-items-center mt-4">
+              <label style="font-weight: bold;">Form-10 Lines</label>
+              <button type="button" class="btn btn-sm btn-outline-primary" onclick="addForm10Line();">Add Line</button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-bordered table-sm" style="min-width: 1100px;">
+                <thead class="table-light text-center align-middle">
+                  <tr>
+                    <th>Commodity</th>
+                    <th>Fish Type</th>
+                    <th>Size</th>
+                    <th>MC</th>
+                    <th>Kg</th>
+                    <th>Pcs</th>
+                    <th>L-In Kg</th>
+                    <th>L-In Pcs</th>
+                    <th>L-Out Kg</th>
+                    <th>L-Out Pcs</th>
+                    <th style="width:1px;">Rem</th>
+                  </tr>
+                </thead>
+                <tbody id="form10-lines">
+                  <tr>
+                    <td>
+                      <select name="item_id[]" class="form-control" style="min-width: 120px;">
+                        <option value="">Select</option>
                         <?php
                         $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
                         $form7commonditystmt->execute();
                         $form7commonditydatas = $form7commonditystmt->fetchall();
                         foreach ($form7commonditydatas as $form7commonditydata) {
-                          $item_id = $form7commonditydata['item_id'];
-                          $commonditydata = $query->select('item', $item_id, 'item_id');
+                          $c_item_id = $form7commonditydata['item_id'];
+                          $commonditydata = $query->select('item', $c_item_id, 'item_id');
                         ?>
-                          <option value="<?php echo $commonditydata['item_id']; ?>" <?php if (!empty($_SESSION['item_id'])) {
-                                                                                      if ($_SESSION['item_id'] == $commonditydata['item_id']) {
-                                                                                        echo "selected";
-                                                                                      }
-                                                                                    } ?>><?php echo $commonditydata['item_name']; ?></option>
-                        <?php
-                        }
-                        ?>
+                          <option value="<?php echo $commonditydata['item_id']; ?>" <?php echo (!empty($_SESSION['item_id']) && $_SESSION['item_id'] == $commonditydata['item_id']) ? 'selected' : ''; ?>>
+                            <?php echo $commonditydata['item_name']; ?>
+                          </option>
+                        <?php } ?>
                       </select>
-                    </div>
-                    <div class="col">
-                      <select name="fish_type" class="form-control inpv2">
+                    </td>
+                    <td>
+                      <select name="fish_type[]" class="form-control" style="min-width: 90px;">
                         <option value="G">G</option>
                         <option value="egg">egg</option>
                         <option value="ggs">ggs</option>
@@ -697,62 +683,26 @@ $bootstrap->css();
                         <option value="Bls">Bl's</option>
                         <option value="iqf">IQF</option>
                       </select>
-                    </div>
-                  </div>
-                </div>
-                <div class="col">
-                  <label>Country</label>
-                  <input type="text" name="country" class="form-control inpv2 mb-2" value="<?php if (!empty($_SESSION['country'])) {
-                                                                                              echo $_SESSION['country'];
-                                                                                            } ?>">
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <label>Size</label>
-                  <input type="text" name="size" class="form-control inpv2 mb-2">
-                </div>
-                <div class="col">
-                  <label>Mc</label>
-                  <input type="number" name="mc" class="form-control inpv2 mb-2">
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <label>Kg</label>
-                  <input type="text" name="kg" class="form-control inpv2 mb-2">
-                </div>
-                <div class="col">
-                  <label>Pcs</label>
-                  <input type="text" name="pcs" class="form-control inpv2 mb-2">
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <label>Loose In Kg</label>
-                  <input type="text" name="loose_in_kg" class="form-control inpv2 mb-2">
-                </div>
-                <div class="col">
-                  <label>Loose In Pcs</label>
-                  <input type="number" name="loose_in_pcs" class="form-control inpv2 mb-2">
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <label>Loose Out Kg</label>
-                  <input type="text" name="loose_out_kg" class="form-control inpv2 mb-2">
-                </div>
-                <div class="col">
-                  <label>Loose Out Pcs</label>
-                  <input type="number" name="loose_out_pcs" class="form-control inpv2 mb-2">
-                </div>
-              </div>
+                    </td>
+                    <td><input type="text" name="size[]" class="form-control" style="min-width: 70px;"></td>
+                    <td><input type="number" name="mc[]" class="form-control" style="min-width: 70px;"></td>
+                    <td><input type="text" name="kg[]" class="form-control" style="min-width: 70px;"></td>
+                    <td><input type="text" name="pcs[]" class="form-control" style="min-width: 70px;"></td>
+                    <td><input type="text" name="loose_in_kg[]" class="form-control" style="min-width: 70px;"></td>
+                    <td><input type="number" name="loose_in_pcs[]" class="form-control" style="min-width: 70px;"></td>
+                    <td><input type="text" name="loose_out_kg[]" class="form-control" style="min-width: 70px;"></td>
+                    <td><input type="number" name="loose_out_pcs[]" class="form-control" style="min-width: 70px;"></td>
+                    <td><button type="button" class="btn btn-danger btn-sm" onclick="removeForm10Line(this);">×</button></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-success" name="add">Add</button>
-        </div>
+
+            <div class="text-end mt-3">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-success" name="add">Save Form 10</button>
+            </div>
+          </div>
         </form>
       </div>
     </div>
@@ -774,9 +724,52 @@ $bootstrap->css();
       }
     });
   </script>
-  <?php
-  $bootstrap->javascript();
-  ?>
+  <script type="text/javascript">
+    function addForm10Line() {
+      const tbody = document.getElementById('form10-lines');
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>
+          <select name="item_id[]" class="form-control" style="min-width: 120px;">
+            <option value="">Select</option>
+            <?php
+            foreach ($form7commonditydatas as $form7commonditydata) {
+              $c_item_id = $form7commonditydata['item_id'];
+              $commonditydata = $query->select('item', $c_item_id, 'item_id');
+              echo '<option value="' . $commonditydata['item_id'] . '">' . $commonditydata['item_name'] . '</option>';
+            }
+            ?>
+          </select>
+        </td>
+        <td>
+          <select name="fish_type[]" class="form-control" style="min-width: 90px;">
+            <option value="G">G</option><option value="egg">egg</option><option value="ggs">ggs</option>
+            <option value="fillet">fillet</option><option value="W">W</option><option value="Cut_piece">Cut Piece</option>
+            <option value="Scaless">Scaless</option><option value="Bls">Bl's</option><option value="iqf">IQF</option>
+          </select>
+        </td>
+        <td><input type="text" name="size[]" class="form-control" style="min-width: 70px;"></td>
+        <td><input type="number" name="mc[]" class="form-control" style="min-width: 70px;"></td>
+        <td><input type="text" name="kg[]" class="form-control" style="min-width: 70px;"></td>
+        <td><input type="text" name="pcs[]" class="form-control" style="min-width: 70px;"></td>
+        <td><input type="text" name="loose_in_kg[]" class="form-control" style="min-width: 70px;"></td>
+        <td><input type="number" name="loose_in_pcs[]" class="form-control" style="min-width: 70px;"></td>
+        <td><input type="text" name="loose_out_kg[]" class="form-control" style="min-width: 70px;"></td>
+        <td><input type="number" name="loose_out_pcs[]" class="form-control" style="min-width: 70px;"></td>
+        <td><button type="button" class="btn btn-danger btn-sm" onclick="removeForm10Line(this);">×</button></td>
+      `;
+      tbody.appendChild(row);
+    }
+
+    function removeForm10Line(button) {
+      const row = button.closest('tr');
+      const tbody = row.closest('tbody');
+      if (tbody.rows.length > 1) {
+        row.remove();
+      }
+    }
+  </script>
+  <?php $bootstrap->javascript(); ?>
 </body>
 
 </html>

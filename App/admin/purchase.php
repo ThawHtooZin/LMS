@@ -357,7 +357,7 @@ $bootstrap->css();
               <?php ob_start(); // Start buffering the modal 
               ?>
               <div class="modal fade" id="voucherModal<?php echo $purchasedata['id']; ?>" tabindex="-1">
-                <div class="modal-dialog modal-xl">
+                <div class="modal-dialog modal-lg">
                   <div class="modal-content" style="margin-top:70px !important;">
                     <div class="modal-header bg-secondary text-light">
                       <h5 class="modal-title">Edit Voucher - <?php echo $purchasedata['voucher_no']; ?></h5>
@@ -387,12 +387,15 @@ $bootstrap->css();
                           </div>
                           <div class="col-md-3">
                             <label style="font-weight: bold;">Supplier</label>
-                            <select name="supplier_code_no" class="form-control inpv2">
+                            <select name="supplier_code_no" class="form-control inpv2 chzn-select" data-placeholder="Select supplier">
+                              <option value=""></option>
                               <?php
                               $supplierdatas2 = $query->selectall('supplier');
                               foreach ($supplierdatas2 as $supplierdata2) {
                               ?>
-                                <option value="<?php echo $supplierdata2['supplier_id']; ?>" <?php if ($purchasedata['supplier_id'] == $supplierdata2['supplier_id']) echo 'selected'; ?>><?php echo $supplierdata2['supplier_name']; ?></option>
+                                <option value="<?php echo $supplierdata2['supplier_id']; ?>" <?php if ($purchasedata['supplier_id'] == $supplierdata2['supplier_id']) echo 'selected'; ?>>
+                                  <?php echo $supplierdata2['supplier_id'] . ' - ' . $supplierdata2['supplier_name']; ?>
+                                </option>
                               <?php } ?>
                             </select>
                           </div>
@@ -525,7 +528,7 @@ $bootstrap->css();
   </div>
 
   <div class="modal fade" id="addmodal" style="margin-left:auto !important; margin-right: auto !important;">
-    <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content" style="margin-top:70px !important;">
         <div class="modal-header bg-secondary text-light">
           <h5 class="modal-title" id="addmodellabel">Create New Purchase Voucher</h5>
@@ -569,13 +572,14 @@ $bootstrap->css();
               </div>
               <div class="col-md-3">
                 <label style="font-weight: bold;">Supplier</label>
-                <select name="supplier_code_no" class="form-control inpv2">
-                  <option value="">Select supplier</option>
-                  <?php
-                  $supplierdatas = $query->selectall('supplier');
-                  foreach ($supplierdatas as $supplierdata) {
-                  ?>
-                    <option value="<?php echo $supplierdata['supplier_id']; ?>" <?php echo (!empty($_POST['supplier_code_no']) && $_POST['supplier_code_no'] == $supplierdata['supplier_id']) ? 'selected' : ''; ?>><?php echo $supplierdata['supplier_name']; ?></option>
+                <select name="supplier_code_no" class="form-control inpv2 chzn-select" data-placeholder="Select supplier">
+                  <option value=""></option> <?php
+                                              $supplierdatas = $query->selectall('supplier');
+                                              foreach ($supplierdatas as $supplierdata) {
+                                              ?>
+                    <option value="<?php echo $supplierdata['supplier_id']; ?>" <?php echo (!empty($_POST['supplier_code_no']) && $_POST['supplier_code_no'] == $supplierdata['supplier_id']) ? 'selected' : ''; ?>>
+                      <?php echo $supplierdata['supplier_id'] . ' - ' . $supplierdata['supplier_name']; ?>
+                    </option>
                   <?php } ?>
                 </select>
                 <div class="text-danger small"><?php echo $supplier_name_error; ?></div>
