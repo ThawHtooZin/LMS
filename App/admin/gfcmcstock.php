@@ -54,6 +54,7 @@ $bootstrap->css();
 
     $query->exportmcstock($exportdate, $exportparticular, $exportcountry, $exportcommondity_id, $exportfish_type, $exportsize, $exportkg, $exportmc);
   }
+
   $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM gfcmcstock WHERE country IS NOT NULL");
   $countrystmt->execute();
   $countrydatas = $countrystmt->fetchall();
@@ -114,8 +115,6 @@ $bootstrap->css();
           </form>
         </div>
         <div class="card-body">
-          <?php
-          ?>
           <form action="" method="post" class="text-center">
             <?php
             $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM gfcmcstock WHERE country IS NOT NULL");
@@ -150,12 +149,14 @@ $bootstrap->css();
               if (isset($_POST['searchcommonditybtn']) && !empty($_POST['search'])) {
                 $searchcommondity = $_POST['search'];
                 $searchtype = $_POST['searchtype'];
-                $searchcommonditystmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE country = :country AND commondity_id='$searchcommondity' AND fish_type='$searchtype' GROUP BY commondity_id,size");
+                // ADDED fish_type to GROUP BY
+                $searchcommonditystmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE country = :country AND commondity_id='$searchcommondity' AND fish_type='$searchtype' GROUP BY commondity_id, fish_type, size");
                 $searchcommonditystmt->bindParam(':country', $_SESSION['tabs']);
                 $searchcommonditystmt->execute();
                 $datas = $searchcommonditystmt->fetchall();
               } else {
-                $stmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE country='$country' GROUP BY commondity_id,size");
+                // ADDED fish_type to GROUP BY
+                $stmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE country='$country' GROUP BY commondity_id, fish_type, size");
                 $stmt->execute();
                 $datas = $stmt->fetchall();
               }
@@ -166,43 +167,23 @@ $bootstrap->css();
                 $kg = $gfcstockdata['kg'];
                 $commondity_id = $gfcstockdata['commondity_id'];
                 $fish_type = $gfcstockdata['fish_type'];
-                $sizestmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE size=:size ORDER BY id DESC");
-                $sizestmt->execute(
-                 array(':size'=>$size)
-                );
-                $sizedata = $sizestmt->fetch(PDO::FETCH_ASSOC);
 
-                // IN (HHK, NT, others)
-                $totalmcreceivestmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%to%'");
-                $totalmcreceivestmt->execute(
-                  array(':size'=>$size)
-                );
-                $totalmcreceive = $totalmcreceivestmt->fetch(PDO::FETCH_ASSOC);
-                
-                // Balance
-                $totalmcbalancestmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%balance%'");
-                $totalmcbalancestmt->execute(
-                  array(':size'=>$size)
-                );
-                $totalmcbalance = $totalmcbalancestmt->fetch(PDO::FETCH_ASSOC);
-                
-                // Ship (export)
-                $totalmcexportstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%ship%'");
-                $totalmcexportstmt->execute(
-                  array(':size'=>$size)
-                );
-                $totalmcexport = $totalmcexportstmt->fetch(PDO::FETCH_ASSOC);
-                
-                // take out
-                $totaltakeoutstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type' AND particular LIKE '%t/o%'");
-                $totaltakeoutstmt->execute(
-                  array(':size'=>$size)
-                );
-                $totaltakeout = $totaltakeoutstmt->fetch(PDO::FETCH_ASSOC);
+                // SINGLE query to get all MCs and Particulars for this combo
+                $mathstmt = $pdo->prepare("SELECT particular, mc FROM gfcmcstock WHERE size=:size AND country='$country' AND commondity_id='$commondity_id' AND fish_type='$fish_type'");
+                $mathstmt->execute([':size' => $size]);
+                $mathdatas = $mathstmt->fetchAll();
 
-                $totalmc = ($totalmcreceive['total_mc'] + $totalmcbalance['total_mc']) - ($totalmcexport['total_mc'] + $totaltakeout['total_mc']);
-
-                ?>
+                $totalmc = 0;
+                foreach ($mathdatas as $mathrow) {
+                  $part = strtolower($mathrow['particular']);
+                  // Match EXACTLY how gfcmc_stock_info.php identifies an OUT
+                  if (str_contains($part, 'ship') || str_contains($part, 't/o')) {
+                    $totalmc -= floatval($mathrow['mc']);
+                  } else {
+                    $totalmc += floatval($mathrow['mc']);
+                  }
+                }
+              ?>
                 <tr style="<?php if ($totalmc > 200) {
                               echo 'background-color:rgba(0, 255, 0, 0.4) !important;';
                             } ?>">
@@ -217,7 +198,7 @@ $bootstrap->css();
                   <td>
                     <a href="gfcmc_stock_info.php?sizeinfo=<?php echo $gfcstockdata['size']; ?>&commondity=<?php echo $gfcstockdata['commondity_id']; ?>&country=<?php echo $gfcstockdata['country']; ?>&fish_type=<?php echo $gfcstockdata['fish_type']; ?>" class="btn btn-info btn-sm text-light">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-check" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z" />
+                        <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z" />
                       </svg></a>
                   </td>
                 </tr>
@@ -225,26 +206,12 @@ $bootstrap->css();
               }
               ?>
             </table>
-            <?php
-
-            $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
-            $form7commonditystmt->execute();
-            $form7commonditydatas = $form7commonditystmt->fetchall();
-            $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form7stock WHERE country IS NOT NULL");
-            $countrystmt->execute();
-            $countrydatas = $countrystmt->fetchall();
-
-            ?>
             <script type="text/javascript">
               <?php
               if ($_SESSION['tabs'] == $countrydata['country']) {
                 echo "show" . $countrydata['country'] . "();";
                 if ($_SESSION['tabs'] == $countrydata['country']) {
                   echo ' function show' . $countrydata['country'] . '(){';
-                  // foreach ($countrydatas as $countrydata) {
-                  //   echo 'document.querySelector("#'.$countrydata['country'].'table").classList.add(\'hide\');';
-                  //   echo 'document.querySelector(".'.$countrydata['country'].'link").classList.remove(\'color\');';
-                  // }
                   echo 'document.querySelector("#' . $_SESSION['tabs'] . 'table").classList.remove(\'hide\');';
                   echo 'document.querySelector(".' . $_SESSION['tabs'] . 'link").classList.add(\'color\');';
                   echo '}';
