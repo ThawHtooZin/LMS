@@ -1284,6 +1284,7 @@ CREATE TABLE `payable` (
   `remark` VARCHAR(255) DEFAULT NULL,
   `closing_balance` DECIMAL(15,2) NOT NULL DEFAULT 0,
   `report_date` DATE DEFAULT NULL,
+  `link_id` INT(11) NOT NULL,
   KEY `idx_payable_purchase_voucher_id` (`purchase_voucher_id`),
   CONSTRAINT `fk_payable_purchase_voucher`
     FOREIGN KEY (`purchase_voucher_id`)

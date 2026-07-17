@@ -58,42 +58,61 @@ $bootstrap->css();
 
         </div>
         <div class="card-body" style="margin-top:-8px !important;">
-        <?php
+          <?php
           $date_error = '';
           $voucher_no_error = '';
           $type_error = '';
           $supplier_name_error = '';
           $quantity_error = '';
           $rate_error = '';
-          
+
           if (isset($_POST['addbutton'])) {
-          
+
             $date = $_POST['date'];
             $voucher_no = $_POST['voucher_no'];
             $supplier_name = $_POST['supplier_code_no'];
-            $material = $_POST['material'];
-            $quantity = $_POST['quantity'];
-            $rate = $_POST['rate'];
 
-            if (empty($date) || empty($voucher_no) || empty($supplier_name) || empty($quantity) || empty($rate)) {
-              echo '<script>swal("Error!", "Error accors when added Purchase Voucher", "error");</script>';
-              if (empty($date)) {
-                $date_error = "Please Enter The Date";
+            // Arrays from the dynamic table
+            $materials = isset($_POST['material']) ? $_POST['material'] : [];
+            $quantities = isset($_POST['quantity']) ? $_POST['quantity'] : [];
+            $rates = isset($_POST['rate']) ? $_POST['rate'] : [];
+
+            $_SESSION['purchase_date'] = $date;
+            $_SESSION['purchase_voucher_no'] = $voucher_no;
+            $_SESSION['purchase_supplier_name'] = $supplier_name;
+
+            // Check if at least one valid line exists
+            $hasLine = false;
+            foreach ($materials as $index => $mat) {
+              $qty = isset($quantities[$index]) ? trim($quantities[$index]) : '';
+              $rt = isset($rates[$index]) ? trim($rates[$index]) : '';
+              if (!empty($mat) && $qty !== '' && $rt !== '') {
+                $hasLine = true;
+                break;
               }
-              if (empty($voucher_no)) {
-                $voucher_no_error = "Please Enter The Voucher_no";
-              }
-              if (empty($supplier_name)) {
-                $supplier_name_error = "Please Enter The Supplier A/C Code";
-              }
-              if (empty($quantity)) {
-                $quantity_error = "Please Enter The Quantity";
-              }
-              if (empty($rate)) {
-                $rate_error = "Please Enter The Rate";
-              }
+            }
+
+            if (empty($date) || empty($voucher_no) || empty($supplier_name) || !$hasLine) {
+              echo '<script>swal("Error!", "Please fill in all required fields and at least one material line.", "error");</script>';
+              if (empty($date)) $date_error = "Please Enter The Date";
+              if (empty($voucher_no)) $voucher_no_error = "Please Enter The Voucher No";
+              if (empty($supplier_name)) $supplier_name_error = "Please Enter The Supplier A/C Code";
+              if (!$hasLine) $quantity_error = "Please add at least one complete material line";
             } else {
-              $query->addmaterialpurchase('material_purchase', $date, $voucher_no, $supplier_name, $material, $quantity, $rate);
+              // Loop through the arrays and insert each line
+              foreach ($materials as $index => $material) {
+                $material = trim($material);
+                $quantity = isset($quantities[$index]) ? trim($quantities[$index]) : '';
+                $rate = isset($rates[$index]) ? trim($rates[$index]) : '';
+
+                // Skip incomplete lines silently
+                if ($material === '' || $quantity === '' || $rate === '') {
+                  continue;
+                }
+
+                // Fire the existing backend function for each row
+                $query->addmaterialpurchase('material_purchase', $date, $voucher_no, $supplier_name, $material, $quantity, $rate);
+              }
             }
           }
 
@@ -264,86 +283,88 @@ $bootstrap->css();
                         <input type="hidden" name="up_id" value="<?php echo $purchasedata['id']; ?>">
                         <input type="hidden" name="deletevoucher_no" value="<?php echo $purchasedata['voucher_no']; ?>">
                         <input type="hidden" name="deletesupplier_id" value="<?php echo $purchasedata['supplier_id']; ?>">
-                      <div class="col">
-                        <button type="submit" name="updatebtn" class="btn btn-success ps-2 pe-2 pb-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                        <div class="col">
+                          <button type="submit" name="updatebtn" class="btn btn-success ps-2 pe-2 pb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                               <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
                               <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
-                          </svg>
-                        </button>
-                        <button type="submit" name="deletebtn" class="btn btn-danger ps-2 pe-2 pb-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
-                            <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z" />
-                          </svg>
-                        </button>
-                        <button type="button" class="btn btn-primary ps-2 pe-2 pb-1 pt-0" data-bs-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true" class="h3">&times;</span>
-                        </button>
+                            </svg>
+                          </button>
+                          <button type="submit" name="deletebtn" class="btn btn-danger ps-2 pe-2 pb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                              <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z" />
+                            </svg>
+                          </button>
+                          <button type="button" class="btn btn-primary ps-2 pe-2 pb-1 pt-0" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true" class="h3">&times;</span>
+                          </button>
+                        </div>
+                    </div>
+                    <div class="modal-body pt-4 pb-5 ps-4 pe-4">
+                      <div class="row">
+                        <input type="hidden" name="up_id" value="<?php echo $purchasedata['id']; ?>">
+                        <div class="col">
+                          <label style="font-weight: bold;">Date</label>
+                          <input type="date" name="up_date" class="form-control inpv2" value="<?php echo $purchasedata['date']; ?>">
+                          <span class="text-danger" style="font-size:12px; font-weight:bold;" style="font-weight:bold !important;"><?php echo $date_error; ?></span>
+                        </div>
+                        <div class="col">
+                          <label style="font-weight: bold;">Voucher No</label>
+                          <input type="number" name="up_voucher_no" class="form-control inpv2" value="<?php echo $purchasedata['voucher_no']; ?>">
+                          <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;" style="font-weight:bold !important;"><?php echo $voucher_no_error; ?></span>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-6">
+                          <label style="font-weight: bold;">Supplier A/C Code</label>
+                          <div class="row">
+                            <div style="width: 40%;">
+                              <input type="text" id="addac_code" name="up_supplier_code_no" class="form-control inpv2" value="<?php echo $purchasedata['supplier_id']; ?>">
+                            </div>
+                            <div style="width: 10%;">
+                              <a href="supplier.php" target="_blank" style="width: 10%; padding: 2.5px; color:black; text-align: center;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                                </svg>
+                              </a>
+                            </div>
+                            <div class="col-6">
+                              <div id='addac_name'>
+                                <input type="text" name="addac_name" disabled class="form-control inpv2 mb-1" style="padding-top: 2px; padding-bottom: 2px;">
+                              </div>
+                            </div>
+                            <span class="text-danger mb-1" style="font-size:12px; font-weight:bold;"><?php echo $supplier_name_error; ?></span>
+                          </div>
+                        </div>
+                        <div class="col-6">
+                          <label style="font-weight: bold;">Material</label>
+                          <select class="form-control inpv2 mb-2" name="up_material">
+                            <?php
+                            $materialdatas = $query->selectall('materials');
+                            foreach ($materialdatas as $materialdata) {
+                            ?>
+                              <option value="<?php echo $materialdata['id']; ?>" <?php if ($materialdata['id'] == $purchasedata['material_id']) {
+                                                                                    echo "selected";
+                                                                                  } ?>><?php echo $materialdata['name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col">
+                          <label style="font-weight: bold;">Quantity</label>
+                          <input type="number" name="up_quantity" class="form-control inpv2" value="<?php echo $purchasedata['quantity']; ?>">
+                          <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;"><?php echo $quantity_error; ?></span>
+                        </div>
+                        <div class="col">
+                          <label style="font-weight: bold;">Rate</label>
+                          <input type="text" name="up_rate" class="form-control inpv2" value="<?php echo $purchasedata['rate']; ?>">
+                          <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;"><?php echo $rate_error; ?></span>
+                        </div>
                       </div>
                     </div>
-                      <div class="modal-body pt-4 pb-5 ps-4 pe-4">
-                        <div class="row">
-                          <input type="hidden" name="up_id" value="<?php echo $purchasedata['id']; ?>">
-                          <div class="col">
-                            <label style="font-weight: bold;">Date</label>
-                            <input type="date" name="up_date" class="form-control inpv2" value="<?php echo $purchasedata['date']; ?>">
-                            <span class="text-danger" style="font-size:12px; font-weight:bold;" style="font-weight:bold !important;"><?php echo $date_error; ?></span>
-                          </div>
-                          <div class="col">
-                            <label style="font-weight: bold;">Voucher No</label>
-                            <input type="number" name="up_voucher_no" class="form-control inpv2" value="<?php echo $purchasedata['voucher_no']; ?>">
-                            <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;" style="font-weight:bold !important;"><?php echo $voucher_no_error; ?></span>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col-6">
-                            <label style="font-weight: bold;">Supplier A/C Code</label>
-                            <div class="row">
-                              <div style="width: 40%;">
-                                <input type="text" id="addac_code" name="up_supplier_code_no" class="form-control inpv2" value="<?php echo $purchasedata['supplier_id']; ?>">
-                              </div>
-                              <div style="width: 10%;">
-                                <a href="supplier.php" target="_blank" style="width: 10%; padding: 2.5px; color:black; text-align: center;">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
-                                  </svg>
-                                </a>
-                              </div>
-                              <div class="col-6">
-                                <div id='addac_name'>
-                                  <input type="text" name="addac_name" disabled class="form-control inpv2 mb-1" style="padding-top: 2px; padding-bottom: 2px;">
-                                </div>
-                              </div>
-                              <span class="text-danger mb-1" style="font-size:12px; font-weight:bold;"><?php echo $supplier_name_error; ?></span>
-                            </div>
-                          </div>
-                          <div class="col-6">
-                            <label style="font-weight: bold;">Material</label>
-                            <select class="form-control inpv2 mb-2" name="up_material">
-                              <?php
-                              $materialdatas = $query->selectall('materials');
-                              foreach ($materialdatas as $materialdata) {
-                              ?>
-                                <option value="<?php echo $materialdata['id']; ?>" <?php if($materialdata['id'] == $purchasedata['material_id']){ echo "selected"; } ?>><?php echo $materialdata['name']; ?></option>
-                              <?php
-                              }
-                              ?>
-                            </select>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col">
-                            <label style="font-weight: bold;">Quantity</label>
-                            <input type="number" name="up_quantity" class="form-control inpv2" value="<?php echo $purchasedata['quantity']; ?>">
-                            <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;"><?php echo $quantity_error; ?></span>
-                          </div>
-                          <div class="col">
-                            <label style="font-weight: bold;">Rate</label>
-                            <input type="text" name="up_rate" class="form-control inpv2" value="<?php echo $purchasedata['rate']; ?>">
-                            <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;"><?php echo $rate_error; ?></span>
-                          </div>
-                        </div>
-                      </div>
                     </form>
                   </div>
                 </div>
@@ -434,8 +455,8 @@ $bootstrap->css();
 
   <!-- Data Add Modal -->
   <div class="modal fade" id="addmodal" style="margin-left:auto !important; margin-right: auto !important;">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content" style="width: 750px !important; margin-top:70px !important;">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content" style="margin-top:70px !important;">
         <div class="modal-header bg-secondary text-light">
           <h5 class="modal-title" id="addmodellabel">Create New Purchase Voucher</h5>
           <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
@@ -444,95 +465,75 @@ $bootstrap->css();
         </div>
         <form action="" method="post" autocomplete="off">
           <div class="modal-body">
-            <div class="row">
-              <div class="col">
+
+            <!-- Header Section -->
+            <div class="row mb-3">
+              <div class="col-md-4">
                 <label style="font-weight: bold;">Date</label>
-                <input type="date" name="date" <?php if (!empty($date_error)) {
-                                                  echo "class=\"form-control is-invalid\"";
-                                                } else {
-                                                  echo "class=\"form-control inpv2\"";
-                                                } ?> value="<?php if (!empty($_SESSION['purchase_date'])) {
-                                                              echo $_SESSION['purchase_date'];
-                                                            }; ?>">
-                <span class="text-danger" style="font-size:12px; font-weight:bold;" style="font-weight:bold !important;"><?php echo $date_error; ?></span>
+                <input type="date" name="date" class="form-control inpv2 <?php echo !empty($date_error) ? 'is-invalid' : ''; ?>" value="<?php echo !empty($_SESSION['purchase_date']) ? $_SESSION['purchase_date'] : ''; ?>">
+                <span class="text-danger" style="font-size:12px; font-weight:bold;"><?php echo $date_error; ?></span>
               </div>
-              <div class="col">
+              <div class="col-md-4">
                 <label style="font-weight: bold;">Voucher No</label>
-                <input type="number" name="voucher_no" <?php if (!empty($voucher_no_error)) {
-                                                          echo "class=\"form-control is-invalid\"";
-                                                        } else {
-                                                          echo "class=\"form-control inpv2\"";
-                                                        } ?> value="<?php if (!empty($_SESSION['purchase_voucher_no'])) {
-                                                                      echo $_SESSION['purchase_voucher_no'];
-                                                                    }; ?>">
-                <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;" style="font-weight:bold !important;"><?php echo $voucher_no_error; ?></span>
+                <input type="number" name="voucher_no" class="form-control inpv2 <?php echo !empty($voucher_no_error) ? 'is-invalid' : ''; ?>" value="<?php echo !empty($_SESSION['purchase_voucher_no']) ? $_SESSION['purchase_voucher_no'] : ''; ?>">
+                <span class="text-danger" style="font-size:12px; font-weight:bold;"><?php echo $voucher_no_error; ?></span>
               </div>
-            </div>
-            <div class="row">
-              <div class="col-6">
+              <div class="col-md-4">
                 <label style="font-weight: bold;">Supplier A/C Code</label>
-                <div class="row">
-                  <div style="width: 40%;">
-                    <input type="text" id="addac_code" name="supplier_code_no" <?php if (!empty($supplier_name_error)) {
-                                                                                  echo "class=\"form-control is-invalid\"";
-                                                                                } else {
-                                                                                  echo "class=\"form-control inpv2\"";
-                                                                                } ?> style="padding-top: 2px; padding-bottom: 2px;" value="<?php if (!empty($_SESSION['purchase_supplier_name'])) {
-                                                                                                                                              echo $_SESSION['purchase_supplier_name'];
-                                                                                                                                            }; ?>">
-                  </div>
-                  <div style="width: 10%;">
-                    <a href="supplier.php" target="_blank" style="width: 10%; padding: 2.5px; color:black; text-align: center;">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
-                      </svg>
-                    </a>
-                  </div>
-                  <div class="col-6">
-                    <div id='addac_name'>
-                      <input type="text" name="addac_name" disabled class="form-control inpv2 mb-1" style="padding-top: 2px; padding-bottom: 2px;">
-                    </div>
-                  </div>
-                  <span class="text-danger mb-1" style="font-size:12px; font-weight:bold;"><?php echo $supplier_name_error; ?></span>
+                <div class="d-flex">
+                  <input type="text" id="addac_code" name="supplier_code_no" class="form-control inpv2 <?php echo !empty($supplier_name_error) ? 'is-invalid' : ''; ?>" style="padding-top: 2px; padding-bottom: 2px;" value="<?php echo !empty($_SESSION['purchase_supplier_name']) ? $_SESSION['purchase_supplier_name'] : ''; ?>">
+                  <a href="supplier.php" target="_blank" class="ms-2 mt-1 text-dark">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                      <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                    </svg>
+                  </a>
                 </div>
-              </div>
-              <div class="col-6">
-                <label style="font-weight: bold;">Material</label>
-                <select class="form-control inpv2 mb-2" name="material">
-                  <?php
-                  $materialdatas = $query->selectall('materials');
-                  foreach ($materialdatas as $materialdata) {
-                  ?>
-                    <option value="<?php echo $materialdata['id']; ?>"><?php echo $materialdata['name']; ?></option>
-                  <?php
-                  }
-                  ?>
-                </select>
+                <div id='addac_name' class="mt-1">
+                  <input type="text" name="addac_name" disabled class="form-control inpv2" style="padding-top: 2px; padding-bottom: 2px;">
+                </div>
+                <span class="text-danger" style="font-size:12px; font-weight:bold;"><?php echo $supplier_name_error; ?></span>
               </div>
             </div>
-            <div class="row">
-              <div class="col">
-                <label style="font-weight: bold;">Quantity</label>
-                <input type="number" name="quantity" <?php if (!empty($quantity_error)) {
-                                                        echo "class=\"form-control is-invalid\"";
-                                                      } else {
-                                                        echo "class=\"form-control inpv2\"";
-                                                      } ?>>
-                <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;"><?php echo $quantity_error; ?></span>
-              </div>
-              <div class="col">
-                <label style="font-weight: bold;">Rate</label>
-                <input type="text" name="rate" <?php if (!empty($rate_error)) {
-                                                  echo "class=\"form-control is-invalid\"";
-                                                } else {
-                                                  echo "class=\"form-control inpv2\"";
-                                                } ?>>
-                <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;"><?php echo $rate_error; ?></span>
-              </div>
+
+            <!-- Material Lines Section -->
+            <div class="d-flex justify-content-between align-items-center mb-2 mt-4">
+              <label style="font-weight: bold;">Material Lines</label>
+              <button type="button" class="btn btn-sm btn-outline-primary" onclick="addMaterialLine();">Add Line</button>
             </div>
-            <div class="mt-2 float-end mb-3 mt-3">
-              <button class="btn btn-secondary" data-bs-dismiss="model">Cancel</button>
-              <button class="btn btn-success" name="addbutton">Add Voucher</button>
+            <span class="text-danger d-block mb-2" style="font-size:12px; font-weight:bold;"><?php echo $quantity_error; ?></span>
+
+            <div class="table-responsive">
+              <table class="table table-bordered table-sm">
+                <thead class="table-light text-center">
+                  <tr>
+                    <th>Material</th>
+                    <th>Quantity</th>
+                    <th>Rate</th>
+                    <th style="width:1px;">Rem</th>
+                  </tr>
+                </thead>
+                <tbody id="material-lines">
+                  <?php $materialdatas = $query->selectall('materials'); ?>
+                  <tr>
+                    <td>
+                      <select class="form-control" name="material[]">
+                        <option value="">Select Material</option>
+                        <?php foreach ($materialdatas as $materialdata) { ?>
+                          <option value="<?php echo $materialdata['id']; ?>"><?php echo $materialdata['name']; ?></option>
+                        <?php } ?>
+                      </select>
+                    </td>
+                    <td><input type="number" name="quantity[]" class="form-control"></td>
+                    <td><input type="text" name="rate[]" class="form-control"></td>
+                    <td><button type="button" class="btn btn-danger btn-sm" onclick="removeMaterialLine(this);">×</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="text-end mt-3">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-success" name="addbutton">Add Voucher</button>
             </div>
           </div>
         </form>
@@ -540,6 +541,39 @@ $bootstrap->css();
     </div>
   </div>
   <!-- Add Modal -->
+
+  <script type="text/javascript">
+    function addMaterialLine() {
+      const tbody = document.getElementById('material-lines');
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>
+          <select name="material[]" class="form-control">
+            <option value="">Select Material</option>
+            <?php
+            $jsmaterialdatas = $query->selectall('materials');
+            foreach ($jsmaterialdatas as $materialdata) {
+              echo '<option value="' . $materialdata['id'] . '">' . addslashes($materialdata['name']) . '</option>';
+            }
+            ?>
+          </select>
+        </td>
+        <td><input type="number" name="quantity[]" class="form-control"></td>
+        <td><input type="text" name="rate[]" class="form-control"></td>
+        <td><button type="button" class="btn btn-danger btn-sm" onclick="removeMaterialLine(this);">×</button></td>
+      `;
+      tbody.appendChild(row);
+    }
+
+    function removeMaterialLine(button) {
+      const row = button.closest('tr');
+      const tbody = row.closest('tbody');
+      // Always leave at least one empty row
+      if (tbody.rows.length > 1) {
+        row.remove();
+      }
+    }
+  </script>
 
   <?php
   $bootstrap->javascript();

@@ -3420,6 +3420,17 @@ class Query
     $stmt->execute();
   }
 
+  function bulkUpdateForm7Tcl($ids, $country)
+  {
+    global $pdo;
+    $idArray = explode(',', $ids);
+    $idList = implode(',', array_map('intval', $idArray));
+    if (empty($idList) || $country === '') return;
+    $stmt = $pdo->prepare("UPDATE form7stocktcl SET country='$country' WHERE id IN ($idList)");
+    $stmt->execute();
+    echo '<script>swal("Success!", "Bulk update completed.", "success");</script>';
+  }
+
   function form7tcldelete($idtodelete)
   {
     global $pdo;
