@@ -41,10 +41,12 @@ $bootstrap->css();
             $incheckstmt = $pdo->prepare("SELECT SUM(`in`) AS totalin FROM stock_output_group WHERE material_id = '$material'");
             $incheckstmt->execute();
             $incheckdata = $incheckstmt->fetch(PDO::FETCH_ASSOC);
+            $incheckdata = ['totalin' => 0];
 
             $outcheckstmt = $pdo->prepare("SELECT SUM(`out`) AS totalout FROM stock_output_group WHERE material_id = '$material'");
             $outcheckstmt->execute();
             $outcheckdata = $outcheckstmt->fetch(PDO::FETCH_ASSOC);
+            $outcheckdata = ['totalout' => 0];
 
             $totalquantity = $incheckdata['totalin'] - $outcheckdata['totalout'];
 
@@ -78,19 +80,24 @@ $bootstrap->css();
                                             <option value="return">Return</option>
                                             <option value="damaged">Damaged</option>
                                         </select>
-
+                                        <!-- 
                                         <div id="transftertodiv" style="display:none;">
                                             <label>Transfer To</label>
                                             <select name="transfer_to" class="form-control">
                                                 <?php
-                                                $coldstorestmt = $pdo->prepare("SELECT * FROM config_coldstore");
-                                                $coldstorestmt->execute();
-                                                $coldstores = $coldstorestmt->fetchAll();
-                                                foreach ($coldstores as $coldstore): ?>
-                                                    <option value="<?= $coldstore['name'] ?>" style="text-transform: uppercase;"><?= $coldstore['name'] ?></option>
-                                                <?php endforeach; ?>
+                                                // $coldstorestmt = $pdo->prepare("SELECT * FROM config_coldstore");
+                                                // $coldstorestmt->execute();
+                                                // $coldstores = $coldstorestmt->fetchAll();
+                                                // $coldstores = [];
+                                                // foreach ($coldstores as $coldstore): 
+                                                ?>
+                                                    <option value="<?php // $coldstore['name'] 
+                                                                    ?>" style="text-transform: uppercase;"><?php // $coldstore['name'] 
+                                                                                                            ?></option>
+                                                <?php // endforeach; 
+                                                ?>
                                             </select>
-                                        </div>
+                                        </div> -->
 
                                         <label>Date</label>
                                         <input type="date" name="date" class="form-control">
@@ -101,11 +108,13 @@ $bootstrap->css();
                                             $materialstmt = $pdo->prepare("SELECT material_id FROM stock_output_group GROUP BY material_id");
                                             $materialstmt->execute();
                                             $materials = $materialstmt->fetchAll();
+                                            $materials = [];
                                             foreach ($materials as $material) {
                                                 $materialid = $material['material_id'];
                                                 $materialstmt = $pdo->prepare("SELECT * FROM materials WHERE id='$materialid'");
                                                 $materialstmt->execute();
                                                 $materialdata = $materialstmt->fetch(PDO::FETCH_ASSOC);
+                                                $materialdata = ['name' => ''];
                                             ?>
                                                 <option value="<?= $material['material_id']; ?>"><?= $materialdata['name']; ?></option>
                                             <?php
@@ -160,6 +169,7 @@ $bootstrap->css();
                             $stmt = $pdo->prepare("SELECT stock_to FROM stock_output_group GROUP BY stock_to");
                             $stmt->execute();
                             $datas = $stmt->fetchAll();
+                            $datas = [];
                             foreach ($datas as $data) {
                                 if (isset($_POST[$data['stock_to'] . 'btn'])) {
                                     $_SESSION['tabs'] = $data['stock_to'];
@@ -190,15 +200,20 @@ $bootstrap->css();
                         </tr>
 
                         <?php
-                        $stock_to = $_SESSION['tabs'];
+                        $stock_to = isset($_SESSION['tabs']) ? $_SESSION['tabs'] : '';
+
                         $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$stock_to' GROUP BY material_id ORDER BY id");
                         $stmt->execute();
                         $rawResult = $stmt->fetchAll();
+                        $rawResult = [];
+
                         $total_pages = ceil(count($rawResult) / $numOfrecs);
+                        if ($total_pages == 0) $total_pages = 1;
 
                         $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$stock_to' GROUP BY material_id ORDER BY id LIMIT $offset,$numOfrecs ");
                         $stmt->execute();
                         $datas = $stmt->fetchAll();
+                        $datas = [];
                         ?>
                         <?php
                         $no = 1;
@@ -208,16 +223,19 @@ $bootstrap->css();
                             $stmt = $pdo->prepare("SELECT * FROM materials WHERE id='$material_id'");
                             $stmt->execute();
                             $material = $stmt->fetch(PDO::FETCH_ASSOC);
+                            $material = ['name' => ''];
 
                             $insumstmt = $pdo->prepare("SELECT SUM(`in`) as totalin FROM stock_output_group WHERE material_id='$material_id' AND stock_to = '$stock_to'");
                             $insumstmt->execute();
                             $totalin = $insumstmt->fetch(PDO::FETCH_ASSOC);
+                            $totalin = ['totalin' => ''];
 
                             $outsumstmt = $pdo->prepare("SELECT SUM(`out`) as totalout FROM stock_output_group WHERE material_id='$material_id' AND stock_to = '$stock_to'");
                             $outsumstmt->execute();
                             $totalout = $outsumstmt->fetch(PDO::FETCH_ASSOC);
+                            $totalout = ['totalout' => ''];
 
-                            $balance = $totalin['totalin'] - $totalout['totalout'];
+                            $balance = (int)$totalin['totalin'] - (int)$totalout['totalout'];
                         ?>
 
                             <tr>
@@ -243,7 +261,7 @@ $bootstrap->css();
                                         </svg></a></td>
                             </tr>
                             <!-- Data Update Modal -->
-                            <div class="modal fade" id="updatemodal<?php echo $itemdata['id']; ?>" tabindex="-1" role="dialog">
+                            <div class="modal fade" id="updatemodal<?php echo $material_id; ?>" tabindex="-1" role="dialog">
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header bg-warning text-light">
@@ -255,10 +273,11 @@ $bootstrap->css();
                                         <form action="" method="post" autocomplete="off">
                                             <div class="modal-body">
                                                 <?php
-                                                $id = $itemdata['id'];
+                                                $id = $material_id;
                                                 $updatedata = $query->select('materials', $id, 'id');
+                                                $updatedata = ['name' => '', 'description' => ''];
                                                 ?>
-                                                <input type="hidden" name="id" value="<?php echo $itemdata['id']; ?>">
+                                                <input type="hidden" name="id" value="<?php echo $material_id; ?>">
                                                 <label>Material Name</label>
                                                 <input type="text" name="name" class="form-control" placeholder="Name" value="<?php echo $updatedata['name']; ?>">
                                                 <label>Description</label>

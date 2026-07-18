@@ -209,9 +209,7 @@ $bootstrap->css();
                 <div class="col-4">
                   <select class="form-control inpv2 mb-2 chzn-select" name="voucher_no" data-placeholder="Select Voucher">
                     <?php
-                    $voucherdatas = $query->selectall('purchase');
-                    print_r($voucherdatas);
-                    echo "Asdfasdfasdf";
+                    $voucherdatas = $query->selectall('purchase_voucher');
                     foreach ($voucherdatas as $voucherdata) {
                     ?>
                       <option value="<?php echo $voucherdata['voucher_no']; ?>"><?php echo $voucherdata['voucher_no']; ?></option>
@@ -273,83 +271,110 @@ $bootstrap->css();
               <th>Amount</th>
             </tr>
             <?php
-            // Search Queries
+            global $pdo;
+
+            // Updated base queries targeting the relational structure
+            $base_sql = "SELECT p.*, pv.date, pv.voucher_no, pv.supplier_id, pv.tclfrozen 
+                         FROM purchase p 
+                         JOIN purchase_voucher pv ON p.purchase_voucher_id = pv.id";
+
+            $base_sum_sql = "SELECT SUM(p.amount) as total_amount FROM purchase p JOIN purchase_voucher pv ON p.purchase_voucher_id = pv.id";
+
+            // Data Retrieval logic using correct parameters
             if (isset($_POST['suppliersearch'])) {
               $supplier_id = $_POST['supplier_id'];
-              $purchasedatas = $query->search("purchase", 'supplier_id', $supplier_id);
+              $stmt = $pdo->prepare("$base_sql WHERE pv.supplier_id = ?");
+              $stmt->execute([$supplier_id]);
+              $purchasedatas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+              $sum_stmt = $pdo->prepare("$base_sum_sql WHERE pv.supplier_id = ?");
+              $sum_stmt->execute([$supplier_id]);
+              $total_amount_supplier_search = $sum_stmt->fetch(PDO::FETCH_ASSOC);
             } elseif (isset($_POST['commoditysearch'])) {
               $commodity_id = $_POST['item_id'];
-              $purchasedatas = $query->search("purchase", 'commodity', $commodity_id);
+              $stmt = $pdo->prepare("$base_sql WHERE p.commodity = ?");
+              $stmt->execute([$commodity_id]);
+              $purchasedatas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+              $sum_stmt = $pdo->prepare("SELECT SUM(amount) as total_amount FROM purchase WHERE commodity = ?");
+              $sum_stmt->execute([$commodity_id]);
+              $total_amount_commodity_search = $sum_stmt->fetch(PDO::FETCH_ASSOC);
+
+              $sum_stmt2 = $pdo->prepare("SELECT SUM(viss) as total_viss FROM purchase WHERE commodity = ?");
+              $sum_stmt2->execute([$commodity_id]);
+              $total_amount_commodity_search_viss = $sum_stmt2->fetch(PDO::FETCH_ASSOC);
             } elseif (isset($_POST['dbwsearch'])) {
               $startdate = $_POST['dbwstartdate'];
               $enddate = $_POST['dbwenddate'];
-              $purchasedatas = $query->selectdbw('purchase', $startdate, $enddate);
+              $stmt = $pdo->prepare("$base_sql WHERE pv.date BETWEEN ? AND ?");
+              $stmt->execute([$startdate, $enddate]);
+              $purchasedatas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+              $sum_stmt = $pdo->prepare("$base_sum_sql WHERE pv.date BETWEEN ? AND ?");
+              $sum_stmt->execute([$startdate, $enddate]);
+              $total_amount_dbw_search = $sum_stmt->fetch(PDO::FETCH_ASSOC);
             } elseif (isset($_POST['tdysearch'])) {
               $startdate = date('Y-m-d');
               $enddate = date('Y-m-d');
-              $purchasedatas = $query->selectdbw('purchase', $startdate, $enddate);
+              $stmt = $pdo->prepare("$base_sql WHERE pv.date BETWEEN ? AND ?");
+              $stmt->execute([$startdate, $enddate]);
+              $purchasedatas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+              $sum_stmt = $pdo->prepare("$base_sum_sql WHERE pv.date BETWEEN ? AND ?");
+              $sum_stmt->execute([$startdate, $enddate]);
+              $total_amount_dbw_search = $sum_stmt->fetch(PDO::FETCH_ASSOC);
             } elseif (isset($_POST['supplierdbwsearch'])) {
               $startdate = $_POST['dbwstartdate'];
               $enddate = $_POST['dbwenddate'];
               $supplier_id = $_POST['supplier_name'];
-              $purchasedatas = $query->selectsupplierdbw('purchase', $supplier_id, $startdate, $enddate);
+              $stmt = $pdo->prepare("$base_sql WHERE pv.supplier_id = ? AND pv.date BETWEEN ? AND ?");
+              $stmt->execute([$supplier_id, $startdate, $enddate]);
+              $purchasedatas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+              $sum_stmt = $pdo->prepare("$base_sum_sql WHERE pv.supplier_id = ? AND pv.date BETWEEN ? AND ?");
+              $sum_stmt->execute([$supplier_id, $startdate, $enddate]);
+              $total_amount_dbw_supplier_search = $sum_stmt->fetch(PDO::FETCH_ASSOC);
             } elseif (isset($_POST['commoditydbwsearch'])) {
               $startdate = $_POST['dbwstartdate'];
               $enddate = $_POST['dbwenddate'];
               $commodity = $_POST['item_id'];
-              $purchasedatas = $query->selectcommoditydbw('purchase', $commodity, $startdate, $enddate);
+              $stmt = $pdo->prepare("$base_sql WHERE p.commodity = ? AND pv.date BETWEEN ? AND ?");
+              $stmt->execute([$commodity, $startdate, $enddate]);
+              $purchasedatas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+              $sum_stmt = $pdo->prepare("$base_sum_sql WHERE p.commodity = ? AND pv.date BETWEEN ? AND ?");
+              $sum_stmt->execute([$commodity, $startdate, $enddate]);
+              $total_amount_dbw_commodity_search = $sum_stmt->fetch(PDO::FETCH_ASSOC);
             } elseif (isset($_POST['vouchersearch'])) {
               $voucher_no = $_POST['voucher_no'];
-              $purchasedatas = $query->selectvoucher("purchase", $voucher_no);
+              $stmt = $pdo->prepare("$base_sql WHERE pv.voucher_no = ?");
+              $stmt->execute([$voucher_no]);
+              $purchasedatas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+              $sum_stmt = $pdo->prepare("$base_sum_sql WHERE pv.voucher_no = ?");
+              $sum_stmt->execute([$voucher_no]);
+              $total_amount_commodity_search = $sum_stmt->fetch(PDO::FETCH_ASSOC);
             } elseif (isset($_POST['commodityandsizesearch'])) {
               $item_id = $_POST['item_id'];
               $size = $_POST['size'];
-              $purchasedatas = $query->selectcommodityandsize('purchase', $item_id, $size);
+              $stmt = $pdo->prepare("$base_sql WHERE p.commodity = ? AND p.size = ?");
+              $stmt->execute([$item_id, $size]);
+              $purchasedatas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+              $sum_stmt = $pdo->prepare("SELECT SUM(amount) as total_amount FROM purchase WHERE commodity = ? AND size = ?");
+              $sum_stmt->execute([$item_id, $size]);
+              $total_amount_commodity_and_size_search = $sum_stmt->fetch(PDO::FETCH_ASSOC);
+
+              $sum_stmt2 = $pdo->prepare("SELECT SUM(viss) as total_viss FROM purchase WHERE commodity = ? AND size = ?");
+              $sum_stmt2->execute([$item_id, $size]);
+              $total_amount_commodity_and_size_search_viss = $sum_stmt2->fetch(PDO::FETCH_ASSOC);
             } else {
-              $purchasedatas = $query->selectall("purchase");
+              $stmt = $pdo->prepare($base_sql);
+              $stmt->execute();
+              $purchasedatas = $stmt->fetchAll(PDO::FETCH_ASSOC);
             }
-            // Total Sums
-            if (isset($_POST['suppliersearch'])) {
-              $supplier_id = $_POST['supplier_id'];
-              $total_amount_supplier_search = $query->selectsum('purchase', $supplier_id, 'supplier_id');
-            }
-            if (isset($_POST['commoditysearch'])) {
-              $item_id = $_POST['item_id'];
-              $total_amount_commodity_search = $query->selectsum('purchase', $item_id, 'commodity');
-              $total_amount_commodity_search_viss = $query->selectsumviss('purchase', $item_id, 'commodity');
-            }
-            if (isset($_POST['dbwsearch'])) {
-              $startdate = $_POST['dbwstartdate'];
-              $enddate = $_POST['dbwenddate'];
-              $total_amount_dbw_search = $query->selectsumdbw('purchase', 'amount', 'total_amount', $startdate, $enddate, 'date');
-            }
-            if (isset($_POST['tdysearch'])) {
-              $startdate = date('Y-m-d');
-              $enddate = date('Y-m-d');
-              $total_amount_dbw_search = $query->selectsumdbw('purchase', 'amount', 'total_amount', $startdate, $enddate, 'date');
-            }
-            if (isset($_POST['supplierdbwsearch'])) {
-              $startdate = $_POST['dbwstartdate'];
-              $enddate = $_POST['dbwenddate'];
-              $supplier_id = $_POST['supplier_name'];
-              $total_amount_dbw_supplier_search = $query->selectsupplierdbwsum('purchase', 'amount', 'total_amount', $supplier_id, $startdate, $enddate);
-            }
-            if (isset($_POST['commoditydbwsearch'])) {
-              $startdate = $_POST['dbwstartdate'];
-              $enddate = $_POST['dbwenddate'];
-              $commodity = $_POST['item_id'];
-              $total_amount_dbw_commodity_search = $query->selectcommoditydbwsum('purchase', 'amount', 'total_amount', $commodity, $startdate, $enddate);
-            }
-            if (isset($_POST['vouchersearch'])) {
-              $voucher_no = $_POST['voucher_no'];
-              $total_amount_commodity_search = $query->selectvouchersum('purchase', 'amount', 'total_amount', $voucher_no,);
-            }
-            if (isset($_POST['commodityandsizesearch'])) {
-              $item_id = $_POST['item_id'];
-              $size = $_POST['size'];
-              $total_amount_commodity_and_size_search = $query->selectcommodityandsizesum('purchase', 'amount', 'total_amount', $item_id, $size);
-              $total_amount_commodity_and_size_search_viss = $query->selectsumvisswithsize('purchase', $item_id, $size);
-            }
+
+            // Loop mapped data correctly to frontend
             foreach ($purchasedatas as $purchasedata) {
               $supplierid = $purchasedata['supplier_id'];
               $supplier_name = $query->select('supplier', $supplierid, 'supplier_id');
