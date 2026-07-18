@@ -227,8 +227,8 @@ $bootstrap->css();
 
               <!-- Modals for this row -->
               <div class="modal fade" id="updatemodal<?php echo $form7data['id']; ?>">
-                <div class="modal-dialog" role="document">
-                  <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+                <div class="modal-dialog modal-md" role="document">
+                  <div class="modal-content" style="margin-top:70px !important;">
                     <div class="modal-header bg-warning text-light">
                       <h1 class="modal-title fs-5">Update Data</h1>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -242,10 +242,6 @@ $bootstrap->css();
                           $updata = $query->select('form7stocktcl', $idd, 'id');
                           ?>
                           <div class="row">
-                            <div class="col">
-                              <label>Country</label>
-                              <input type="text" name="country" class="form-control inpv2 mt-1" value="<?php echo $updata['country']; ?>">
-                            </div>
                             <div class="col">
                               <label>Pcs Per F7</label>
                               <input type="text" name="pcsperf7" class="form-control inpv2 mt-1" value="<?php echo $updata['pcsperf7']; ?>">

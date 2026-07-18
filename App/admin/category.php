@@ -1,4 +1,13 @@
 <?php
+if (isset($_GET['action']) && $_GET['action'] == 'check_duplicate') {
+  include '../../Controllers/query.ctr.php';
+  $query = new Query();
+  $table = $_GET['table'];
+  $column = $_GET['column'];
+  $value = $_GET['value'];
+  echo $query->isDuplicate($table, $column, $value) ? '1' : '0';
+  exit;
+}
 session_start();
 include '../../Auth/authrize.ctr.php';
 include '../../Resources/resource.boot.php';
@@ -137,8 +146,7 @@ $bootstrap->css();
                 <td><?php echo $categorydata['category_name']; ?></td>
                 <td><?php echo $categorydata['rate']; ?></td>
                 <td>
-                  <input type="hidden" name="updateid" value="<?php echo $categorydata['id']; ?>">
-                  <button type="submit" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $categorydata['id']; ?>">
+                  <button type="button" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $categorydata['id']; ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                       <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
                       <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
@@ -159,10 +167,8 @@ $bootstrap->css();
                 <div class="modal-dialog" role="document">
                   <div class="modal-content">
                     <div class="modal-header bg-warning text-light">
-                      <h5 class="modal-title" id="updatemodallabel">Update An Category</h5>
-                      <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true" class="h3">&times;</span>
-                      </button>
+                      <h5 class="modal-title">Update An Category</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <form action="" method="post" autocomplete="off">
                       <div class="modal-body">
@@ -172,11 +178,11 @@ $bootstrap->css();
                         ?>
                         <input type="hidden" name="updateid" value="<?php echo $categorydata['id']; ?>">
                         <label>Category Id</label>
-                        <input type="text" name="id" class="form-control" placeholder="Category Id" value="<?php echo $updatedata['category_id']; ?>">
+                        <input type="text" name="id" class="form-control" value="<?php echo $updatedata['category_id']; ?>">
                         <label>Category Name</label>
-                        <input type="text" name="category_name" class="form-control" placeholder="Category Name" value="<?php echo $updatedata['category_name']; ?>">
+                        <input type="text" name="category_name" class="form-control" value="<?php echo $updatedata['category_name']; ?>">
                         <label>Rate</label>
-                        <input type="text" name="rate" class="form-control" placeholder="Rate" value="<?php echo $updatedata['rate']; ?>">
+                        <input type="text" name="rate" class="form-control" value="<?php echo $updatedata['rate']; ?>">
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -228,19 +234,21 @@ $bootstrap->css();
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header bg-secondary text-light">
-          <h5 class="modal-title" id="addmodellabel">New Coldstore Item</h5>
-          <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true" class="h3">&times;</span>
-          </button>
+          <h5 class="modal-title">New Coldstore Item</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <form action="category.php" method="post" autocomplete="off">
           <div class="modal-body">
             <label>Item Code</label>
-            <input type="text" name="item_id" class="form-control" placeholder="Item Id">
+            <input type="text" name="item_id" id="item_id" class="form-control" placeholder="Item Id" oninput="validateInput('category', 'category_id', this.value, 'id_error')" required>
+            <span id="id_error" class="text-danger small"></span><br>
+
             <label>Item Name</label>
-            <input type="text" name="item_name" class="form-control" placeholder="Item Name">
+            <input type="text" name="item_name" class="form-control" placeholder="Item Name" required>
+            <br>
             <label>Rate</label>
             <input type="text" name="rate" class="form-control" placeholder="Rate">
+            <br>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -251,6 +259,24 @@ $bootstrap->css();
     </div>
   </div>
   <!-- Add Modal -->
+
+  <script>
+    function validateInput(table, column, value, errorId) {
+      if (value.length === 0) {
+        document.getElementById(errorId).innerText = "";
+        return;
+      }
+      fetch(`category.php?action=check_duplicate&table=${table}&column=${column}&value=${encodeURIComponent(value)}`)
+        .then(response => response.text())
+        .then(data => {
+          if (data === '1') {
+            document.getElementById(errorId).innerText = "This value is already taken.";
+          } else {
+            document.getElementById(errorId).innerText = "";
+          }
+        });
+    }
+  </script>
 
   <?php
   $bootstrap->javascript();

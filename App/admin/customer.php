@@ -1,4 +1,13 @@
 <?php
+if (isset($_GET['action']) && $_GET['action'] == 'check_duplicate') {
+    include '../../Controllers/query.ctr.php';
+    $query = new Query();
+    $table = $_GET['table'];
+    $column = $_GET['column'];
+    $value = $_GET['value'];
+    echo $query->isDuplicate($table, $column, $value) ? '1' : '0';
+    exit;
+}
 session_start();
 include '../../Auth/authrize.ctr.php';
 include '../../Resources/resource.boot.php';
@@ -145,8 +154,6 @@ $bootstrap->css();
                         }
                         ?>
                         <?php
-
-
                         foreach ($customerdatas as $customerdata) {
                             $accode = $customerdata['customer_id'];
                             $check = $query->checkifacexists($accode);
@@ -158,9 +165,7 @@ $bootstrap->css();
                                 <td><?php echo $customerdata['customer_detail']; ?></td>
                                 <td><?php echo $customerdata['customer_address']; ?></td>
                                 <td>
-                                    <input type="hidden" name="updateid"
-                                        value="<?php echo $customerdata['customer_id']; ?>">
-                                    <button type="submit" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal"
+                                    <button type="button" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal"
                                         data-bs-target="#updatemodal<?php echo $customerdata['customer_id']; ?>">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                             class="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -274,7 +279,7 @@ $bootstrap->css();
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-secondary text-light">
-                    <h5 class="modal-title" id="addmodellabel">Create New Category</h5>
+                    <h5 class="modal-title" id="addmodellabel">Create New Customer</h5>
                     <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true" class="h3">&times;</span>
                     </button>
@@ -282,11 +287,16 @@ $bootstrap->css();
                 <form action="customer.php" method="post" autocomplete="off">
                     <div class="modal-body">
                         <label>Customer A/C Code</label>
-                        <input type="text" name="customer_id" class="form-control" placeholder="Customer A/C Code">
+                        <input type="text" name="customer_id" id="customer_id" class="form-control" placeholder="Customer A/C Code" oninput="validateInput('customers', 'customer_id', this.value, 'id_error')" required>
+                        <span id="id_error" class="text-danger small"></span><br>
+
                         <label>Customer Name</label>
-                        <input type="text" name="customer_name" class="form-control" placeholder="Customer Name">
+                        <input type="text" name="customer_name" id="customer_name" class="form-control" placeholder="Customer Name" oninput="validateInput('customers', 'customer_name', this.value, 'name_error')" required>
+                        <span id="name_error" class="text-danger small"></span><br>
+
                         <label>Customer Information</label>
                         <textarea name="customer_detail" class="form-control" cols="30" rows="4"></textarea>
+                        <br>
                         <label>Customer Address</label>
                         <input type="text" name="customer_address" class="form-control" placeholder="Customer Address">
                     </div>
@@ -299,6 +309,24 @@ $bootstrap->css();
         </div>
     </div>
     <!-- Add Modal -->
+
+    <script>
+        function validateInput(table, column, value, errorId) {
+            if (value.length === 0) {
+                document.getElementById(errorId).innerText = "";
+                return;
+            }
+            fetch(`customer.php?action=check_duplicate&table=${table}&column=${column}&value=${encodeURIComponent(value)}`)
+                .then(response => response.text())
+                .then(data => {
+                    if (data === '1') {
+                        document.getElementById(errorId).innerText = "This value is already taken.";
+                    } else {
+                        document.getElementById(errorId).innerText = "";
+                    }
+                });
+        }
+    </script>
 
     <?php
     $bootstrap->javascript();

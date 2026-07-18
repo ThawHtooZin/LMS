@@ -195,19 +195,12 @@ $bootstrap->css();
             $purchasedatas = $query->search('purchase_voucher', 'supplier_id', $supplier_id);
           }
 
-          if (isset($_POST['commoditybtn'])) {
-            $item_id = $_POST['item_id'];
-            $stmt = $pdo->prepare("SELECT DISTINCT purchase_voucher_id FROM purchase WHERE commodity='$item_id'");
-            $stmt->execute();
-            $voucherIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
-            if (!empty($voucherIds)) {
-              $idList = implode(',', array_map('intval', $voucherIds));
-              $stmt = $pdo->prepare("SELECT * FROM purchase_voucher WHERE id IN ($idList) ORDER BY id");
-              $stmt->execute();
-              $purchasedatas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            } else {
-              $purchasedatas = [];
-            }
+          // --- Voucher No Search Logic ---
+          if (isset($_POST['voucherno_btn'])) {
+            $v_no = $_POST['search_voucher_no'];
+            $stmt = $pdo->prepare("SELECT * FROM purchase_voucher WHERE voucher_no = :v_no");
+            $stmt->execute(['v_no' => $v_no]);
+            $purchasedatas = $stmt->fetchAll(PDO::FETCH_ASSOC);
           }
 
           if (!empty($message)) {
@@ -260,16 +253,9 @@ $bootstrap->css();
             </select>
             <button type="submit" name="total" class="btn btn-primary btn-sm">Search</button>
 
-            <span>Commodity:</span>
-            <select class="form-control d-inline" name="item_id" style="width:15%;">
-              <?php
-              $itemdatas = $query->selectall('item');
-              foreach ($itemdatas as $itemdata) {
-              ?>
-                <option value="<?php echo $itemdata['item_id']; ?>"><?php echo $itemdata['item_name']; ?></option>
-              <?php } ?>
-            </select>
-            <button type="submit" name="commoditybtn" class="btn btn-primary btn-sm">Find Commodity</button>
+            <span>Voucher No:</span>
+            <input type="text" name="search_voucher_no" class="form-control d-inline" style="width:15%;" placeholder="Enter Voucher No">
+            <button type="submit" name="voucherno_btn" class="btn btn-primary btn-sm">Search Voucher</button>
           </form>
 
           <button type="button" class="btn btn-primary float-end btn-sm" data-bs-toggle="modal" data-bs-target="#addmodal">
@@ -302,21 +288,13 @@ $bootstrap->css();
               $purchasedatas = $query->search('purchase_voucher', 'supplier_id', $supplier_id);
               $total_pages = 1;
               $total_amount = $query->selectallsumcheck('purchase_voucher', 'total_amount', 'total_amount', 'supplier_id', $supplier_id);
-            } elseif (isset($_POST['commoditybtn'])) {
-              $item_id = $_POST['item_id'];
-              $stmt = $pdo->prepare("SELECT DISTINCT purchase_voucher_id FROM purchase WHERE commodity='$item_id'");
-              $stmt->execute();
-              $voucherIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
-              if (!empty($voucherIds)) {
-                $idList = implode(',', array_map('intval', $voucherIds));
-                $stmt = $pdo->prepare("SELECT * FROM purchase_voucher WHERE id IN ($idList) ORDER BY id");
-                $stmt->execute();
-                $purchasedatas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-              } else {
-                $purchasedatas = [];
-              }
-              $total_amount = $query->selectsum('purchase', $item_id, 'commodity');
+            } elseif (isset($_POST['voucherno_btn'])) {
+              $v_no = $_POST['search_voucher_no'];
+              $stmt = $pdo->prepare("SELECT * FROM purchase_voucher WHERE voucher_no = :v_no");
+              $stmt->execute(['v_no' => $v_no]);
+              $purchasedatas = $stmt->fetchAll(PDO::FETCH_ASSOC);
               $total_pages = 1;
+              $total_amount = ['total_amount' => 0]; // Or fetch specific sum if required
             } else {
               $stmt = $pdo->prepare("SELECT COUNT(*) AS cnt FROM purchase_voucher");
               $stmt->execute();

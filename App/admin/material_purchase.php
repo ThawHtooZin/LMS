@@ -239,21 +239,33 @@ $bootstrap->css();
               <th>Total</th>
             </tr>
             <?php
+            // 1. Initialize variables
+            $sql = "SELECT * FROM material_purchase";
+            $params = [];
+
+            // 2. Apply filters based on POST
             if (isset($_POST['total'])) {
               $supplier_id = $_POST['supplier_id'];
+              $sql .= " WHERE supplier_id = ?";
+              $params = [$supplier_id];
             } elseif (isset($_POST['commoditybtn'])) {
               $material_id = $_POST['material_id'];
-            } else {
-              $stmt = $pdo->prepare("SELECT * FROM material_purchase ORDER BY id");
-              $stmt->execute();
-              $rawResult = $stmt->fetchAll();
-              $total_pages = ceil(count($rawResult) / $numOfrecs);
-
-              $stmt = $pdo->prepare("SELECT * FROM material_purchase ORDER BY id LIMIT $offset,$numOfrecs");
-              $stmt->execute();
-              $purchasedatas = $stmt->fetchAll();
+              $sql .= " WHERE material_id = ?";
+              $params = [$material_id];
             }
-            $idd = 0;
+
+            // 3. Get total count for pagination (for the filtered or full set)
+            $countStmt = $pdo->prepare($sql);
+            $countStmt->execute($params);
+            $total_pages = ceil($countStmt->rowCount() / $numOfrecs);
+
+            // 4. Fetch the paginated data
+            $sql .= " ORDER BY id LIMIT $offset, $numOfrecs";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            $purchasedatas = $stmt->fetchAll();
+
+            $idd = $offset; // Ensure numbering continues correctly across pages
             foreach ($purchasedatas as $purchasedata) {
               $idd++;
               $supplierid = $purchasedata['supplier_id'];
@@ -385,6 +397,7 @@ $bootstrap->css();
               }
             ?>
               <tr>
+                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>

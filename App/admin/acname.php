@@ -1,4 +1,13 @@
 <?php
+if (isset($_GET['action']) && $_GET['action'] == 'check_duplicate') {
+  include '../../Controllers/query.ctr.php';
+  $query = new Query();
+  $table = $_GET['table'];
+  $column = $_GET['column'];
+  $value = $_GET['value'];
+  echo $query->isDuplicate($table, $column, $value) ? '1' : '0';
+  exit;
+}
 session_start();
 include '../../Auth/authrize.ctr.php';
 include '../../Resources/resource.boot.php';
@@ -26,7 +35,7 @@ $bootstrap->css();
 <body>
   <script>
     function sweetConfirm(event, title, message, callback) {
-      event.preventDefault(); // Prevent the default form submission
+      event.preventDefault();
       swal({
         title: title,
         text: message,
@@ -105,7 +114,7 @@ $bootstrap->css();
   if (isset($_POST['deletebutton'])) {
     $id = $_POST['id'];
 
-    $query->deleteacname($id);
+    $stmt = $query->deleteacname($id);
   }
 
   if (isset($_POST['replaceform'])) {
@@ -161,14 +170,6 @@ $bootstrap->css();
           </form>
           <button type="button" class="btn btn-primary btn-sm float-end text-light ms-2" data-bs-toggle="modal" data-bs-target="#replacemodal">Replace A/C</button>
           <button type="button" class="btn btn-secondary btn-sm float-end text-light" data-bs-toggle="modal" data-bs-target="#addmodal">Add A/C Name</button>
-          <?php
-          if (!empty($_GET['fromtransaction'])) {
-          ?>
-            <a href="transaction.php" class="btn btn-danger btn-sm float-end me-2">Back</a>
-
-          <?php
-          }
-          ?>
         </div>
         <div class="card-body">
           <table class="table table-bodrder table-hover table-striped">
@@ -203,7 +204,6 @@ $bootstrap->css();
               $idd++;
               $actype = $query->select('actype', $data['ac_type'], 'acid');
               $accode = $data['code_no'];
-
               $check = $query->checkifacexists($accode);
             ?>
               <tr <?php if (!str_contains($data['code_no'], '4000/') && !str_contains($data['code_no'], '3300/')) {
@@ -224,30 +224,10 @@ $bootstrap->css();
                 <div class="modal-dialog" role="document">
                   <div class="modal-content" style="width: 750px !important; margin-top:70px !important;">
                     <form action="" method="post" autocomplete="off">
-                      <input type="hidden" name="id" value="<?php echo $data['id']; ?>">
+                      <input type="hidden" name="id" value="<?php echo $data['acid']; ?>">
                       <div class="modal-header bg-warning text-light">
-                        <h5 class="modal-title" id="updatemodallabel">Update A/C Name</h5>
-                        <div class="row">
-                          <div class="col">
-                            <button type="submit" class="btn btn-success d-inline" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
-                              </svg>
-                            </button>
-                            <?php
-                            if ($check === false) {
-                            ?>
-                              <button type="submit" name="deletebutton" class="btn btn-danger d-inline">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
-                                  <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z" />
-                                </svg>
-                              </button>
-                            <?php
-                            }
-                            ?>
-                            <button type="button" class="btn btn-primary d-inline" data-bs-toggle="modal">&times;</button>
-                          </div>
-                        </div>
+                        <h5 class="modal-title">Update A/C Name</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
                         <?php
@@ -283,7 +263,9 @@ $bootstrap->css();
                             <label>A/C Name</label>
                             <input type="text" name="ac_name" class="form-control inpv2 mb-2" value="<?php echo $updatedata['ac_name']; ?>">
                           </div>
-                          <div class="col">
+                          <div class="col mt-4">
+                            <button type="submit" class="btn btn-success" name="updatebutton">Update</button>
+                            <button type="submit" name="deletebutton" class="btn btn-danger">Delete</button>
                           </div>
                         </div>
                       </div>
@@ -295,90 +277,21 @@ $bootstrap->css();
             }
             ?>
           </table>
-          <div class="modal fade" id="cantupdatecustomer" tabindex="-1" role="dialog" style="margin-left:auto !important; margin-right: auto !important;">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content p-5">
-                <div class="modal-body text-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="75" height="75" style="color: #ffc107;" fill="currentColor" class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
-                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
-                  </svg>
-                  <h2 class="text-center">Can't Update!</h2>
-                  <p style="font-size: 17px;">Must go to Customer to edit <b>Customer</b> IDs</p>
-                  <a href="customer.php" class="btn btn-success btn-lg">Go Edit</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal fade" id="cantupdatesupplier" tabindex="-1" role="dialog" style="margin-left:auto !important; margin-right: auto !important;">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content p-5">
-                <div class="modal-body text-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="75" height="75" fill="currentColor" class="text-warning bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
-                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
-                  </svg>
-                  <h2 class="text-center">Can't Update!</h2>
-                  <p style="font-size: 17px;">Must go to supplier to edit <b>Supplier</b> IDs</p>
-                  <a href="supplier.php" class="btn btn-success btn-lg">Go Edit</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal fade" id="replacemodal" tabindex="-1" role="dialog" style="margin-left:auto !important; margin-right: auto !important;">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header bg-success">
-                  <h3 class="text-light">Replace Account Code</h3>
-                </div>
-                <div class="modal-body text-center p-5">
-                  <form action="" method="POST" id="myForm">
-                    <h4>From A/C Code</h4>
-                    <div class="d-flex">
-                      <div class="col m-2">
-                        <input type="text" name="from_accode" class="form-control inpv2" id="fromaccode" placeholder="Add AC Code">
-                      </div>
 
-                      <div class="col m-2" id="fromac_code">
-                        <input type="text" class="form-control inpv2" disabled>
-                      </div>
-                    </div>
-                    <p class="mt-3"><svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="text-primary bi bi-arrow-down-up" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5m-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5" />
-                      </svg>
-                    </p>
-                    <h4>To A/C Code</h4>
-                    <div class="d-flex">
-                      <div class="col m-2">
-                        <input type="text" name="to_accode" class="form-control inpv2" id="toaccode" placeholder="Add AC Code">
-                      </div>
-
-                      <div class="col m-2" id="toac_code">
-                        <input type="text" class="form-control inpv2" disabled>
-                      </div>
-                    </div>
-                    <input type="hidden" name="replaceform" value="true">
-                    <button class="btn btn-success mt-3" name="replacebtn" onclick="sweetConfirm(event, 'Are you sure?', 'This replace cannot be undone!', function(confirmed) { if (confirmed) { document.querySelector('#myForm').submit(); } });">Submit</button>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
           <div class="modal fade" id="addmodal" tabindex="-1" role="dialog" style="margin-left:auto !important; margin-right: auto !important;">
             <div class="modal-dialog" role="document">
-              <form action="acname.php" method="post">
+              <form action="actype.php" method="post">
                 <div class="modal-content" style="width: 750px !important; margin-top:70px !important;">
                   <div class="modal-header bg-warning text-light">
-                    <h5 class="modal-title" id="updatemodallabel">Add A/C Name</h5>
-                    <div class="row">
-                      <div class="col">
-                        <button type="button" class="btn btn-default d-inline btn-sm" style="font-size: 20px;" data-bs-toggle="modal">&times;</button>
-                      </div>
-                    </div>
+                    <h5 class="modal-title">Add A/C Name</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
                     <div class="row">
                       <div class="col">
                         <label>Code No</label>
-                        <input type="text" name="code_no" class="form-control inpv2 mb-2">
+                        <input type="text" name="code_no" id="code_no" class="form-control inpv2 mb-2" oninput="validateInput('acname', 'code_no', this.value, 'code_error')" required>
+                        <span id="code_error" class="text-danger small"></span>
                       </div>
                       <div class="col">
                         <label>A/C Type</label>
@@ -394,7 +307,7 @@ $bootstrap->css();
                     <div class="row">
                       <div class="col">
                         <label>A/C Name</label>
-                        <input type="text" name="ac_name" class="form-control inpv2 mb-2">
+                        <input type="text" name="ac_name" class="form-control inpv2 mb-2" required>
                       </div>
                       <div class="col mt-4">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -410,9 +323,26 @@ $bootstrap->css();
       </div>
     </div>
   </div>
-  <?php
-  $bootstrap->javascript();
-  ?>
+
+  <script>
+    function validateInput(table, column, value, errorId) {
+      if (value.length === 0) {
+        document.getElementById(errorId).innerText = "";
+        return;
+      }
+      fetch(`actype.php?action=check_duplicate&table=${table}&column=${column}&value=${encodeURIComponent(value)}`)
+        .then(response => response.text())
+        .then(data => {
+          if (data === '1') {
+            document.getElementById(errorId).innerText = "This code is already taken.";
+          } else {
+            document.getElementById(errorId).innerText = "";
+          }
+        });
+    }
+  </script>
+
+  <?php $bootstrap->javascript(); ?>
 </body>
 
 </html>

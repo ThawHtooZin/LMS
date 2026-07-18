@@ -1,4 +1,13 @@
 <?php
+if (isset($_GET['action']) && $_GET['action'] == 'check_duplicate') {
+  include '../../Controllers/query.ctr.php';
+  $query = new Query();
+  $table = $_GET['table'];
+  $column = $_GET['column'];
+  $value = $_GET['value'];
+  echo $query->isDuplicate($table, $column, $value) ? '1' : '0';
+  exit;
+}
 session_start();
 include '../../Auth/authrize.ctr.php';
 include '../../Resources/resource.boot.php';
@@ -27,35 +36,29 @@ $bootstrap->css();
   <?php
   if (isset($_POST['addbtn'])) {
     $actype = $_POST['actype'];
-
     $query->addactype($actype);
   }
 
   if (isset($_POST['updatebutton'])) {
     $id = $_POST['id'];
     $actype = $_POST['actype'];
-
     $query->updateactype($actype, $id);
   }
 
   if (isset($_POST['deletebutton'])) {
     $id = $_POST['id'];
-
     $stmt = $query->deleteactype($id);
   }
   ?>
   <div class="row">
     <div class="sidebarcol" id="sidebar">
-      <?php
-      include 'sidebar.php';
-      ?>
+      <?php include 'sidebar.php'; ?>
     </div>
     <div class="contentcol" id="content">
       <?php require 'navbar.php'; ?>
       <div class="card">
         <div class="card-header bg-info text-light">
           <b style="font-size:18px;">Manage A/C Type</b>
-
           <button type="button" class="btn btn-secondary btn-sm float-end text-light" data-bs-toggle="modal" data-bs-target="#addmodal">Add A/C Type</button>
         </div>
         <div class="card-body">
@@ -97,27 +100,20 @@ $bootstrap->css();
                     <form action="" method="post" autocomplete="off">
                       <input type="hidden" name="id" value="<?php echo $data['acid']; ?>">
                       <div class="modal-header bg-warning text-light">
-                        <h5 class="modal-title" id="updatemodallabel">Update A/C Type</h5>
-                        <div class="row">
-                          <div class="col">
-                            <button type="button" class="btn btn-default d-inline" data-bs-toggle="modal">&times;</button>
-                          </div>
-                        </div>
+                        <h5 class="modal-title">Update A/C Type</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
                         <?php
                         $id = $data['acid'];
                         $updatedata = $query->select('actype', $id, 'acid');
                         ?>
-                        <input type="hidden" name="updateid" value="<?php echo $data['acid']; ?>">
                         <label>A/C Type</label>
                         <input type="text" name="actype" class="form-control inpv2 mb-2" value="<?php echo $updatedata['ac_type']; ?>">
                       </div>
                       <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary d-inline" data-bs-toggle="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success d-inline" name="updatebutton">
-                          Update
-                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success" name="updatebutton">Update</button>
                       </div>
                     </form>
                   </div>
@@ -132,16 +128,13 @@ $bootstrap->css();
               <form action="actype.php" method="post">
                 <div class="modal-content">
                   <div class="modal-header bg-warning text-light">
-                    <h5 class="modal-title" id="updatemodallabel">Add A/C Type</h5>
-                    <div class="row">
-                      <div class="col">
-                        <button type="button" class="btn btn-default d-inline btn-sm" style="font-size: 20px;" data-bs-toggle="modal">&times;</button>
-                      </div>
-                    </div>
+                    <h5 class="modal-title">Add A/C Type</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
                     <label>A/C Type</label>
-                    <input type="text" name="actype" class="form-control inpv2 mb-2">
+                    <input type="text" name="actype" id="actype" class="form-control inpv2 mb-2" oninput="validateInput('actype', 'ac_type', this.value, 'ac_error')" required>
+                    <span id="ac_error" class="text-danger small"></span>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -155,6 +148,25 @@ $bootstrap->css();
       </div>
     </div>
   </div>
+
+  <script>
+    function validateInput(table, column, value, errorId) {
+      if (value.length === 0) {
+        document.getElementById(errorId).innerText = "";
+        return;
+      }
+      fetch(`actype.php?action=check_duplicate&table=${table}&column=${column}&value=${encodeURIComponent(value)}`)
+        .then(response => response.text())
+        .then(data => {
+          if (data === '1') {
+            document.getElementById(errorId).innerText = "This value is already taken.";
+          } else {
+            document.getElementById(errorId).innerText = "";
+          }
+        });
+    }
+  </script>
+
   <?php
   $bootstrap->javascript();
   ?>

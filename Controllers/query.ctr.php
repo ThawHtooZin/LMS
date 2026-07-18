@@ -115,6 +115,14 @@ class Query
     return $stmt->fetchall();
   }
 
+  function isDuplicate($table, $column, $value)
+  {
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM $table WHERE $column = :value");
+    $stmt->execute([':value' => $value]);
+    return $stmt->fetchColumn() > 0;
+  }
+
   function createaccount($table, $username, $password, $email, $role)
   {
     global $pdo;
@@ -5610,7 +5618,7 @@ class Query
 
     // Store House Add
 
-    $storehousestmt = $pdo->prepare("INSERT INTO material_store_house(date, voucher_no, supplier_id, material_id, `in`) VALUES('$date', '$voucher_no','$supplier_name', '$material', '$quantity')");
+    $storehousestmt = $pdo->prepare("INSERT INTO material_store_house(date, voucher_no, supplier_id, material_id, `in_quantity`) VALUES('$date', '$voucher_no','$supplier_name', '$material', '$quantity')");
     $storehousestmt->execute();
 
     // // General Ledger Add
@@ -5757,7 +5765,7 @@ class Query
     if ($action == 'return') {
       $stmt = $pdo->prepare("INSERT INTO stock_output_group(date, stock_to, voucher_no, description, material_id, `out`, action) VALUES('$date', '$stockto', '$voucher_no', '$description', '$material', '$quantity', '$action')");
       $stmt->execute();
-      $stmt = $pdo->prepare("INSERT INTO material_store_house(date, voucher_no, material_id, description, `in`, action) VALUES('$date', '$voucher_no', '$material', '$description', '$quantity', '$action')");
+      $stmt = $pdo->prepare("INSERT INTO material_store_house(date, voucher_no, material_id, description, `in_quantity`, action) VALUES('$date', '$voucher_no', '$material', '$description', '$quantity', '$action')");
       $stmt->execute();
     }
 
