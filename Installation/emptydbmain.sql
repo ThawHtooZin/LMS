@@ -496,7 +496,7 @@ CREATE TABLE `form7stock` (
   `pcsperf7` int(11) NOT NULL,
   `link_id` int(11) NOT NULL,
   `water_kg` int(11) NOT NULL,
-  `fish_type` varchar(255) NOT NULL,
+  `fish_type` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -1285,6 +1285,7 @@ CREATE TABLE `payable` (
   `closing_balance` DECIMAL(15,2) NOT NULL DEFAULT 0,
   `report_date` DATE DEFAULT NULL,
   `link_id` INT(11) NOT NULL,
+  `fishormaterial` VARCHAR(255) DEFAULT NULL,
   KEY `idx_payable_purchase_voucher_id` (`purchase_voucher_id`),
   CONSTRAINT `fk_payable_purchase_voucher`
     FOREIGN KEY (`purchase_voucher_id`)

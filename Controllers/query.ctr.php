@@ -706,7 +706,8 @@ class Query
         $updatePayable = $pdo->prepare("UPDATE payable SET date='$date', supplier_id='$supplier_name', purchase_voucher_no='$voucher_no', purchase_amount='$newPurchaseAmount', balance='$newBalance' WHERE purchase_voucher_id='$purchase_voucher_id'");
         $updatePayable->execute();
       } else {
-        $payablestmt = $pdo->prepare("INSERT INTO payable(purchase_voucher_id, date, supplier_id, purchase_voucher_no, purchase_amount, balance) VALUES('$purchase_voucher_id', '$date', '$supplier_name', '$voucher_no', '$totalAmount', '$totalAmount')");
+        // Updated to include fishormaterial
+        $payablestmt = $pdo->prepare("INSERT INTO payable(purchase_voucher_id, date, supplier_id, purchase_voucher_no, purchase_amount, balance, fishormaterial) VALUES('$purchase_voucher_id', '$date', '$supplier_name', '$voucher_no', '$totalAmount', '$totalAmount', 'fish')");
         $payablestmt->execute();
       }
 
@@ -5607,7 +5608,9 @@ class Query
     $idstmt->execute();
     $iddata = $idstmt->fetch(PDO::FETCH_ASSOC);
     $id = $iddata['id'];
-    $payablestmt = $pdo->prepare("INSERT INTO payable(date, supplier_id, purchase_voucher_no, purchase_amount, balance, link_id) VALUES('$date', '$supplier_name', '$voucher_no', '$amount', '$total_balance', '$id')");
+
+    // Updated to include fishormaterial
+    $payablestmt = $pdo->prepare("INSERT INTO payable(date, supplier_id, purchase_voucher_no, purchase_amount, balance, link_id, fishormaterial) VALUES('$date', '$supplier_name', '$voucher_no', '$amount', '$total_balance', '$id', 'material')");
     $payablestmt->execute();
 
     if ($stmt) {

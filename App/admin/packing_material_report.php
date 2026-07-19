@@ -73,6 +73,18 @@ $query = new Query();
               <div class="nav-card-title">LM WareHouse Report</div>
             </a>
           </div>
+          <!-- Packing Material Payable Report -->
+          <div class="col-lg-3">
+            <a href="payablereport.php?type=material" class="nav-card">
+              <div class="icon-box">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0dcaf0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="2" x2="12" y2="22"></line>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+              </div>
+              <div class="nav-card-title">Packing Material Payable Report</div>
+            </a>
+          </div>
           <!-- Gate Pass Report -->
           <div class="col-lg-3">
             <a href="gatepassreport.php" class="nav-card">

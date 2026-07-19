@@ -1,4 +1,15 @@
 <?php
+// Handle real-time duplicate validation
+if (isset($_GET['action']) && $_GET['action'] == 'check_duplicate') {
+  include '../../Controllers/query.ctr.php';
+  $query = new Query();
+  $table = $_GET['table'];
+  $column = $_GET['column'];
+  $value = $_GET['value'];
+  echo $query->isDuplicate($table, $column, $value) ? '1' : '0';
+  exit;
+}
+
 session_start();
 include '../../Auth/authrize.ctr.php';
 include '../../Resources/resource.boot.php';
@@ -14,7 +25,7 @@ $query = new Query();
 
 <head>
   <meta charset="utf-8">
-  <title>Document</title>
+  <title>Material Purchase</title>
 </head>
 <?php
 $bootstrap->css();
@@ -42,20 +53,33 @@ $bootstrap->css();
         });
       });
     });
+
+    // Real-time validation for duplicate voucher numbers
+    function validateInput(table, column, value, errorId) {
+      if (value.length === 0) {
+        document.getElementById(errorId).innerText = "";
+        return;
+      }
+      fetch(`material_purchase.php?action=check_duplicate&table=${table}&column=${column}&value=${encodeURIComponent(value)}`)
+        .then(response => response.text())
+        .then(data => {
+          if (data === '1') {
+            document.getElementById(errorId).innerText = "This voucher number is already taken.";
+          } else {
+            document.getElementById(errorId).innerText = "";
+          }
+        });
+    }
   </script>
   <div class="row">
     <div class="sidebarcol" id="sidebar">
-      <?php
-      include 'sidebar.php';
-      ?>
+      <?php include 'sidebar.php'; ?>
     </div>
     <div class="contentcol" id="content">
       <?php require 'navbar.php'; ?>
       <div class="card">
         <div class="card-header bg-warning text-light" style="padding:-10px;">
-
           <b>Packing Material Purchase</b>
-
         </div>
         <div class="card-body" style="margin-top:-8px !important;">
           <?php
@@ -67,12 +91,9 @@ $bootstrap->css();
           $rate_error = '';
 
           if (isset($_POST['addbutton'])) {
-
             $date = $_POST['date'];
             $voucher_no = $_POST['voucher_no'];
             $supplier_name = $_POST['supplier_code_no'];
-
-            // Arrays from the dynamic table
             $materials = isset($_POST['material']) ? $_POST['material'] : [];
             $quantities = isset($_POST['quantity']) ? $_POST['quantity'] : [];
             $rates = isset($_POST['rate']) ? $_POST['rate'] : [];
@@ -81,7 +102,6 @@ $bootstrap->css();
             $_SESSION['purchase_voucher_no'] = $voucher_no;
             $_SESSION['purchase_supplier_name'] = $supplier_name;
 
-            // Check if at least one valid line exists
             $hasLine = false;
             foreach ($materials as $index => $mat) {
               $qty = isset($quantities[$index]) ? trim($quantities[$index]) : '';
@@ -99,18 +119,11 @@ $bootstrap->css();
               if (empty($supplier_name)) $supplier_name_error = "Please Enter The Supplier A/C Code";
               if (!$hasLine) $quantity_error = "Please add at least one complete material line";
             } else {
-              // Loop through the arrays and insert each line
               foreach ($materials as $index => $material) {
                 $material = trim($material);
                 $quantity = isset($quantities[$index]) ? trim($quantities[$index]) : '';
                 $rate = isset($rates[$index]) ? trim($rates[$index]) : '';
-
-                // Skip incomplete lines silently
-                if ($material === '' || $quantity === '' || $rate === '') {
-                  continue;
-                }
-
-                // Fire the existing backend function for each row
+                if ($material === '' || $quantity === '' || $rate === '') continue;
                 $query->addmaterialpurchase('material_purchase', $date, $voucher_no, $supplier_name, $material, $quantity, $rate);
               }
             }
@@ -145,47 +158,32 @@ $bootstrap->css();
           }
 
           if (!empty($message)) {
-            if (strpos($message, 'Successfully')) {
-              $successmessage = $message;
-            }
-
-            if (strpos($message, 'Error')) {
-              $errmessage = $message;
-            }
-
-            if (strpos($message, 'following')) {
-              $errormessage = $message;
-            }
+            if (strpos($message, 'Successfully')) $successmessage = $message;
+            if (strpos($message, 'Error')) $errmessage = $message;
+            if (strpos($message, 'following')) $errormessage = $message;
           }
-
           ?>
 
           <?php
-          if (!empty($errormessage)) {
-          ?>
+          if (!empty($errormessage)) { ?>
             <div class="alert alert-danger alert-dismissible fade show">
               <strong>Error! </strong> <?php echo $errormessage; ?>
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-          <?php
-          }
-          if (!empty($errmessage)) {
-          ?>
+          <?php }
+          if (!empty($errmessage)) { ?>
             <div class="alert alert-danger alert-dismissible fade show">
               <strong>Error! </strong> <?php echo $errmessage; ?>
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-          <?php
-          }
-          if (!empty($successmessage)) {
-          ?>
+          <?php }
+          if (!empty($successmessage)) { ?>
             <div class="alert alert-success alert-dismissible fade show">
               <strong>Success! </strong> <?php echo $successmessage; ?>
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-          <?php
-          }
-          ?>
+          <?php } ?>
+
           <form action="material_purchase.php" method="post" class="d-inline">
             <span>Supplier Name:</span>
             <select class="chzn-select" name="supplier_id" style="width:15%;" data-placeholder="Supplier Name">
@@ -197,9 +195,7 @@ $bootstrap->css();
                 $supplier_name = $query->select('supplier', $supplierdata['supplier_id'], 'supplier_id');
               ?>
                 <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplier_name['supplier_name']; ?> - <?= $supplierdata['supplier_id']; ?></option>
-              <?php
-              }
-              ?>
+              <?php } ?>
             </select>
             <button type="submit" name="total" class="btn btn-primary btn-sm">Search</button>
             <span>Material:</span>
@@ -209,9 +205,7 @@ $bootstrap->css();
               foreach ($materialdatas as $materialdata) {
               ?>
                 <option value="<?php echo $materialdata['id']; ?>"><?php echo $materialdata['name']; ?></option>
-              <?php
-              }
-              ?>
+              <?php } ?>
             </select>
             <button type="submit" name="commoditybtn" class="btn btn-primary btn-sm">Find Material</button>
           </form>
@@ -219,11 +213,8 @@ $bootstrap->css();
             Add Material Purchase Voucher
           </button>
           <?php
-          if (!empty($_GET['pageno'])) {
-            $pageno = $_GET['pageno'];
-          } else {
-            $pageno = 1;
-          }
+          if (!empty($_GET['pageno'])) $pageno = $_GET['pageno'];
+          else $pageno = 1;
           $numOfrecs = 15;
           $offset = ($pageno - 1) * $numOfrecs;
           ?>
@@ -239,11 +230,8 @@ $bootstrap->css();
               <th>Total</th>
             </tr>
             <?php
-            // 1. Initialize variables
             $sql = "SELECT * FROM material_purchase";
             $params = [];
-
-            // 2. Apply filters based on POST
             if (isset($_POST['total'])) {
               $supplier_id = $_POST['supplier_id'];
               $sql .= " WHERE supplier_id = ?";
@@ -254,18 +242,16 @@ $bootstrap->css();
               $params = [$material_id];
             }
 
-            // 3. Get total count for pagination (for the filtered or full set)
             $countStmt = $pdo->prepare($sql);
             $countStmt->execute($params);
             $total_pages = ceil($countStmt->rowCount() / $numOfrecs);
 
-            // 4. Fetch the paginated data
             $sql .= " ORDER BY id LIMIT $offset, $numOfrecs";
             $stmt = $pdo->prepare($sql);
             $stmt->execute($params);
             $purchasedatas = $stmt->fetchAll();
 
-            $idd = $offset; // Ensure numbering continues correctly across pages
+            $idd = $offset;
             foreach ($purchasedatas as $purchasedata) {
               $idd++;
               $supplierid = $purchasedata['supplier_id'];
@@ -318,12 +304,10 @@ $bootstrap->css();
                         <div class="col">
                           <label style="font-weight: bold;">Date</label>
                           <input type="date" name="up_date" class="form-control inpv2" value="<?php echo $purchasedata['date']; ?>">
-                          <span class="text-danger" style="font-size:12px; font-weight:bold;" style="font-weight:bold !important;"><?php echo $date_error; ?></span>
                         </div>
                         <div class="col">
                           <label style="font-weight: bold;">Voucher No</label>
                           <input type="number" name="up_voucher_no" class="form-control inpv2" value="<?php echo $purchasedata['voucher_no']; ?>">
-                          <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;" style="font-weight:bold !important;"><?php echo $voucher_no_error; ?></span>
                         </div>
                       </div>
                       <div class="row">
@@ -345,7 +329,6 @@ $bootstrap->css();
                                 <input type="text" name="addac_name" disabled class="form-control inpv2 mb-1" style="padding-top: 2px; padding-bottom: 2px;">
                               </div>
                             </div>
-                            <span class="text-danger mb-1" style="font-size:12px; font-weight:bold;"><?php echo $supplier_name_error; ?></span>
                           </div>
                         </div>
                         <div class="col-6">
@@ -358,9 +341,7 @@ $bootstrap->css();
                               <option value="<?php echo $materialdata['id']; ?>" <?php if ($materialdata['id'] == $purchasedata['material_id']) {
                                                                                     echo "selected";
                                                                                   } ?>><?php echo $materialdata['name']; ?></option>
-                            <?php
-                            }
-                            ?>
+                            <?php } ?>
                           </select>
                         </div>
                       </div>
@@ -368,12 +349,10 @@ $bootstrap->css();
                         <div class="col">
                           <label style="font-weight: bold;">Quantity</label>
                           <input type="number" name="up_quantity" class="form-control inpv2" value="<?php echo $purchasedata['quantity']; ?>">
-                          <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;"><?php echo $quantity_error; ?></span>
                         </div>
                         <div class="col">
                           <label style="font-weight: bold;">Rate</label>
                           <input type="text" name="up_rate" class="form-control inpv2" value="<?php echo $purchasedata['rate']; ?>">
-                          <span class="text-danger mb-2" style="font-size:12px; font-weight:bold;"><?php echo $rate_error; ?></span>
                         </div>
                       </div>
                     </div>
@@ -381,81 +360,19 @@ $bootstrap->css();
                   </div>
                 </div>
               </div>
-            <?php
-            };
-            ?>
-            <?php
-            if (isset($_POST['total'])) {
-              $supplier_id = $_POST['supplier_id'];
-              $purchasestmt = $pdo->prepare("SELECT * FROM material_purchase WHERE supplier_id='$supplier_id'");
-              $purchasestmt->execute();
-              $purchasedatas = $purchasestmt->fetchAll();
-              $total_amount = 0;
-
-              foreach ($purchasedatas as $purchasedata) {
-                $total_amount += $purchasedata['quantity'] * $purchasedata['rate'];
-              }
-            ?>
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>Total Amount:</td>
-                <td><?php echo $total_amount;  ?></td>
-              </tr>
-            <?php
-            }
-            ?>
-            <?php
-            if (isset($_POST['commoditybtn'])) {
-              $material_id = $_POST['material_id'];
-              $purchasestmt = $pdo->prepare("SELECT * FROM material_purchase WHERE material_id='$material_id'");
-              $purchasestmt->execute();
-              $purchasedatas = $purchasestmt->fetchAll();
-              $total_amount = 0;
-
-              foreach ($purchasedatas as $purchasedata) {
-                $total_amount += $purchasedata['quantity'] * $purchasedata['rate'];
-              }
-
-            ?>
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>Total Amount:</td>
-                <td><?php echo $total_amount;  ?></td>
-              </tr>
-            <?php
-            }
-            ?>
+            <?php } ?>
           </table>
           <div aria-label="Page navigation example" style="float:right;">
             <ul class="pagination">
               <li class="page-item"><a class="page-link" href="?pageno=1">First</a></li>
-              <li class="page-item <?php if ($pageno <= 1) {
-                                      echo 'disabled';
-                                    } ?>">
-                <a class="page-link" href="<?php if ($pageno <= 1) {
-                                              echo '#';
-                                            } else {
-                                              echo "?pageno=" . ($pageno - 1);
-                                            } ?>">Previous</a>
+              <li class="page-item <?php if ($pageno <= 1) echo 'disabled'; ?>">
+                <a class="page-link" href="<?php if ($pageno <= 1) echo '#';
+                                            else echo "?pageno=" . ($pageno - 1); ?>">Previous</a>
               </li>
               <li class="page-item"><a class="page-link" href="#"><?php echo $pageno; ?></a></li>
-              <li class="page-item <?php if ($pageno >= $total_pages) {
-                                      echo 'disabled';
-                                    }; ?>">
-                <a class="page-link" href="<?php if ($pageno >= $total_pages) {
-                                              echo '#';
-                                            } else {
-                                              echo "?pageno=" . ($pageno + 1);
-                                            } ?>">Next</a>
+              <li class="page-item <?php if ($pageno >= $total_pages) echo 'disabled'; ?>">
+                <a class="page-link" href="<?php if ($pageno >= $total_pages) echo '#';
+                                            else echo "?pageno=" . ($pageno + 1); ?>">Next</a>
               </li>
               <li class="page-item"><a class="page-link" href="?pageno=<?php echo $total_pages; ?>">Last</a> </li>
             </ul>
@@ -464,7 +381,6 @@ $bootstrap->css();
       </div>
     </div>
   </div>
-
 
   <!-- Data Add Modal -->
   <div class="modal fade" id="addmodal" style="margin-left:auto !important; margin-right: auto !important;">
@@ -478,42 +394,38 @@ $bootstrap->css();
         </div>
         <form action="" method="post" autocomplete="off">
           <div class="modal-body">
-
-            <!-- Header Section -->
             <div class="row mb-3">
               <div class="col-md-4">
                 <label style="font-weight: bold;">Date</label>
-                <input type="date" name="date" class="form-control inpv2 <?php echo !empty($date_error) ? 'is-invalid' : ''; ?>" value="<?php echo !empty($_SESSION['purchase_date']) ? $_SESSION['purchase_date'] : ''; ?>">
-                <span class="text-danger" style="font-size:12px; font-weight:bold;"><?php echo $date_error; ?></span>
+                <input type="date" name="date" class="form-control inpv2" value="<?php echo !empty($_SESSION['purchase_date']) ? $_SESSION['purchase_date'] : ''; ?>">
               </div>
               <div class="col-md-4">
                 <label style="font-weight: bold;">Voucher No</label>
-                <input type="number" name="voucher_no" class="form-control inpv2 <?php echo !empty($voucher_no_error) ? 'is-invalid' : ''; ?>" value="<?php echo !empty($_SESSION['purchase_voucher_no']) ? $_SESSION['purchase_voucher_no'] : ''; ?>">
-                <span class="text-danger" style="font-size:12px; font-weight:bold;"><?php echo $voucher_no_error; ?></span>
+                <!-- Updated input with validation -->
+                <input type="number" name="voucher_no" id="voucher_no" class="form-control inpv2" oninput="validateInput('material_purchase', 'voucher_no', this.value, 'voucher_error')" required>
+                <span id="voucher_error" class="text-danger small"></span>
               </div>
               <div class="col-md-4">
                 <label style="font-weight: bold;">Supplier A/C Code</label>
                 <div class="d-flex">
-                  <input type="text" id="addac_code" name="supplier_code_no" class="form-control inpv2 <?php echo !empty($supplier_name_error) ? 'is-invalid' : ''; ?>" style="padding-top: 2px; padding-bottom: 2px;" value="<?php echo !empty($_SESSION['purchase_supplier_name']) ? $_SESSION['purchase_supplier_name'] : ''; ?>">
-                  <a href="supplier.php" target="_blank" class="ms-2 mt-1 text-dark">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                      <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
-                    </svg>
-                  </a>
+                  <!-- Using Chosen Select -->
+                  <select name="supplier_code_no" id="addac_code" class="chzn-select form-control" style="width: 100%;" required>
+                    <option value="">Select Supplier</option>
+                    <?php
+                    $supplier_list = $query->selectall('supplier');
+                    foreach ($supplier_list as $s) {
+                      echo "<option value='" . $s['supplier_id'] . "'>" . $s['supplier_name'] . " - " . $s['supplier_id'] . "</option>";
+                    }
+                    ?>
+                  </select>
                 </div>
-                <div id='addac_name' class="mt-1">
-                  <input type="text" name="addac_name" disabled class="form-control inpv2" style="padding-top: 2px; padding-bottom: 2px;">
-                </div>
-                <span class="text-danger" style="font-size:12px; font-weight:bold;"><?php echo $supplier_name_error; ?></span>
               </div>
             </div>
 
-            <!-- Material Lines Section -->
             <div class="d-flex justify-content-between align-items-center mb-2 mt-4">
               <label style="font-weight: bold;">Material Lines</label>
               <button type="button" class="btn btn-sm btn-outline-primary" onclick="addMaterialLine();">Add Line</button>
             </div>
-            <span class="text-danger d-block mb-2" style="font-size:12px; font-weight:bold;"><?php echo $quantity_error; ?></span>
 
             <div class="table-responsive">
               <table class="table table-bordered table-sm">
@@ -553,7 +465,6 @@ $bootstrap->css();
       </div>
     </div>
   </div>
-  <!-- Add Modal -->
 
   <script type="text/javascript">
     function addMaterialLine() {
@@ -581,16 +492,38 @@ $bootstrap->css();
     function removeMaterialLine(button) {
       const row = button.closest('tr');
       const tbody = row.closest('tbody');
-      // Always leave at least one empty row
       if (tbody.rows.length > 1) {
         row.remove();
       }
     }
+    $(document).ready(() => {
+      // Initialize Chosen
+      $('.chzn-select').chosen();
+
+      // Updated event listener for the supplier select
+      $('#addac_code').on('change', function() {
+        var ac_codepost = $(this).val();
+        var type = "";
+        if (ac_codepost.includes('/')) {
+          ac_code = ac_codepost.split('/');
+          type = "slash";
+        } else {
+          ac_code = ac_codepost.split('-');
+          type = "dash";
+        }
+        firstpart = ac_code[0];
+        lastpart = ac_code[1];
+
+        $('#addac_name').load('ac_name.php', {
+          FirstPart: firstpart,
+          LastPart: JSON.stringify(lastpart),
+          Type: type
+        });
+      });
+    });
   </script>
 
-  <?php
-  $bootstrap->javascript();
-  ?>
+  <?php $bootstrap->javascript(); ?>
 </body>
 
 </html>

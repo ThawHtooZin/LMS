@@ -8,277 +8,186 @@ $auth = new auth();
 $auth->checkadmin();
 $bootstrap = new Bootstrap();
 $query = new Query();
+
+// Logic: If type is 'material', filter for material. Otherwise, show everything (1=1).
+$type = isset($_GET['type']) ? $_GET['type'] : '';
+
+if ($type === 'material') {
+  $type_filter = "fishormaterial = 'material'";
+  $display_title = "Material";
+} else {
+  $type_filter = "1=1";
+  $display_title = "All";
+}
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>Admin | Dashboard</title>
-  </head>
-  <?php
-  $bootstrap->css();
-  ?>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
-  <body>
-    <?php
-    if(isset($_POST['print'])){
-      // $query->payablereport();
-    }
-    if (isset($_POST['addbalance'])) {
-      $date = $_POST['date'];
-      $supplier_id = $_POST['supplier_name'];
-      $description = $_POST['description'];
-      $amount = $_POST['amount'];
 
-      $query->addbalancepayable($date, $supplier_id, $description, $amount);
+<head>
+  <meta charset="utf-8">
+  <title>Admin | Payable Reports</title>
+</head>
+<?php $bootstrap->css(); ?>
 
-    }
-     ?>
-    <div class="row">
-      <div class="sidebarcol" id="sidebar">
-        <?php
-        include 'sidebar.php';
-        ?>
-      </div>
-      <div class="contentcol" id="content">
-        <?php require 'navbar.php'; ?>
-        <div class="card">
-          <div class="card-header bg-info text-light">
-            <h5>Payable Reports</h5>
-
-            <?php
-              if(isset($_POST['date_search'])){
-                ?>
-                  <a href="export.php?table_name=payable&search_date=<?= $_POST['date_search_inp']; ?>" class="btn btn-success btn-sm ms-2 float-end">Export To Excel</a>
-                <?php
-              }else{
-                ?>
-                  <a href="export.php?table_name=payable" class="btn btn-success btn-sm ms-2 float-end">Export To Excel</a>
-                <?php
-              }
-            ?>
-            <form action="" method="post" class="d-inline">
-              <!-- <button type="submit" name="print" class="btn btn-success float-end btn-sm d-inline" onclick="window.open('print/payablereportprint.php');">Print</button> -->
+<body>
+  <div class="row">
+    <div class="sidebarcol" id="sidebar">
+      <?php include 'sidebar.php'; ?>
+    </div>
+    <div class="contentcol" id="content">
+      <?php require 'navbar.php'; ?>
+      <div class="card">
+        <div class="card-header bg-info text-light">
+          <h5>Payable Reports (<?= $display_title; ?>)</h5>
+          <button onclick="printReport()" class="btn btn-secondary btn-sm ms-2 float-end">Print Report</button>
+          <?php
+          // Export button logic
+          $date_range_params = "";
+          if (isset($_POST['date_search'])) {
+            $date_range_params = "&from=" . $_POST['date_from'] . "&to=" . $_POST['date_to'];
+          }
+          echo '<a href="export.php?table_name=payable&type=' . $type . $date_range_params . '" class="btn btn-success btn-sm ms-2 float-end">Export To Excel</a>';
+          ?>
+          <form action="payablereport.php?type=<?= $type; ?>" method="post" class="d-inline">
             <button type="submit" name="date_search" class="btn btn-primary float-end btn-sm ms-2 me-2">Search</button>
-            <input type="date" name="date_search_inp" class="inpv2 form-control d-inline float-end ms-2" style=" width: 150px; padding: 2px;">
+            <input type="date" name="date_to" class="inpv2 form-control d-inline float-end ms-2" style="width: 150px; padding: 2px;" value="<?= isset($_POST['date_to']) ? $_POST['date_to'] : '' ?>">
+            <input type="date" name="date_from" class="inpv2 form-control d-inline float-end ms-2" style="width: 150px; padding: 2px;" value="<?= isset($_POST['date_from']) ? $_POST['date_from'] : '' ?>">
           </form>
-          </div>
-          <div class="card-body">
-            <b>Payable for Supplier</b>
-            <?php
-              if(isset($_POST['date_search'])){
-                $searchdate = $_POST['date_search_inp'];
-                ?>
-                  <div class="float-end">
-                  <b>
-                    Date :
-                    <?php if(empty($searchdate)){ echo date('d-m-Y'); }else{ echo date('d-m-Y', strtotime($searchdate)); }; ?>
-                  </b>
-                </div>
-                <table class="mt-3 table table-bordered table-striped rounded">
-                  <tr>
-                    <th>No</th>
-                    <th>Supplier Name</th>
-                    <th>Opening Amount</th>
-                    <th>Add Amt</th>
-                    <th>Paid Amt</th>
-                    <th>Balance</th>
-                  </tr>
-                  <?php
-                  $stmt = $pdo->prepare("SELECT DISTINCT supplier_id FROM payable WHERE date='$searchdate' OR paid_date='$searchdate' OR date!='0000-00-00' AND paid_date='0000-00-00'");
-                  $stmt->execute();
-                  $payablesuppliers = $stmt->fetchall();
-                  // print_r($payablesuppliers);
-                  $id = 0;
-                  $totalbalance = 0;
-                  foreach ($payablesuppliers as $payablesupplier) :
-                    $supplier_id = $payablesupplier['supplier_id'];
+        </div>
+        <div class="card-body">
+          <b>Payable for Supplier</b>
+          <?php
+          if (isset($_POST['date_search'])) {
+            $from = $_POST['date_from'];
+            $to = $_POST['date_to'];
+          ?>
+            <div class="float-end"><b>Date Range: <?= date('d-m-Y', strtotime($from)); ?> to <?= date('d-m-Y', strtotime($to)); ?></b></div>
+            <table class="mt-3 table table-bordered table-striped rounded">
+              <tr>
+                <th>No</th>
+                <th>Supplier Name</th>
+                <th>Opening Amount</th>
+                <th>Add Amt</th>
+                <th>Paid Amt</th>
+                <th>Balance</th>
+              </tr>
+              <?php
+              $stmt = $pdo->prepare("SELECT DISTINCT supplier_id FROM payable WHERE $type_filter AND (date BETWEEN '$from' AND '$to' OR paid_date BETWEEN '$from' AND '$to')");
+              $stmt->execute();
+              $payablesuppliers = $stmt->fetchall();
+              $id = 0;
+              $totalbalance = 0;
+              foreach ($payablesuppliers as $payablesupplier) :
+                $supplier_id = $payablesupplier['supplier_id'];
 
-                    // $date = date('Y-m-d', strtotime($searchdate . ' -1 day'));
-                    $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' AND date='$searchdate'");
-                    $payablestmt->execute();
-                    $payabledata = $payablestmt->fetch(PDO::FETCH_ASSOC);
+                $openingamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE $type_filter AND supplier_id='$supplier_id' AND date<'$from' ORDER BY id DESC LIMIT 1");
+                $openingamountstmt->execute();
+                $openingamount = $openingamountstmt->fetch(PDO::FETCH_ASSOC);
 
-                    $openingamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id' AND date<'$searchdate' OR paid_date='$searchdate'");
-                    $openingamountstmt->execute();
-                    $openingamount = $openingamountstmt->fetch(PDO::FETCH_ASSOC);
+                $purchaseamtstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS purchase_amount FROM payable WHERE $type_filter AND supplier_id='$supplier_id' AND date BETWEEN '$from' AND '$to'");
+                $purchaseamtstmt->execute();
+                $purchaseamt = $purchaseamtstmt->fetch(PDO::FETCH_ASSOC);
 
+                $paidamtstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE $type_filter AND supplier_id='$supplier_id' AND paid_date BETWEEN '$from' AND '$to'");
+                $paidamtstmt->execute();
+                $paidamt = $paidamtstmt->fetch(PDO::FETCH_ASSOC);
 
-                    $purchaseamtstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND date<'$searchdate'");
-                    $purchaseamtstmt->execute();
-                    $purchaseamt = $purchaseamtstmt->fetch(PDO::FETCH_ASSOC);
-                    // print_r($purchaseamt['purchase_amount']);
-
-                    $paidamtstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE supplier_id='$supplier_id' AND paid_date<'$searchdate'");
-                    $paidamtstmt->execute();
-                    $paidamt = $paidamtstmt->fetch(PDO::FETCH_ASSOC);
-                    // print_r($paidamt['paid_amount']);
-
-                    // Add Amount Total
-                    $addamountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS add_amount FROM payable WHERE supplier_id='$supplier_id' AND date='$searchdate'");
-                    $addamountstmt->execute();
-                    $addamountdata = $addamountstmt->fetch(PDO::FETCH_ASSOC);
-                    $addamount = $addamountdata['add_amount'];
-
-                    // Paid Amount Total
-                    $paidamountstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE supplier_id='$supplier_id' AND paid_date='$searchdate'");
-                    $paidamountstmt->execute();
-                    $paidamountdata = $paidamountstmt->fetch(PDO::FETCH_ASSOC);
-                    $paidamount = $paidamountdata['paid_amount'];
-
-
-                    $id++;
-                    if (!empty($openingamount['closing_balance'])) {
-                      $openingamt = $openingamount['closing_balance'];
-                    }else{
-                      $openingamt = 0;
-                    }
-                    $balance =  ($openingamt + $purchaseamt['purchase_amount']) - $paidamt['paid_amount'];
-
-                    $supplier_id = $payablesupplier['supplier_id'];
-                    $supplierdata = $query->select('acname', $supplier_id, 'code_no');
-
-                  ?>
-                  <tr style="<?php if($balance == 0 && $addamount == 0 && $paidamount == 0){ echo 'display:none;'; } ?>">
-                    <td><?= $id; ?></td>
-                    <td><?= $supplierdata['ac_name']; ?></td>
-                    <td><?= $balance; ?></td>
-                    <td><?php if($addamount != 0){echo $addamount;}; ?></td>
-                    <td><?php if($paidamount != 0){echo $paidamount;}; ?></td>
-                    <td><?= ($balance + $addamount) - $paidamount; ?></td>
-                  </tr>
-                  <?php
-                  // Calculate individual balance
-                  $balance = ($openingamt + $purchaseamt['purchase_amount']) - $paidamt['paid_amount'];
-
-                  // Add individual balance to total balance
-                  $totalbalance += $balance;
-                  endforeach;
-                  // Add Amount Total
-                  $addamountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS add_amount FROM payable WHERE date='$searchdate'");
-                  $addamountstmt->execute();
-                  $addamountdata = $addamountstmt->fetch(PDO::FETCH_ASSOC);
-                  $addamount = $addamountdata['add_amount'];
-
-                  // Paid Amount Total
-                  $paidamountstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE paid_date='$searchdate'");
-                  $paidamountstmt->execute();
-                  $paidamountdata = $paidamountstmt->fetch(PDO::FETCH_ASSOC);
-                  $paidamount = $paidamountdata['paid_amount'];
-
-                  if (!empty($openingamount['closing_balance'])) {
-                    $openingamt = $openingamount['closing_balance'];
-                  }else{
-                    $openingamt = 0;
-                  }
-                  ?>
-                  <tr style="background-color: lightgreen;">
+                $openingamt = !empty($openingamount['closing_balance']) ? $openingamount['closing_balance'] : 0;
+                $balance = ($openingamt + $purchaseamt['purchase_amount']) - $paidamt['paid_amount'];
+                $supplierdata = $query->select('acname', $supplier_id, 'code_no');
+                $id++;
+              ?>
+                <tr>
+                  <td><?= $id; ?></td>
+                  <td><?= $supplierdata['ac_name']; ?></td>
+                  <td><?= $openingamt; ?></td>
+                  <td><?= $purchaseamt['purchase_amount']; ?></td>
+                  <td><?= $paidamt['paid_amount']; ?></td>
+                  <td><?= $balance; ?></td>
+                </tr>
+              <?php
+                $totalbalance += $balance;
+              endforeach; ?>
+              <tr style="background-color: lightgreen;">
                 <td>TOTAL</td>
                 <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
                 <td><?= $totalbalance; ?></td>
-                <td><?= $addamount; ?></td>
-                <td><?= $paidamount; ?></td>
-                <td><?= ($totalbalance + $addamount) - $paidamount; ?></td>
-              </tr>  
-                </table>
-                <?php
-              }else{
-                ?>
-                <div class="float-end">
-                  <b>
-                    Date :
-                    <?= date('d-m-Y'); ?>
-                  </b>
-                </div>
-                <table class="mt-3 table table-bordered table-striped rounded">
-                  <tr>
-                    <th>No</th>
-                    <th>Supplier Name</th>
-                    <th>Opening Amount</th>
-                    <th>Add Amt</th>
-                    <th>Paid Amt</th>
-                    <th>Balance</th>
-                  </tr>
-                  <?php
-                  $originalDate = date('Y-m-d');
-                  $stmt = $pdo->prepare("SELECT DISTINCT supplier_id FROM payable WHERE date='$originalDate' OR paid_date='$originalDate'");
-                  $stmt->execute();
-                  $payablesuppliers = $stmt->fetchall();
-                  $id = 0;
-                  foreach ($payablesuppliers as $payablesupplier) :
-                    $supplier_id = $payablesupplier['supplier_id'];
-                    // $date = date('Y-m-d', strtotime($originalDate . ' -1 day'));
-                    $payablestmt = $pdo->prepare("SELECT * FROM payable WHERE supplier_id='$supplier_id' AND date='$originalDate' AND paid_date<'$originalDate'");
-                    $payablestmt->execute();
-                    $payabledata = $payablestmt->fetch(PDO::FETCH_ASSOC);
+              </tr>
+            </table>
+          <?php
+          } else {
+            // Default view
+            $originalDate = date('Y-m-d');
+            $stmt = $pdo->prepare("SELECT DISTINCT supplier_id FROM payable WHERE $type_filter AND (date='$originalDate' OR paid_date='$originalDate')");
+            $stmt->execute();
+            $payablesuppliers = $stmt->fetchall();
+          ?>
+            <table class="mt-3 table table-bordered table-striped rounded">
+              <tr>
+                <th>No</th>
+                <th>Supplier Name</th>
+                <th>Opening Amount</th>
+                <th>Add Amt</th>
+                <th>Paid Amt</th>
+                <th>Balance</th>
+              </tr>
+              <?php
+              $id = 0;
+              foreach ($payablesuppliers as $payablesupplier) :
+                $supplier_id = $payablesupplier['supplier_id'];
+                $id++;
+                $openingamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE $type_filter AND supplier_id='$supplier_id' AND date<'$originalDate' ORDER BY id DESC LIMIT 1");
+                $openingamountstmt->execute();
+                $openingamount = $openingamountstmt->fetch(PDO::FETCH_ASSOC);
+                $openingamt = !empty($openingamount['closing_balance']) ? $openingamount['closing_balance'] : 0;
 
-                    $openingamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE supplier_id='$supplier_id' AND date<'$originalDate'");
-                    $openingamountstmt->execute();
-                    $openingamount = $openingamountstmt->fetch(PDO::FETCH_ASSOC);
-                    // print_r($openingamount['closing_balance']);
+                $purchaseamtstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS purchase_amount FROM payable WHERE $type_filter AND supplier_id='$supplier_id' AND date<'$originalDate'");
+                $purchaseamtstmt->execute();
+                $purchaseamt = $purchaseamtstmt->fetch(PDO::FETCH_ASSOC);
 
-                    $purchaseamtstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND date<'$originalDate'");
-                    $purchaseamtstmt->execute();
-                    $purchaseamt = $purchaseamtstmt->fetch(PDO::FETCH_ASSOC);
-                    // print_r($purchaseamt['purchase_amount']);
+                $paidamtstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE $type_filter AND supplier_id='$supplier_id' AND paid_date<'$originalDate'");
+                $paidamtstmt->execute();
+                $paidamt = $paidamtstmt->fetch(PDO::FETCH_ASSOC);
 
-                    $paidamtstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE supplier_id='$supplier_id' AND paid_date<'$originalDate'");
-                    $paidamtstmt->execute();
-                    $paidamt = $paidamtstmt->fetch(PDO::FETCH_ASSOC);
-                    // print_r($paidamt['paid_amount']);
+                $addamountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS add_amount FROM payable WHERE $type_filter AND supplier_id='$supplier_id' AND date='$originalDate'");
+                $addamountstmt->execute();
+                $addamountdata = $addamountstmt->fetch(PDO::FETCH_ASSOC);
 
-                    // Add Amount Total
-                    $addamountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS add_amount FROM payable WHERE supplier_id='$supplier_id' AND date='$originalDate'");
-                    $addamountstmt->execute();
-                    $addamountdata = $addamountstmt->fetch(PDO::FETCH_ASSOC);
-                    $addamount = $addamountdata['add_amount'];
+                $paidamountstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE $type_filter AND supplier_id='$supplier_id' AND paid_date='$originalDate'");
+                $paidamountstmt->execute();
+                $paidamountdata = $paidamountstmt->fetch(PDO::FETCH_ASSOC);
 
-                    // Paid Amount Total
-                    $paidamountstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE supplier_id='$supplier_id' AND paid_date='$originalDate'");
-                    $paidamountstmt->execute();
-                    $paidamountdata = $paidamountstmt->fetch(PDO::FETCH_ASSOC);
-                    $paidamount = $paidamountdata['paid_amount'];
-
-
-                    $id++;
-                    if (!empty($openingamount['closing_balance'])) {
-                      $openingamt = $openingamount['closing_balance'];
-                    }else{
-                      $openingamt = 0;
-                    }
-                    $balance =  ($openingamt + $purchaseamt['purchase_amount']) - $paidamt['paid_amount'];
-
-                    $supplier_id = $payablesupplier['supplier_id'];
-                    $supplierdata = $query->select('acname', $supplier_id, 'code_no');
-
-                  ?>
-                  <tr>
-                    <td><?= $id; ?></td>
-                    <td><?= $supplierdata['ac_name']; ?></td>
-                    <td><?= $balance; ?></td>
-                    <td><?= $addamount; ?></td>
-                    <td><?= $paidamount; ?></td>
-                    <td><?= ($balance + $addamount) - $paidamount; ?></td>
-                  </tr>
-                  <?php
-                  endforeach;
-                  ?>
-                </table>
-                <?php
-              }
-            ?>
-          </div>
+                $balance = ($openingamt + $purchaseamt['purchase_amount']) - $paidamt['paid_amount'];
+                $supplierdata = $query->select('acname', $supplier_id, 'code_no');
+              ?>
+                <tr>
+                  <td><?= $id; ?></td>
+                  <td><?= $supplierdata['ac_name']; ?></td>
+                  <td><?= $balance; ?></td>
+                  <td><?= $addamountdata['add_amount']; ?></td>
+                  <td><?= $paidamountdata['paid_amount']; ?></td>
+                  <td><?= ($balance + $addamountdata['add_amount']) - $paidamountdata['paid_amount']; ?></td>
+                </tr>
+              <?php endforeach; ?>
+            </table>
+          <?php } ?>
         </div>
       </div>
     </div>
-    <!-- Opening Amount Modal -->
+  </div>
+  <script>
+    function printReport() {
+      // Get dates from inputs to ensure we print what we are looking at
+      var from = document.getElementsByName('date_from')[0].value;
+      var to = document.getElementsByName('date_to')[0].value;
+      var type = "<?= $type ?>";
+      window.open(`payable_print.php?type=${type}&from=${from}&to=${to}`, '_blank');
+    }
+  </script>
+  <?php $bootstrap->javascript(); ?>
+</body>
 
-
-
-    <?php
-    $bootstrap->javascript();
-    ?>
-  </body>
 </html>
