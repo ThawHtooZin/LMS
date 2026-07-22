@@ -606,7 +606,7 @@ class Query
    * Create or update a purchase voucher and insert multiple purchase lines atomically.
    * $lines is an array of ['commodity'=>id, 'size'=>..., 'viss'=>..., 'pcs'=>..., 'price'=>...]
    */
-  function addPurchaseVoucher($date, $voucher_no, $tclfrozen, $supplier_name, $lines = [])
+  public function addPurchaseVoucher($date, $voucher_no, $tclfrozen, $supplier_name, $lines = [])
   {
     global $pdo;
     try {
@@ -616,27 +616,38 @@ class Query
       foreach ($lines as $ln) {
         $v = (float) $ln['viss'];
         $p = (float) $ln['price'];
-        $totalAmount += $v * $p;
+        $totalAmount += ($v * $p);
       }
 
-      $voucherStmt = $pdo->prepare("SELECT * FROM purchase_voucher WHERE voucher_no='$voucher_no'");
-      $voucherStmt->execute();
+      // 1. Insert or update parent purchase voucher
+      $voucherStmt = $pdo->prepare("SELECT * FROM purchase_voucher WHERE voucher_no=:v_no");
+      $voucherStmt->execute([':v_no' => $voucher_no]);
       $voucherData = $voucherStmt->fetch(PDO::FETCH_ASSOC);
 
       if (empty($voucherData)) {
-        $voucherInsert = $pdo->prepare("INSERT INTO purchase_voucher(voucher_no, date, supplier_id, tclfrozen, total_amount) VALUES('$voucher_no', '$date', '$supplier_name', '$tclfrozen', '$totalAmount')");
-        $voucherInsert->execute();
+        $voucherInsert = $pdo->prepare("INSERT INTO purchase_voucher(voucher_no, date, supplier_id, tclfrozen, total_amount) VALUES(:voucher_no, :date, :supplier_id, :tclfrozen, :total_amount)");
+        $voucherInsert->execute([
+          ':voucher_no' => $voucher_no,
+          ':date' => $date,
+          ':supplier_id' => $supplier_name,
+          ':tclfrozen' => $tclfrozen,
+          ':total_amount' => $totalAmount
+        ]);
         $purchase_voucher_id = $pdo->lastInsertId();
       } else {
         $purchase_voucher_id = $voucherData['id'];
         $newTotal = floatval($voucherData['total_amount']) + $totalAmount;
-        $voucherUpdate = $pdo->prepare("UPDATE purchase_voucher SET date='$date', supplier_id='$supplier_name', tclfrozen='$tclfrozen', total_amount='$newTotal' WHERE id='$purchase_voucher_id'");
-        $voucherUpdate->execute();
+        $voucherUpdate = $pdo->prepare("UPDATE purchase_voucher SET date=:date, supplier_id=:supplier_id, tclfrozen=:tclfrozen, total_amount=:total_amount WHERE id=:id");
+        $voucherUpdate->execute([
+          ':date' => $date,
+          ':supplier_id' => $supplier_name,
+          ':tclfrozen' => $tclfrozen,
+          ':total_amount' => $newTotal,
+          ':id' => $purchase_voucher_id
+        ]);
       }
 
-      // Insert purchase lines
-      $linkIds = [];
-      $missingTables = [];
+      // 2. Insert line items
       foreach ($lines as $ln) {
         $commodity = $ln['commodity'];
         $size = $ln['size'];
@@ -645,81 +656,78 @@ class Query
         $price = $ln['price'];
         $amount = floatval($price) * floatval($viss);
 
-        $stmt = $pdo->prepare("INSERT INTO purchase(purchase_voucher_id, commodity, size, viss, pcs, price, amount) VALUES('$purchase_voucher_id', '$commodity', '$size', '$viss', '$pcs', '$price', '$amount')");
-        $stmt->execute();
-        $lastPurchaseId = $pdo->lastInsertId();
-        $linkIds[] = $lastPurchaseId;
-
-        $kg = floatval($viss) * 1.634;
-        if ($tclfrozen === 'tcl') {
-          // only insert into form7stocktcl if the table exists
-          $chk = $pdo->prepare("SHOW TABLES LIKE 'form7stocktcl'");
-          $chk->execute();
-          if ($chk->fetch()) {
-            // check if form7stocktcl has a purchase_voucher_no column
-            $hasVoucherCol = false;
-            $colchk = $pdo->prepare("SHOW COLUMNS FROM form7stocktcl LIKE 'purchase_voucher_no'");
-            $colchk->execute();
-            if ($colchk->fetch()) {
-              $hasVoucherCol = true;
-            }
-            if ($hasVoucherCol) {
-              $formstmt = $pdo->prepare("INSERT INTO form7stocktcl(date, item_id, supplier_name, country, type, size, viss, kg, pcspervr, link_id, purchase_voucher_no) VALUES('$date', '$commodity', '$supplier_name', 'DAKA', 'TCl', '$size', '$viss', '$kg', '$pcs', '$lastPurchaseId', '$voucher_no')");
-            } else {
-              $formstmt = $pdo->prepare("INSERT INTO form7stocktcl(date, item_id, supplier_name, country, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', 'DAKA', 'TCl', '$size', '$viss', '$kg', '$pcs', '$lastPurchaseId')");
-            }
-            $formstmt->execute();
-          } else {
-            $missingTables[] = 'form7stocktcl';
-          }
-        } else {
-          // only insert into form7stock if the table exists
-          $chk2 = $pdo->prepare("SHOW TABLES LIKE 'form7stock'");
-          $chk2->execute();
-          if ($chk2->fetch()) {
-            // check if form7stock has a purchase_voucher_no column
-            $hasVoucherCol2 = false;
-            $colchk2 = $pdo->prepare("SHOW COLUMNS FROM form7stock LIKE 'purchase_voucher_no'");
-            $colchk2->execute();
-            if ($colchk2->fetch()) {
-              $hasVoucherCol2 = true;
-            }
-            if ($hasVoucherCol2) {
-              $formstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, type, size, viss, kg, pcspervr, link_id, purchase_voucher_no) VALUES('$date', '$commodity', '$supplier_name', 'Frozen', '$size', '$viss', '$kg', '$pcs', '$lastPurchaseId', '$voucher_no')");
-            } else {
-              $formstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', 'Frozen', '$size', '$viss', '$kg', '$pcs', '$lastPurchaseId')");
-            }
-            $formstmt->execute();
-          } else {
-            $missingTables[] = 'form7stock';
-          }
-        }
+        $stmt = $pdo->prepare("INSERT INTO purchase(purchase_voucher_id, commodity, size, viss, pcs, price, amount) VALUES(:pv_id, :commodity, :size, :viss, :pcs, :price, :amount)");
+        $stmt->execute([
+          ':pv_id' => $purchase_voucher_id,
+          ':commodity' => $commodity,
+          ':size' => $size,
+          ':viss' => $viss,
+          ':pcs' => $pcs,
+          ':price' => $price,
+          ':amount' => $amount
+        ]);
       }
 
-      // Update or create payable for this voucher
-      $payableStmt = $pdo->prepare("SELECT * FROM payable WHERE purchase_voucher_id='$purchase_voucher_id' ORDER BY id DESC");
-      $payableStmt->execute();
+      // 3. Update or Insert Payable Sub-ledger tracker
+      $payableStmt = $pdo->prepare("SELECT * FROM payable WHERE purchase_voucher_id=:pv_id ORDER BY id DESC");
+      $payableStmt->execute([':pv_id' => $purchase_voucher_id]);
       $payableData = $payableStmt->fetch(PDO::FETCH_ASSOC);
+
       if (!empty($payableData)) {
         $newPurchaseAmount = floatval($payableData['purchase_amount']) + $totalAmount;
         $newBalance = floatval($payableData['balance']) + $totalAmount;
-        $updatePayable = $pdo->prepare("UPDATE payable SET date='$date', supplier_id='$supplier_name', purchase_voucher_no='$voucher_no', purchase_amount='$newPurchaseAmount', balance='$newBalance' WHERE purchase_voucher_id='$purchase_voucher_id'");
-        $updatePayable->execute();
+        $updatePayable = $pdo->prepare("UPDATE payable SET date=:date, supplier_id=:supplier_id, purchase_voucher_no=:voucher_no, purchase_amount=:purchase_amount, balance=:balance WHERE purchase_voucher_id=:pv_id");
+        $updatePayable->execute([
+          ':date' => $date,
+          ':supplier_id' => $supplier_name,
+          ':voucher_no' => $voucher_no,
+          ':purchase_amount' => $newPurchaseAmount,
+          ':balance' => $newBalance,
+          ':pv_id' => $purchase_voucher_id
+        ]);
       } else {
-        // Updated to include fishormaterial
-        $payablestmt = $pdo->prepare("INSERT INTO payable(purchase_voucher_id, date, supplier_id, purchase_voucher_no, purchase_amount, balance, fishormaterial) VALUES('$purchase_voucher_id', '$date', '$supplier_name', '$voucher_no', '$totalAmount', '$totalAmount', 'fish')");
-        $payablestmt->execute();
+        $payablestmt = $pdo->prepare("INSERT INTO payable(purchase_voucher_id, date, supplier_id, purchase_voucher_no, purchase_amount, balance, fishormaterial) VALUES(:pv_id, :date, :supplier_id, :voucher_no, :purchase_amount, :balance, 'fish')");
+        $payablestmt->execute([
+          ':pv_id' => $purchase_voucher_id,
+          ':date' => $date,
+          ':supplier_id' => $supplier_name,
+          ':voucher_no' => $voucher_no,
+          ':purchase_amount' => $totalAmount,
+          ':balance' => $totalAmount
+        ]);
       }
 
+      // 4. TRUE DOUBLE-ENTRY POSTING TO GENERAL LEDGER
+      // Account Definitions: 
+      // Inventory / Purchases Account (e.g., 6100/008 or Material Purchase) -> DEBIT (Increases Asset/Expense)
+      // Supplier Account (e.g., 4000/xxx) -> CREDIT (Increases Liability - what you owe them)
+      $inventoryAccount = '6100/009';
+
+      // Post Debit Line (Inventory)
+      $glDebit = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, narration) VALUES(:date, :voucherno, :ac_code, :debit, 0, :narration)");
+      $glDebit->execute([
+        ':date' => $date,
+        ':voucherno' => $voucher_no,
+        ':ac_code' => $inventoryAccount,
+        ':debit' => $totalAmount,
+        ':narration' => 'Purchase Invoice - Inventory Entry'
+      ]);
+
+      // Post Credit Line (Supplier Payable)
+      $glCredit = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, narration) VALUES(:date, :voucherno, :ac_code, 0, :credit, :narration)");
+      $glCredit->execute([
+        ':date' => $date,
+        ':voucherno' => $voucher_no,
+        ':ac_code' => $supplier_name,
+        ':credit' => $totalAmount,
+        ':narration' => 'Purchase Invoice - Liability Entry'
+      ]);
+
       $pdo->commit();
-      echo '<script>swal("Success!", "Purchase Voucher Added Successfully", "success");</script>';
-      if (!empty($missingTables)) {
-        $missing = implode(', ', array_unique($missingTables));
-        echo '<script>swal("Warning", "Some optional stock tables are missing: ' . addslashes($missing) . '", "warning");</script>';
-      }
+      echo '<script>swal("Success!", "Purchase Voucher & Double Entry Posted Successfully", "success");</script>';
     } catch (Exception $e) {
       $pdo->rollBack();
-      echo '<script>swal("Error!", "Error when adding Purchase Voucher: ' . addslashes($e->getMessage()) . '", "error");</script>';
+      echo '<script>swal("Error!", "Error posting purchase: ' . addslashes($e->getMessage()) . '", "error");</script>';
     }
   }
 

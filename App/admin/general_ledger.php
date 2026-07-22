@@ -125,7 +125,8 @@ $query = new Query();
         });
       });
       $(window).on('load', function() {
-        <?php if ($_SERVER['REQUEST_METHOD'] != 'POST') : ?>
+        // Updated PHP condition: Only show modal if it's NOT a POST request AND fullview is NOT true
+        <?php if ($_SERVER['REQUEST_METHOD'] != 'POST' && ($_GET['fullview'] ?? '') !== 'true') : ?>
           $('#reportsmodal').modal('show');
           $('#table').hide();
         <?php endif; ?>

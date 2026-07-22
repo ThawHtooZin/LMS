@@ -610,13 +610,8 @@ CREATE TABLE `general_ledger` (
   `ac_code` varchar(25) NOT NULL,
   `debit` text NOT NULL,
   `credit` text NOT NULL,
-  `balance` text NOT NULL,
   `narration` text NOT NULL,
-  `sr_no` varchar(25) NOT NULL,
-  `container_no` varchar(25) NOT NULL,
-  `bank_charges` float NOT NULL,
-  `acid` int(11) NOT NULL,
-  `transactionid` int(11) NOT NULL
+  `sr_no` varchar(25) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -1675,31 +1670,6 @@ CREATE TABLE `total_charges` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `transaction`
---
-
-CREATE TABLE `transaction` (
-  `id` int(11) NOT NULL,
-  `date` date NOT NULL,
-  `voucher_no` varchar(44) NOT NULL,
-  `ac_code` varchar(255) NOT NULL,
-  `description` text NOT NULL,
-  `debit` text NOT NULL,
-  `credit` text NOT NULL,
-  `currency` varchar(20) NOT NULL,
-  `sr_no` varchar(25) NOT NULL,
-  `container_no` varchar(25) NOT NULL,
-  `bank_charges` float NOT NULL,
-  `status` varchar(25) NOT NULL DEFAULT 'selected'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `transaction`
---
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `truckactualinvoice`
 --
 
@@ -2197,12 +2167,6 @@ ALTER TABLE `total_charges`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `transaction`
---
-ALTER TABLE `transaction`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indexes for table `truckactualinvoice`
 --
 ALTER TABLE `truckactualinvoice`
@@ -2559,12 +2523,6 @@ ALTER TABLE `tclmcstock`
 --
 ALTER TABLE `total_charges`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
-
---
--- AUTO_INCREMENT for table `transaction`
---
-ALTER TABLE `transaction`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6147;
 
 --
 -- AUTO_INCREMENT for table `truckactualinvoice`
