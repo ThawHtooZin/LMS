@@ -65,7 +65,7 @@ CREATE TABLE `acname` (
 -- Dumping data for table `acname`
 --
 
-INSERT INTO `acname` (`id`, `code_no`, `ac_type`, `ac_name`) VALUES
+INSERT INTO `acname` (`id`, `code_no`, `ac_type`, `ac_name`) VALUES 
 (229, '3600/001', 35, 'Main Cash Kyats A/C'),
 (230, '5000/001', 36, 'Credit Sale-South Asia Food (USA) A/C'),
 (231, '5000/002', 36, 'Credit Sale-Jamuna Food (Canada) A/C'),
@@ -274,7 +274,8 @@ INSERT INTO `acname` (`id`, `code_no`, `ac_type`, `ac_name`) VALUES
 (450, '4000/Y02', 40, 'Ye Yint (TCL)'),
 (451, '7000/003', 38, 'Discount Received'),
 (452, '4000/Z06', 40, 'Zaw Win Naing (TCL)'),
-(453, '6100/009', 37, 'China Plastic A/C '),
+(453, '6100/009', 37, 'Fish Purchase'),
+(454, '6100/010', 37, 'China Plastic A/C '),
 (455, '4000/P05', 40, 'Phoe Zaw'),
 (456, '3600/003', 35, 'Transit Account'),
 (457, '3200/001', 34, 'Computer, Printer & Projector'),
