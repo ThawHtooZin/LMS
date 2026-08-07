@@ -16,7 +16,6 @@ if ($purchase_id === 0) {
     exit;
 }
 
-// Fetch Existing Header
 $stmt = $pdo->prepare("SELECT * FROM purchases WHERE id = ?");
 $stmt->execute([$purchase_id]);
 $purchase = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -26,12 +25,10 @@ if (!$purchase) {
     exit;
 }
 
-// Fetch Existing Lines
 $line_stmt = $pdo->prepare("SELECT * FROM purchase_lines WHERE purchase_id = ?");
 $line_stmt->execute([$purchase_id]);
 $existing_lines = $line_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Handle Form Submissions (Updates & Deletes)
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
     $action_type = $_POST['action_type'];
 
@@ -42,18 +39,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
 
     $contact_id = $_POST['contact_id'];
     $date = $_POST['date'];
+    $tclfrozen = $_POST['tclfrozen'];
     $due_date = !empty($_POST['due_date']) ? $_POST['due_date'] : NULL;
     $voucher_no = $_POST['voucher_no'];
     $currency = $_POST['currency'];
 
-    // Maintain current status unless specifically approving
     $status = $purchase['status'];
     if (in_array($action_type, ['submit_approval'])) {
         $status = 'AWAITING_APPROVAL';
     } elseif (in_array($action_type, ['approve', 'approve_add_another'])) {
         $status = 'AUTHORISED';
     } elseif (in_array($action_type, ['save_draft', 'save_continue', 'save_add_another'])) {
-        // If it was already approved but they clicked "Save as Draft", revert it
         $status = 'DRAFT';
     }
 
@@ -61,18 +57,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
     $lines = [];
     if (isset($_POST['account_code'])) {
         for ($i = 0; $i < count($_POST['account_code']); $i++) {
-            $qty = floatval($_POST['quantity'][$i]);
+            $viss = floatval($_POST['viss'][$i]);
             $price = floatval($_POST['unit_price'][$i]);
             $acc = $_POST['account_code'][$i];
 
-            if (!empty($acc) && $qty > 0) {
-                $line_total = $qty * $price;
+            if (!empty($acc) && $viss > 0) {
+                $line_total = $viss * $price;
                 $subtotal += $line_total;
                 $lines[] = [
                     'product_id' => !empty($_POST['product_id'][$i]) ? $_POST['product_id'][$i] : NULL,
                     'account_id' => $acc,
                     'description' => $_POST['description'][$i],
-                    'quantity' => $qty,
+                    'size' => $_POST['size'][$i],
+                    'viss' => $viss,
+                    'pcs' => intval($_POST['pcs'][$i]),
                     'unit_price' => $price,
                     'line_amount' => $line_total
                 ];
@@ -84,10 +82,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
     if ($action_type == 'save_continue') $ctrl_action = 'continue_editing';
     if ($action_type == 'save_add_another' || $action_type == 'approve_add_another') $ctrl_action = 'add_another';
 
-    $query->savePurchase($purchase_id, $contact_id, $date, $due_date, $voucher_no, $currency, $status, $subtotal, $subtotal, $lines, $ctrl_action);
+    $query->savePurchase($purchase_id, $contact_id, $date, $tclfrozen, $due_date, $voucher_no, $currency, $status, $subtotal, $subtotal, $lines, $ctrl_action);
 }
 
-// Data Fetching for UI
 $suppliers = $pdo->query("SELECT id, name FROM contacts WHERE is_supplier = 1 ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
 $products = $pdo->query("SELECT id, code, name, purchase_account FROM products WHERE is_purchased = 1 ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
 $currencies = $pdo->query("SELECT code, name FROM system_currencies ORDER BY code ASC")->fetchAll(PDO::FETCH_ASSOC);
@@ -163,7 +160,6 @@ foreach ($accounts as $acc) {
             margin-bottom: 20px;
         }
 
-        /* Dropdown button styling */
         .btn-group .btn-main {
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
@@ -229,6 +225,13 @@ foreach ($accounts as $acc) {
                             <input type="date" name="date" class="form-control" value="<?php echo htmlspecialchars($purchase['date']); ?>" required>
                         </div>
                         <div class="col-md-2">
+                            <label class="fw-bold small mb-1">Type</label>
+                            <select name="tclfrozen" class="form-select form-select-sm" style="height: 38px;">
+                                <option value="Frozen" <?php echo ($purchase['tclfrozen'] == 'Frozen') ? 'selected' : ''; ?>>Frozen</option>
+                                <option value="tcl" <?php echo ($purchase['tclfrozen'] == 'tcl') ? 'selected' : ''; ?>>TCL</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
                             <label class="fw-bold small mb-1">Due Date</label>
                             <input type="date" name="due_date" class="form-control" value="<?php echo htmlspecialchars($purchase['due_date']); ?>">
                         </div>
@@ -252,11 +255,13 @@ foreach ($accounts as $acc) {
                     <table class="table table-borderless table-lines" id="linesTable">
                         <thead>
                             <tr>
-                                <th width="20%">Item</th>
-                                <th width="25%">Description</th>
-                                <th width="10%">Qty</th>
+                                <th width="15%">Item</th>
+                                <th width="15%">Description</th>
+                                <th width="10%">Size</th>
+                                <th width="10%">Viss</th>
+                                <th width="10%">Pcs</th>
                                 <th width="15%">Unit Price</th>
-                                <th width="20%">Account</th>
+                                <th width="15%">Account</th>
                                 <th width="10%" class="text-end">Amount</th>
                             </tr>
                         </thead>
@@ -272,7 +277,9 @@ foreach ($accounts as $acc) {
                                         </select>
                                     </td>
                                     <td><input type="text" name="description[]" value="<?php echo htmlspecialchars($line['description']); ?>"></td>
-                                    <td><input type="number" name="quantity[]" step="0.01" class="calc-input qty-input" value="<?php echo htmlspecialchars($line['quantity']); ?>"></td>
+                                    <td><input type="text" name="size[]" value="<?php echo htmlspecialchars($line['size']); ?>"></td>
+                                    <td><input type="number" name="viss[]" step="0.01" class="calc-input viss-input" value="<?php echo htmlspecialchars($line['viss']); ?>"></td>
+                                    <td><input type="number" name="pcs[]" class="calc-input pcs-input" value="<?php echo htmlspecialchars($line['pcs']); ?>"></td>
                                     <td><input type="number" name="unit_price[]" step="0.01" class="calc-input price-input" value="<?php echo htmlspecialchars($line['unit_price']); ?>"></td>
                                     <td>
                                         <select name="account_code[]" class="form-control chosen-select acc-select">
@@ -333,13 +340,11 @@ foreach ($accounts as $acc) {
                             <a href="purchase.php" class="btn btn-secondary">Cancel</a>
                         </div>
                     </div>
-
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Hidden templates for dynamically adding lines -->
     <select id="accTpl" style="display:none;">
         <option value="">- Account -</option>
         <?php foreach ($grouped_accs as $class => $accs): ?>
@@ -357,6 +362,7 @@ foreach ($accounts as $acc) {
         <?php endforeach; ?>
     </select>
 
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <?php $bootstrap->javascript(); ?>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
     <script>
@@ -368,11 +374,10 @@ foreach ($accounts as $acc) {
                 search_contains: true
             });
 
-            // If the bill has no lines, add a blank one
             if ($('#linesBody tr').length === 0) {
                 addNewLine();
             } else {
-                calcTotals(); // Initial calculation for loaded data
+                calcTotals();
             }
 
             $('#addLineBtn').click(addNewLine);
@@ -393,7 +398,9 @@ foreach ($accounts as $acc) {
                 <tr>
                     <td><select name="product_id[]" class="form-control chosen-select prod-select">${$('#prodTpl').html()}</select></td>
                     <td><input type="text" name="description[]"></td>
-                    <td><input type="number" name="quantity[]" step="0.01" class="calc-input qty-input"></td>
+                    <td><input type="text" name="size[]" placeholder="e.g. 1up"></td>
+                    <td><input type="number" name="viss[]" step="0.01" class="calc-input viss-input"></td>
+                    <td><input type="number" name="pcs[]" class="calc-input pcs-input"></td>
                     <td><input type="number" name="unit_price[]" step="0.01" class="calc-input price-input"></td>
                     <td><select name="account_code[]" class="form-control chosen-select acc-select">${$('#accTpl').html()}</select></td>
                     <td class="line-total text-end">0.00</td>
@@ -409,9 +416,9 @@ foreach ($accounts as $acc) {
         function calcTotals() {
             let total = 0;
             $('#linesBody tr').each(function() {
-                let q = parseFloat($(this).find('.qty-input').val()) || 0;
+                let v = parseFloat($(this).find('.viss-input').val()) || 0;
                 let p = parseFloat($(this).find('.price-input').val()) || 0;
-                let t = q * p;
+                let t = v * p;
                 $(this).find('.line-total').text(t.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2

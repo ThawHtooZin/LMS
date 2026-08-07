@@ -578,16 +578,16 @@ class Query
   }
 
   // ==========================================
-  // PURCHASE BILLS
+  // PURCHASE BILLS & HYBRID STOCK SYNC
   // ==========================================
 
-  public function savePurchase($id, $contact_id, $date, $due_date, $voucher_no, $currency, $status, $subtotal, $grand_total, $lines, $action_type)
+  public function savePurchase($id, $contact_id, $date, $tclfrozen, $due_date, $voucher_no, $currency, $status, $subtotal, $grand_total, $lines, $action_type)
   {
     global $pdo;
     try {
       $pdo->beginTransaction();
 
-      // Fetch active exchange rate
+      // 1. Fetch active exchange rate
       $ex_rate = 1.0000;
       if ($currency !== 'MMK') {
         $stmt = $pdo->prepare("SELECT rate FROM exchange_rates WHERE currency_code = ? AND effective_date <= ? ORDER BY effective_date DESC LIMIT 1");
@@ -598,40 +598,83 @@ class Query
         }
       }
 
+      // 2. Fetch Supplier Name for legacy table requirements
+      $supStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ?");
+      $supStmt->execute([$contact_id]);
+      $supplier_name = $supStmt->fetchColumn();
+
       if (empty($id)) {
         // INSERT NEW
-        $stmt = $pdo->prepare("INSERT INTO purchases (voucher_no, contact_id, date, due_date, currency, exchange_rate, status, subtotal, grand_total) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$voucher_no, $contact_id, $date, $due_date, $currency, $ex_rate, $status, $subtotal, $grand_total]);
+        $stmt = $pdo->prepare("INSERT INTO purchases (voucher_no, contact_id, date, tclfrozen, due_date, currency, exchange_rate, status, subtotal, grand_total) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$voucher_no, $contact_id, $date, $tclfrozen, $due_date, $currency, $ex_rate, $status, $subtotal, $grand_total]);
         $purchase_id = $pdo->lastInsertId();
       } else {
         // UPDATE EXISTING
         $purchase_id = $id;
-        $stmt = $pdo->prepare("UPDATE purchases SET voucher_no=?, contact_id=?, date=?, due_date=?, currency=?, exchange_rate=?, status=?, subtotal=?, grand_total=? WHERE id=?");
-        $stmt->execute([$voucher_no, $contact_id, $date, $due_date, $currency, $ex_rate, $status, $subtotal, $grand_total, $purchase_id]);
+        $stmt = $pdo->prepare("UPDATE purchases SET voucher_no=?, contact_id=?, date=?, tclfrozen=?, due_date=?, currency=?, exchange_rate=?, status=?, subtotal=?, grand_total=? WHERE id=?");
+        $stmt->execute([$voucher_no, $contact_id, $date, $tclfrozen, $due_date, $currency, $ex_rate, $status, $subtotal, $grand_total, $purchase_id]);
+
+        // Clear old stock records first by looking up the old line IDs
+        $pdo->prepare("DELETE FROM form7stocktcl WHERE link_id IN (SELECT id FROM purchase_lines WHERE purchase_id = ?)")->execute([$purchase_id]);
+        $pdo->prepare("DELETE FROM form7stock WHERE link_id IN (SELECT id FROM purchase_lines WHERE purchase_id = ?)")->execute([$purchase_id]);
 
         // Clear old lines before re-inserting
         $del_lines = $pdo->prepare("DELETE FROM purchase_lines WHERE purchase_id = ?");
         $del_lines->execute([$purchase_id]);
       }
 
-      // Insert Line Items
-      $line_stmt = $pdo->prepare("INSERT INTO purchase_lines (purchase_id, product_id, account_id, description, quantity, unit_price, line_amount) VALUES (?, ?, ?, ?, ?, ?, ?)");
+      // 3. Insert Line Items & Sync to Stock Ledgers
+      $line_stmt = $pdo->prepare("INSERT INTO purchase_lines (purchase_id, product_id, account_id, description, size, viss, pcs, unit_price, line_amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
       foreach ($lines as $line) {
         $prod_id = !empty($line['product_id']) ? $line['product_id'] : NULL;
+
         $line_stmt->execute([
           $purchase_id,
           $prod_id,
           $line['account_id'],
           $line['description'],
-          $line['quantity'],
+          $line['size'],
+          $line['viss'],
+          $line['pcs'],
           $line['unit_price'],
           $line['line_amount']
         ]);
+        $link_id = $pdo->lastInsertId();
+
+        $kg = floatval($line['viss']) * 1.634;
+
+        // Physical Stock Routing
+        if ($tclfrozen === 'tcl') {
+          $formstmt = $pdo->prepare("INSERT INTO form7stocktcl (date, item_id, supplier_name, country, type, size, viss, kg, pcspervr, link_id, purchase_voucher_no) VALUES (?, ?, ?, 'DAKA', 'TCl', ?, ?, ?, ?, ?, ?)");
+          $formstmt->execute([$date, $prod_id, $supplier_name, $line['size'], $line['viss'], $kg, $line['pcs'], $link_id, $voucher_no]);
+        } else {
+          $formstmt = $pdo->prepare("INSERT INTO form7stock (date, item_id, supplier_name, type, size, viss, kg, pcspervr, link_id, purchase_voucher_no) VALUES (?, ?, ?, 'Frozen', ?, ?, ?, ?, ?, ?)");
+          $formstmt->execute([$date, $prod_id, $supplier_name, $line['size'], $line['viss'], $kg, $line['pcs'], $link_id, $voucher_no]);
+        }
+      }
+
+      // 4. Update Payable Ledger
+      $payableStmt = $pdo->prepare("SELECT purchase_amount, balance FROM payable WHERE purchase_voucher_id = ?");
+      $payableStmt->execute([$purchase_id]);
+      $payableRow = $payableStmt->fetch(PDO::FETCH_ASSOC);
+
+      if ($payableRow) {
+        $oldPurchaseAmt = floatval($payableRow['purchase_amount']);
+        $oldBalance = floatval($payableRow['balance']);
+        $diff = $grand_total - $oldPurchaseAmt;
+        $newBalance = $oldBalance + $diff;
+
+        $updPayable = $pdo->prepare("UPDATE payable SET date=?, supplier_id=?, purchase_voucher_no=?, purchase_amount=?, balance=? WHERE purchase_voucher_id=?");
+        $updPayable->execute([$date, $supplier_name, $voucher_no, $grand_total, $newBalance, $purchase_id]);
+      } else {
+        $insPayable = $pdo->prepare("INSERT INTO payable (purchase_voucher_id, date, supplier_id, purchase_voucher_no, purchase_amount, balance, fishormaterial) VALUES (?, ?, ?, ?, ?, ?, 'fish')");
+        $insPayable->execute([$purchase_id, $date, $supplier_name, $voucher_no, $grand_total, $grand_total]);
       }
 
       $pdo->commit();
 
-      // Handle Redirections based on the button clicked
+      // 5. Handle Redirections
       $msg = ($status == 'DRAFT') ? 'Draft saved successfully' : 'Bill approved successfully';
 
       if ($action_type == 'continue_editing') {
@@ -645,7 +688,7 @@ class Query
       echo "<script>alert('$msg'); window.location.href='$redirect';</script>";
     } catch (Exception $e) {
       $pdo->rollBack();
-      echo "<script>alert('Failed to save bill. Reference might be a duplicate.');</script>";
+      echo "<script>alert('Failed to save bill. Error: " . addslashes($e->getMessage()) . "');</script>";
     }
   }
 
@@ -654,11 +697,19 @@ class Query
     global $pdo;
     try {
       $pdo->beginTransaction();
-      $stmt = $pdo->prepare("DELETE FROM purchase_lines WHERE purchase_id = ?");
-      $stmt->execute([$id]);
 
-      $stmt2 = $pdo->prepare("DELETE FROM purchases WHERE id = ?");
-      $stmt2->execute([$id]);
+      // 1. Delete from stock ledgers using the line IDs
+      $pdo->prepare("DELETE FROM form7stocktcl WHERE link_id IN (SELECT id FROM purchase_lines WHERE purchase_id = ?)")->execute([$id]);
+      $pdo->prepare("DELETE FROM form7stock WHERE link_id IN (SELECT id FROM purchase_lines WHERE purchase_id = ?)")->execute([$id]);
+
+      // 2. Delete from Payable Ledger
+      $pdo->prepare("DELETE FROM payable WHERE purchase_voucher_id = ?")->execute([$id]);
+
+      // 3. Delete Purchase Lines
+      $pdo->prepare("DELETE FROM purchase_lines WHERE purchase_id = ?")->execute([$id]);
+
+      // 4. Delete Header
+      $pdo->prepare("DELETE FROM purchases WHERE id = ?")->execute([$id]);
 
       $pdo->commit();
 
@@ -666,18 +717,6 @@ class Query
     } catch (Exception $e) {
       $pdo->rollBack();
       echo "<script>alert('Failed to delete bill.');</script>";
-    }
-  }
-
-  function deletepayable($table, $deleteid)
-  {
-    global $pdo;
-    $stmt = $pdo->prepare("DELETE FROM $table WHERE id='$deleteid' OR purchase_voucher_id='$deleteid' OR link_id='$deleteid'");
-    $stmt->execute();
-    if ($stmt) {
-      return $successmessage = "Payable Voucher Deleted Successfully";
-    } else {
-      return $errmessage = "Error accors when deleted Payable Voucher";
     }
   }
 

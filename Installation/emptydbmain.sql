@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 27, 2026 at 06:20 AM
+-- Generation Time: Aug 07, 2026 at 05:11 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -237,6 +237,13 @@ CREATE TABLE `contacts` (
   `is_customer` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `contacts`
+--
+
+INSERT INTO `contacts` (`id`, `name`, `email`, `phone`, `address`, `is_supplier`, `is_customer`) VALUES
+(0, 'Tommy', '', '', '', 1, 0);
+
 -- --------------------------------------------------------
 
 --
@@ -253,18 +260,22 @@ CREATE TABLE `container` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `currency`
+-- Table structure for table `exchange_rates`
 --
 
-CREATE TABLE `currency` (
+CREATE TABLE `exchange_rates` (
   `id` int(11) NOT NULL,
-  `dollar_rate` double NOT NULL,
-  `debitorcredit` varchar(255) NOT NULL,
-  `mmk_amount` text NOT NULL,
-  `usd_amount` text NOT NULL,
-  `voucher_no` varchar(255) NOT NULL,
-  `transactionid` int(11) NOT NULL
+  `currency_code` varchar(10) NOT NULL,
+  `rate` decimal(15,4) NOT NULL,
+  `effective_date` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `exchange_rates`
+--
+
+INSERT INTO `exchange_rates` (`id`, `currency_code`, `rate`, `effective_date`) VALUES
+(1, 'USD', 4500.0000, '2026-07-27');
 
 -- --------------------------------------------------------
 
@@ -882,7 +893,7 @@ CREATE TABLE `permission` (
 --
 
 INSERT INTO `permission` (`id`, `role_id`, `permission`) VALUES
-(1, 1, 'manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_acpayable,manage_accountreceivable,manage_transaction,manage_general_ledger,manage_contacts,manage_coldstoreitem,manage_products,manage_coa,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,sale_report,purchase_report,payable_report,manage_mcreport,manage_tclmcstock,manage_material_purchase,material_store_house,material_gatepass,packing_material_report,manage_product_types'),
+(1, 1, 'manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_accountpayable,manage_acpayable,manage_accountreceivable,manage_transaction,manage_general_ledger,manage_ledger_record,manage_contacts,manage_products,manage_product_types,manage_currency,manage_coa,manage_coldstoreitem,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,sale_report,purchase_report,payable_report,manage_mcreport,manage_tclmcstock,manage_generalledger,manage_material_purchase,material_store_house,material_gatepass,configuration_coldstore,packing_material_report,temp_pm_stock'),
 (2, 2, ',manage_products,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_mcreport,manage_tclmcstock'),
 (3, 3, ',manage_coldstoreitem,manage_coldstorecharges,manage_shippmentexport,manage_truckexport'),
 (4, 4, ',manage_purchase,manage_cashbook,manage_acpayable,manage_accountreceivable,manage_transaction,manage_general_ledger,manage_contacts,manage_coldstoreitem,manage_products,manage_coa,manage_unit,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,sale_report,purchase_report,payable_report,manage_mcreport,manage_tclmcstock'),
@@ -928,6 +939,14 @@ CREATE TABLE `products` (
   `sales_account` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `products`
+--
+
+INSERT INTO `products` (`id`, `code`, `name`, `description`, `type_id`, `unit`, `is_purchased`, `purchase_account`, `is_sold`, `sales_account`) VALUES
+(1, 'h001', 'HILSA', 'Fish here can be tested anytime', 1, '', 1, '5000', 1, '200'),
+(2, 'r001', 'rohu', 'This fish is rly good taste ngl', 1, '', 1, '5000', 1, '200');
+
 -- --------------------------------------------------------
 
 --
@@ -955,13 +974,25 @@ INSERT INTO `product_types` (`id`, `name`) VALUES
 
 CREATE TABLE `purchases` (
   `id` int(11) NOT NULL,
+  `voucher_no` varchar(255) NOT NULL,
   `contact_id` int(11) NOT NULL,
   `date` date NOT NULL,
+  `tclfrozen` varchar(20) NOT NULL DEFAULT 'Frozen',
   `due_date` date DEFAULT NULL,
-  `reference` varchar(255) DEFAULT NULL,
-  `status` varchar(50) NOT NULL DEFAULT 'DRAFT',
-  `total_amount` decimal(15,2) NOT NULL DEFAULT 0.00
+  `currency` varchar(10) NOT NULL DEFAULT 'MMK',
+  `exchange_rate` decimal(15,4) NOT NULL DEFAULT 1.0000,
+  `status` enum('DRAFT','AWAITING_APPROVAL','AUTHORISED','PAID','VOIDED') NOT NULL DEFAULT 'DRAFT',
+  `subtotal` decimal(15,2) NOT NULL DEFAULT 0.00,
+  `grand_total` decimal(15,2) NOT NULL DEFAULT 0.00,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `purchases`
+--
+
+INSERT INTO `purchases` (`id`, `voucher_no`, `contact_id`, `date`, `tclfrozen`, `due_date`, `currency`, `exchange_rate`, `status`, `subtotal`, `grand_total`, `created_at`) VALUES
+(1, 'Dr 24/Feb111', 0, '2026-07-27', 'Frozen', NULL, 'MMK', 1.0000, 'DRAFT', 550000.00, 550000.00, '2026-07-27 11:19:37');
 
 -- --------------------------------------------------------
 
@@ -972,12 +1003,23 @@ CREATE TABLE `purchases` (
 CREATE TABLE `purchase_lines` (
   `id` int(11) NOT NULL,
   `purchase_id` int(11) NOT NULL,
+  `product_id` int(11) DEFAULT NULL,
   `account_id` int(11) NOT NULL,
-  `description` text NOT NULL,
-  `quantity` decimal(10,2) NOT NULL DEFAULT 1.00,
+  `description` text DEFAULT NULL,
+  `size` varchar(50) NOT NULL,
+  `viss` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `pcs` int(11) NOT NULL DEFAULT 0,
   `unit_price` decimal(15,2) NOT NULL DEFAULT 0.00,
   `line_amount` decimal(15,2) NOT NULL DEFAULT 0.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `purchase_lines`
+--
+
+INSERT INTO `purchase_lines` (`id`, `purchase_id`, `product_id`, `account_id`, `description`, `size`, `viss`, `pcs`, `unit_price`, `line_amount`) VALUES
+(1, 1, 1, 3, 'Big fat hilsa', '', 0.00, 0, 2000.00, 50000.00),
+(2, 1, 2, 3, 'RLY BIG FISH', '', 0.00, 0, 10000.00, 500000.00);
 
 -- --------------------------------------------------------
 
@@ -1075,6 +1117,25 @@ CREATE TABLE `stock_output_group` (
   `material_id` varchar(255) DEFAULT NULL,
   `quantity` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `system_currencies`
+--
+
+CREATE TABLE `system_currencies` (
+  `id` int(11) NOT NULL,
+  `code` varchar(10) NOT NULL,
+  `name` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `system_currencies`
+--
+
+INSERT INTO `system_currencies` (`id`, `code`, `name`) VALUES
+(1, 'USD', 'US Dollar');
 
 -- --------------------------------------------------------
 
@@ -1326,6 +1387,13 @@ ALTER TABLE `accounts`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `exchange_rates`
+--
+ALTER TABLE `exchange_rates`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uniq_rate_date` (`currency_code`,`effective_date`);
+
+--
 -- Indexes for table `products`
 --
 ALTER TABLE `products`
@@ -1339,6 +1407,30 @@ ALTER TABLE `product_types`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `purchases`
+--
+ALTER TABLE `purchases`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uniq_voucher` (`voucher_no`),
+  ADD KEY `fk_purchases_contact` (`contact_id`);
+
+--
+-- Indexes for table `purchase_lines`
+--
+ALTER TABLE `purchase_lines`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_pl_purchase` (`purchase_id`),
+  ADD KEY `fk_pl_product` (`product_id`),
+  ADD KEY `fk_pl_account` (`account_id`);
+
+--
+-- Indexes for table `system_currencies`
+--
+ALTER TABLE `system_currencies`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uniq_currency_code` (`code`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -1349,15 +1441,39 @@ ALTER TABLE `accodes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
+-- AUTO_INCREMENT for table `exchange_rates`
+--
+ALTER TABLE `exchange_rates`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `product_types`
 --
 ALTER TABLE `product_types`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `purchases`
+--
+ALTER TABLE `purchases`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `purchase_lines`
+--
+ALTER TABLE `purchase_lines`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `system_currencies`
+--
+ALTER TABLE `system_currencies`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;
 
