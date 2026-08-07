@@ -37,6 +37,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
         exit;
     }
 
+    if ($action_type == 'void') {
+        $query->voidPurchase($purchase_id);
+        exit;
+    }
+
     $contact_id = $_POST['contact_id'];
     $date = $_POST['date'];
     $tclfrozen = $_POST['tclfrozen'];
@@ -197,16 +202,20 @@ foreach ($accounts as $acc) {
                         <div>
                             <?php echo ucfirst(strtolower(str_replace('_', ' ', $purchase['status']))); ?>
                         </div>
-                        <div>
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-outline-secondary btn-sm fw-bold">Print PDF</button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold ms-2" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Bill Options
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item text-danger" onclick="if(confirm('Are you sure you want to delete this bill?')){ submitForm('delete'); }"><i class="bi bi-trash"></i> Delete</a></li>
-                                </ul>
-                            </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-outline-secondary btn-sm fw-bold">Print PDF</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold ms-2" data-bs-toggle="dropdown" aria-expanded="false">
+                                Bill Options
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <?php if ($purchase['status'] === 'DRAFT' || $purchase['status'] === 'AWAITING_APPROVAL'): ?>
+                                    <li><a class="dropdown-item text-danger" onclick="if(confirm('Are you sure you want to delete this draft?')){ submitForm('delete'); }"><i class="bi bi-trash"></i> Delete</a></li>
+                                <?php elseif ($purchase['status'] === 'AUTHORISED'): ?>
+                                    <li><a class="dropdown-item text-warning" onclick="if(confirm('Are you sure you want to void this approved bill?')){ submitForm('void'); }"><i class="bi bi-x-circle"></i> Void</a></li>
+                                <?php elseif ($purchase['status'] === 'PAID'): ?>
+                                    <li><span class="dropdown-item text-muted"><i class="bi bi-lock"></i> Locked (Payment Applied)</span></li>
+                                <?php endif; ?>
+                            </ul>
                         </div>
                     </div>
 
