@@ -176,8 +176,6 @@ $bootstrap->css();
   </div>
   <!-- Opening Amount Modal -->
 
-
-
   <?php
   $bootstrap->javascript();
   ?>

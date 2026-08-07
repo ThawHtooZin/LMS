@@ -116,12 +116,11 @@ $bootstrap->css();
             </tr>
             <?php
             $idd = 0;
-            $running_balance = 0; // 1. Initialize our clean running total
+            $running_balance = 0; // Fix: Initialize running balance properly
 
             foreach ($payabledatas as $payabledata) {
               $purchase_voucher_no = $payabledata['purchase_voucher_no'];
 
-              // 2. Get the purchase amount for this specific voucher
               $totalpurchaseamountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS total_purchase_amount FROM payable WHERE supplier_id='$supplier_id' AND purchase_voucher_no='$purchase_voucher_no'ORDER BY
                 CASE
                     WHEN date = '0000-00-00' THEN paid_date
@@ -131,20 +130,14 @@ $bootstrap->css();
               $totalpurchaseamountstmt->execute();
               $totalpurchaseamount = $totalpurchaseamountstmt->fetch(PDO::FETCH_ASSOC);
 
-              // 3. Add to our running balance safely
+              // Fix: Calculate running balance safely
               if ($payabledata['purchase_voucher_no'] == '') {
-                // If it's the opening balance row, add the closing balance
                 $totalpurchaseamount['total_purchase_amount'] = 0;
                 $running_balance += floatval($payabledata['closing_balance']);
               } else {
-                // If it's a regular voucher, add the purchase amount
                 $running_balance += floatval($totalpurchaseamount['total_purchase_amount']);
               }
-
-              // 4. Subtract any payments made on this line
               $running_balance -= floatval($payabledata['paid_amount']);
-
-              // 5. Pass the final number to your HTML variable
               $thebalanceamount = $running_balance;
 
               $idd++;

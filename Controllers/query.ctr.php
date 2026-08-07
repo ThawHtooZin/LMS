@@ -123,6 +123,18 @@ class Query
     return $stmt->fetchColumn() > 0;
   }
 
+  /**
+   * Fetch the dynamic account code linked to a specific system tag.
+   */
+  public function getAccountCodeByTag($system_tag)
+  {
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT code_no FROM acname WHERE system_tag = :tag LIMIT 1");
+    $stmt->execute([':tag' => $system_tag]);
+    $code = $stmt->fetchColumn();
+    return $code ? $code : false;
+  }
+
   function createaccount($table, $username, $password, $email, $role)
   {
     global $pdo;
@@ -317,6 +329,165 @@ class Query
       return $errmessage = "Error accors when deleted Category";
     }
   }
+
+  // ==========================================
+  // PRODUCT TYPES
+  // ==========================================
+
+  public function addproducttype($name)
+  {
+    global $pdo;
+    $check = $pdo->prepare("SELECT * FROM product_types WHERE name = ?");
+    $check->execute([$name]);
+    if ($check->rowCount() > 0) {
+      echo "<script>swal('Error', 'Product type already exists!', 'error');</script>";
+      return;
+    }
+    $stmt = $pdo->prepare("INSERT INTO product_types (name) VALUES (?)");
+    if ($stmt->execute([$name])) {
+      echo "<script>swal('Success', 'Product Type added successfully', 'success').then(() => { window.location.href=window.location.href; });</script>";
+    }
+  }
+
+  public function updateproducttype($id, $name)
+  {
+    global $pdo;
+    $check = $pdo->prepare("SELECT * FROM product_types WHERE name = ? AND id != ?");
+    $check->execute([$name, $id]);
+    if ($check->rowCount() > 0) {
+      echo "<script>swal('Error', 'Product type already exists!', 'error');</script>";
+      return;
+    }
+    $stmt = $pdo->prepare("UPDATE product_types SET name=? WHERE id=?");
+    if ($stmt->execute([$name, $id])) {
+      echo "<script>swal('Success', 'Product Type updated successfully', 'success').then(() => { window.location.href=window.location.href; });</script>";
+    }
+  }
+
+  public function deleteproducttype($id)
+  {
+    global $pdo;
+    try {
+      $stmt = $pdo->prepare("DELETE FROM product_types WHERE id = ?");
+      $stmt->execute([$id]);
+      echo "<script>swal('Success', 'Product Type deleted successfully', 'success').then(() => { window.location.href=window.location.href; });</script>";
+    } catch (PDOException $e) {
+      echo "<script>swal('Action Denied', 'Cannot delete this type because products are currently assigned to it.', 'error');</script>";
+    }
+  }
+
+  // ==========================================
+  // CURRENCY MANAGEMENT
+  // ==========================================
+
+  public function addSystemCurrency($code, $name)
+  {
+    global $pdo;
+    $check = $pdo->prepare("SELECT * FROM system_currencies WHERE code = ?");
+    $check->execute([$code]);
+
+    if ($check->rowCount() > 0) {
+      echo "<script>swal('Error', 'Currency already added!', 'error');</script>";
+      return;
+    }
+
+    $stmt = $pdo->prepare("INSERT INTO system_currencies (code, name) VALUES (?, ?)");
+    if ($stmt->execute([$code, $name])) {
+      echo "<script>swal('Success', 'Currency added successfully', 'success').then(() => { window.location.href=window.location.href; });</script>";
+    }
+  }
+
+  public function saveDailyRates($date, $rates)
+  {
+    global $pdo;
+
+    foreach ($rates as $code => $rate_value) {
+      if ($rate_value === '' || $rate_value === null) continue; // Skip empty inputs
+
+      // Upsert logic (Insert if not exists, update if exists)
+      $check = $pdo->prepare("SELECT id FROM exchange_rates WHERE currency_code = ? AND effective_date = ?");
+      $check->execute([$code, $date]);
+
+      if ($check->rowCount() > 0) {
+        $stmt = $pdo->prepare("UPDATE exchange_rates SET rate = ? WHERE currency_code = ? AND effective_date = ?");
+        $stmt->execute([$rate_value, $code, $date]);
+      } else {
+        $stmt = $pdo->prepare("INSERT INTO exchange_rates (currency_code, rate, effective_date) VALUES (?, ?, ?)");
+        $stmt->execute([$code, $rate_value, $date]);
+      }
+    }
+    echo "<script>swal('Success', 'Exchange rates saved for " . date('d M Y', strtotime($date)) . "', 'success').then(() => { window.location.href='currency.php?date=" . $date . "'; });</script>";
+  }
+
+  public function deleteSystemCurrency($code)
+  {
+    global $pdo;
+
+    // Delete the currency from the active list
+    $stmt = $pdo->prepare("DELETE FROM system_currencies WHERE code = ?");
+    if ($stmt->execute([$code])) {
+      // Clean up the historical rates for this currency so they don't bloat the database
+      $clean = $pdo->prepare("DELETE FROM exchange_rates WHERE currency_code = ?");
+      $clean->execute([$code]);
+
+      echo "<script>swal('Success', 'Currency deleted successfully', 'success').then(() => { window.location.href=window.location.href; });</script>";
+    }
+  }
+
+  // ==========================================
+  // UNIFIED PRODUCTS & SERVICES
+  // ==========================================
+
+  public function addproduct($code, $name, $description, $type_id, $unit, $is_purchased, $purchase_account, $is_sold, $sales_account)
+  {
+    global $pdo;
+
+    $check = $pdo->prepare("SELECT * FROM products WHERE code = ?");
+    $check->execute([$code]);
+    if ($check->rowCount() > 0) {
+      echo "<script>swal('Error', 'Product code already exists!', 'error');</script>";
+      return;
+    }
+
+    $stmt = $pdo->prepare("INSERT INTO products (code, name, description, type_id, unit, is_purchased, purchase_account, is_sold, sales_account) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    if ($stmt->execute([$code, $name, $description, $type_id, $unit, $is_purchased, $purchase_account, $is_sold, $sales_account])) {
+      echo "<script>swal('Success', 'Product added successfully', 'success').then(() => { window.location.href=window.location.href; });</script>";
+    } else {
+      echo "<script>swal('Error', 'Failed to add product', 'error');</script>";
+    }
+  }
+
+  public function updateproduct($id, $code, $name, $description, $type_id, $unit, $is_purchased, $purchase_account, $is_sold, $sales_account)
+  {
+    global $pdo;
+
+    $check = $pdo->prepare("SELECT * FROM products WHERE code = ? AND id != ?");
+    $check->execute([$code, $id]);
+    if ($check->rowCount() > 0) {
+      echo "<script>swal('Error', 'Product code is used by another item!', 'error');</script>";
+      return;
+    }
+
+    $stmt = $pdo->prepare("UPDATE products SET code=?, name=?, description=?, type_id=?, unit=?, is_purchased=?, purchase_account=?, is_sold=?, sales_account=? WHERE id=?");
+    if ($stmt->execute([$code, $name, $description, $type_id, $unit, $is_purchased, $purchase_account, $is_sold, $sales_account, $id])) {
+      echo "<script>swal('Success', 'Product updated successfully', 'success').then(() => { window.location.href=window.location.href; });</script>";
+    } else {
+      echo "<script>swal('Error', 'Failed to update product', 'error');</script>";
+    }
+  }
+
+  public function deleteproduct($id)
+  {
+    global $pdo;
+    try {
+      $stmt = $pdo->prepare("DELETE FROM products WHERE id = ?");
+      $stmt->execute([$id]);
+      echo "<script>swal('Success', 'Product deleted successfully', 'success').then(() => { window.location.href=window.location.href; });</script>";
+    } catch (PDOException $e) {
+      echo "<script>swal('Action Denied', 'Cannot delete this product because it is linked to existing transactions or stock movements.', 'error');</script>";
+    }
+  }
+
   function additem($table, $item_name)
   {
     global $pdo;
@@ -361,494 +532,140 @@ class Query
     }
   }
 
-  function addcustomer($table, $customer_id, $customer_name, $customer_detail, $customer_address)
+  // ==========================================
+  // UNIFIED CONTACTS FUNCTIONS
+  // ==========================================
+
+  public function addcontact($name, $phone, $email, $address, $is_supplier, $is_customer)
   {
     global $pdo;
+    $stmt = $pdo->prepare("INSERT INTO contacts (name, phone, email, address, is_supplier, is_customer) VALUES (?, ?, ?, ?, ?, ?)");
 
-    $acstmt = $pdo->prepare("SELECT acid FROM actype WHERE ac_type='Current Asset'");
-    $acstmt->execute();
-    $actype = $acstmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!empty($actype)) {
-      $acstmt = $pdo->prepare("SELECT acid FROM actype WHERE ac_type='Current Asset'");
-      $acstmt->execute();
-      $actype = $acstmt->fetch(PDO::FETCH_ASSOC);
-      $actype = $actype['acid'];
+    if ($stmt->execute([$name, $phone, $email, $address, $is_supplier, $is_customer])) {
+      echo "<script>swal('Success', 'Contact added successfully', 'success').then(() => { window.location.href='contacts.php'; });</script>";
     } else {
-      $actypestmt = $pdo->prepare("INSERT INTO actype(ac_type) VALUES('Current Asset')");
-      $actypestmt->execute();
-      $acstmt = $pdo->prepare("SELECT acid FROM actype WHERE ac_type='Current Asset'");
-      $acstmt->execute();
-      $actype = $acstmt->fetch(PDO::FETCH_ASSOC);
-      $actype = $actype['acid'];
+      echo "<script>swal('Error', 'Failed to add contact', 'error');</script>";
     }
+  }
 
-    $acvalidcheckstmt = $pdo->prepare("SELECT * FROM customers WHERE customer_id='$customer_id'");
-    $acvalidcheckstmt->execute();
-    $acvalidcheck = $acvalidcheckstmt->fetchall();
+  public function updatecontact($id, $name, $phone, $email, $address, $is_supplier, $is_customer)
+  {
+    global $pdo;
+    $stmt = $pdo->prepare("UPDATE contacts SET name=?, phone=?, email=?, address=?, is_supplier=?, is_customer=? WHERE id=?");
 
-    if (empty($acvalidcheck)) {
-      if (!empty($customer_id)) {
-        if (str_contains($customer_id, "3300")) {
-          $stmt = $pdo->prepare("INSERT INTO $table(customer_id, customer_name, customer_detail, customer_address) VALUES('$customer_id', '$customer_name', '$customer_detail', '$customer_address');");
-          $stmt->execute();
-          $acstmt = $pdo->prepare("INSERT INTO acname(code_no, ac_type, ac_name) VALUES('$customer_id', '$actype', '$customer_name');");
-          $acstmt->execute();
-          echo "<script>swal('Success!', 'Customer added success!', 'success');</script>";
-        } else {
-          echo "<script>swal('Error!', 'Not a valid code for customer', 'warning');</script>";
-        }
+    if ($stmt->execute([$name, $phone, $email, $address, $is_supplier, $is_customer, $id])) {
+      echo "<script>swal('Success', 'Contact updated successfully', 'success').then(() => { window.location.href='contacts.php'; });</script>";
+    } else {
+      echo "<script>swal('Error', 'Failed to update contact', 'error');</script>";
+    }
+  }
+
+  public function deletecontact($id)
+  {
+    global $pdo;
+    try {
+      $stmt = $pdo->prepare("DELETE FROM contacts WHERE id = ?");
+      $stmt->execute([$id]);
+      echo "<script>swal('Success', 'Contact deleted successfully', 'success').then(() => { window.location.href='contacts.php'; });</script>";
+    } catch (PDOException $e) {
+      // If the contact is used in a purchase, the foreign key restriction will safely trigger this error.
+      if ($e->getCode() == '23000') {
+        echo "<script>swal('Action Denied', 'Cannot delete this contact because they are linked to existing transactions or purchases.', 'error');</script>";
       } else {
-        echo "<script>swal('Error!', 'Invalid Fields', 'warning');</script>";
+        echo "<script>swal('Error', 'Database error: " . addslashes($e->getMessage()) . "', 'error');</script>";
       }
-    } else {
-      echo "<script>swal('Error!', 'Sorry, customer already exists', 'warning');</script>";
     }
   }
 
-  function updatecustomer($table, $customer_name, $customer_detail, $customer_address, $updateid)
-  {
-    global $pdo;
-    $stmt = $pdo->prepare("UPDATE $table SET customer_name='$customer_name', customer_detail='$customer_detail', customer_address='$customer_address' WHERE customer_id='$updateid'");
-    $stmt->execute();
-    $acstmt = $pdo->prepare("UPDATE acname SET ac_name='$customer_name' WHERE code_no='$updateid'");
-    $acstmt->execute();
-    if ($stmt) {
-      echo "<script>swal('Success!', 'Customer updated successfully', 'success');</script>";
-    } else {
-      echo "<script>swal('Error!', 'Error accour', 'warning');</script>";
-    }
-  }
+  // ==========================================
+  // PURCHASE BILLS
+  // ==========================================
 
-  function deletecustomer($table, $deleteid)
-  {
-    global $pdo;
-    $stmt = $pdo->prepare("DELETE FROM $table WHERE customer_id='$deleteid'");
-    $stmt->execute();
-    $acstmt = $pdo->prepare("DELETE FROM acname WHERE code_no='$deleteid'");
-    $acstmt->execute();
-    if ($stmt) {
-      echo "<script>swal('Success!', 'Customer deleted successfully', 'success');</script>";
-    } else {
-      echo "<script>swal('Error!', 'Error accour', 'warning');</script>";
-    }
-  }
-
-  function addsupplier($table, $supplier_id, $supplier_name, $supplier_phone, $supplier_address)
-  {
-    global $pdo;
-
-    $accheckstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no='$supplier_id'");
-    $accheckstmt->execute();
-    $accheck = $accheckstmt->fetchAll();
-
-    $stmt = $pdo->prepare("INSERT INTO $table(supplier_id, supplier_name, supplier_phone, supplier_address) VALUES('$supplier_id', '$supplier_name', '$supplier_phone', '$supplier_address');");
-
-
-    $acstmt = $pdo->prepare("SELECT acid FROM actype WHERE ac_type='Current Liabilities'");
-    $acstmt->execute();
-    $actype = $acstmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!empty($actype)) {
-      $acstmt = $pdo->prepare("SELECT acid FROM actype WHERE ac_type='Current Liabilities'");
-      $acstmt->execute();
-      $actype = $acstmt->fetch(PDO::FETCH_ASSOC);
-      $actype = $actype['acid'];
-    } else {
-      $actypestmt = $pdo->prepare("INSERT INTO actype(ac_type) VALUES('Current Liabilities')");
-      if (empty($accheck)) {
-        $actypestmt->execute();
-      }
-      $acstmt = $pdo->prepare("SELECT acid FROM actype WHERE ac_type='Current Liabilities'");
-      if (empty($accheck)) {
-        $acstmt->execute();
-      }
-      $actype = $acstmt->fetch(PDO::FETCH_ASSOC);
-      $actype = $actype['acid'];
-    }
-    $acstmt = $pdo->prepare("INSERT INTO acname(code_no, ac_type, ac_name) VALUES('$supplier_id', '$actype', '$supplier_name');");
-
-    if (empty($accheck)) {
-      $stmt->execute();
-      $acstmt->execute();
-      echo '<script>swal("Success!", "Supplier Added Successfully", "success");</script>';
-    } else {
-      echo '<script>swal("Error!", "Sorry, this ac_code is already exits", "warning");</script>';
-    }
-  }
-
-  function updatesupplier($table, $supplier_name, $supplier_phone, $supplier_address, $updateid)
-  {
-    global $pdo;
-
-    $accheckstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no='$supplier_name'");
-    $accheckstmt->execute();
-    $accheck = $accheckstmt->fetchAll();
-
-    $stmt = $pdo->prepare("UPDATE $table SET supplier_name='$supplier_name', supplier_phone='$supplier_phone', supplier_address='$supplier_address' WHERE supplier_id='$updateid'");
-    $acstmt = $pdo->prepare("UPDATE acname SET ac_name='$supplier_name' WHERE code_no='$updateid'");
-
-    if (empty($accheck)) {
-      $stmt->execute();
-      $acstmt->execute();
-      echo '<script>swal("Success!", "Supplier Updated Successfully", "success");</script>';
-    } else {
-      echo "<script>swal('Error', 'Duplicate A/C Name' , 'error')</script>";
-    }
-  }
-
-  function deletesupplier($table, $deleteid)
-  {
-    global $pdo;
-    $stmt = $pdo->prepare("DELETE FROM $table WHERE supplier_id='$deleteid'");
-    $stmt->execute();
-    $acstmt = $pdo->prepare("DELETE FROM acname WHERE code_no='$deleteid'");
-    $acstmt->execute();
-    if ($stmt) {
-      echo '<script>swal("success!", "Supplier Deleted Successfully", "success");</script>';
-    } else {
-      echo "<script>swal('Warning', 'Error accors when deleted Supplier', 'warning');</script>";
-    }
-  }
-
-  function addpurchase($table, $date, $voucher_no, $tclfrozen, $supplier_name, $commodity, $size, $viss, $pcs, $price)
-  {
-    global $pdo;
-    if (!empty($viss) || !empty($price)) {
-      $amount = floatval($price) * floatval($viss);
-    } else {
-      $amount = 0;
-    }
-
-    $voucherStmt = $pdo->prepare("SELECT * FROM purchase_voucher WHERE voucher_no='$voucher_no'");
-    $voucherStmt->execute();
-    $voucherData = $voucherStmt->fetch(PDO::FETCH_ASSOC);
-
-    if (empty($voucherData)) {
-      $voucherInsert = $pdo->prepare("INSERT INTO purchase_voucher(voucher_no, date, supplier_id, tclfrozen, total_amount) VALUES('$voucher_no', '$date', '$supplier_name', '$tclfrozen', '$amount')");
-      $voucherInsert->execute();
-      $purchase_voucher_id = $pdo->lastInsertId();
-    } else {
-      $purchase_voucher_id = $voucherData['id'];
-      $total_amount = floatval($voucherData['total_amount']) + $amount;
-      $voucherUpdate = $pdo->prepare("UPDATE purchase_voucher SET date='$date', supplier_id='$supplier_name', tclfrozen='$tclfrozen', total_amount='$total_amount' WHERE id='$purchase_voucher_id'");
-      $voucherUpdate->execute();
-    }
-
-    $stmt = $pdo->prepare("INSERT INTO $table(purchase_voucher_id, commodity, size, viss, pcs, price, amount) VALUES('$purchase_voucher_id', '$commodity', '$size', '$viss', '$pcs', '$price', '$amount')");
-    $stmt->execute();
-    $link_id = $pdo->lastInsertId();
-
-    $payableStmt = $pdo->prepare("SELECT * FROM payable WHERE purchase_voucher_id='$purchase_voucher_id' ORDER BY id DESC");
-    $payableStmt->execute();
-    $payableData = $payableStmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!empty($payableData)) {
-      $newPurchaseAmount = floatval($payableData['purchase_amount']) + $amount;
-      $newBalance = floatval($payableData['balance']) + $amount;
-      $updatePayable = $pdo->prepare("UPDATE payable SET date='$date', supplier_id='$supplier_name', purchase_voucher_no='$voucher_no', purchase_amount='$newPurchaseAmount', balance='$newBalance' WHERE purchase_voucher_id='$purchase_voucher_id'");
-      $updatePayable->execute();
-    } else {
-      $payablestmt = $pdo->prepare("INSERT INTO payable(purchase_voucher_id, date, supplier_id, purchase_voucher_no, purchase_amount, balance) VALUES('$purchase_voucher_id', '$date', '$supplier_name', '$voucher_no', '$amount', '$amount')");
-      $payablestmt->execute();
-    }
-
-    $kg = floatval($viss) * 1.634;
-
-    if ($tclfrozen === "tcl") {
-      $formstmt = $pdo->prepare("INSERT INTO form7stocktcl(date, item_id, supplier_name, country, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', 'DAKA', 'TCl', '$size', '$viss', '$kg', '$pcs', '$link_id')");
-      $formstmt->execute();
-    } else {
-      $formstmt = $pdo->prepare("INSERT INTO form7stock(date, item_id, supplier_name, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', 'Frozen', '$size', '$viss', '$kg', '$pcs', '$link_id')");
-      $formstmt->execute();
-    }
-
-    if ($stmt) {
-      echo '<script>swal("Success!", "Purchase Voucher Added Successfully", "success");</script>';
-    } else {
-      echo '<script>swal("Error!", "Error accors when added Purchase Voucher", "error");</script>';
-    }
-
-    // General Ledger Add
-    $vouchercheckstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE voucherno='$voucher_no' AND ac_code LIKE '4000%'");
-    $vouchercheckstmt->execute();
-    $vouchercheck = $vouchercheckstmt->fetch(PDO::FETCH_ASSOC);
-    if (empty($vouchercheck)) {
-      $balancecheckstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code LIKE '4000%' ORDER BY id DESC");
-      $balancecheckstmt->execute();
-      $balancecheck = $balancecheckstmt->fetch(PDO::FETCH_ASSOC);
-      $balance = $amount + $balancecheck['balance'];
-      $glstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, credit, balance) VALUES('$date', '$voucher_no', '$supplier_name', '$amount', '$balance')");
-      $glstmt->execute();
-    } else {
-      $vouchercheckstmt = $pdo->prepare("SELECT SUM(credit) AS credit FROM general_ledger WHERE voucherno='$voucher_no' AND ac_code='$supplier_name'");
-      $vouchercheckstmt->execute();
-      $creditdata = $vouchercheckstmt->fetch(PDO::FETCH_ASSOC);
-      $total_credit = $creditdata['credit'] + $amount;
-
-      $nowid = $vouchercheck['id'];
-      $balancestmt = $pdo->prepare("SELECT * FROM general_ledger WHERE id<'$nowid' AND ac_code LIKE '4000%' ORDER BY id DESC");
-      $balancestmt->execute();
-      $balancecheck = $balancestmt->fetch(PDO::FETCH_ASSOC);
-
-      if (!empty($balancecheck)) {
-        $balance = ($balancecheck['balance'] + floatval($vouchercheck['debit'])) - $total_credit;
-      } else {
-        $balance = (0 + floatval($vouchercheck['debit'])) - $total_credit;
-      }
-
-      $updatestmt = $pdo->prepare("UPDATE general_ledger SET credit='$total_credit', balance='$balance' WHERE voucherno='$voucher_no' AND ac_code LIKE '4000%'");
-      $updatestmt->execute();
-    }
-  }
-
-  /**
-   * Create or update a purchase voucher and insert multiple purchase lines atomically.
-   * $lines is an array of ['commodity'=>id, 'size'=>..., 'viss'=>..., 'pcs'=>..., 'price'=>...]
-   */
-  public function addPurchaseVoucher($date, $voucher_no, $tclfrozen, $supplier_name, $lines = [])
+  public function savePurchase($id, $contact_id, $date, $due_date, $voucher_no, $currency, $status, $subtotal, $grand_total, $lines, $action_type)
   {
     global $pdo;
     try {
       $pdo->beginTransaction();
 
-      $totalAmount = 0;
-      foreach ($lines as $ln) {
-        $v = (float) $ln['viss'];
-        $p = (float) $ln['price'];
-        $totalAmount += ($v * $p);
-      }
-
-      // 1. Insert or update parent purchase voucher
-      $voucherStmt = $pdo->prepare("SELECT * FROM purchase_voucher WHERE voucher_no=:v_no");
-      $voucherStmt->execute([':v_no' => $voucher_no]);
-      $voucherData = $voucherStmt->fetch(PDO::FETCH_ASSOC);
-
-      if (empty($voucherData)) {
-        $voucherInsert = $pdo->prepare("INSERT INTO purchase_voucher(voucher_no, date, supplier_id, tclfrozen, total_amount) VALUES(:voucher_no, :date, :supplier_id, :tclfrozen, :total_amount)");
-        $voucherInsert->execute([
-          ':voucher_no' => $voucher_no,
-          ':date' => $date,
-          ':supplier_id' => $supplier_name,
-          ':tclfrozen' => $tclfrozen,
-          ':total_amount' => $totalAmount
-        ]);
-        $purchase_voucher_id = $pdo->lastInsertId();
-      } else {
-        $purchase_voucher_id = $voucherData['id'];
-        $newTotal = floatval($voucherData['total_amount']) + $totalAmount;
-        $voucherUpdate = $pdo->prepare("UPDATE purchase_voucher SET date=:date, supplier_id=:supplier_id, tclfrozen=:tclfrozen, total_amount=:total_amount WHERE id=:id");
-        $voucherUpdate->execute([
-          ':date' => $date,
-          ':supplier_id' => $supplier_name,
-          ':tclfrozen' => $tclfrozen,
-          ':total_amount' => $newTotal,
-          ':id' => $purchase_voucher_id
-        ]);
-      }
-
-      // 2. Insert line items
-      foreach ($lines as $ln) {
-        $commodity = $ln['commodity'];
-        $size = $ln['size'];
-        $viss = $ln['viss'];
-        $pcs = $ln['pcs'];
-        $price = $ln['price'];
-        $amount = floatval($price) * floatval($viss);
-
-        $stmt = $pdo->prepare("INSERT INTO purchase(purchase_voucher_id, commodity, size, viss, pcs, price, amount) VALUES(:pv_id, :commodity, :size, :viss, :pcs, :price, :amount)");
-        $stmt->execute([
-          ':pv_id' => $purchase_voucher_id,
-          ':commodity' => $commodity,
-          ':size' => $size,
-          ':viss' => $viss,
-          ':pcs' => $pcs,
-          ':price' => $price,
-          ':amount' => $amount
-        ]);
-      }
-
-      // 3. Update or Insert Payable Sub-ledger tracker
-      $payableStmt = $pdo->prepare("SELECT * FROM payable WHERE purchase_voucher_id=:pv_id ORDER BY id DESC");
-      $payableStmt->execute([':pv_id' => $purchase_voucher_id]);
-      $payableData = $payableStmt->fetch(PDO::FETCH_ASSOC);
-
-      if (!empty($payableData)) {
-        $newPurchaseAmount = floatval($payableData['purchase_amount']) + $totalAmount;
-        $newBalance = floatval($payableData['balance']) + $totalAmount;
-        $updatePayable = $pdo->prepare("UPDATE payable SET date=:date, supplier_id=:supplier_id, purchase_voucher_no=:voucher_no, purchase_amount=:purchase_amount, balance=:balance WHERE purchase_voucher_id=:pv_id");
-        $updatePayable->execute([
-          ':date' => $date,
-          ':supplier_id' => $supplier_name,
-          ':voucher_no' => $voucher_no,
-          ':purchase_amount' => $newPurchaseAmount,
-          ':balance' => $newBalance,
-          ':pv_id' => $purchase_voucher_id
-        ]);
-      } else {
-        $payablestmt = $pdo->prepare("INSERT INTO payable(purchase_voucher_id, date, supplier_id, purchase_voucher_no, purchase_amount, balance, fishormaterial) VALUES(:pv_id, :date, :supplier_id, :voucher_no, :purchase_amount, :balance, 'fish')");
-        $payablestmt->execute([
-          ':pv_id' => $purchase_voucher_id,
-          ':date' => $date,
-          ':supplier_id' => $supplier_name,
-          ':voucher_no' => $voucher_no,
-          ':purchase_amount' => $totalAmount,
-          ':balance' => $totalAmount
-        ]);
-      }
-
-      // 4. TRUE DOUBLE-ENTRY POSTING TO GENERAL LEDGER
-      // Account Definitions: 
-      // Inventory / Purchases Account (e.g., 6100/008 or Material Purchase) -> DEBIT (Increases Asset/Expense)
-      // Supplier Account (e.g., 4000/xxx) -> CREDIT (Increases Liability - what you owe them)
-      $inventoryAccount = '6100/009';
-
-      // Post Debit Line (Inventory)
-      $glDebit = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, narration) VALUES(:date, :voucherno, :ac_code, :debit, 0, :narration)");
-      $glDebit->execute([
-        ':date' => $date,
-        ':voucherno' => $voucher_no,
-        ':ac_code' => $inventoryAccount,
-        ':debit' => $totalAmount,
-        ':narration' => 'Purchase Invoice - Inventory Entry'
-      ]);
-
-      // Post Credit Line (Supplier Payable)
-      $glCredit = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, narration) VALUES(:date, :voucherno, :ac_code, 0, :credit, :narration)");
-      $glCredit->execute([
-        ':date' => $date,
-        ':voucherno' => $voucher_no,
-        ':ac_code' => $supplier_name,
-        ':credit' => $totalAmount,
-        ':narration' => 'Purchase Invoice - Liability Entry'
-      ]);
-
-      $pdo->commit();
-      echo '<script>swal("Success!", "Purchase Voucher & Double Entry Posted Successfully", "success");</script>';
-    } catch (Exception $e) {
-      $pdo->rollBack();
-      echo '<script>swal("Error!", "Error posting purchase: ' . addslashes($e->getMessage()) . '", "error");</script>';
-    }
-  }
-
-  function updatePurchaseVoucher($voucher_id, $date, $voucher_no, $tclfrozen, $supplier_name, $lines_data)
-  {
-    global $pdo;
-    try {
-      $pdo->beginTransaction();
-
-      // 1. Calculate the new total amount across all updated/new lines
-      $totalAmount = 0;
-      foreach ($lines_data as $ln) {
-        $v = floatval($ln['viss']);
-        $p = floatval($ln['price']);
-        $totalAmount += ($v * $p);
-      }
-
-      // 2. Update the parent purchase_voucher
-      $vstmt = $pdo->prepare("UPDATE purchase_voucher SET date='$date', voucher_no='$voucher_no', supplier_id='$supplier_name', tclfrozen='$tclfrozen', total_amount='$totalAmount' WHERE id='$voucher_id'");
-      $vstmt->execute();
-
-      // 3. Find and update the payable table
-      $pStmt = $pdo->prepare("SELECT purchase_amount, balance FROM payable WHERE purchase_voucher_id='$voucher_id'");
-      $pStmt->execute();
-      $payableRow = $pStmt->fetch(PDO::FETCH_ASSOC);
-
-      if ($payableRow) {
-        $oldPurchaseAmt = floatval($payableRow['purchase_amount']);
-        $oldBalance = floatval($payableRow['balance']);
-
-        $diff = $totalAmount - $oldPurchaseAmt;
-        $newBalance = $oldBalance + $diff;
-
-        $updPayable = $pdo->prepare("UPDATE payable SET date='$date', supplier_id='$supplier_name', purchase_voucher_no='$voucher_no', purchase_amount='$totalAmount', balance='$newBalance' WHERE purchase_voucher_id='$voucher_id'");
-        $updPayable->execute();
-      }
-
-      // 4. Update the individual purchase lines and stock ledgers safely
-      foreach ($lines_data as $ln) {
-        $line_id = $ln['line_id'];
-        $commodity = $ln['commodity'];
-        $size = $ln['size'];
-        $viss = $ln['viss'];
-        $pcs = $ln['pcs'];
-        $price = $ln['price'];
-        $amount = floatval($viss) * floatval($price);
-        $kg = floatval($viss) * 1.634;
-
-        if (!empty($line_id)) {
-          // A. Always update the main purchase line with the NEW data
-          $updLine = $pdo->prepare("UPDATE purchase SET commodity='$commodity', size='$size', viss='$viss', pcs='$pcs', price='$price', amount='$amount' WHERE no='$line_id'");
-          $updLine->execute();
-
-          // B. BULLETPROOF SYNC: Only update the very first original row, ignore all splits
-          if ($tclfrozen == 'tcl') {
-            $pdo->exec("UPDATE form7stocktcl SET date='$date', supplier_name='$supplier_name', item_id='$commodity', size='$size', viss='$viss', kg='$kg', pcspervr='$pcs' WHERE link_id='$line_id' ORDER BY id ASC LIMIT 1");
-          } else {
-            $pdo->exec("UPDATE form7stock SET date='$date', supplier_name='$supplier_name', item_id='$commodity', size='$size', viss='$viss', kg='$kg', pcspervr='$pcs' WHERE link_id='$line_id' ORDER BY id ASC LIMIT 1");
-          }
-        } else {
-          // If the user added a brand new line inside the modal, insert it
-          $insLine = $pdo->prepare("INSERT INTO purchase(purchase_voucher_id, commodity, size, viss, pcs, price, amount) VALUES('$voucher_id', '$commodity', '$size', '$viss', '$pcs', '$price', '$amount')");
-          $insLine->execute();
-          $new_line_id = $pdo->lastInsertId();
-
-          if ($tclfrozen == 'tcl') {
-            $pdo->exec("INSERT INTO form7stocktcl(date, item_id, supplier_name, country, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', 'DAKA', 'TCl', '$size', '$viss', '$kg', '$pcs', '$new_line_id')");
-          } else {
-            $pdo->exec("INSERT INTO form7stock(date, item_id, supplier_name, type, size, viss, kg, pcspervr, link_id) VALUES('$date', '$commodity', '$supplier_name', 'Frozen', '$size', '$viss', '$kg', '$pcs', '$new_line_id')");
-          }
+      // Fetch active exchange rate
+      $ex_rate = 1.0000;
+      if ($currency !== 'MMK') {
+        $stmt = $pdo->prepare("SELECT rate FROM exchange_rates WHERE currency_code = ? AND effective_date <= ? ORDER BY effective_date DESC LIMIT 1");
+        $stmt->execute([$currency, $date]);
+        $rate_row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($rate_row) {
+          $ex_rate = $rate_row['rate'];
         }
       }
 
-      $pdo->commit();
-      return "Successfully updated Voucher.";
-    } catch (Exception $e) {
-      $pdo->rollBack();
-      return "Error: " . addslashes($e->getMessage());
-    }
-  }
+      if (empty($id)) {
+        // INSERT NEW
+        $stmt = $pdo->prepare("INSERT INTO purchases (voucher_no, contact_id, date, due_date, currency, exchange_rate, status, subtotal, grand_total) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$voucher_no, $contact_id, $date, $due_date, $currency, $ex_rate, $status, $subtotal, $grand_total]);
+        $purchase_id = $pdo->lastInsertId();
+      } else {
+        // UPDATE EXISTING
+        $purchase_id = $id;
+        $stmt = $pdo->prepare("UPDATE purchases SET voucher_no=?, contact_id=?, date=?, due_date=?, currency=?, exchange_rate=?, status=?, subtotal=?, grand_total=? WHERE id=?");
+        $stmt->execute([$voucher_no, $contact_id, $date, $due_date, $currency, $ex_rate, $status, $subtotal, $grand_total, $purchase_id]);
 
-  function deleteWholeVoucher($voucher_id)
-  {
-    global $pdo;
-    try {
-      $pdo->beginTransaction();
-
-      // 1. Check voucher type for the correct stock ledger
-      $vStmt = $pdo->prepare("SELECT tclfrozen FROM purchase_voucher WHERE id='$voucher_id'");
-      $vStmt->execute();
-      $voucher = $vStmt->fetch(PDO::FETCH_ASSOC);
-
-      if (empty($voucher)) {
-        $pdo->rollBack();
-        return $errmessage = "Voucher not found.";
+        // Clear old lines before re-inserting
+        $del_lines = $pdo->prepare("DELETE FROM purchase_lines WHERE purchase_id = ?");
+        $del_lines->execute([$purchase_id]);
       }
-      $tclfrozen = $voucher['tclfrozen'];
 
-      // 2. Fetch all related purchase lines to remove their stock ledger entries
-      $linesStmt = $pdo->prepare("SELECT no FROM purchase WHERE purchase_voucher_id='$voucher_id'");
-      $linesStmt->execute();
-      $lines = $linesStmt->fetchAll(PDO::FETCH_ASSOC);
-
+      // Insert Line Items
+      $line_stmt = $pdo->prepare("INSERT INTO purchase_lines (purchase_id, product_id, account_id, description, quantity, unit_price, line_amount) VALUES (?, ?, ?, ?, ?, ?, ?)");
       foreach ($lines as $line) {
-        $link_id = $line['no'];
-        if ($tclfrozen === 'tcl') {
-          $pdo->exec("DELETE FROM form7stocktcl WHERE link_id='$link_id'");
-        } else {
-          $pdo->exec("DELETE FROM form7stock WHERE link_id='$link_id'");
-        }
+        $prod_id = !empty($line['product_id']) ? $line['product_id'] : NULL;
+        $line_stmt->execute([
+          $purchase_id,
+          $prod_id,
+          $line['account_id'],
+          $line['description'],
+          $line['quantity'],
+          $line['unit_price'],
+          $line['line_amount']
+        ]);
       }
 
-      // 3. Delete the parent voucher (Cascade constraint auto-deletes purchase lines & payables)
-      $delVoucher = $pdo->prepare("DELETE FROM purchase_voucher WHERE id='$voucher_id'");
-      $delVoucher->execute();
-
       $pdo->commit();
-      return $successmessage = "Entire Purchase Voucher Deleted Successfully.";
+
+      // Handle Redirections based on the button clicked
+      $msg = ($status == 'DRAFT') ? 'Draft saved successfully' : 'Bill approved successfully';
+
+      if ($action_type == 'continue_editing') {
+        $redirect = "editpurchase.php?id=" . $purchase_id;
+      } elseif ($action_type == 'add_another') {
+        $redirect = "newpurchase.php";
+      } else {
+        $redirect = "purchase.php";
+      }
+
+      echo "<script>alert('$msg'); window.location.href='$redirect';</script>";
     } catch (Exception $e) {
       $pdo->rollBack();
-      return $errmessage = "Error deleting voucher: " . addslashes($e->getMessage());
+      echo "<script>alert('Failed to save bill. Reference might be a duplicate.');</script>";
+    }
+  }
+
+  public function deletePurchase($id)
+  {
+    global $pdo;
+    try {
+      $pdo->beginTransaction();
+      $stmt = $pdo->prepare("DELETE FROM purchase_lines WHERE purchase_id = ?");
+      $stmt->execute([$id]);
+
+      $stmt2 = $pdo->prepare("DELETE FROM purchases WHERE id = ?");
+      $stmt2->execute([$id]);
+
+      $pdo->commit();
+
+      echo "<script>alert('Bill deleted successfully'); window.location.href='purchase.php';</script>";
+    } catch (Exception $e) {
+      $pdo->rollBack();
+      echo "<script>alert('Failed to delete bill.');</script>";
     }
   }
 
@@ -3814,51 +3631,57 @@ class Query
       echo "<script>swal('Success', 'Deleted A/C Type' , 'success')</script>";
     }
   }
+  // ==========================================
+  // CHART OF ACCOUNTS (accodes) FUNCTIONS
+  // ==========================================
 
-  function addacname($code_no, $actype, $acname)
+  public function addaccode($code, $name, $type, $class, $description)
   {
     global $pdo;
 
-    $accheckstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no='$code_no'");
-    $accheckstmt->execute();
-    $accheck = $accheckstmt->fetchAll();
+    $check = $pdo->prepare("SELECT * FROM accodes WHERE code = ?");
+    $check->execute([$code]);
+    if ($check->rowCount() > 0) {
+      echo "<script>swal('Error', 'Account code already exists!', 'error');</script>";
+      return;
+    }
 
-    $stmt = $pdo->prepare("INSERT INTO acname(code_no, ac_type, ac_name) VALUES('$code_no', '$actype', '$acname')");
-
-    if (empty($accheck)) {
-      echo "<script>swal('Success', 'Added A/C name' , 'success')</script>";
-      $stmt->execute();
+    $stmt = $pdo->prepare("INSERT INTO accodes (code, name, type, class, description) VALUES (?, ?, ?, ?, ?)");
+    if ($stmt->execute([$code, $name, $type, $class, $description])) {
+      echo "<script>swal('Success', 'Account added successfully', 'success').then(() => { window.location.href=window.location.href; });</script>";
     } else {
-      echo "<script>swal('Error', 'Duplicate A/C Code, Name' , 'error')</script>";
+      echo "<script>swal('Error', 'Failed to add account', 'error');</script>";
     }
   }
 
-  function updateacname($code_no, $actype, $acname, $id)
+  public function updateaccode($id, $code, $name, $type, $class, $description)
   {
     global $pdo;
 
-    $accheckstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no='$code_no' AND id!='$id'");
-    $accheckstmt->execute();
-    $accheck = $accheckstmt->fetchAll();
+    $check = $pdo->prepare("SELECT * FROM accodes WHERE code = ? AND id != ?");
+    $check->execute([$code, $id]);
+    if ($check->rowCount() > 0) {
+      echo "<script>swal('Error', 'Account code already exists on another account!', 'error');</script>";
+      return;
+    }
 
-    $stmt = $pdo->prepare("UPDATE acname SET code_no='$code_no', ac_type='$actype', ac_name='$acname' WHERE id = '$id'");
-
-    if (empty($accheck)) {
-      $stmt->execute();
-      echo "<script>swal('Success', 'Updated A/C Name' , 'success')</script>";
+    $stmt = $pdo->prepare("UPDATE accodes SET code=?, name=?, type=?, class=?, description=? WHERE id=?");
+    if ($stmt->execute([$code, $name, $type, $class, $description, $id])) {
+      echo "<script>swal('Success', 'Account updated successfully', 'success').then(() => { window.location.href=window.location.href; });</script>";
     } else {
-      echo "<script>swal('Error', 'Duplicate A/C Name' , 'error')</script>";
+      echo "<script>swal('Error', 'Failed to update account', 'error');</script>";
     }
   }
 
-  function deleteacname($id)
+  public function deleteaccode($id)
   {
     global $pdo;
-
-    $stmt = $pdo->prepare("DELETE FROM acname WHERE id = '$id'");
-    $stmt->execute();
-    if ($stmt) {
-      echo "<script>swal('Success', 'Deleted A/C Type' , 'success')</script>";
+    try {
+      $stmt = $pdo->prepare("DELETE FROM accodes WHERE id = ?");
+      $stmt->execute([$id]);
+      echo "<script>swal('Success', 'Account deleted successfully', 'success').then(() => { window.location.href=window.location.href; });</script>";
+    } catch (PDOException $e) {
+      echo "<script>swal('Error', 'Database error: " . addslashes($e->getMessage()) . "', 'error');</script>";
     }
   }
 

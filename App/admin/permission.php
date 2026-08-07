@@ -27,130 +27,57 @@ $bootstrap->css();
   <?php
   $permission = "";
   if (isset($_POST['save'])) {
-    if (!empty($_POST['manage_accounts'])) {
-      $permission .= "manage_accounts";
+    $permissions_array = [
+      'manage_accounts',
+      'manage_role',
+      'manage_sale',
+      'manage_purchase',
+      'manage_cashbook',
+      'manage_accountpayable',
+      'manage_acpayable',
+      'manage_accountreceivable',
+      'manage_transaction',
+      'manage_general_ledger',
+      'manage_ledger_record',
+      'manage_contacts',
+      'manage_products',
+      'manage_product_types',
+      'manage_currency',
+      'manage_coa',
+      'manage_coldstoreitem',
+      'manage_unit',
+      'manage_coldstorecharges',
+      'manage_form7',
+      'manage_form10',
+      'manage_hhkmcstock',
+      'manage_gfcmcstock',
+      'manage_stockreport',
+      'manage_shippmentexport',
+      'manage_truckexport',
+      'manage_packingmaterial',
+      'sale_report',
+      'purchase_report',
+      'payable_report',
+      'manage_mcreport',
+      'manage_tclmcstock',
+      'manage_generalledger',
+      'manage_material_purchase',
+      'material_store_house',
+      'material_gatepass',
+      'configuration_coldstore',
+      'material_output',
+      'packing_material_report',
+      'temp_pm_stock'
+    ];
+
+    $selected_permissions = [];
+    foreach ($permissions_array as $perm) {
+      if (!empty($_POST[$perm])) {
+        $selected_permissions[] = $perm;
+      }
     }
-    if (!empty($_POST['manage_role'])) {
-      $permission .= ",manage_role";
-    }
-    if (!empty($_POST['manage_sale'])) {
-      $permission .= ",manage_sale";
-    }
-    if (!empty($_POST['manage_purchase'])) {
-      $permission .= ",manage_purchase";
-    }
-    if (!empty($_POST['manage_cashbook'])) {
-      $permission .= ",manage_cashbook";
-    }
-    if (!empty($_POST['manage_accountpayable'])) {
-      $permission .= ",manage_accountpayable";
-    }
-    if (!empty($_POST['manage_acpayable'])) {
-      $permission .= ",manage_acpayable";
-    }
-    if (!empty($_POST['manage_accountreceivable'])) {
-      $permission .= ",manage_accountreceivable";
-    }
-    if (!empty($_POST['manage_transaction'])) {
-      $permission .= ",manage_transaction";
-    }
-    if (!empty($_POST['manage_general_ledger'])) {
-      $permission .= "manage_general_ledger";
-    }
-    if (!empty($_POST['manage_ledger_record'])) {
-      $permission .= "manage_ledger_record";
-    }
-    if (!empty($_POST['manage_customers'])) {
-      $permission .= ",manage_customers";
-    }
-    if (!empty($_POST['manage_supplier'])) {
-      $permission .= ",manage_supplier";
-    }
-    if (!empty($_POST['manage_coldstoreitem'])) {
-      $permission .= ",manage_coldstoreitem";
-    }
-    if (!empty($_POST['manage_item'])) {
-      $permission .= ",manage_item";
-    }
-    if (!empty($_POST['manage_actype'])) {
-      $permission .= ",manage_actype";
-    }
-    if (!empty($_POST['manage_acname'])) {
-      $permission .= ",manage_acname";
-    }
-    if (!empty($_POST['manage_unit'])) {
-      $permission .= ",manage_unit";
-    }
-    if (!empty($_POST['manage_coldstorecharges'])) {
-      $permission .= ",manage_coldstorecharges";
-    }
-    if (!empty($_POST['manage_form7'])) {
-      $permission .= ",manage_form7";
-    }
-    if (!empty($_POST['manage_form10'])) {
-      $permission .= ",manage_form10";
-    }
-    if (!empty($_POST['manage_hhkmcstock'])) {
-      $permission .= ",manage_hhkmcstock";
-    }
-    if (!empty($_POST['manage_gfcmcstock'])) {
-      $permission .= ",manage_gfcmcstock";
-    }
-    if (!empty($_POST['manage_stockreport'])) {
-      $permission .= ",manage_stockreport";
-    }
-    if (!empty($_POST['manage_shippmentexport'])) {
-      $permission .= ",manage_shippmentexport";
-    }
-    if (!empty($_POST['manage_truckexport'])) {
-      $permission .= ",manage_truckexport";
-    }
-    if (!empty($_POST['manage_packingmaterial'])) {
-      $permission .= ",manage_packingmaterial";
-    }
-    if (!empty($_POST['sale_report'])) {
-      $permission .= ",sale_report";
-    }
-    if (!empty($_POST['purchase_report'])) {
-      $permission .= ",purchase_report";
-    }
-    if (!empty($_POST['payable_report'])) {
-      $permission .= ",payable_report";
-    }
-    if (!empty($_POST['manage_mcreport'])) {
-      $permission .= ",manage_mcreport";
-    }
-    if (!empty($_POST['manage_tclmcstock'])) {
-      $permission .= ",manage_tclmcstock";
-    }
-    if (!empty($_POST['manage_generalledger'])) {
-      $permission .= ",manage_generalledger";
-    }
-    if (!empty($_POST['material_list'])) {
-      $permission .= ",material_list";
-    }
-    if (!empty($_POST['manage_material_purchase'])) {
-      $permission .= ",manage_material_purchase";
-    }
-    if (!empty($_POST['material_store_house'])) {
-      $permission .= ",material_store_house";
-    }
-    if (!empty($_POST['material_gatepass'])) {
-      $permission .= ",material_gatepass";
-    }
-    if (!empty($_POST['configuration_coldstore'])) {
-      $permission .= ",configuration_coldstore";
-    }
-    if (!empty($_POST['material_output'])) {
-      $permission .= ",material_output";
-    }
-    if (!empty($_POST['packing_material_report'])) {
-      $permission .= ",packing_material_report";
-    }
-    if (!empty($_POST['temp_pm_stock'])) {
-      $permission .= ",temp_pm_stock";
-    }
-    $permission;
+
+    $permission = implode(',', $selected_permissions);
     $role_id = $_GET['role_id'];
 
     $query->permission($permission, $role_id);
@@ -179,308 +106,152 @@ $bootstrap->css();
           $permissionstmt = $pdo->prepare("SELECT * FROM permission WHERE role_id='$role_id'");
           $permissionstmt->execute();
           $permissiondata = $permissionstmt->fetch(PDO::FETCH_ASSOC);
-          if (!empty($permissiondata)) {
-            $permissionshow = $permissiondata['permission'];
+          $permissionshow = !empty($permissiondata) ? $permissiondata['permission'] : '';
+
+          function isChecked($perm, $permissionshow)
+          {
+            return (strpos($permissionshow, $perm) !== false) ? 'checked' : '';
           }
           ?>
-          <table class="table table-bordered">
-            <form action="" method="post">
-              <tr>
-                <th>Permissions</th>
-                <th>Check</th>
-                <th>Permissions</th>
-                <th>Check</th>
-              </tr>
-              <tr>
-                <td>Manage Accounts</td>
-                <td><input type="checkbox" name="manage_accounts" <?php if (!empty($permissionshow)) {
-                                                                    if (str_contains($permissionshow, 'manage_accounts') == 1) {
-                                                                      echo "checked";
-                                                                    }
-                                                                  } ?>></td>
-                <td>Manage A/C Type</td>
-                <td><input type="checkbox" name="manage_actype" <?php if (!empty($permissionshow)) {
-                                                                  if (str_contains($permissionshow, 'manage_actype') == 1) {
-                                                                    echo "checked";
-                                                                  }
-                                                                } ?>></td>
-              </tr>
-              <tr>
-                <td>Manage Role</td>
-                <td><input type="checkbox" name="manage_role" <?php if (!empty($permissionshow)) {
-                                                                if (str_contains($permissionshow, 'manage_role') == 1) {
-                                                                  echo "checked";
-                                                                }
-                                                              } ?>></td>
-                <td>Manage A/C Name</td>
-                <td><input type="checkbox" name="manage_acname" <?php if (!empty($permissionshow)) {
-                                                                  if (str_contains($permissionshow, 'manage_acname') == 1) {
-                                                                    echo "checked";
-                                                                  }
-                                                                } ?>></td>
-              </tr>
-              <tr>
-                <td>Manage Sale</td>
-                <td><input type="checkbox" name="manage_sale" <?php if (!empty($permissionshow)) {
-                                                                if (str_contains($permissionshow, 'manage_sale') == 1) {
-                                                                  echo "checked";
-                                                                }
-                                                              } ?>></td>
-                <td>Manage Unit</td>
-                <td><input type="checkbox" name="manage_unit" <?php if (!empty($permissionshow)) {
-                                                                if (str_contains($permissionshow, 'manage_unit') == 1) {
-                                                                  echo "checked";
-                                                                }
-                                                              } ?>></td>
-              </tr>
-              <tr>
-                <td>Manage Purchase</td>
-                <td><input type="checkbox" name="manage_purchase" <?php if (!empty($permissionshow)) {
-                                                                    if (str_contains($permissionshow, 'manage_purchase') == 1) {
-                                                                      echo "checked";
-                                                                    }
-                                                                  } ?>></td>
-                <td>Manage Cold Store Charges</td>
-                <td><input type="checkbox" name="manage_coldstorecharges" <?php if (!empty($permissionshow)) {
-                                                                            if (str_contains($permissionshow, 'manage_coldstorecharges') == 1) {
-                                                                              echo "checked";
-                                                                            }
-                                                                          } ?>></td>
-              </tr>
-              <tr>
-                <td>Manage Cash Book</td>
-                <td><input type="checkbox" name="manage_cashbook" <?php if (!empty($permissionshow)) {
-                                                                    if (str_contains($permissionshow, 'manage_cashbook') == 1) {
-                                                                      echo "checked";
-                                                                    }
-                                                                  } ?>></td>
-                <td>Manage Form7</td>
-                <td><input type="checkbox" name="manage_form7" <?php if (!empty($permissionshow)) {
-                                                                  if (str_contains($permissionshow, 'manage_form7') == 1) {
-                                                                    echo "checked";
-                                                                  }
-                                                                } ?>></td>
-              </tr>
-              <tr>
-                <td>Manage Account Payable</td>
-                <td><input type="checkbox" name="manage_accountpayable" <?php if (!empty($permissionshow)) {
-                                                                          if (str_contains($permissionshow, 'manage_accountpayable') == 1) {
-                                                                            echo "checked";
-                                                                          }
-                                                                        } ?>></td>
-                <td>Manage Form10</td>
-                <td><input type="checkbox" name="manage_form10" <?php if (!empty($permissionshow)) {
-                                                                  if (str_contains($permissionshow, 'manage_form10') == 1) {
-                                                                    echo "checked";
-                                                                  }
-                                                                } ?>></td>
-              </tr>
-              <tr>
-                <td>Manage A/C Payable</td>
-                <td><input type="checkbox" name="manage_acpayable" <?php if (!empty($permissionshow)) {
-                                                                      if (str_contains($permissionshow, 'manage_acpayable') == 1) {
-                                                                        echo "checked";
-                                                                      }
-                                                                    } ?>></td>
-                <td>Manage Transaction</td>
-                <td><input type="checkbox" name="manage_transaction" <?php if (!empty($permissionshow)) {
-                                                                        if (str_contains($permissionshow, 'manage_transaction') == 1) {
-                                                                          echo "checked";
-                                                                        }
-                                                                      } ?>></td>
-              </tr>
-              <tr>
-                <td>Manage Account Receivable</td>
-                <td><input type="checkbox" name="manage_accountreceivable" <?php if (!empty($permissionshow)) {
-                                                                              if (str_contains($permissionshow, 'manage_accountreceivable') == 1) {
-                                                                                echo "checked";
-                                                                              }
-                                                                            } ?>></td>
-                <td>Manage HHK Mc Stock</td>
-                <td><input type="checkbox" name="manage_hhkmcstock" <?php if (!empty($permissionshow)) {
-                                                                      if (str_contains($permissionshow, 'manage_hhkmcstock') == 1) {
-                                                                        echo "checked";
-                                                                      }
-                                                                    } ?>></td>
-              </tr>
-              <tr>
-                <td>Manage General ledger</td>
-                <td><input type="checkbox" name="manage_general_ledger" <?php if (!empty($permissionshow)) {
-                                                                          if (str_contains($permissionshow, 'manage_general_ledger') == 1) {
-                                                                            echo "checked";
-                                                                          }
-                                                                        } ?>></td>
-                <td>Manage GFC Mc Stock</td>
-                <td><input type="checkbox" name="manage_gfcmcstock" <?php if (!empty($permissionshow)) {
-                                                                      if (str_contains($permissionshow, 'manage_gfcmcstock') == 1) {
-                                                                        echo "checked";
-                                                                      }
-                                                                    } ?>></td>
-              </tr>
-              <tr>
-                <td>Manage Ledger Record</td>
-                <td><input type="checkbox" name="manage_ledger_record" <?php if (!empty($permissionshow)) {
-                                                                          if (str_contains($permissionshow, 'manage_ledger_record') == 1) {
-                                                                            echo "checked";
-                                                                          }
-                                                                        } ?>></td>
-                <td>Manage TCL Mc Stock</td>
-                <td><input type="checkbox" name="manage_tclmcstock" <?php if (!empty($permissionshow)) {
-                                                                      if (str_contains($permissionshow, 'manage_tclmcstock') == 1) {
-                                                                        echo "checked";
-                                                                      }
-                                                                    } ?>></td>
-              </tr>
-              <tr>
-                <td>Manage Mc Report</td>
-                <td><input type="checkbox" name="manage_mcreport" <?php if (!empty($permissionshow)) {
-                                                                    if (str_contains($permissionshow, 'manage_mcreport') == 1) {
-                                                                      echo "checked";
-                                                                    }
-                                                                  } ?>></td>
-                <td>Manage Customers</td>
-                <td><input type="checkbox" name="manage_customers" <?php if (!empty($permissionshow)) {
-                                                                      if (str_contains($permissionshow, 'manage_customers') == 1) {
-                                                                        echo "checked";
-                                                                      }
-                                                                    } ?>></td>
-              </tr>
-              <tr>
-                <td>Manage Shippment Export</td>
-                <td><input type="checkbox" name="manage_shippmentexport" <?php if (!empty($permissionshow)) {
-                                                                            if (str_contains($permissionshow, 'manage_shippmentexport') == 1) {
-                                                                              echo "checked";
-                                                                            }
-                                                                          } ?>></td>
-                <td>Manage Supplier</td>
-                <td><input type="checkbox" name="manage_supplier" <?php if (!empty($permissionshow)) {
-                                                                    if (str_contains($permissionshow, 'manage_supplier') == 1) {
-                                                                      echo "checked";
-                                                                    }
-                                                                  } ?>></td>
-              </tr>
-              <tr>
-                <td>Manage Truck Export</td>
-                <td><input type="checkbox" name="manage_truckexport" <?php if (!empty($permissionshow)) {
-                                                                        if (str_contains($permissionshow, 'manage_truckexport') == 1) {
-                                                                          echo "checked";
-                                                                        }
-                                                                      } ?>></td>
-                <td>Manage Coldstore Item</td>
-                <td><input type="checkbox" name="manage_coldstoreitem" <?php if (!empty($permissionshow)) {
-                                                                          if (str_contains($permissionshow, 'manage_coldstoreitem') == 1) {
-                                                                            echo "checked";
-                                                                          }
-                                                                        } ?>></td>
-              </tr>
-              <tr>
-                <td>Manage Packing Material</td>
-                <td><input type="checkbox" name="manage_packingmaterial" <?php if (!empty($permissionshow)) {
-                                                                            if (str_contains($permissionshow, 'manage_packingmaterial') == 1) {
-                                                                              echo "checked";
-                                                                            }
-                                                                          } ?>></td>
-                <td>Manage Item</td>
-                <td><input type="checkbox" name="manage_item" <?php if (!empty($permissionshow)) {
-                                                                if (str_contains($permissionshow, 'manage_item') == 1) {
-                                                                  echo "checked";
-                                                                }
-                                                              } ?>></td>
-              </tr>
-              <tr>
-                <td>Sale Report</td>
-                <td><input type="checkbox" name="sale_report" <?php if (!empty($permissionshow)) {
-                                                                if (str_contains($permissionshow, 'sale_report') == 1) {
-                                                                  echo "checked";
-                                                                }
-                                                              } ?>></td>
-                <td>Purchase Report</td>
-                <td><input type="checkbox" name="purchase_report" <?php if (!empty($permissionshow)) {
-                                                                    if (str_contains($permissionshow, 'purchase_report') == 1) {
-                                                                      echo "checked";
-                                                                    }
-                                                                  } ?>></td>
-              </tr>
-              <tr>
-                <td>Payable Report</td>
-                <td><input type="checkbox" name="payable_report" <?php if (!empty($permissionshow)) {
-                                                                    if (str_contains($permissionshow, 'payable_report') == 1) {
-                                                                      echo "checked";
-                                                                    }
-                                                                  } ?>></td>
-                <td>Manage Stock Report</td>
-                <td><input type="checkbox" name="manage_stockreport" <?php if (!empty($permissionshow)) {
-                                                                        if (str_contains($permissionshow, 'manage_stockreport') == 1) {
-                                                                          echo "checked";
-                                                                        }
-                                                                      } ?>></td>
-              </tr>
-              <tr>
-                <td>Manage General Ledger Report</td>
-                <td><input type="checkbox" name="manage_generalledger" <?php if (!empty($permissionshow)) {
-                                                                          if (str_contains($permissionshow, 'manage_generalledger') == 1) {
-                                                                            echo "checked";
-                                                                          }
-                                                                        } ?>></td>
-                <td>Material List</td>
-                <td><input type="checkbox" name="material_list" <?php if (!empty($permissionshow)) {
-                                                                  if (str_contains($permissionshow, 'material_list') == 1) {
-                                                                    echo "checked";
-                                                                  }
-                                                                } ?>></td>
-              </tr>
-              <tr>
-                <td>Manage Material Purchase</td>
-                <td><input type="checkbox" name="manage_material_purchase" <?php if (!empty($permissionshow)) {
-                                                                              if (str_contains($permissionshow, 'manage_material_purchase') == 1) {
-                                                                                echo "checked";
-                                                                              }
-                                                                            } ?>></td>
-                <td>Material Store House</td>
-                <td><input type="checkbox" name="material_store_house" <?php if (!empty($permissionshow)) {
-                                                                          if (str_contains($permissionshow, 'material_store_house') == 1) {
-                                                                            echo "checked";
-                                                                          }
-                                                                        } ?>></td>
-              </tr>
-              <tr>
-                <td>Packing Material Report</td>
-                <td><input type="checkbox" name="packing_material_report" <?php if (!empty($permissionshow)) {
-                                                                            if (str_contains($permissionshow, 'packing_material_report') == 1) {
-                                                                              echo "checked";
-                                                                            }
-                                                                          } ?>></td>
-                <td>Temp P/M Stock</td>
-                <td><input type="checkbox" name="temp_pm_stock" <?php if (!empty($permissionshow)) {
-                                                                  if (str_contains($permissionshow, 'temp_pm_stock') == 1) {
-                                                                    echo "checked";
-                                                                  }
-                                                                } ?>></td>
-              </tr>
-
-              <tr>
-                <td>Packing Material Gate Pass</td>
-                <td><input type="checkbox" name="material_gatepass" <?php if (!empty($permissionshow)) {
-                                                                      if (str_contains($permissionshow, 'material_gatepass') == 1) {
-                                                                        echo "checked";
-                                                                      }
-                                                                    } ?>></td>
-                <td>Configuration Coldstore</td>
-                <td><input type="checkbox" name="configuration_coldstore" <?php if (!empty($permissionshow)) {
-                                                                            if (str_contains($permissionshow, 'configuration_coldstore') == 1) {
-                                                                              echo "checked";
-                                                                            }
-                                                                          } ?>></td>
-              </tr>
-
-
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><button type="submit" name="save" class="btn btn-success">Save</button></td>
-              </tr>
-          </table>
+          <form action="" method="post">
+            <table class="table table-bordered table-striped">
+              <thead class="table-dark">
+                <tr>
+                  <th>Permissions</th>
+                  <th>Check</th>
+                  <th>Permissions</th>
+                  <th>Check</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Manage Accounts</td>
+                  <td><input type="checkbox" name="manage_accounts" <?= isChecked('manage_accounts', $permissionshow) ?>></td>
+                  <td>Manage Contacts (Suppliers/Customers)</td>
+                  <td><input type="checkbox" name="manage_contacts" <?= isChecked('manage_contacts', $permissionshow) ?>></td>
+                </tr>
+                <tr>
+                  <td>Manage Role</td>
+                  <td><input type="checkbox" name="manage_role" <?= isChecked('manage_role', $permissionshow) ?>></td>
+                  <td>Manage Chart of Accounts (COA)</td>
+                  <td><input type="checkbox" name="manage_coa" <?= isChecked('manage_coa', $permissionshow) ?>></td>
+                </tr>
+                <tr>
+                  <td>Manage Sale</td>
+                  <td><input type="checkbox" name="manage_sale" <?= isChecked('manage_sale', $permissionshow) ?>></td>
+                  <td>Manage Products & Services</td>
+                  <td><input type="checkbox" name="manage_products" <?= isChecked('manage_products', $permissionshow) ?>></td>
+                </tr>
+                <tr>
+                  <td>Manage Purchase</td>
+                  <td><input type="checkbox" name="manage_purchase" <?= isChecked('manage_purchase', $permissionshow) ?>></td>
+                  <td>Manage Product Types</td>
+                  <td><input type="checkbox" name="manage_product_types" <?= isChecked('manage_product_types', $permissionshow) ?>></td>
+                </tr>
+                <tr>
+                  <td>Manage Cash Book</td>
+                  <td><input type="checkbox" name="manage_cashbook" <?= isChecked('manage_cashbook', $permissionshow) ?>></td>
+                  <td>Manage Unit</td>
+                  <td><input type="checkbox" name="manage_unit" <?= isChecked('manage_unit', $permissionshow) ?>></td>
+                </tr>
+                <tr>
+                  <td>Manage Account Payable</td>
+                  <td><input type="checkbox" name="manage_accountpayable" <?= isChecked('manage_accountpayable', $permissionshow) ?>></td>
+                  <td>Manage Cold Store Charges</td>
+                  <td><input type="checkbox" name="manage_coldstorecharges" <?= isChecked('manage_coldstorecharges', $permissionshow) ?>></td>
+                </tr>
+                <tr>
+                  <td>Manage A/C Payable</td>
+                  <td><input type="checkbox" name="manage_acpayable" <?= isChecked('manage_acpayable', $permissionshow) ?>></td>
+                  <td>Manage Form7</td>
+                  <td><input type="checkbox" name="manage_form7" <?= isChecked('manage_form7', $permissionshow) ?>></td>
+                </tr>
+                <tr>
+                  <td>Manage Account Receivable</td>
+                  <td><input type="checkbox" name="manage_accountreceivable" <?= isChecked('manage_accountreceivable', $permissionshow) ?>></td>
+                  <td>Manage Form10</td>
+                  <td><input type="checkbox" name="manage_form10" <?= isChecked('manage_form10', $permissionshow) ?>></td>
+                </tr>
+                <tr>
+                  <td>Manage Transaction</td>
+                  <td><input type="checkbox" name="manage_transaction" <?= isChecked('manage_transaction', $permissionshow) ?>></td>
+                  <td>Manage HHK Mc Stock</td>
+                  <td><input type="checkbox" name="manage_hhkmcstock" <?= isChecked('manage_hhkmcstock', $permissionshow) ?>></td>
+                </tr>
+                <tr>
+                  <td>Manage General ledger</td>
+                  <td><input type="checkbox" name="manage_general_ledger" <?= isChecked('manage_general_ledger', $permissionshow) ?>></td>
+                  <td>Manage GFC Mc Stock</td>
+                  <td><input type="checkbox" name="manage_gfcmcstock" <?= isChecked('manage_gfcmcstock', $permissionshow) ?>></td>
+                </tr>
+                <tr>
+                  <td>Manage Ledger Record</td>
+                  <td><input type="checkbox" name="manage_ledger_record" <?= isChecked('manage_ledger_record', $permissionshow) ?>></td>
+                  <td>Manage TCL Mc Stock</td>
+                  <td><input type="checkbox" name="manage_tclmcstock" <?= isChecked('manage_tclmcstock', $permissionshow) ?>></td>
+                </tr>
+                <tr>
+                  <td>Sale Report</td>
+                  <td><input type="checkbox" name="sale_report" <?= isChecked('sale_report', $permissionshow) ?>></td>
+                  <td>Manage Shippment Export</td>
+                  <td><input type="checkbox" name="manage_shippmentexport" <?= isChecked('manage_shippmentexport', $permissionshow) ?>></td>
+                </tr>
+                <tr>
+                  <td>Purchase Report</td>
+                  <td><input type="checkbox" name="purchase_report" <?= isChecked('purchase_report', $permissionshow) ?>></td>
+                  <td>Manage Truck Export</td>
+                  <td><input type="checkbox" name="manage_truckexport" <?= isChecked('manage_truckexport', $permissionshow) ?>></td>
+                </tr>
+                <tr>
+                  <td>Payable Report</td>
+                  <td><input type="checkbox" name="payable_report" <?= isChecked('payable_report', $permissionshow) ?>></td>
+                  <td>Manage Coldstore Item</td>
+                  <td><input type="checkbox" name="manage_coldstoreitem" <?= isChecked('manage_coldstoreitem', $permissionshow) ?>></td>
+                </tr>
+                <tr>
+                  <td>Manage Stock Report</td>
+                  <td><input type="checkbox" name="manage_stockreport" <?= isChecked('manage_stockreport', $permissionshow) ?>></td>
+                  <td>Manage Packing Material</td>
+                  <td><input type="checkbox" name="manage_packingmaterial" <?= isChecked('manage_packingmaterial', $permissionshow) ?>></td>
+                </tr>
+                <tr>
+                  <td>Manage General Ledger Report</td>
+                  <td><input type="checkbox" name="manage_generalledger" <?= isChecked('manage_generalledger', $permissionshow) ?>></td>
+                  <td>Manage Material Purchase</td>
+                  <td><input type="checkbox" name="manage_material_purchase" <?= isChecked('manage_material_purchase', $permissionshow) ?>></td>
+                </tr>
+                <tr>
+                  <td>Packing Material Report</td>
+                  <td><input type="checkbox" name="packing_material_report" <?= isChecked('packing_material_report', $permissionshow) ?>></td>
+                  <td>Material Store House</td>
+                  <td><input type="checkbox" name="material_store_house" <?= isChecked('material_store_house', $permissionshow) ?>></td>
+                </tr>
+                <tr>
+                  <td>Temp P/M Stock</td>
+                  <td><input type="checkbox" name="temp_pm_stock" <?= isChecked('temp_pm_stock', $permissionshow) ?>></td>
+                  <td>Packing Material Gate Pass</td>
+                  <td><input type="checkbox" name="material_gatepass" <?= isChecked('material_gatepass', $permissionshow) ?>></td>
+                </tr>
+                <tr>
+                  <td>Configuration Coldstore</td>
+                  <td><input type="checkbox" name="configuration_coldstore" <?= isChecked('configuration_coldstore', $permissionshow) ?>></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>Manage Mc Report</td>
+                  <td><input type="checkbox" name="manage_mcreport" <?= isChecked('manage_mcreport', $permissionshow) ?>></td>
+                  <td>Manage Currency</td>
+                  <td><input type="checkbox" name="manage_currency" <?= isChecked('manage_currency', $permissionshow) ?>></td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td><button type="submit" name="save" class="btn btn-success w-100 fw-bold">Save</button></td>
+                </tr>
+              </tbody>
+            </table>
           </form>
         </div>
       </div>
