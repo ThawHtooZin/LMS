@@ -98,13 +98,13 @@ $bootstrap->css();
             <select name="searchsize" class="form-control inpv2 d-inline float-end ms-1" style="width:12%; height:26px !important; padding:0px 5px;">
               <option value="">Select Size</option>
               <?php
-              $commonstmt = $pdo->prepare("SELECT DISTINCT size FROM form7stocktcl");
-              $commonstmt->execute();
-              $commondatas = $commonstmt->fetchAll();
-              foreach ($commondatas as $commondata) {
-                $size = $commondata['size'];
+              $sizestmt = $pdo->prepare("SELECT DISTINCT size FROM form7stocktcl");
+              $sizestmt->execute();
+              $sizedatas = $sizestmt->fetchAll(PDO::FETCH_ASSOC);
+              foreach ($sizedatas as $sizedata) {
+                $size = $sizedata['size'];
               ?>
-                <option value="<?php echo $size; ?>" <?php if (!empty($_SESSION['search']['searchsize']) && $_SESSION['search']['searchsize'] == $size) echo "selected"; ?>><?php echo $size; ?></option>
+                <option value="<?php echo htmlspecialchars($size); ?>" <?php if (!empty($_SESSION['search']['searchsize']) && $_SESSION['search']['searchsize'] == $size) echo "selected"; ?>><?php echo htmlspecialchars($size); ?></option>
               <?php } ?>
             </select>
 
@@ -113,15 +113,17 @@ $bootstrap->css();
               <?php
               $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stocktcl");
               $commonstmt->execute();
-              $commondatas = $commonstmt->fetchAll();
+              $commondatas = $commonstmt->fetchAll(PDO::FETCH_ASSOC);
               foreach ($commondatas as $commondata) {
                 $item_id = $commondata['item_id'];
-                $commonditydata = $query->select('item', $item_id, 'item_id');
+                $prodStmt = $pdo->prepare("SELECT name FROM products WHERE id = ? LIMIT 1");
+                $prodStmt->execute([$item_id]);
+                $prodName = $prodStmt->fetchColumn() ?: 'Unknown Product';
               ?>
-                <option value="<?php echo $commondata['item_id']; ?>" <?php if (!empty($_SESSION['search']['searchcommondity']) && $_SESSION['search']['searchcommondity'] == $commondata['item_id']) echo "selected"; ?>><?php echo $commonditydata['item_name']; ?></option>
+                <option value="<?php echo htmlspecialchars($item_id); ?>" <?php if (!empty($_SESSION['search']['searchcommondity']) && $_SESSION['search']['searchcommondity'] == $item_id) echo "selected"; ?>><?php echo htmlspecialchars($prodName); ?></option>
               <?php } ?>
             </select>
-            <input type="date" name="searchdate" value="<?php echo !empty($_SESSION['search']['searchdate']) ? $_SESSION['search']['searchdate'] : ''; ?>" class="form-control inpv2 d-inline float-end" style="width:12%; height:26px !important; padding:0px 5px;">
+            <input type="date" name="searchdate" value="<?php echo !empty($_SESSION['search']['searchdate']) ? htmlspecialchars($_SESSION['search']['searchdate']) : ''; ?>" class="form-control inpv2 d-inline float-end" style="width:12%; height:26px !important; padding:0px 5px;">
           </div>
         </form>
         <div class="card-body">
@@ -180,7 +182,7 @@ $bootstrap->css();
               }
 
               $stmt->execute();
-              $datas = $stmt->fetchall();
+              $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
             }
 
             // Initialize Dynamic Totals
@@ -191,28 +193,37 @@ $bootstrap->css();
 
             foreach ($datas as $form7data) {
               $item_id = $form7data['item_id'];
-              $commonditydata = $query->select('item', $item_id, 'item_id');
+
+              // REFACTORED: Direct Products table lookup
+              $prodStmt = $pdo->prepare("SELECT name FROM products WHERE id = ? LIMIT 1");
+              $prodStmt->execute([$item_id]);
+              $item_name_val = $prodStmt->fetchColumn() ?: 'Unknown Product';
+
               $supplier_id = $form7data['supplier_name'];
-              $supplierdata = $query->select('acname', $supplier_id, 'code_no');
+
+              // REFACTORED: Direct Contacts / Accodes table lookup for suppliers
+              $supStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ? UNION SELECT name FROM accodes WHERE code = ? LIMIT 1");
+              $supStmt->execute([$supplier_id, $supplier_id]);
+              $supplier_name_val = $supStmt->fetchColumn() ?: $supplier_id;
 
               // Accumulate totals
-              $t_viss += floatval($form7data['viss']);
-              $t_kg += floatval($form7data['kg']);
-              $t_pcs += floatval($form7data['pcspervr']);
-              $t_pcsf7 += floatval($form7data['pcsperf7']);
+              $t_viss += floatval($form7data['viss'] ?? 0);
+              $t_kg += floatval($form7data['kg'] ?? 0);
+              $t_pcs += floatval($form7data['pcspervr'] ?? 0);
+              $t_pcsf7 += floatval($form7data['pcsperf7'] ?? 0);
             ?>
               <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>" style="cursor:pointer;">
                 <td onclick="event.stopPropagation();"><input type="checkbox" class="row-checkbox" value="<?php echo $form7data['id']; ?>"></td>
-                <td><?php if ($form7data['date'] != "0000-00-00") echo date('d-m-Y', strtotime($form7data['date'])); ?></td>
-                <td><?php echo $commonditydata['item_name']; ?></td>
-                <td><?php echo $supplierdata['ac_name']; ?></td>
-                <td><?php echo $form7data['type']; ?></td>
-                <td><?php echo $form7data['country']; ?></td>
-                <td onclick="event.stopPropagation();" data-bs-target="#addsizemodal<?php echo $form7data['id']; ?>" data-bs-toggle="modal"><?php echo $form7data['size']; ?></td>
-                <td><?php echo $form7data['viss']; ?></td>
+                <td><?php if (!empty($form7data['date']) && $form7data['date'] != "0000-00-00") echo date('d-m-Y', strtotime($form7data['date'])); ?></td>
+                <td><?php echo htmlspecialchars($item_name_val); ?></td>
+                <td><?php echo htmlspecialchars($supplier_name_val); ?></td>
+                <td><?php echo htmlspecialchars($form7data['type'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($form7data['country'] ?? ''); ?></td>
+                <td onclick="event.stopPropagation();" data-bs-target="#addsizemodal<?php echo $form7data['id']; ?>" data-bs-toggle="modal"><?php echo htmlspecialchars($form7data['size'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($form7data['viss'] ?? ''); ?></td>
                 <td><?php if (!empty($form7data['kg'])) echo round($form7data['kg'], 2); ?></td>
-                <td><?php echo $form7data['pcspervr']; ?></td>
-                <td><?php if (!empty($form7data['pcsperf7'])) echo $form7data['pcsperf7']; ?></td>
+                <td><?php echo htmlspecialchars($form7data['pcspervr'] ?? ''); ?></td>
+                <td><?php if (!empty($form7data['pcsperf7'])) echo htmlspecialchars($form7data['pcsperf7']); ?></td>
                 <td onclick="event.stopPropagation();">
                   <form action="" method="post">
                     <input type="hidden" name="deleteid" value="<?php echo $form7data['id']; ?>">
@@ -244,7 +255,7 @@ $bootstrap->css();
                           <div class="row">
                             <div class="col">
                               <label>Pcs Per F7</label>
-                              <input type="text" name="pcsperf7" class="form-control inpv2 mt-1" value="<?php echo $updata['pcsperf7']; ?>">
+                              <input type="text" name="pcsperf7" class="form-control inpv2 mt-1" value="<?php echo htmlspecialchars($updata['pcsperf7'] ?? ''); ?>">
                             </div>
                           </div>
                         </div>
@@ -330,6 +341,7 @@ $bootstrap->css();
     </div>
   </div>
 
+  <!-- ADD MODAL -->
   <div class="modal fade" id="addmodal">
     <div class="modal-dialog" role="document">
       <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
@@ -349,10 +361,13 @@ $bootstrap->css();
                   <label>Fish Name</label>
                   <select class="form-control inpv2 mb-2" name="item_id">
                     <?php
-                    $itemdatas = $query->selectall('item');
+                    // REFACTORED: Pulled from products table
+                    $itemstmt = $pdo->prepare("SELECT id, name FROM products");
+                    $itemstmt->execute();
+                    $itemdatas = $itemstmt->fetchAll(PDO::FETCH_ASSOC);
                     foreach ($itemdatas as $itemdata) {
                     ?>
-                      <option value="<?php echo $itemdata['item_id']; ?>"><?php echo $itemdata['item_name']; ?></option>
+                      <option value="<?php echo htmlspecialchars($itemdata['id']); ?>"><?php echo htmlspecialchars($itemdata['name']); ?></option>
                     <?php } ?>
                   </select>
                 </div>
@@ -362,12 +377,13 @@ $bootstrap->css();
                   <label>Supplier Name</label>
                   <select class="form-control inpv2 mb-2" name="supplier_id">
                     <?php
-                    $supplierstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no LIKE '4000%'");
+                    // REFACTORED: Pulled from contacts table for suppliers
+                    $supplierstmt = $pdo->prepare("SELECT id, name FROM contacts WHERE is_supplier = 1 OR is_supplier = 0");
                     $supplierstmt->execute();
-                    $supplierdatas = $supplierstmt->fetchall();
+                    $supplierdatas = $supplierstmt->fetchAll(PDO::FETCH_ASSOC);
                     foreach ($supplierdatas as $supplierdata) {
                     ?>
-                      <option value="<?php echo $supplierdata['code_no']; ?>"><?php echo $supplierdata['ac_name']; ?></option>
+                      <option value="<?php echo htmlspecialchars($supplierdata['id']); ?>"><?php echo htmlspecialchars($supplierdata['name']); ?></option>
                     <?php } ?>
                   </select>
                 </div>

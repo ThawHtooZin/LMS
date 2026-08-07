@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 07, 2026 at 05:11 AM
+-- Generation Time: Aug 07, 2026 at 09:43 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -299,6 +299,13 @@ CREATE TABLE `form7stock` (
   `water_kg` int(11) NOT NULL,
   `fish_type` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `form7stock`
+--
+
+INSERT INTO `form7stock` (`id`, `date`, `item_id`, `supplier_name`, `country`, `type`, `size`, `viss`, `kg`, `pcspervr`, `pcsperf7`, `link_id`, `water_kg`, `fish_type`) VALUES
+(1, '2026-08-07', '1', 'Tommy', NULL, 'Frozen', '2up', '120', '196.08', '10', 0, 11, 0, '');
 
 -- --------------------------------------------------------
 
@@ -984,15 +991,9 @@ CREATE TABLE `purchases` (
   `status` enum('DRAFT','AWAITING_APPROVAL','AUTHORISED','PAID','VOIDED') NOT NULL DEFAULT 'DRAFT',
   `subtotal` decimal(15,2) NOT NULL DEFAULT 0.00,
   `grand_total` decimal(15,2) NOT NULL DEFAULT 0.00,
+  `paid_amount` decimal(15,2) NOT NULL DEFAULT 0.00,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `purchases`
---
-
-INSERT INTO `purchases` (`id`, `voucher_no`, `contact_id`, `date`, `tclfrozen`, `due_date`, `currency`, `exchange_rate`, `status`, `subtotal`, `grand_total`, `created_at`) VALUES
-(1, 'Dr 24/Feb111', 0, '2026-07-27', 'Frozen', NULL, 'MMK', 1.0000, 'DRAFT', 550000.00, 550000.00, '2026-07-27 11:19:37');
 
 -- --------------------------------------------------------
 
@@ -1018,8 +1019,9 @@ CREATE TABLE `purchase_lines` (
 --
 
 INSERT INTO `purchase_lines` (`id`, `purchase_id`, `product_id`, `account_id`, `description`, `size`, `viss`, `pcs`, `unit_price`, `line_amount`) VALUES
-(1, 1, 1, 3, 'Big fat hilsa', '', 0.00, 0, 2000.00, 50000.00),
-(2, 1, 2, 3, 'RLY BIG FISH', '', 0.00, 0, 10000.00, 500000.00);
+(9, 12, 1, 5000, 'Big fat hilsa', '2up', 200.00, 10, 2000.00, 400000.00),
+(10, 12, 2, 5000, 'BIG FAT FISH', '3up', 100.00, 20, 3500.00, 350000.00),
+(11, 13, 1, 5000, 'Big fat hilsa', '2up', 120.00, 10, 1400.00, 168000.00);
 
 -- --------------------------------------------------------
 
@@ -1394,6 +1396,18 @@ ALTER TABLE `exchange_rates`
   ADD UNIQUE KEY `uniq_rate_date` (`currency_code`,`effective_date`);
 
 --
+-- Indexes for table `form7stock`
+--
+ALTER TABLE `form7stock`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `general_ledger`
+--
+ALTER TABLE `general_ledger`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `products`
 --
 ALTER TABLE `products`
@@ -1447,6 +1461,18 @@ ALTER TABLE `exchange_rates`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `form7stock`
+--
+ALTER TABLE `form7stock`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `general_ledger`
+--
+ALTER TABLE `general_ledger`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
@@ -1462,13 +1488,13 @@ ALTER TABLE `product_types`
 -- AUTO_INCREMENT for table `purchases`
 --
 ALTER TABLE `purchases`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `purchase_lines`
 --
 ALTER TABLE `purchase_lines`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `system_currencies`

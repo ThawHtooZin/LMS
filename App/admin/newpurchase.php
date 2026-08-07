@@ -31,11 +31,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
     if (isset($_POST['account_code'])) {
         for ($i = 0; $i < count($_POST['account_code']); $i++) {
             $viss = floatval($_POST['viss'][$i]);
+            $pcs = intval($_POST['pcs'][$i]);
             $price = floatval($_POST['unit_price'][$i]);
             $acc = $_POST['account_code'][$i];
 
-            if (!empty($acc) && $viss > 0) {
-                $line_total = $viss * $price;
+            // Calculate line total based on type (Material uses pcs as qty)
+            $multiplier = (strtolower($tclfrozen) === 'material') ? $pcs : $viss;
+
+            if (!empty($acc) && ($multiplier > 0 || $price > 0)) {
+                $line_total = $multiplier * $price;
                 $subtotal += $line_total;
                 $lines[] = [
                     'product_id' => !empty($_POST['product_id'][$i]) ? $_POST['product_id'][$i] : NULL,
@@ -43,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
                     'description' => $_POST['description'][$i],
                     'size' => $_POST['size'][$i],
                     'viss' => $viss,
-                    'pcs' => intval($_POST['pcs'][$i]),
+                    'pcs' => $pcs,
                     'unit_price' => $price,
                     'line_amount' => $line_total
                 ];
@@ -58,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
     $query->savePurchase(null, $contact_id, $date, $tclfrozen, $due_date, $voucher_no, $currency, $status, $subtotal, $subtotal, $lines, $ctrl_action);
 }
 
-$suppliers = $pdo->query("SELECT id, name FROM contacts WHERE is_supplier = 1 ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
+$suppliers = $pdo->query("SELECT id, name FROM contacts WHERE is_supplier = 1 OR is_supplier = 0 ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
 $products = $pdo->query("SELECT id, code, name, purchase_account FROM products WHERE is_purchased = 1 ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
 $currencies = $pdo->query("SELECT code, name FROM system_currencies ORDER BY code ASC")->fetchAll(PDO::FETCH_ASSOC);
 
@@ -173,9 +177,11 @@ foreach ($accounts as $acc) {
                         </div>
                         <div class="col-md-2">
                             <label class="fw-bold small mb-1">Type</label>
-                            <select name="tclfrozen" class="form-select form-select-sm" style="height: 38px;">
+                            <select name="tclfrozen" id="tclfrozenTypeSelect" class="form-select form-select-sm" style="height: 38px;">
                                 <option value="Frozen">Frozen</option>
                                 <option value="tcl">TCL</option>
+                                <option value="Material">Material</option>
+                                <option value="Other">Other</option>
                             </select>
                         </div>
                         <div class="col-md-2">
@@ -204,9 +210,9 @@ foreach ($accounts as $acc) {
                             <tr>
                                 <th width="15%">Item</th>
                                 <th width="15%">Description</th>
-                                <th width="10%">Size</th>
-                                <th width="10%">Viss</th>
-                                <th width="10%">Pcs</th>
+                                <th width="10%" class="col-fish-only">Size</th>
+                                <th width="10%" class="col-fish-only">Viss</th>
+                                <th width="10%" id="qtyHeaderTh">Pcs</th>
                                 <th width="15%">Unit Price</th>
                                 <th width="15%">Account</th>
                                 <th width="10%" class="text-end">Amount</th>
@@ -290,9 +296,21 @@ foreach ($accounts as $acc) {
                 width: '100%',
                 search_contains: true
             });
-            addNewLine();
-            addNewLine();
-            addNewLine();
+
+            toggleMaterialColumns($('#tclfrozenTypeSelect').val());
+
+            $('#tclfrozenTypeSelect').change(function() {
+                toggleMaterialColumns($(this).val());
+                calcTotals();
+            });
+
+            if ($('#linesBody tr').length === 0) {
+                addNewLine();
+                addNewLine();
+                addNewLine();
+            } else {
+                calcTotals();
+            }
 
             $('#addLineBtn').click(addNewLine);
             $('#linesBody').on('input', '.calc-input', calcTotals);
@@ -307,13 +325,26 @@ foreach ($accounts as $acc) {
             });
         });
 
+        function toggleMaterialColumns(selectedType) {
+            if (selectedType === 'Material') {
+                $('.col-fish-only').hide();
+                $('#qtyHeaderTh').text('Quantity');
+            } else {
+                $('.col-fish-only').show();
+                $('#qtyHeaderTh').text('Pcs');
+            }
+        }
+
         function addNewLine() {
+            let selectedType = $('#tclfrozenTypeSelect').val();
+            let displayStyle = (selectedType === 'Material') ? 'style="display:none;"' : '';
+
             let tr = `
                 <tr>
                     <td><select name="product_id[]" class="form-control chosen-select prod-select">${$('#prodTpl').html()}</select></td>
                     <td><input type="text" name="description[]"></td>
-                    <td><input type="text" name="size[]" placeholder="e.g. 1up"></td>
-                    <td><input type="number" name="viss[]" step="0.01" class="calc-input viss-input"></td>
+                    <td class="col-fish-only" ${displayStyle}><input type="text" name="size[]" placeholder="e.g. 1up"></td>
+                    <td class="col-fish-only" ${displayStyle}><input type="number" name="viss[]" step="0.01" class="calc-input viss-input" value="0"></td>
                     <td><input type="number" name="pcs[]" class="calc-input pcs-input"></td>
                     <td><input type="number" name="unit_price[]" step="0.01" class="calc-input price-input"></td>
                     <td><select name="account_code[]" class="form-control chosen-select acc-select">${$('#accTpl').html()}</select></td>
@@ -325,14 +356,26 @@ foreach ($accounts as $acc) {
                 width: '100%',
                 search_contains: true
             });
+            if (selectedType === 'Material') {
+                $('.col-fish-only').hide();
+            }
         }
 
         function calcTotals() {
             let total = 0;
+            let selectedType = $('#tclfrozenTypeSelect').val();
+
             $('#linesBody tr').each(function() {
-                let v = parseFloat($(this).find('.viss-input').val()) || 0;
+                let multiplier = 0;
                 let p = parseFloat($(this).find('.price-input').val()) || 0;
-                let t = v * p;
+
+                if (selectedType === 'Material') {
+                    multiplier = parseFloat($(this).find('.pcs-input').val()) || 0;
+                } else {
+                    multiplier = parseFloat($(this).find('.viss-input').val()) || 0;
+                }
+
+                let t = multiplier * p;
                 $(this).find('.line-total').text(t.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2

@@ -32,7 +32,7 @@ $bootstrap->css();
 
     // Fetch existing country so it is not overwritten
     $existing_data = $query->select('form7stock', $updateid, 'id');
-    $country = $existing_data['country'];
+    $country = $existing_data ? ($existing_data['country'] ?? '') : '';
 
     $query->updatefrozencountry($country, $pcsperf7, $updateid);
   }
@@ -114,17 +114,20 @@ $bootstrap->css();
 
               foreach ($commondatas as $commondata) {
                 $item_id = $commondata['item_id'];
-                $commonditydata = $query->select('item', $item_id, 'item_id');
+                if (empty($item_id)) continue;
+                // REFACTORED: Querying 'products' table directly
+                $prodStmt = $pdo->prepare("SELECT name FROM products WHERE id = ? LIMIT 1");
+                $prodStmt->execute([$item_id]);
+                $prodName = $prodStmt->fetchColumn();
+                $display_name = $prodName ? $prodName : 'Unknown Product';
               ?>
-                <option value="<?php echo $commondata['item_id']; ?>" <?php if (!empty($_SESSION['search']['searchcommondity'])) {
-                                                                        if ($_SESSION['search']['searchcommondity'] == $commondata['item_id']) {
-                                                                          echo "selected";
-                                                                        }
-                                                                      } ?>><?php echo $commonditydata['item_name']; ?></option>
+                <option value="<?php echo htmlspecialchars($item_id); ?>" <?php if (!empty($_SESSION['search']['searchcommondity']) && $_SESSION['search']['searchcommondity'] == $item_id) echo "selected"; ?>>
+                  <?php echo htmlspecialchars($display_name); ?>
+                </option>
               <?php } ?>
             </select>
             <input type="date" name="date" value="<?php if (!empty($_SESSION['search']['searchdate'])) {
-                                                    echo $_SESSION['search']['searchdate'];
+                                                    echo htmlspecialchars($_SESSION['search']['searchdate']);
                                                   } ?>" class="form-control inpv2 d-inline float-end" style="margin-left:5px; width: 14%; height:26px !important; padding:0px 2px;">
             <select name="size" class="form-control inpv2 d-inline float-end" style="margin-left:5px; width: 10%; height:26px !important; padding:0px 2px;">
               <option value="">Select Size</option>
@@ -134,12 +137,11 @@ $bootstrap->css();
               $sizedatas = $sizestmt->fetchAll();
 
               foreach ($sizedatas as $sizedata) {
+                if (empty($sizedata['size'])) continue;
               ?>
-                <option value="<?php echo $sizedata['size']; ?>" <?php if (!empty($_SESSION['search']['searchsize'])) {
-                                                                    if ($_SESSION['search']['searchsize'] == $sizedata['size']) {
-                                                                      echo "selected";
-                                                                    }
-                                                                  } ?>><?php echo $sizedata['size']; ?></option>
+                <option value="<?php echo htmlspecialchars($sizedata['size']); ?>" <?php if (!empty($_SESSION['search']['searchsize']) && $_SESSION['search']['searchsize'] == $sizedata['size']) echo "selected"; ?>>
+                  <?php echo htmlspecialchars($sizedata['size']); ?>
+                </option>
               <?php } ?>
             </select>
           </div>
@@ -168,11 +170,10 @@ $bootstrap->css();
             $searchdate = !empty($_SESSION['search']['searchdate']) ? $_SESSION['search']['searchdate'] : '';
             $searchsize = !empty($_SESSION['search']['searchsize']) ? $_SESSION['search']['searchsize'] : '';
 
-            // Initialize the base query and an array for the conditions
+            // Initialize base query and conditions
             $sql = "SELECT * FROM form7stock";
             $conditions = [];
 
-            // Add conditions based on the session variables
             if ($commondity_id != '') {
               $conditions[] = "item_id = :commondity_id";
             }
@@ -183,15 +184,12 @@ $bootstrap->css();
               $conditions[] = "size = :searchsize";
             }
 
-            // If there are conditions, append them to the base sql
             if (count($conditions) > 0) {
               $sql .= " WHERE " . implode(" AND ", $conditions);
             }
 
-            // Prepare the statement
             $stmt = $pdo->prepare($sql);
 
-            // Bind parameters if they are set
             if ($commondity_id != '') {
               $stmt->bindParam(':commondity_id', $commondity_id, PDO::PARAM_STR);
             }
@@ -202,47 +200,55 @@ $bootstrap->css();
               $stmt->bindParam(':searchsize', $searchsize, PDO::PARAM_STR);
             }
 
-            // Execute the statement
             $stmt->execute();
-            $datas = $stmt->fetchall();
+            $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Initialize accumulator variables for our totals
+            // Accumulator variables
             $total_viss = 0;
             $total_kg = 0;
             $total_pcs = 0;
             $total_pcsf7 = 0;
 
             foreach ($datas as $form7data) {
-              $item_id = $form7data['item_id'];
-              $commonditydata = $query->select('item', $item_id, 'item_id');
-              $supplier_id = $form7data['supplier_name'];
-              $supplierdata = $query->select('acname', $supplier_id, 'code_no');
+              $item_id = $form7data['item_id'] ?? '';
+
+              // REFACTORED: Direct Product Lookup
+              $prodStmt = $pdo->prepare("SELECT name FROM products WHERE id = ? LIMIT 1");
+              $prodStmt->execute([$item_id]);
+              $item_name_val = $prodStmt->fetchColumn() ?: 'Unknown Product';
+
+              $supplier_id = $form7data['supplier_name'] ?? '';
+
+              // REFACTORED: Direct Supplier Lookup from new accounts/contacts structure
+              $supStmt = $pdo->prepare("SELECT name FROM accodes WHERE code = ? UNION SELECT name FROM contacts WHERE id = ? LIMIT 1");
+              $supStmt->execute([$supplier_id, $supplier_id]);
+              $supplier_name_val = $supStmt->fetchColumn() ?: $supplier_id;
 
               // Accumulate totals dynamically
-              $total_viss += floatval($form7data['viss']);
-              $total_kg += floatval($form7data['kg']);
-              $total_pcs += floatval($form7data['pcspervr']);
-              $total_pcsf7 += floatval($form7data['pcsperf7']);
+              $total_viss += floatval($form7data['viss'] ?? 0);
+              $total_kg += floatval($form7data['kg'] ?? 0);
+              $total_pcs += floatval($form7data['pcspervr'] ?? 0);
+              $total_pcsf7 += floatval($form7data['pcsperf7'] ?? 0);
             ?>
               <tr>
                 <td><input type="checkbox" class="row-checkbox" value="<?php echo $form7data['id']; ?>"></td>
-                <td><?php if ($form7data['date'] != "0000-00-00") {
+                <td><?php if (!empty($form7data['date']) && $form7data['date'] != "0000-00-00") {
                       echo date('d-m-Y', strtotime($form7data['date']));
                     }; ?></td>
-                <td><?php echo $commonditydata['item_name'] . "(" . $form7data['fish_type'] . ")"; ?></td>
-                <td><?php echo $supplierdata['ac_name']; ?></td>
-                <td><?php echo $form7data['type']; ?></td>
-                <td><?php echo $form7data['country']; ?></td>
-                <td data-bs-toggle="modal" data-bs-target="#updatesizemodal<?php echo $form7data['id']; ?>"><?php echo $form7data['size']; ?></td>
-                <td><?php echo $form7data['viss']; ?></td>
-                <td><?php echo floatval($form7data['viss']) * 1.634; ?></td>
+                <td><?php echo htmlspecialchars($item_name_val) . "(" . htmlspecialchars($form7data['fish_type'] ?? '') . ")"; ?></td>
+                <td><?php echo htmlspecialchars($supplier_name_val); ?></td>
+                <td><?php echo htmlspecialchars($form7data['type'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($form7data['country'] ?? ''); ?></td>
+                <td data-bs-toggle="modal" data-bs-target="#updatesizemodal<?php echo $form7data['id']; ?>"><?php echo htmlspecialchars($form7data['size'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($form7data['viss'] ?? '0'); ?></td>
+                <td><?php echo floatval($form7data['viss'] ?? 0) * 1.634; ?></td>
                 <td data-bs-toggle="modal" data-bs-target="#waterkgmodal<?php echo $form7data['id']; ?>"><?php if (!empty($form7data['water_kg'])) {
-                                                                                                            echo $form7data['water_kg'];
+                                                                                                            echo htmlspecialchars($form7data['water_kg']);
                                                                                                           } ?></td>
-                <td><?php echo $form7data['kg']; ?></td>
-                <td><?php echo $form7data['pcspervr']; ?></td>
+                <td><?php echo htmlspecialchars($form7data['kg'] ?? '0'); ?></td>
+                <td><?php echo htmlspecialchars($form7data['pcspervr'] ?? '0'); ?></td>
                 <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>"><?php if (!empty($form7data['pcsperf7'])) {
-                                                                                                          echo $form7data['pcsperf7'];
+                                                                                                          echo htmlspecialchars($form7data['pcsperf7']);
                                                                                                         }; ?></td>
                 <td>
                   <form action="form_7_frozen.php" method="post">
@@ -256,6 +262,7 @@ $bootstrap->css();
                 </td>
               </tr>
 
+              <!-- WATER KG MODAL -->
               <div class="modal fade" id="waterkgmodal<?php echo $form7data['id']; ?>">
                 <div class="modal-dialog" role="document">
                   <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
@@ -270,9 +277,10 @@ $bootstrap->css();
                           <?php
                           $idd = $form7data['id'];
                           $updata = $query->select('form7stock', $idd, 'id');
+                          $safe_waterkg = $updata ? ($updata['water_kg'] ?? '') : '';
                           ?>
                           <label>Water Kg</label>
-                          <input type="text" name="waterkg" class="form-control inpv2 mt-1" value="<?php echo $updata['water_kg']; ?>">
+                          <input type="text" name="waterkg" class="form-control inpv2 mt-1" value="<?php echo htmlspecialchars($safe_waterkg); ?>">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -284,6 +292,7 @@ $bootstrap->css();
                 </div>
               </div>
 
+              <!-- UPDATE MODAL -->
               <div class="modal fade" id="updatemodal<?php echo $form7data['id']; ?>">
                 <div class="modal-dialog" role="document">
                   <div class="modal-content" style="margin-top:70px !important;">
@@ -298,11 +307,12 @@ $bootstrap->css();
                           <?php
                           $idd = $form7data['id'];
                           $updata = $query->select('form7stock', $idd, 'id');
+                          $safe_pcsperf7 = $updata ? ($updata['pcsperf7'] ?? '') : '';
                           ?>
                           <div class="row">
                             <div class="col">
                               <label>Pcs Per F7</label>
-                              <input type="text" name="pcsperf7" class="form-control inpv2 mt-1" value="<?php echo $updata['pcsperf7']; ?>">
+                              <input type="text" name="pcsperf7" class="form-control inpv2 mt-1" value="<?php echo htmlspecialchars($safe_pcsperf7); ?>">
                             </div>
                           </div>
                         </div>
@@ -316,6 +326,7 @@ $bootstrap->css();
                 </div>
               </div>
 
+              <!-- ADD SIZE MODAL -->
               <div class="modal fade" id="updatesizemodal<?php echo $form7data['id']; ?>">
                 <div class="modal-dialog" role="document">
                   <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
@@ -330,11 +341,12 @@ $bootstrap->css();
                           <?php
                           $idd = $form7data['id'];
                           $updata = $query->select('form7stock', $idd, 'id');
+                          $safe_size = $updata ? ($updata['size'] ?? '') : '';
                           ?>
                           <div class="row">
                             <div class="col">
                               <label>Size</label>
-                              <input type="text" name="size" class="form-control inpv2 mt-1" value="<?php echo $updata['size']; ?>">
+                              <input type="text" name="size" class="form-control inpv2 mt-1" value="<?php echo htmlspecialchars($safe_size); ?>">
                             </div>
                           </div>
                         </div>
@@ -347,8 +359,7 @@ $bootstrap->css();
                   </div>
                 </div>
               </div>
-            <?php } // End of foreach loop 
-            ?>
+            <?php } ?>
 
             <?php if (count($datas) > 0) { ?>
               <tr style="font-weight: bold !important; background-color: #f8f9fa;">
@@ -374,6 +385,7 @@ $bootstrap->css();
     </div>
   </div>
 
+  <!-- BULK UPDATE MODAL -->
   <div class="modal fade" id="bulkUpdateModal" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content" style="margin-top:70px !important;">
@@ -415,6 +427,7 @@ $bootstrap->css();
     </div>
   </div>
 
+  <!-- ADD DATA MODAL -->
   <div class="modal fade" id="addmodal">
     <div class="modal-dialog" role="document">
       <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
@@ -434,10 +447,11 @@ $bootstrap->css();
                   <label>Fish Name</label>
                   <select class="form-control inpv2 mb-2" name="item_id">
                     <?php
-                    $itemdatas = $query->selectall('item');
+                    // REFACTORED: Pulled directly from new 'products' table
+                    $itemdatas = $query->selectall('products');
                     foreach ($itemdatas as $itemdata) {
                     ?>
-                      <option value="<?php echo $itemdata['item_id']; ?>"><?php echo $itemdata['item_name']; ?></option>
+                      <option value="<?php echo htmlspecialchars($itemdata['id']); ?>"><?php echo htmlspecialchars($itemdata['name']); ?></option>
                     <?php } ?>
                   </select>
                 </div>
@@ -447,13 +461,14 @@ $bootstrap->css();
                   <label>Supplier Name</label>
                   <select class="form-control inpv2 mb-2" name="supplier_id">
                     <?php
-                    $supplierstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no LIKE '4000%'");
+                    // REFACTORED: Pulled directly from new 'accodes' or 'contacts' table
+                    $supplierstmt = $pdo->prepare("SELECT code AS code_no, name AS ac_name FROM accodes UNION SELECT id AS code_no, name AS ac_name FROM contacts");
                     $supplierstmt->execute();
-                    $supplierdatas = $supplierstmt->fetchall();
+                    $supplierdatas = $supplierstmt->fetchAll(PDO::FETCH_ASSOC);
 
                     foreach ($supplierdatas as $supplierdata) {
                     ?>
-                      <option value="<?php echo $supplierdata['code_no']; ?>"><?php echo $supplierdata['ac_name']; ?></option>
+                      <option value="<?php echo htmlspecialchars($supplierdata['code_no']); ?>"><?php echo htmlspecialchars($supplierdata['ac_name']); ?></option>
                     <?php } ?>
                   </select>
                 </div>

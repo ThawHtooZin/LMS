@@ -647,17 +647,26 @@ class Query
         // THE GATEKEEPER: Only inject into operations and GL if AUTHORISED
         if ($status === 'AUTHORISED') {
 
-          // A. Route to Physical Stock 
-          $kg = floatval($line['viss']) * 1.634;
-          if ($tclfrozen === 'tcl') {
-            $formstmt = $pdo->prepare("INSERT INTO form7stocktcl (date, item_id, supplier_name, country, type, size, viss, kg, pcspervr, link_id) VALUES (?, ?, ?, 'DAKA', 'TCl', ?, ?, ?, ?, ?)");
-            $formstmt->execute([$date, $prod_id, $supplier_name, $line['size'], $line['viss'], $kg, $line['pcs'], $link_id]);
-          } else {
-            $formstmt = $pdo->prepare("INSERT INTO form7stock (date, item_id, supplier_name, type, size, viss, kg, pcspervr, link_id) VALUES (?, ?, ?, 'Frozen', ?, ?, ?, ?, ?)");
-            $formstmt->execute([$date, $prod_id, $supplier_name, $line['size'], $line['viss'], $kg, $line['pcs'], $link_id]);
-          }
+          $lowerType = strtolower($tclfrozen);
 
-          // B. General Ledger: Debit the specific Expense Account (e.g. 5000)
+          // A. Route based on Type (Phase 2)
+          if ($lowerType === 'frozen' || $lowerType === 'tcl') {
+            $kg = floatval($line['viss']) * 1.634;
+            if ($lowerType === 'tcl') {
+              $formstmt = $pdo->prepare("INSERT INTO form7stocktcl (date, item_id, supplier_name, country, type, size, viss, kg, pcspervr, link_id) VALUES (?, ?, ?, 'DAKA', 'TCl', ?, ?, ?, ?, ?)");
+              $formstmt->execute([$date, $prod_id, $supplier_name, $line['size'], $line['viss'], $kg, $line['pcs'], $link_id]);
+            } else {
+              $formstmt = $pdo->prepare("INSERT INTO form7stock (date, item_id, supplier_name, type, size, viss, kg, pcspervr, link_id) VALUES (?, ?, ?, 'Frozen', ?, ?, ?, ?, ?)");
+              $formstmt->execute([$date, $prod_id, $supplier_name, $line['size'], $line['viss'], $kg, $line['pcs'], $link_id]);
+            }
+          } elseif ($lowerType === 'material') {
+            // Route directly to material storehouse tracking using pcs as quantity
+            $storehousestmt = $pdo->prepare("INSERT INTO material_store_house (date, voucher_no, supplier_id, material_id, in_quantity) VALUES (?, ?, ?, ?, ?)");
+            $storehousestmt->execute([$date, $voucher_no, $contact_id, $prod_id, $line['pcs']]);
+          }
+          // Note: 'Other' type skips physical inventory insertion entirely, recording only financial GL records.
+
+          // B. General Ledger: Debit the specific Expense/Asset Account
           $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, ?, ?, '0', ?, ?)");
           $narration = !empty($line['description']) ? $line['description'] : 'Purchase Line Item';
           $glDebit->execute([$date, $voucher_no, $line['account_id'], $line['line_amount'], $narration, $sr_no]);
@@ -666,7 +675,6 @@ class Query
 
       // 4. General Ledger: Credit Accounts Payable (Only if AUTHORISED)
       if ($status === 'AUTHORISED') {
-        // Master Accounts Payable is Account 2000
         $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, '2000', '0', ?, ?, ?)");
         $glCredit->execute([$date, $voucher_no, $grand_total, "Total Bill - $supplier_name", $sr_no]);
       }
@@ -690,7 +698,6 @@ class Query
       echo "<script>alert('Failed to save bill. Error: " . addslashes($e->getMessage()) . "');</script>";
     }
   }
-
   public function deletePurchase($id)
   {
     global $pdo;
@@ -779,6 +786,131 @@ class Query
     } catch (Exception $e) {
       $pdo->rollBack();
       echo "<script>alert('Failed to void bill. Error: " . addslashes($e->getMessage()) . "');</script>";
+    }
+  }
+
+  // ==========================================
+  // PAYMENT PROCESSING & LEDGER SETTLEMENT
+  // ==========================================
+
+  public function payPurchaseBill($purchase_id, $payment_date, $payment_account, $reference)
+  {
+    global $pdo;
+    try {
+      $pdo->beginTransaction();
+
+      // 1. Fetch the bill to ensure it exists and is currently Authorised
+      $stmt = $pdo->prepare("SELECT voucher_no, contact_id, grand_total, status FROM purchases WHERE id = ?");
+      $stmt->execute([$purchase_id]);
+      $bill = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      if (!$bill) {
+        throw new Exception("Bill not found.");
+      }
+      if ($bill['status'] !== 'AUTHORISED') {
+        throw new Exception("Only authorised bills can be paid. Current status: " . $bill['status']);
+      }
+
+      $voucher_no = $bill['voucher_no'];
+      $amount = $bill['grand_total'];
+      $supplier_id = $bill['contact_id'];
+
+      // Fetch supplier name for the General Ledger narration
+      $supStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ?");
+      $supStmt->execute([$supplier_id]);
+      $supplier_name = $supStmt->fetchColumn();
+
+      // 2. Lock the Purchase Document Status
+      $updStmt = $pdo->prepare("UPDATE purchases SET status = 'PAID' WHERE id = ?");
+      $updStmt->execute([$purchase_id]);
+
+      // 3. Double-Entry Bookkeeping
+      // Generate a unique serial number for the payment batch
+      $sr_no = 'PAY-' . time();
+      $narration = "Payment to $supplier_name - Ref: $reference";
+
+      // A. Debit Accounts Payable (Account 2000) to clear the liability
+      $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, '2000', ?, '0', ?, ?)");
+      $glDebit->execute([$payment_date, $voucher_no, $amount, $narration, $sr_no]);
+
+      // B. Credit the specific Bank/Cash Account to reduce cash on hand
+      $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, ?, '0', ?, ?, ?)");
+      $glCredit->execute([$payment_date, $voucher_no, $payment_account, $amount, $narration, $sr_no]);
+
+      $pdo->commit();
+
+      echo "<script>alert('Payment successfully recorded and posted to the General Ledger.'); window.location.href='acpayabledetail.php?supplier_id=$supplier_id';</script>";
+    } catch (Exception $e) {
+      $pdo->rollBack();
+      echo "<script>alert('Payment failed. Error: " . addslashes($e->getMessage()) . "'); window.location.href='acpayabledetail.php?supplier_id=$supplier_id';</script>";
+    }
+  }
+
+  public function paySupplierBalance($supplier_id, $payment_date, $payment_account, $reference, $payment_amount)
+  {
+    global $pdo;
+    try {
+      $pdo->beginTransaction();
+
+      $payment_amount = floatval($payment_amount);
+      if ($payment_amount <= 0) {
+        throw new Exception("Payment amount must be greater than zero.");
+      }
+
+      // Fetch supplier name for narration
+      $supStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ?");
+      $supStmt->execute([$supplier_id]);
+      $supplier_name = $supStmt->fetchColumn();
+
+      // Fetch all unpaid bills (Oldest first)
+      $stmt = $pdo->prepare("SELECT id, voucher_no, grand_total, paid_amount FROM purchases WHERE contact_id = ? AND status = 'AUTHORISED' ORDER BY date ASC, id ASC");
+      $stmt->execute([$supplier_id]);
+      $bills = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $remaining_payment = $payment_amount;
+      $sr_no = 'PAY-' . time();
+      $narration = "Supplier Payment to $supplier_name - Ref: $reference";
+
+      foreach ($bills as $bill) {
+        if ($remaining_payment <= 0) break;
+
+        $amount_due = $bill['grand_total'] - $bill['paid_amount'];
+
+        if ($remaining_payment >= $amount_due) {
+          // Fully pay this bill
+          $apply_amount = $amount_due;
+          $new_paid = $bill['grand_total'];
+          $new_status = 'PAID';
+        } else {
+          // Partially pay this bill
+          $apply_amount = $remaining_payment;
+          $new_paid = $bill['paid_amount'] + $apply_amount;
+          $new_status = 'AUTHORISED';
+        }
+
+        $upd = $pdo->prepare("UPDATE purchases SET paid_amount = ?, status = ? WHERE id = ?");
+        $upd->execute([$new_paid, $new_status, $bill['id']]);
+
+        $remaining_payment -= $apply_amount;
+      }
+
+      $actual_applied = $payment_amount - $remaining_payment;
+
+      if ($actual_applied > 0) {
+        // 1. Debit Accounts Payable (2000)
+        $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, '2000', ?, '0', ?, ?)");
+        $glDebit->execute([$payment_date, $reference, $actual_applied, $narration, $sr_no]);
+
+        // 2. Credit Selected Bank/Cash Account
+        $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, ?, '0', ?, ?, ?)");
+        $glCredit->execute([$payment_date, $reference, $payment_account, $actual_applied, $narration, $sr_no]);
+      }
+
+      $pdo->commit();
+      echo "<script>alert('Payment of " . number_format($actual_applied, 2) . " applied successfully across open bills.'); window.location.href='acpayabledetail.php?supplier_id=$supplier_id';</script>";
+    } catch (Exception $e) {
+      $pdo->rollBack();
+      echo "<script>alert('Payment failed. Error: " . addslashes($e->getMessage()) . "'); window.location.href='acpayabledetail.php?supplier_id=$supplier_id';</script>";
     }
   }
 

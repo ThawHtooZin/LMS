@@ -49,13 +49,11 @@ $bootstrap->css();
   }
 
   if (isset($_POST['add'])) {
-    // Header Level Data
     $date = $_POST['date'];
     $supplier_id = $_POST['supplier_id'];
     $country = $_POST['country'];
     $type = $_POST['type'];
 
-    // Line Level Arrays
     $item_ids = isset($_POST['item_id']) ? $_POST['item_id'] : [];
     $fish_types = isset($_POST['fish_type']) ? $_POST['fish_type'] : [];
     $sizes = isset($_POST['size']) ? $_POST['size'] : [];
@@ -67,7 +65,6 @@ $bootstrap->css();
     $loose_out_kgs = isset($_POST['loose_out_kg']) ? $_POST['loose_out_kg'] : [];
     $loose_out_pcss = isset($_POST['loose_out_pcs']) ? $_POST['loose_out_pcs'] : [];
 
-    // Process each line
     foreach ($item_ids as $index => $item_id) {
       $item_id = trim($item_id);
       if (empty($item_id)) continue;
@@ -90,7 +87,6 @@ $bootstrap->css();
     $_SESSION['country'] = $country;
   }
 
-  // Handle Main Table Header Filters
   if (isset($_POST['searchbtn'])) {
     $_SESSION['search']['searchcommondity'] = $_POST['commondity_id'];
     $_SESSION['search']['searchdate'] = $_POST['date'];
@@ -126,17 +122,18 @@ $bootstrap->css();
             <button type="submit" name="clearfilter" class="btn btn-secondary btn-sm float-end ms-2" style="border-top-left-radius:0px; border-bottom-left-radius:0px;">Clear Filter</button>
             <button type="submit" name="searchbtn" class="btn btn-primary btn-sm float-end me-2" style="border-top-left-radius:0px; border-bottom-left-radius:0px;">View</button>
 
+            <!-- REFACTORED: Filter bar commodity dropdown pulls directly from products table -->
             <select name="commondity_id" class="form-control inpv2 d-inline float-end" style="margin-left:5px; width: 10%; height:26px !important; padding:0px 2px;">
               <option value="">Select Commondity</option>
               <?php
-              $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
-              $commonstmt->execute();
-              $commondatas = $commonstmt->fetchAll();
-              foreach ($commondatas as $commondata) {
-                $item_id = $commondata['item_id'];
-                $commonditydata = $query->select('item', $item_id, 'item_id');
+              $prodFilterStmt = $pdo->prepare("SELECT id, name FROM products");
+              $prodFilterStmt->execute();
+              $prodFilterDatas = $prodFilterStmt->fetchAll(PDO::FETCH_ASSOC);
+              foreach ($prodFilterDatas as $prodData) {
               ?>
-                <option value="<?php echo $commondata['item_id']; ?>" <?php if (!empty($_SESSION['search']['searchcommondity']) && $_SESSION['search']['searchcommondity'] == $commondata['item_id']) echo "selected"; ?>><?php echo $commonditydata['item_name']; ?></option>
+                <option value="<?php echo htmlspecialchars($prodData['id']); ?>" <?php if (!empty($_SESSION['search']['searchcommondity']) && $_SESSION['search']['searchcommondity'] == $prodData['id']) echo "selected"; ?>>
+                  <?php echo htmlspecialchars($prodData['name']); ?>
+                </option>
               <?php } ?>
             </select>
             <input type="date" name="date" value="<?php echo !empty($_SESSION['search']['searchdate']) ? $_SESSION['search']['searchdate'] : ''; ?>" class="form-control inpv2 d-inline float-end" style="margin-left:5px; width: 14%; height:26px !important; padding:0px 2px;">
@@ -148,7 +145,7 @@ $bootstrap->css();
               $sizedatas = $sizestmt->fetchAll();
               foreach ($sizedatas as $sizedata) {
               ?>
-                <option value="<?php echo $sizedata['size']; ?>" <?php if (!empty($_SESSION['search']['searchsize']) && $_SESSION['search']['searchsize'] == $sizedata['size']) echo "selected"; ?>><?php echo $sizedata['size']; ?></option>
+                <option value="<?php echo htmlspecialchars($sizedata['size']); ?>" <?php if (!empty($_SESSION['search']['searchsize']) && $_SESSION['search']['searchsize'] == $sizedata['size']) echo "selected"; ?>><?php echo htmlspecialchars($sizedata['size']); ?></option>
               <?php } ?>
             </select>
 
@@ -185,7 +182,7 @@ $bootstrap->css();
                           $countrydatas = $countrystmt->fetchall();
                           foreach ($countrydatas as $countrydata) {
                           ?>
-                            <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
+                            <option value="<?php echo htmlspecialchars($countrydata['country']); ?>"><?php echo htmlspecialchars($countrydata['country']); ?></option>
                           <?php } ?>
                         </select>
                       </div>
@@ -196,14 +193,9 @@ $bootstrap->css();
                         <select name="commondity" class="form-control inpv2">
                           <option value="">Select Commondity</option>
                           <?php
-                          $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
-                          $commonstmt->execute();
-                          $commondatas = $commonstmt->fetchall();
-                          foreach ($commondatas as $commondata) {
-                            $itemid = $commondata['item_id'];
-                            $item_name = $query->select('item', $itemid, 'item_id');
+                          foreach ($prodFilterDatas as $prodData) {
                           ?>
-                            <option value="<?php echo $item_name['item_id']; ?>"><?php echo $item_name['item_name']; ?></option>
+                            <option value="<?php echo htmlspecialchars($prodData['id']); ?>"><?php echo htmlspecialchars($prodData['name']); ?></option>
                           <?php } ?>
                         </select>
                       </div>
@@ -266,13 +258,11 @@ $bootstrap->css();
             </tr>
 
             <?php
-            // Setup Unified Fetching
             $sql = "SELECT * FROM form10stock";
             $conditions = [];
-            $nodata = true; // Assume blank table
+            $nodata = true;
 
             if ($isViewMode) {
-              // Percentage Report Logic
               if (!empty($_POST['commondity'])) {
                 $conditions[] = "item_id = '" . $_POST['commondity'] . "'";
               }
@@ -289,7 +279,6 @@ $bootstrap->css();
                 $nodata = false;
               }
             } else {
-              // Main Table Filter Logic
               $search_commondity = !empty($_SESSION['search']['searchcommondity']) ? $_SESSION['search']['searchcommondity'] : '';
               $search_date = !empty($_SESSION['search']['searchdate']) ? $_SESSION['search']['searchdate'] : '';
               $search_size = !empty($_SESSION['search']['searchsize']) ? $_SESSION['search']['searchsize'] : '';
@@ -316,7 +305,6 @@ $bootstrap->css();
               }
               $stmt = $pdo->prepare($sql);
 
-              // Bind params specifically for standard filter
               if (!$isViewMode) {
                 if ($search_commondity != '') {
                   $stmt->bindParam(':commondity_id', $search_commondity, PDO::PARAM_STR);
@@ -329,10 +317,9 @@ $bootstrap->css();
                 }
               }
               $stmt->execute();
-              $datas = $stmt->fetchall();
+              $datas = $stmt->fetchall(PDO::FETCH_ASSOC);
             }
 
-            // Initialize Dynamic Totals
             $t_pcsform10 = 0;
             $t_mc = 0;
             $t_kg = 0;
@@ -345,37 +332,43 @@ $bootstrap->css();
 
             foreach ($datas as $data) {
               $item_id = $data['item_id'];
-              $commonditydata = $query->select('item', $item_id, 'item_id');
-              $supplierid = $data['supplier_id'];
-              $supplier_name = $query->select('acname', $supplierid, 'code_no');
 
-              // Accumulate totals
-              $t_pcsform10 += floatval($data['pcsform10']);
-              $t_mc += floatval($data['mc']);
-              $t_kg += floatval($data['kg']);
-              $t_pcs += floatval($data['pcs']);
-              $t_looseinkg += floatval($data['looseinkg']);
-              $t_looseinpcs += floatval($data['looseinpcs']);
-              $t_looseoutkg += floatval($data['looseoutkg']);
-              $t_looseoutpcs += floatval($data['looseoutpcs']);
-              $t_total_kg += floatval($data['total_kg']);
+              $prodStmt = $pdo->prepare("SELECT name FROM products WHERE id = ? LIMIT 1");
+              $prodStmt->execute([$item_id]);
+              $item_name = $prodStmt->fetchColumn() ?: 'Unknown';
+
+              $supplierid = $data['supplier_id'];
+
+              $supStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ? LIMIT 1");
+              $supStmt->execute([$supplierid]);
+              $supplier_name_val = $supStmt->fetchColumn() ?: $supplierid;
+
+              $t_pcsform10 += floatval($data['pcsform10'] ?? 0);
+              $t_mc += floatval($data['mc'] ?? 0);
+              $t_kg += floatval($data['kg'] ?? 0);
+              $t_pcs += floatval($data['pcs'] ?? 0);
+              $t_looseinkg += floatval($data['looseinkg'] ?? 0);
+              $t_looseinpcs += floatval($data['looseinpcs'] ?? 0);
+              $t_looseoutkg += floatval($data['looseoutkg'] ?? 0);
+              $t_looseoutpcs += floatval($data['looseoutpcs'] ?? 0);
+              $t_total_kg += floatval($data['total_kg'] ?? 0);
             ?>
               <tr>
-                <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
-                <td><?php echo $commonditydata['item_name'] . '(' . $data['fish_type'] . ')'; ?></td>
-                <td><?php echo $supplier_name['ac_name']; ?></td>
-                <td><?php echo $data['country']; ?></td>
-                <td><?php echo $data['type']; ?></td>
-                <td><?php echo $data['size']; ?></td>
-                <td><?php echo $data['pcsform10']; ?></td>
-                <td><?php echo $data['mc']; ?></td>
-                <td><?php echo $data['kg']; ?></td>
-                <td><?php echo $data['pcs']; ?></td>
-                <td><?php echo $data['looseinkg']; ?></td>
-                <td><?php echo $data['looseinpcs']; ?></td>
-                <td><?php echo $data['looseoutkg']; ?></td>
-                <td><?php echo $data['looseoutpcs']; ?></td>
-                <td><?php echo round($data['total_kg'], 2); ?></td>
+                <td><?php echo !empty($data['date']) && $data['date'] != '0000-00-00' ? date('d-m-Y', strtotime($data['date'])) : ''; ?></td>
+                <td><?php echo htmlspecialchars($item_name) . '(' . htmlspecialchars($data['fish_type'] ?? '') . ')'; ?></td>
+                <td><?php echo htmlspecialchars($supplier_name_val); ?></td>
+                <td><?php echo htmlspecialchars($data['country'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($data['type'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($data['size'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($data['pcsform10'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($data['mc'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($data['kg'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($data['pcs'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($data['looseinkg'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($data['looseinpcs'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($data['looseoutkg'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($data['looseoutpcs'] ?? ''); ?></td>
+                <td><?php echo round(floatval($data['total_kg'] ?? 0), 2); ?></td>
 
                 <?php if (!$isViewMode) { ?>
                   <td>
@@ -390,6 +383,7 @@ $bootstrap->css();
                   <td>-</td> <?php } ?>
               </tr>
 
+              <!-- UPDATE MODAL -->
               <div class="modal fade" id="updatemodal<?= $data['id']; ?>" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
                   <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
@@ -405,28 +399,26 @@ $bootstrap->css();
                         <input type="hidden" name="upid" value="<?php echo $data['id']; ?>">
                         <div class="modal-body">
                           <label>Date</label>
-                          <input type="date" name="update" class="form-control inpv2 mb-2" value="<?php echo $updatedata['date']; ?>">
+                          <input type="date" name="update" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($updatedata['date'] ?? ''); ?>">
                           <div class="row">
                             <div class="col">
                               <label>Type</label>
                               <select class="form-control inpv2 mb-2" name="uptype">
                                 <option>Select Type</option>
-                                <option value="frozen" <?php if ($updatedata['type'] == 'frozen') echo "selected"; ?>>frozen</option>
-                                <option value="tcl" <?php if ($updatedata['type'] == 'tcl') echo "selected"; ?>>tcl</option>
+                                <option value="frozen" <?php if (($updatedata['type'] ?? '') == 'frozen') echo "selected"; ?>>frozen</option>
+                                <option value="tcl" <?php if (($updatedata['type'] ?? '') == 'tcl') echo "selected"; ?>>tcl</option>
                               </select>
                             </div>
                             <div class="col">
                               <label>Supplier Name</label>
                               <select name="upsupplier_id" class="form-control inpv2">
                                 <?php
-                                $supplier_id_stmt = $pdo->prepare("SELECT DISTINCT supplier_name FROM form7stock");
+                                $supplier_id_stmt = $pdo->prepare("SELECT id, name FROM contacts WHERE is_supplier = 1 OR is_supplier = 0");
                                 $supplier_id_stmt->execute();
-                                $supplier_id_datas = $supplier_id_stmt->fetchall();
-                                foreach ($supplier_id_datas as $supplier_id_data) {
-                                  $supplierid_opt = $supplier_id_data['supplier_name'];
-                                  $supplier_name_opt = $query->select('acname', $supplierid_opt, 'code_no');
+                                $supplier_id_datas = $supplier_id_stmt->fetchAll(PDO::FETCH_ASSOC);
+                                foreach ($supplier_id_datas as $supplier_name_opt) {
                                 ?>
-                                  <option value="<?php echo $supplier_name_opt['code_no']; ?>" <?php if ($updatedata['supplier_id'] == $supplier_name_opt['code_no']) echo "selected"; ?>><?php echo $supplier_name_opt['ac_name']; ?></option>
+                                  <option value="<?php echo htmlspecialchars($supplier_name_opt['id']); ?>" <?php if (($updatedata['supplier_id'] ?? '') == $supplier_name_opt['id']) echo "selected"; ?>><?php echo htmlspecialchars($supplier_name_opt['name']); ?></option>
                                 <?php } ?>
                               </select>
                             </div>
@@ -438,75 +430,70 @@ $bootstrap->css();
                                 <div class="col">
                                   <select class="form-control inpv2 mb-2" name="upitem_id">
                                     <?php
-                                    $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
-                                    $form7commonditystmt->execute();
-                                    $form7commonditydatas = $form7commonditystmt->fetchall();
-                                    foreach ($form7commonditydatas as $form7commonditydata) {
-                                      $item_id_opt = $form7commonditydata['item_id'];
-                                      $commonditydata_opt = $query->select('item', $item_id_opt, 'item_id');
+                                    foreach ($prodFilterDatas as $commonditydata_opt) {
                                     ?>
-                                      <option value="<?php echo $commonditydata_opt['item_id']; ?>" <?php if ($updatedata['item_id'] == $commonditydata_opt['item_id']) echo "selected"; ?>><?php echo $commonditydata_opt['item_name']; ?></option>
+                                      <option value="<?php echo htmlspecialchars($commonditydata_opt['id']); ?>" <?php if (($updatedata['item_id'] ?? '') == $commonditydata_opt['id']) echo "selected"; ?>><?php echo htmlspecialchars($commonditydata_opt['name']); ?></option>
                                     <?php } ?>
                                   </select>
                                 </div>
                                 <div class="col">
                                   <select name="upfish_type" class="form-control inpv2">
-                                    <option value="G" <?php if ($updatedata['fish_type'] == 'G') echo "selected"; ?>>G</option>
-                                    <option value="egg" <?php if ($updatedata['fish_type'] == 'egg') echo "selected"; ?>>egg</option>
-                                    <option value="ggs" <?php if ($updatedata['fish_type'] == 'ggs') echo "selected"; ?>>ggs</option>
-                                    <option value="fillet" <?php if ($updatedata['fish_type'] == 'fillet') echo "selected"; ?>>fillet</option>
-                                    <option value="W" <?php if ($updatedata['fish_type'] == 'W') echo "selected"; ?>>W</option>
-                                    <option value="Cut_piece" <?php if ($updatedata['fish_type'] == 'Cut_piece') echo "selected"; ?>>Cut Piece</option>
-                                    <option value="Scaless" <?php if ($updatedata['fish_type'] == 'Scaless') echo "selected"; ?>>Scaless</option>
-                                    <option value="Bls" <?php if ($updatedata['fish_type'] == 'Bls') echo "selected"; ?>>Bl's</option>
-                                    <option value="iqf" <?php if ($updatedata['fish_type'] == 'iqf') echo "selected"; ?>>IQF</option>
+                                    <option value="G" <?php if (($updatedata['fish_type'] ?? '') == 'G') echo "selected"; ?>>G</option>
+                                    <option value="egg" <?php if (($updatedata['fish_type'] ?? '') == 'egg') echo "selected"; ?>>egg</option>
+                                    <option value="ggs" <?php if (($updatedata['fish_type'] ?? '') == 'ggs') echo "selected"; ?>>ggs</option>
+                                    <option value="fillet" <?php if (($updatedata['fish_type'] ?? '') == 'fillet') echo "selected"; ?>>fillet</option>
+                                    <option value="W" <?php if (($updatedata['fish_type'] ?? '') == 'W') echo "selected"; ?>>W</option>
+                                    <option value="Cut_piece" <?php if (($updatedata['fish_type'] ?? '') == 'Cut_piece') echo "selected"; ?>>Cut Piece</option>
+                                    <option value="Scaless" <?php if (($updatedata['fish_type'] ?? '') == 'Scaless') echo "selected"; ?>>Scaless</option>
+                                    <option value="Bls" <?php if (($updatedata['fish_type'] ?? '') == 'Bls') echo "selected"; ?>>Bl's</option>
+                                    <option value="iqf" <?php if (($updatedata['fish_type'] ?? '') == 'iqf') echo "selected"; ?>>IQF</option>
                                   </select>
                                 </div>
                               </div>
                             </div>
                             <div class="col">
                               <label>Country</label>
-                              <input type="text" name="upcountry" class="form-control inpv2 mb-2" value="<?php echo $updatedata['country']; ?>">
+                              <input type="text" name="upcountry" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($updatedata['country'] ?? ''); ?>">
                             </div>
                           </div>
                           <div class="row">
                             <div class="col">
                               <label>Size</label>
-                              <input type="text" name="upsize" class="form-control inpv2 mb-2" value="<?php echo $updatedata['size']; ?>">
+                              <input type="text" name="upsize" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($updatedata['size'] ?? ''); ?>">
                             </div>
                             <div class="col">
                               <label>Mc</label>
-                              <input type="number" name="upmc" class="form-control inpv2 mb-2" value="<?php echo $updatedata['mc']; ?>">
+                              <input type="number" name="upmc" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($updatedata['mc'] ?? ''); ?>">
                             </div>
                           </div>
                           <div class="row">
                             <div class="col">
                               <label>Kg</label>
-                              <input type="text" name="upkg" class="form-control inpv2 mb-2" value="<?php echo $updatedata['kg']; ?>">
+                              <input type="text" name="upkg" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($updatedata['kg'] ?? ''); ?>">
                             </div>
                             <div class="col">
                               <label>Pcs</label>
-                              <input type="text" name="uppcs" class="form-control inpv2 mb-2" value="<?php echo $updatedata['pcs']; ?>">
+                              <input type="text" name="uppcs" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($updatedata['pcs'] ?? ''); ?>">
                             </div>
                           </div>
                           <div class="row">
                             <div class="col">
                               <label>Loose In Kg</label>
-                              <input type="text" name="uploose_in_kg" class="form-control inpv2 mb-2" value="<?php echo $updatedata['looseinkg']; ?>">
+                              <input type="text" name="uploose_in_kg" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($updatedata['looseinkg'] ?? ''); ?>">
                             </div>
                             <div class="col">
                               <label>Loose In Pcs</label>
-                              <input type="number" name="uploose_in_pcs" class="form-control inpv2 mb-2" value="<?php echo $updatedata['looseinpcs']; ?>">
+                              <input type="number" name="uploose_in_pcs" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($updatedata['looseinpcs'] ?? ''); ?>">
                             </div>
                           </div>
                           <div class="row">
                             <div class="col">
                               <label>Loose Out Kg</label>
-                              <input type="text" name="uploose_out_kg" class="form-control inpv2 mb-2" value="<?php echo $updatedata['looseoutkg']; ?>">
+                              <input type="text" name="uploose_out_kg" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($updatedata['looseoutkg'] ?? ''); ?>">
                             </div>
                             <div class="col">
                               <label>Loose Out Pcs</label>
-                              <input type="number" name="uploose_out_pcs" class="form-control inpv2 mb-2" value="<?php echo $updatedata['looseoutpcs']; ?>">
+                              <input type="number" name="uploose_out_pcs" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($updatedata['looseoutpcs'] ?? ''); ?>">
                             </div>
                           </div>
                         </div>
@@ -522,7 +509,6 @@ $bootstrap->css();
             <?php } ?>
 
             <?php
-            // Calculate Form 7 Percentage if viewing report and provided form7date
             $percentage = "";
             if ($isViewMode && !empty($_POST['form7date']) && !empty($_POST['commondity']) && !empty($_POST['country']) && !empty($_POST['fish_type'])) {
               $form7date = $_POST['form7date'];
@@ -586,6 +572,7 @@ $bootstrap->css();
     </div>
   </div>
 
+  <!-- ADD MODAL -->
   <div class="modal fade" id="addmodal">
     <div class="modal-dialog modal-xl" role="document">
       <div class="modal-content" style="margin-top:70px !important;">
@@ -593,7 +580,7 @@ $bootstrap->css();
           <h1 class="modal-title fs-5">Add Form 10 Data</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <form action="form_10_frozen.php" method="post" autocomplete="off">
+        <form action="" method="post" autocomplete="off">
           <div class="modal-body">
             <div class="row g-3 mb-3">
               <div class="col-md-3">
@@ -611,15 +598,13 @@ $bootstrap->css();
                 <select name="supplier_id" class="form-control inpv2 chzn-select" data-placeholder="Select Supplier">
                   <option value=""></option>
                   <?php
-                  $supplier_id_stmt = $pdo->prepare("SELECT DISTINCT supplier_name FROM form7stock");
+                  $supplier_id_stmt = $pdo->prepare("SELECT id, name FROM contacts WHERE is_supplier = 1 OR is_supplier = 0");
                   $supplier_id_stmt->execute();
-                  $supplier_id_datas = $supplier_id_stmt->fetchall();
-                  foreach ($supplier_id_datas as $supplier_id_data) {
-                    $supplierid = $supplier_id_data['supplier_name'];
-                    $supplier_name = $query->select('acname', $supplierid, 'code_no');
+                  $supplier_id_datas = $supplier_id_stmt->fetchAll(PDO::FETCH_ASSOC);
+                  foreach ($supplier_id_datas as $supplier_name) {
                   ?>
-                    <option value="<?php echo $supplier_name['code_no']; ?>" <?php echo (!empty($_SESSION['supplier_id']) && $_SESSION['supplier_id'] == $supplier_name['code_no']) ? 'selected' : ''; ?>>
-                      <?php echo $supplier_name['ac_name']; ?>
+                    <option value="<?php echo htmlspecialchars($supplier_name['id']); ?>" <?php echo (!empty($_SESSION['supplier_id']) && $_SESSION['supplier_id'] == $supplier_name['id']) ? 'selected' : ''; ?>>
+                      <?php echo htmlspecialchars($supplier_name['name']); ?>
                     </option>
                   <?php } ?>
                 </select>
@@ -658,15 +643,10 @@ $bootstrap->css();
                       <select name="item_id[]" class="form-control" style="min-width: 120px;">
                         <option value="">Select</option>
                         <?php
-                        $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stock");
-                        $form7commonditystmt->execute();
-                        $form7commonditydatas = $form7commonditystmt->fetchall();
-                        foreach ($form7commonditydatas as $form7commonditydata) {
-                          $c_item_id = $form7commonditydata['item_id'];
-                          $commonditydata = $query->select('item', $c_item_id, 'item_id');
+                        foreach ($prodFilterDatas as $commonditydata) {
                         ?>
-                          <option value="<?php echo $commonditydata['item_id']; ?>" <?php echo (!empty($_SESSION['item_id']) && $_SESSION['item_id'] == $commonditydata['item_id']) ? 'selected' : ''; ?>>
-                            <?php echo $commonditydata['item_name']; ?>
+                          <option value="<?php echo htmlspecialchars($commonditydata['id']); ?>" <?php echo (!empty($_SESSION['item_id']) && $_SESSION['item_id'] == $commonditydata['id']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($commonditydata['name']); ?>
                           </option>
                         <?php } ?>
                       </select>
@@ -733,10 +713,8 @@ $bootstrap->css();
           <select name="item_id[]" class="form-control" style="min-width: 120px;">
             <option value="">Select</option>
             <?php
-            foreach ($form7commonditydatas as $form7commonditydata) {
-              $c_item_id = $form7commonditydata['item_id'];
-              $commonditydata = $query->select('item', $c_item_id, 'item_id');
-              echo '<option value="' . $commonditydata['item_id'] . '">' . $commonditydata['item_name'] . '</option>';
+            foreach ($prodFilterDatas as $commonditydata) {
+              echo '<option value="' . htmlspecialchars($commonditydata['id']) . '">' . htmlspecialchars($commonditydata['name']) . '</option>';
             }
             ?>
           </select>
