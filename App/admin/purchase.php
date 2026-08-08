@@ -119,8 +119,8 @@ $tabs = ['All', 'Draft', 'Awaiting Approval', 'Awaiting Payment', 'Paid'];
       <div class="card shadow-sm border-0">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="mb-0 text-dark fw-bold">Bills</h4>
-            <a href="newpurchase.php" class="btn btn-success fw-bold">New bill</a>
+            <h4 class="mb-0 text-dark fw-bold">Purchases</h4>
+            <a href="newpurchase.php" class="btn btn-success fw-bold">New Purchase</a>
           </div>
 
           <!-- Tabs -->
@@ -147,13 +147,13 @@ $tabs = ['All', 'Draft', 'Awaiting Approval', 'Awaiting Payment', 'Paid'];
           <table class="table table-striped align-middle border">
             <thead class="table-light">
               <tr>
-                <th>From</th>
+                <th>Suppliers Name</th>
                 <th>Status</th>
                 <th>Reference</th>
                 <th>Date</th>
                 <th>Due Date</th>
                 <th class="text-end">Paid</th>
-                <th class="text-end">Due</th>
+                <th class="text-end">Amount</th>
               </tr>
             </thead>
             <tbody>

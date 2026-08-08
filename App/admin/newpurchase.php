@@ -83,7 +83,7 @@ foreach ($accounts as $acc) {
 
 <head>
     <meta charset="utf-8">
-    <title>New Bill</title>
+    <title>New Purchase</title>
     <?php $bootstrap->css(); ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">
     <style>
@@ -171,7 +171,7 @@ foreach ($accounts as $acc) {
 
                 <div class="bg-white p-4 shadow-sm rounded">
                     <div class="text-muted small"><a href="purchase.php" class="text-decoration-none">Purchases overview</a> > Bills to pay ></div>
-                    <div class="xero-title">New Bill</div>
+                    <div class="xero-title">New Purchase</div>
 
                     <div class="row mb-4 gx-3">
                         <div class="col-md-3">

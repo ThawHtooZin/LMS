@@ -606,6 +606,17 @@ class Query
         $stmt->execute([$voucher_no, $contact_id, $date, $tclfrozen, $due_date, $currency, $ex_rate, $status, $subtotal, $grand_total]);
         $purchase_id = $pdo->lastInsertId();
       } else {
+        // STRICT AUDIT BLOCK: Prevent editing if partially or fully paid
+        $checkStmt = $pdo->prepare("SELECT paid_amount FROM purchases WHERE id = ?");
+        $checkStmt->execute([$id]);
+        $paid_check = floatval($checkStmt->fetchColumn());
+
+        if ($paid_check > 0) {
+          $pdo->rollBack();
+          echo "<script>alert('Strict Audit Block: This bill has already been partially or fully paid. Editing is disabled to protect financial integrity.'); window.location.href='purchase.php';</script>";
+          exit;
+        }
+
         $purchase_id = $id;
         $stmt = $pdo->prepare("UPDATE purchases SET voucher_no=?, contact_id=?, date=?, tclfrozen=?, due_date=?, currency=?, exchange_rate=?, status=?, subtotal=?, grand_total=? WHERE id=?");
         $stmt->execute([$voucher_no, $contact_id, $date, $tclfrozen, $due_date, $currency, $ex_rate, $status, $subtotal, $grand_total, $purchase_id]);
@@ -797,8 +808,8 @@ class Query
       if (!$bill) {
         throw new Exception("Bill not found.");
       }
-      if ($bill['status'] !== 'AUTHORISED') {
-        throw new Exception("Only authorised bills can be paid. Current status: " . $bill['status']);
+      if ($bill['status'] !== 'AWAITING_PAYMENT') {
+        throw new Exception("Only bills awaiting payment can be paid. Current status: " . $bill['status']);
       }
 
       $voucher_no = $bill['voucher_no'];
@@ -809,8 +820,13 @@ class Query
       $supStmt->execute([$supplier_id]);
       $supplier_name = $supStmt->fetchColumn();
 
-      $updStmt = $pdo->prepare("UPDATE purchases SET status = 'PAID' WHERE id = ?");
-      $updStmt->execute([$purchase_id]);
+      // Lock the Purchase Document Status & Update Paid Amount
+      $updStmt = $pdo->prepare("UPDATE purchases SET status = 'PAID', paid_amount = ? WHERE id = ?");
+      $updStmt->execute([$amount, $purchase_id]);
+
+      // NEW: Insert exact allocation into the bridge table
+      $payStmt = $pdo->prepare("INSERT INTO purchase_payments (purchase_id, payment_date, payment_account, reference, amount) VALUES (?, ?, ?, ?, ?)");
+      $payStmt->execute([$purchase_id, $payment_date, $payment_account, $reference, $amount]);
 
       $sr_no = 'PAY-' . time();
       $narration = "Payment to $supplier_name - Ref: $reference";
@@ -845,13 +861,16 @@ class Query
       $supStmt->execute([$supplier_id]);
       $supplier_name = $supStmt->fetchColumn();
 
-      $stmt = $pdo->prepare("SELECT id, voucher_no, grand_total, paid_amount FROM purchases WHERE contact_id = ? AND status = 'AUTHORISED' ORDER BY date ASC, id ASC");
+      $stmt = $pdo->prepare("SELECT id, voucher_no, grand_total, paid_amount FROM purchases WHERE contact_id = ? AND status = 'AWAITING_PAYMENT' ORDER BY date ASC, id ASC");
       $stmt->execute([$supplier_id]);
       $bills = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
       $remaining_payment = $payment_amount;
       $sr_no = 'PAY-' . time();
       $narration = "Supplier Payment to $supplier_name - Ref: $reference";
+
+      // Prepare the allocation insert statement for the loop
+      $allocStmt = $pdo->prepare("INSERT INTO purchase_payments (purchase_id, payment_date, payment_account, reference, amount) VALUES (?, ?, ?, ?, ?)");
 
       foreach ($bills as $bill) {
         if ($remaining_payment <= 0) break;
@@ -865,11 +884,14 @@ class Query
         } else {
           $apply_amount = $remaining_payment;
           $new_paid = $bill['paid_amount'] + $apply_amount;
-          $new_status = 'AUTHORISED';
+          $new_status = 'AWAITING_PAYMENT';
         }
 
         $upd = $pdo->prepare("UPDATE purchases SET paid_amount = ?, status = ? WHERE id = ?");
         $upd->execute([$new_paid, $new_status, $bill['id']]);
+
+        // NEW: Log this exact slice of money against this exact bill
+        $allocStmt->execute([$bill['id'], $payment_date, $payment_account, $reference, $apply_amount]);
 
         $remaining_payment -= $apply_amount;
       }

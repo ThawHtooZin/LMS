@@ -115,7 +115,7 @@ foreach ($accounts as $acc) {
 
 <head>
     <meta charset="utf-8">
-    <title>Edit Bill</title>
+    <title>Edit Purchase</title>
     <?php $bootstrap->css(); ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">
     <style>
@@ -185,16 +185,16 @@ foreach ($accounts as $acc) {
 
                 <div class="bg-white p-4 shadow-sm rounded">
                     <div class="text-muted small"><a href="purchase.php" class="text-decoration-none">Purchases overview</a> > Bills to pay ></div>
-                    <div class="xero-title">Edit Bill</div>
+                    <div class="xero-title">Edit Purchase</div>
 
                     <div class="d-flex justify-content-between align-items-center status-header">
                         <div>
                             <?php echo ucfirst(strtolower(str_replace('_', ' ', $purchase['status']))); ?>
                         </div>
                         <div class="btn-group">
-                            <button type="button" class="btn btn-outline-secondary btn-sm fw-bold">Print PDF</button>
+                            <a href="print_purchase.php?id=<?php echo $purchase_id; ?>" target="_blank" class="btn btn-outline-secondary btn-sm fw-bold"><i class="bi bi-printer"></i> Print PDF</a>
                             <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold ms-2" data-bs-toggle="dropdown" aria-expanded="false">
-                                Bill Options
+                                Purchase Options
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <?php if ($purchase['status'] === 'DRAFT' || $purchase['status'] === 'AWAITING_APPROVAL'): ?>
