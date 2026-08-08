@@ -59,6 +59,152 @@ class Bootstrap
   .modal .chosen-container .chosen-drop {
     z-index: 99999 !important;
   }
+    :root {
+      --primary-color: #2D4CCF;
+      --background-color: #F8F9FC;
+      --text-muted-color: #7B809A;
+      --accent-color: #B2C3F9;
+    }
+
+    body {
+      background-color: var(--background-color);
+      color: #333;
+    }
+
+    #content {
+      // padding: 30px;
+    }
+
+    /* Welcome Card Styling */
+    .welcome-card {
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 15px;
+      padding: 60px 50px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-card .card-title {
+      font-size: 2.5rem;
+      font-weight: bold;
+    }
+
+    .welcome-card .card-subtitle {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 1rem;
+      max-width: 60%;
+    }
+
+    .shield-icon {
+      position: absolute;
+      right: 50px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 150px;
+      color: rgba(255, 255, 255, 0.15);
+    }
+
+    /* Summary Card Styling */
+    .info-card {
+      border: none;
+      border-radius: 15px;
+      padding: 40px 20px;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.03);
+    }
+
+    .info-icon-wrapper {
+      background-color: #E8EDFB;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 25px auto;
+    }
+
+    .info-icon {
+      font-size: 30px;
+      color: var(--primary-color);
+    }
+
+    .card-label {
+      color: var(--text-muted-color);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      margin-bottom: 5px;
+    }
+
+    .card-value {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #111;
+      margin-bottom: 3px;
+    }
+
+    .card-sub-value {
+      color: var(--text-muted-color);
+      font-size: 0.9rem;
+    }
+
+    /* Badge Styling */
+    .badge-connected {
+      background-color: #E6EDFB;
+      color: var(--primary-color);
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .badge-connected .dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--primary-color);
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    /* Footer Divider & Icons Styling */
+    .status-summary-header {
+      margin-top: 50px;
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    .status-summary-header span {
+      background-color: var(--background-color);
+      padding: 0 15px;
+      color: var(--text-muted-color);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .status-summary-header .line {
+      height: 1px;
+      background-color: #ddd;
+      width: 100%;
+      position: absolute;
+      top: 50%;
+      z-index: -1;
+    }
+
+    .status-footer-icon {
+      color: var(--accent-color);
+      font-size: 1.2rem;
+      margin-right: 10px;
+    }
+
+    .status-text {
+      color: #a0a0a0;
+      font-size: 0.9rem;
+      vertical-align: middle;
+    }
 </style>
     <link rel="stylesheet" href="../../Resources\bootstrap-5.3.1-dist\css\bootstrap.min.css">
     <script type="text/javascript">
@@ -196,11 +342,6 @@ class Bootstrap
         .modal-header{
           border-radius: 0 !important;
         }
-        .sidebarcol{
-          position:fixed;
-          height: 100%;
-          width: 16% !important;
-        }
 
         .card-header b{
           font-size: 19px !important;
@@ -222,40 +363,81 @@ class Bootstrap
         [data-bs-toggle]:hover {
           cursor: pointer !important;
         }
-        @media screen and (min-width: 1300px){
-          .contentcol{
-            left: 14.5%;
-            position:absolute;
-            width: 85.5% !important;
-          }
-          .contentfullcol{
-            left: 44px;
-            position:absolute;
-            width: 96% !important;
-          }
-          .sidebarnocol{
-            position:fixed;
-            height: 100%;
-            width: 4.8% !important;
-          }
+        .nav-link{
+          font-weight: bold !important;
+          color: #ababab !important;
         }
-        @media screen and (min-width: 1400px){
-          .contentcol{
-            left: 14.55%;
-            position:absolute;
-            width: 85.4% !important;
-          }
-          .contentfullcol{
-            left: 52px;
-            position:absolute;
-            width: 96% !important;
-          }
-          .sidebarnocol{
-            position:fixed;
-            height: 100%;
-            width: 4.8% !important;
-          }
+        .sub-menu{
+          padding-left: 30px;
         }
+        /* Sidebar Hover State */
+        .nav-link.h:hover {
+          background-color: rgba(255, 255, 255, 0.15) !important;
+          color: #fff !important;
+          border-radius: 4px;
+        }
+
+        /* Submenu Active State (Discreet highlight) */
+        .btn-toggle-nav .nav-link.active {
+          background-color: rgba(255, 255, 255, 0.25) !important;
+          color: #fff !important;
+          font-weight: 600;
+          border-left: 3px solid #0d6efd; /* Accent line on active sub-link */
+          border-radius: 0 4px 4px 0;
+        }
+
+        /* Main Menu Active State */
+        #sidebarlink.active {
+          background-color: #0d6efd !important; /* Primary active background */
+          color: #fff !important;
+          border-radius: 4px;
+        }
+
+        .sidebarcol{
+          width: 19% !important;
+          z-index: 9999;
+        }
+        .contentcol{
+            position: absolute;
+            left: 17.3% !important;
+            width: 82.5% !important;
+            white-space: nowrap;
+          }
+
+        // @media screen and (min-width: 1300px){
+        //   .contentcol{
+        //     left: 14.5%;
+        //     position:absolute;
+        //     width: 85.5% !important;
+        //   }
+        //   .contentfullcol{
+        //     left: 44px;
+        //     position:absolute;
+        //     width: 96% !important;
+        //   }
+        //   .sidebarnocol{
+        //     position:fixed;
+        //     height: 100%;
+        //     width: 4.8% !important;
+        //   }
+        // }
+        // @media screen and (min-width: 1400px){
+        //   .contentcol{
+        //     left: 14.55%;
+        //     position:absolute;
+        //     width: 85.4% !important;
+        //   }
+        //   .contentfullcol{
+        //     left: 52px;
+        //     position:absolute;
+        //     width: 96% !important;
+        //   }
+        //   .sidebarnocol{
+        //     position:fixed;
+        //     height: 100%;
+        //     width: 4.8% !important;
+        //   }
+        // }
         .redborder{
           border: 1px solid red !important;
         }
@@ -306,34 +488,34 @@ class Bootstrap
         myVariable = !myVariable;
         return myVariable;
       }
-      $('#menu').on('click', function() {
-        var newValue = toggleVariable();
-        if (newValue === false) {
-          setTimeout(function() {
-            $("#navtitle").animate({
-              opacity: "show",
-              padding: "show"
-            }, "normal");
-            $("span#navname").animate({
-              opacity: "show",
-              padding: "show"
-            }, "normal");
-            $('.arrow').show("slow");
-          }, 500);
-          $('#sidebar').toggleClass('sidebarcol sidebarnocol');
-          $('#thenavbar').slideToggle(800);
-          // $('#sidebarlink').removeAttr('disabled');
-        } else {
-          // $('#sidebarlink').attr('disabled', true);
-          $('#sidebar').toggleClass('sidebarcol sidebarnocol', 1000);
-          $("#navtitle").hide();
-          $('#menu').css('height', 82, '%');
-          $("span#navname").hide();
-          $('.arrow').hide();
-          $('#thenavbar').slideToggle(500);
-        }
-        $('#content').toggleClass('contentcol contentfullcol');
-      });
+      // $('#menu').on('click', function() {
+      //   var newValue = toggleVariable();
+      //   if (newValue === false) {
+      //     setTimeout(function() {
+      //       $("#navtitle").animate({
+      //         opacity: "show",
+      //         padding: "show"
+      //       }, "normal");
+      //       $("span#navname").animate({
+      //         opacity: "show",
+      //         padding: "show"
+      //       }, "normal");
+      //       $('.arrow').show("slow");
+      //     }, 500);
+      //     $('#sidebar').toggleClass('sidebarcol sidebarnocol');
+      //     $('#thenavbar').slideToggle(800);
+      //     // $('#sidebarlink').removeAttr('disabled');
+      //   } else {
+      //     // $('#sidebarlink').attr('disabled', true);
+      //     $('#sidebar').toggleClass('sidebarcol sidebarnocol', 1000);
+      //     $("#navtitle").hide();
+      //     $('#menu').css('height', 82, '%');
+      //     $("span#navname").hide();
+      //     $('.arrow').hide();
+      //     $('#thenavbar').slideToggle(500);
+      //   }
+      //   $('#content').toggleClass('contentcol contentfullcol');
+      // });
       $('.table').removeClass('table-bordered');
       $('th').css('background-color', 'black');
 
