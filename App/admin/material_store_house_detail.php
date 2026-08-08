@@ -33,44 +33,22 @@ $bootstrap->css();
         <div class="card-header bg-primary text-light" style="padding:-10px;">
           <?php
           $id = $_GET['id'];
-          $materialstmt = $pdo->prepare("SELECT * FROM materials WHERE id='$id'");
-          $materialstmt->execute();
-          $material = $materialstmt->fetch(PDO::FETCH_ASSOC);
+          // RULE 1: Items -> Products
+          $materialstmt = $pdo->prepare("SELECT * FROM products WHERE id = ? LIMIT 1");
+          $materialstmt->execute([$id]);
+          $material = $materialstmt->fetch(PDO::FETCH_ASSOC) ?: ['name' => 'Unknown Material', 'unit' => ''];
           ?>
-          <h5>Manage Store {<?= $material['name']; ?>} Detail</h5>
+          <h5>Manage Store {<?= htmlspecialchars($material['name']); ?>} Detail</h5>
           <a href="material_store_house.php" class="float-end btn btn-secondary btn-sm">Back</a>
         </div>
         <div class="card-body">
           <?php
-          if (!empty($message)) {
-            if (strpos($message, 'Successfully')) {
-              $successmessage = $message;
-            }
-
-            if (strpos($message, 'Error')) {
-              $errmessage = $message;
-            }
-
-            if (strpos($message, 'following')) {
-              $errormessage = $message;
-            }
-          }
-
-          ?>
-
-          <?php
-
-          if (!empty($_GET['pageno'])) {
-            $pageno = $_GET['pageno'];
-          } else {
-            $pageno = 1;
-          }
+          $pageno = !empty($_GET['pageno']) ? intval($_GET['pageno']) : 1;
           $numOfrecs = 13;
           $offset = ($pageno - 1) * $numOfrecs;
           ?>
           <table class="mt-3 table table-bordered table-striped rounded">
             <tr>
-              <!-- <th>Category Name</th> -->
               <th>Id</th>
               <th>Date</th>
               <th>Voucher No</th>
@@ -85,108 +63,55 @@ $bootstrap->css();
             </tr>
 
             <?php
-            $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id='$id' ORDER BY id");
-            $stmt->execute();
-            $rawResult = $stmt->fetchAll();
+            $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id = ? ORDER BY id");
+            $stmt->execute([$id]);
+            $rawResult = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-            $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id='$id' ORDER BY id LIMIT $offset,$numOfrecs ");
-            $stmt->execute();
-            $datas = $stmt->fetchAll();
+            $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id = ? ORDER BY id LIMIT $offset, $numOfrecs");
+            $stmt->execute([$id]);
+            $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
             ?>
             <?php
-            $no = 1;
+            $no = $offset + 1;
             $balance = 0;
             foreach ($datas as $data) {
               $material_id = $data['material_id'];
               $supplier_id = $data['supplier_id'];
 
-              $stmt = $pdo->prepare("SELECT * FROM materials WHERE id='$material_id'");
-              $stmt->execute();
-              $material = $stmt->fetch(PDO::FETCH_ASSOC);
+              // RULE 1: Products table
+              $mStmt = $pdo->prepare("SELECT * FROM products WHERE id = ? LIMIT 1");
+              $mStmt->execute([$material_id]);
+              $matData = $mStmt->fetch(PDO::FETCH_ASSOC) ?: ['name' => '', 'unit' => ''];
 
-              $supplierstmt = $pdo->prepare("SELECT * FROM supplier WHERE supplier_id='$supplier_id'");
-              $supplierstmt->execute();
-              $supplier = $supplierstmt->fetch(PDO::FETCH_ASSOC);
+              // RULE 3: Suppliers -> Contacts table
+              $suppStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ? LIMIT 1");
+              $suppStmt->execute([$supplier_id]);
+              $supplierName = $suppStmt->fetchColumn() ?: '';
 
-              if (empty($supplier)) {
-                $supplier['supplier_name'] = '';
-              }
-
-              $in = $data['in_quantity'];
-              $out = $data['out_quantity'];
+              $in = floatval($data['in_quantity'] ?? 0);
+              $out = floatval($data['out_quantity'] ?? 0);
               $balance += $in - $out;
 
               $outgroupid = $data['output_group'];
-              $outstmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE id='$outgroupid'");
-              $outstmt->execute();
+              $outstmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE id = ? LIMIT 1");
+              $outstmt->execute([$outgroupid]);
               $outdata = $outstmt->fetch(PDO::FETCH_ASSOC);
             ?>
 
               <tr>
                 <td><?php echo $no; ?></td>
-                <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
-                <td><?php if (empty($outdata['stock_to'])) {
-                      echo $data['voucher_no'];
-                    } ?></td>
-                <td><?php if (!empty($outdata['stock_to'])) {
-                      echo $outdata['stock_to'];
-                    } ?></td>
-                <td><?php if (!empty($outdata['voucher_no'])) {
-                      echo $outdata['voucher_no'];
-                    } ?></td>
-                <td><?php if (empty($outdata['stock_to'])) {
-                      echo $supplier['supplier_name'];
-                    } ?></td>
-                <td><?= $data['description']; ?></td>
-                <td><?php echo $material['unit']; ?></td>
-                <td style="color: green; font-weight: bolder;"><?php if ($in == '') {
-                                                                  echo '-';
-                                                                } else {
-                                                                  echo $in;
-                                                                }; ?></td>
-                <td style="color: red; font-weight: bolder;"><?php if ($out == '') {
-                                                                echo '-';
-                                                              } else {
-                                                                echo $out;
-                                                              }; ?></td>
-                <td style="color: blue; font-weight: bolder;"><?php if ($balance == '') {
-                                                                echo '-';
-                                                              } else {
-                                                                echo $balance;
-                                                              }; ?></td>
+                <td><?php echo !empty($data['date']) && $data['date'] != '0000-00-00' ? date('d-m-Y', strtotime($data['date'])) : ''; ?></td>
+                <td><?php echo empty($outdata['stock_to']) ? htmlspecialchars($data['voucher_no'] ?? '') : ''; ?></td>
+                <td><?php echo !empty($outdata['stock_to']) ? htmlspecialchars($outdata['stock_to']) : ''; ?></td>
+                <td><?php echo !empty($outdata['voucher_no']) ? htmlspecialchars($outdata['voucher_no']) : ''; ?></td>
+                <td><?php echo empty($outdata['stock_to']) ? htmlspecialchars($supplierName) : ''; ?></td>
+                <td><?= htmlspecialchars($data['description'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($matData['unit']); ?></td>
+                <td style="color: green; font-weight: bolder;"><?php echo $in == 0 ? '-' : $in; ?></td>
+                <td style="color: red; font-weight: bolder;"><?php echo $out == 0 ? '-' : $out; ?></td>
+                <td style="color: blue; font-weight: bolder;"><?php echo $balance == 0 && $in == 0 && $out == 0 ? '-' : $balance; ?></td>
               </tr>
-              <!-- Data Update Modal -->
-              <div class="modal fade" id="updatemodal<?php echo $itemdata['id']; ?>" tabindex="-1" role="dialog">
-                <div class="modal-dialog" role="document">
-                  <div class="modal-content">
-                    <div class="modal-header bg-warning text-light">
-                      <h5 class="modal-title" id="updatemodallabel">Update An Material</h5>
-                      <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true" class="h3">&times;</span>
-                      </button>
-                    </div>
-                    <form action="" method="post" autocomplete="off">
-                      <div class="modal-body">
-                        <?php
-                        $id = $itemdata['id'];
-                        $updatedata = $query->select('materials', $id, 'id');
-                        ?>
-                        <input type="hidden" name="id" value="<?php echo $itemdata['id']; ?>">
-                        <label>Material Name</label>
-                        <input type="text" name="name" class="form-control" placeholder="Name" value="<?php echo $updatedata['name']; ?>">
-                        <label>Description</label>
-                        <textarea name="description" class="form-control" placeholder="Description"><?php echo $updatedata['description']; ?></textarea>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-warning" name="updatebutton">Update</button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-              <!-- Update Modal -->
             <?php
               $no++;
             };
@@ -197,26 +122,16 @@ $bootstrap->css();
           <div aria-label="Page navigation example" style="float:right;">
             <ul class="pagination">
               <li class="page-item"><a class="page-link" href="?pageno=1">First</a></li>
-              <li class="page-item <?php if ($pageno <= 1) {
-                                      echo 'disabled';
-                                    } ?>">
-                <a class="page-link" href="<?php if ($pageno <= 1) {
-                                              echo '#';
-                                            } else {
-                                              echo "?pageno=" . ($pageno - 1);
-                                            } ?>">Previous</a>
+              <li class="page-item <?php if ($pageno <= 1) echo 'disabled'; ?>">
+                <a class="page-link" href="<?php if ($pageno <= 1) echo '#';
+                                            else echo "?pageno=" . ($pageno - 1); ?>">Previous</a>
               </li>
               <li class="page-item"><a class="page-link" href="#"><?php echo $pageno; ?></a></li>
-              <li class="page-item <?php if ($pageno >= $total_pages) {
-                                      echo 'disabled';
-                                    }; ?>">
-                <a class="page-link" href="<?php if ($pageno >= $total_pages) {
-                                              echo '#';
-                                            } else {
-                                              echo "?pageno=" . ($pageno + 1);
-                                            } ?>">Next</a>
+              <li class="page-item <?php if ($pageno >= $total_pages) echo 'disabled'; ?>">
+                <a class="page-link" href="<?php if ($pageno >= $total_pages) echo '#';
+                                            else echo "?pageno=" . ($pageno + 1); ?>">Next</a>
               </li>
-              <li class="page-item"><a class="page-link" href="?pageno=<?php echo $total_pages; ?>">Last</a> </li>
+              <li class="page-item"><a class="page-link" href="?pageno=<?php echo $total_pages; ?>">Last</a></li>
             </ul>
           </div>
         </div>
@@ -224,36 +139,7 @@ $bootstrap->css();
     </div>
   </div>
 
-  <!-- Data Add Modal -->
-  <div class="modal fade" id="addmodal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header bg-secondary text-light">
-          <h5 class="modal-title" id="addmodellabel">Create New Material</h5>
-          <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true" class="h3">&times;</span>
-          </button>
-        </div>
-        <form action="material_list.php" method="post" autocomplete="off">
-          <div class="modal-body">
-            <label>Material Name</label>
-            <input type="text" name="name" class="form-control" placeholder="Name">
-            <label>Description</label>
-            <textarea name="description" class="form-control" placeholder="Description"></textarea>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-success" name="addbutton">Add Material</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-  <!-- Add Modal -->
-
-  <?php
-  $bootstrap->javascript();
-  ?>
+  <?php $bootstrap->javascript(); ?>
 </body>
 
 </html>

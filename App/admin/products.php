@@ -396,7 +396,7 @@ foreach ($all_accounts as $acc) {
                                 <label class="form-check-label" for="add_pur">I purchase this item</label>
                             </div>
                             <label class="text-muted" style="font-size:12px;">Purchase Account</label>
-                            <select name="purchase_account" id="add_pur_ac" class="form-control chosen-select" data-placeholder="Search or Select Account..." disabled required>
+                            <select name="purchase_account" id="add_pur_ac" class="form-control chosen-select" data-placeholder="Search or Select Account..." disabled>
                                 <option value=""></option>
                                 <?php foreach ($grouped_accounts as $class => $accounts): ?>
                                     <optgroup label="<?php echo htmlspecialchars($class); ?>">
@@ -415,7 +415,7 @@ foreach ($all_accounts as $acc) {
                                 <label class="form-check-label" for="add_sal">I sell this item</label>
                             </div>
                             <label class="text-muted" style="font-size:12px;">Sales Account</label>
-                            <select name="sales_account" id="add_sal_ac" class="form-control chosen-select" data-placeholder="Search or Select Account..." disabled required>
+                            <select name="sales_account" id="add_sal_ac" class="form-control chosen-select" data-placeholder="Search or Select Account..." disabled>
                                 <option value=""></option>
                                 <?php foreach ($grouped_accounts as $class => $accounts): ?>
                                     <optgroup label="<?php echo htmlspecialchars($class); ?>">

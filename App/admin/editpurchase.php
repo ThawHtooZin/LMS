@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
     $voucher_no = $_POST['voucher_no'];
     $currency = $_POST['currency'];
 
-    $status = $purchase['status'];
+    $status = (isset($purchase['status'])) ? $purchase['status'] : 'DRAFT';
     if (in_array($action_type, ['submit_approval'])) {
         $status = 'AWAITING_APPROVAL';
     } elseif (in_array($action_type, ['approve', 'approve_add_another'])) {
@@ -60,22 +60,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
 
     $subtotal = 0;
     $lines = [];
-    if (isset($_POST['account_code'])) {
-        for ($i = 0; $i < count($_POST['account_code']); $i++) {
+    if (isset($_POST['unit_price'])) {
+        for ($i = 0; $i < count($_POST['unit_price']); $i++) {
             $viss = floatval($_POST['viss'][$i]);
             $pcs = intval($_POST['pcs'][$i]);
             $price = floatval($_POST['unit_price'][$i]);
-            $acc = $_POST['account_code'][$i];
+            $acc = isset($_POST['account_code'][$i]) ? $_POST['account_code'][$i] : '';
+            $desc = isset($_POST['description'][$i]) ? $_POST['description'][$i] : '';
+            $prod = isset($_POST['product_id'][$i]) ? $_POST['product_id'][$i] : '';
 
             $multiplier = (strtolower($tclfrozen) === 'material') ? $pcs : $viss;
 
-            if (!empty($acc)) {
+            if (!empty($prod) || !empty($desc) || !empty($acc) || $multiplier > 0 || $price > 0) {
                 $line_total = $multiplier * $price;
                 $subtotal += $line_total;
                 $lines[] = [
-                    'product_id' => !empty($_POST['product_id'][$i]) ? $_POST['product_id'][$i] : NULL,
-                    'account_id' => $acc,
-                    'description' => $_POST['description'][$i],
+                    'product_id' => !empty($prod) ? $prod : NULL,
+                    'account_id' => !empty($acc) ? $acc : NULL,
+                    'description' => $desc,
                     'size' => $_POST['size'][$i],
                     'viss' => $viss,
                     'pcs' => $pcs,
@@ -398,6 +400,8 @@ foreach ($accounts as $acc) {
                 let accCode = prodMap[pId];
                 if (accCode) {
                     row.find('.acc-select').val(accCode).trigger('chosen:updated');
+                } else {
+                    row.find('.acc-select').val('').trigger('chosen:updated');
                 }
             });
         });

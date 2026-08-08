@@ -28,23 +28,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
 
     $subtotal = 0;
     $lines = [];
-    if (isset($_POST['account_code'])) {
-        for ($i = 0; $i < count($_POST['account_code']); $i++) {
+    if (isset($_POST['unit_price'])) {
+        for ($i = 0; $i < count($_POST['unit_price']); $i++) {
             $viss = floatval($_POST['viss'][$i]);
             $pcs = intval($_POST['pcs'][$i]);
             $price = floatval($_POST['unit_price'][$i]);
-            $acc = $_POST['account_code'][$i];
+            $acc = isset($_POST['account_code'][$i]) ? $_POST['account_code'][$i] : '';
+            $desc = isset($_POST['description'][$i]) ? $_POST['description'][$i] : '';
+            $prod = isset($_POST['product_id'][$i]) ? $_POST['product_id'][$i] : '';
 
-            // Calculate line total based on type (Material uses pcs as qty)
             $multiplier = (strtolower($tclfrozen) === 'material') ? $pcs : $viss;
 
-            if (!empty($acc) && ($multiplier > 0 || $price > 0)) {
+            if (!empty($prod) || !empty($desc) || !empty($acc) || $multiplier > 0 || $price > 0) {
                 $line_total = $multiplier * $price;
                 $subtotal += $line_total;
                 $lines[] = [
-                    'product_id' => !empty($_POST['product_id'][$i]) ? $_POST['product_id'][$i] : NULL,
-                    'account_id' => $acc,
-                    'description' => $_POST['description'][$i],
+                    'product_id' => !empty($prod) ? $prod : NULL,
+                    'account_id' => !empty($acc) ? $acc : NULL,
+                    'description' => $desc,
                     'size' => $_POST['size'][$i],
                     'viss' => $viss,
                     'pcs' => $pcs,
@@ -143,6 +144,17 @@ foreach ($accounts as $acc) {
             font-size: 14px;
             cursor: pointer;
         }
+
+        /* Error Validation Styling */
+        .error-border {
+            border-bottom: 2px solid #dc3545 !important;
+            box-shadow: 0 1px 0 0 #dc3545 !important;
+        }
+
+        .chosen-container.error-border .chosen-single {
+            border-bottom: 2px solid #dc3545 !important;
+            box-shadow: 0 1px 0 0 #dc3545 !important;
+        }
     </style>
 </head>
 
@@ -164,7 +176,7 @@ foreach ($accounts as $acc) {
                     <div class="row mb-4 gx-3">
                         <div class="col-md-3">
                             <label class="fw-bold small mb-1">From</label>
-                            <select name="contact_id" class="form-control chosen-select" data-placeholder="Select supplier..." required>
+                            <select name="contact_id" class="form-control chosen-select req-input" data-placeholder="Select supplier...">
                                 <option value=""></option>
                                 <?php foreach ($suppliers as $sup): ?>
                                     <option value="<?php echo $sup['id']; ?>"><?php echo htmlspecialchars($sup['name']); ?></option>
@@ -173,7 +185,7 @@ foreach ($accounts as $acc) {
                         </div>
                         <div class="col-md-2">
                             <label class="fw-bold small mb-1">Date</label>
-                            <input type="date" name="date" class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
+                            <input type="date" name="date" class="form-control req-input" value="<?php echo date('Y-m-d'); ?>">
                         </div>
                         <div class="col-md-2">
                             <label class="fw-bold small mb-1">Type</label>
@@ -190,7 +202,7 @@ foreach ($accounts as $acc) {
                         </div>
                         <div class="col-md-3">
                             <label class="fw-bold small mb-1">Reference</label>
-                            <input type="text" name="voucher_no" class="form-control" placeholder="Supplier Slip No" required>
+                            <input type="text" name="voucher_no" class="form-control req-input" placeholder="Supplier Slip No">
                         </div>
                     </div>
 
@@ -315,12 +327,22 @@ foreach ($accounts as $acc) {
             $('#addLineBtn').click(addNewLine);
             $('#linesBody').on('input', '.calc-input', calcTotals);
 
+            // Clean error classes on user input
+            $(document).on('input change', '.req-input, .error-border, select', function() {
+                $(this).removeClass('error-border');
+                if ($(this).is('select')) {
+                    $(this).next('.chosen-container').removeClass('error-border');
+                }
+            });
+
             $('#linesBody').on('change', '.prod-select', function() {
                 let row = $(this).closest('tr');
                 let pId = $(this).val();
                 let accCode = prodMap[pId];
                 if (accCode) {
                     row.find('.acc-select').val(accCode).trigger('chosen:updated');
+                } else {
+                    row.find('.acc-select').val('').trigger('chosen:updated');
                 }
             });
         });
@@ -391,6 +413,99 @@ foreach ($accounts as $acc) {
         }
 
         function submitForm(action) {
+            let isValid = true;
+            let selectedType = $('#tclfrozenTypeSelect').val();
+
+            // Clear previous errors
+            $('.error-border').removeClass('error-border');
+
+            // 1. Validate Main Header Fields
+            let contact = $('select[name="contact_id"]');
+            if (!contact.val()) {
+                contact.next('.chosen-container').addClass('error-border');
+                isValid = false;
+            }
+
+            let dateField = $('input[name="date"]');
+            if (!dateField.val()) {
+                dateField.addClass('error-border');
+                isValid = false;
+            }
+
+            let refField = $('input[name="voucher_no"]');
+            if (!refField.val().trim()) {
+                refField.addClass('error-border');
+                isValid = false;
+            }
+
+            // 2. Validate Lines
+            let hasActiveLines = false;
+            $('#linesBody tr').each(function() {
+                let prodSelect = $(this).find('select[name="product_id[]"]');
+                let sizeInput = $(this).find('input[name="size[]"]');
+                let vissInput = $(this).find('input[name="viss[]"]');
+                let pcsInput = $(this).find('input[name="pcs[]"]');
+                let priceInput = $(this).find('input[name="unit_price[]"]');
+                let accSelect = $(this).find('select[name="account_code[]"]');
+                let descInput = $(this).find('input[name="description[]"]');
+
+                let prod = prodSelect.val();
+                let size = sizeInput.val().trim();
+                let viss = parseFloat(vissInput.val());
+                let pcs = parseFloat(pcsInput.val());
+                let price = parseFloat(priceInput.val());
+                let acc = accSelect.val();
+                let desc = descInput.val().trim();
+
+                // Determine if this row has any content inputted
+                let isRowActive = prod || size || (!isNaN(viss) && viss > 0) || (!isNaN(pcs) && pcs > 0) || (!isNaN(price) && price > 0) || acc || desc;
+
+                if (isRowActive) {
+                    hasActiveLines = true;
+
+                    if (!prod) {
+                        prodSelect.next('.chosen-container').addClass('error-border');
+                        isValid = false;
+                    }
+
+                    if (selectedType !== 'Material') {
+                        if (!size) {
+                            sizeInput.addClass('error-border');
+                            isValid = false;
+                        }
+                        if (isNaN(viss) || viss <= 0) {
+                            vissInput.addClass('error-border');
+                            isValid = false;
+                        }
+                    }
+
+                    if (isNaN(pcs) || pcs <= 0) {
+                        pcsInput.addClass('error-border');
+                        isValid = false;
+                    }
+                    if (isNaN(price) || price <= 0) {
+                        priceInput.addClass('error-border');
+                        isValid = false;
+                    }
+
+                    if (!acc) {
+                        accSelect.next('.chosen-container').addClass('error-border');
+                        isValid = false;
+                    }
+                }
+            });
+
+            if (!hasActiveLines) {
+                alert("Please add at least one valid line item.");
+                return;
+            }
+
+            if (!isValid) {
+                alert("Please fill in all mandatory fields indicated by the red lines.");
+                return;
+            }
+
+            // If everything is perfectly valid, submit.
             document.getElementById('action_type').value = action;
             document.getElementById('billForm').submit();
         }

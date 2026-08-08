@@ -15,7 +15,14 @@ $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 $where_clause = "1=1";
 if ($tab !== 'All') {
-  $where_clause .= " AND p.status = " . $pdo->quote(strtoupper(str_replace(' ', '_', $tab)));
+  $db_tab_val = strtoupper(str_replace(' ', '_', $tab));
+  if ($db_tab_val === 'AWAITING_APPROVAL') {
+    $where_clause .= " AND p.status = 'AWAITING_APPROVAL'";
+  } elseif ($db_tab_val === 'AWAITING_PAYMENT') {
+    $where_clause .= " AND p.status = 'AWAITING_PAYMENT'";
+  } else {
+    $where_clause .= " AND p.status = " . $pdo->quote($db_tab_val);
+  }
 }
 if (!empty($search)) {
   $where_clause .= " AND (c.name LIKE '%$search%' OR p.voucher_no LIKE '%$search%')";
@@ -40,6 +47,7 @@ $tabs = ['All', 'Draft', 'Awaiting Approval', 'Awaiting Payment', 'Paid'];
   <meta charset="utf-8">
   <title>Purchases Overview</title>
   <?php $bootstrap->css(); ?>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css">
   <style>
     .nav-tabs .nav-link {
       color: #555;
@@ -72,7 +80,13 @@ $tabs = ['All', 'Draft', 'Awaiting Approval', 'Awaiting Payment', 'Paid'];
       border: 1px solid #ced4da;
     }
 
-    .bg-awaiting {
+    .bg-awaiting-payment {
+      background-color: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+    }
+
+    .bg-awaiting-approval {
       background-color: #d4edda;
       color: #155724;
       border: 1px solid #c3e6cb;
@@ -149,12 +163,13 @@ $tabs = ['All', 'Draft', 'Awaiting Approval', 'Awaiting Payment', 'Paid'];
                 </tr>
               <?php else: ?>
                 <?php foreach ($bills as $b):
-                  $status_class = 'bg-awaiting';
+                  $status_class = 'bg-awaiting-payment';
                   if ($b['status'] == 'DRAFT') $status_class = 'bg-draft';
+                  if ($b['status'] == 'AWAITING_APPROVAL') $status_class = 'bg-awaiting-approval';
                   if ($b['status'] == 'PAID') $status_class = 'bg-paid';
 
-                  $due = $b['grand_total'];
-                  $paid = 0.00;
+                  $due = floatval($b['grand_total']) - floatval($b['paid_amount']);
+                  $paid = floatval($b['paid_amount']);
                 ?>
                   <tr class="clickable-row" onclick="window.location='editpurchase.php?id=<?php echo $b['id']; ?>'">
                     <td class="fw-bold text-primary"><?php echo htmlspecialchars($b['supplier_name']); ?></td>
