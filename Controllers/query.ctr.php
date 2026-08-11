@@ -536,24 +536,24 @@ class Query
   // UNIFIED CONTACTS FUNCTIONS
   // ==========================================
 
-  public function addcontact($name, $phone, $email, $address, $is_supplier, $is_customer)
+  public function addcontact($name, $phone, $email, $address, $is_supplier, $is_customer, $contact_type)
   {
     global $pdo;
-    $stmt = $pdo->prepare("INSERT INTO contacts (name, phone, email, address, is_supplier, is_customer) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt = $pdo->prepare("INSERT INTO contacts (name, contact_type, phone, email, address, is_supplier, is_customer) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
-    if ($stmt->execute([$name, $phone, $email, $address, $is_supplier, $is_customer])) {
+    if ($stmt->execute([$name, $contact_type, $phone, $email, $address, $is_supplier, $is_customer])) {
       echo "<script>swal('Success', 'Contact added successfully', 'success').then(() => { window.location.href='contacts.php'; });</script>";
     } else {
       echo "<script>swal('Error', 'Failed to add contact', 'error');</script>";
     }
   }
 
-  public function updatecontact($id, $name, $phone, $email, $address, $is_supplier, $is_customer)
+  public function updatecontact($id, $name, $phone, $email, $address, $is_supplier, $is_customer, $contact_type)
   {
     global $pdo;
-    $stmt = $pdo->prepare("UPDATE contacts SET name=?, phone=?, email=?, address=?, is_supplier=?, is_customer=? WHERE id=?");
+    $stmt = $pdo->prepare("UPDATE contacts SET name=?, contact_type=?, phone=?, email=?, address=?, is_supplier=?, is_customer=? WHERE id=?");
 
-    if ($stmt->execute([$name, $phone, $email, $address, $is_supplier, $is_customer, $id])) {
+    if ($stmt->execute([$name, $contact_type, $phone, $email, $address, $is_supplier, $is_customer, $id])) {
       echo "<script>swal('Success', 'Contact updated successfully', 'success').then(() => { window.location.href='contacts.php'; });</script>";
     } else {
       echo "<script>swal('Error', 'Failed to update contact', 'error');</script>";
@@ -808,8 +808,9 @@ class Query
       if (!$bill) {
         throw new Exception("Bill not found.");
       }
-      if ($bill['status'] !== 'AWAITING_PAYMENT') {
-        throw new Exception("Only bills awaiting payment can be paid. Current status: " . $bill['status']);
+      // FIXED: Reverted back to AUTHORISED
+      if ($bill['status'] !== 'AUTHORISED') {
+        throw new Exception("Only authorised bills can be paid. Current status: " . $bill['status']);
       }
 
       $voucher_no = $bill['voucher_no'];
@@ -824,7 +825,7 @@ class Query
       $updStmt = $pdo->prepare("UPDATE purchases SET status = 'PAID', paid_amount = ? WHERE id = ?");
       $updStmt->execute([$amount, $purchase_id]);
 
-      // NEW: Insert exact allocation into the bridge table
+      // Insert exact allocation into the bridge table
       $payStmt = $pdo->prepare("INSERT INTO purchase_payments (purchase_id, payment_date, payment_account, reference, amount) VALUES (?, ?, ?, ?, ?)");
       $payStmt->execute([$purchase_id, $payment_date, $payment_account, $reference, $amount]);
 
@@ -861,7 +862,8 @@ class Query
       $supStmt->execute([$supplier_id]);
       $supplier_name = $supStmt->fetchColumn();
 
-      $stmt = $pdo->prepare("SELECT id, voucher_no, grand_total, paid_amount FROM purchases WHERE contact_id = ? AND status = 'AWAITING_PAYMENT' ORDER BY date ASC, id ASC");
+      // FIXED: Reverted back to AUTHORISED
+      $stmt = $pdo->prepare("SELECT id, voucher_no, grand_total, paid_amount FROM purchases WHERE contact_id = ? AND status = 'AUTHORISED' ORDER BY date ASC, id ASC");
       $stmt->execute([$supplier_id]);
       $bills = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -884,13 +886,13 @@ class Query
         } else {
           $apply_amount = $remaining_payment;
           $new_paid = $bill['paid_amount'] + $apply_amount;
-          $new_status = 'AWAITING_PAYMENT';
+          $new_status = 'AUTHORISED'; // Reverted
         }
 
         $upd = $pdo->prepare("UPDATE purchases SET paid_amount = ?, status = ? WHERE id = ?");
         $upd->execute([$new_paid, $new_status, $bill['id']]);
 
-        // NEW: Log this exact slice of money against this exact bill
+        // Log this exact slice of money against this exact bill
         $allocStmt->execute([$bill['id'], $payment_date, $payment_account, $reference, $apply_amount]);
 
         $remaining_payment -= $apply_amount;

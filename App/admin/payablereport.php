@@ -9,15 +9,20 @@ $auth->checkadmin();
 $bootstrap = new Bootstrap();
 $query = new Query();
 
-// Logic: If type is 'material', filter for material. Otherwise, show everything (1=1).
-$type = isset($_GET['type']) ? $_GET['type'] : '';
+// Filter parameters
+$from = isset($_POST['date_from']) ? $_POST['date_from'] : date('Y-m-01');
+$to = isset($_POST['date_to']) ? $_POST['date_to'] : date('Y-m-d');
+$filter_type = isset($_POST['supplier_type']) ? $_POST['supplier_type'] : 'All';
 
-if ($type === 'material') {
-  $type_filter = "fishormaterial = 'material'";
-  $display_title = "Material";
-} else {
-  $type_filter = "1=1";
-  $display_title = "All";
+$categories = [
+  'Fish Supplier' => 'Payable for Supplier',
+  'Material Supplier' => 'Materials',
+  'Cold Store Factory' => 'Cold Store Charges Balance'
+];
+
+$active_categories = $categories;
+if ($filter_type !== 'All' && array_key_exists($filter_type, $categories)) {
+  $active_categories = [$filter_type => $categories[$filter_type]];
 }
 ?>
 <!DOCTYPE html>
@@ -25,9 +30,42 @@ if ($type === 'material') {
 
 <head>
   <meta charset="utf-8">
-  <title>Admin | Payable Reports</title>
+  <title>Supplier Statement Report</title>
+  <?php $bootstrap->css(); ?>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css">
+  <style>
+    .report-table {
+      border-collapse: collapse;
+      width: 100%;
+      color: #000;
+    }
+
+    /* Exact full-grid black borders */
+    .report-table th,
+    .report-table td {
+      border: 1px solid #000 !important;
+      padding: 6px 10px;
+    }
+
+    .report-table th {
+      font-weight: bold;
+      text-align: center;
+      background: transparent;
+    }
+
+    .report-table .row-total td {
+      font-weight: bold;
+      background: transparent;
+    }
+
+    .sig-line {
+      border-bottom: 1px solid #000;
+      width: 200px;
+      display: inline-block;
+      margin-left: 10px;
+    }
+  </style>
 </head>
-<?php $bootstrap->css(); ?>
 
 <body>
   <div class="row">
@@ -36,157 +74,144 @@ if ($type === 'material') {
     </div>
     <div class="contentcol" id="content">
       <?php require 'navbar.php'; ?>
-      <div class="card">
-        <div class="card-header bg-info text-light">
-          <h5>Payable Reports (<?= $display_title; ?>)</h5>
-          <button onclick="printReport()" class="btn btn-secondary btn-sm ms-2 float-end">Print Report</button>
-          <?php
-          // Export button logic
-          $date_range_params = "";
-          if (isset($_POST['date_search'])) {
-            $date_range_params = "&from=" . $_POST['date_from'] . "&to=" . $_POST['date_to'];
-          }
-          echo '<a href="export.php?table_name=payable&type=' . $type . $date_range_params . '" class="btn btn-success btn-sm ms-2 float-end">Export To Excel</a>';
-          ?>
-          <form action="payablereport.php?type=<?= $type; ?>" method="post" class="d-inline">
-            <button type="submit" name="date_search" class="btn btn-primary float-end btn-sm ms-2 me-2">Search</button>
-            <input type="date" name="date_to" class="inpv2 form-control d-inline float-end ms-2" style="width: 150px; padding: 2px;" value="<?= isset($_POST['date_to']) ? $_POST['date_to'] : '' ?>">
-            <input type="date" name="date_from" class="inpv2 form-control d-inline float-end ms-2" style="width: 150px; padding: 2px;" value="<?= isset($_POST['date_from']) ? $_POST['date_from'] : '' ?>">
+
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-dark text-light d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold">Link Mark Supplier Statement</h5>
+
+          <form action="export/payablereport.php" method="POST" target="_blank" class="m-0 p-0 d-flex">
+            <input type='hidden' name='date_from' value='<?= htmlspecialchars($from) ?>'>
+            <input type='hidden' name='date_to' value='<?= htmlspecialchars($to) ?>'>
+            <input type='hidden' name='supplier_type' value='<?= htmlspecialchars($filter_type) ?>'>
+
+            <button type="submit" name="export_type" value="excel" class="btn btn-success btn-sm fw-bold shadow-sm">
+              <i class="bi bi-file-earmark-excel"></i> Export Excel
+            </button>
+            <button type="submit" name="export_type" value="pdf" class="btn btn-danger btn-sm fw-bold ms-2 shadow-sm">
+              <i class="bi bi-printer"></i> Print / Save PDF
+            </button>
           </form>
         </div>
+
         <div class="card-body">
-          <b>Payable for Supplier</b>
-          <?php
-          if (isset($_POST['date_search'])) {
-            $from = $_POST['date_from'];
-            $to = $_POST['date_to'];
+          <form action="" method="post" class="p-3 mb-4 bg-light border rounded d-flex align-items-end">
+            <div class="me-3">
+              <label class="fw-bold small">Start Date</label>
+              <input type="date" name="date_from" class="form-control form-control-sm border-dark" value="<?= $from; ?>" required>
+            </div>
+            <div class="me-3">
+              <label class="fw-bold small">End Date</label>
+              <input type="date" name="date_to" class="form-control form-control-sm border-dark" value="<?= $to; ?>" required>
+            </div>
+            <div class="me-3">
+              <label class="fw-bold small">Supplier Type</label>
+              <select name="supplier_type" class="form-select form-select-sm border-dark">
+                <option value="All" <?= $filter_type == 'All' ? 'selected' : '' ?>>All Types</option>
+                <option value="Fish Supplier" <?= $filter_type == 'Fish Supplier' ? 'selected' : '' ?>>Fish Supplier</option>
+                <option value="Material Supplier" <?= $filter_type == 'Material Supplier' ? 'selected' : '' ?>>Material Supplier</option>
+                <option value="Cold Store Factory" <?= $filter_type == 'Cold Store Factory' ? 'selected' : '' ?>>Cold Store Factory</option>
+              </select>
+            </div>
+            <div>
+              <button type="submit" name="date_search" class="btn btn-primary btn-sm fw-bold px-4">Load Statement</button>
+            </div>
+          </form>
+
+          <div class="d-flex justify-content-between mb-3 px-2 text-dark">
+            <h5 class="fw-bold text-decoration-underline mb-0">Link Mark Supplier Statement</h5>
+            <h5 class="fw-bold mb-0">Date: <?= date('d.m.y', strtotime($to)); ?></h5>
+          </div>
+
+          <?php foreach ($active_categories as $db_type => $display_title):
+            // Set column header based on type to match physical paper exactly
+            $name_header = 'Supplier Name';
+            if ($db_type == 'Material Supplier') $name_header = 'Name';
+            if ($db_type == 'Cold Store Factory') $name_header = 'Factory';
           ?>
-            <div class="float-end"><b>Date Range: <?= date('d-m-Y', strtotime($from)); ?> to <?= date('d-m-Y', strtotime($to)); ?></b></div>
-            <table class="mt-3 table table-bordered table-striped rounded">
+            <h6 class="fw-bold text-decoration-underline mt-4 mb-2 text-dark"><?= $display_title; ?></h6>
+            <table class="table report-table mb-5">
               <tr>
-                <th>No</th>
-                <th>Supplier Name</th>
-                <th>Opening Amount</th>
-                <th>Add Amt</th>
-                <th>Paid Amt</th>
-                <th>Balance</th>
+                <th width="5%">No</th>
+                <th width="30%" class="text-start"><?= $name_header; ?></th>
+                <th width="15%" class="text-center">Opening Balance</th>
+                <th width="15%" class="text-center">Add Amt</th>
+                <th width="15%" class="text-center">Paid Amt</th>
+                <th width="20%" class="text-center">Balance</th>
               </tr>
               <?php
-              $stmt = $pdo->prepare("SELECT DISTINCT supplier_id FROM payable WHERE $type_filter AND (date BETWEEN '$from' AND '$to' OR paid_date BETWEEN '$from' AND '$to')");
-              $stmt->execute();
-              $payablesuppliers = $stmt->fetchall();
-              $id = 0;
-              $totalbalance = 0;
-              foreach ($payablesuppliers as $payablesupplier) :
-                $supplier_id = $payablesupplier['supplier_id'];
+              $stmt = $pdo->prepare("SELECT id, name FROM contacts WHERE contact_type = ? ORDER BY name ASC");
+              $stmt->execute([$db_type]);
+              $contacts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                $openingamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE $type_filter AND supplier_id='$supplier_id' AND date<'$from' ORDER BY id DESC LIMIT 1");
-                $openingamountstmt->execute();
-                $openingamount = $openingamountstmt->fetch(PDO::FETCH_ASSOC);
+              $id_count = 1;
+              $cat_opening = $cat_add = $cat_paid = $cat_balance = 0;
 
-                $purchaseamtstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS purchase_amount FROM payable WHERE $type_filter AND supplier_id='$supplier_id' AND date BETWEEN '$from' AND '$to'");
-                $purchaseamtstmt->execute();
-                $purchaseamt = $purchaseamtstmt->fetch(PDO::FETCH_ASSOC);
+              foreach ($contacts as $contact) {
+                $supplier_id = $contact['id'];
 
-                $paidamtstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE $type_filter AND supplier_id='$supplier_id' AND paid_date BETWEEN '$from' AND '$to'");
-                $paidamtstmt->execute();
-                $paidamt = $paidamtstmt->fetch(PDO::FETCH_ASSOC);
+                $opPurStmt = $pdo->prepare("SELECT COALESCE(SUM(grand_total), 0) FROM purchases WHERE contact_id = ? AND date < ? AND status IN ('AUTHORISED', 'PAID')");
+                $opPurStmt->execute([$supplier_id, $from]);
+                $opening_purchases = floatval($opPurStmt->fetchColumn());
 
-                $openingamt = !empty($openingamount['closing_balance']) ? $openingamount['closing_balance'] : 0;
-                $balance = ($openingamt + $purchaseamt['purchase_amount']) - $paidamt['paid_amount'];
-                $supplierdata = $query->select('acname', $supplier_id, 'code_no');
-                $id++;
+                $opPayStmt = $pdo->prepare("SELECT COALESCE(SUM(pp.amount), 0) FROM purchase_payments pp JOIN purchases p ON pp.purchase_id = p.id WHERE p.contact_id = ? AND pp.payment_date < ?");
+                $opPayStmt->execute([$supplier_id, $from]);
+                $opening_payments = floatval($opPayStmt->fetchColumn());
+
+                $opening = $opening_purchases - $opening_payments;
+
+                $addStmt = $pdo->prepare("SELECT COALESCE(SUM(grand_total), 0) FROM purchases WHERE contact_id = ? AND date BETWEEN ? AND ? AND status IN ('AUTHORISED', 'PAID')");
+                $addStmt->execute([$supplier_id, $from, $to]);
+                $add = floatval($addStmt->fetchColumn());
+
+                $paidStmt = $pdo->prepare("SELECT COALESCE(SUM(pp.amount), 0) FROM purchase_payments pp JOIN purchases p ON pp.purchase_id = p.id WHERE p.contact_id = ? AND pp.payment_date BETWEEN ? AND ?");
+                $paidStmt->execute([$supplier_id, $from, $to]);
+                $paid = floatval($paidStmt->fetchColumn());
+
+                $balance = ($opening + $add) - $paid;
+
+                if ($opening == 0 && $add == 0 && $paid == 0 && $balance == 0) continue;
+
+                $cat_opening += $opening;
+                $cat_add += $add;
+                $cat_paid += $paid;
+                $cat_balance += $balance;
               ?>
                 <tr>
-                  <td><?= $id; ?></td>
-                  <td><?= $supplierdata['ac_name']; ?></td>
-                  <td><?= $openingamt; ?></td>
-                  <td><?= $purchaseamt['purchase_amount']; ?></td>
-                  <td><?= $paidamt['paid_amount']; ?></td>
-                  <td><?= $balance; ?></td>
+                  <td class="text-center"><?= $id_count++; ?></td>
+                  <td><?= htmlspecialchars($contact['name']); ?></td>
+                  <td class="text-end"><?= $opening != 0 ? number_format($opening) : ''; ?></td>
+                  <td class="text-end"><?= $add != 0 ? number_format($add) : ''; ?></td>
+                  <td class="text-end"><?= $paid != 0 ? number_format($paid) : ''; ?></td>
+                  <td class="text-end"><?= $balance != 0 ? number_format($balance) : '-'; ?></td>
                 </tr>
-              <?php
-                $totalbalance += $balance;
-              endforeach; ?>
-              <tr style="background-color: lightgreen;">
-                <td>TOTAL</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><?= $totalbalance; ?></td>
+              <?php } ?>
+
+              <tr class="row-total">
+                <td colspan="2" class="text-center">Total Amount</td>
+                <td class="text-end"><?= $cat_opening != 0 ? number_format($cat_opening) : ''; ?></td>
+                <td class="text-end"><?= $cat_add != 0 ? number_format($cat_add) : ''; ?></td>
+                <td class="text-end"><?= $cat_paid != 0 ? number_format($cat_paid) : ''; ?></td>
+                <td class="text-end"><?= $cat_balance != 0 ? number_format($cat_balance) : '-'; ?></td>
               </tr>
             </table>
-          <?php
-          } else {
-            // Default view
-            $originalDate = date('Y-m-d');
-            $stmt = $pdo->prepare("SELECT DISTINCT supplier_id FROM payable WHERE $type_filter AND (date='$originalDate' OR paid_date='$originalDate')");
-            $stmt->execute();
-            $payablesuppliers = $stmt->fetchall();
-          ?>
-            <table class="mt-3 table table-bordered table-striped rounded">
-              <tr>
-                <th>No</th>
-                <th>Supplier Name</th>
-                <th>Opening Amount</th>
-                <th>Add Amt</th>
-                <th>Paid Amt</th>
-                <th>Balance</th>
-              </tr>
-              <?php
-              $id = 0;
-              foreach ($payablesuppliers as $payablesupplier) :
-                $supplier_id = $payablesupplier['supplier_id'];
-                $id++;
-                $openingamountstmt = $pdo->prepare("SELECT closing_balance FROM payable WHERE $type_filter AND supplier_id='$supplier_id' AND date<'$originalDate' ORDER BY id DESC LIMIT 1");
-                $openingamountstmt->execute();
-                $openingamount = $openingamountstmt->fetch(PDO::FETCH_ASSOC);
-                $openingamt = !empty($openingamount['closing_balance']) ? $openingamount['closing_balance'] : 0;
+          <?php endforeach; ?>
 
-                $purchaseamtstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS purchase_amount FROM payable WHERE $type_filter AND supplier_id='$supplier_id' AND date<'$originalDate'");
-                $purchaseamtstmt->execute();
-                $purchaseamt = $purchaseamtstmt->fetch(PDO::FETCH_ASSOC);
+          <div class="row mt-5 pt-5 pb-4 text-dark">
+            <div class="col-6 text-center">
+              <span class="fw-bold">Prepared</span>
+              <div class="sig-line"></div>
+            </div>
+            <div class="col-6 text-center">
+              <span class="fw-bold">Checked By</span>
+              <div class="sig-line"></div>
+            </div>
+          </div>
 
-                $paidamtstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE $type_filter AND supplier_id='$supplier_id' AND paid_date<'$originalDate'");
-                $paidamtstmt->execute();
-                $paidamt = $paidamtstmt->fetch(PDO::FETCH_ASSOC);
-
-                $addamountstmt = $pdo->prepare("SELECT SUM(purchase_amount) AS add_amount FROM payable WHERE $type_filter AND supplier_id='$supplier_id' AND date='$originalDate'");
-                $addamountstmt->execute();
-                $addamountdata = $addamountstmt->fetch(PDO::FETCH_ASSOC);
-
-                $paidamountstmt = $pdo->prepare("SELECT SUM(paid_amount) AS paid_amount FROM payable WHERE $type_filter AND supplier_id='$supplier_id' AND paid_date='$originalDate'");
-                $paidamountstmt->execute();
-                $paidamountdata = $paidamountstmt->fetch(PDO::FETCH_ASSOC);
-
-                $balance = ($openingamt + $purchaseamt['purchase_amount']) - $paidamt['paid_amount'];
-                $supplierdata = $query->select('acname', $supplier_id, 'code_no');
-              ?>
-                <tr>
-                  <td><?= $id; ?></td>
-                  <td><?= $supplierdata['ac_name']; ?></td>
-                  <td><?= $balance; ?></td>
-                  <td><?= $addamountdata['add_amount']; ?></td>
-                  <td><?= $paidamountdata['paid_amount']; ?></td>
-                  <td><?= ($balance + $addamountdata['add_amount']) - $paidamountdata['paid_amount']; ?></td>
-                </tr>
-              <?php endforeach; ?>
-            </table>
-          <?php } ?>
         </div>
       </div>
     </div>
   </div>
-  <script>
-    function printReport() {
-      // Get dates from inputs to ensure we print what we are looking at
-      var from = document.getElementsByName('date_from')[0].value;
-      var to = document.getElementsByName('date_to')[0].value;
-      var type = "<?= $type ?>";
-      window.open(`payable_print.php?type=${type}&from=${from}&to=${to}`, '_blank');
-    }
-  </script>
+
   <?php $bootstrap->javascript(); ?>
 </body>
 
