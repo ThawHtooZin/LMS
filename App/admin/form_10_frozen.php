@@ -155,7 +155,7 @@ $bootstrap->css();
           </form>
         </div>
 
-        <div class="modal fade" id="filtermodal" tabindex="-1" role="dialog">
+        <div class="modal fade" id="filtermodal" tabindex="-1" role="dialog" style="z-index: 999999999999999 !important;">
           <div class="modal-dialog" role="document">
             <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
               <div class="modal-header bg-info text-light">

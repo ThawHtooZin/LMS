@@ -22,13 +22,14 @@ $query = new Query();
   ?>
   <body>
     <div class="row">
-      <div class="sidebarcol" id="sidebar">
-        <?php
-        include 'sidebar.php';
-        ?>
-      </div>
-      <div class="contentcol" id="content">
-        <?php require 'navbar.php'; ?>
+    <div class="sidebarcol bg-warning">
+      <?php
+      include 'sidebar.php';
+      ?>
+    </div>
+    <div class="contentcol bg-danger" id="content">
+      <!-- Top Navbar Placeholder -->
+      <?php require 'navbar.php'; ?>
         <div class="card">
           <div class="card-header bg-warning text-light" style="padding:-10px;">
 
