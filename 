@@ -1,0 +1,232 @@
+[33mcommit 073975bb8c55a37d9f79d4f9417eabb4fe1e25c5[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdivided[m[33m)[m
+Author: Myatthu1582 <komyatthu1582.ygn@gmail.com>
+Date:   Sun Aug 9 02:49:09 2026 +0630
+
+    changed UI for some pages
+
+[33mcommit 3475fef70b33f42a2b90eedd48bd79c45943d973[m
+Author: ThawHtooZin (Tommy) <96006503+ThawHtooZin@users.noreply.github.com>
+Date:   Sat Aug 8 11:42:07 2026 +0630
+
+    feat: changed database structure and changing purchase features
+
+[33mcommit 7cd71c3c2c687cef237890785401d4f06105bece[m
+Author: ThawHtooZin (Tommy) <96006503+ThawHtooZin@users.noreply.github.com>
+Date:   Fri Aug 7 21:44:27 2026 +0630
+
+    feat: fixed from 7 and 10 tcl and frozen and added packing material purchase
+
+[33mcommit ec34c8d262743b92fae280b4a99c6c18f54532b6[m
+Author: ThawHtooZin (Tommy) <96006503+ThawHtooZin@users.noreply.github.com>
+Date:   Fri Aug 7 10:20:37 2026 +0630
+
+    Added void purchase voucher
+
+[33mcommit b4fee5f38c538738c1be359620449524ca386f1d[m
+Author: ThawHtooZin (Tommy) <96006503+ThawHtooZin@users.noreply.github.com>
+Date:   Fri Aug 7 09:51:57 2026 +0630
+
+    feat: added necessary column in purchase and updated tables structure
+
+[33mcommit 5094bc61a6286e49eec77b55b3d6b2d0bcc32b5e[m
+Author: ThawHtooZin (Tommy) <96006503+ThawHtooZin@users.noreply.github.com>
+Date:   Fri Aug 7 09:12:42 2026 +0630
+
+    feat: purchase changes, currency changes, database refactor, accounting features refactoring and changing
+
+[33mcommit 18caadf71cfe184972acbb5c31952da2a92e809f[m
+Author: ThawHtooZin (Tommy) <96006503+ThawHtooZin@users.noreply.github.com>
+Date:   Wed Jul 22 22:00:21 2026 +0630
+
+    Fix: Transaction Deleted. Making general_ledger main transactions. Purchase Integrated with general_ledger accounting
+
+[33mcommit 657395cccf1d1bdbca3df4ae813950ac6fa447bf[m
+Author: ThawHtooZin (Tommy) <96006503+ThawHtooZin@users.noreply.github.com>
+Date:   Wed Jul 22 19:03:37 2026 +0630
+
+    changed acname design
+
+[33mcommit 356e622c8987cdec6bebd4b50bf795fd610b399d[m
+Author: ThawHtooZin (Tommy) <96006503+ThawHtooZin@users.noreply.github.com>
+Date:   Sun Jul 19 17:20:05 2026 +0630
+
+    Added packing material report and payable report
+
+[33mcommit d807fa0da96e474b37643604572371afd08034ca[m
+Author: ThawHtooZin (Tommy) <96006503+ThawHtooZin@users.noreply.github.com>
+Date:   Sat Jul 18 15:37:02 2026 +0630
+
+    Finished All 17/7/2026 Fix List.
+
+[33mcommit 7d9f29a89ec018ba294c34eba33f4df0df5b0b2c[m
+Author: ThawHtooZin (Tommy) <96006503+ThawHtooZin@users.noreply.github.com>
+Date:   Sat Jul 18 11:33:15 2026 +0630
+
+    Fixed form 10 tcl error, material gatepass error, and purchase report errors
+
+[33mcommit 26f16825426befe9a63fa74ae2b869d463dcaf60[m
+Author: ThawHtooZin (Tommy) <96006503+ThawHtooZin@users.noreply.github.com>
+Date:   Fri Jul 17 22:30:15 2026 +0630
+
+    packing material purchase multi row done. Form 10 and 7 TCL multi row and bulk update done. packaging material purchase error done
+
+[33mcommit e44dfaf66d5a1f52f08007ea3dad349b632f8af7[m
+Merge: c6d08bd 6773c18
+Author: ThawHtooZin (Tommy) <96006503+ThawHtooZin@users.noreply.github.com>
+Date:   Fri Jul 17 16:03:36 2026 +0630
+
+    Merge branch 'divided' of https://github.com/ThawHtooZin/LMS into divided
+
+[33mcommit c6d08bd8dbf325090bd7e70e862039d75f347b0d[m
+Author: ThawHtooZin (Tommy) <96006503+ThawHtooZin@users.noreply.github.com>
+Date:   Fri Jul 17 16:03:26 2026 +0630
+
+    Changed design
+
+[33mcommit 6773c1839a3ec5292bee064d55728f0d08909461[m
+Author: Myatthu1582 <komyatthu1582.ygn@gmail.com>
+Date:   Fri Jul 17 13:52:14 2026 +0630
+
+    added latest db
+
+[33mcommit ef79970f8dc1e94799d31a2c3be66a567d2b32cd[m
+Author: ThawHtooZin (Tommy) <96006503+ThawHtooZin@users.noreply.github.com>
+Date:   Fri Jul 17 13:01:26 2026 +0630
+
+    Added sql file and Installation/emptydbmain.sql updated
+
+[33mcommit 5bbcfbda6ed1c77160ea6534165700c9aed9e7b6[m
+Author: ThawHtooZin (Tommy) <96006503+ThawHtooZin@users.noreply.github.com>
+Date:   Fri Jul 17 12:51:07 2026 +0630
+
+    latest update with some refactoring
+
+[33mcommit 93651103918106bbb96f79040aa9b3982faaf508[m
+Author: ThawHtooZin (Tommy) <96006503+ThawHtooZin@users.noreply.github.com>
+Date:   Thu Jul 16 15:43:24 2026 +0630
+
+    Added filter in form 10 and refactor form 7 and 10 and bulk update feature and etc
+
+[33mcommit 4579eafb240abad1c74910d9dafc96d980b6b3ea[m
+Author: ThawHtooZin (Tommy) <96006503+ThawHtooZin@users.noreply.github.com>
+Date:   Wed Jul 15 17:05:08 2026 +0630
+
+    fixing calculation errors and adding correct queries
+
+[33mcommit d7875019e0afb733dfced31caba3d584d06ef006[m
+Merge: 8c97d04 f3dff9a
+Author: ThawHtooZin (Tommy) <96006503+ThawHtooZin@users.noreply.github.com>
+Date:   Wed Jul 15 15:46:30 2026 +0630
+
+    Merge branch 'divided' of https://github.com/ThawHtooZin/LMS into divided
+
+[33mcommit 8c97d042c4fd7aadc3806540c2f7358556232fcb[m
+Author: ThawHtooZin (Tommy) <96006503+ThawHtooZin@users.noreply.github.com>
+Date:   Wed Jul 15 15:46:07 2026 +0630
+
+    Fixed and updating purchase UI and teh table structures and etc
+
+[33mcommit f3dff9a40c0db3de87d284e895b28d75c21f9f83[m
+Author: MyatThu1582 <komyatthu1582@gmail.com>
+Date:   Thu Aug 7 15:58:56 2025 +0630
+
+    checked data and fixed mc report
+
+[33mcommit bbfdd5d8653940b92953be2bb167bdf27211e66c[m
+Author: MyatThu1582 <komyatthu1582@gmail.com>
+Date:   Thu Jul 31 19:02:56 2025 +0630
+
+    added repacking out in hhkmcstock
+
+[33mcommit 9522a6af883831c2520305d6748071189113eceb[m
+Author: MyatThu1582 <komyatthu1582@gmail.com>
+Date:   Thu Jul 31 15:41:22 2025 +0630
+
+    spreated HHK coldstore and labour also added fish_type col for mslcoldstore
+
+[33mcommit 113f32855ce6b84b80370a2d1e9649ab7c6219b9[m
+Author: MyatThu1582 <komyatthu1582@gmail.com>
+Date:   Thu Jul 31 14:15:29 2025 +0630
+
+    added fish type in mslcoldstore
+
+[33mcommit bbd5a1252f40d335434877e050fc8fb41412c4f5[m
+Author: Myat Thu <myatthu1582.ygn@gmail.com>
+Date:   Wed Jul 30 16:28:24 2025 +0630
+
+    30-7-25 added db
+
+[33mcommit 5ed9d75237a07611f27fc800f9c15126a0a9d186[m
+Merge: 052355d 1a1b47c
+Author: Myat Thu <myatthu1582.ygn@gmail.com>
+Date:   Wed Jul 30 16:25:00 2025 +0630
+
+    changed for coldstore 30-7-25
+
+[33mcommit 1a1b47cf7207e9759edae983c7690ae35453915e[m
+Author: Myatthu1582 <komyatthu1582@gmail.com>
+Date:   Wed Jul 30 08:55:17 2025 +0630
+
+    added 29-7-25 db file
+
+[33mcommit 052355dcc0912e6da3d1fd173672312648bf167f[m
+Author: Myat Thu <myatthu1582.ygn@gmail.com>
+Date:   Wed Jul 30 08:46:05 2025 +0630
+
+    added 29-7-25 db file
+
+[33mcommit dccafe4351516aa6a7b3ad3603ed5b30b8a5f1bb[m
+Author: MyatThu1582 <komyatthu1582@gmail.com>
+Date:   Mon Jul 28 11:18:39 2025 +0630
+
+    added form validation in coldstore
+
+[33mcommit 63451f01f4e5e8dbe9e84140c890a80d4b849536[m
+Author: MyatThu1582 <komyatthu1582@gmail.com>
+Date:   Fri Jul 25 18:38:58 2025 +0630
+
+    fixed form10 percentage fish_type mix error
+
+[33mcommit 1f14b085a8a49d0ce33cdbc8e0ff78216bcb3976[m
+Author: MyatThu1582 <komyatthu1582@gmail.com>
+Date:   Fri Jul 25 11:46:16 2025 +0630
+
+    checked mcreport
+
+[33mcommit 8b3d0d9113d2cd8569b0db677062dd8d1d991171[m
+Author: MyatThu1582 <komyatthu1582@gmail.com>
+Date:   Fri Jul 25 11:00:36 2025 +0630
+
+    fixed percentage minus error
+
+[33mcommit 08adc5777a160d866be6d0f3a43bf2a199d3d6e4[m
+Author: MyatThu1582 <komyatthu1582@gmail.com>
+Date:   Wed Jul 23 16:33:54 2025 +0630
+
+    added jquery link in resource.boot.php
+
+[33mcommit 9beb644487fbe392ca5f6e3ccc48c94e00f0b0ed[m
+Author: MyatThu1582 <komyatthu1582@gmail.com>
+Date:   Mon Jul 21 09:42:26 2025 +0630
+
+    add 21-7-25 db file
+
+[33mcommit 36313f8bf5c2414df8dd2b7b682610563334a2e1[m
+Author: MyatThu1582 <komyatthu1582@gmail.com>
+Date:   Fri Jun 27 15:03:36 2025 +0630
+
+    fixed update error in GFC mc Stock
+
+[33mcommit c7ffd7cce43bceac3c645c45b63c2f13d12eda0b[m
+Author: Myat Thu <myatthu1582.ygn@gmail.com>
+Date:   Thu Jun 26 17:38:20 2025 +0630
+
+    added db and remove tested text in modal
+
+[33mcommit 1b11840f149aa40d7c27fc0df56bf5dd820a2926[m
+Author: MyatThu1582 <komyatthu1582@gmail.com>
+Date:   Thu Jun 26 11:46:51 2025 +0630
+
+    fixed wrong calculating balance error and add some rules in GFC MC STOCK
+
+[33mcommit bc2d51ef2d59c290cc11afb6f

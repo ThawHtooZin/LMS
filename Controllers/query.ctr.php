@@ -582,128 +582,148 @@ class Query
   // ==========================================
 
   public function savePurchase($id, $contact_id, $date, $tclfrozen, $due_date, $voucher_no, $currency, $status, $subtotal, $grand_total, $lines, $action_type)
-  {
-    global $pdo;
-    try {
-      $pdo->beginTransaction();
+{
+  global $pdo;
+  try {
+    $pdo->beginTransaction();
 
-      $ex_rate = 1.0000;
-      if ($currency !== 'MMK') {
-        $stmt = $pdo->prepare("SELECT rate FROM exchange_rates WHERE currency_code = ? AND effective_date <= ? ORDER BY effective_date DESC LIMIT 1");
-        $stmt->execute([$currency, $date]);
-        $rate_row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($rate_row) {
-          $ex_rate = $rate_row['rate'];
-        }
+    $ex_rate = 1.0000;
+    if ($currency !== 'MMK') {
+      $stmt = $pdo->prepare("SELECT rate FROM exchange_rates WHERE currency_code = ? AND effective_date <= ? ORDER BY effective_date DESC LIMIT 1");
+      $stmt->execute([$currency, $date]);
+      $rate_row = $stmt->fetch(PDO::FETCH_ASSOC);
+      if ($rate_row) {
+        $ex_rate = $rate_row['rate'];
       }
-
-      $supStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ?");
-      $supStmt->execute([$contact_id]);
-      $supplier_name = $supStmt->fetchColumn();
-
-      if (empty($id)) {
-        $stmt = $pdo->prepare("INSERT INTO purchases (voucher_no, contact_id, date, tclfrozen, due_date, currency, exchange_rate, status, subtotal, grand_total) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$voucher_no, $contact_id, $date, $tclfrozen, $due_date, $currency, $ex_rate, $status, $subtotal, $grand_total]);
-        $purchase_id = $pdo->lastInsertId();
-      } else {
-        // STRICT AUDIT BLOCK: Prevent editing if partially or fully paid
-        $checkStmt = $pdo->prepare("SELECT paid_amount FROM purchases WHERE id = ?");
-        $checkStmt->execute([$id]);
-        $paid_check = floatval($checkStmt->fetchColumn());
-
-        if ($paid_check > 0) {
-          $pdo->rollBack();
-          echo "<script>alert('Strict Audit Block: This bill has already been partially or fully paid. Editing is disabled to protect financial integrity.'); window.location.href='purchase.php';</script>";
-          exit;
-        }
-
-        $purchase_id = $id;
-        $stmt = $pdo->prepare("UPDATE purchases SET voucher_no=?, contact_id=?, date=?, tclfrozen=?, due_date=?, currency=?, exchange_rate=?, status=?, subtotal=?, grand_total=? WHERE id=?");
-        $stmt->execute([$voucher_no, $contact_id, $date, $tclfrozen, $due_date, $currency, $ex_rate, $status, $subtotal, $grand_total, $purchase_id]);
-
-        $pdo->prepare("DELETE FROM form7stocktcl WHERE link_id IN (SELECT id FROM purchase_lines WHERE purchase_id = ?)")->execute([$purchase_id]);
-        $pdo->prepare("DELETE FROM form7stock WHERE link_id IN (SELECT id FROM purchase_lines WHERE purchase_id = ?)")->execute([$purchase_id]);
-        $pdo->prepare("DELETE FROM material_store_house WHERE voucher_no = ?")->execute([$voucher_no]);
-        $pdo->prepare("DELETE FROM general_ledger WHERE voucherno = ?")->execute([$voucher_no]);
-
-        $pdo->prepare("DELETE FROM purchase_lines WHERE purchase_id = ?")->execute([$purchase_id]);
-      }
-
-      $line_stmt = $pdo->prepare("INSERT INTO purchase_lines (purchase_id, product_id, account_id, description, size, viss, pcs, unit_price, line_amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-      $sr_no = 'PR-' . time();
-
-      foreach ($lines as $line) {
-        $prod_id = !empty($line['product_id']) ? $line['product_id'] : NULL;
-        $acc_id = !empty($line['account_id']) ? $line['account_id'] : NULL;
-
-        // XERO GATEKEEPER: Prevent approval if ANY line is missing an account
-        if ($status === 'AUTHORISED' && empty($acc_id)) {
-          $pdo->rollBack();
-          echo "<script>alert('Validation Error: You cannot approve a bill with missing Account Codes. Please assign an account to every item line.'); window.history.back();</script>";
-          exit;
-        }
-
-        $line_stmt->execute([
-          $purchase_id,
-          $prod_id,
-          $acc_id,
-          $line['description'],
-          $line['size'],
-          $line['viss'],
-          $line['pcs'],
-          $line['unit_price'],
-          $line['line_amount']
-        ]);
-        $link_id = $pdo->lastInsertId();
-
-        // ROUTE ONLY IF AUTHORISED
-        if ($status === 'AUTHORISED') {
-          $lowerType = strtolower($tclfrozen);
-
-          if ($lowerType === 'frozen' || $lowerType === 'tcl') {
-            $kg = floatval($line['viss']) * 1.634;
-            if ($lowerType === 'tcl') {
-              $formstmt = $pdo->prepare("INSERT INTO form7stocktcl (date, item_id, supplier_name, country, type, size, viss, kg, pcspervr, link_id) VALUES (?, ?, ?, 'DAKA', 'TCl', ?, ?, ?, ?, ?)");
-              $formstmt->execute([$date, $prod_id, $supplier_name, $line['size'], $line['viss'], $kg, $line['pcs'], $link_id]);
-            } else {
-              $formstmt = $pdo->prepare("INSERT INTO form7stock (date, item_id, supplier_name, type, size, viss, kg, pcspervr, link_id) VALUES (?, ?, ?, 'Frozen', ?, ?, ?, ?, ?)");
-              $formstmt->execute([$date, $prod_id, $supplier_name, $line['size'], $line['viss'], $kg, $line['pcs'], $link_id]);
-            }
-          } elseif ($lowerType === 'material') {
-            $storehousestmt = $pdo->prepare("INSERT INTO material_store_house (date, voucher_no, supplier_id, material_id, in_quantity) VALUES (?, ?, ?, ?, ?)");
-            $storehousestmt->execute([$date, $voucher_no, $contact_id, $prod_id, $line['pcs']]);
-          }
-
-          $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, ?, ?, '0', ?, ?)");
-          $narration = !empty($line['description']) ? $line['description'] : 'Purchase Line Item';
-          $glDebit->execute([$date, $voucher_no, $acc_id, $line['line_amount'], $narration, $sr_no]);
-        }
-      }
-
-      if ($status === 'AUTHORISED') {
-        $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, '2000', '0', ?, ?, ?)");
-        $glCredit->execute([$date, $voucher_no, $grand_total, "Total Bill - $supplier_name", $sr_no]);
-      }
-
-      $pdo->commit();
-
-      $msg = ($status == 'AUTHORISED') ? 'Bill authorized & posted to GL successfully' : 'Draft saved successfully';
-
-      if ($action_type == 'continue_editing') {
-        $redirect = "editpurchase.php?id=" . $purchase_id;
-      } elseif ($action_type == 'add_another') {
-        $redirect = "newpurchase.php";
-      } else {
-        $redirect = "purchase.php";
-      }
-
-      echo "<script>alert('$msg'); window.location.href='$redirect';</script>";
-    } catch (Exception $e) {
-      $pdo->rollBack();
-      echo "<script>alert('Failed to save bill. Error: " . addslashes($e->getMessage()) . "');</script>";
     }
+
+    $supStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ?");
+    $supStmt->execute([$contact_id]);
+    $supplier_name = $supStmt->fetchColumn();
+
+    if (empty($id)) {
+      $stmt = $pdo->prepare("INSERT INTO purchases (voucher_no, contact_id, date, tclfrozen, due_date, currency, exchange_rate, status, subtotal, grand_total) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+      $stmt->execute([$voucher_no, $contact_id, $date, $tclfrozen, $due_date, $currency, $ex_rate, $status, $subtotal, $grand_total]);
+      $purchase_id = $pdo->lastInsertId();
+    } else {
+      // STRICT AUDIT BLOCK: Prevent editing if partially or fully paid
+      $checkStmt = $pdo->prepare("SELECT paid_amount FROM purchases WHERE id = ?");
+      $checkStmt->execute([$id]);
+      $paid_check = floatval($checkStmt->fetchColumn());
+
+      if ($paid_check > 0) {
+        $pdo->rollBack();
+        return [
+          'status'   => false,
+          'type'     => 'audit_block',
+          'title'    => 'Strict Audit Block!',
+          'message'  => 'This bill has already been partially or fully paid. Editing is disabled to protect financial integrity.',
+          'redirect' => 'purchase.php'
+        ];
+      }
+
+      $purchase_id = $id;
+      $stmt = $pdo->prepare("UPDATE purchases SET voucher_no=?, contact_id=?, date=?, tclfrozen=?, due_date=?, currency=?, exchange_rate=?, status=?, subtotal=?, grand_total=? WHERE id=?");
+      $stmt->execute([$voucher_no, $contact_id, $date, $tclfrozen, $due_date, $currency, $ex_rate, $status, $subtotal, $grand_total, $purchase_id]);
+
+      $pdo->prepare("DELETE FROM form7stocktcl WHERE link_id IN (SELECT id FROM purchase_lines WHERE purchase_id = ?)")->execute([$purchase_id]);
+      $pdo->prepare("DELETE FROM form7stock WHERE link_id IN (SELECT id FROM purchase_lines WHERE purchase_id = ?)")->execute([$purchase_id]);
+      $pdo->prepare("DELETE FROM material_store_house WHERE voucher_no = ?")->execute([$voucher_no]);
+      $pdo->prepare("DELETE FROM general_ledger WHERE voucherno = ?")->execute([$voucher_no]);
+
+      $pdo->prepare("DELETE FROM purchase_lines WHERE purchase_id = ?")->execute([$purchase_id]);
+    }
+
+    $line_stmt = $pdo->prepare("INSERT INTO purchase_lines (purchase_id, product_id, account_id, description, size, viss, pcs, unit_price, line_amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+    $sr_no = 'PR-' . time();
+
+    foreach ($lines as $line) {
+      $prod_id = !empty($line['product_id']) ? $line['product_id'] : NULL;
+      $acc_id  = !empty($line['account_id']) ? $line['account_id'] : NULL;
+
+      // XERO GATEKEEPER: Prevent approval if ANY line is missing an account
+      if ($status === 'AUTHORISED' && empty($acc_id)) {
+        $pdo->rollBack();
+        return [
+          'status'  => false,
+          'type'    => 'validation_error',
+          'title'   => 'Validation Error!',
+          'message' => 'You cannot approve a bill with missing Account Codes. Please assign an account to every item line.'
+        ];
+      }
+
+      $line_stmt->execute([
+        $purchase_id,
+        $prod_id,
+        $acc_id,
+        $line['description'],
+        $line['size'],
+        $line['viss'],
+        $line['pcs'],
+        $line['unit_price'],
+        $line['line_amount']
+      ]);
+      $link_id = $pdo->lastInsertId();
+
+      // ROUTE ONLY IF AUTHORISED
+      if ($status === 'AUTHORISED') {
+        $lowerType = strtolower($tclfrozen);
+
+        if ($lowerType === 'frozen' || $lowerType === 'tcl') {
+          $kg = floatval($line['viss']) * 1.634;
+          if ($lowerType === 'tcl') {
+            $formstmt = $pdo->prepare("INSERT INTO form7stocktcl (date, item_id, supplier_name, country, type, size, viss, kg, pcspervr, link_id) VALUES (?, ?, ?, 'DAKA', 'TCl', ?, ?, ?, ?, ?)");
+            $formstmt->execute([$date, $prod_id, $supplier_name, $line['size'], $line['viss'], $kg, $line['pcs'], $link_id]);
+          } else {
+            $formstmt = $pdo->prepare("INSERT INTO form7stock (date, item_id, supplier_name, type, size, viss, kg, pcspervr, link_id) VALUES (?, ?, ?, 'Frozen', ?, ?, ?, ?, ?)");
+            $formstmt->execute([$date, $prod_id, $supplier_name, $line['size'], $line['viss'], $kg, $line['pcs'], $link_id]);
+          }
+        } elseif ($lowerType === 'material') {
+          $storehousestmt = $pdo->prepare("INSERT INTO material_store_house (date, voucher_no, supplier_id, material_id, in_quantity) VALUES (?, ?, ?, ?, ?)");
+          $storehousestmt->execute([$date, $voucher_no, $contact_id, $prod_id, $line['pcs']]);
+        }
+
+        $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, ?, ?, '0', ?, ?)");
+        $narration = !empty($line['description']) ? $line['description'] : 'Purchase Line Item';
+        $glDebit->execute([$date, $voucher_no, $acc_id, $line['line_amount'], $narration, $sr_no]);
+      }
+    }
+
+    if ($status === 'AUTHORISED') {
+      $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, '2000', '0', ?, ?, ?)");
+      $glCredit->execute([$date, $voucher_no, $grand_total, "Total Bill - $supplier_name", $sr_no]);
+    }
+
+    $pdo->commit();
+
+    $msg = ($status == 'AUTHORISED') ? 'Bill authorized & posted to GL successfully' : 'Draft saved successfully';
+
+    if ($action_type == 'continue_editing') {
+      $redirect = "editpurchase.php?id=" . $purchase_id;
+    } elseif ($action_type == 'add_another') {
+      $redirect = "newpurchase.php";
+    } else {
+      $redirect = "purchase.php";
+    }
+
+    return [
+      'status'   => true,
+      'title'    => 'Success!',
+      'message'  => $msg,
+      'redirect' => $redirect
+    ];
+
+  } catch (Exception $e) {
+    $pdo->rollBack();
+    return [
+      'status'  => false,
+      'type'    => 'exception',
+      'title'   => 'Error!',
+      'message' => 'Failed to save bill. Error: ' . $e->getMessage()
+    ];
   }
+}
   public function deletePurchase($id)
   {
     global $pdo;
@@ -720,7 +740,15 @@ class Query
 
       if ($purchase['status'] === 'AUTHORISED' || $purchase['status'] === 'PAID') {
         $pdo->rollBack();
-        echo "<script>alert('Strict Audit Block: You cannot delete an Approved or Paid bill.'); window.location.href='purchase.php';</script>";
+        echo "<script>
+          swal({
+              title: 'Strict Audit Block!',
+              text: 'You cannot delete an Approved or Paid bill.',
+              icon: 'error',
+          }).then(function() {
+              window.location.href = 'purchase.php';
+          });
+        </script>";
         return;
       }
 
@@ -738,10 +766,24 @@ class Query
 
       $pdo->commit();
 
-      echo "<script>alert('Draft deleted successfully'); window.location.href='purchase.php';</script>";
+      echo "<script>
+        swal({
+            title: 'Success!',
+            text: 'Draft deleted successfully',
+            icon: 'success',
+        }).then(function() {
+            window.location.href = 'purchase.php';
+        });
+    </script>";
     } catch (Exception $e) {
       $pdo->rollBack();
-      echo "<script>alert('Failed to delete bill.');</script>";
+      echo "<script>
+        swal({
+            title: 'Error!',
+            text: 'Failed to delete bill.',
+            icon: 'error',
+        });
+    </script>";
     }
   }
 
@@ -761,7 +803,15 @@ class Query
 
       if ($purchase['status'] === 'VOIDED') {
         $pdo->rollBack();
-        echo "<script>alert('This bill is already voided.'); window.location.href='purchase.php';</script>";
+        echo "<script>
+          swal({
+              title: 'Validation Error!',
+              text: 'This bill is already voided.',
+              icon: 'warning',
+          }).then(function() {
+              window.location.href = 'purchase.php';
+          });
+        </script>";
         return;
       }
 
@@ -784,10 +834,24 @@ class Query
 
       $pdo->commit();
 
-      echo "<script>alert('Bill successfully voided. Financial and stock records have been reversed.'); window.location.href='purchase.php';</script>";
+      echo "<script>
+        swal({
+            title: 'Success!',
+            text: 'Bill successfully voided. Financial and stock records have been reversed.',
+            icon: 'success',
+        }).then(function() {
+            window.location.href = 'purchase.php';
+        });
+    </script>";
     } catch (Exception $e) {
       $pdo->rollBack();
-      echo "<script>alert('Failed to void bill. Error: " . addslashes($e->getMessage()) . "');</script>";
+      echo "<script>
+        swal({
+            title: 'Error!',
+            text: 'Failed to void bill. Error: " . addslashes($e->getMessage()) . "',
+            icon: 'error',
+        });
+    </script>";
     }
   }
 
@@ -840,10 +904,24 @@ class Query
 
       $pdo->commit();
 
-      echo "<script>alert('Payment successfully recorded and posted to the General Ledger.'); window.location.href='acpayabledetail.php?supplier_id=$supplier_id';</script>";
+      echo "<script>
+        swal({
+            title: 'Success!',
+            text: 'Payment successfully recorded and posted to the General Ledger.',
+            icon: 'success',
+        }).then(function() {
+            window.location.href = 'acpayabledetail.php?supplier_id=$supplier_id';
+        });
+      </script>";
     } catch (Exception $e) {
       $pdo->rollBack();
-      echo "<script>alert('Payment failed. Error: " . addslashes($e->getMessage()) . "'); window.location.href='acpayabledetail.php?supplier_id=$supplier_id';</script>";
+      echo "<script>
+        swal({
+            title: 'Error!',
+            text: 'Payment failed. Error: " . addslashes($e->getMessage()) . "',
+            icon: 'error',
+        });
+    </script>";
     }
   }
 
@@ -862,7 +940,6 @@ class Query
       $supStmt->execute([$supplier_id]);
       $supplier_name = $supStmt->fetchColumn();
 
-      // FIXED: Reverted back to AUTHORISED
       $stmt = $pdo->prepare("SELECT id, voucher_no, grand_total, paid_amount FROM purchases WHERE contact_id = ? AND status = 'AUTHORISED' ORDER BY date ASC, id ASC");
       $stmt->execute([$supplier_id]);
       $bills = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -871,7 +948,6 @@ class Query
       $sr_no = 'PAY-' . time();
       $narration = "Supplier Payment to $supplier_name - Ref: $reference";
 
-      // Prepare the allocation insert statement for the loop
       $allocStmt = $pdo->prepare("INSERT INTO purchase_payments (purchase_id, payment_date, payment_account, reference, amount) VALUES (?, ?, ?, ?, ?)");
 
       foreach ($bills as $bill) {
@@ -886,13 +962,12 @@ class Query
         } else {
           $apply_amount = $remaining_payment;
           $new_paid = $bill['paid_amount'] + $apply_amount;
-          $new_status = 'AUTHORISED'; // Reverted
+          $new_status = 'AUTHORISED';
         }
 
         $upd = $pdo->prepare("UPDATE purchases SET paid_amount = ?, status = ? WHERE id = ?");
         $upd->execute([$new_paid, $new_status, $bill['id']]);
 
-        // Log this exact slice of money against this exact bill
         $allocStmt->execute([$bill['id'], $payment_date, $payment_account, $reference, $apply_amount]);
 
         $remaining_payment -= $apply_amount;
@@ -909,10 +984,21 @@ class Query
       }
 
       $pdo->commit();
-      echo "<script>alert('Payment of " . number_format($actual_applied, 2) . " applied successfully across open bills.'); window.location.href='acpayabledetail.php?supplier_id=$supplier_id';</script>";
+
+      // Return success response with applied amount
+      return [
+        'status' => true,
+        'amount' => $actual_applied
+      ];
+
     } catch (Exception $e) {
       $pdo->rollBack();
-      echo "<script>alert('Payment failed. Error: " . addslashes($e->getMessage()) . "'); window.location.href='acpayabledetail.php?supplier_id=$supplier_id';</script>";
+
+      // Return error response with message
+      return [
+        'status' => false,
+        'message' => $e->getMessage()
+      ];
     }
   }
 

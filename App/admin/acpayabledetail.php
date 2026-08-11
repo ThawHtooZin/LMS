@@ -16,6 +16,8 @@ if (!isset($_GET['supplier_id'])) {
 
 $supplier_id = intval($_GET['supplier_id']);
 
+$paymentResult = null; // Store execution result for SweetAlert
+
 // Handle Bulk/Waterfall Payment Submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['pay_bulk'])) {
   $payment_date = $_POST['payment_date'];
@@ -23,7 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['pay_bulk'])) {
   $reference = $_POST['reference'];
   $payment_amount = $_POST['payment_amount'];
 
-  $query->paySupplierBalance($supplier_id, $payment_date, $payment_account, $reference, $payment_amount);
+  // Capture the result array returned by paySupplierBalance
+  $paymentResult = $query->paySupplierBalance($supplier_id, $payment_date, $payment_account, $reference, $payment_amount);
 }
 
 // Fetch Supplier Info
@@ -88,6 +91,23 @@ $asset_accounts = $accStmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 
 <body>
+
+<!-- Include JavaScript Files -->
+  <?php $bootstrap->javascriptindex(); ?>
+
+  <!-- SweetAlert Trigger Script -->
+  <?php if ($paymentResult !== null): ?>
+    <script>
+      <?php if ($paymentResult['status'] === true): ?>
+        swal("Success!", "Payment of <?= number_format($paymentResult['amount'], 2); ?> applied successfully across open bills.", "success").then(function() {
+            window.location.href = "acpayabledetail.php?supplier_id=<?= $supplier_id; ?>";
+        });
+      <?php else: ?>
+        swal("Error!", "Payment failed: <?= addslashes($paymentResult['message']); ?>", "error");
+      <?php endif; ?>
+    </script>
+  <?php endif; ?>
+
   <div class="row">
     <div class="sidebarcol" id="sidebar">
       <?php include 'sidebar.php'; ?>

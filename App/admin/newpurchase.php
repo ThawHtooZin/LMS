@@ -11,11 +11,11 @@ $query = new Query();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
     $contact_id = $_POST['contact_id'];
-    $date = $_POST['date'];
-    $tclfrozen = $_POST['tclfrozen'];
-    $due_date = !empty($_POST['due_date']) ? $_POST['due_date'] : NULL;
+    $date       = $_POST['date'];
+    $tclfrozen  = $_POST['tclfrozen'];
+    $due_date   = !empty($_POST['due_date']) ? $_POST['due_date'] : NULL;
     $voucher_no = $_POST['voucher_no'];
-    $currency = $_POST['currency'];
+    $currency   = $_POST['currency'];
 
     $action_type = $_POST['action_type'];
 
@@ -31,9 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
     if (isset($_POST['unit_price'])) {
         for ($i = 0; $i < count($_POST['unit_price']); $i++) {
             $viss = floatval($_POST['viss'][$i]);
-            $pcs = intval($_POST['pcs'][$i]);
+            $pcs  = intval($_POST['pcs'][$i]);
             $price = floatval($_POST['unit_price'][$i]);
-            $acc = isset($_POST['account_code'][$i]) ? $_POST['account_code'][$i] : '';
+            $acc  = isset($_POST['account_code'][$i]) ? $_POST['account_code'][$i] : '';
             $desc = isset($_POST['description'][$i]) ? $_POST['description'][$i] : '';
             $prod = isset($_POST['product_id'][$i]) ? $_POST['product_id'][$i] : '';
 
@@ -41,16 +41,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
 
             if (!empty($prod) || !empty($desc) || !empty($acc) || $multiplier > 0 || $price > 0) {
                 $line_total = $multiplier * $price;
-                $subtotal += $line_total;
+                $subtotal  += $line_total;
                 $lines[] = [
-                    'product_id' => !empty($prod) ? $prod : NULL,
-                    'account_id' => !empty($acc) ? $acc : NULL,
+                    'product_id'  => !empty($prod) ? $prod : NULL,
+                    'account_id'  => !empty($acc) ? $acc : NULL,
                     'description' => $desc,
-                    'size' => $_POST['size'][$i],
-                    'viss' => $viss,
-                    'pcs' => $pcs,
-                    'unit_price' => $price,
-                    'line_amount' => $line_total
+                    'size'        => $_POST['size'][$i],
+                    'viss'        => $viss,
+                    'pcs'         => $pcs,
+                    'unit_price'  => $price,
+                    'line_amount'  => $line_total
                 ];
             }
         }
@@ -60,7 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
     if ($action_type == 'save_continue') $ctrl_action = 'continue_editing';
     if ($action_type == 'save_add_another' || $action_type == 'approve_add_another') $ctrl_action = 'add_another';
 
-    $query->savePurchase(null, $contact_id, $date, $tclfrozen, $due_date, $voucher_no, $currency, $status, $subtotal, $subtotal, $lines, $ctrl_action);
+    // Capture the return response from controller
+    $saveResult = $query->savePurchase(null, $contact_id, $date, $tclfrozen, $due_date, $voucher_no, $currency, $status, $subtotal, $subtotal, $lines, $ctrl_action);
 }
 
 $suppliers = $pdo->query("SELECT id, name FROM contacts WHERE is_supplier = 1 OR is_supplier = 0 ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
@@ -159,6 +160,43 @@ foreach ($accounts as $acc) {
 </head>
 
 <body>
+
+<!-- Load JavaScript Assets First -->
+    <?php $bootstrap->javascriptindex(); ?>
+
+    <!-- SweetAlert Script Block -->
+    <?php if (!empty($saveResult)): ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            <?php if ($saveResult['status'] === true): ?>
+                swal({
+                    title: <?= json_encode($saveResult['title']); ?>,
+                    text: <?= json_encode($saveResult['message']); ?>,
+                    icon: "success"
+                }).then(function() {
+                    window.location.href = <?= json_encode($saveResult['redirect']); ?>;
+                });
+            <?php else: ?>
+                <?php if (isset($saveResult['type']) && $saveResult['type'] === 'validation_error'): ?>
+                    swal({
+                        title: <?= json_encode($saveResult['title']); ?>,
+                        text: <?= json_encode($saveResult['message']); ?>,
+                        icon: "warning"
+                    }).then(function() {
+                        window.history.back();
+                    });
+                <?php else: ?>
+                    swal({
+                        title: <?= json_encode($saveResult['title']); ?>,
+                        text: <?= json_encode($saveResult['message']); ?>,
+                        icon: "error"
+                    });
+                <?php endif; ?>
+            <?php endif; ?>
+        });
+    </script>
+    <?php endif; ?>
+    
     <div class="row">
         <div class="sidebarcol" id="sidebar">
             <?php include 'sidebar.php'; ?>
@@ -496,12 +534,12 @@ foreach ($accounts as $acc) {
             });
 
             if (!hasActiveLines) {
-                alert("Please add at least one valid line item.");
+                swal('Warning!', 'Please add at least one valid line item.', 'warning');
                 return;
             }
 
             if (!isValid) {
-                alert("Please fill in all mandatory fields indicated by the red lines.");
+                swal('Warning!', 'Please fill in all mandatory fields indicated by the red lines.', 'warning');
                 return;
             }
 

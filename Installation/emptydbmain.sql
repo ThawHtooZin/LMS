@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 08, 2026 at 05:52 AM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Generation Time: Aug 11, 2026 at 11:07 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -28,14 +28,13 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `accodes` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `code` varchar(50) NOT NULL,
   `name` varchar(255) NOT NULL,
   `type` varchar(100) NOT NULL,
   `class` varchar(50) NOT NULL,
   `description` text DEFAULT NULL,
-  `system_tag` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `system_tag` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -110,12 +109,11 @@ INSERT INTO `accodes` (`id`, `code`, `name`, `type`, `class`, `description`, `sy
 --
 
 CREATE TABLE `accounts` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
-  `role` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `role` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -138,7 +136,7 @@ INSERT INTO `accounts` (`id`, `username`, `password`, `email`, `role`) VALUES
 --
 
 CREATE TABLE `actualinvoice` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `commondity_id` varchar(11) NOT NULL,
   `size` varchar(11) NOT NULL,
   `packingkgperbox` varchar(11) NOT NULL,
@@ -147,8 +145,7 @@ CREATE TABLE `actualinvoice` (
   `usd` varchar(11) NOT NULL,
   `total_usd` varchar(11) NOT NULL,
   `infoid` int(11) NOT NULL,
-  `link_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `link_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -158,7 +155,7 @@ CREATE TABLE `actualinvoice` (
 --
 
 CREATE TABLE `bankdetail` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `infoid` int(11) NOT NULL,
   `company_name` varchar(255) NOT NULL,
   `company_address` varchar(255) NOT NULL,
@@ -167,8 +164,7 @@ CREATE TABLE `bankdetail` (
   `bank_name` varchar(255) NOT NULL,
   `swift_code` varchar(200) NOT NULL,
   `bank_branch_address` varchar(200) NOT NULL,
-  `branch_name` varchar(200) NOT NULL,
-  PRIMARY KEY (`id`)
+  `branch_name` varchar(200) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -178,7 +174,7 @@ CREATE TABLE `bankdetail` (
 --
 
 CREATE TABLE `cashbook` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `sr_no` varchar(25) NOT NULL,
   `ac_name` varchar(25) NOT NULL,
@@ -189,8 +185,7 @@ CREATE TABLE `cashbook` (
   `voucher_no` varchar(25) DEFAULT NULL,
   `crossac_name` varchar(25) DEFAULT NULL,
   `transactionid` int(11) NOT NULL,
-  `interfacerowid` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `interfacerowid` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -200,11 +195,10 @@ CREATE TABLE `cashbook` (
 --
 
 CREATE TABLE `category` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `category_id` varchar(22) NOT NULL,
   `category_name` varchar(255) NOT NULL,
-  `rate` float DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `rate` float DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -214,7 +208,7 @@ CREATE TABLE `category` (
 --
 
 CREATE TABLE `coldstore` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `indate` date NOT NULL,
   `outdate` date NOT NULL,
   `commondity_id` varchar(11) NOT NULL,
@@ -225,8 +219,7 @@ CREATE TABLE `coldstore` (
   `day` int(11) NOT NULL,
   `rate` varchar(12) NOT NULL,
   `charges` int(11) NOT NULL,
-  `total_charges` bigint(16) NOT NULL,
-  PRIMARY KEY (`id`)
+  `total_charges` bigint(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -236,22 +229,26 @@ CREATE TABLE `coldstore` (
 --
 
 CREATE TABLE `contacts` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
+  `contact_type` varchar(50) NOT NULL DEFAULT 'Fish Supplier',
   `email` varchar(255) DEFAULT NULL,
   `phone` varchar(255) DEFAULT NULL,
   `address` text DEFAULT NULL,
   `is_supplier` tinyint(1) NOT NULL DEFAULT 0,
-  `is_customer` tinyint(1) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`)
+  `is_customer` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `contacts`
 --
 
-INSERT INTO `contacts` (`id`, `name`, `email`, `phone`, `address`, `is_supplier`, `is_customer`) VALUES
-(2, 'Tommy', '', '0987654321', '', 1, 0);
+INSERT INTO `contacts` (`id`, `name`, `contact_type`, `email`, `phone`, `address`, `is_supplier`, `is_customer`) VALUES
+(2, 'Tommy', 'Fish Supplier', '', '0987654321', '', 1, 0),
+(3, 'Ko Myo', 'Fish Supplier', '', '234567890324567', '', 1, 0),
+(4, 'Ko Myo Naing', 'Fish Supplier', '', '123456543234', '', 1, 0),
+(5, 'Ko Aung Naing', 'Fish Supplier', '', '67766754565', '', 1, 0),
+(6, 'Shwe Myay', 'Material Supplier', '', '', '', 1, 0);
 
 -- --------------------------------------------------------
 
@@ -260,11 +257,10 @@ INSERT INTO `contacts` (`id`, `name`, `email`, `phone`, `address`, `is_supplier`
 --
 
 CREATE TABLE `container` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `container_no` int(11) NOT NULL,
   `country` varchar(20) NOT NULL,
-  `date` date NOT NULL,
-  PRIMARY KEY (`id`)
+  `date` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -274,12 +270,10 @@ CREATE TABLE `container` (
 --
 
 CREATE TABLE `exchange_rates` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `currency_code` varchar(10) NOT NULL,
   `rate` decimal(15,4) NOT NULL,
-  `effective_date` date NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uniq_rate_date` (`currency_code`,`effective_date`)
+  `effective_date` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -298,7 +292,7 @@ INSERT INTO `exchange_rates` (`id`, `currency_code`, `rate`, `effective_date`) V
 --
 
 CREATE TABLE `form7stock` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `item_id` varchar(11) NOT NULL,
   `supplier_name` varchar(255) NOT NULL,
@@ -311,8 +305,7 @@ CREATE TABLE `form7stock` (
   `pcsperf7` int(11) NOT NULL,
   `link_id` int(11) NOT NULL,
   `water_kg` int(11) NOT NULL,
-  `fish_type` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
+  `fish_type` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -322,7 +315,7 @@ CREATE TABLE `form7stock` (
 --
 
 CREATE TABLE `form7stocktcl` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `item_id` varchar(11) NOT NULL,
   `supplier_name` varchar(255) NOT NULL,
@@ -333,9 +326,15 @@ CREATE TABLE `form7stocktcl` (
   `kg` varchar(15) NOT NULL,
   `pcspervr` varchar(15) NOT NULL,
   `pcsperf7` int(11) NOT NULL,
-  `link_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `link_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `form7stocktcl`
+--
+
+INSERT INTO `form7stocktcl` (`id`, `date`, `item_id`, `supplier_name`, `country`, `type`, `size`, `viss`, `kg`, `pcspervr`, `pcsperf7`, `link_id`) VALUES
+(1, '2026-08-11', '1', 'Ko Myo Naing', 'DAKA', 'TCl', '1.5up', '100', '163.4', '1', 0, 35);
 
 -- --------------------------------------------------------
 
@@ -344,7 +343,7 @@ CREATE TABLE `form7stocktcl` (
 --
 
 CREATE TABLE `form10stock` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `item_id` varchar(11) NOT NULL,
   `supplier_id` varchar(20) NOT NULL,
@@ -361,8 +360,7 @@ CREATE TABLE `form10stock` (
   `looseoutpcs` int(11) NOT NULL,
   `total_kg` varchar(11) NOT NULL,
   `percentage` varchar(11) NOT NULL,
-  `fish_type` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
+  `fish_type` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -372,7 +370,7 @@ CREATE TABLE `form10stock` (
 --
 
 CREATE TABLE `form10stocktcl` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `item_id` varchar(11) NOT NULL,
   `supplier_id` varchar(20) NOT NULL,
@@ -398,8 +396,7 @@ CREATE TABLE `form10stocktcl` (
   `cutpiece_pcs` int(11) DEFAULT NULL,
   `cutpiece_kg` float DEFAULT NULL,
   `total_kg` varchar(11) NOT NULL,
-  `percentage` varchar(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `percentage` varchar(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -409,15 +406,14 @@ CREATE TABLE `form10stocktcl` (
 --
 
 CREATE TABLE `general_ledger` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `voucherno` varchar(255) NOT NULL,
   `ac_code` varchar(25) NOT NULL,
   `debit` text NOT NULL,
   `credit` text NOT NULL,
   `narration` text NOT NULL,
-  `sr_no` varchar(25) NOT NULL,
-  PRIMARY KEY (`id`)
+  `sr_no` varchar(25) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -427,7 +423,7 @@ CREATE TABLE `general_ledger` (
 --
 
 CREATE TABLE `gfcdryfishcoldstore` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `ite` varchar(11) NOT NULL,
   `kg` varchar(11) NOT NULL,
@@ -435,8 +431,7 @@ CREATE TABLE `gfcdryfishcoldstore` (
   `rate` varchar(11) NOT NULL,
   `charges` bigint(15) NOT NULL,
   `total_charges` bigint(15) NOT NULL,
-  `remark` text NOT NULL,
-  PRIMARY KEY (`id`)
+  `remark` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -446,15 +441,14 @@ CREATE TABLE `gfcdryfishcoldstore` (
 --
 
 CREATE TABLE `gfcdryfishlabour` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `ite` varchar(11) NOT NULL,
   `kg` varchar(11) NOT NULL,
   `rate` varchar(11) NOT NULL,
   `charges` bigint(15) NOT NULL,
   `total_charges` bigint(15) NOT NULL,
-  `remark` text NOT NULL,
-  PRIMARY KEY (`id`)
+  `remark` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -464,7 +458,7 @@ CREATE TABLE `gfcdryfishlabour` (
 --
 
 CREATE TABLE `gfcfishcoldstore` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `ite` varchar(11) NOT NULL,
   `mc` int(11) NOT NULL,
@@ -474,8 +468,7 @@ CREATE TABLE `gfcfishcoldstore` (
   `rate` varchar(11) NOT NULL,
   `charges` bigint(13) NOT NULL,
   `total_charges` bigint(14) NOT NULL,
-  `remark` text NOT NULL,
-  PRIMARY KEY (`id`)
+  `remark` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -485,15 +478,14 @@ CREATE TABLE `gfcfishcoldstore` (
 --
 
 CREATE TABLE `gfcfishlabour` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `ite` varchar(12) NOT NULL,
   `kg` varchar(11) NOT NULL,
   `rate` varchar(11) NOT NULL,
   `charges` bigint(15) NOT NULL,
   `total_charges` bigint(15) NOT NULL,
-  `remark` text NOT NULL,
-  PRIMARY KEY (`id`)
+  `remark` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -503,7 +495,7 @@ CREATE TABLE `gfcfishlabour` (
 --
 
 CREATE TABLE `gfcmcstock` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `country` varchar(19) NOT NULL,
   `particular` varchar(255) NOT NULL,
   `date` date NOT NULL,
@@ -520,8 +512,7 @@ CREATE TABLE `gfcmcstock` (
   `looseout_kg` varchar(20) NOT NULL,
   `looseout_pcs` varchar(20) NOT NULL,
   `remark` text NOT NULL,
-  `hhk_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `hhk_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -531,7 +522,7 @@ CREATE TABLE `gfcmcstock` (
 --
 
 CREATE TABLE `gfctotal` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `totalfishcoldstorecharges` bigint(15) NOT NULL,
   `totalfishlabourcharges` bigint(15) NOT NULL,
@@ -543,8 +534,7 @@ CREATE TABLE `gfctotal` (
   `payment_date` date NOT NULL,
   `payment_amount` bigint(15) NOT NULL,
   `balance_amount` bigint(15) NOT NULL,
-  `remark` text NOT NULL,
-  PRIMARY KEY (`id`)
+  `remark` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -554,7 +544,7 @@ CREATE TABLE `gfctotal` (
 --
 
 CREATE TABLE `hhkmcstock` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `country` varchar(19) NOT NULL,
   `particular` varchar(255) NOT NULL,
   `date` date NOT NULL,
@@ -570,8 +560,7 @@ CREATE TABLE `hhkmcstock` (
   `looseout_kg` varchar(20) NOT NULL,
   `looseout_pcs` bigint(15) NOT NULL,
   `remark` text NOT NULL,
-  `fish_type` varchar(100) NOT NULL,
-  PRIMARY KEY (`id`)
+  `fish_type` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -581,7 +570,7 @@ CREATE TABLE `hhkmcstock` (
 --
 
 CREATE TABLE `hhkstock` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `indate` date NOT NULL,
   `outdate` date NOT NULL,
   `commondity_id` varchar(11) NOT NULL,
@@ -592,8 +581,7 @@ CREATE TABLE `hhkstock` (
   `balance` varchar(11) NOT NULL,
   `balance_kg` varchar(11) NOT NULL,
   `balance_mc` int(11) DEFAULT NULL,
-  `link_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `link_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -603,7 +591,7 @@ CREATE TABLE `hhkstock` (
 --
 
 CREATE TABLE `invoice_costing` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `commondity_id` varchar(11) NOT NULL,
   `size` varchar(11) NOT NULL,
   `kg` varchar(11) NOT NULL,
@@ -624,8 +612,7 @@ CREATE TABLE `invoice_costing` (
   `profit_amount` varchar(11) NOT NULL,
   `total_kg_price` varchar(11) NOT NULL,
   `infoid` int(11) NOT NULL,
-  `link_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `link_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -635,7 +622,7 @@ CREATE TABLE `invoice_costing` (
 --
 
 CREATE TABLE `labour` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `indate` date NOT NULL,
   `outdate` date NOT NULL,
   `commondity_id` varchar(11) NOT NULL,
@@ -645,8 +632,7 @@ CREATE TABLE `labour` (
   `total_kg` varchar(11) NOT NULL,
   `rate` varchar(11) NOT NULL,
   `charges` int(11) NOT NULL,
-  `total_charges` bigint(16) NOT NULL,
-  PRIMARY KEY (`id`)
+  `total_charges` bigint(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -656,14 +642,13 @@ CREATE TABLE `labour` (
 --
 
 CREATE TABLE `material_purchase` (
-  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) UNSIGNED NOT NULL,
   `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `voucher_no` int(11) NOT NULL,
   `supplier_id` varchar(255) DEFAULT NULL,
   `material_id` text DEFAULT NULL,
   `quantity` int(11) DEFAULT NULL,
-  `rate` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `rate` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -673,7 +658,7 @@ CREATE TABLE `material_purchase` (
 --
 
 CREATE TABLE `material_store_house` (
-  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) UNSIGNED NOT NULL,
   `date` date DEFAULT NULL,
   `time` time DEFAULT current_timestamp(),
   `voucher_no` text NOT NULL,
@@ -683,9 +668,19 @@ CREATE TABLE `material_store_house` (
   `in_quantity` int(11) DEFAULT NULL,
   `out_quantity` int(11) DEFAULT NULL,
   `output_group` int(11) DEFAULT NULL,
-  `action` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
+  `action` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `material_store_house`
+--
+
+INSERT INTO `material_store_house` (`id`, `date`, `time`, `voucher_no`, `description`, `supplier_id`, `material_id`, `in_quantity`, `out_quantity`, `output_group`, `action`) VALUES
+(1, '2026-08-08', '10:27:20', 'Dr 24/Feb111', '', '2', 4, 20, NULL, NULL, ''),
+(2, '2026-08-08', '10:32:56', 'SV-001', '', '2', 4, 20, NULL, NULL, ''),
+(5, '2026-08-10', '12:30:52', '123123', '', '6', 4, 20, NULL, NULL, ''),
+(6, '2026-08-11', '14:57:22', '8798', '', '6', 4, 100, NULL, NULL, ''),
+(7, '2026-08-11', '15:29:39', '789', '', '6', 4, 30, NULL, NULL, '');
 
 -- --------------------------------------------------------
 
@@ -694,10 +689,9 @@ CREATE TABLE `material_store_house` (
 --
 
 CREATE TABLE `migrations` (
-  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` int(10) UNSIGNED NOT NULL,
   `migration` varchar(255) NOT NULL,
-  `batch` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `batch` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -707,7 +701,7 @@ CREATE TABLE `migrations` (
 --
 
 CREATE TABLE `mslcoldstore` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `indate` date NOT NULL,
   `outdate` date NOT NULL,
   `item_id` varchar(11) NOT NULL,
@@ -718,8 +712,7 @@ CREATE TABLE `mslcoldstore` (
   `day` int(11) NOT NULL,
   `rate` varchar(12) NOT NULL,
   `charges` int(11) NOT NULL,
-  `total_charges` bigint(16) NOT NULL,
-  PRIMARY KEY (`id`)
+  `total_charges` bigint(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -729,7 +722,7 @@ CREATE TABLE `mslcoldstore` (
 --
 
 CREATE TABLE `mslexportcharges` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `indate` date NOT NULL,
   `outdate` date NOT NULL,
   `item_id` varchar(11) NOT NULL,
@@ -739,8 +732,7 @@ CREATE TABLE `mslexportcharges` (
   `total_kg` varchar(11) NOT NULL,
   `rate` varchar(15) NOT NULL,
   `charges` int(11) NOT NULL,
-  `total_charges` bigint(16) NOT NULL,
-  PRIMARY KEY (`id`)
+  `total_charges` bigint(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -750,7 +742,7 @@ CREATE TABLE `mslexportcharges` (
 --
 
 CREATE TABLE `mslfreezing` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `indate` date NOT NULL,
   `outdate` date NOT NULL,
   `item_id` varchar(11) NOT NULL,
@@ -760,8 +752,7 @@ CREATE TABLE `mslfreezing` (
   `total_kg` varchar(11) NOT NULL,
   `rate` varchar(11) NOT NULL,
   `charges` int(11) NOT NULL,
-  `total_charges` bigint(16) NOT NULL,
-  PRIMARY KEY (`id`)
+  `total_charges` bigint(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -771,15 +762,14 @@ CREATE TABLE `mslfreezing` (
 --
 
 CREATE TABLE `mslrepacking` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `description` varchar(255) NOT NULL,
   `sheet` int(11) NOT NULL,
   `plastic` varchar(11) NOT NULL,
   `price` varchar(11) NOT NULL,
   `amount` varchar(11) NOT NULL,
-  `total_charges` varchar(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `total_charges` varchar(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -789,7 +779,7 @@ CREATE TABLE `mslrepacking` (
 --
 
 CREATE TABLE `mslstock` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `indate` date NOT NULL,
   `outdate` date NOT NULL,
   `item_id` varchar(11) NOT NULL,
@@ -797,8 +787,7 @@ CREATE TABLE `mslstock` (
   `total_mc` int(11) NOT NULL,
   `kg` varchar(11) NOT NULL,
   `total_kg` varchar(11) NOT NULL,
-  `balance` varchar(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `balance` varchar(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -808,7 +797,7 @@ CREATE TABLE `mslstock` (
 --
 
 CREATE TABLE `msl_total_charges` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `item_id` varchar(11) NOT NULL,
   `total_coldstore_charges` bigint(19) NOT NULL,
@@ -821,8 +810,7 @@ CREATE TABLE `msl_total_charges` (
   `payment_date` date NOT NULL,
   `payment_amount` bigint(19) NOT NULL,
   `balance_amount` bigint(19) NOT NULL,
-  `remark` bigint(19) NOT NULL,
-  PRIMARY KEY (`id`)
+  `remark` bigint(19) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -832,7 +820,7 @@ CREATE TABLE `msl_total_charges` (
 --
 
 CREATE TABLE `packingliststock` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `customer_id` varchar(11) NOT NULL,
   `country` varchar(11) NOT NULL,
@@ -840,8 +828,7 @@ CREATE TABLE `packingliststock` (
   `containerno` varchar(11) NOT NULL,
   `vessel_name` varchar(33) NOT NULL,
   `voyname` varchar(55) NOT NULL,
-  `fda` varchar(56) NOT NULL,
-  PRIMARY KEY (`id`)
+  `fda` varchar(56) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -858,7 +845,7 @@ INSERT INTO `packingliststock` (`id`, `date`, `customer_id`, `country`, `invoice
 --
 
 CREATE TABLE `packingliststockinfo` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `commondity_id` varchar(11) NOT NULL,
   `size` varchar(11) NOT NULL,
   `packingkgperbox` int(11) NOT NULL,
@@ -867,8 +854,7 @@ CREATE TABLE `packingliststockinfo` (
   `totalgrossweight` varchar(11) NOT NULL,
   `usd` varchar(11) NOT NULL,
   `total_usd` varchar(11) NOT NULL,
-  `infoid` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `infoid` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -885,7 +871,7 @@ INSERT INTO `packingliststockinfo` (`id`, `commondity_id`, `size`, `packingkgper
 --
 
 CREATE TABLE `packingmaterial` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `commondity_id` varchar(11) NOT NULL,
   `fish_size` varchar(11) NOT NULL,
   `plastic` varchar(11) NOT NULL,
@@ -906,8 +892,7 @@ CREATE TABLE `packingmaterial` (
   `pcsperlb` int(11) NOT NULL,
   `pcspermc` int(11) NOT NULL,
   `link_id` int(11) NOT NULL,
-  `infoid` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `infoid` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -924,10 +909,9 @@ INSERT INTO `packingmaterial` (`id`, `commondity_id`, `fish_size`, `plastic`, `j
 --
 
 CREATE TABLE `permission` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `role_id` int(11) NOT NULL,
-  `permission` text NOT NULL,
-  PRIMARY KEY (`id`)
+  `permission` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -940,7 +924,7 @@ INSERT INTO `permission` (`id`, `role_id`, `permission`) VALUES
 (3, 3, ',manage_coldstoreitem,manage_coldstorecharges,manage_shippmentexport,manage_truckexport'),
 (4, 4, ',manage_purchase,manage_cashbook,manage_acpayable,manage_accountreceivable,manage_transaction,manage_general_ledger,manage_contacts,manage_coldstoreitem,manage_products,manage_coa,manage_unit,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,sale_report,purchase_report,payable_report,manage_mcreport,manage_tclmcstock'),
 (5, 5, ',manage_coldstoreitem,manage_coldstorecharges'),
-(6, 6, ',manage_stockreport,sale_report,purchase_report,payable_report,manage_mcreport,manage_generalledger,packing_material_report');
+(6, 6, 'manage_stockreport,sale_report,purchase_report,payable_report,manage_mcreport,manage_generalledger,packing_material_report');
 
 -- --------------------------------------------------------
 
@@ -949,7 +933,7 @@ INSERT INTO `permission` (`id`, `role_id`, `permission`) VALUES
 --
 
 CREATE TABLE `processing` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `indate` date NOT NULL,
   `outdate` date NOT NULL,
   `commondity_id` varchar(11) NOT NULL,
@@ -959,8 +943,7 @@ CREATE TABLE `processing` (
   `total_kg` varchar(11) NOT NULL,
   `rate` varchar(15) NOT NULL,
   `charges` int(11) NOT NULL,
-  `total_charges` bigint(16) NOT NULL,
-  PRIMARY KEY (`id`)
+  `total_charges` bigint(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -970,7 +953,7 @@ CREATE TABLE `processing` (
 --
 
 CREATE TABLE `products` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `code` varchar(50) NOT NULL,
   `name` varchar(255) NOT NULL,
   `description` text DEFAULT NULL,
@@ -979,9 +962,7 @@ CREATE TABLE `products` (
   `is_purchased` tinyint(1) NOT NULL DEFAULT 0,
   `purchase_account` varchar(50) DEFAULT NULL,
   `is_sold` tinyint(1) NOT NULL DEFAULT 0,
-  `sales_account` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uniq_product_code` (`code`)
+  `sales_account` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -992,7 +973,8 @@ INSERT INTO `products` (`id`, `code`, `name`, `description`, `type_id`, `unit`, 
 (1, 'h001', 'HILSA', 'Fish here can be tested anytime', 1, '', 1, '5000', 1, '200'),
 (2, 'r001', 'rohu', 'This fish is rly good taste ngl', 1, '', 1, '5000', 1, '200'),
 (3, 'bbb01', 'Boal', '', 1, '', 1, '5000', 0, NULL),
-(4, 'MT001', 'Cotton Box', 'Cotton box for packaging MC', 2, '', 1, '5001', 1, '200');
+(4, 'MT001', 'Cotton Box', 'Cotton box for packaging MC', 2, '', 1, '5001', 1, '200'),
+(5, 'M001', 'Marigal', '', 1, '', 1, '', 1, '');
 
 -- --------------------------------------------------------
 
@@ -1001,9 +983,8 @@ INSERT INTO `products` (`id`, `code`, `name`, `description`, `type_id`, `unit`, 
 --
 
 CREATE TABLE `product_types` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -1021,7 +1002,7 @@ INSERT INTO `product_types` (`id`, `name`) VALUES
 --
 
 CREATE TABLE `purchases` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `voucher_no` varchar(255) NOT NULL,
   `contact_id` int(11) NOT NULL,
   `date` date NOT NULL,
@@ -1033,10 +1014,7 @@ CREATE TABLE `purchases` (
   `subtotal` decimal(15,2) NOT NULL DEFAULT 0.00,
   `grand_total` decimal(15,2) NOT NULL DEFAULT 0.00,
   `paid_amount` decimal(15,2) NOT NULL DEFAULT 0.00,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uniq_voucher` (`voucher_no`),
-  KEY `fk_purchases_contact` (`contact_id`)
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -1046,7 +1024,7 @@ CREATE TABLE `purchases` (
 --
 
 CREATE TABLE `purchase_lines` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `purchase_id` int(11) NOT NULL,
   `product_id` int(11) DEFAULT NULL,
   `account_id` int(11) NOT NULL,
@@ -1055,11 +1033,23 @@ CREATE TABLE `purchase_lines` (
   `viss` decimal(10,2) NOT NULL DEFAULT 0.00,
   `pcs` int(11) NOT NULL DEFAULT 0,
   `unit_price` decimal(15,2) NOT NULL DEFAULT 0.00,
-  `line_amount` decimal(15,2) NOT NULL DEFAULT 0.00,
-  PRIMARY KEY (`id`),
-  KEY `fk_pl_purchase` (`purchase_id`),
-  KEY `fk_pl_product` (`product_id`),
-  KEY `fk_pl_account` (`account_id`)
+  `line_amount` decimal(15,2) NOT NULL DEFAULT 0.00
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `purchase_payments`
+--
+
+CREATE TABLE `purchase_payments` (
+  `id` int(11) NOT NULL,
+  `purchase_id` int(11) NOT NULL,
+  `payment_date` date NOT NULL,
+  `payment_account` varchar(50) NOT NULL,
+  `reference` varchar(255) NOT NULL,
+  `amount` decimal(15,2) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -1069,7 +1059,7 @@ CREATE TABLE `purchase_lines` (
 --
 
 CREATE TABLE `receivable` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `ac_code` varchar(25) NOT NULL,
   `sr_no` varchar(25) NOT NULL,
@@ -1080,8 +1070,7 @@ CREATE TABLE `receivable` (
   `particulars` varchar(255) NOT NULL,
   `paid_amount` text NOT NULL,
   `balance` text NOT NULL,
-  `transactionid` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `transactionid` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -1091,7 +1080,7 @@ CREATE TABLE `receivable` (
 --
 
 CREATE TABLE `repacking` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `in_mc` int(10) NOT NULL,
   `in_kg` varchar(10) NOT NULL,
@@ -1101,8 +1090,7 @@ CREATE TABLE `repacking` (
   `diff_kg` varchar(11) NOT NULL,
   `rate` varchar(11) NOT NULL,
   `charges` varchar(11) NOT NULL,
-  `total_charges` varchar(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `total_charges` varchar(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -1112,13 +1100,12 @@ CREATE TABLE `repacking` (
 --
 
 CREATE TABLE `repackingout` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `outkg` varchar(11) NOT NULL,
   `rate` varchar(11) NOT NULL,
   `charges` bigint(15) NOT NULL,
-  `total_charges` bigint(15) NOT NULL,
-  PRIMARY KEY (`id`)
+  `total_charges` bigint(15) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -1128,9 +1115,8 @@ CREATE TABLE `repackingout` (
 --
 
 CREATE TABLE `role` (
-  `role_id` int(11) NOT NULL AUTO_INCREMENT,
-  `role_name` varchar(255) NOT NULL,
-  PRIMARY KEY (`role_id`)
+  `role_id` int(11) NOT NULL,
+  `role_name` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -1152,7 +1138,7 @@ INSERT INTO `role` (`role_id`, `role_name`) VALUES
 --
 
 CREATE TABLE `stock_output_group` (
-  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) UNSIGNED NOT NULL,
   `date` date DEFAULT current_timestamp(),
   `time` time DEFAULT current_timestamp(),
   `stock_to` varchar(255) DEFAULT NULL,
@@ -1160,8 +1146,7 @@ CREATE TABLE `stock_output_group` (
   `description` varchar(255) NOT NULL,
   `group_name` text DEFAULT NULL,
   `material_id` varchar(255) DEFAULT NULL,
-  `quantity` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `quantity` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -1171,11 +1156,9 @@ CREATE TABLE `stock_output_group` (
 --
 
 CREATE TABLE `system_currencies` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `code` varchar(10) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uniq_currency_code` (`code`)
+  `name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -1192,7 +1175,7 @@ INSERT INTO `system_currencies` (`id`, `code`, `name`) VALUES
 --
 
 CREATE TABLE `tclmcstock` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `item_id` varchar(9) NOT NULL,
   `size` varchar(9) NOT NULL,
@@ -1204,8 +1187,7 @@ CREATE TABLE `tclmcstock` (
   `transfer_mc` int(11) NOT NULL,
   `loading_no` text NOT NULL,
   `loading_mc` int(11) NOT NULL,
-  `grandtotal_mc` bigint(77) NOT NULL,
-  PRIMARY KEY (`id`)
+  `grandtotal_mc` bigint(77) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -1215,7 +1197,7 @@ CREATE TABLE `tclmcstock` (
 --
 
 CREATE TABLE `total_charges` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `commondity_id` int(11) NOT NULL,
   `total_coldstore_charges` bigint(19) NOT NULL,
@@ -1231,8 +1213,7 @@ CREATE TABLE `total_charges` (
   `payment_amount` bigint(19) NOT NULL,
   `balance_amount` bigint(19) NOT NULL,
   `remark` text NOT NULL,
-  `link_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `link_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -1242,7 +1223,7 @@ CREATE TABLE `total_charges` (
 --
 
 CREATE TABLE `truckactualinvoice` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `item_id` varchar(24) NOT NULL,
   `size` varchar(24) NOT NULL,
   `pcsperbox` bigint(20) NOT NULL,
@@ -1252,8 +1233,7 @@ CREATE TABLE `truckactualinvoice` (
   `usd` float NOT NULL,
   `total_usd` float NOT NULL,
   `invoice_no` varchar(15) NOT NULL,
-  `link_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `link_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -1263,7 +1243,7 @@ CREATE TABLE `truckactualinvoice` (
 --
 
 CREATE TABLE `truckdeclare` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `item_id` varchar(24) NOT NULL,
   `size` varchar(24) NOT NULL,
   `pcsperbox` bigint(20) NOT NULL,
@@ -1271,8 +1251,7 @@ CREATE TABLE `truckdeclare` (
   `mc` bigint(20) NOT NULL,
   `netweight` float NOT NULL,
   `invoice_no` varchar(15) NOT NULL,
-  `link_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `link_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -1282,7 +1261,7 @@ CREATE TABLE `truckdeclare` (
 --
 
 CREATE TABLE `truckfoambox` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `item_id` varchar(24) NOT NULL,
   `size` varchar(24) NOT NULL,
   `pcsperbox` bigint(20) NOT NULL,
@@ -1292,8 +1271,7 @@ CREATE TABLE `truckfoambox` (
   `foambox_no` varchar(225) NOT NULL,
   `total_foambox_no` varchar(255) NOT NULL,
   `invoice_no` varchar(15) DEFAULT NULL,
-  `link_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `link_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -1303,11 +1281,10 @@ CREATE TABLE `truckfoambox` (
 --
 
 CREATE TABLE `truckpackingliststock` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `invoice_no` varchar(11) NOT NULL,
-  `truck_no` varchar(16) NOT NULL,
-  PRIMARY KEY (`id`)
+  `truck_no` varchar(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -1317,7 +1294,7 @@ CREATE TABLE `truckpackingliststock` (
 --
 
 CREATE TABLE `truckpackingliststockinfo` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `item_id` varchar(11) NOT NULL,
   `size` varchar(11) NOT NULL,
   `pcsperbox` int(11) NOT NULL,
@@ -1325,8 +1302,7 @@ CREATE TABLE `truckpackingliststockinfo` (
   `mc` int(11) NOT NULL,
   `netweight` float NOT NULL,
   `totalgrossweight` float NOT NULL,
-  `invoice_no` varchar(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `invoice_no` varchar(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -1336,7 +1312,7 @@ CREATE TABLE `truckpackingliststockinfo` (
 --
 
 CREATE TABLE `truckpackingmaterial` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `remark` varchar(255) NOT NULL,
   `ice` int(11) NOT NULL,
@@ -1348,8 +1324,7 @@ CREATE TABLE `truckpackingmaterial` (
   `total_viss` bigint(19) NOT NULL,
   `form10kg` float NOT NULL,
   `costperkg` float NOT NULL,
-  `invoice_no` varchar(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `invoice_no` varchar(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -1359,7 +1334,7 @@ CREATE TABLE `truckpackingmaterial` (
 --
 
 CREATE TABLE `trucktotalcosting` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `item_id` varchar(11) NOT NULL,
   `size` varchar(11) NOT NULL,
@@ -1384,8 +1359,7 @@ CREATE TABLE `trucktotalcosting` (
   `profit` float NOT NULL,
   `invoice_no` varchar(11) NOT NULL,
   `link_id` int(11) NOT NULL,
-  `infoid` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `infoid` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -1395,13 +1369,12 @@ CREATE TABLE `trucktotalcosting` (
 --
 
 CREATE TABLE `userlogs` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `login_time` time(6) NOT NULL,
   `login_date` date NOT NULL,
   `login_username` varchar(125) NOT NULL,
   `login_password` varchar(125) NOT NULL,
-  `status` varchar(55) NOT NULL,
-  PRIMARY KEY (`id`)
+  `status` varchar(55) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -1424,8 +1397,746 @@ INSERT INTO `userlogs` (`id`, `login_time`, `login_date`, `login_username`, `log
 (882, '03:31:57.000000', '2026-07-02', 'Administrator', '', 'Logout Success'),
 (883, '03:32:04.000000', '2026-07-02', 'UMyoWinSwe', 'password', 'Login Success'),
 (884, '03:35:52.000000', '2026-07-02', 'UMyoWinSwe', '', 'Logout Success'),
-(885, '03:35:53.000000', '2026-07-02', 'Administrator', 'protechadmin2024***', 'Login Success');
+(885, '03:35:53.000000', '2026-07-02', 'Administrator', 'protechadmin2024***', 'Login Success'),
+(886, '02:02:45.000000', '2026-08-11', 'Administrator', '', 'Logout Success'),
+(887, '02:02:49.000000', '2026-08-11', 'Administrator', 'protechadmin2024***', 'Login Success');
 
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `accodes`
+--
+ALTER TABLE `accodes`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `accounts`
+--
+ALTER TABLE `accounts`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `actualinvoice`
+--
+ALTER TABLE `actualinvoice`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `bankdetail`
+--
+ALTER TABLE `bankdetail`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `cashbook`
+--
+ALTER TABLE `cashbook`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `category`
+--
+ALTER TABLE `category`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `coldstore`
+--
+ALTER TABLE `coldstore`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `contacts`
+--
+ALTER TABLE `contacts`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `container`
+--
+ALTER TABLE `container`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `exchange_rates`
+--
+ALTER TABLE `exchange_rates`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uniq_rate_date` (`currency_code`,`effective_date`);
+
+--
+-- Indexes for table `form7stock`
+--
+ALTER TABLE `form7stock`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `form7stocktcl`
+--
+ALTER TABLE `form7stocktcl`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `form10stock`
+--
+ALTER TABLE `form10stock`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `form10stocktcl`
+--
+ALTER TABLE `form10stocktcl`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `general_ledger`
+--
+ALTER TABLE `general_ledger`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `gfcdryfishcoldstore`
+--
+ALTER TABLE `gfcdryfishcoldstore`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `gfcdryfishlabour`
+--
+ALTER TABLE `gfcdryfishlabour`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `gfcfishcoldstore`
+--
+ALTER TABLE `gfcfishcoldstore`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `gfcfishlabour`
+--
+ALTER TABLE `gfcfishlabour`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `gfcmcstock`
+--
+ALTER TABLE `gfcmcstock`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `gfctotal`
+--
+ALTER TABLE `gfctotal`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `hhkmcstock`
+--
+ALTER TABLE `hhkmcstock`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `hhkstock`
+--
+ALTER TABLE `hhkstock`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `invoice_costing`
+--
+ALTER TABLE `invoice_costing`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `labour`
+--
+ALTER TABLE `labour`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `material_purchase`
+--
+ALTER TABLE `material_purchase`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `material_store_house`
+--
+ALTER TABLE `material_store_house`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `migrations`
+--
+ALTER TABLE `migrations`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `mslcoldstore`
+--
+ALTER TABLE `mslcoldstore`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `mslexportcharges`
+--
+ALTER TABLE `mslexportcharges`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `mslfreezing`
+--
+ALTER TABLE `mslfreezing`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `mslrepacking`
+--
+ALTER TABLE `mslrepacking`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `mslstock`
+--
+ALTER TABLE `mslstock`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `msl_total_charges`
+--
+ALTER TABLE `msl_total_charges`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `packingliststock`
+--
+ALTER TABLE `packingliststock`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `packingliststockinfo`
+--
+ALTER TABLE `packingliststockinfo`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `packingmaterial`
+--
+ALTER TABLE `packingmaterial`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `permission`
+--
+ALTER TABLE `permission`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `processing`
+--
+ALTER TABLE `processing`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `products`
+--
+ALTER TABLE `products`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uniq_product_code` (`code`);
+
+--
+-- Indexes for table `product_types`
+--
+ALTER TABLE `product_types`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `purchases`
+--
+ALTER TABLE `purchases`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uniq_voucher` (`voucher_no`),
+  ADD KEY `fk_purchases_contact` (`contact_id`);
+
+--
+-- Indexes for table `purchase_lines`
+--
+ALTER TABLE `purchase_lines`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_pl_purchase` (`purchase_id`),
+  ADD KEY `fk_pl_product` (`product_id`),
+  ADD KEY `fk_pl_account` (`account_id`);
+
+--
+-- Indexes for table `purchase_payments`
+--
+ALTER TABLE `purchase_payments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_payment_purchase` (`purchase_id`);
+
+--
+-- Indexes for table `receivable`
+--
+ALTER TABLE `receivable`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `repacking`
+--
+ALTER TABLE `repacking`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `repackingout`
+--
+ALTER TABLE `repackingout`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `role`
+--
+ALTER TABLE `role`
+  ADD PRIMARY KEY (`role_id`);
+
+--
+-- Indexes for table `stock_output_group`
+--
+ALTER TABLE `stock_output_group`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `system_currencies`
+--
+ALTER TABLE `system_currencies`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uniq_currency_code` (`code`);
+
+--
+-- Indexes for table `tclmcstock`
+--
+ALTER TABLE `tclmcstock`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `total_charges`
+--
+ALTER TABLE `total_charges`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `truckactualinvoice`
+--
+ALTER TABLE `truckactualinvoice`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `truckdeclare`
+--
+ALTER TABLE `truckdeclare`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `truckfoambox`
+--
+ALTER TABLE `truckfoambox`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `truckpackingliststock`
+--
+ALTER TABLE `truckpackingliststock`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `truckpackingliststockinfo`
+--
+ALTER TABLE `truckpackingliststockinfo`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `truckpackingmaterial`
+--
+ALTER TABLE `truckpackingmaterial`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `trucktotalcosting`
+--
+ALTER TABLE `trucktotalcosting`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `userlogs`
+--
+ALTER TABLE `userlogs`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `accodes`
+--
+ALTER TABLE `accodes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
+
+--
+-- AUTO_INCREMENT for table `accounts`
+--
+ALTER TABLE `accounts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `actualinvoice`
+--
+ALTER TABLE `actualinvoice`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `bankdetail`
+--
+ALTER TABLE `bankdetail`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `cashbook`
+--
+ALTER TABLE `cashbook`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `category`
+--
+ALTER TABLE `category`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `coldstore`
+--
+ALTER TABLE `coldstore`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `contacts`
+--
+ALTER TABLE `contacts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `container`
+--
+ALTER TABLE `container`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `exchange_rates`
+--
+ALTER TABLE `exchange_rates`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `form7stock`
+--
+ALTER TABLE `form7stock`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+
+--
+-- AUTO_INCREMENT for table `form7stocktcl`
+--
+ALTER TABLE `form7stocktcl`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `form10stock`
+--
+ALTER TABLE `form10stock`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `form10stocktcl`
+--
+ALTER TABLE `form10stocktcl`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `general_ledger`
+--
+ALTER TABLE `general_ledger`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=93;
+
+--
+-- AUTO_INCREMENT for table `gfcdryfishcoldstore`
+--
+ALTER TABLE `gfcdryfishcoldstore`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `gfcdryfishlabour`
+--
+ALTER TABLE `gfcdryfishlabour`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `gfcfishcoldstore`
+--
+ALTER TABLE `gfcfishcoldstore`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `gfcfishlabour`
+--
+ALTER TABLE `gfcfishlabour`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `gfcmcstock`
+--
+ALTER TABLE `gfcmcstock`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `gfctotal`
+--
+ALTER TABLE `gfctotal`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `hhkmcstock`
+--
+ALTER TABLE `hhkmcstock`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `hhkstock`
+--
+ALTER TABLE `hhkstock`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `invoice_costing`
+--
+ALTER TABLE `invoice_costing`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `labour`
+--
+ALTER TABLE `labour`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `material_purchase`
+--
+ALTER TABLE `material_purchase`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `material_store_house`
+--
+ALTER TABLE `material_store_house`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `migrations`
+--
+ALTER TABLE `migrations`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `mslcoldstore`
+--
+ALTER TABLE `mslcoldstore`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `mslexportcharges`
+--
+ALTER TABLE `mslexportcharges`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `mslfreezing`
+--
+ALTER TABLE `mslfreezing`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `mslrepacking`
+--
+ALTER TABLE `mslrepacking`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `mslstock`
+--
+ALTER TABLE `mslstock`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `msl_total_charges`
+--
+ALTER TABLE `msl_total_charges`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `packingliststock`
+--
+ALTER TABLE `packingliststock`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `packingliststockinfo`
+--
+ALTER TABLE `packingliststockinfo`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `packingmaterial`
+--
+ALTER TABLE `packingmaterial`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `permission`
+--
+ALTER TABLE `permission`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `processing`
+--
+ALTER TABLE `processing`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `products`
+--
+ALTER TABLE `products`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `product_types`
+--
+ALTER TABLE `product_types`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `purchases`
+--
+ALTER TABLE `purchases`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+
+--
+-- AUTO_INCREMENT for table `purchase_lines`
+--
+ALTER TABLE `purchase_lines`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+
+--
+-- AUTO_INCREMENT for table `purchase_payments`
+--
+ALTER TABLE `purchase_payments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- AUTO_INCREMENT for table `receivable`
+--
+ALTER TABLE `receivable`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `repacking`
+--
+ALTER TABLE `repacking`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `repackingout`
+--
+ALTER TABLE `repackingout`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `role`
+--
+ALTER TABLE `role`
+  MODIFY `role_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `stock_output_group`
+--
+ALTER TABLE `stock_output_group`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `system_currencies`
+--
+ALTER TABLE `system_currencies`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `tclmcstock`
+--
+ALTER TABLE `tclmcstock`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `total_charges`
+--
+ALTER TABLE `total_charges`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `truckactualinvoice`
+--
+ALTER TABLE `truckactualinvoice`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `truckdeclare`
+--
+ALTER TABLE `truckdeclare`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `truckfoambox`
+--
+ALTER TABLE `truckfoambox`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `truckpackingliststock`
+--
+ALTER TABLE `truckpackingliststock`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `truckpackingliststockinfo`
+--
+ALTER TABLE `truckpackingliststockinfo`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `truckpackingmaterial`
+--
+ALTER TABLE `truckpackingmaterial`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `trucktotalcosting`
+--
+ALTER TABLE `trucktotalcosting`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `userlogs`
+--
+ALTER TABLE `userlogs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=888;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
