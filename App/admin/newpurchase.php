@@ -213,7 +213,7 @@ foreach ($accounts as $acc) {
 
                     <div class="row mb-4 gx-3">
                         <div class="col-md-3">
-                            <label class="fw-bold small mb-1">From</label>
+                            <label class="fw-bold small mb-1">From</label><br>
                             <select name="contact_id" class="form-control chosen-select req-input" data-placeholder="Select supplier...">
                                 <option value=""></option>
                                 <?php foreach ($suppliers as $sup): ?>

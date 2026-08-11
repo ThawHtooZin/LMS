@@ -48,45 +48,6 @@ $bootstrap->css();
     $query->updateform10($updateid, $newdate, $upitem_id, $upfish_type, $upsupplier_id, $upcountry, $uptype, $upsize, $upmc, $upkg, $uppcs, $uplooseinkg, $uplooseinpcs, $uplooseoutkg, $uplooseoutpcs);
   }
 
-  if (isset($_POST['add'])) {
-    $date = $_POST['date'];
-    $supplier_id = $_POST['supplier_id'];
-    $country = $_POST['country'];
-    $type = $_POST['type'];
-
-    $item_ids = isset($_POST['item_id']) ? $_POST['item_id'] : [];
-    $fish_types = isset($_POST['fish_type']) ? $_POST['fish_type'] : [];
-    $sizes = isset($_POST['size']) ? $_POST['size'] : [];
-    $mcs = isset($_POST['mc']) ? $_POST['mc'] : [];
-    $kgs = isset($_POST['kg']) ? $_POST['kg'] : [];
-    $pcss = isset($_POST['pcs']) ? $_POST['pcs'] : [];
-    $loose_in_kgs = isset($_POST['loose_in_kg']) ? $_POST['loose_in_kg'] : [];
-    $loose_in_pcss = isset($_POST['loose_in_pcs']) ? $_POST['loose_in_pcs'] : [];
-    $loose_out_kgs = isset($_POST['loose_out_kg']) ? $_POST['loose_out_kg'] : [];
-    $loose_out_pcss = isset($_POST['loose_out_pcs']) ? $_POST['loose_out_pcs'] : [];
-
-    foreach ($item_ids as $index => $item_id) {
-      $item_id = trim($item_id);
-      if (empty($item_id)) continue;
-
-      $fish_type = isset($fish_types[$index]) ? trim($fish_types[$index]) : '';
-      $size = isset($sizes[$index]) ? trim($sizes[$index]) : '';
-      $mc = isset($mcs[$index]) ? trim($mcs[$index]) : '';
-      $kg = isset($kgs[$index]) ? trim($kgs[$index]) : '';
-      $pcs = isset($pcss[$index]) ? trim($pcss[$index]) : '';
-      $looseinkg = isset($loose_in_kgs[$index]) ? trim($loose_in_kgs[$index]) : '';
-      $looseinpcs = isset($loose_in_pcss[$index]) ? trim($loose_in_pcss[$index]) : '';
-      $looseoutkg = isset($loose_out_kgs[$index]) ? trim($loose_out_kgs[$index]) : '';
-      $looseoutpcs = isset($loose_out_pcss[$index]) ? trim($loose_out_pcss[$index]) : '';
-
-      $query->addform10($date, $item_id, $fish_type, $supplier_id, $country, $type, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs);
-    }
-
-    $_SESSION['date'] = $date;
-    $_SESSION['supplier_id'] = $supplier_id;
-    $_SESSION['country'] = $country;
-  }
-
   if (isset($_POST['searchbtn'])) {
     $_SESSION['search']['searchcommondity'] = $_POST['commondity_id'];
     $_SESSION['search']['searchdate'] = $_POST['date'];
@@ -112,7 +73,7 @@ $bootstrap->css();
           <form action="" method="post">
             <b class="h5">Link Mark Limited (F-10) Frozen</b>
 
-            <button type="button" class="btn btn-success btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#addmodal">Add Form-10 Data</button>
+            <a href="add_form_10_frozen.php" class="btn btn-success btn-sm float-end ms-2">New Form-10 Data</a>
             <button type="button" class="btn btn-primary btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#filtermodal" title="Percentage Report">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-binoculars" viewBox="0 0 16 16">
                 <path d="M3 2.5A1.5 1.5 0 0 1 4.5 1h1A1.5 1.5 0 0 1 7 2.5V5h2V2.5A1.5 1.5 0 0 1 10.5 1h1A1.5 1.5 0 0 1 13 2.5v2.382a.5.5 0 0 0 .276.447l.895.447A1.5 1.5 0 0 1 15 7.118V14.5a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 14.5v-3a.5.5 0 0 1 .146-.354l.854-.853V9.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v.793l.854.853A.5.5 0 0 1 7 11.5v3A1.5 1.5 0 0 1 5.5 16h-3A1.5 1.5 0 0 1 1 14.5V7.118a1.5 1.5 0 0 1 .83-1.342l.894-.447A.5.5 0 0 0 3 4.882zM4.5 2a.5.5 0 0 0-.5.5V3h2v-.5a.5.5 0 0 0-.5-.5zM6 4H4v.882a1.5 1.5 0 0 1-.83 1.342l-.894.447A.5.5 0 0 0 2 7.118V13h4v-1.293l-.854-.853A.5.5 0 0 1 5 10.5v-1A1.5 1.5 0 0 1 6.5 8h3A1.5 1.5 0 0 1 11 9.5v1a.5.5 0 0 1-.146.354l-.854.853V13h4V7.118a.5.5 0 0 0-.276-.447l-.895-.447A1.5 1.5 0 0 1 12 4.882V4h-2v1.5a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5zm4-1h2v-.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zm4 11h-4v.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5zm-8 0H2v.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5z" />
@@ -122,7 +83,6 @@ $bootstrap->css();
             <button type="submit" name="clearfilter" class="btn btn-secondary btn-sm float-end ms-2" style="border-top-left-radius:0px; border-bottom-left-radius:0px;">Clear Filter</button>
             <button type="submit" name="searchbtn" class="btn btn-primary btn-sm float-end me-2" style="border-top-left-radius:0px; border-bottom-left-radius:0px;">View</button>
 
-            <!-- REFACTORED: Filter bar commodity dropdown pulls directly from products table -->
             <select name="commondity_id" class="form-control inpv2 d-inline float-end" style="margin-left:5px; width: 10%; height:26px !important; padding:0px 2px;">
               <option value="">Select Commondity</option>
               <?php
@@ -155,73 +115,81 @@ $bootstrap->css();
           </form>
         </div>
 
-        <div class="modal fade" id="filtermodal" tabindex="-1" role="dialog" style="z-index: 999999999999999 !important;">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+        <div class="modal fade" id="filtermodal" tabindex="-1" aria-labelledby="filtermodalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content" style="overflow: visible !important;">
               <div class="modal-header bg-info text-light">
-                <h1 class="modal-title fs-5">Percentage Report</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h1 class="modal-title fs-5" id="filtermodalLabel">Percentage Report</h1>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
-              <div class="modal-body">
-                <form action="" method="post">
-                  <div class="modal-body">
-                    <label>Form7Date:</label>
+              
+              <form action="" method="post">
+                <div class="modal-body" style="overflow: visible !important;">
+                  <div class="mb-3">
+                    <label for="dateselector" class="form-label">Form7Date:</label>
                     <input type="date" id="dateselector" name="form7date" class="form-control inpv2">
-                    <div class="row" style="margin-top: 10px !important;">
-                      <div class="col">
-                        <label>Form10Date:</label>
-                        <input type="date" name="searchdate" class="form-control inpv2">
-                      </div>
-                      <div class="col">
-                        <label>Country:</label>
-                        <select name="country" class="form-control inpv2">
-                          <option value="">Select Country</option>
-                          <?php
-                          $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock");
-                          $countrystmt->execute();
-                          $countrydatas = $countrystmt->fetchall();
-                          foreach ($countrydatas as $countrydata) {
-                          ?>
-                            <option value="<?php echo htmlspecialchars($countrydata['country']); ?>"><?php echo htmlspecialchars($countrydata['country']); ?></option>
-                          <?php } ?>
-                        </select>
-                      </div>
+                  </div>
+                  
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label">Form10Date:</label>
+                      <input type="date" name="searchdate" class="form-control inpv2">
                     </div>
-                    <div class="row" style="margin-top: 10px !important;">
-                      <div class="col">
-                        <label>Commondity:</label>
-                        <select name="commondity" class="form-control inpv2">
-                          <option value="">Select Commondity</option>
-                          <?php
-                          foreach ($prodFilterDatas as $prodData) {
-                          ?>
-                            <option value="<?php echo htmlspecialchars($prodData['id']); ?>"><?php echo htmlspecialchars($prodData['name']); ?></option>
-                          <?php } ?>
-                        </select>
-                      </div>
-                      <div class="col">
-                        <label>Fish Type:</label>
-                        <select name="fish_type" class="form-control inpv2">
-                          <option value="">No Fish Type</option>
-                          <option value="G">G</option>
-                          <option value="egg">egg</option>
-                          <option value="ggs">ggs</option>
-                          <option value="fillet">fillet</option>
-                          <option value="W">W</option>
-                          <option value="Cut_piece">Cut Piece</option>
-                          <option value="Scaless">Scaless</option>
-                          <option value="Bls">Bl's</option>
-                          <option value="iqf">IQF</option>
-                        </select>
-                      </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Country:</label>
+                      <select name="country" class="form-control inpv2">
+                        <option value="">Select Country</option>
+                        <?php
+                        $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock");
+                        $countrystmt->execute();
+                        $countrydatas = $countrystmt->fetchAll(PDO::FETCH_ASSOC);
+                        foreach ($countrydatas as $countrydata) {
+                        ?>
+                          <option value="<?php echo htmlspecialchars($countrydata['country']); ?>">
+                            <?php echo htmlspecialchars($countrydata['country']); ?>
+                          </option>
+                        <?php } ?>
+                      </select>
                     </div>
                   </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" name="view" class="btn btn-primary float-end me-2">View</button>
+
+                  <div class="row g-3 mt-1">
+                    <div class="col-md-6">
+                      <label class="form-label">Commodity:</label>
+                      <select name="commondity" class="form-control inpv2">
+                        <option value="">Select Commodity</option>
+                        <?php
+                        foreach ($prodFilterDatas as $prodData) {
+                        ?>
+                          <option value="<?php echo htmlspecialchars($prodData['id']); ?>">
+                            <?php echo htmlspecialchars($prodData['name']); ?>
+                          </option>
+                        <?php } ?>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Fish Type:</label>
+                      <select name="fish_type" class="form-control inpv2">
+                        <option value="">No Fish Type</option>
+                        <option value="G">G</option>
+                        <option value="egg">egg</option>
+                        <option value="ggs">ggs</option>
+                        <option value="fillet">fillet</option>
+                        <option value="W">W</option>
+                        <option value="Cut_piece">Cut Piece</option>
+                        <option value="Scaless">Scaless</option>
+                        <option value="Bls">Bl's</option>
+                        <option value="iqf">IQF</option>
+                      </select>
+                    </div>
                   </div>
-                </form>
-              </div>
+                </div>
+
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="submit" name="view" class="btn btn-primary">View</button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
@@ -572,121 +540,6 @@ $bootstrap->css();
     </div>
   </div>
 
-  <!-- ADD MODAL -->
-  <div class="modal fade" id="addmodal">
-    <div class="modal-dialog modal-xl" role="document">
-      <div class="modal-content" style="margin-top:70px !important;">
-        <div class="modal-header bg-warning text-light">
-          <h1 class="modal-title fs-5">Add Form 10 Data</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <form action="" method="post" autocomplete="off">
-          <div class="modal-body">
-            <div class="row g-3 mb-3">
-              <div class="col-md-3">
-                <label style="font-weight: bold;">Date</label>
-                <input type="date" name="date" class="form-control inpv2" value="<?php echo !empty($_SESSION['date']) ? $_SESSION['date'] : ''; ?>">
-              </div>
-              <div class="col-md-3">
-                <label style="font-weight: bold;">Type</label>
-                <select class="form-control inpv2" name="type">
-                  <option value="frozen">Frozen</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                <label style="font-weight: bold;">Supplier</label>
-                <select name="supplier_id" class="form-control inpv2 chzn-select" data-placeholder="Select Supplier">
-                  <option value=""></option>
-                  <?php
-                  $supplier_id_stmt = $pdo->prepare("SELECT id, name FROM contacts WHERE is_supplier = 1 OR is_supplier = 0");
-                  $supplier_id_stmt->execute();
-                  $supplier_id_datas = $supplier_id_stmt->fetchAll(PDO::FETCH_ASSOC);
-                  foreach ($supplier_id_datas as $supplier_name) {
-                  ?>
-                    <option value="<?php echo htmlspecialchars($supplier_name['id']); ?>" <?php echo (!empty($_SESSION['supplier_id']) && $_SESSION['supplier_id'] == $supplier_name['id']) ? 'selected' : ''; ?>>
-                      <?php echo htmlspecialchars($supplier_name['name']); ?>
-                    </option>
-                  <?php } ?>
-                </select>
-              </div>
-              <div class="col-md-3">
-                <label style="font-weight: bold;">Country</label>
-                <input type="text" name="country" class="form-control inpv2" value="<?php echo !empty($_SESSION['country']) ? $_SESSION['country'] : ''; ?>">
-              </div>
-            </div>
-
-            <div class="mb-2 d-flex justify-content-between align-items-center mt-4">
-              <label style="font-weight: bold;">Form-10 Lines</label>
-              <button type="button" class="btn btn-sm btn-outline-primary" onclick="addForm10Line();">Add Line</button>
-            </div>
-
-            <div class="table-responsive">
-              <table class="table table-bordered table-sm" style="min-width: 1100px;">
-                <thead class="table-light text-center align-middle">
-                  <tr>
-                    <th>Commodity</th>
-                    <th>Fish Type</th>
-                    <th>Size</th>
-                    <th>MC</th>
-                    <th>Kg</th>
-                    <th>Pcs</th>
-                    <th>L-In Kg</th>
-                    <th>L-In Pcs</th>
-                    <th>L-Out Kg</th>
-                    <th>L-Out Pcs</th>
-                    <th style="width:1px;">Rem</th>
-                  </tr>
-                </thead>
-                <tbody id="form10-lines">
-                  <tr>
-                    <td>
-                      <select name="item_id[]" class="form-control" style="min-width: 120px;">
-                        <option value="">Select</option>
-                        <?php
-                        foreach ($prodFilterDatas as $commonditydata) {
-                        ?>
-                          <option value="<?php echo htmlspecialchars($commonditydata['id']); ?>" <?php echo (!empty($_SESSION['item_id']) && $_SESSION['item_id'] == $commonditydata['id']) ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($commonditydata['name']); ?>
-                          </option>
-                        <?php } ?>
-                      </select>
-                    </td>
-                    <td>
-                      <select name="fish_type[]" class="form-control" style="min-width: 90px;">
-                        <option value="G">G</option>
-                        <option value="egg">egg</option>
-                        <option value="ggs">ggs</option>
-                        <option value="fillet">fillet</option>
-                        <option value="W">W</option>
-                        <option value="Cut_piece">Cut Piece</option>
-                        <option value="Scaless">Scaless</option>
-                        <option value="Bls">Bl's</option>
-                        <option value="iqf">IQF</option>
-                      </select>
-                    </td>
-                    <td><input type="text" name="size[]" class="form-control" style="min-width: 70px;"></td>
-                    <td><input type="number" name="mc[]" class="form-control" style="min-width: 70px;"></td>
-                    <td><input type="text" name="kg[]" class="form-control" style="min-width: 70px;"></td>
-                    <td><input type="text" name="pcs[]" class="form-control" style="min-width: 70px;"></td>
-                    <td><input type="text" name="loose_in_kg[]" class="form-control" style="min-width: 70px;"></td>
-                    <td><input type="number" name="loose_in_pcs[]" class="form-control" style="min-width: 70px;"></td>
-                    <td><input type="text" name="loose_out_kg[]" class="form-control" style="min-width: 70px;"></td>
-                    <td><input type="number" name="loose_out_pcs[]" class="form-control" style="min-width: 70px;"></td>
-                    <td><button type="button" class="btn btn-danger btn-sm" onclick="removeForm10Line(this);">×</button></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div class="text-end mt-3">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-success" name="add">Save Form 10</button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
   <script>
     $('#filtertogglebtn').click(function() {
       var filterDiv = $('#filterdiv');
@@ -703,49 +556,6 @@ $bootstrap->css();
         console.log('Selected dates:', selectedDates.map(date => date.toISOString().split('T')[0]));
       }
     });
-  </script>
-  <script type="text/javascript">
-    function addForm10Line() {
-      const tbody = document.getElementById('form10-lines');
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>
-          <select name="item_id[]" class="form-control" style="min-width: 120px;">
-            <option value="">Select</option>
-            <?php
-            foreach ($prodFilterDatas as $commonditydata) {
-              echo '<option value="' . htmlspecialchars($commonditydata['id']) . '">' . htmlspecialchars($commonditydata['name']) . '</option>';
-            }
-            ?>
-          </select>
-        </td>
-        <td>
-          <select name="fish_type[]" class="form-control" style="min-width: 90px;">
-            <option value="G">G</option><option value="egg">egg</option><option value="ggs">ggs</option>
-            <option value="fillet">fillet</option><option value="W">W</option><option value="Cut_piece">Cut Piece</option>
-            <option value="Scaless">Scaless</option><option value="Bls">Bl's</option><option value="iqf">IQF</option>
-          </select>
-        </td>
-        <td><input type="text" name="size[]" class="form-control" style="min-width: 70px;"></td>
-        <td><input type="number" name="mc[]" class="form-control" style="min-width: 70px;"></td>
-        <td><input type="text" name="kg[]" class="form-control" style="min-width: 70px;"></td>
-        <td><input type="text" name="pcs[]" class="form-control" style="min-width: 70px;"></td>
-        <td><input type="text" name="loose_in_kg[]" class="form-control" style="min-width: 70px;"></td>
-        <td><input type="number" name="loose_in_pcs[]" class="form-control" style="min-width: 70px;"></td>
-        <td><input type="text" name="loose_out_kg[]" class="form-control" style="min-width: 70px;"></td>
-        <td><input type="number" name="loose_out_pcs[]" class="form-control" style="min-width: 70px;"></td>
-        <td><button type="button" class="btn btn-danger btn-sm" onclick="removeForm10Line(this);">×</button></td>
-      `;
-      tbody.appendChild(row);
-    }
-
-    function removeForm10Line(button) {
-      const row = button.closest('tr');
-      const tbody = row.closest('tbody');
-      if (tbody.rows.length > 1) {
-        row.remove();
-      }
-    }
   </script>
   <?php $bootstrap->javascript(); ?>
 </body>
