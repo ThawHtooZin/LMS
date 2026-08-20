@@ -219,7 +219,7 @@ class Bootstrap
     currentHours = ( currentHours > 12 ) ? currentHours - 12 : currentHours;
     currentHours = ( currentHours == 0 ) ? 12 : currentHours;
     var currentTimeString = currentHours + ":" + currentMinutes + ":" + currentSeconds + " " + timeOfDay;
-    document.getElementById("timer").innerHTML = currentTimeString;
+    // document.getElementById("timer").innerHTML = currentTimeString;
     }, 100);
     </script>
       <style>

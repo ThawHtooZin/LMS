@@ -9,6 +9,8 @@ $auth->checkadmin();
 $bootstrap = new Bootstrap();
 $query = new Query();
 
+// Safely capture the GET parameter to prevent strict PHP warnings
+$fullview = isset($_GET['fullview']) ? $_GET['fullview'] : '';
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -39,7 +41,7 @@ $query = new Query();
             <?php
             if (isset($_POST['searchgeneralledger'])) {
             ?>
-              <a href="export.php?table_name=general_ledger&searchgeneralledger=true&date_from=<?= $_POST['date_from']; ?>&date_to=<?= $_POST['date_to']; ?>&ac_code=<?= $_POST['ac_code'] ?>" class="btn btn-sm ms-2 btn-success float-end">Export</a>
+              <a href="export.php?table_name=general_ledger&searchgeneralledger=true&date_from=<?= urlencode($_POST['date_from'] ?? ''); ?>&date_to=<?= urlencode($_POST['date_to'] ?? ''); ?>&ac_code=<?= urlencode($_POST['ac_code'] ?? '') ?>" class="btn btn-sm ms-2 btn-success float-end">Export</a>
             <?php
             } else {
             ?>
@@ -52,11 +54,16 @@ $query = new Query();
           <h5>General Ledger</h5>
         </div>
         <div class="card-body">
-          <?php if ($_GET['fullview'] ?? '' == 'true' || $_SERVER['REQUEST_METHOD'] == 'POST') :
+          <?php
+          // Fixed Operator Precedence logic
+          if ($fullview === 'true' || $_SERVER['REQUEST_METHOD'] === 'POST') :
             include 'general_ledger_table.php';
-          endif; ?>
+          endif;
+          ?>
         </div>
       </div>
+
+      <!-- Reports Modal -->
       <div class="modal fade" id="reportsmodal">
         <div class="modal-dialog">
           <div class="modal-content" style=" margin-top:70px !important;">
@@ -118,15 +125,21 @@ $query = new Query();
         }
         firstpart = ac_code[0];
         lastpart = ac_code[1];
-        $('#ac_name').load('ac_name.php', {
-          FirstPart: firstpart,
-          LastPart: JSON.stringify(lastpart),
-          Type: type
-        });
+
+        if (ac_codepost.length > 0) {
+          $('#ac_name').load('ac_name.php', {
+            FirstPart: firstpart,
+            LastPart: JSON.stringify(lastpart),
+            Type: type
+          });
+        } else {
+          $('#ac_name').html('<input type="text" disabled class="form-control inpv2 mb-2">');
+        }
       });
+
       $(window).on('load', function() {
-        // Updated PHP condition: Only show modal if it's NOT a POST request AND fullview is NOT true
-        <?php if ($_SERVER['REQUEST_METHOD'] != 'POST' && ($_GET['fullview'] ?? '') !== 'true') : ?>
+        // Fixed PHP condition for triggering modal
+        <?php if ($_SERVER['REQUEST_METHOD'] !== 'POST' && $fullview !== 'true') : ?>
           $('#reportsmodal').modal('show');
           $('#table').hide();
         <?php endif; ?>

@@ -15,13 +15,11 @@ $query = new Query();
 <head>
   <meta charset="utf-8">
   <title>Admin | Dashboard</title>
+  <?php $bootstrap->css(); ?>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
 </head>
-<?php
-$bootstrap->css();
-?>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
 
 <body>
   <?php
@@ -67,7 +65,9 @@ $bootstrap->css();
       'configuration_coldstore',
       'material_output',
       'packing_material_report',
-      'temp_pm_stock'
+      'temp_pm_stock',
+      'profit_loss_report',
+      'manage_manual_journals' // The new permission
     ];
 
     $selected_permissions = [];
@@ -83,17 +83,14 @@ $bootstrap->css();
     $query->permission($permission, $role_id);
   }
   ?>
-  <div class="row">
+  <div class="row m-0">
     <div class="sidebarcol" id="sidebar">
-      <?php
-      include 'sidebar.php';
-      ?>
+      <?php include 'sidebar.php'; ?>
     </div>
     <div class="contentcol" id="content">
       <?php require 'navbar.php'; ?>
-      <div class="card">
+      <div class="card mt-2 shadow-sm">
         <div class="card-header bg-info">
-
           <?php
           $role_id = $_GET['role_id'];
           $role_name = $query->select('role', $_GET['role_id'], 'role_id');
@@ -235,8 +232,8 @@ $bootstrap->css();
                 <tr>
                   <td>Configuration Coldstore</td>
                   <td><input type="checkbox" name="configuration_coldstore" <?= isChecked('configuration_coldstore', $permissionshow) ?>></td>
-                  <td></td>
-                  <td></td>
+                  <td>Profit and Loss Report</td>
+                  <td><input type="checkbox" name="profit_loss_report" <?= isChecked('profit_loss_report', $permissionshow) ?>></td>
                 </tr>
                 <tr>
                   <td>Manage Mc Report</td>
@@ -245,10 +242,16 @@ $bootstrap->css();
                   <td><input type="checkbox" name="manage_currency" <?= isChecked('manage_currency', $permissionshow) ?>></td>
                 </tr>
                 <tr>
+                  <!-- FIXED: Placed Manual Journals in the correct grid structure -->
+                  <td>Manage Manual Journals</td>
+                  <td><input type="checkbox" name="manage_manual_journals" <?= isChecked('manage_manual_journals', $permissionshow) ?>></td>
                   <td></td>
                   <td></td>
-                  <td></td>
-                  <td><button type="submit" name="save" class="btn btn-success w-100 fw-bold">Save</button></td>
+                </tr>
+                <tr>
+                  <td colspan="4" class="text-end">
+                    <button type="submit" name="save" class="btn btn-success fw-bold px-5">Save Permissions</button>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -257,9 +260,7 @@ $bootstrap->css();
       </div>
     </div>
   </div>
-  <?php
-  $bootstrap->javascript();
-  ?>
+  <?php $bootstrap->javascript(); ?>
 </body>
 
 </html>

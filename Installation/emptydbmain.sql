@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 11, 2026 at 11:07 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- Generation Time: Aug 20, 2026 at 06:11 AM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -329,13 +329,6 @@ CREATE TABLE `form7stocktcl` (
   `link_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `form7stocktcl`
---
-
-INSERT INTO `form7stocktcl` (`id`, `date`, `item_id`, `supplier_name`, `country`, `type`, `size`, `viss`, `kg`, `pcspervr`, `pcsperf7`, `link_id`) VALUES
-(1, '2026-08-11', '1', 'Ko Myo Naing', 'DAKA', 'TCl', '1.5up', '100', '163.4', '1', 0, 35);
-
 -- --------------------------------------------------------
 
 --
@@ -638,6 +631,35 @@ CREATE TABLE `labour` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `manual_journals`
+--
+
+CREATE TABLE `manual_journals` (
+  `id` int(11) NOT NULL,
+  `journal_date` date NOT NULL,
+  `narration` varchar(255) NOT NULL,
+  `status` enum('DRAFT','POSTED','VOIDED') DEFAULT 'DRAFT',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `manual_journal_lines`
+--
+
+CREATE TABLE `manual_journal_lines` (
+  `id` int(11) NOT NULL,
+  `journal_id` int(11) NOT NULL,
+  `account_code` varchar(50) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `debit` decimal(15,2) DEFAULT 0.00,
+  `credit` decimal(15,2) DEFAULT 0.00
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `material_purchase`
 --
 
@@ -678,9 +700,7 @@ CREATE TABLE `material_store_house` (
 INSERT INTO `material_store_house` (`id`, `date`, `time`, `voucher_no`, `description`, `supplier_id`, `material_id`, `in_quantity`, `out_quantity`, `output_group`, `action`) VALUES
 (1, '2026-08-08', '10:27:20', 'Dr 24/Feb111', '', '2', 4, 20, NULL, NULL, ''),
 (2, '2026-08-08', '10:32:56', 'SV-001', '', '2', 4, 20, NULL, NULL, ''),
-(5, '2026-08-10', '12:30:52', '123123', '', '6', 4, 20, NULL, NULL, ''),
-(6, '2026-08-11', '14:57:22', '8798', '', '6', 4, 100, NULL, NULL, ''),
-(7, '2026-08-11', '15:29:39', '789', '', '6', 4, 30, NULL, NULL, '');
+(5, '2026-08-10', '12:30:52', '123123', '', '6', 4, 20, NULL, NULL, '');
 
 -- --------------------------------------------------------
 
@@ -919,12 +939,12 @@ CREATE TABLE `permission` (
 --
 
 INSERT INTO `permission` (`id`, `role_id`, `permission`) VALUES
-(1, 1, 'manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_acpayable,manage_accountreceivable,manage_transaction,manage_general_ledger,manage_ledger_record,manage_contacts,manage_products,manage_product_types,manage_currency,manage_coa,manage_coldstoreitem,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,sale_report,purchase_report,payable_report,manage_mcreport,manage_tclmcstock,manage_generalledger,manage_material_purchase,material_store_house,material_gatepass,configuration_coldstore,packing_material_report,temp_pm_stock'),
+(1, 1, 'manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_acpayable,manage_accountreceivable,manage_general_ledger,manage_contacts,manage_products,manage_product_types,manage_currency,manage_coa,manage_coldstoreitem,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,sale_report,purchase_report,payable_report,manage_mcreport,manage_tclmcstock,manage_generalledger,manage_material_purchase,material_store_house,material_gatepass,configuration_coldstore,packing_material_report,temp_pm_stock,profit_loss_report,manage_manual_journals'),
 (2, 2, ',manage_products,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_mcreport,manage_tclmcstock'),
 (3, 3, ',manage_coldstoreitem,manage_coldstorecharges,manage_shippmentexport,manage_truckexport'),
-(4, 4, ',manage_purchase,manage_cashbook,manage_acpayable,manage_accountreceivable,manage_transaction,manage_general_ledger,manage_contacts,manage_coldstoreitem,manage_products,manage_coa,manage_unit,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,sale_report,purchase_report,payable_report,manage_mcreport,manage_tclmcstock'),
+(4, 4, ',manage_purchase,manage_cashbook,manage_acpayable,manage_accountreceivable,manage_transaction,manage_general_ledger,manage_contacts,manage_coldstoreitem,manage_products,manage_coa,manage_unit,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,sale_report,purchase_report,payable_report,manage_mcreport,manage_tclmcstock,profit_loss_report,manage_manual_journals'),
 (5, 5, ',manage_coldstoreitem,manage_coldstorecharges'),
-(6, 6, 'manage_stockreport,sale_report,purchase_report,payable_report,manage_mcreport,manage_generalledger,packing_material_report');
+(6, 6, ',manage_stockreport,sale_report,purchase_report,payable_report,manage_mcreport,manage_generalledger,packing_material_report,profit_loss_report');
 
 -- --------------------------------------------------------
 
@@ -1557,6 +1577,19 @@ ALTER TABLE `labour`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `manual_journals`
+--
+ALTER TABLE `manual_journals`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `manual_journal_lines`
+--
+ALTER TABLE `manual_journal_lines`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `journal_id` (`journal_id`);
+
+--
 -- Indexes for table `material_purchase`
 --
 ALTER TABLE `material_purchase`
@@ -1842,19 +1875,19 @@ ALTER TABLE `exchange_rates`
 -- AUTO_INCREMENT for table `form7stock`
 --
 ALTER TABLE `form7stock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `form7stocktcl`
 --
 ALTER TABLE `form7stocktcl`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `form10stock`
 --
 ALTER TABLE `form10stock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `form10stocktcl`
@@ -1866,7 +1899,7 @@ ALTER TABLE `form10stocktcl`
 -- AUTO_INCREMENT for table `general_ledger`
 --
 ALTER TABLE `general_ledger`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=93;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
 
 --
 -- AUTO_INCREMENT for table `gfcdryfishcoldstore`
@@ -1929,6 +1962,18 @@ ALTER TABLE `labour`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `manual_journals`
+--
+ALTER TABLE `manual_journals`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `manual_journal_lines`
+--
+ALTER TABLE `manual_journal_lines`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
 -- AUTO_INCREMENT for table `material_purchase`
 --
 ALTER TABLE `material_purchase`
@@ -1938,7 +1983,7 @@ ALTER TABLE `material_purchase`
 -- AUTO_INCREMENT for table `material_store_house`
 --
 ALTER TABLE `material_store_house`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `migrations`
@@ -2028,19 +2073,19 @@ ALTER TABLE `product_types`
 -- AUTO_INCREMENT for table `purchases`
 --
 ALTER TABLE `purchases`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `purchase_lines`
 --
 ALTER TABLE `purchase_lines`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `purchase_payments`
 --
 ALTER TABLE `purchase_payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `receivable`
@@ -2137,6 +2182,16 @@ ALTER TABLE `trucktotalcosting`
 --
 ALTER TABLE `userlogs`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=888;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `manual_journal_lines`
+--
+ALTER TABLE `manual_journal_lines`
+  ADD CONSTRAINT `fk_journal_lines` FOREIGN KEY (`journal_id`) REFERENCES `manual_journals` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
