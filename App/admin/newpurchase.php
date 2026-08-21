@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
     $saveResult = $query->savePurchase(null, $contact_id, $date, $tclfrozen, $due_date, $voucher_no, $currency, $status, $subtotal, $subtotal, $lines, $ctrl_action);
 }
 
-$suppliers = $pdo->query("SELECT id, name FROM contacts WHERE is_supplier = 1 OR is_supplier = 0 ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
+$suppliers = $pdo->query("SELECT id, name FROM contacts WHERE is_supplier = 1 ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
 $products = $pdo->query("SELECT id, code, name, purchase_account FROM products WHERE is_purchased = 1 ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
 $currencies = $pdo->query("SELECT code, name FROM system_currencies ORDER BY code ASC")->fetchAll(PDO::FETCH_ASSOC);
 
@@ -161,42 +161,42 @@ foreach ($accounts as $acc) {
 
 <body>
 
-<!-- Load JavaScript Assets First -->
+    <!-- Load JavaScript Assets First -->
     <?php $bootstrap->javascriptindex(); ?>
 
     <!-- SweetAlert Script Block -->
     <?php if (!empty($saveResult)): ?>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            <?php if ($saveResult['status'] === true): ?>
-                swal({
-                    title: <?= json_encode($saveResult['title']); ?>,
-                    text: <?= json_encode($saveResult['message']); ?>,
-                    icon: "success"
-                }).then(function() {
-                    window.location.href = <?= json_encode($saveResult['redirect']); ?>;
-                });
-            <?php else: ?>
-                <?php if (isset($saveResult['type']) && $saveResult['type'] === 'validation_error'): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                <?php if ($saveResult['status'] === true): ?>
                     swal({
                         title: <?= json_encode($saveResult['title']); ?>,
                         text: <?= json_encode($saveResult['message']); ?>,
-                        icon: "warning"
+                        icon: "success"
                     }).then(function() {
-                        window.history.back();
+                        window.location.href = <?= json_encode($saveResult['redirect']); ?>;
                     });
                 <?php else: ?>
-                    swal({
-                        title: <?= json_encode($saveResult['title']); ?>,
-                        text: <?= json_encode($saveResult['message']); ?>,
-                        icon: "error"
-                    });
+                    <?php if (isset($saveResult['type']) && $saveResult['type'] === 'validation_error'): ?>
+                        swal({
+                            title: <?= json_encode($saveResult['title']); ?>,
+                            text: <?= json_encode($saveResult['message']); ?>,
+                            icon: "warning"
+                        }).then(function() {
+                            window.history.back();
+                        });
+                    <?php else: ?>
+                        swal({
+                            title: <?= json_encode($saveResult['title']); ?>,
+                            text: <?= json_encode($saveResult['message']); ?>,
+                            icon: "error"
+                        });
+                    <?php endif; ?>
                 <?php endif; ?>
-            <?php endif; ?>
-        });
-    </script>
+            });
+        </script>
     <?php endif; ?>
-    
+
     <div class="row">
         <div class="sidebarcol" id="sidebar">
             <?php include 'sidebar.php'; ?>

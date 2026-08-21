@@ -21,7 +21,6 @@ $bootstrap->css();
 ?>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
@@ -122,14 +121,14 @@ $bootstrap->css();
                 <h1 class="modal-title fs-5" id="filtermodalLabel">Percentage Report</h1>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
-              
+
               <form action="" method="post">
                 <div class="modal-body" style="overflow: visible !important;">
                   <div class="mb-3">
                     <label for="dateselector" class="form-label">Form7Date:</label>
                     <input type="date" id="dateselector" name="form7date" class="form-control inpv2">
                   </div>
-                  
+
                   <div class="row g-3">
                     <div class="col-md-6">
                       <label class="form-label">Form10Date:</label>

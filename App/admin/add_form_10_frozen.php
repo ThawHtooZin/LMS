@@ -47,19 +47,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add'])) {
 
         // Execute DB insertion directly via Query controller class
         $query->addform10(
-            $date, 
-            $item_id, 
-            $fish_type, 
-            $supplier_id, 
-            $country, 
-            $type, 
-            $size, 
-            $mc, 
-            $kg, 
-            $pcs, 
-            $looseinkg, 
-            $looseinpcs, 
-            $looseoutkg, 
+            $date,
+            $item_id,
+            $fish_type,
+            $supplier_id,
+            $country,
+            $type,
+            $size,
+            $mc,
+            $kg,
+            $pcs,
+            $looseinkg,
+            $looseinpcs,
+            $looseoutkg,
             $looseoutpcs
         );
         $saved_count++;
@@ -99,10 +99,10 @@ $prodFilterDatas = $prodFilterStmt ? $prodFilterStmt->fetchAll(PDO::FETCH_ASSOC)
     <title>Add Form 10 Data</title>
     <?php $bootstrap->css(); ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">
-    
+
     <style>
         .table-responsive {
-            overflow-y: hidden !important;
+            overflow-y: visible !important;
         }
 
         .chosen-container-single .chosen-single {
@@ -114,7 +114,7 @@ $prodFilterDatas = $prodFilterStmt ? $prodFilterStmt->fetchAll(PDO::FETCH_ASSOC)
             box-shadow: none !important;
         }
 
-        .table-lines th, 
+        .table-lines th,
         .table-lines td {
             vertical-align: middle;
             padding: 6px 4px;
@@ -126,7 +126,7 @@ $prodFilterDatas = $prodFilterStmt ? $prodFilterStmt->fetchAll(PDO::FETCH_ASSOC)
             border-bottom: 2px solid #ddd;
         }
 
-        .table-lines input, 
+        .table-lines input,
         .table-lines select {
             font-size: 14px;
             border-radius: 4px;
@@ -161,19 +161,19 @@ $prodFilterDatas = $prodFilterStmt ? $prodFilterStmt->fetchAll(PDO::FETCH_ASSOC)
     <?php $bootstrap->javascriptindex(); ?>
 
     <?php if (!empty($saveResult)): ?>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            swal({
-                title: <?= json_encode($saveResult['title']); ?>,
-                text: <?= json_encode($saveResult['message']); ?>,
-                icon: <?= json_encode($saveResult['status'] ? 'success' : 'error'); ?>
-            }).then(function() {
-                <?php if (!empty($saveResult['redirect'])): ?>
-                    window.location.href = <?= json_encode($saveResult['redirect']); ?>;
-                <?php endif; ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                swal({
+                    title: <?= json_encode($saveResult['title']); ?>,
+                    text: <?= json_encode($saveResult['message']); ?>,
+                    icon: <?= json_encode($saveResult['status'] ? 'success' : 'error'); ?>
+                }).then(function() {
+                    <?php if (!empty($saveResult['redirect'])): ?>
+                        window.location.href = <?= json_encode($saveResult['redirect']); ?>;
+                    <?php endif; ?>
+                });
             });
-        });
-    </script>
+        </script>
     <?php endif; ?>
 
     <div class="row">
@@ -237,40 +237,40 @@ $prodFilterDatas = $prodFilterStmt ? $prodFilterStmt->fetchAll(PDO::FETCH_ASSOC)
                             </thead>
                             <tbody id="form10-lines">
                                 <?php for ($i = 0; $i < 5; $i++): ?>
-                                <tr>
-                                    <td>
-                                        <select name="item_id[]" class="form-control chosen-select item-select">
-                                            <option value="">- Select Item -</option>
-                                            <?php foreach ($prodFilterDatas as $commonditydata): ?>
-                                                <option value="<?php echo htmlspecialchars($commonditydata['id']); ?>">
-                                                    <?php echo htmlspecialchars($commonditydata['name']); ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select name="fish_type[]" class="form-select form-select-sm">
-                                            <option value="G">G</option>
-                                            <option value="egg">egg</option>
-                                            <option value="ggs">ggs</option>
-                                            <option value="fillet">fillet</option>
-                                            <option value="W">W</option>
-                                            <option value="Cut_piece">Cut Piece</option>
-                                            <option value="Scaless">Scaless</option>
-                                            <option value="Bls">Bl's</option>
-                                            <option value="iqf">IQF</option>
-                                        </select>
-                                    </td>
-                                    <td><input type="text" name="size[]"></td>
-                                    <td><input type="number" name="mc[]"></td>
-                                    <td><input type="text" name="kg[]"></td>
-                                    <td><input type="text" name="pcs[]"></td>
-                                    <td><input type="text" name="loose_in_kg[]"></td>
-                                    <td><input type="number" name="loose_in_pcs[]"></td>
-                                    <td><input type="text" name="loose_out_kg[]"></td>
-                                    <td><input type="number" name="loose_out_pcs[]"></td>
-                                    <td class="text-center"><button type="button" class="btn btn-outline-danger btn-sm fw-bold" onclick="removeForm10Line(this);">×</button></td>
-                                </tr>
+                                    <tr>
+                                        <td>
+                                            <select name="item_id[]" class="form-control chosen-select item-select">
+                                                <option value="">- Select Item -</option>
+                                                <?php foreach ($prodFilterDatas as $commonditydata): ?>
+                                                    <option value="<?php echo htmlspecialchars($commonditydata['id']); ?>">
+                                                        <?php echo htmlspecialchars($commonditydata['name']); ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select name="fish_type[]" class="form-select form-select-sm">
+                                                <option value="G">G</option>
+                                                <option value="egg">egg</option>
+                                                <option value="ggs">ggs</option>
+                                                <option value="fillet">fillet</option>
+                                                <option value="W">W</option>
+                                                <option value="Cut_piece">Cut Piece</option>
+                                                <option value="Scaless">Scaless</option>
+                                                <option value="Bls">Bl's</option>
+                                                <option value="iqf">IQF</option>
+                                            </select>
+                                        </td>
+                                        <td><input type="text" name="size[]"></td>
+                                        <td><input type="number" name="mc[]"></td>
+                                        <td><input type="text" name="kg[]"></td>
+                                        <td><input type="text" name="pcs[]"></td>
+                                        <td><input type="text" name="loose_in_kg[]"></td>
+                                        <td><input type="number" name="loose_in_pcs[]"></td>
+                                        <td><input type="text" name="loose_out_kg[]"></td>
+                                        <td><input type="number" name="loose_out_pcs[]"></td>
+                                        <td class="text-center"><button type="button" class="btn btn-outline-danger btn-sm fw-bold" onclick="removeForm10Line(this);">×</button></td>
+                                    </tr>
                                 <?php endfor; ?>
                             </tbody>
                         </table>

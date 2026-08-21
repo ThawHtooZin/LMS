@@ -204,7 +204,8 @@ class Query
   public function getAccountCodeByTag($system_tag)
   {
     global $pdo;
-    $stmt = $pdo->prepare("SELECT code_no FROM acname WHERE system_tag = :tag LIMIT 1");
+    // Changed acname to accodes, and code_no to code
+    $stmt = $pdo->prepare("SELECT code FROM accodes WHERE system_tag = :tag LIMIT 1");
     $stmt->execute([':tag' => $system_tag]);
     $code = $stmt->fetchColumn();
     return $code ? $code : false;
@@ -3285,17 +3286,20 @@ class Query
 
     $totalnetweight = $packingkgperbox * $mc;
     $totalgrossweight = $totalnetweight + $mc;
-    $commondity;
-    $checkitemname = $this->select('item', $commondity, 'item_id');
 
-    if (str_contains($checkitemname['item_name'], "block") || str_contains($checkitemname['item_name'], "balachaung")) {
+    // FIXED: Query the new 'products' table using 'id'
+    $checkitemname = $this->select('products', $commondity, 'id');
+
+    // SAFE CHECK: Ensure name exists before running str_contains
+    $itemName = !empty($checkitemname['name']) ? strtolower($checkitemname['name']) : '';
+
+    if (str_contains($itemName, "block") || str_contains($itemName, "balachaung")) {
       $addpackingliststmt = $pdo->prepare("INSERT INTO packingliststockinfo(commondity_id, size, packingkgperbox, mc, totalnetweight, infoid) VALUES('$commondity', '$size', '$packingkgperbox', '$mc', '$totalnetweight', '$infoid')");
       $addpackingliststmt->execute();
     } else {
       $addpackingliststmt = $pdo->prepare("INSERT INTO packingliststockinfo(commondity_id, size, packingkgperbox, mc, totalnetweight, totalgrossweight, infoid) VALUES('$commondity', '$size', '$packingkgperbox', '$mc', '$totalnetweight', '$totalgrossweight', '$infoid')");
       $addpackingliststmt->execute();
     }
-
 
     $linkidstmt = $pdo->prepare("SELECT * FROM packingliststockinfo ORDER BY id DESC");
     $linkidstmt->execute();
@@ -4780,10 +4784,10 @@ class Query
       $sr_no = $transactiondata['sr_no'];
       $container_no = $transactiondata['container_no'];
       $bank_charges = $transactiondata['bank_charges'];
-      $actypestmt = $pdo->prepare("SELECT * FROM acname WHERE code_no='$ac_code'");
+      $actypestmt = $pdo->prepare("SELECT * FROM accodes WHERE code='$ac_code'");
       $actypestmt->execute();
       $acid = $actypestmt->fetch(PDO::FETCH_ASSOC);
-      $acid = $acid['ac_type'];
+      $acid = $acid['type'] ?? '';
 
       $balancestmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$ac_code' ORDER BY id DESC");
       $balancestmt->execute();
@@ -6278,7 +6282,7 @@ class Query
   function selectacname($code_no)
   {
     global $pdo;
-    $stmt = $pdo->prepare("SELECT * FROM acname WHERE code_no='$code_no'");
+    $stmt = $pdo->prepare("SELECT * FROM accodes WHERE code='$code_no'");
     $stmt->execute();
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
