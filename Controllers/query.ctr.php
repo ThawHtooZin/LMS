@@ -90,14 +90,24 @@ class Query
       $params[':date_to'] = $date_to;
     }
 
+    // Handle multiple account codes (array or single string)
     if (!empty($ac_code)) {
-      $conditions[] = "gl.ac_code = :ac_code";
-      $params[':ac_code'] = $ac_code;
+      if (is_array($ac_code)) {
+        $placeholders = [];
+        foreach ($ac_code as $index => $code) {
+          $key = ":ac_code_" . $index;
+          $placeholders[] = $key;
+          $params[$key] = $code;
+        }
+        $conditions[] = "gl.ac_code IN (" . implode(", ", $placeholders) . ")";
+      } else {
+        $conditions[] = "gl.ac_code = :ac_code";
+        $params[':ac_code'] = $ac_code;
+      }
     }
 
     $whereClause = count($conditions) > 0 ? "WHERE " . implode(" AND ", $conditions) : "";
 
-    // Single mega-query to fetch everything at once, including the offset account code
     $sql = "
           SELECT 
               gl.id,
@@ -121,7 +131,6 @@ class Query
     $stmt->execute($params);
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Group the data by account code in PHP so the table can render it easily
     $grouped = [];
     foreach ($results as $row) {
       $grouped[$row['ac_code']][] = $row;
@@ -2822,7 +2831,6 @@ class Query
     // $addpackingmaterialstmt = $pdo->prepare("INSERT INTO packingmaterial(commondity_id, fish_size, plastic, jcv, inner_box, sticker, mc_plastic, carton_box, tape, penon, p_sticker, plastic_rope, micellion, processing, total, perkgcost, plastic_size, pcsperlb, pcspermc)
     // VALUES('$commondity_id', '$fish_size', '$plastic', '$jcv', '$inner_box', '$sticker', '$mc_plastic', '$carton_box', '$tape', '$penon', '$p_sticker', '$plastic_rope', '$micellion', '$processing', '$total', '$perkgcost', '$plastic_size', '$pcsperlb', '$pcspermc')");
     // $addpackingmaterialstmt->execute();
-    echo $upid;
     $addpackingmaterialstmt = $pdo->prepare("UPDATE packingmaterial SET plastic='$plastic', jcv='$jcv', inner_box='$inner_box', sticker='$sticker', mc_plastic='$mc_plastic', carton_box='$carton_box', tape='$tape', penon='$penon', p_sticker='$p_sticker', plastic_rope='$plastic_rope', micellion='$micellion', processing='$processing', total='$total', perkgcost='$perkgcost', plastic_size='$plastic_size', pcsperlb='$pcsperlb', pcspermc='$pcspermc' WHERE id='$upid'");
     $addpackingmaterialstmt->execute();
   }

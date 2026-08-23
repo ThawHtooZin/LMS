@@ -13,13 +13,16 @@
     <?php
     $date_from = $_POST['date_from'] ?? '';
     $date_to = $_POST['date_to'] ?? '';
-    $ac_code = $_POST['ac_code'] ?? '';
+    // Capture array of selected account codes
+    $ac_codes = $_POST['ac_codes'] ?? [];
 
-    // If it's a POST request (search) or full view, fetch data using the new optimized engine
     if (isset($_POST['searchgeneralledger']) || isset($_GET['fullview'])) {
 
-        $ledgerData = $query->getOptimizedLedger($date_from, $date_to, $ac_code);
-        $allAccounts = $query->getAllAccountNames(); // Fetches all names in 1 query
+        // Pass array of codes to the ledger engine (if empty, engine handles full view)
+        $ledgerData = $query->getOptimizedLedger($date_from, $date_to, $ac_codes);
+
+        // FIXED: Fetch account names from accodes table
+        $allAccounts = $query->getAllAccountNames();
 
         if (empty($ledgerData)) {
             echo "<tr><td colspan='9' class='text-center fw-bold py-4'>No records found for the selected criteria.</td></tr>";
@@ -39,7 +42,6 @@
             foreach ($transactions as $t) {
                 $offset_code = $t['offset_ac_code'];
 
-                // Offset Account Naming Logic
                 if (str_contains((string)$offset_code, '4000/')) {
                     $offset_name = 'Supplier';
                 } elseif (!empty($offset_code)) {
@@ -64,9 +66,8 @@
                 $t_debit += $debit;
                 $t_credit += $credit;
 
-                // Safe fallback for currency 
                 $currency_display = 'MMK';
-                if (str_contains((string)$current_ac_code, '3600/002')) {
+                if (str_contains((string)$current_ac_code, '1502') || str_contains((string)$current_ac_code, '3600/002')) {
                     $currency_display = 'USD';
                 }
             ?>
