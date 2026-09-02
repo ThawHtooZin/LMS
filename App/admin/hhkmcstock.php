@@ -15,13 +15,13 @@ $query = new Query();
 <head>
   <meta charset="utf-8">
   <title>Admin | Dashboard</title>
+  <?php
+  $bootstrap->css();
+  ?>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
 </head>
-<?php
-$bootstrap->css();
-?>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
 
 <body>
   <?php
@@ -37,7 +37,7 @@ $bootstrap->css();
     $query->addmcstock($date, $particular, $country, $commondity_id, $fish_type, $size, $kg, $mc);
     $_SESSION['date'] = $_POST['date'];
     $_SESSION['particular'] = $_POST['particular'];
-    $_SESSION['commondity_id2'] = $_POST['commondity_id2'];
+    $_SESSION['commondity_id2'] = $_POST['commondity_id2'] ?? '';
     $_SESSION['size'] = $_POST['size'];
   }
 
@@ -72,18 +72,6 @@ $bootstrap->css();
     $transfercheck = $transfercheckstmt->fetch(PDO::FETCH_ASSOC);
 
     $query->transfermcstock($transferdate, $transferparticular, $transfercountry, $transfercommondity_id, $transferfish_type, $transfersize, $transferkg, $transfermc);
-    // $validcheckstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE kg='$transferkg' AND size='$transfersize' AND country='$transfercountry' AND commondity_id='$transfercommondity_id' ORDER BY id DESC");
-    // $validcheckstmt->execute();
-    // $validcheck = $validcheckstmt->fetch(PDO::FETCH_ASSOC);
-
-    // if(!empty($validcheck)){
-    //   if($transfercheck['balance_mc'] >= $transfermc){
-    //   }else{
-    //     echo '<script>swal("Sorry!", "Not Enough Mc!", "warning");</script>';
-    //   }
-    // }else{
-    //   echo '<script>swal("Sorry!", "Not Valid data for transfering!", "warning");</script>';
-    // }
   }
 
   if (isset($_POST['repackingoutbtn'])) {
@@ -97,18 +85,6 @@ $bootstrap->css();
     $repackingoutcountry = $_POST['repackingoutcountry'];
 
     $query->repackingout($repackingoutdate, $repackingoutparticular, $repackingoutcountry, $repackingoutcommondity_id, $repackingoutfish_type, $repackingoutsize, $repackingoutkg, $repackingoutmc);
-    // $validcheckstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE kg='$transferkg' AND size='$transfersize' AND country='$transfercountry' AND commondity_id='$transfercommondity_id' ORDER BY id DESC");
-    // $validcheckstmt->execute();
-    // $validcheck = $validcheckstmt->fetch(PDO::FETCH_ASSOC);
-
-    // if(!empty($validcheck)){
-    //   if($transfercheck['balance_mc'] >= $transfermc){
-    //   }else{
-    //     echo '<script>swal("Sorry!", "Not Enough Mc!", "warning");</script>';
-    //   }
-    // }else{
-    //   echo '<script>swal("Sorry!", "Not Valid data for transfering!", "warning");</script>';
-    // }
   }
 
   $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
@@ -122,6 +98,7 @@ $bootstrap->css();
   }
 
   ?>
+  <?php $bootstrap->javascript(); ?>
   <script>
     $(document).ready(() => {
       $('#commondityid2').hide();
@@ -164,8 +141,6 @@ $bootstrap->css();
       <?php require 'navbar.php'; ?>
       <div class="card mt-1">
         <div class="card-header bg-info">
-
-
           <h5 style="font-weight:bold;" class="text-light d-inline">HHK MC STOCK</h5>
           <button type="button" class="btn btn-danger float-end ms-2" data-bs-toggle="modal" data-bs-target="#transfer">Transfer Mc</button>
           <button type="button" class="btn btn-secondary float-end ms-2 text-light" data-bs-toggle="modal" data-bs-target="#repackingout">Repacking Out Mc</button>
@@ -191,7 +166,7 @@ $bootstrap->css();
             <select class="inpv2 form-control d-inline me-2 float-end" name="searchtype" style="width: 10%;">
               <?php foreach ($searchtype as $type):
               ?>
-                <option value="<?php echo $type['fish_type']; ?>"><?php echo $type['fish_type']; ?></option>
+                <option value="<?php echo htmlspecialchars($type['fish_type']); ?>"><?php echo htmlspecialchars($type['fish_type']); ?></option>
               <?php endforeach; ?>
             </select>
             <?php
@@ -203,10 +178,10 @@ $bootstrap->css();
             <select class="inpv2 form-control d-inline me-2 float-end" name="search" style="width: 10%;">
               <?php foreach ($searchcommon as $commondity_id):
                 $item_id = $commondity_id['commondity_id'];
-                $commonditydata = $query->select('item', $item_id, 'item_id');
+                $commonditydata = $query->select('products', $item_id, 'id');
               ?>
                 <?php if (!empty($commondity_id)): ?>
-                  <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                  <option value="<?php echo htmlspecialchars($commonditydata['id'] ?? ''); ?>"><?php echo htmlspecialchars($commonditydata['name'] ?? 'Unknown'); ?></option>
                 <?php else: ?>
                   <option value=""></option>
                 <?php endif; ?>
@@ -234,7 +209,7 @@ $bootstrap->css();
           ?>
             <table class="table table-hover table-bordered table-striped hide" id="<?php echo str_replace('/', '_', $countrydata['country']); ?>table">
               <tr>
-                <th>Commondity</th>
+                <th>Commodity</th>
                 <th>Country</th>
                 <th>Size</th>
                 <th>Total Mc</th>
@@ -245,9 +220,8 @@ $bootstrap->css();
               if (isset($_POST['searchcommonditybtn']) && !empty($_POST['search'])) {
                 $searchcommondity = $_POST['search'];
                 $searchtype = $_POST['searchtype'];
-                $searchcommonditystmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country = :country AND commondity_id='$searchcommondity' AND fish_type = '$searchtype' AND remark NOT LIKE '%packing%' GROUP BY commondity_id,size");
-                $searchcommonditystmt->bindParam(':country', $_SESSION['tabs']);
-                $searchcommonditystmt->execute();
+                $searchcommonditystmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country = :country AND commondity_id=:searchcommondity AND fish_type = :searchtype AND remark NOT LIKE '%packing%' GROUP BY commondity_id,size");
+                $searchcommonditystmt->execute([':country' => $_SESSION['tabs'], ':searchcommondity' => $searchcommondity, ':searchtype' => $searchtype]);
                 $datas = $searchcommonditystmt->fetchall();
               } else {
                 $stmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country=:country AND remark NOT LIKE '%packing%' GROUP BY commondity_id,size");
@@ -255,16 +229,14 @@ $bootstrap->css();
                 $stmt->execute();
                 $datas = $stmt->fetchall();
               }
+
               foreach ($datas as $hhkstockdata) {
                 $item_id = $hhkstockdata['commondity_id'];
-                $commonditydata = $query->select('item', $item_id, 'item_id');
+                $commonditydata = $query->select('products', $item_id, 'id');
                 $size = $hhkstockdata['size'];
                 $kg = $hhkstockdata['kg'];
                 $commondity_id = $hhkstockdata['commondity_id'];
-                $sizestmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE size='$size' AND remark NOT LIKE '%packing%' ORDER BY id DESC");
-                $sizestmt->execute();
-                $sizedata = $sizestmt->fetch(PDO::FETCH_ASSOC);
-                
+
                 $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular NOT LIKE '%out%' AND particular NOT LIKE '%to%'");
                 $totalmcstmt->execute();
                 $totalmcnotsub = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
@@ -273,27 +245,27 @@ $bootstrap->css();
                 $totalmcsubnumstmt->execute();
                 $totalmcsubnum = $totalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
 
-                // Repacking out
                 $totalrepackinoutstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular LIKE '%out%' AND particular NOT LIKE '%to%'");
                 $totalrepackinoutstmt->execute();
                 $totalrepackinout = $totalrepackinoutstmt->fetch(PDO::FETCH_ASSOC);
+
                 $totalmc = ($totalmcnotsub['total_mc'] - $totalmcsubnum['total_mc']) - $totalrepackinout['total_mc'];
               ?>
                 <tr style="<?php if ($totalmc > 200) {
                               echo 'background-color:rgba(0, 255, 0, 0.4) !important;';
                             } ?>">
                   <td><?php if (!empty($hhkstockdata['fish_type'])) {
-                        echo $commonditydata['item_name'] . ' (' . $hhkstockdata['fish_type'] . ')';
+                        echo htmlspecialchars($commonditydata['name'] ?? '') . ' (' . htmlspecialchars($hhkstockdata['fish_type']) . ')';
                       } else {
-                        echo $commonditydata['item_name'];
+                        echo htmlspecialchars($commonditydata['name'] ?? '');
                       } ?></td>
-                  <td><?php echo $countrydata['country']; ?></td>
-                  <td><?php echo $hhkstockdata['size']; ?></td>
+                  <td><?php echo htmlspecialchars($countrydata['country']); ?></td>
+                  <td><?php echo htmlspecialchars($hhkstockdata['size']); ?></td>
                   <td><?php echo $totalmc; ?></td>
                   <td>
-                    <a href="hhkmc_stock_info.php?sizeinfo=<?php echo $hhkstockdata['size']; ?>&commondity=<?php echo $hhkstockdata['commondity_id']; ?>&country=<?php echo $hhkstockdata['country']; ?>&fish_type=<?php echo $hhkstockdata['fish_type']; ?>" class="btn btn-info btn-sm text-light">
+                    <a href="hhkmc_stock_info.php?sizeinfo=<?php echo urlencode($hhkstockdata['size']); ?>&commondity=<?php echo urlencode($hhkstockdata['commondity_id']); ?>&country=<?php echo urlencode($hhkstockdata['country']); ?>&fish_type=<?php echo urlencode($hhkstockdata['fish_type']); ?>" class="btn btn-info btn-sm text-light">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-check" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z" />
+                        <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z" />
                       </svg></a>
                   </td>
                 </tr>
@@ -310,6 +282,8 @@ $bootstrap->css();
             $countrystmt->execute();
             $countrydatas = $countrystmt->fetchall();
             ?>
+
+            <!-- ADD MODAL 1 -->
             <div class="modal fade" id="add">
               <div class="modal-dialog" role="document">
                 <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
@@ -325,7 +299,7 @@ $bootstrap->css();
                           <input type="date" name="date" class="form-control inpv2 mb-2" value="<?php if (!empty($_SESSION['date'])) {
                                                                                                   echo $_SESSION['date'];
                                                                                                 } ?>">
-                          <label>Commondity</label>
+                          <label>Commodity</label>
                           <div class="row">
                             <div class="col">
                               <select class="form-control inpv2 mb-2" name="commondity_id1" id="commondityid1">
@@ -333,14 +307,13 @@ $bootstrap->css();
                                 if (!empty($form7commonditydatas)) {
                                   foreach ($form7commonditydatas as $form7commonditydata) {
                                     $item_id = $form7commonditydata['item_id'];
-                                    $commonditydata = $query->select('item', $item_id, 'item_id');
-                                    print_r($commonditydat);
+                                    $commonditydata = $query->select('products', $item_id, 'id');
                                 ?>
-                                    <option value="<?php echo $commonditydata['item_id']; ?>" <?php if (!empty($_SESSION['commondity_id1'])) {
-                                                                                                if ($_SESSION['commondity_id1'] == $commonditydata['item_id']) {
-                                                                                                  echo "selected";
-                                                                                                }
-                                                                                              } ?>><?php echo $commonditydata['item_name']; ?></option>
+                                    <option value="<?php echo htmlspecialchars($commonditydata['id'] ?? ''); ?>" <?php if (!empty($_SESSION['commondity_id1'])) {
+                                                                                                                    if ($_SESSION['commondity_id1'] == ($commonditydata['id'] ?? '')) {
+                                                                                                                      echo "selected";
+                                                                                                                    }
+                                                                                                                  } ?>><?php echo htmlspecialchars($commonditydata['name'] ?? ''); ?></option>
                                 <?php
                                   }
                                 }
@@ -365,14 +338,12 @@ $bootstrap->css();
                             <div class="col">
                               <select class="form-control inpv2 mb-2" name="commondity_id2" id="commondityid2">
                                 <?php
-                                $commonditydatastmt = $pdo->prepare("SELECT * FROM item");
+                                $commonditydatastmt = $pdo->prepare("SELECT id, name FROM products ORDER BY name ASC");
                                 $commonditydatastmt->execute();
-                                $commonditydatas = $commonditydatastmt->fetchAll();
+                                $commonditydatas = $commonditydatastmt->fetchAll(PDO::FETCH_ASSOC);
                                 foreach ($commonditydatas as $commonditydata) {
-                                  $item_id = $commonditydata['item_id'];
-                                  $commonditydata = $query->select('item', $item_id, 'item_id');
                                 ?>
-                                  <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                                  <option value="<?php echo htmlspecialchars($commonditydata['id']); ?>"><?php echo htmlspecialchars($commonditydata['name']); ?></option>
                                 <?php
                                 }
                                 ?>
@@ -410,20 +381,20 @@ $bootstrap->css();
                             if (!empty($countrydatas)) {
                               foreach ($countrydatas as $countrydata) {
                             ?>
-                                <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
+                                <option value="<?php echo htmlspecialchars($countrydata['country']); ?>"><?php echo htmlspecialchars($countrydata['country']); ?></option>
                             <?php
                               }
                             }
                             ?>
                           </select>
                           <input type="text" name="balance_country" id="country2" class="hide form-control inpv2" value="<?php if (!empty($_SESSION['country'])) {
-                                                                                                                    echo $_SESSION['country'];
-                                                                                                                  } ?>">
+                                                                                                                            echo htmlspecialchars($_SESSION['country']);
+                                                                                                                          } ?>">
                         </div>
                         <div class="col">
                           <label>Size</label>
                           <input type="text" name="size" class="form-control inpv2 mb-2" value="<?php if (!empty($_SESSION['size'])) {
-                                                                                                  echo $_SESSION['size'];
+                                                                                                  echo htmlspecialchars($_SESSION['size']);
                                                                                                 } ?>">
                         </div>
                       </div>
@@ -459,6 +430,8 @@ $bootstrap->css();
       </div>
     </div>
   </div>
+
+  <!-- ADD MODAL 2 -->
   <div class="modal fade" id="add2">
     <div class="modal-dialog" role="document">
       <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
@@ -472,7 +445,7 @@ $bootstrap->css();
               <div class="col">
                 <label>Date</label>
                 <input type="date" name="date" class="form-control inpv2 mb-2">
-                <label>Commondity</label>
+                <label>Commodity</label>
                 <div class="row">
                   <div class="col">
                     <select class="form-control inpv2 mb-2" name="commondity_id1" id="commondityid1">
@@ -480,9 +453,9 @@ $bootstrap->css();
                       if (!empty($form7commonditydatas)) {
                         foreach ($form7commonditydatas as $form7commonditydata) {
                           $item_id = $form7commonditydata['item_id'];
-                          $commonditydata = $query->select('item', $item_id, 'item_id');
+                          $commonditydata = $query->select('products', $item_id, 'id');
                       ?>
-                          <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                          <option value="<?php echo htmlspecialchars($commonditydata['id'] ?? ''); ?>"><?php echo htmlspecialchars($commonditydata['name'] ?? ''); ?></option>
                       <?php
                         }
                       }
@@ -490,14 +463,12 @@ $bootstrap->css();
                     </select>
                     <select class="form-control inpv2 mb-2" name="commondity_id2" id="commondityid2">
                       <?php
-                      $commonditydatastmt = $pdo->prepare("SELECT * FROM item");
+                      $commonditydatastmt = $pdo->prepare("SELECT id, name FROM products ORDER BY name ASC");
                       $commonditydatastmt->execute();
-                      $commonditydatas = $commonditydatastmt->fetchAll();
+                      $commonditydatas = $commonditydatastmt->fetchAll(PDO::FETCH_ASSOC);
                       foreach ($commonditydatas as $commonditydata) {
-                        $item_id = $commonditydata['item_id'];
-                        $commonditydata = $query->select('item', $item_id, 'item_id');
                       ?>
-                        <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                        <option value="<?php echo htmlspecialchars($commonditydata['id']); ?>"><?php echo htmlspecialchars($commonditydata['name']); ?></option>
                       <?php
                       }
                       ?>
@@ -520,7 +491,7 @@ $bootstrap->css();
               </div>
               <div class="col">
                 <label>Particular</label>
-                <textarea name="particular" rows="4" class="form-control inpv2 mb-2" id="particular">From From-10</textarea>
+                <textarea name="particular" rows="4" class="form-control inpv2 mb-2" id="particular">From Form-10</textarea>
               </div>
             </div>
             <div class="row">
@@ -530,13 +501,13 @@ $bootstrap->css();
                   <?php
                   foreach ($countrydatas as $countrydata) {
                   ?>
-                    <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
+                    <option value="<?php echo htmlspecialchars($countrydata['country']); ?>"><?php echo htmlspecialchars($countrydata['country']); ?></option>
                   <?php
                   }
                   ?>
                 </select>
                 <input type="text" name="country2" id="country2" class="form-control inpv2" value="<?php if (!empty($_SESSION['country'])) {
-                                                                                                      echo $_SESSION['country'];
+                                                                                                      echo htmlspecialchars($_SESSION['country']);
                                                                                                     } ?>">
               </div>
               <div class="col">
@@ -563,11 +534,13 @@ $bootstrap->css();
       </div>
     </div>
   </div>
+
+  <!-- TRANSFER MODAL -->
   <div class="modal fade" id="transfer">
     <div class="modal-dialog" role="document">
       <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
         <div class="modal-header bg-warning text-light">
-          <h1 class="modal-title fs-5">Tranfer Mc</h1>
+          <h1 class="modal-title fs-5">Transfer Mc</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <form action="hhkmcstock.php" method="post">
@@ -576,7 +549,7 @@ $bootstrap->css();
               <div class="col">
                 <label>Date</label>
                 <input type="date" name="transferdate" class="form-control inpv2 mb-2">
-                <label>Commondity</label>
+                <label>Commodity</label>
                 <div class="row">
                   <div class="col">
                     <select class="form-control inpv2 mb-2" name="transfercommondity_id">
@@ -587,9 +560,9 @@ $bootstrap->css();
                       if (!empty($hhkmcdatas)) {
                         foreach ($hhkmcdatas as $hhkmcdata) {
                           $item_id = $hhkmcdata['commondity_id'];
-                          $commonditydata = $query->select('item', $item_id, 'item_id');
+                          $commonditydata = $query->select('products', $item_id, 'id');
                       ?>
-                          <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                          <option value="<?php echo htmlspecialchars($commonditydata['id'] ?? ''); ?>"><?php echo htmlspecialchars($commonditydata['name'] ?? ''); ?></option>
                       <?php
                         }
                       }
@@ -625,7 +598,7 @@ $bootstrap->css();
                   if (!empty($countrydatas)) {
                     foreach ($countrydatas as $countrydata) {
                   ?>
-                      <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
+                      <option value="<?php echo htmlspecialchars($countrydata['country']); ?>"><?php echo htmlspecialchars($countrydata['country']); ?></option>
                   <?php
                     }
                   }
@@ -657,6 +630,7 @@ $bootstrap->css();
     </div>
   </div>
 
+  <!-- REPACKING OUT MODAL -->
   <div class="modal fade" id="repackingout">
     <div class="modal-dialog" role="document">
       <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
@@ -670,7 +644,7 @@ $bootstrap->css();
               <div class="col">
                 <label>Date</label>
                 <input type="date" name="repackingoutdate" class="form-control inpv2 mb-2">
-                <label>Commondity</label>
+                <label>Commodity</label>
                 <div class="row">
                   <div class="col">
                     <select class="form-control inpv2 mb-2" name="repackingoutcommondity_id">
@@ -681,9 +655,9 @@ $bootstrap->css();
                       if (!empty($hhkmcdatas)) {
                         foreach ($hhkmcdatas as $hhkmcdata) {
                           $item_id = $hhkmcdata['commondity_id'];
-                          $commonditydata = $query->select('item', $item_id, 'item_id');
+                          $commonditydata = $query->select('products', $item_id, 'id');
                       ?>
-                          <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                          <option value="<?php echo htmlspecialchars($commonditydata['id'] ?? ''); ?>"><?php echo htmlspecialchars($commonditydata['name'] ?? ''); ?></option>
                       <?php
                         }
                       }
@@ -714,12 +688,11 @@ $bootstrap->css();
               <div class="col">
                 <label>Country</label>
                 <select class="form-control inpv2 mb-2" name="repackingoutcountry">
-
                   <?php
                   if (!empty($countrydatas)) {
                     foreach ($countrydatas as $countrydata) {
                   ?>
-                      <option value="<?php echo $countrydata['country']; ?>"><?php echo $countrydata['country']; ?></option>
+                      <option value="<?php echo htmlspecialchars($countrydata['country']); ?>"><?php echo htmlspecialchars($countrydata['country']); ?></option>
                   <?php
                     }
                   }
@@ -758,27 +731,21 @@ $bootstrap->css();
     $hhkcountrydatas = $countrystmt->fetchall();
 
     foreach ($hhkcountrydatas as $countrydata) {
-      if ($_SESSION['tabs'] == $countrydata['country']) {
+      if (isset($_SESSION['tabs']) && $_SESSION['tabs'] == $countrydata['country']) {
         $escapedTabs = str_replace('/', '_', $_SESSION['tabs']);
         echo "show" . $escapedTabs . "();";
-        if ($_SESSION['tabs'] == $countrydata['country']) {
-          echo ' function show' . $escapedTabs . '(){';
-          foreach ($countrydatas as $countrydata) {
-            echo 'document.querySelector("#' . $escapedTabs . 'table").classList.add(\'hide\');';
-            echo 'document.querySelector(".' . $escapedTabs . 'link").classList.remove(\'color\');';
-          }
-          echo 'document.querySelector("#' . $escapedTabs . 'table").classList.remove(\'hide\');';
-          echo 'document.querySelector(".' . $escapedTabs . 'link").classList.add(\'color\');';
-          echo '}';
+        echo ' function show' . $escapedTabs . '(){';
+        foreach ($countrydatas as $countrydata2) {
+          echo 'document.querySelector("#' . str_replace('/', '_', $countrydata2['country']) . 'table").classList.add(\'hide\');';
+          echo 'document.querySelector(".' . str_replace('/', '_', $countrydata2['country']) . 'link").classList.remove(\'color\');';
         }
+        echo 'document.querySelector("#' . $escapedTabs . 'table").classList.remove(\'hide\');';
+        echo 'document.querySelector(".' . $escapedTabs . 'link").classList.add(\'color\');';
+        echo '}';
       }
     }
     ?>
   </script>
-
-  <?php
-  $bootstrap->javascript();
-  ?>
 </body>
 
 </html>
