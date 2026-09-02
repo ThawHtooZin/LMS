@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 20, 2026 at 06:11 AM
+-- Generation Time: Sep 02, 2026 at 05:27 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -148,6 +148,14 @@ CREATE TABLE `actualinvoice` (
   `link_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `actualinvoice`
+--
+
+INSERT INTO `actualinvoice` (`id`, `commondity_id`, `size`, `packingkgperbox`, `mc`, `totalnetweight`, `usd`, `total_usd`, `infoid`, `link_id`) VALUES
+(1, '1', '1up', '100', 2, '200', '', '', 2, 2),
+(2, '1', '5up', '20', 8, '160', '', '', 2, 3);
+
 -- --------------------------------------------------------
 
 --
@@ -248,7 +256,9 @@ INSERT INTO `contacts` (`id`, `name`, `contact_type`, `email`, `phone`, `address
 (3, 'Ko Myo', 'Fish Supplier', '', '234567890324567', '', 1, 0),
 (4, 'Ko Myo Naing', 'Fish Supplier', '', '123456543234', '', 1, 0),
 (5, 'Ko Aung Naing', 'Fish Supplier', '', '67766754565', '', 1, 0),
-(6, 'Shwe Myay', 'Material Supplier', '', '', '', 1, 0);
+(6, 'Shwe Myay', 'Material Supplier', '', '', '', 1, 0),
+(7, 'Tommy', 'Fish Supplier', '', '', '', 0, 1),
+(8, 'ThawHtooZin', 'Fish Supplier', '', '', '', 1, 0);
 
 -- --------------------------------------------------------
 
@@ -283,7 +293,9 @@ CREATE TABLE `exchange_rates` (
 INSERT INTO `exchange_rates` (`id`, `currency_code`, `rate`, `effective_date`) VALUES
 (1, 'USD', 4500.0000, '2026-07-27'),
 (2, 'USD', 4000.0000, '2026-08-07'),
-(3, 'USD', 4500.0000, '2026-08-01');
+(3, 'USD', 4500.0000, '2026-08-01'),
+(4, 'USD', 4300.0000, '2026-08-24'),
+(5, 'USD', 4500.0000, '2026-08-23');
 
 -- --------------------------------------------------------
 
@@ -307,6 +319,18 @@ CREATE TABLE `form7stock` (
   `water_kg` int(11) NOT NULL,
   `fish_type` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `form7stock`
+--
+
+INSERT INTO `form7stock` (`id`, `date`, `item_id`, `supplier_name`, `country`, `type`, `size`, `viss`, `kg`, `pcspervr`, `pcsperf7`, `link_id`, `water_kg`, `fish_type`) VALUES
+(22, '2026-08-20', '3', 'Tommy', 'NY', 'Frozen', '2up', '250', '408.5', '20', 10, 30, 0, 'G'),
+(23, '2026-08-20', '1', 'Tommy', 'NY', 'Frozen', '1up', '220', '359.48', '18', 10, 31, 0, 'G'),
+(25, '2026-08-20', '3', 'Tommy', 'NY', 'Frozen', '3up', '', '', '', 5, 30, 0, 'G'),
+(26, '2026-08-20', '3', 'Tommy', 'NY', 'Frozen', '4up', '', '', '', 5, 30, 0, 'G'),
+(28, '2026-08-20', '1', 'Tommy', 'NY', 'Frozen', '5up', '', '', '', 8, 31, 0, 'G'),
+(33, '2026-08-24', '6', 'ThawHtooZin', NULL, 'Frozen', '1up', '600', '980.4', '50', 0, 37, 0, '');
 
 -- --------------------------------------------------------
 
@@ -355,6 +379,17 @@ CREATE TABLE `form10stock` (
   `percentage` varchar(11) NOT NULL,
   `fish_type` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `form10stock`
+--
+
+INSERT INTO `form10stock` (`id`, `date`, `item_id`, `supplier_id`, `country`, `type`, `size`, `pcsform10`, `mc`, `kg`, `pcs`, `looseinkg`, `looseinpcs`, `looseoutkg`, `looseoutpcs`, `total_kg`, `percentage`, `fish_type`) VALUES
+(1, '2026-08-20', '3', '2', 'NY', 'frozen', '2up', 10, 2, '200', 10, '', 0, '', 0, '200', '', 'G'),
+(2, '2026-08-20', '3', '2', 'NY', 'frozen', '3up', 5, 1, '100', 5, '', 0, '', 0, '100', '', 'G'),
+(3, '2026-08-20', '3', '2', 'NY', 'frozen', '4up', 5, 1, '100', 5, '', 0, '', 0, '100', '', 'G'),
+(4, '2026-08-20', '1', '2', 'NY', 'frozen', '1up', 10, 2, '200', 10, '', 0, '', 0, '200', '', 'G'),
+(5, '2026-08-20', '1', '2', 'NY', 'frozen', '5up', 8, 1, '150', 8, '', 0, '', 0, '150', '', 'G');
 
 -- --------------------------------------------------------
 
@@ -408,6 +443,23 @@ CREATE TABLE `general_ledger` (
   `narration` text NOT NULL,
   `sr_no` varchar(25) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `general_ledger`
+--
+
+INSERT INTO `general_ledger` (`id`, `date`, `voucherno`, `ac_code`, `debit`, `credit`, `narration`, `sr_no`) VALUES
+(70, '2026-08-20', '1111111', '5000', '375000', '0', 'Boal', 'PR-1787229680'),
+(71, '2026-08-20', '1111111', '5000', '396000', '0', 'Big fat hilsa SOme description info here.', 'PR-1787229680'),
+(72, '2026-08-20', '1111111', '2000', '0', '771000', 'Total Bill - Tommy', 'PR-1787229680'),
+(73, '2026-08-20', '1552', '2000', '500000', '0', 'Supplier Payment to Tommy - Ref: 1552', 'PAY-1787229735'),
+(74, '2026-08-20', '1552', '1501', '0', '500000', 'Supplier Payment to Tommy - Ref: 1552', 'PAY-1787229735'),
+(75, '2026-08-20', '24', '2000', '200000', '0', 'Supplier Payment to Tommy - Ref: 24', 'PAY-1787229746'),
+(76, '2026-08-20', '24', '1501', '0', '200000', 'Supplier Payment to Tommy - Ref: 24', 'PAY-1787229746'),
+(77, '2026-08-20', '71', '2000', '71000', '0', 'Supplier Payment to Tommy - Ref: 71', 'PAY-1787229762'),
+(78, '2026-08-20', '71', '1501', '0', '71000', 'Supplier Payment to Tommy - Ref: 71', 'PAY-1787229762'),
+(87, '2026-08-24', '4556454', '5000', '720000', '0', 'Salmon Purchase', 'PR-1788319467'),
+(88, '2026-08-24', '4556454', '2000', '0', '720000', 'Total Bill - ThawHtooZin', 'PR-1788319467');
 
 -- --------------------------------------------------------
 
@@ -607,6 +659,14 @@ CREATE TABLE `invoice_costing` (
   `infoid` int(11) NOT NULL,
   `link_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `invoice_costing`
+--
+
+INSERT INTO `invoice_costing` (`id`, `commondity_id`, `size`, `kg`, `priceperviss`, `priceperkg`, `yield`, `total_price`, `usd`, `packing_material`, `ocean_pacific`, `tax`, `agent`, `transport`, `total_usd`, `sellingpriceperkg`, `total_selling_price`, `profitorlossperkg`, `profit_amount`, `total_kg_price`, `infoid`, `link_id`) VALUES
+(1, '1', '1up', '100', '15000', '9179.926560', '5', '8742.787200', '1.986997091', '0.14', '0.20', '0.1', '0.15', '0.25', '2.826997091', '', '', '', '', '282.6997091', 2, 2),
+(2, '1', '5up', '20', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 2, 3);
 
 -- --------------------------------------------------------
 
@@ -856,7 +916,7 @@ CREATE TABLE `packingliststock` (
 --
 
 INSERT INTO `packingliststock` (`id`, `date`, `customer_id`, `country`, `invoiceno`, `containerno`, `vessel_name`, `voyname`, `fda`) VALUES
-(1, '2025-05-15', '3300/004', 'italy', '45454', 'KND', 'HEHE', 'YOYOYO', 'abcdefg');
+(2, '2026-08-20', '7', 'NY', '112222', '12411', 'Jarvis', 'ToooNY', '1231');
 
 -- --------------------------------------------------------
 
@@ -882,7 +942,8 @@ CREATE TABLE `packingliststockinfo` (
 --
 
 INSERT INTO `packingliststockinfo` (`id`, `commondity_id`, `size`, `packingkgperbox`, `mc`, `totalnetweight`, `totalgrossweight`, `usd`, `total_usd`, `infoid`) VALUES
-(1, '1002', '3up', 10, 20, 200, '220', '', '', 1);
+(2, '1', '1up', 100, 2, 200, '202', '', '', 2),
+(3, '1', '5up', 20, 8, 160, '168', '', '', 2);
 
 -- --------------------------------------------------------
 
@@ -920,7 +981,9 @@ CREATE TABLE `packingmaterial` (
 --
 
 INSERT INTO `packingmaterial` (`id`, `commondity_id`, `fish_size`, `plastic`, `jcv`, `inner_box`, `sticker`, `mc_plastic`, `carton_box`, `tape`, `penon`, `p_sticker`, `plastic_rope`, `micellion`, `processing`, `total`, `perkgcost`, `plastic_size`, `pcsperlb`, `pcspermc`, `link_id`, `infoid`) VALUES
-(1, '1002', '3up', '122.5', '13.57425', '50', '87.5', '24.5', '72', 3, 16, 4, '4.571428571', 50, 350, 797, '0.18', '50', 50, 50, 1, 1);
+(1, '1002', '3up', '122.5', '13.57425', '50', '87.5', '24.5', '72', 3, 16, 4, '4.571428571', 50, 350, 797, '0.18', '50', 50, 50, 1, 1),
+(2, '1', '1up', '', '', '', '', '', '', 0, 0, 0, '', 0, 0, 0, '', '', 0, 0, 2, 2),
+(3, '1', '5up', '61.25', '13.2726', '', '3.5', '24.5', '72', 3, 16, 4, '4.571428571', 50, 350, 602, '0.14', '12', 4, 2, 3, 2);
 
 -- --------------------------------------------------------
 
@@ -939,7 +1002,7 @@ CREATE TABLE `permission` (
 --
 
 INSERT INTO `permission` (`id`, `role_id`, `permission`) VALUES
-(1, 1, 'manage_accounts,manage_role,manage_sale,manage_purchase,manage_cashbook,manage_acpayable,manage_accountreceivable,manage_general_ledger,manage_contacts,manage_products,manage_product_types,manage_currency,manage_coa,manage_coldstoreitem,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,sale_report,purchase_report,payable_report,manage_mcreport,manage_tclmcstock,manage_generalledger,manage_material_purchase,material_store_house,material_gatepass,configuration_coldstore,packing_material_report,temp_pm_stock,profit_loss_report,manage_manual_journals'),
+(1, 1, 'manage_accounts,manage_role,manage_sale,manage_purchase,manage_acpayable,manage_accountreceivable,manage_general_ledger,manage_contacts,manage_products,manage_product_types,manage_currency,manage_coa,manage_coldstoreitem,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,sale_report,purchase_report,payable_report,manage_mcreport,manage_tclmcstock,manage_generalledger,manage_material_purchase,material_store_house,material_gatepass,configuration_coldstore,packing_material_report,temp_pm_stock,profit_loss_report,manage_manual_journals'),
 (2, 2, ',manage_products,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_mcreport,manage_tclmcstock'),
 (3, 3, ',manage_coldstoreitem,manage_coldstorecharges,manage_shippmentexport,manage_truckexport'),
 (4, 4, ',manage_purchase,manage_cashbook,manage_acpayable,manage_accountreceivable,manage_transaction,manage_general_ledger,manage_contacts,manage_coldstoreitem,manage_products,manage_coa,manage_unit,manage_coldstorecharges,manage_form7,manage_form10,manage_hhkmcstock,manage_gfcmcstock,manage_stockreport,manage_shippmentexport,manage_truckexport,manage_packingmaterial,sale_report,purchase_report,payable_report,manage_mcreport,manage_tclmcstock,profit_loss_report,manage_manual_journals'),
@@ -992,9 +1055,10 @@ CREATE TABLE `products` (
 INSERT INTO `products` (`id`, `code`, `name`, `description`, `type_id`, `unit`, `is_purchased`, `purchase_account`, `is_sold`, `sales_account`) VALUES
 (1, 'h001', 'HILSA', 'Fish here can be tested anytime', 1, '', 1, '5000', 1, '200'),
 (2, 'r001', 'rohu', 'This fish is rly good taste ngl', 1, '', 1, '5000', 1, '200'),
-(3, 'bbb01', 'Boal', '', 1, '', 1, '5000', 0, NULL),
+(3, 'bbb01', 'Boal', '', 1, '', 1, '', 0, NULL),
 (4, 'MT001', 'Cotton Box', 'Cotton box for packaging MC', 2, '', 1, '5001', 1, '200'),
-(5, 'M001', 'Marigal', '', 1, '', 1, '', 1, '');
+(5, 'M001', 'Marigal', '', 1, '', 1, '', 1, ''),
+(6, 'S0001', 'Salmon', '', 1, '', 1, '5000', 1, '200');
 
 -- --------------------------------------------------------
 
@@ -1037,6 +1101,14 @@ CREATE TABLE `purchases` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `purchases`
+--
+
+INSERT INTO `purchases` (`id`, `voucher_no`, `contact_id`, `date`, `tclfrozen`, `due_date`, `currency`, `exchange_rate`, `status`, `subtotal`, `grand_total`, `paid_amount`, `created_at`) VALUES
+(13, '1111111', 2, '2026-08-20', 'Frozen', NULL, 'MMK', 1.0000, 'PAID', 771000.00, 771000.00, 771000.00, '2026-08-20 12:41:20'),
+(14, '4556454', 8, '2026-08-24', 'Frozen', NULL, 'MMK', 1.0000, 'AUTHORISED', 720000.00, 720000.00, 0.00, '2026-08-24 11:08:01');
+
 -- --------------------------------------------------------
 
 --
@@ -1056,6 +1128,15 @@ CREATE TABLE `purchase_lines` (
   `line_amount` decimal(15,2) NOT NULL DEFAULT 0.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `purchase_lines`
+--
+
+INSERT INTO `purchase_lines` (`id`, `purchase_id`, `product_id`, `account_id`, `description`, `size`, `viss`, `pcs`, `unit_price`, `line_amount`) VALUES
+(30, 13, 3, 5000, 'Boal', '2up', 250.00, 20, 1500.00, 375000.00),
+(31, 13, 1, 5000, 'Big fat hilsa SOme description info here.', '1up', 220.00, 18, 1800.00, 396000.00),
+(37, 14, 6, 5000, 'Salmon Purchase', '1up', 600.00, 50, 1200.00, 720000.00);
+
 -- --------------------------------------------------------
 
 --
@@ -1071,6 +1152,15 @@ CREATE TABLE `purchase_payments` (
   `amount` decimal(15,2) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `purchase_payments`
+--
+
+INSERT INTO `purchase_payments` (`id`, `purchase_id`, `payment_date`, `payment_account`, `reference`, `amount`, `created_at`) VALUES
+(6, 13, '2026-08-20', '1501', '1552', 500000.00, '2026-08-20 12:42:15'),
+(7, 13, '2026-08-20', '1501', '24', 200000.00, '2026-08-20 12:42:26'),
+(8, 13, '2026-08-20', '1501', '71', 71000.00, '2026-08-20 12:42:42');
 
 -- --------------------------------------------------------
 
@@ -1419,7 +1509,11 @@ INSERT INTO `userlogs` (`id`, `login_time`, `login_date`, `login_username`, `log
 (884, '03:35:52.000000', '2026-07-02', 'UMyoWinSwe', '', 'Logout Success'),
 (885, '03:35:53.000000', '2026-07-02', 'Administrator', 'protechadmin2024***', 'Login Success'),
 (886, '02:02:45.000000', '2026-08-11', 'Administrator', '', 'Logout Success'),
-(887, '02:02:49.000000', '2026-08-11', 'Administrator', 'protechadmin2024***', 'Login Success');
+(887, '02:02:49.000000', '2026-08-11', 'Administrator', 'protechadmin2024***', 'Login Success'),
+(888, '05:26:32.000000', '2026-08-24', 'Administrator', '', 'Logout Success'),
+(889, '05:26:49.000000', '2026-08-24', 'UMyoWinSwe', 'password', 'Login Success'),
+(890, '05:27:06.000000', '2026-08-24', 'UMyoWinSwe', '', 'Logout Success'),
+(891, '05:27:08.000000', '2026-08-24', 'Administrator', 'protechadmin2024***', 'Login Success');
 
 --
 -- Indexes for dumped tables
@@ -1827,7 +1921,7 @@ ALTER TABLE `accounts`
 -- AUTO_INCREMENT for table `actualinvoice`
 --
 ALTER TABLE `actualinvoice`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `bankdetail`
@@ -1857,7 +1951,7 @@ ALTER TABLE `coldstore`
 -- AUTO_INCREMENT for table `contacts`
 --
 ALTER TABLE `contacts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `container`
@@ -1869,13 +1963,13 @@ ALTER TABLE `container`
 -- AUTO_INCREMENT for table `exchange_rates`
 --
 ALTER TABLE `exchange_rates`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `form7stock`
 --
 ALTER TABLE `form7stock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `form7stocktcl`
@@ -1887,7 +1981,7 @@ ALTER TABLE `form7stocktcl`
 -- AUTO_INCREMENT for table `form10stock`
 --
 ALTER TABLE `form10stock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `form10stocktcl`
@@ -1899,7 +1993,7 @@ ALTER TABLE `form10stocktcl`
 -- AUTO_INCREMENT for table `general_ledger`
 --
 ALTER TABLE `general_ledger`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=89;
 
 --
 -- AUTO_INCREMENT for table `gfcdryfishcoldstore`
@@ -1953,7 +2047,7 @@ ALTER TABLE `hhkstock`
 -- AUTO_INCREMENT for table `invoice_costing`
 --
 ALTER TABLE `invoice_costing`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `labour`
@@ -2031,19 +2125,19 @@ ALTER TABLE `msl_total_charges`
 -- AUTO_INCREMENT for table `packingliststock`
 --
 ALTER TABLE `packingliststock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `packingliststockinfo`
 --
 ALTER TABLE `packingliststockinfo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `packingmaterial`
 --
 ALTER TABLE `packingmaterial`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `permission`
@@ -2061,7 +2155,7 @@ ALTER TABLE `processing`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `product_types`
@@ -2073,19 +2167,19 @@ ALTER TABLE `product_types`
 -- AUTO_INCREMENT for table `purchases`
 --
 ALTER TABLE `purchases`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `purchase_lines`
 --
 ALTER TABLE `purchase_lines`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT for table `purchase_payments`
 --
 ALTER TABLE `purchase_payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `receivable`
@@ -2181,7 +2275,7 @@ ALTER TABLE `trucktotalcosting`
 -- AUTO_INCREMENT for table `userlogs`
 --
 ALTER TABLE `userlogs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=888;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=892;
 
 --
 -- Constraints for dumped tables
