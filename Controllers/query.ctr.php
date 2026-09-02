@@ -957,9 +957,9 @@ class Query
       if (!$bill) {
         throw new Exception("Bill not found.");
       }
-      // FIXED: Reverted back to AUTHORISED
-      if ($bill['status'] !== 'AUTHORISED') {
-        throw new Exception("Only authorised bills can be paid. Current status: " . $bill['status']);
+      // FIXED: Updated from AUTHORISED to AWAITING_PAYMENT
+      if ($bill['status'] !== 'AWAITING_PAYMENT') {
+        throw new Exception("Only approved bills can be paid. Current status: " . $bill['status']);
       }
 
       $voucher_no = $bill['voucher_no'];
@@ -1025,13 +1025,14 @@ class Query
       $supStmt->execute([$supplier_id]);
       $supplier_name = $supStmt->fetchColumn();
 
-      $stmt = $pdo->prepare("SELECT id, voucher_no, grand_total, paid_amount FROM purchases WHERE contact_id = ? AND status = 'AUTHORISED' ORDER BY date ASC, id ASC");
+      // FIXED: Updated from AUTHORISED to AWAITING_PAYMENT
+      $stmt = $pdo->prepare("SELECT id, voucher_no, grand_total, paid_amount FROM purchases WHERE contact_id = ? AND status = 'AWAITING_PAYMENT' ORDER BY date ASC, id ASC");
       $stmt->execute([$supplier_id]);
       $bills = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
       $remaining_payment = $payment_amount;
       $sr_no = 'PAY-' . time();
-      $narration = "Supplier Payment to $supplier_name - Ref: $reference";
+      $narration = "Payment to $supplier_name - Ref: $reference";
 
       $allocStmt = $pdo->prepare("INSERT INTO purchase_payments (purchase_id, payment_date, payment_account, reference, amount) VALUES (?, ?, ?, ?, ?)");
 
@@ -1047,7 +1048,7 @@ class Query
         } else {
           $apply_amount = $remaining_payment;
           $new_paid = $bill['paid_amount'] + $apply_amount;
-          $new_status = 'AUTHORISED';
+          $new_status = 'AWAITING_PAYMENT'; // Retain status if partially paid
         }
 
         $upd = $pdo->prepare("UPDATE purchases SET paid_amount = ?, status = ? WHERE id = ?");
@@ -1070,7 +1071,6 @@ class Query
 
       $pdo->commit();
 
-      // Return success response with applied amount
       return [
         'status' => true,
         'amount' => $actual_applied
@@ -1078,7 +1078,6 @@ class Query
     } catch (Exception $e) {
       $pdo->rollBack();
 
-      // Return error response with message
       return [
         'status' => false,
         'message' => $e->getMessage()

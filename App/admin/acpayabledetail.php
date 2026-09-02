@@ -35,10 +35,11 @@ $supStmt->execute([$supplier_id]);
 $supplier_name = $supStmt->fetchColumn();
 
 // Fetch all Authorised and Paid Bills for this supplier
+// Fetch all Awaiting Payment and Paid Bills for this supplier
 $billsStmt = $pdo->prepare("
     SELECT id, date, voucher_no, grand_total, paid_amount, (grand_total - paid_amount) AS outstanding, status 
     FROM purchases 
-    WHERE contact_id = ? AND status IN ('AUTHORISED', 'PAID') 
+    WHERE contact_id = ? AND status IN ('AWAITING_PAYMENT', 'PAID') 
     ORDER BY date ASC, id ASC
 ");
 $billsStmt->execute([$supplier_id]);
@@ -92,7 +93,7 @@ $asset_accounts = $accStmt->fetchAll(PDO::FETCH_ASSOC);
 
 <body>
 
-<!-- Include JavaScript Files -->
+  <!-- Include JavaScript Files -->
   <?php $bootstrap->javascriptindex(); ?>
 
   <!-- SweetAlert Trigger Script -->
@@ -100,7 +101,7 @@ $asset_accounts = $accStmt->fetchAll(PDO::FETCH_ASSOC);
     <script>
       <?php if ($paymentResult['status'] === true): ?>
         swal("Success!", "Payment of <?= number_format($paymentResult['amount'], 2); ?> applied successfully across open bills.", "success").then(function() {
-            window.location.href = "acpayabledetail.php?supplier_id=<?= $supplier_id; ?>";
+          window.location.href = "acpayabledetail.php?supplier_id=<?= $supplier_id; ?>";
         });
       <?php else: ?>
         swal("Error!", "Payment failed: <?= addslashes($paymentResult['message']); ?>", "error");

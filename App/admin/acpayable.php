@@ -56,7 +56,7 @@ $query = new Query();
                     SUM(p.grand_total - p.paid_amount) AS balance_owed
                 FROM contacts c
                 INNER JOIN purchases p ON c.id = p.contact_id
-                WHERE c.is_supplier = 1 AND p.status IN ('AUTHORISED', 'PAID')
+                WHERE c.is_supplier = 1 AND p.status IN ('AWAITING_PAYMENT', 'PAID')
                 GROUP BY c.id, c.name
                 HAVING total_billed > 0
                 ORDER BY balance_owed DESC, c.name ASC
