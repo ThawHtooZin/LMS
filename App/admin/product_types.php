@@ -58,13 +58,13 @@ $query = new Query();
                             <th width="25%">Action</th>
                         </tr>
                         <?php
-                        $stmt = $pdo->prepare("SELECT * FROM product_types ORDER BY id DESC");
+                        $stmt = $pdo->prepare("SELECT * FROM product_types");
                         $stmt->execute();
                         $rawResult = $stmt->fetchAll();
                         $total_pages = ceil(count($rawResult) / $numOfrecs);
                         if ($total_pages == 0) $total_pages = 1;
 
-                        $stmt = $pdo->prepare("SELECT * FROM product_types ORDER BY id DESC LIMIT $offset, $numOfrecs");
+                        $stmt = $pdo->prepare("SELECT * FROM product_types LIMIT $offset, $numOfrecs");
                         $stmt->execute();
                         $typedatas = $stmt->fetchAll();
 
@@ -76,7 +76,8 @@ $query = new Query();
                                     <button type="button" class="btn btn-warning btn-sm text-light" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $data['id']; ?>">Edit</button>
                                     <form action="product_types.php" method="post" style="display: inline !important;">
                                         <input type="hidden" name="deleteid" value="<?php echo $data['id']; ?>">
-                                        <button type="submit" name="deletebutton" class="btn btn-sm btn-danger">Delete</button>
+                                        <input type="hidden" name="deletebutton" value="1">
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete(this, 'product type')">Delete</button>
                                     </form>
                                 </td>
                             </tr>
@@ -155,6 +156,21 @@ $query = new Query();
         </div>
     </div>
     <?php $bootstrap->javascript(); ?>
+    <script>
+        function confirmDelete(button, itemType) {
+            swal({
+                title: "Are you sure?",
+                text: "Do you really want to delete this " + itemType + "?",
+                icon: "warning",
+                buttons: ["Cancel", "Yes, Delete"],
+                dangerMode: true,
+            }).then((willDelete) => {
+                if (willDelete) {
+                    button.closest("form").submit();
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>

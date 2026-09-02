@@ -216,9 +216,10 @@ foreach ($all_accounts as $acc) {
                                 <td><?php echo ($data['is_sold']) ? htmlspecialchars($data['sales_account']) : '<span class="text-muted">-</span>'; ?></td>
                                 <td>
                                     <button type="button" class="btn btn-warning btn-sm text-light" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $data['id']; ?>">Edit</button>
-                                    <form action="products.php" method="post" style="display: inline !important;">
+                                    <form action="products.php" method="post" style="display: inline !important;" class="delete-product-form">
                                         <input type="hidden" name="deleteid" value="<?php echo $data['id']; ?>">
-                                        <button type="submit" name="deletebutton" class="btn btn-sm btn-danger" onclick="return confirm('Delete this product?');">Delete</button>
+                                        <input type="hidden" name="deletebutton" value="1">
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete(this, 'product')">Delete</button>
                                     </form>
                                 </td>
                             </tr>
@@ -491,6 +492,21 @@ foreach ($all_accounts as $acc) {
                         document.getElementById(errorId).innerText = "";
                     }
                 });
+        }
+    </script>
+    <script>
+        function confirmDelete(button, itemType) {
+            swal({
+                title: "Are you sure?",
+                text: "Do you really want to delete this " + itemType + "?",
+                icon: "warning",
+                buttons: ["Cancel", "Yes, Delete"],
+                dangerMode: true,
+            }).then((willDelete) => {
+                if (willDelete) {
+                    button.closest("form").submit();
+                }
+            });
         }
     </script>
 </body>

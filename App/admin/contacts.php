@@ -44,7 +44,7 @@ $query = new Query();
                         $address = $_POST['address'];
                         $is_supplier = ($_POST['contact_role'] == 'supplier') ? 1 : 0;
                         $is_customer = ($_POST['contact_role'] == 'customer') ? 1 : 0;
-                        
+
                         // NEW: Capture Contact Type
                         $contact_type = $_POST['contact_type'];
 
@@ -58,7 +58,7 @@ $query = new Query();
                         $address = $_POST['address'];
                         $is_supplier = ($_POST['contact_role'] == 'supplier') ? 1 : 0;
                         $is_customer = ($_POST['contact_role'] == 'customer') ? 1 : 0;
-                        
+
                         // NEW: Capture Contact Type
                         $contact_type = $_POST['contact_type'];
 
@@ -141,13 +141,13 @@ $query = new Query();
                             $where .= " AND contact_type='$type_filter'";
                         }
 
-                        $stmt = $pdo->prepare("SELECT * FROM contacts WHERE $where ORDER BY id DESC");
+                        $stmt = $pdo->prepare("SELECT * FROM contacts WHERE $where");
                         $stmt->execute();
                         $rawResult = $stmt->fetchAll();
                         $total_pages = ceil(count($rawResult) / $numOfrecs);
                         if ($total_pages == 0) $total_pages = 1;
 
-                        $stmt = $pdo->prepare("SELECT * FROM contacts WHERE $where ORDER BY id DESC LIMIT $offset, $numOfrecs");
+                        $stmt = $pdo->prepare("SELECT * FROM contacts WHERE $where LIMIT $offset, $numOfrecs");
                         $stmt->execute();
                         $contactdatas = $stmt->fetchAll();
                         ?>
@@ -168,9 +168,10 @@ $query = new Query();
                                 </td>
                                 <td>
                                     <button type="button" class="btn btn-warning btn-sm text-light" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $data['id']; ?>">Edit</button>
-                                    <form action="" method="post" style="display: inline !important;">
+                                    <form action="" method="post" style="display: inline !important;" class="delete-contact-form">
                                         <input type="hidden" name="deleteid" value="<?php echo $data['id']; ?>">
-                                        <button type="submit" name="deletebutton" class="btn btn-sm btn-danger" onclick="return confirm('Delete this contact?');">Delete</button>
+                                        <input type="hidden" name="deletebutton" value="1">
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete(this, 'contact')">Delete</button>
                                     </form>
                                 </td>
                             </tr>
@@ -235,11 +236,19 @@ $query = new Query();
                         <ul class="pagination">
                             <li class="page-item"><a class="page-link" href="?pageno=1<?php echo $qs; ?>">First</a></li>
                             <li class="page-item <?php if ($pageno <= 1) echo 'disabled'; ?>">
-                                <a class="page-link" href="<?php if ($pageno <= 1) { echo '#'; } else { echo "?pageno=" . ($pageno - 1) . $qs; } ?>">Previous</a>
+                                <a class="page-link" href="<?php if ($pageno <= 1) {
+                                                                echo '#';
+                                                            } else {
+                                                                echo "?pageno=" . ($pageno - 1) . $qs;
+                                                            } ?>">Previous</a>
                             </li>
                             <li class="page-item"><a class="page-link" href="#"><?php echo $pageno; ?></a></li>
                             <li class="page-item <?php if ($pageno >= $total_pages) echo 'disabled'; ?>">
-                                <a class="page-link" href="<?php if ($pageno >= $total_pages) { echo '#'; } else { echo "?pageno=" . ($pageno + 1) . $qs; } ?>">Next</a>
+                                <a class="page-link" href="<?php if ($pageno >= $total_pages) {
+                                                                echo '#';
+                                                            } else {
+                                                                echo "?pageno=" . ($pageno + 1) . $qs;
+                                                            } ?>">Next</a>
                             </li>
                             <li class="page-item"><a class="page-link" href="?pageno=<?php echo $total_pages . $qs; ?>">Last</a> </li>
                         </ul>
@@ -262,7 +271,7 @@ $query = new Query();
                     <div class="modal-body">
                         <label class="fw-bold">Contact Name</label>
                         <input type="text" name="name" class="form-control" placeholder="e.g., Shwe Myay" required>
-                        
+
                         <!-- NEW: Add Contact Type -->
                         <label class="fw-bold mt-2">Contact Type</label>
                         <select name="contact_type" class="form-control" required>
@@ -274,13 +283,13 @@ $query = new Query();
 
                         <label class="fw-bold mt-2">Contact Phone</label>
                         <input type="text" name="phone" class="form-control" placeholder="09xxxxxxxxx">
-                        
+
                         <label class="fw-bold mt-2">Contact Email</label>
                         <input type="email" name="email" class="form-control" placeholder="contact@example.com">
-                        
+
                         <label class="fw-bold mt-2">Contact Address</label>
                         <input type="text" name="address" class="form-control" placeholder="Address Details">
-                        
+
                         <label class="fw-bold mt-3">Role</label><br>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="contact_role" value="supplier" required checked>
@@ -300,6 +309,22 @@ $query = new Query();
         </div>
     </div>
 
+    <script>
+        function confirmDelete(button, itemType) {
+            swal({
+                title: "Are you sure?",
+                text: "Do you really want to delete this " + itemType + "?",
+                icon: "warning",
+                buttons: ["Cancel", "Yes, Delete"],
+                dangerMode: true,
+            }).then((willDelete) => {
+                if (willDelete) {
+                    button.closest("form").submit();
+                }
+            });
+        }
+    </script>
     <?php $bootstrap->javascript(); ?>
 </body>
+
 </html>
