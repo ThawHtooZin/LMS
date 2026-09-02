@@ -339,7 +339,6 @@ foreach ($accounts as $acc) {
         <?php endforeach; ?>
     </select>
     <select id="prodTpl" style="display:none;">
-        <option value="">- Product -</option>
         <?php foreach ($products as $p): ?>
             <option value="<?php echo htmlspecialchars($p['id']); ?>"><?php echo htmlspecialchars($p['code'] . ' - ' . $p['name']); ?></option>
         <?php endforeach; ?>
@@ -439,7 +438,7 @@ foreach ($accounts as $acc) {
                     <td class="col-fish-only" ${displayStyle}><input type="number" name="viss[]" step="0.01" class="calc-input viss-input" value="${data.viss || '0'}"></td>
                     <td><input type="number" name="pcs[]" class="calc-input pcs-input" value="${data.pcs || ''}"></td>
                     <td><input type="number" name="unit_price[]" step="0.01" class="calc-input price-input" value="${data.unit_price || ''}"></td>
-                    <td><select name="account_code[]" class="form-control chosen-select acc-select"><option value="">- Account -</option>${$('#accTpl').html().replace('value="' + data.account_code + '"', 'value="' + data.account_code + '" selected')}</select></td>
+                    <td><select name="account_code[]" class="form-control chosen-select acc-select">${$('#accTpl').html().replace('value="' + data.account_code + '"', 'value="' + data.account_code + '" selected')}</select></td>
                     <td class="line-total text-end">0.00</td>
                 </tr>
             `;

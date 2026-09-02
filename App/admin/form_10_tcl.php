@@ -137,9 +137,9 @@ $bootstrap->css();
               $commondatas = $commonstmt->fetchall();
               foreach ($commondatas as $commondata) {
                 $itemid = $commondata['item_id'];
-                $item_name = $query->select('item', $itemid, 'item_id');
+                $item_name = $query->select('products', $itemid, 'id');
               ?>
-                <option value="<?php echo $item_name['item_id']; ?>" <?php if (!empty($_SESSION['search_tcl']['commondity']) && $_SESSION['search_tcl']['commondity'] == $item_name['item_id']) echo "selected"; ?>><?php echo $item_name['item_name']; ?></option>
+                <option value="<?php echo htmlspecialchars($item_name['id']); ?>" <?php if (!empty($_SESSION['search_tcl']['commondity']) && $_SESSION['search_tcl']['commondity'] == $item_name['id']) echo "selected"; ?>><?php echo htmlspecialchars($item_name['name']); ?></option>
               <?php } ?>
             </select>
             <input type="date" name="searchdate" value="<?php echo !empty($_SESSION['search_tcl']['searchdate']) ? $_SESSION['search_tcl']['searchdate'] : ''; ?>" class="form-control inpv2 w-25 d-inline float-end me-2" style="width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
@@ -233,7 +233,7 @@ $bootstrap->css();
 
             foreach ($datas as $data) {
               $item_id = $data['item_id'];
-              $commonditydata = $query->select('item', $item_id, 'item_id');
+              $commonditydata = $query->select('products', $item_id, 'id');
 
               $t_pcsform10 += floatval($data['pcsform10']);
               $t_mc += floatval($data['mc']);
@@ -257,26 +257,26 @@ $bootstrap->css();
             ?>
               <tr>
                 <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
-                <td><?php echo $commonditydata['item_name']; ?></td>
-                <td><?php echo $data['size']; ?></td>
-                <td><?php echo $data['pcsform10']; ?></td>
-                <td><?php echo $data['mc']; ?></td>
-                <td><?php echo $data['kg']; ?></td>
-                <td><?php echo $data['pcs']; ?></td>
-                <td><?php echo $data['looseinkg']; ?></td>
-                <td><?php echo $data['looseinpcs']; ?></td>
-                <td><?php echo $data['looseoutkg']; ?></td>
-                <td><?php echo $data['looseoutpcs']; ?></td>
-                <td><?php echo $data['cc_kg']; ?></td>
-                <td><?php echo $data['cc_pcs']; ?></td>
-                <td><?php echo $data['lanfish_kg']; ?></td>
-                <td><?php echo $data['lanfish_pcs']; ?></td>
-                <td><?php echo $data['cutpiece_kg']; ?></td>
-                <td><?php echo $data['cutpiece_pcs']; ?></td>
-                <td><?php echo $data['hhk_kg']; ?></td>
-                <td><?php echo $data['hhk_pcs']; ?></td>
-                <td><?php echo $data['msl_kg']; ?></td>
-                <td><?php echo $data['msl_pcs']; ?></td>
+                <td><?php echo htmlspecialchars($commonditydata['name'] ?? 'Unknown'); ?></td>
+                <td><?php echo htmlspecialchars($data['size']); ?></td>
+                <td><?php echo htmlspecialchars($data['pcsform10']); ?></td>
+                <td><?php echo htmlspecialchars($data['mc']); ?></td>
+                <td><?php echo htmlspecialchars($data['kg']); ?></td>
+                <td><?php echo htmlspecialchars($data['pcs']); ?></td>
+                <td><?php echo htmlspecialchars($data['looseinkg']); ?></td>
+                <td><?php echo htmlspecialchars($data['looseinpcs']); ?></td>
+                <td><?php echo htmlspecialchars($data['looseoutkg']); ?></td>
+                <td><?php echo htmlspecialchars($data['looseoutpcs']); ?></td>
+                <td><?php echo htmlspecialchars($data['cc_kg']); ?></td>
+                <td><?php echo htmlspecialchars($data['cc_pcs']); ?></td>
+                <td><?php echo htmlspecialchars($data['lanfish_kg']); ?></td>
+                <td><?php echo htmlspecialchars($data['lanfish_pcs']); ?></td>
+                <td><?php echo htmlspecialchars($data['cutpiece_kg']); ?></td>
+                <td><?php echo htmlspecialchars($data['cutpiece_pcs']); ?></td>
+                <td><?php echo htmlspecialchars($data['hhk_kg']); ?></td>
+                <td><?php echo htmlspecialchars($data['hhk_pcs']); ?></td>
+                <td><?php echo htmlspecialchars($data['msl_kg']); ?></td>
+                <td><?php echo htmlspecialchars($data['msl_pcs']); ?></td>
                 <td><?php echo round($data['total_kg'], 2); ?></td>
                 <td>
                   <button type="submit" data-bs-toggle="modal" data-bs-target="#updatemodal<?= $data['id']; ?>" class="btn btn-warning text-light btn-sm d-inline"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -299,66 +299,64 @@ $bootstrap->css();
                       <input type="hidden" name="upid" value="<?php echo $data['id']; ?>">
                       <div class="modal-body">
                         <label>Date</label>
-                        <input type="date" name="update" class="form-control inpv2 mb-2" value="<?php echo $data['date']; ?>">
+                        <input type="date" name="update" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($data['date']); ?>">
                         <div class="row">
                           <div class="col">
                             <label>Commondity</label>
                             <select class="form-control inpv2 mb-2" name="upitem_id">
                               <?php
-                              $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM item");
+                              $form7commonditystmt = $pdo->prepare("SELECT id, name FROM products ORDER BY name ASC");
                               $form7commonditystmt->execute();
                               $form7commonditydatas = $form7commonditystmt->fetchall();
-                              foreach ($form7commonditydatas as $form7commonditydata) {
-                                $item_id_opt = $form7commonditydata['item_id'];
-                                $commonditydata_opt = $query->select('item', $item_id_opt, 'item_id');
+                              foreach ($form7commonditydatas as $commonditydata_opt) {
                               ?>
-                                <option value="<?php echo $commonditydata_opt['item_id']; ?>" <?php if ($data['item_id'] == $commonditydata_opt['item_id']) echo "selected"; ?>><?php echo $commonditydata_opt['item_name']; ?></option>
+                                <option value="<?php echo htmlspecialchars($commonditydata_opt['id']); ?>" <?php if ($data['item_id'] == $commonditydata_opt['id']) echo "selected"; ?>><?php echo htmlspecialchars($commonditydata_opt['name']); ?></option>
                               <?php } ?>
                             </select>
                           </div>
                           <div class="col">
                             <label>Country</label>
-                            <input type="text" name="upcountry" class="form-control inpv2 mb-2" value="<?php echo $data['country']; ?>">
+                            <input type="text" name="upcountry" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($data['country']); ?>">
                           </div>
                         </div>
                         <div class="row">
                           <div class="col">
                             <label>Size</label>
-                            <input type="text" name="upsize" class="form-control inpv2 mb-2" value="<?php echo $data['size']; ?>">
+                            <input type="text" name="upsize" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($data['size']); ?>">
                           </div>
                           <div class="col">
                             <label>Mc</label>
-                            <input type="number" name="upmc" class="form-control inpv2 mb-2" value="<?php echo $data['mc']; ?>">
+                            <input type="number" name="upmc" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($data['mc']); ?>">
                           </div>
                         </div>
                         <div class="row">
                           <div class="col">
                             <label>Kg</label>
-                            <input type="text" name="upkg" class="form-control inpv2 mb-2" value="<?php echo $data['kg']; ?>">
+                            <input type="text" name="upkg" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($data['kg']); ?>">
                           </div>
                           <div class="col">
                             <label>Pcs</label>
-                            <input type="text" name="uppcs" class="form-control inpv2 mb-2" value="<?php echo $data['pcs']; ?>">
+                            <input type="text" name="uppcs" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($data['pcs']); ?>">
                           </div>
                         </div>
                         <div class="row">
                           <div class="col">
                             <label>Loose In Kg</label>
-                            <input type="text" name="uploose_in_kg" class="form-control inpv2 mb-2" value="<?php echo $data['looseinkg']; ?>">
+                            <input type="text" name="uploose_in_kg" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($data['looseinkg']); ?>">
                           </div>
                           <div class="col">
                             <label>Loose In Pcs</label>
-                            <input type="number" name="uploose_in_pcs" class="form-control inpv2 mb-2" value="<?php echo $data['looseinpcs']; ?>">
+                            <input type="number" name="uploose_in_pcs" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($data['looseinpcs']); ?>">
                           </div>
                         </div>
                         <div class="row">
                           <div class="col">
                             <label>Loose Out Kg</label>
-                            <input type="text" name="uploose_out_kg" class="form-control inpv2 mb-2" value="<?php echo $data['looseoutkg']; ?>">
+                            <input type="text" name="uploose_out_kg" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($data['looseoutkg']); ?>">
                           </div>
                           <div class="col">
                             <label>Loose Out Pcs</label>
-                            <input type="number" name="uploose_out_pcs" class="form-control inpv2 mb-2" value="<?php echo $data['looseoutpcs']; ?>">
+                            <input type="number" name="uploose_out_pcs" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($data['looseoutpcs']); ?>">
                           </div>
                         </div>
                       </div>
@@ -470,14 +468,12 @@ $bootstrap->css();
                       <select name="item_id[]" class="form-control form-control-sm">
                         <option value="">Select</option>
                         <?php
-                        $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stocktcl");
+                        $form7commonditystmt = $pdo->prepare("SELECT id, name FROM products ORDER BY name ASC");
                         $form7commonditystmt->execute();
                         $form7commonditydatas = $form7commonditystmt->fetchall();
-                        foreach ($form7commonditydatas as $form7commonditydata) {
-                          $c_id = $form7commonditydata['item_id'];
-                          $commonditydata = $query->select('item', $c_id, 'item_id');
+                        foreach ($form7commonditydatas as $commonditydata) {
                         ?>
-                          <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                          <option value="<?php echo htmlspecialchars($commonditydata['id']); ?>"><?php echo htmlspecialchars($commonditydata['name']); ?></option>
                         <?php } ?>
                       </select>
                     </div>
@@ -532,10 +528,8 @@ $bootstrap->css();
               <select name="item_id[]" class="form-control form-control-sm">
                 <option value="">Select</option>
                 <?php
-                foreach ($form7commonditydatas as $form7commonditydata) {
-                  $c_id = $form7commonditydata['item_id'];
-                  $commonditydata = $query->select('item', $c_id, 'item_id');
-                  echo '<option value="' . $commonditydata['item_id'] . '">' . addslashes($commonditydata['item_name']) . '</option>';
+                foreach ($form7commonditydatas as $commonditydata) {
+                  echo '<option value="' . htmlspecialchars($commonditydata['id']) . '">' . addslashes($commonditydata['name']) . '</option>';
                 }
                 ?>
               </select>
@@ -555,7 +549,7 @@ $bootstrap->css();
             <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">CC Pcs</label><input type="number" name="cc_pcs[]" class="form-control form-control-sm"></div>
             <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">Cut Kg</label><input type="text" name="cutpiece_kg[]" class="form-control form-control-sm"></div>
             <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">Cut Pcs</label><input type="number" name="cutpiece_pcs[]" class="form-control form-control-sm"></div>
-            <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">HHK Kg</label><input type="text" name="hhk_kg[]" class="form-control form-control-sm"></div>
+            <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">HHK Kg</label><input type="number" name="hhk_kg[]" class="form-control form-control-sm"></div>
             <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">HHK Pcs</label><input type="number" name="hhk_pcs[]" class="form-control form-control-sm"></div>
             <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">MSL Kg</label><input type="text" name="msl_kg[]" class="form-control form-control-sm"></div>
             <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">MSL Pcs</label><input type="number" name="msl_pcs[]" class="form-control form-control-sm"></div>

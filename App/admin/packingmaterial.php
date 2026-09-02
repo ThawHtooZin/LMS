@@ -36,9 +36,6 @@ $bootstrap->css();
           <a href="packing_stock.php" class="btn btn-danger float-end me-2 btn-sm ms-2" id="back">Back</a>
           <button class="detailbtn btn btn-info float-end text-light btn-sm" onclick="showdetail()">Show Detail</button>
           <button class="overviewbtn btn btn-info text-light float-end hide btn-sm" onclick="showoverview()">Show OverView</button>
-          <!-- <button type="button" class="btn btn-primary btn-sm float-end me-2">
-              Add Packing Meterial Costing
-            </button> -->
         </div>
         <div class="card-body">
           <?php
@@ -78,14 +75,13 @@ $bootstrap->css();
             <div class="col-7">
               <?php
               $customer_id = $infodata['customer_id'] ?? 0;
-              // FIXED: Pull directly from the unified contacts table
               $customerdata = $query->select('contacts', $customer_id, 'id');
               echo htmlspecialchars($customerdata['name'] ?? 'Unknown Customer');
               ?><br><?php
                     echo htmlspecialchars($customerdata['phone'] ?? '');
                     ?><br><?php
-                                echo htmlspecialchars($customerdata['address'] ?? '');
-                                ?>
+                          echo htmlspecialchars($customerdata['address'] ?? '');
+                          ?>
             </div>
             <div class="col-3">
               Date : <?php echo date('d-m-Y', strtotime($infodata['date']));  ?>
@@ -121,7 +117,6 @@ $bootstrap->css();
             $packingmaterialdatas = $query->search("packingmaterial", 'infoid', $infoid);
             $noo = 1;
             foreach ($packingmaterialdatas as $packingmaterialdata) {
-              // FIXED: Pull from the products table instead of item
               $itemdata = $query->select('products', $packingmaterialdata['commondity_id'], 'id');
               $item_id = $packingmaterialdata['commondity_id'];
               $lastid = $packingmaterialdata['id'];
@@ -135,7 +130,7 @@ $bootstrap->css();
               $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
 
             ?>
-              <tr data-bs-toggle="modal" data-bs-target="#addpackingmaterialcosting<?php echo $packingmaterialdata['id']; ?>">
+              <tr style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#addpackingmaterialcosting<?php echo $packingmaterialdata['id']; ?>">
                 <td><?php if (empty($lastcommondity)) {
                       echo $noo;
                     } ?></td>
@@ -154,6 +149,110 @@ $bootstrap->css();
                 <td><?php echo $packingmaterialdata['total']; ?></td>
                 <td><?php echo $packingmaterialdata['perkgcost']; ?></td>
               </tr>
+
+              <!-- Slick Multi-Column Grid Modal Rendered Per Row -->
+              <div class="modal fade" id="addpackingmaterialcosting<?php echo $packingmaterialdata['id']; ?>" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header bg-secondary text-light">
+                      <h5 class="modal-title">Packing Material Costing</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="" method="post">
+                      <div class="modal-body">
+                        <input type="hidden" name="upid" value="<?php echo $packingmaterialdata['id']; ?>">
+
+                        <div class="row">
+                          <div class="col-md-4 mb-3">
+                            <label class="fw-bold small">Plastic Costing</label>
+                            <input type="text" name="plastic" class="form-control" value="<?php echo $packingmaterialdata['plastic']; ?>">
+                          </div>
+                          <div class="col-md-4 mb-3">
+                            <label class="fw-bold small">JCV Cost</label>
+                            <input type="text" name="jcv" class="form-control" value="<?php echo $packingmaterialdata['jcv']; ?>">
+                          </div>
+                          <div class="col-md-4 mb-3">
+                            <label class="fw-bold small">Inner Box</label>
+                            <input type="text" name="inner_box" class="form-control" value="<?php echo $packingmaterialdata['inner_box']; ?>">
+                          </div>
+                        </div>
+
+                        <div class="row">
+                          <div class="col-md-4 mb-3">
+                            <label class="fw-bold small">Sticker Cost</label>
+                            <input type="text" name="sticker" class="form-control" value="<?php echo $packingmaterialdata['sticker']; ?>">
+                          </div>
+                          <div class="col-md-4 mb-3">
+                            <label class="fw-bold small">MC Plastic Cost</label>
+                            <input type="text" name="mc_plastic" class="form-control" value="<?php echo $packingmaterialdata['mc_plastic']; ?>">
+                          </div>
+                          <div class="col-md-4 mb-3">
+                            <label class="fw-bold small">Carton Box Cost</label>
+                            <input type="text" name="carton_box" class="form-control" value="<?php echo $packingmaterialdata['carton_box']; ?>">
+                          </div>
+                        </div>
+
+                        <div class="row">
+                          <div class="col-md-4 mb-3">
+                            <label class="fw-bold small">Tape Cost</label>
+                            <input type="text" name="tape" class="form-control" value="<?php echo $packingmaterialdata['tape']; ?>">
+                          </div>
+                          <div class="col-md-4 mb-3">
+                            <label class="fw-bold small">Penon Cost</label>
+                            <input type="text" name="penon" class="form-control" value="<?php echo $packingmaterialdata['penon']; ?>">
+                          </div>
+                          <div class="col-md-4 mb-3">
+                            <label class="fw-bold small">P-Sticker Cost</label>
+                            <input type="text" name="p_sticker" class="form-control" value="<?php echo $packingmaterialdata['p_sticker']; ?>">
+                          </div>
+                        </div>
+
+                        <div class="row">
+                          <div class="col-md-4 mb-3">
+                            <label class="fw-bold small">Plastic Rope Cost</label>
+                            <input type="text" name="plastic_rope" class="form-control" value="<?php echo $packingmaterialdata['plastic_rope']; ?>">
+                          </div>
+                          <div class="col-md-4 mb-3">
+                            <label class="fw-bold small">Micellion Cost</label>
+                            <input type="text" name="micellion" class="form-control" value="<?php echo $packingmaterialdata['micellion']; ?>">
+                          </div>
+                          <div class="col-md-4 mb-3">
+                            <label class="fw-bold small">Processing Cost</label>
+                            <input type="text" name="processing" class="form-control" value="<?php echo $packingmaterialdata['processing']; ?>">
+                          </div>
+                        </div>
+
+                        <div class="row">
+                          <div class="col-md-4 mb-3">
+                            <label class="fw-bold small">Plastic Size</label>
+                            <input type="text" name="plastic_size" class="form-control" value="<?php echo htmlspecialchars($packingmaterialdata['plastic_size']); ?>">
+                          </div>
+                          <div class="col-md-4 mb-3">
+                            <label class="fw-bold small">Pcs Per Lb</label>
+                            <input type="text" name="pcsperlb" class="form-control" value="<?php echo $packingmaterialdata['pcsperlb']; ?>">
+                          </div>
+                          <div class="col-md-4 mb-3">
+                            <label class="fw-bold small">Pcs Per MC</label>
+                            <input type="text" name="pcspermc" class="form-control" value="<?php echo $packingmaterialdata['pcspermc']; ?>">
+                          </div>
+                        </div>
+
+                        <div class="row">
+                          <div class="col-md-4 mb-3">
+                            <label class="fw-bold small">Dollar Rate</label>
+                            <input type="text" name="tdydollorprice" class="form-control" value="">
+                          </div>
+                        </div>
+
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" name="addpackingmaterialbtn" class="btn btn-success">Add</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
             <?php
               $noo++;
             };
@@ -217,7 +316,6 @@ $bootstrap->css();
     </div>
   </div>
 
-  <?php include 'addmodals.php'; ?>
   <script type="text/javascript">
     function showdetail() {
       document.querySelector('.detailbtn').classList.add('hide');

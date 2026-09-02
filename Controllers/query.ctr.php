@@ -670,6 +670,24 @@ class Query
   {
     global $pdo;
     try {
+      // UNIQUE VOUCHER VALIDATION CHECK
+      if (empty($id)) {
+        $dupStmt = $pdo->prepare("SELECT COUNT(*) FROM purchases WHERE voucher_no = ?");
+        $dupStmt->execute([$voucher_no]);
+      } else {
+        $dupStmt = $pdo->prepare("SELECT COUNT(*) FROM purchases WHERE voucher_no = ? AND id != ?");
+        $dupStmt->execute([$voucher_no, $id]);
+      }
+
+      if ($dupStmt->fetchColumn() > 0) {
+        return [
+          'status'  => false,
+          'type'    => 'validation_error',
+          'title'   => 'Duplicate Voucher!',
+          'message' => 'The voucher reference number "' . htmlspecialchars($voucher_no) . '" already exists. Please use a unique reference.'
+        ];
+      }
+
       $pdo->beginTransaction();
 
       $ex_rate = 1.0000;
