@@ -87,7 +87,7 @@ foreach ($active_categories as $db_type => $display_title) {
     foreach ($contacts as $contact) {
         $supplier_id = $contact['id'];
 
-        $opPurStmt = $pdo->prepare("SELECT COALESCE(SUM(grand_total), 0) FROM purchases WHERE contact_id = ? AND date < ? AND status IN ('AUTHORISED', 'PAID')");
+        $opPurStmt = $pdo->prepare("SELECT COALESCE(SUM(grand_total), 0) FROM purchases WHERE contact_id = ? AND date < ? AND status IN ('AWAITING_PAYMENT', 'PAID')");
         $opPurStmt->execute([$supplier_id, $from]);
         $opening_purchases = floatval($opPurStmt->fetchColumn());
 
@@ -97,7 +97,7 @@ foreach ($active_categories as $db_type => $display_title) {
 
         $opening = $opening_purchases - $opening_payments;
 
-        $addStmt = $pdo->prepare("SELECT COALESCE(SUM(grand_total), 0) FROM purchases WHERE contact_id = ? AND date BETWEEN ? AND ? AND status IN ('AUTHORISED', 'PAID')");
+        $addStmt = $pdo->prepare("SELECT COALESCE(SUM(grand_total), 0) FROM purchases WHERE contact_id = ? AND date BETWEEN ? AND ? AND status IN ('AWAITING_PAYMENT', 'PAID')");
         $addStmt->execute([$supplier_id, $from, $to]);
         $add = floatval($addStmt->fetchColumn());
 
