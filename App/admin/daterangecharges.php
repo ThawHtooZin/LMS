@@ -26,29 +26,29 @@ $bootstrap->css();
 <body>
   <?php
   if (isset($_POST['add'])) {
-    if(empty($_POST['indate']) || empty($_POST['outdate']) || empty($_POST['commondity_id']) || empty($_POST['mc']) || empty($_POST['kg'])) {
-      if(empty($_POST['indate'])){
+    if (empty($_POST['indate']) || empty($_POST['outdate']) || empty($_POST['commondity_id']) || empty($_POST['mc']) || empty($_POST['kg'])) {
+      if (empty($_POST['indate'])) {
         echo "<script>swal('Error!', 'Please select In Date', 'error');</script>";
       }
-      if(empty($_POST['outdate'])){
+      if (empty($_POST['outdate'])) {
         echo "<script>swal('Error!', 'Please select Out Date', 'error');</script>";
       }
-      if(empty($_POST['commondity_id'])){
+      if (empty($_POST['commondity_id'])) {
         echo "<script>swal('Error!', 'Please select Commondity', 'error');</script>";
       }
-      if(empty($_POST['mc'])){
+      if (empty($_POST['mc'])) {
         echo "<script>swal('Error!', 'Please enter Mc', 'error');</script>";
       }
-      if(empty($_POST['kg'])){
+      if (empty($_POST['kg'])) {
         echo "<script>swal('Error!', 'Please enter Kg', 'error');</script>";
       }
-      if(empty($_POST['coldstorerate'])){
+      if (empty($_POST['coldstorerate'])) {
         echo "<script>swal('Error!', 'Please enter Cold Store Rate', 'error');</script>";
       }
-      if(empty($_POST['labourrate'])){
+      if (empty($_POST['labourrate'])) {
         echo "<script>swal('Error!', 'Please enter Labour Rate', 'error');</script>";
       }
-    }else{
+    } else {
       $indate = $_POST['indate'];
       $outdate = $_POST['outdate'];
       $commondity_id = $_POST['commondity_id'];
@@ -83,26 +83,26 @@ $bootstrap->css();
   }
 
   if (isset($_POST['addlabour'])) {
-    if(empty($_POST['indate']) || empty($_POST['outdate']) || empty($_POST['commondity_id']) || empty($_POST['mc']) || empty($_POST['kg'])) {
-      if(empty($_POST['indate'])){
+    if (empty($_POST['indate']) || empty($_POST['outdate']) || empty($_POST['commondity_id']) || empty($_POST['mc']) || empty($_POST['kg'])) {
+      if (empty($_POST['indate'])) {
         echo "<script>swal('Error!', 'Please select In Date', 'error');</script>";
       }
-      if(empty($_POST['outdate'])){
+      if (empty($_POST['outdate'])) {
         echo "<script>swal('Error!', 'Please select Out Date', 'error');</script>";
       }
-      if(empty($_POST['commondity_id'])){
+      if (empty($_POST['commondity_id'])) {
         echo "<script>swal('Error!', 'Please select Commondity', 'error');</script>";
       }
-      if(empty($_POST['mc'])){
+      if (empty($_POST['mc'])) {
         echo "<script>swal('Error!', 'Please enter Mc', 'error');</script>";
       }
-      if(empty($_POST['kg'])){
+      if (empty($_POST['kg'])) {
         echo "<script>swal('Error!', 'Please enter Kg', 'error');</script>";
       }
-      if(empty($_POST['labourrate'])){
+      if (empty($_POST['labourrate'])) {
         echo "<script>swal('Error!', 'Please enter Labour Rate', 'error');</script>";
       }
-    }else{
+    } else {
       $indate = $_POST['indate'];
       $outdate = $_POST['outdate'];
       $commondity_id = $_POST['commondity_id'];
@@ -133,14 +133,14 @@ $bootstrap->css();
   }
 
   if (isset($_POST['paymentbtn'])) {
-    if(empty($_POST['payment_date']) || empty($_POST['payment_amount'])) {
-      if(empty($_POST['payment_date'])){
+    if (empty($_POST['payment_date']) || empty($_POST['payment_amount'])) {
+      if (empty($_POST['payment_date'])) {
         echo "<script>swal('Error!', 'Please select Payment Date', 'error');</script>";
       }
-      if(empty($_POST['payment_amount'])){
+      if (empty($_POST['payment_amount'])) {
         echo "<script>swal('Error!', 'Please enter Payment Amount', 'error');</script>";
       }
-    }else{
+    } else {
       $payment_date = $_POST['payment_date'];
       $payment_amount = $_POST['payment_amount'];
 
@@ -149,27 +149,26 @@ $bootstrap->css();
   }
 
   if (isset($_POST['repackingadd'])) {
-    if(empty($_POST['date']) || empty($_POST['in_mc']) || empty($_POST['in_kg']) || empty($_POST['out_mc']) || empty($_POST['out_kg']) || empty($_POST['rate'])) {
-      if(empty($_POST['date'])){
+    if (empty($_POST['date']) || empty($_POST['in_mc']) || empty($_POST['in_kg']) || empty($_POST['out_mc']) || empty($_POST['out_kg']) || empty($_POST['rate'])) {
+      if (empty($_POST['date'])) {
         echo "<script>swal('Error!', 'Please select Date', 'error');</script>";
       }
-      if(empty($_POST['in_mc'])){
+      if (empty($_POST['in_mc'])) {
         echo "<script>swal('Error!', 'Please enter In Mc', 'error');</script>";
       }
-      if(empty($_POST['in_kg'])){
+      if (empty($_POST['in_kg'])) {
         echo "<script>swal('Error!', 'Please enter In Kg', 'error');</script>";
       }
-      if(empty($_POST['out_mc'])){
+      if (empty($_POST['out_mc'])) {
         echo "<script>swal('Error!', 'Please enter Out Mc', 'error');</script>";
       }
-      if(empty($_POST['out_kg'])){
+      if (empty($_POST['out_kg'])) {
         echo "<script>swal('Error!', 'Please enter Out Kg', 'error');</script>";
       }
-      if(empty($_POST['rate'])){
+      if (empty($_POST['rate'])) {
         echo "<script>swal('Error!', 'Please enter Rate', 'error');</script>";
       }
-
-    }else{
+    } else {
       $date = $_POST['date'];
       $in_mc = $_POST['in_mc'];
       $in_kg = $_POST['in_kg'];
@@ -182,27 +181,26 @@ $bootstrap->css();
   }
 
   if (isset($_POST['addstockbtn'])) {
-    if(empty($_POST['indate']) || empty($_POST['commondity_id']) || empty($_POST['mc']) || empty($_POST['kg'])) {
-      if(empty($_POST['indate'])){
+    if (empty($_POST['indate']) || empty($_POST['commondity_id']) || empty($_POST['mc']) || empty($_POST['kg'])) {
+      if (empty($_POST['indate'])) {
         echo "<script>swal('Error!', 'Please select In Date', 'error');</script>";
       }
-      if(empty($_POST['commondity_id'])){
+      if (empty($_POST['commondity_id'])) {
         echo "<script>swal('Error!', 'Please select Commondity', 'error');</script>";
       }
-      if(empty($_POST['mc'])){
+      if (empty($_POST['mc'])) {
         echo "<script>swal('Error!', 'Please enter Mc', 'error');</script>";
       }
-      if(empty($_POST['kg'])){
+      if (empty($_POST['kg'])) {
         echo "<script>swal('Error!', 'Please enter Kg', 'error');</script>";
       }
-    }else{
+    } else {
       $indate = $_POST['indate'];
       $commondity_id = $_POST['commondity_id'];
       $mc = $_POST['mc'];
       $kg = $_POST['kg'];
       $query->addnewstock($indate, $commondity_id, $mc, $kg);
     }
-
   }
 
   if (isset($_POST['update'])) {
@@ -320,7 +318,6 @@ $bootstrap->css();
                 <th>Action</th>
               </tr>
               <?php
-
               $commonditycountstmt = $pdo->prepare("SELECT COUNT(DISTINCT commondity_id) FROM coldstore");
               $commonditycountstmt->execute();
               $commonditycountdatas = $commonditycountstmt->fetchColumn();
@@ -330,14 +327,14 @@ $bootstrap->css();
                 $commonditystmt->execute();
                 $commonditydata = $commonditystmt->fetchall();
                 $commondity_id = $commonditydata[$i]['commondity_id'];
-                $commonditydata = $query->select('category', $commondity_id, 'category_id');
+                $commonditydata = $query->select('products', $commondity_id, 'id');
                 $stmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='$commondity_id'");
                 $stmt->execute();
                 $datas = $stmt->fetchall();
 
               ?>
                 <tr style="font-weight:bold;">
-                  <td><?= $commonditydata['category_name']; ?></td>
+                  <td><?= htmlspecialchars($commonditydata['name'] ?? ''); ?></td>
                   <td colspan="12"></td>
                 </tr>
                 <?php
@@ -345,7 +342,7 @@ $bootstrap->css();
                 foreach ($datas as $data) {
                   $idd++;
                   $item_id = $data['commondity_id'];
-                  $commonditydata = $query->select('category', $item_id, 'category_id');
+                  $commonditydata = $query->select('products', $item_id, 'id');
 
                   $comstmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='$commondity_id' GROUP BY commondity_id");
                   $comstmt->execute();
@@ -355,13 +352,11 @@ $bootstrap->css();
                   $commonstmt->execute();
                   $commondata = $commonstmt->fetch(PDO::FETCH_ASSOC);
                 ?>
-                  <!-- <tr style="<?php //if($commonditydata['category_name'] == "IQF"){echo "background-color: #6ef757 !important;";}elseif($commonditydata['category_name'] == "Block"){echo "background-color: #f5764c !important;";}elseif($commonditydata['category_name'] == "Pujanut"){echo "background-color: lightblue !important;";}
-                                  ?>"> -->
                   <tr>
                     <td><?php echo $idd; ?></td>
                     <td><?php echo date('d-m-Y', strtotime($data['indate'])); ?></td>
                     <td><?php echo date('d-m-Y', strtotime($data['outdate'])); ?></td>
-                    <td><?php echo $commonditydata['category_name']; ?></td>
+                    <td><?php echo htmlspecialchars($commonditydata['name'] ?? ''); ?></td>
                     <td style="text-align:right;"><?php echo $data['mc']; ?></td>
                     <td style="text-align:right;"><?php echo $data['total_mc']; ?></td>
                     <td style="text-align:right;"><?php echo $data['kg']; ?></td>
@@ -375,9 +370,6 @@ $bootstrap->css();
                           <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
                           <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
                         </svg></a>
-                      <!-- <button type="submit" name="deletebutton" class="btn btn-danger">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
-                    </button> -->
                     </td>
                   </tr>
                   <div class="modal fade" id="coldstoreupdatemodal<?php echo $data['id']; ?>">
@@ -422,12 +414,12 @@ $bootstrap->css();
                                   <label>Commondity</label>
                                   <select class="form-control inpv2" name="commondity_id" id="upcommondity<?= $id; ?>">
                                     <?php
-                                    $commonditydatas = $query->selectall('category');
+                                    $commonditydatas = $pdo->query("SELECT id, name FROM products ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
                                     foreach ($commonditydatas as $commonditydata) {
                                     ?>
-                                      <option value="<?php echo $commonditydata['category_id']; ?>" <?php if ($commonditydata['category_id'] == $data['commondity_id']) {
-                                                                                                      echo "selected";
-                                                                                                    } ?>><?php echo $commonditydata['category_name']; ?></option>
+                                      <option value="<?php echo htmlspecialchars($commonditydata['id']); ?>" <?php if ($commonditydata['id'] == $data['commondity_id']) {
+                                                                                                                echo "selected";
+                                                                                                              } ?>><?php echo htmlspecialchars($commonditydata['name']); ?></option>
                                     <?php
                                     }
                                     ?>
@@ -462,14 +454,14 @@ $bootstrap->css();
                     </div>
                   </div>
                   <?php
-                  $blockid = $query->selectoncecontain('category', 'category_name', 'Block');
-
+                  $blockid = $pdo->query("SELECT id FROM products WHERE name LIKE '%Block%' LIMIT 1")->fetchColumn();
+                  if (!$blockid) $blockid = 0;
                   ?>
                   <script type="text/javascript">
                     var upcommondity<?= $id; ?> = $("#upcommondity<?= $id; ?>").val();
                     $("#upcommondity<?= $id; ?>").change(function() {
                       upcommondity<?= $id; ?> = $("#upcommondity<?= $id; ?>").val();
-                      if (upcommondity<?= $id; ?> == <?= $blockid['category_id']; ?>) {
+                      if (upcommondity<?= $id; ?> == <?= $blockid; ?>) {
                         $(".upprocessingratediv<?= $id; ?>").hide();
                         $(".upprocessingchargesdiv<?= $id; ?>").show();
                       } else {
@@ -477,7 +469,7 @@ $bootstrap->css();
                         $(".upprocessingchargesdiv<?= $id; ?>").hide();
                       }
                     });
-                    if (upcommondity<?= $id; ?> == <?= $blockid['category_id']; ?>) {
+                    if (upcommondity<?= $id; ?> == <?= $blockid; ?>) {
                       $(".upprocessingratediv<?= $id; ?>").hide();
                       $(".upprocessingchargesdiv<?= $id; ?>").show();
                     }
@@ -518,10 +510,10 @@ $bootstrap->css();
                 $labourstmt->execute();
                 $labourdatas = $labourstmt->fetchall();
 
-                $commonditydata = $query->select('category', $commondity_id, 'category_id');
+                $commonditydata = $query->select('products', $commondity_id, 'id');
               ?>
                 <tr style="font-weight:bold;">
-                  <td><?= $commonditydata['category_name']; ?></td>
+                  <td><?= htmlspecialchars($commonditydata['name'] ?? ''); ?></td>
                   <td colspan="12"></td>
                 </tr>
                 <?php
@@ -529,13 +521,13 @@ $bootstrap->css();
                 foreach ($labourdatas as $labourdata) {
                   $idd++;
                   $item_id = $labourdata['commondity_id'];
-                  $commonditydata = $query->select('category', $item_id, 'category_id');
+                  $commonditydata = $query->select('products', $item_id, 'id');
                 ?>
                   <tr>
                     <td><?php echo $idd; ?></td>
                     <td><?php echo date('d-m-Y', strtotime($labourdata['indate']));  ?></td>
                     <td><?php echo date('d-m-Y', strtotime($labourdata['outdate'])); ?></td>
-                    <td><?php echo $commonditydata['category_name']; ?></td>
+                    <td><?php echo htmlspecialchars($commonditydata['name'] ?? ''); ?></td>
                     <td style="text-align:right;"><?php echo $labourdata['mc']; ?></td>
                     <td style="text-align:right;"><?php echo $labourdata['total_mc']; ?></td>
                     <td style="text-align:right;"><?php echo $labourdata['kg']; ?></td>
@@ -543,9 +535,6 @@ $bootstrap->css();
                     <td style="text-align:right;"><?php echo $labourdata['rate']; ?></td>
                     <td style="text-align:right;"><?php echo $labourdata['charges']; ?></td>
                     <td style="text-align:right;"><?php echo $labourdata['total_charges']; ?></td>
-                    <!-- <button type="submit" name="deletebutton" class="btn btn-danger">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
-                  </button> -->
                     </td>
                   </tr>
               <?php
@@ -583,13 +572,10 @@ $bootstrap->css();
                 $processingstmt = $pdo->prepare("SELECT * FROM processing WHERE commondity_id='$commondity_id'");
                 $processingstmt->execute();
                 $processingdatas = $processingstmt->fetchall();
-                $commonditydata = $query->select('category', $commondity_id, 'category_id');
-
-
-
+                $commonditydata = $query->select('products', $commondity_id, 'id');
               ?>
                 <tr style="font-weight:bold;">
-                  <td><?= $commonditydata['category_name']; ?></td>
+                  <td><?= htmlspecialchars($commonditydata['name'] ?? ''); ?></td>
                   <td colspan="12"></td>
                 </tr>
                 <?php
@@ -597,8 +583,10 @@ $bootstrap->css();
                 foreach ($processingdatas as $processingdata) {
                   $lastid = $processingdata['id'];
                   $commondity_id = $processingdata['commondity_id'];
-                  $commonditydata = $query->select('category', $commondity_id, 'category_id');
-                  if (str_contains(strtolower($commonditydata['category_name']), 'block')) {
+                  $commonditydata = $query->select('products', $commondity_id, 'id');
+                  $commondity_name = strtolower($commonditydata['name'] ?? '');
+
+                  if (str_contains($commondity_name, 'block')) {
                     $lastrowstmt = $pdo->prepare("SELECT * FROM processing WHERE id<'$lastid' AND commondity_id='$commondity_id' ORDER BY id DESC ");
                     $lastrowstmt->execute();
                     $lastrowdata = $lastrowstmt->fetch(PDO::FETCH_ASSOC);
@@ -618,29 +606,26 @@ $bootstrap->css();
 
                   $idd++;
                   $item_id = $processingdata['commondity_id'];
-                  $commonditydata = $query->select('category', $item_id, 'category_id');
+                  $commonditydata = $query->select('products', $item_id, 'id');
                 ?>
                   <tr>
                     <td><?php echo $idd; ?></td>
                     <td><?php echo date('d-m-Y', strtotime($processingdata['indate']));  ?></td>
                     <td><?php echo date('d-m-Y', strtotime($processingdata['outdate'])); ?></td>
-                    <td><?php echo $commonditydata['category_name']; ?></td>
+                    <td><?php echo htmlspecialchars($commonditydata['name'] ?? ''); ?></td>
                     <td style="text-align:right;"><?php echo $processingdata['mc']; ?></td>
                     <td style="text-align:right;"><?php echo $processingdata['total_mc']; ?></td>
-                    <td style="text-align:right;" <?php if (str_contains(strtolower($commonditydata['category_name']), 'block')) {
+                    <td style="text-align:right;" <?php if (str_contains($commondity_name, 'block')) {
                                                     echo 'data-bs-toggle="modal" data-bs-target="#importkg' . $processingdata["id"] . '"';
                                                   } ?>><?php echo $processingdata['kg']; ?></td>
                     <td style="text-align:right;"><?php echo $processingdata['total_kg']; ?></td>
                     <td style="text-align:right;"><?php echo $processingdata['rate']; ?></td>
-                    <td style="text-align:right;" <?php if (str_contains(strtolower($commonditydata['category_name']), 'block')) {
+                    <td style="text-align:right;" <?php if (str_contains($commondity_name, 'block')) {
                                                     echo 'data-bs-toggle="modal" data-bs-target="#importcharges' . $processingdata["id"] . '"';
                                                   } ?>><?php if ($processingdata['charges'] != 0) {
                                                           echo $processingdata['charges'];
                                                         } ?></td>
                     <td style="text-align:right;"><?php echo $processingdata['total_charges']; ?></td>
-                    <!-- <button type="submit" name="deletebutton" class="btn btn-danger">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
-                  </button> -->
                     </td>
                   </tr>
                   <div class="modal fade" id="importkg<?= $processingdata['id']; ?>">
@@ -718,8 +703,8 @@ $bootstrap->css();
               foreach ($totaldatas as $total_charges_data) {
                 $idd++;
                 $item_id = $total_charges_data['commondity_id'];
-                $commonditydata = $query->select('category', $item_id, 'category_id');
-                
+                $commonditydata = $query->select('products', $item_id, 'id');
+
 
                 $nowid = $total_charges_data['id'];
                 $laststmt = $pdo->prepare("SELECT * FROM total_charges WHERE id < '$nowid' ORDER BY id DESC");
@@ -727,28 +712,24 @@ $bootstrap->css();
                 $lastdata = $laststmt->fetch(PDO::FETCH_ASSOC);
 
                 if (!empty($lastdata)) {
-                  // grand_total_charges
                   $grand_total_charges = $total_charges_data['total_charges'] + $lastdata['balance_amount'];
                   if ($grand_total_charges != $total_charges_data['grand_total_charges']) {
                     $updatestmt = $pdo->prepare("UPDATE total_charges SET grand_total_charges='$grand_total_charges' WHERE id='$nowid'");
                     $updatestmt->execute();
                   }
 
-                  // balance_amount
                   $balance_amount = $grand_total_charges - $total_charges_data['payment_amount'];
                   if ($balance_amount != $total_charges_data['balance_amount']) {
                     $balanceupdatestmt = $pdo->prepare("UPDATE total_charges SET balance_amount='$balance_amount' WHERE id='$nowid'");
                     $balanceupdatestmt->execute();
                   }
                 } else {
-                  // grand_total_charges
                   $grand_total_charges = $total_charges_data['total_charges'] + 0;
                   if ($grand_total_charges != $total_charges_data['grand_total_charges']) {
                     $updatestmt = $pdo->prepare("UPDATE total_charges SET grand_total_charges='$grand_total_charges' WHERE id='$nowid'");
                     $updatestmt->execute();
                   }
 
-                  // balance_amount
                   $balance_amount = $grand_total_charges - $total_charges_data['payment_amount'];
                   if ($balance_amount != $total_charges_data['balance_amount']) {
                     $balanceupdatestmt = $pdo->prepare("UPDATE total_charges SET balance_amount='$balance_amount' WHERE id='$nowid'");
@@ -757,19 +738,18 @@ $bootstrap->css();
                 }
               ?>
                 <tr>
-                  <!-- <td><?php echo $idd; ?></td> -->
                   <td style="width: 80px;"><?php if ($total_charges_data['date'] != "0000-00-00") {
                                               echo date('d-m-Y', strtotime($total_charges_data['date']));
                                             }; ?></td>
-                  <td><?php if (!empty($commonditydata['category_name'])) {
-                        echo $commonditydata['category_name'];
+                  <td><?php if (!empty($commonditydata['name'])) {
+                        echo htmlspecialchars($commonditydata['name']);
                       }; ?></td>
                   <td style="text-align:center;"><?php if ($total_charges_data['total_coldstore_charges'] != "0") {
                                                     echo $total_charges_data['total_coldstore_charges'];
                                                   }; ?></td>
                   <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if ($total_charges_data['total_labour_charges'] != "0") {
-                                                    echo $total_charges_data['total_labour_charges'];
-                                                  }; ?></td>
+                                                                                                                                                        echo $total_charges_data['total_labour_charges'];
+                                                                                                                                                      }; ?></td>
                   <td style="text-align:center;" data-bs-toggle="modal" data-bs-target="#updatetotalcharges<?php echo $total_charges_data['id']; ?>"><?php if ($total_charges_data['total_processing_charges'] != "0") {
                                                                                                                                                         echo $total_charges_data['total_processing_charges'];
                                                                                                                                                       }; ?></td>
@@ -804,7 +784,6 @@ $bootstrap->css();
                                                                                                                                                                                                           echo $total_charges_data['remark'];
                                                                                                                                                                                                         }; ?></td>
                 </tr>
-                <!-- Add updatetotalcharges -->
                 <div class="modal fade" id="updatetotalcharges<?php echo $total_charges_data['id']; ?>">
                   <div class="modal-dialog">
                     <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
@@ -873,8 +852,6 @@ $bootstrap->css();
                     </div>
                   </div>
                 </div>
-                <!-- Add updatetotalcharges -->
-                <!--Add Remark-->
                 <div class="modal fade" id="remark<?php echo $total_charges_data['id']; ?>">
                   <div class="modal-dialog">
                     <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
@@ -887,7 +864,7 @@ $bootstrap->css();
                         <div class="modal-body">
                           <div class="">
                             <label>Remark</label>
-                            <input type="text" name="remark" value="<?= $total_charges_data['remark']; ?>" class="form-control inpv2 mt-2 mb-3">
+                            <input type="text" name="remark" value="<?= htmlspecialchars($total_charges_data['remark']); ?>" class="form-control inpv2 mt-2 mb-3">
                           </div>
                         </div>
                         <div class="card-footer p-3">
@@ -896,11 +873,10 @@ $bootstrap->css();
                             <button type="submit" name="addremarkbtn" class="btn btn-success">Add Remark</button>
                           </div>
                         </div>
+                      </form>
                     </div>
-                    </form>
                   </div>
                 </div>
-                <!--Add Remark-->
               <?php
               }
               ?>
@@ -970,14 +946,12 @@ $bootstrap->css();
                 $commonditydata = $commonditystmt->fetchall();
                 $commondity_id = $commonditydata[$i]['commondity_id'];
 
-                $commonditydata = $query->select('category', $commondity_id, 'category_id');
-
-                // Edit Check
-                $commondity_id = $commonditydata['category_id'];
+                $commonditydata = $query->select('products', $commondity_id, 'id');
+                $commondity_id = $commonditydata['id'];
 
               ?>
                 <tr style="font-weight:bold;">
-                  <td><?= $commonditydata['category_name']; ?></td>
+                  <td><?= htmlspecialchars($commonditydata['name'] ?? ''); ?></td>
                   <td colspan="12"></td>
                 </tr>
                 <?php
@@ -987,16 +961,14 @@ $bootstrap->css();
                 foreach ($hhkstockdatas as $hhkstockdata) {
                   $idd++;
                   $item_id = $hhkstockdata['commondity_id'];
-                  $commonditydata = $query->select('category', $item_id, 'category_id');
+                  $commonditydata = $query->select('products', $item_id, 'id');
 
-                  // Edit Check
-                  $commondity_id = $commonditydata['category_id'];
+                  $commondity_id = $commonditydata['id'];
                   $nowid = $hhkstockdata['id'];
                   $editcheckstmt = $pdo->prepare("SELECT * FROM hhkstock WHERE commondity_id='$commondity_id' AND outdate!='0000-00-00' AND id > '$nowid'");
                   $editcheckstmt->execute();
                   $editcheckdata = $editcheckstmt->fetch(PDO::FETCH_ASSOC);
 
-                  // Outdatecheck
                   $outdatecheckstmt = $pdo->prepare("SELECT outdate FROM hhkstock WHERE id='$nowid'");
                   $outdatecheckstmt->execute();
                   $outdatecheckdata = $outdatecheckstmt->fetch(PDO::FETCH_ASSOC);
@@ -1041,7 +1013,7 @@ $bootstrap->css();
                     <td><?php if ($hhkstockdata['outdate'] != "0000-00-00") {
                           echo date('d-m-Y', strtotime($hhkstockdata['outdate']));
                         }; ?></td>
-                    <td><?php echo $commonditydata['category_name']; ?></td>
+                    <td><?php echo htmlspecialchars($commonditydata['name'] ?? ''); ?></td>
                     <td style="text-align:right;"><?php echo $hhkstockdata['mc']; ?></td>
                     <td style="text-align:right;"><?php echo $hhkstockdata['total_mc']; ?></td>
                     <td style="text-align:right;"><?php echo $hhkstockdata['kg']; ?></td>
@@ -1058,7 +1030,6 @@ $bootstrap->css();
                       <?php endif; ?>
                     </td>
                   </tr>
-                  <!-- Edit Stock Modal -->
                   <div class="modal fade" id="stockupdatemodal<?= $hhkstockdata['id']; ?>">
                     <div class="modal-dialog">
                       <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
@@ -1078,11 +1049,11 @@ $bootstrap->css();
                                 <label>Commondity</label>
                                 <select class="form-control inpv2" name="upcommondity">
                                   <?php
-                                  $commonditydatas = $query->selectall('category');
+                                  $commonditydatas = $pdo->query("SELECT id, name FROM products ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
                                   foreach ($commonditydatas as $commonditydata) {
                                   ?>
-                                    <option value="<?php echo $commonditydata['category_id']; ?>" <?php if ($commonditydata['category_id'] == $hhkstockdata['commondity_id']): echo "selected";
-                                                                                                  endif; ?>><?php echo $commonditydata['category_name']; ?></option>
+                                    <option value="<?php echo htmlspecialchars($commonditydata['id']); ?>" <?php if ($commonditydata['id'] == $hhkstockdata['commondity_id']): echo "selected";
+                                                                                                            endif; ?>><?php echo htmlspecialchars($commonditydata['name']); ?></option>
                                   <?php
                                   }
                                   ?>
@@ -1139,7 +1110,6 @@ $bootstrap->css();
                       </div>
                     </div>
                   </div>
-                  <!-- Edit Stock Modal -->
               <?php
                 }
               }
@@ -1150,7 +1120,6 @@ $bootstrap->css();
       </div>
     </div>
   </div>
-  <!-- Add Coldstore And Processing Modal -->
   <div class="modal fade" id="newcharges" aria-labelledby="newcharges">
     <div class="modal-dialog">
       <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
@@ -1175,13 +1144,15 @@ $bootstrap->css();
                 <label>Commondity</label>
                 <select class="form-control inpv2" name="commondity_id" id="commondity">
                   <?php
-                  $commonditydatas = $query->selectdis('hhkstock', 'commondity_id');
+                  $commonditydatas = $pdo->query("SELECT DISTINCT commondity_id FROM hhkstock")->fetchAll(PDO::FETCH_ASSOC);
                   foreach ($commonditydatas as $commonditydata) {
                     $item_id = $commonditydata['commondity_id'];
-                    $item = $query->select('category', $item_id, 'category_id');
+                    $item = $query->select('products', $item_id, 'id');
+                    if (!empty($item['id'])) {
                   ?>
-                    <option value="<?php echo $item['category_id']; ?>"><?php echo $item['category_name']; ?></option>
+                      <option value="<?php echo htmlspecialchars($item['id']); ?>"><?php echo htmlspecialchars($item['name']); ?></option>
                   <?php
+                    }
                   }
                   ?>
                 </select>
@@ -1209,7 +1180,7 @@ $bootstrap->css();
               <div class="col">
                 <div class="processingratediv">
                   <label style="font-weight: bold;">Processing Rate</label>
-                  <input type="hidden" name="upprocessingrate" value="<?php echo $processingdataup['rate'];  ?>">
+                  <input type="hidden" name="upprocessingrate" value="<?php echo $processingdataup['rate'] ?? 0; ?>">
                   <div id="processingrate">
                     <input type="text" name="processingrate" disabled class="form-control inpv2">
                   </div>
@@ -1225,69 +1196,67 @@ $bootstrap->css();
       </div>
     </div>
   </div>
-  <!-- Add Coldstore And Processing Modal -->
-  <!-- Add Labour -->
   <div class="modal fade" id="newlabourcharges" aria-labelledby="newlabourcharges">
-      <div class="modal-dialog">
-        <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
-          <div class="modal-header bg-secondary text-light">
-            <h1 class="modal-title fs-5">New Labour Charges</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <form action="daterangecharges.php" method="post">
-            <div class="modal-body">
-              <div class="row" style="margin-bottom: 10px !important;">
-                <div class="col">
-                  <label style="font-weight: bold;">In Date</label>
-                  <input type="date" name="indate" class="form-control inpv2">
-                </div>
-                <div class="col">
-                  <label style="font-weight: bold;">Out Date</label>
-                  <input type="date" name="outdate" class="form-control inpv2">
-                </div>
-              </div>
-              <div class="row" style="margin-bottom: 10px !important;">
-                <div class="col">
-                  <label>Commondity</label>
-                  <select class="form-control inpv2" name="commondity_id" id="commondity">
-                    <?php
-                    $commonditydatas = $query->selectdis('hhkstock', 'commondity_id');
-                    foreach ($commonditydatas as $commonditydata) {
-                      $item_id = $commonditydata['commondity_id'];
-                      $item = $query->select('category', $item_id, 'category_id');
-                    ?>
-                      <option value="<?php echo $item['category_id']; ?>"><?php echo $item['category_name']; ?></option>
-                    <?php
-                    }
-                    ?>
-                  </select>
-                </div>
-                <div class="col">
-                  <label style="font-weight: bold;">Mc</label>
-                  <input type="number" name="mc" class="form-control inpv2">
-                </div>
-              </div>
-              <div class="row" style="margin-bottom: 10px !important;">
-                <div class="col">
-                  <label style="font-weight: bold;">Kg</label>
-                  <input type="text" name="kg" class="form-control inpv2">
-                </div>
-                <div class="col">
-                  <label style="font-weight: bold;">Labour Rate</label>
-                  <input type="text" name="labourrate" class="form-control inpv2">
-                </div>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-success" name="addlabour">Add</button>
-            </div>
-          </form>
+    <div class="modal-dialog">
+      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+        <div class="modal-header bg-secondary text-light">
+          <h1 class="modal-title fs-5">New Labour Charges</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+        <form action="daterangecharges.php" method="post">
+          <div class="modal-body">
+            <div class="row" style="margin-bottom: 10px !important;">
+              <div class="col">
+                <label style="font-weight: bold;">In Date</label>
+                <input type="date" name="indate" class="form-control inpv2">
+              </div>
+              <div class="col">
+                <label style="font-weight: bold;">Out Date</label>
+                <input type="date" name="outdate" class="form-control inpv2">
+              </div>
+            </div>
+            <div class="row" style="margin-bottom: 10px !important;">
+              <div class="col">
+                <label>Commondity</label>
+                <select class="form-control inpv2" name="commondity_id" id="commondity">
+                  <?php
+                  $commonditydatas = $pdo->query("SELECT DISTINCT commondity_id FROM hhkstock")->fetchAll(PDO::FETCH_ASSOC);
+                  foreach ($commonditydatas as $commonditydata) {
+                    $item_id = $commonditydata['commondity_id'];
+                    $item = $query->select('products', $item_id, 'id');
+                    if (!empty($item['id'])) {
+                  ?>
+                      <option value="<?php echo htmlspecialchars($item['id']); ?>"><?php echo htmlspecialchars($item['name']); ?></option>
+                  <?php
+                    }
+                  }
+                  ?>
+                </select>
+              </div>
+              <div class="col">
+                <label style="font-weight: bold;">Mc</label>
+                <input type="number" name="mc" class="form-control inpv2">
+              </div>
+            </div>
+            <div class="row" style="margin-bottom: 10px !important;">
+              <div class="col">
+                <label style="font-weight: bold;">Kg</label>
+                <input type="text" name="kg" class="form-control inpv2">
+              </div>
+              <div class="col">
+                <label style="font-weight: bold;">Labour Rate</label>
+                <input type="text" name="labourrate" class="form-control inpv2">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-success" name="addlabour">Add</button>
+          </div>
+        </form>
       </div>
     </div>
-  <!-- Add Labour Modal -->
-  <!-- Add Payment -->
+  </div>
   <div class="modal fade" id="addpayment">
     <div class="modal-dialog">
       <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
@@ -1316,8 +1285,6 @@ $bootstrap->css();
       </div>
     </div>
   </div>
-  <!-- Add Payment -->
-  <!-- Add repackingcharges -->
   <div class="modal fade" id="repackingcharges">
     <div class="modal-dialog">
       <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
@@ -1364,8 +1331,6 @@ $bootstrap->css();
       </div>
     </div>
   </div>
-  <!-- Add Modal -->
-  <!-- Add Stock Modal -->
   <div class="modal fade" id="newstock">
     <div class="modal-dialog">
       <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
@@ -1384,10 +1349,10 @@ $bootstrap->css();
                 <label>Commondity</label>
                 <select class="form-control inpv2" name="commondity_id">
                   <?php
-                  $commonditydatas = $query->selectall('category');
+                  $commonditydatas = $pdo->query("SELECT id, name FROM products ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
                   foreach ($commonditydatas as $commonditydata) {
                   ?>
-                    <option value="<?php echo $commonditydata['category_id']; ?>"><?php echo $commonditydata['category_name']; ?></option>
+                    <option value="<?php echo htmlspecialchars($commonditydata['id']); ?>"><?php echo htmlspecialchars($commonditydata['name']); ?></option>
                   <?php
                   }
                   ?>
@@ -1413,52 +1378,41 @@ $bootstrap->css();
       </div>
     </div>
   </div>
-  <!-- Add Stock Modal -->
   <script>
     $(document).ready(() => {
-    let commondity = $("#commondity").val();
+      let commondity = $("#commondity").val();
 
-    <?php
-    $blockidstmt = $pdo->prepare("SELECT category_id FROM category WHERE category_name='Block'");
-    $blockidstmt->execute();
-    $blockiddata = $blockidstmt->fetch(PDO::FETCH_ASSOC);
-    $blockid = '';
-    if (!empty($blockiddata['category_id'])) {
-        $blockid = $blockiddata['category_id'];
-    }
-    ?>
+      <?php
+      $blockid = $pdo->query("SELECT id FROM products WHERE name LIKE '%Block%' LIMIT 1")->fetchColumn();
+      if (!$blockid) $blockid = 0;
+      ?>
 
-    // On change/click of commondity dropdown
-    $("#commondity").click(function () {
-      let commondityid = $("#commondity").val();
+      $("#commondity").click(function() {
+        let commondityid = $("#commondity").val();
 
-      // Load charges dynamically
-      $("#processingrate").load('chargescommondity.php', {
-        commondityid: commondityid,
+        $("#processingrate").load('chargescommondity.php', {
+          commondityid: commondityid,
+        });
+
+        toggleProcessingVisibility(commondityid);
       });
 
-      // Update UI based on commondity type
-      toggleProcessingVisibility(commondityid);
-    });
+      let initialCommondityId = $("#commondity").val();
+      $("#processingrate").load('changecommondity.php', {
+        commondityid: initialCommondityId,
+      });
+      toggleProcessingVisibility(initialCommondityId);
 
-    // Initial load
-    let initialCommondityId = $("#commondity").val();
-    $("#processingrate").load('changecommondity.php', {
-      commondityid: initialCommondityId,
-    });
-    toggleProcessingVisibility(initialCommondityId);
-
-    // Reusable function to toggle views
-    function toggleProcessingVisibility(commondityId) {
-      if (commondityId === '<?php echo $blockid; ?>') {
-        $(".processingratediv").hide();
-        $(".processingchargesdiv").show();
-      } else {
-        $(".processingratediv").show();
-        $(".processingchargesdiv").hide();
+      function toggleProcessingVisibility(commondityId) {
+        if (commondityId === '<?php echo $blockid; ?>') {
+          $(".processingratediv").hide();
+          $(".processingchargesdiv").show();
+        } else {
+          $(".processingratediv").show();
+          $(".processingchargesdiv").hide();
+        }
       }
-    }
-  });
+    });
   </script>
   <script>
     <?php
@@ -1599,4 +1553,5 @@ $bootstrap->css();
   $bootstrap->javascript();
   ?>
 </body>
+
 </html>
