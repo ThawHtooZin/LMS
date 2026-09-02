@@ -167,6 +167,7 @@ $tabs = ['All', 'Draft', 'Awaiting Approval', 'Awaiting Payment', 'Paid'];
                   if ($b['status'] == 'DRAFT') $status_class = 'bg-draft';
                   if ($b['status'] == 'AWAITING_APPROVAL') $status_class = 'bg-awaiting-approval';
                   if ($b['status'] == 'PAID') $status_class = 'bg-paid';
+                  if ($b['status'] == 'AWAITING_PAYMENT') $status_class = 'bg-awaiting-payment';
 
                   $due = floatval($b['grand_total']) - floatval($b['paid_amount']);
                   $paid = floatval($b['paid_amount']);

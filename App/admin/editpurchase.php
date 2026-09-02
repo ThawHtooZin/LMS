@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
     if (in_array($action_type, ['submit_approval'])) {
         $status = 'AWAITING_APPROVAL';
     } elseif (in_array($action_type, ['approve', 'approve_add_another'])) {
-        $status = 'AUTHORISED';
+        $status = 'AWAITING_PAYMENT';
     } elseif (in_array($action_type, ['save_draft', 'save_continue', 'save_add_another'])) {
         $status = 'DRAFT';
     }
@@ -199,7 +199,7 @@ foreach ($accounts as $acc) {
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <?php if ($purchase['status'] === 'DRAFT' || $purchase['status'] === 'AWAITING_APPROVAL'): ?>
                                     <li><a class="dropdown-item text-danger" onclick="if(confirm('Are you sure you want to delete this draft?')){ submitForm('delete'); }"><i class="bi bi-trash"></i> Delete</a></li>
-                                <?php elseif ($purchase['status'] === 'AUTHORISED'): ?>
+                                <?php elseif ($purchase['status'] === 'AWAITING_PAYMENT'): ?>
                                     <li><a class="dropdown-item text-warning" onclick="if(confirm('Are you sure you want to void this approved bill?')){ submitForm('void'); }"><i class="bi bi-x-circle"></i> Void</a></li>
                                 <?php elseif ($purchase['status'] === 'PAID'): ?>
                                     <li><span class="dropdown-item text-muted"><i class="bi bi-lock"></i> Locked (Payment Applied)</span></li>

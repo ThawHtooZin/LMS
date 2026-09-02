@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
     if (in_array($action_type, ['submit_approval'])) {
         $status = 'AWAITING_APPROVAL';
     } elseif (in_array($action_type, ['approve', 'approve_add_another'])) {
-        $status = 'AUTHORISED';
+        $status = 'AWAITING_PAYMENT';
     }
 
     $subtotal = 0;

@@ -728,7 +728,7 @@ class Query
         $acc_id  = !empty($line['account_id']) ? $line['account_id'] : NULL;
 
         // XERO GATEKEEPER: Prevent approval if ANY line is missing an account
-        if ($status === 'AUTHORISED' && empty($acc_id)) {
+        if ($status === 'AWAITING_PAYMENT' && empty($acc_id)) {
           $pdo->rollBack();
           return [
             'status'  => false,
@@ -751,8 +751,8 @@ class Query
         ]);
         $link_id = $pdo->lastInsertId();
 
-        // ROUTE ONLY IF AUTHORISED
-        if ($status === 'AUTHORISED') {
+        // ROUTE ONLY IF AWAITING PAYMENT
+        if ($status === 'AWAITING_PAYMENT') {
           $lowerType = strtolower($tclfrozen);
 
           if ($lowerType === 'frozen' || $lowerType === 'tcl') {
@@ -775,14 +775,14 @@ class Query
         }
       }
 
-      if ($status === 'AUTHORISED') {
+      if ($status === 'AWAITING_PAYMENT') {
         $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, '2000', '0', ?, ?, ?)");
         $glCredit->execute([$date, $voucher_no, $grand_total, "Total Bill - $supplier_name", $sr_no]);
       }
 
       $pdo->commit();
 
-      $msg = ($status == 'AUTHORISED') ? 'Bill authorized & posted to GL successfully' : 'Draft saved successfully';
+      $msg = ($status == 'AWAITING_PAYMENT') ? 'Bill approved & posted to GL successfully' : 'Draft saved successfully';
 
       if ($action_type == 'continue_editing') {
         $redirect = "editpurchase.php?id=" . $purchase_id;
@@ -808,6 +808,7 @@ class Query
       ];
     }
   }
+
   public function deletePurchase($id)
   {
     global $pdo;
@@ -822,7 +823,7 @@ class Query
         throw new Exception("Bill not found.");
       }
 
-      if ($purchase['status'] === 'AUTHORISED' || $purchase['status'] === 'PAID') {
+      if ($purchase['status'] === 'AWAITING_PAYMENT' || $purchase['status'] === 'PAID') {
         $pdo->rollBack();
         echo "<script>
           swal({
