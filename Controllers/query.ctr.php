@@ -702,7 +702,7 @@ class Query
             'status'   => false,
             'type'     => 'audit_block',
             'title'    => 'Strict Audit Block!',
-            'message'  => 'This bill has already been partially or fully paid. Editing is disabled to protect financial integrity.',
+            'message'  => 'You cannot update paid or partially paid vouchers to protect financial integrity.',
             'redirect' => 'purchase.php'
           ];
         }
@@ -726,6 +726,8 @@ class Query
       foreach ($lines as $line) {
         $prod_id = !empty($line['product_id']) ? $line['product_id'] : NULL;
         $acc_id  = !empty($line['account_id']) ? $line['account_id'] : NULL;
+        // Default to 0 instead of null/empty to satisfy legacy constraints safely
+        $pcs     = !empty($line['pcs']) ? intval($line['pcs']) : 0;
 
         // XERO GATEKEEPER: Prevent approval if ANY line is missing an account
         if ($status === 'AWAITING_PAYMENT' && empty($acc_id)) {
@@ -745,7 +747,7 @@ class Query
           $line['description'],
           $line['size'],
           $line['viss'],
-          $line['pcs'],
+          $pcs,
           $line['unit_price'],
           $line['line_amount']
         ]);
@@ -757,16 +759,17 @@ class Query
 
           if ($lowerType === 'frozen' || $lowerType === 'tcl') {
             $kg = floatval($line['viss']) * 1.634;
+
             if ($lowerType === 'tcl') {
               $formstmt = $pdo->prepare("INSERT INTO form7stocktcl (date, item_id, supplier_name, country, type, size, viss, kg, pcspervr, link_id) VALUES (?, ?, ?, 'DAKA', 'TCl', ?, ?, ?, ?, ?)");
-              $formstmt->execute([$date, $prod_id, $supplier_name, $line['size'], $line['viss'], $kg, $line['pcs'], $link_id]);
+              $formstmt->execute([$date, $prod_id, $supplier_name, $line['size'], $line['viss'], $kg, $pcs, $link_id]);
             } else {
               $formstmt = $pdo->prepare("INSERT INTO form7stock (date, item_id, supplier_name, type, size, viss, kg, pcspervr, link_id) VALUES (?, ?, ?, 'Frozen', ?, ?, ?, ?, ?)");
-              $formstmt->execute([$date, $prod_id, $supplier_name, $line['size'], $line['viss'], $kg, $line['pcs'], $link_id]);
+              $formstmt->execute([$date, $prod_id, $supplier_name, $line['size'], $line['viss'], $kg, $pcs, $link_id]);
             }
           } elseif ($lowerType === 'material') {
             $storehousestmt = $pdo->prepare("INSERT INTO material_store_house (date, voucher_no, supplier_id, material_id, in_quantity) VALUES (?, ?, ?, ?, ?)");
-            $storehousestmt->execute([$date, $voucher_no, $contact_id, $prod_id, $line['pcs']]);
+            $storehousestmt->execute([$date, $voucher_no, $contact_id, $prod_id, $pcs]);
           }
 
           $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, ?, ?, '0', ?, ?)");

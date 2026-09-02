@@ -9,7 +9,13 @@ $auth->checkadmin();
 $bootstrap = new Bootstrap();
 $query = new Query();
 
+$saveResult = null;
+
+// Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
+    // Preserve input data in session in case we need to bounce back
+    $_SESSION['old_purchase'] = $_POST;
+
     $contact_id = $_POST['contact_id'];
     $date       = $_POST['date'];
     $tclfrozen  = $_POST['tclfrozen'];
@@ -31,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
     if (isset($_POST['unit_price'])) {
         for ($i = 0; $i < count($_POST['unit_price']); $i++) {
             $viss = floatval($_POST['viss'][$i]);
-            $pcs  = intval($_POST['pcs'][$i]);
+            $pcs  = !empty($_POST['pcs'][$i]) ? intval($_POST['pcs'][$i]) : 0;
             $price = floatval($_POST['unit_price'][$i]);
             $acc  = isset($_POST['account_code'][$i]) ? $_POST['account_code'][$i] : '';
             $desc = isset($_POST['description'][$i]) ? $_POST['description'][$i] : '';
@@ -48,9 +54,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
                     'description' => $desc,
                     'size'        => $_POST['size'][$i],
                     'viss'        => $viss,
-                    'pcs'         => $pcs,
+                    'pcs'         => $pcs > 0 ? $pcs : NULL,
                     'unit_price'  => $price,
-                    'line_amount'  => $line_total
+                    'line_amount' => $line_total
                 ];
             }
         }
@@ -60,9 +66,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
     if ($action_type == 'save_continue') $ctrl_action = 'continue_editing';
     if ($action_type == 'save_add_another' || $action_type == 'approve_add_another') $ctrl_action = 'add_another';
 
-    // Capture the return response from controller
     $saveResult = $query->savePurchase(null, $contact_id, $date, $tclfrozen, $due_date, $voucher_no, $currency, $status, $subtotal, $subtotal, $lines, $ctrl_action);
+
+    // If successfully saved, clear the old session data
+    if ($saveResult['status'] === true) {
+        unset($_SESSION['old_purchase']);
+    }
 }
+
+// Pull old input data if available
+$old = $_SESSION['old_purchase'] ?? [];
+unset($_SESSION['old_purchase']); // Clear after reading so it doesn't stick permanently
 
 $suppliers = $pdo->query("SELECT id, name FROM contacts WHERE is_supplier = 1 ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
 $products = $pdo->query("SELECT id, code, name, purchase_account FROM products WHERE is_purchased = 1 ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
@@ -85,7 +99,8 @@ foreach ($accounts as $acc) {
 <head>
     <meta charset="utf-8">
     <title>New Purchase</title>
-    <?php $bootstrap->css(); ?>
+    <?php echo $bootstrap->css(); // Fixed reference to use echo 
+    ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">
     <style>
         .chosen-container-single .chosen-single {
@@ -146,7 +161,6 @@ foreach ($accounts as $acc) {
             cursor: pointer;
         }
 
-        /* Error Validation Styling */
         .error-border {
             border-bottom: 2px solid #dc3545 !important;
             box-shadow: 0 1px 0 0 #dc3545 !important;
@@ -161,10 +175,8 @@ foreach ($accounts as $acc) {
 
 <body>
 
-    <!-- Load JavaScript Assets First -->
-    <?php $bootstrap->javascriptindex(); ?>
+    <?php echo $bootstrap->javascriptindex(); ?>
 
-    <!-- SweetAlert Script Block -->
     <?php if (!empty($saveResult)): ?>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -182,8 +194,6 @@ foreach ($accounts as $acc) {
                             title: <?= json_encode($saveResult['title']); ?>,
                             text: <?= json_encode($saveResult['message']); ?>,
                             icon: "warning"
-                        }).then(function() {
-                            window.history.back();
                         });
                     <?php else: ?>
                         swal({
@@ -217,39 +227,39 @@ foreach ($accounts as $acc) {
                             <select name="contact_id" class="form-control chosen-select req-input" data-placeholder="Select supplier...">
                                 <option value=""></option>
                                 <?php foreach ($suppliers as $sup): ?>
-                                    <option value="<?php echo $sup['id']; ?>"><?php echo htmlspecialchars($sup['name']); ?></option>
+                                    <option value="<?php echo $sup['id']; ?>" <?php echo (isset($old['contact_id']) && $old['contact_id'] == $sup['id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($sup['name']); ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="col-md-2">
                             <label class="fw-bold small mb-1">Date</label>
-                            <input type="date" name="date" class="form-control req-input" value="<?php echo date('Y-m-d'); ?>">
+                            <input type="date" name="date" class="form-control req-input" value="<?php echo htmlspecialchars($old['date'] ?? date('Y-m-d')); ?>">
                         </div>
                         <div class="col-md-2">
                             <label class="fw-bold small mb-1">Type</label>
                             <select name="tclfrozen" id="tclfrozenTypeSelect" class="form-select form-select-sm" style="height: 38px;">
-                                <option value="Frozen">Frozen</option>
-                                <option value="tcl">TCL</option>
-                                <option value="Material">Material</option>
-                                <option value="Other">Other</option>
+                                <option value="Frozen" <?php echo (isset($old['tclfrozen']) && $old['tclfrozen'] == 'Frozen') ? 'selected' : ''; ?>>Frozen</option>
+                                <option value="tcl" <?php echo (isset($old['tclfrozen']) && $old['tclfrozen'] == 'tcl') ? 'selected' : ''; ?>>TCL</option>
+                                <option value="Material" <?php echo (isset($old['tclfrozen']) && $old['tclfrozen'] == 'Material') ? 'selected' : ''; ?>>Material</option>
+                                <option value="Other" <?php echo (isset($old['tclfrozen']) && $old['tclfrozen'] == 'Other') ? 'selected' : ''; ?>>Other</option>
                             </select>
                         </div>
                         <div class="col-md-2">
                             <label class="fw-bold small mb-1">Due Date</label>
-                            <input type="date" name="due_date" class="form-control">
+                            <input type="date" name="due_date" class="form-control" value="<?php echo htmlspecialchars($old['due_date'] ?? ''); ?>">
                         </div>
                         <div class="col-md-3">
-                            <label class="fw-bold small mb-1">Reference</label>
-                            <input type="text" name="voucher_no" class="form-control req-input" placeholder="Supplier Slip No">
+                            <label class="fw-bold small mb-1">Voucher No</label>
+                            <input type="text" name="voucher_no" class="form-control req-input" placeholder="Supplier Slip No" value="<?php echo htmlspecialchars($old['voucher_no'] ?? ''); ?>">
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-3">
                             <select name="currency" class="form-select form-select-sm">
-                                <option value="MMK">MMK (Base)</option>
+                                <option value="MMK" <?php echo (isset($old['currency']) && $old['currency'] == 'MMK') ? 'selected' : ''; ?>>MMK (Base)</option>
                                 <?php foreach ($currencies as $c): ?>
-                                    <option value="<?php echo $c['code']; ?>"><?php echo $c['code']; ?></option>
+                                    <option value="<?php echo htmlspecialchars($c['code']); ?>" <?php echo (isset($old['currency']) && $old['currency'] == $c['code']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($c['code']); ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -323,7 +333,7 @@ foreach ($accounts as $acc) {
         <?php foreach ($grouped_accs as $class => $accs): ?>
             <optgroup label="<?php echo htmlspecialchars($class); ?>">
                 <?php foreach ($accs as $a): ?>
-                    <option value="<?php echo $a['code']; ?>"><?php echo $a['code'] . ' - ' . htmlspecialchars($a['name']); ?></option>
+                    <option value="<?php echo htmlspecialchars($a['code']); ?>"><?php echo htmlspecialchars($a['code'] . ' - ' . $a['name']); ?></option>
                 <?php endforeach; ?>
             </optgroup>
         <?php endforeach; ?>
@@ -331,15 +341,25 @@ foreach ($accounts as $acc) {
     <select id="prodTpl" style="display:none;">
         <option value="">- Product -</option>
         <?php foreach ($products as $p): ?>
-            <option value="<?php echo $p['id']; ?>"><?php echo htmlspecialchars($p['code'] . ' - ' . $p['name']); ?></option>
+            <option value="<?php echo htmlspecialchars($p['id']); ?>"><?php echo htmlspecialchars($p['code'] . ' - ' . $p['name']); ?></option>
         <?php endforeach; ?>
     </select>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-    <?php $bootstrap->javascript(); ?>
+    <?php
+    echo $bootstrap->javascript();
+    ?>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
     <script>
         const prodMap = <?php echo json_encode($prod_map); ?>;
+        const oldLines = <?php echo json_encode($old['unit_price'] ?? []); ?>;
+        const oldProducts = <?php echo json_encode($old['product_id'] ?? []); ?>;
+        const oldDescs = <?php echo json_encode($old['description'] ?? []); ?>;
+        const oldSizes = <?php echo json_encode($old['size'] ?? []); ?>;
+        const oldVisses = <?php echo json_encode($old['viss'] ?? []); ?>;
+        const oldPcs = <?php echo json_encode($old['pcs'] ?? []); ?>;
+        const oldPrices = <?php echo json_encode($old['unit_price'] ?? []); ?>;
+        const oldAccounts = <?php echo json_encode($old['account_code'] ?? []); ?>;
 
         $(document).ready(function() {
             $('.chosen-select').chosen({
@@ -354,18 +374,30 @@ foreach ($accounts as $acc) {
                 calcTotals();
             });
 
-            if ($('#linesBody tr').length === 0) {
-                addNewLine();
-                addNewLine();
-                addNewLine();
+            // Repopulate lines if old data exists, otherwise default to 3 empty lines
+            if (oldLines.length > 0) {
+                for (let i = 0; i < oldLines.length; i++) {
+                    addNewLine({
+                        product_id: oldProducts[i] || '',
+                        description: oldDescs[i] || '',
+                        size: oldSizes[i] || '',
+                        viss: oldVisses[i] || '0',
+                        pcs: oldPcs[i] || '',
+                        unit_price: oldPrices[i] || '',
+                        account_code: oldAccounts[i] || ''
+                    });
+                }
             } else {
-                calcTotals();
+                addNewLine();
+                addNewLine();
+                addNewLine();
             }
 
-            $('#addLineBtn').click(addNewLine);
+            calcTotals();
+
+            $('#addLineBtn').click(() => addNewLine());
             $('#linesBody').on('input', '.calc-input', calcTotals);
 
-            // Clean error classes on user input
             $(document).on('input change', '.req-input, .error-border, select', function() {
                 $(this).removeClass('error-border');
                 if ($(this).is('select')) {
@@ -395,27 +427,34 @@ foreach ($accounts as $acc) {
             }
         }
 
-        function addNewLine() {
+        function addNewLine(data = {}) {
             let selectedType = $('#tclfrozenTypeSelect').val();
             let displayStyle = (selectedType === 'Material') ? 'style="display:none;"' : '';
 
             let tr = `
                 <tr>
-                    <td><select name="product_id[]" class="form-control chosen-select prod-select">${$('#prodTpl').html()}</select></td>
-                    <td><input type="text" name="description[]"></td>
-                    <td class="col-fish-only" ${displayStyle}><input type="text" name="size[]" placeholder="e.g. 1up"></td>
-                    <td class="col-fish-only" ${displayStyle}><input type="number" name="viss[]" step="0.01" class="calc-input viss-input" value="0"></td>
-                    <td><input type="number" name="pcs[]" class="calc-input pcs-input"></td>
-                    <td><input type="number" name="unit_price[]" step="0.01" class="calc-input price-input"></td>
-                    <td><select name="account_code[]" class="form-control chosen-select acc-select">${$('#accTpl').html()}</select></td>
+                    <td><select name="product_id[]" class="form-control chosen-select prod-select"><option value="">- Product -</option>${$('#prodTpl').html().replace('value="' + data.product_id + '"', 'value="' + data.product_id + '" selected')}</select></td>
+                    <td><input type="text" name="description[]" value="${data.description || ''}"></td>
+                    <td class="col-fish-only" ${displayStyle}><input type="text" name="size[]" placeholder="e.g. 1up" value="${data.size || ''}"></td>
+                    <td class="col-fish-only" ${displayStyle}><input type="number" name="viss[]" step="0.01" class="calc-input viss-input" value="${data.viss || '0'}"></td>
+                    <td><input type="number" name="pcs[]" class="calc-input pcs-input" value="${data.pcs || ''}"></td>
+                    <td><input type="number" name="unit_price[]" step="0.01" class="calc-input price-input" value="${data.unit_price || ''}"></td>
+                    <td><select name="account_code[]" class="form-control chosen-select acc-select"><option value="">- Account -</option>${$('#accTpl').html().replace('value="' + data.account_code + '"', 'value="' + data.account_code + '" selected')}</select></td>
                     <td class="line-total text-end">0.00</td>
                 </tr>
             `;
             $('#linesBody').append(tr);
-            $('#linesBody tr:last-child .chosen-select').chosen({
+            let newRow = $('#linesBody tr:last-child');
+
+            // Set selections properly via JS for chosen-select
+            if (data.product_id) newRow.find('.prod-select').val(data.product_id);
+            if (data.account_code) newRow.find('.acc-select').val(data.account_code);
+
+            newRow.find('.chosen-select').chosen({
                 width: '100%',
                 search_contains: true
             });
+
             if (selectedType === 'Material') {
                 $('.col-fish-only').hide();
             }
@@ -451,99 +490,6 @@ foreach ($accounts as $acc) {
         }
 
         function submitForm(action) {
-            let isValid = true;
-            let selectedType = $('#tclfrozenTypeSelect').val();
-
-            // Clear previous errors
-            $('.error-border').removeClass('error-border');
-
-            // 1. Validate Main Header Fields
-            let contact = $('select[name="contact_id"]');
-            if (!contact.val()) {
-                contact.next('.chosen-container').addClass('error-border');
-                isValid = false;
-            }
-
-            let dateField = $('input[name="date"]');
-            if (!dateField.val()) {
-                dateField.addClass('error-border');
-                isValid = false;
-            }
-
-            let refField = $('input[name="voucher_no"]');
-            if (!refField.val().trim()) {
-                refField.addClass('error-border');
-                isValid = false;
-            }
-
-            // 2. Validate Lines
-            let hasActiveLines = false;
-            $('#linesBody tr').each(function() {
-                let prodSelect = $(this).find('select[name="product_id[]"]');
-                let sizeInput = $(this).find('input[name="size[]"]');
-                let vissInput = $(this).find('input[name="viss[]"]');
-                let pcsInput = $(this).find('input[name="pcs[]"]');
-                let priceInput = $(this).find('input[name="unit_price[]"]');
-                let accSelect = $(this).find('select[name="account_code[]"]');
-                let descInput = $(this).find('input[name="description[]"]');
-
-                let prod = prodSelect.val();
-                let size = sizeInput.val().trim();
-                let viss = parseFloat(vissInput.val());
-                let pcs = parseFloat(pcsInput.val());
-                let price = parseFloat(priceInput.val());
-                let acc = accSelect.val();
-                let desc = descInput.val().trim();
-
-                // Determine if this row has any content inputted
-                let isRowActive = prod || size || (!isNaN(viss) && viss > 0) || (!isNaN(pcs) && pcs > 0) || (!isNaN(price) && price > 0) || acc || desc;
-
-                if (isRowActive) {
-                    hasActiveLines = true;
-
-                    if (!prod) {
-                        prodSelect.next('.chosen-container').addClass('error-border');
-                        isValid = false;
-                    }
-
-                    if (selectedType !== 'Material') {
-                        if (!size) {
-                            sizeInput.addClass('error-border');
-                            isValid = false;
-                        }
-                        if (isNaN(viss) || viss <= 0) {
-                            vissInput.addClass('error-border');
-                            isValid = false;
-                        }
-                    }
-
-                    if (isNaN(pcs) || pcs <= 0) {
-                        pcsInput.addClass('error-border');
-                        isValid = false;
-                    }
-                    if (isNaN(price) || price <= 0) {
-                        priceInput.addClass('error-border');
-                        isValid = false;
-                    }
-
-                    if (!acc) {
-                        accSelect.next('.chosen-container').addClass('error-border');
-                        isValid = false;
-                    }
-                }
-            });
-
-            if (!hasActiveLines) {
-                swal('Warning!', 'Please add at least one valid line item.', 'warning');
-                return;
-            }
-
-            if (!isValid) {
-                swal('Warning!', 'Please fill in all mandatory fields indicated by the red lines.', 'warning');
-                return;
-            }
-
-            // If everything is perfectly valid, submit.
             document.getElementById('action_type').value = action;
             document.getElementById('billForm').submit();
         }

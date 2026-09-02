@@ -15,13 +15,13 @@ $query = new Query();
 <head>
   <meta charset="utf-8">
   <title>Admin | Dashboard</title>
+  <?php
+  $bootstrap->css();
+  ?>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
 </head>
-<?php
-$bootstrap->css();
-?>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
 
 <body>
   <?php
@@ -73,12 +73,12 @@ $bootstrap->css();
             <h5 style="font-weight:bold;" class="text-light d-inline">GFC MC STOCK INFO</h5>
             <a href="gfcmcstock.php" type="button" class="btn btn-danger float-end ms-2">Back</a>
             <?php
-            $size = $_GET['sizeinfo'];
-            $commondity_id = $_GET['commondity'];
-            $country = $_GET['country'];
-            $fish_type = $_GET['fish_type'];
-            $kgstmt = $pdo->prepare("SELECT DISTINCT kg FROM gfcmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country' AND fish_type='$fish_type'");
-            $kgstmt->execute();
+            $size = $_GET['sizeinfo'] ?? '';
+            $commondity_id = $_GET['commondity'] ?? '';
+            $country = $_GET['country'] ?? '';
+            $fish_type = $_GET['fish_type'] ?? '';
+            $kgstmt = $pdo->prepare("SELECT DISTINCT kg FROM gfcmcstock WHERE commondity_id=:commondity_id AND size=:size AND country=:country AND fish_type=:fish_type");
+            $kgstmt->execute([':commondity_id' => $commondity_id, ':size' => $size, ':country' => $country, ':fish_type' => $fish_type]);
             $kgdatas = $kgstmt->fetchall();
             ?>
             <button type="submit" name="view" class="btn btn-secondary float-end ms-2">View</button>
@@ -87,7 +87,7 @@ $bootstrap->css();
               <?php
               foreach ($kgdatas as $kgdata) {
               ?>
-                <option value="<?php echo $kgdata['kg']; ?>"><?php echo $kgdata['kg']; ?></option>
+                <option value="<?php echo htmlspecialchars($kgdata['kg']); ?>"><?php echo htmlspecialchars($kgdata['kg']); ?></option>
               <?php
               }
               ?>
@@ -99,7 +99,7 @@ $bootstrap->css();
             <tr>
               <th rowspan="2" style="padding-top: 22px;">Date</th>
               <th rowspan="2" style="padding-top: 22px;">Particular</th>
-              <th rowspan="2" style="padding-top: 22px;">Commondity</th>
+              <th rowspan="2" style="padding-top: 22px;">Commodity</th>
               <th rowspan="2" style="padding-top: 22px;">Country</th>
               <th rowspan="2" style="padding-top: 22px;">Size</th>
               <th rowspan="2" style="padding-top: 22px;">Kg</th>
@@ -121,21 +121,22 @@ $bootstrap->css();
 
             if (isset($_POST['view']) && !empty($_POST['kgsearch'])) {
               $kgsearch = $_POST['kgsearch'];
-              $sizeinfostmt2 = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country' AND kg='$kgsearch' AND fish_type='$fish_type'");
-              $sizeinfostmt2->execute();
+              $sizeinfostmt2 = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id=:commondity_id AND size=:size AND country=:country AND kg=:kgsearch AND fish_type=:fish_type");
+              $sizeinfostmt2->execute([':commondity_id' => $commondity_id, ':size' => $size, ':country' => $country, ':kgsearch' => $kgsearch, ':fish_type' => $fish_type]);
               $sizeinfodatas = $sizeinfostmt2->fetchall();
             } else {
-              $sizeinfostmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id='$commondity_id' AND size='$size' AND country='$country' AND fish_type='$fish_type'");
-              $sizeinfostmt->execute();
+              $sizeinfostmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id=:commondity_id AND size=:size AND country=:country AND fish_type=:fish_type");
+              $sizeinfostmt->execute([':commondity_id' => $commondity_id, ':size' => $size, ':country' => $country, ':fish_type' => $fish_type]);
               $sizeinfodatas = $sizeinfostmt->fetchall();
             }
 
             foreach ($sizeinfodatas as $sizeinfodata) {
               $kg = $sizeinfodata['kg'];
               $item_id = $sizeinfodata['commondity_id'];
-              $commonditydata = $query->select('item', $item_id, 'item_id');
+              // Updated to pull from products
+              $commonditydata = $query->select('products', $item_id, 'id');
+              $commondity_name = $commonditydata['name'] ?? 'Unknown';
 
-              // Standardize text matching to avoid bugs
               $part = strtolower($sizeinfodata['particular']);
               $is_out = (str_contains($part, 'ship') || str_contains($part, 't/o'));
               $is_hhk = str_contains($part, 'hhk');
@@ -144,62 +145,62 @@ $bootstrap->css();
                 data-bs-toggle="<?php if (!$is_hhk) echo 'modal'; ?>"
                 data-bs-target="#update<?= $sizeinfodata['id']; ?>">
                 <td><?php echo date('d-m-Y', strtotime($sizeinfodata['date'])); ?></td>
-                <td><?php echo $sizeinfodata['particular']; ?></td>
-                <td><?php echo $commonditydata['item_name'] . '(' . $sizeinfodata['fish_type'] . ')'; ?></td>
-                <td><?php echo $sizeinfodata['country']; ?></td>
-                <td><?php echo $sizeinfodata['size']; ?></td>
-                <td><?php echo $sizeinfodata['kg']; ?></td>
-                <td><?php echo $sizeinfodata['mc']; ?></td>
-                <td><?php echo $sizeinfodata['balance_mc']; ?></td>
-                <td data-bs-toggle="modal" data-bs-target="#loosemodal<?= $sizeinfodata['id']; ?>"><?php echo $sizeinfodata['loosein_size']; ?></td>
-                <td data-bs-toggle="modal" data-bs-target="#loosemodal<?= $sizeinfodata['id']; ?>"><?php echo $sizeinfodata['loosein_kg']; ?></td>
+                <td><?php echo htmlspecialchars($sizeinfodata['particular']); ?></td>
+                <td><?php echo htmlspecialchars($commondity_name) . '(' . htmlspecialchars($sizeinfodata['fish_type']) . ')'; ?></td>
+                <td><?php echo htmlspecialchars($sizeinfodata['country']); ?></td>
+                <td><?php echo htmlspecialchars($sizeinfodata['size']); ?></td>
+                <td><?php echo htmlspecialchars($sizeinfodata['kg']); ?></td>
+                <td><?php echo htmlspecialchars($sizeinfodata['mc']); ?></td>
+                <td><?php echo htmlspecialchars($sizeinfodata['balance_mc']); ?></td>
+                <td data-bs-toggle="modal" data-bs-target="#loosemodal<?= $sizeinfodata['id']; ?>"><?php echo htmlspecialchars($sizeinfodata['loosein_size']); ?></td>
+                <td data-bs-toggle="modal" data-bs-target="#loosemodal<?= $sizeinfodata['id']; ?>"><?php echo htmlspecialchars($sizeinfodata['loosein_kg']); ?></td>
                 <td data-bs-toggle="modal" data-bs-target="#loosemodal<?= $sizeinfodata['id']; ?>"><?php if ($sizeinfodata['loosein_pcs'] != 0) {
-                                                                                                      echo $sizeinfodata['loosein_pcs'];
+                                                                                                      echo htmlspecialchars($sizeinfodata['loosein_pcs']);
                                                                                                     }; ?></td>
-                <td data-bs-toggle="modal" data-bs-target="#loosemodal<?= $sizeinfodata['id']; ?>"><?php echo $sizeinfodata['looseout_size']; ?></td>
-                <td data-bs-toggle="modal" data-bs-target="#loosemodal<?= $sizeinfodata['id']; ?>"><?php echo $sizeinfodata['looseout_kg']; ?></td>
+                <td data-bs-toggle="modal" data-bs-target="#loosemodal<?= $sizeinfodata['id']; ?>"><?php echo htmlspecialchars($sizeinfodata['looseout_size']); ?></td>
+                <td data-bs-toggle="modal" data-bs-target="#loosemodal<?= $sizeinfodata['id']; ?>"><?php echo htmlspecialchars($sizeinfodata['looseout_kg']); ?></td>
                 <td data-bs-toggle="modal" data-bs-target="#loosemodal<?= $sizeinfodata['id']; ?>"><?php if ($sizeinfodata['looseout_pcs'] != 0) {
-                                                                                                      echo $sizeinfodata['looseout_pcs'];
+                                                                                                      echo htmlspecialchars($sizeinfodata['looseout_pcs']);
                                                                                                     }; ?></td>
-                <td data-bs-toggle="modal" data-bs-target="#remark<?= $sizeinfodata['id']; ?>"><?php echo $sizeinfodata['remark']; ?></td>
+                <td data-bs-toggle="modal" data-bs-target="#remark<?= $sizeinfodata['id']; ?>"><?php echo htmlspecialchars($sizeinfodata['remark']); ?></td>
               </tr>
               <div class="modal fade" id="loosemodal<?= $sizeinfodata['id']; ?>">
                 <div class="modal-dialog" role="document">
                   <div class="modal-content">
                     <div class="modal-header bg-info text-light">
-                      <h5 class="modal-title">loose In/Out Edit Data</h5>
+                      <h5 class="modal-title">Loose In/Out Edit Data</h5>
                     </div>
                     <form action="" method="post">
                       <input type="hidden" name="editlooseinoutid" value="<?= $sizeinfodata['id']; ?>" class="form-control inpv2">
                       <div class="modal-body">
                         <div class="row">
                           <div class="col">
-                            <label>loose In Size</label>
-                            <input type="text" name="loosein_size" value="<?= $sizeinfodata['loosein_size']; ?>" class="form-control inpv2 mb-2">
+                            <label>Loose In Size</label>
+                            <input type="text" name="loosein_size" value="<?= htmlspecialchars($sizeinfodata['loosein_size']); ?>" class="form-control inpv2 mb-2">
                           </div>
                           <div class="col">
-                            <label>loose Out Size</label>
-                            <input type="text" name="looseout_size" value="<?= $sizeinfodata['looseout_size']; ?>" class="form-control inpv2 mb-2">
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col">
-                            <label>loose In Kg</label>
-                            <input type="text" name="loosein_kg" value="<?= $sizeinfodata['loosein_kg']; ?>" class="form-control inpv2 mb-2">
-                          </div>
-                          <div class="col">
-                            <label>loose Out Kg</label>
-                            <input type="text" name="looseout_kg" value="<?= $sizeinfodata['looseout_kg']; ?>" class="form-control inpv2 mb-2">
+                            <label>Loose Out Size</label>
+                            <input type="text" name="looseout_size" value="<?= htmlspecialchars($sizeinfodata['looseout_size']); ?>" class="form-control inpv2 mb-2">
                           </div>
                         </div>
                         <div class="row">
                           <div class="col">
-                            <label>loose in Pcs</label>
-                            <input type="number" name="loosein_pcs" value="<?= $sizeinfodata['loosein_pcs']; ?>" class="form-control inpv2 mb-2">
+                            <label>Loose In Kg</label>
+                            <input type="text" name="loosein_kg" value="<?= htmlspecialchars($sizeinfodata['loosein_kg']); ?>" class="form-control inpv2 mb-2">
                           </div>
                           <div class="col">
-                            <label>loose out Pcs</label>
-                            <input type="number" name="looseout_pcs" value="<?= $sizeinfodata['looseout_pcs']; ?>" class="form-control inpv2 mb-2">
+                            <label>Loose Out Kg</label>
+                            <input type="text" name="looseout_kg" value="<?= htmlspecialchars($sizeinfodata['looseout_kg']); ?>" class="form-control inpv2 mb-2">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <label>Loose In Pcs</label>
+                            <input type="number" name="loosein_pcs" value="<?= htmlspecialchars($sizeinfodata['loosein_pcs']); ?>" class="form-control inpv2 mb-2">
+                          </div>
+                          <div class="col">
+                            <label>Loose Out Pcs</label>
+                            <input type="number" name="looseout_pcs" value="<?= htmlspecialchars($sizeinfodata['looseout_pcs']); ?>" class="form-control inpv2 mb-2">
                           </div>
                         </div>
                       </div>
@@ -221,7 +222,7 @@ $bootstrap->css();
                       <input type="hidden" name="remarkupdateid" value="<?= $sizeinfodata['id']; ?>">
                       <div class="modal-body">
                         <label for="">Remark</label>
-                        <textarea name="remarkedit" rows="3" cols="80" class="form-control inpv2"><?= $sizeinfodata['remark']; ?></textarea>
+                        <textarea name="remarkedit" rows="3" cols="80" class="form-control inpv2"><?= htmlspecialchars($sizeinfodata['remark']); ?></textarea>
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -239,28 +240,26 @@ $bootstrap->css();
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <form action="" method="post">
-                      <input type="hidden" name="upid" value="<?php echo $sizeinfodata['id']; ?>">
+                      <input type="hidden" name="upid" value="<?php echo htmlspecialchars($sizeinfodata['id']); ?>">
                       <div class="modal-body">
                         <div class="row">
                           <div class="col">
                             <label>Date</label>
-                            <input type="date" name="newdate" class="form-control inpv2 mb-2" value="<?php echo $sizeinfodata['date']; ?>">
-                            <label>Commondity</label>
+                            <input type="date" name="newdate" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($sizeinfodata['date']); ?>">
+                            <label>Commodity</label>
                             <div class="col">
                               <div class="d-flex">
                                 <div class="col">
                                   <select class="form-control inpv2 mb-2" name="newcommondity_id">
                                     <?php
-                                    $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM item");
-                                    $form7commonditystmt->execute();
-                                    $form7commonditydatas = $form7commonditystmt->fetchall();
-                                    foreach ($form7commonditydatas as $form7commonditydata) {
-                                      $item_id = $form7commonditydata['item_id'];
-                                      $commonditydata = $query->select('item', $item_id, 'item_id');
+                                    $prodStmt = $pdo->prepare("SELECT id, name FROM products ORDER BY name ASC");
+                                    $prodStmt->execute();
+                                    $products = $prodStmt->fetchAll(PDO::FETCH_ASSOC);
+                                    foreach ($products as $prod) {
                                     ?>
-                                      <option value="<?php echo $commonditydata['item_id']; ?>" <?php if ($sizeinfodata['commondity_id'] == $commonditydata['item_id']) {
-                                                                                                  echo "selected";
-                                                                                                } ?>><?php echo $commonditydata['item_name']; ?></option>
+                                      <option value="<?php echo htmlspecialchars($prod['id']); ?>" <?php if ($sizeinfodata['commondity_id'] == $prod['id']) {
+                                                                                                      echo "selected";
+                                                                                                    } ?>><?php echo htmlspecialchars($prod['name']); ?></option>
                                     <?php
                                     }
                                     ?>
@@ -292,6 +291,9 @@ $bootstrap->css();
                                     <option <?php if ($sizeinfodata['fish_type'] == 'Bls') {
                                               echo "selected";
                                             } ?> value="Bls">Bl's</option>
+                                    <option <?php if ($sizeinfodata['fish_type'] == 'iqf') {
+                                              echo "selected";
+                                            } ?> value="iqf">IQF</option>
                                   </select>
                                 </div>
                               </div>
@@ -299,23 +301,22 @@ $bootstrap->css();
                           </div>
                           <div class="col">
                             <label>Particular</label>
-                            <textarea name="newparticular" rows="4" class="form-control inpv2 mb-2"><?php echo $sizeinfodata['particular']; ?></textarea>
+                            <textarea name="newparticular" rows="4" class="form-control inpv2 mb-2"><?php echo htmlspecialchars($sizeinfodata['particular']); ?></textarea>
                           </div>
                         </div>
                         <div class="row">
                           <div class="col">
                             <label>Country</label>
                             <select class="form-control inpv2 mb-2" name="newcountry">
-
                               <?php
                               $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM hhkmcstock WHERE country IS NOT NULL");
                               $countrystmt->execute();
                               $countrydatas = $countrystmt->fetchall();
                               foreach ($countrydatas as $countrydata) {
                               ?>
-                                <option value="<?php echo $countrydata['country']; ?>" <?php if ($countrydata['country'] == $sizeinfodata['country']) {
-                                                                                          echo 'selected';
-                                                                                        }; ?>><?php echo $countrydata['country']; ?></option>
+                                <option value="<?php echo htmlspecialchars($countrydata['country']); ?>" <?php if ($countrydata['country'] == $sizeinfodata['country']) {
+                                                                                                            echo 'selected';
+                                                                                                          }; ?>><?php echo htmlspecialchars($countrydata['country']); ?></option>
                               <?php
                               }
                               ?>
@@ -323,17 +324,17 @@ $bootstrap->css();
                           </div>
                           <div class="col">
                             <label>Size</label>
-                            <input type="text" name="newsize" class="form-control inpv2 mb-2" value="<?php echo $sizeinfodata['size']; ?>">
+                            <input type="text" name="newsize" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($sizeinfodata['size']); ?>">
                           </div>
                         </div>
                         <div class="row">
                           <div class="col">
                             <label>Kg</label>
-                            <input type="text" name="newkg" class="form-control inpv2 mb-2" value="<?php echo $sizeinfodata['kg']; ?>">
+                            <input type="text" name="newkg" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($sizeinfodata['kg']); ?>">
                           </div>
                           <div class="col">
                             <label>Mc</label>
-                            <input type="number" name="newmc" class="form-control inpv2 mb-2" value="<?php echo $sizeinfodata['mc']; ?>">
+                            <input type="number" name="newmc" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($sizeinfodata['mc']); ?>">
                           </div>
                         </div>
                       </div>
@@ -347,7 +348,6 @@ $bootstrap->css();
               </div>
             <?php
             }
-
             ?>
           </table>
         </div>
