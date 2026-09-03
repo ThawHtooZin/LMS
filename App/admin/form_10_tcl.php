@@ -85,9 +85,13 @@ $bootstrap->css();
               foreach ($commondatas as $commondata) {
                 $itemid = $commondata['item_id'];
                 $item_name = $query->select('products', $itemid, 'id');
+                if (!empty($item_name) && isset($item_name['id'], $item_name['name'])) {
               ?>
-                <option value="<?php echo htmlspecialchars($item_name['id']); ?>" <?php if (!empty($_SESSION['search_tcl']['commondity']) && $_SESSION['search_tcl']['commondity'] == $item_name['id']) echo "selected"; ?>><?php echo htmlspecialchars($item_name['name']); ?></option>
-              <?php } ?>
+                  <option value="<?php echo htmlspecialchars($item_name['id']); ?>" <?php if (!empty($_SESSION['search_tcl']['commondity']) && $_SESSION['search_tcl']['commondity'] == $item_name['id']) echo "selected"; ?>><?php echo htmlspecialchars($item_name['name']); ?></option>
+              <?php
+                }
+              }
+              ?>
             </select>
             <input type="date" name="searchdate" value="<?php echo !empty($_SESSION['search_tcl']['searchdate']) ? $_SESSION['search_tcl']['searchdate'] : ''; ?>" class="form-control inpv2 w-25 d-inline float-end me-2" style="width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
           </form>
@@ -377,63 +381,6 @@ $bootstrap->css();
       </div>
     </div>
   </div>
-
-  <script type="text/javascript">
-    function addForm10TclLine() {
-      const container = document.getElementById('form10-tcl-lines');
-      const entry = document.createElement('div');
-      entry.className = 'card bg-light mb-3 entry-line border-secondary';
-      entry.innerHTML = `
-        <div class="card-body position-relative pb-2">
-          <button type="button" class="btn btn-danger btn-sm position-absolute" style="top: 10px; right: 10px; z-index: 10;" onclick="removeForm10Line(this);">×</button>
-          
-          <div class="row g-2 mb-2 pe-4">
-            <div class="col-md-2">
-              <label class="form-label text-dark" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">Commodity</label>
-              <select name="item_id[]" class="form-control form-control-sm">
-                <option value="">Select</option>
-                <?php
-                foreach ($form7commonditydatas as $commonditydata) {
-                  echo '<option value="' . htmlspecialchars($commonditydata['id']) . '">' . addslashes($commonditydata['name']) . '</option>';
-                }
-                ?>
-              </select>
-            </div>
-            <div class="col"><label class="form-label text-dark" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">Size</label><input type="text" name="size[]" class="form-control form-control-sm"></div>
-            <div class="col"><label class="form-label text-dark" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">MC</label><input type="number" name="mc[]" class="form-control form-control-sm"></div>
-            <div class="col"><label class="form-label text-dark" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">Kg</label><input type="text" name="kg[]" class="form-control form-control-sm"></div>
-            <div class="col"><label class="form-label text-dark" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">Pcs</label><input type="text" name="pcs[]" class="form-control form-control-sm"></div>
-            <div class="col"><label class="form-label text-dark" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">L-Out Kg</label><input type="text" name="loose_out_kg[]" class="form-control form-control-sm"></div>
-            <div class="col"><label class="form-label text-dark" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">L-Out Pcs</label><input type="number" name="loose_out_pcs[]" class="form-control form-control-sm"></div>
-            <div class="col"><label class="form-label text-dark" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">L-In Kg</label><input type="text" name="loose_in_kg[]" class="form-control form-control-sm"></div>
-            <div class="col"><label class="form-label text-dark" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">L-In Pcs</label><input type="number" name="loose_in_pcs[]" class="form-control form-control-sm"></div>
-          </div>
-
-          <div class="row g-2 pe-4">
-            <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">CC Kg</label><input type="text" name="cc_kg[]" class="form-control form-control-sm"></div>
-            <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">CC Pcs</label><input type="number" name="cc_pcs[]" class="form-control form-control-sm"></div>
-            <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">Cut Kg</label><input type="text" name="cutpiece_kg[]" class="form-control form-control-sm"></div>
-            <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">Cut Pcs</label><input type="number" name="cutpiece_pcs[]" class="form-control form-control-sm"></div>
-            <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">HHK Kg</label><input type="number" name="hhk_kg[]" class="form-control form-control-sm"></div>
-            <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">HHK Pcs</label><input type="number" name="hhk_pcs[]" class="form-control form-control-sm"></div>
-            <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">MSL Kg</label><input type="text" name="msl_kg[]" class="form-control form-control-sm"></div>
-            <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">MSL Pcs</label><input type="number" name="msl_pcs[]" class="form-control form-control-sm"></div>
-            <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">Lan Kg</label><input type="text" name="lanfish_kg[]" class="form-control form-control-sm"></div>
-            <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">Lan Pcs</label><input type="number" name="lanfish_pcs[]" class="form-control form-control-sm"></div>
-          </div>
-        </div>
-      `;
-      container.appendChild(entry);
-    }
-
-    function removeForm10Line(button) {
-      const entry = button.closest('.entry-line');
-      const container = document.getElementById('form10-tcl-lines');
-      if (container.querySelectorAll('.entry-line').length > 1) {
-        entry.remove();
-      }
-    }
-  </script>
 
   <?php $bootstrap->javascript(); ?>
 </body>
