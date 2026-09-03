@@ -45,59 +45,6 @@ $bootstrap->css();
     $query->updateform10tcl($updateid, $newdate, $upitem_id, $upcountry, $upsize, $upmc, $upkg, $uppcs, $uplooseinkg, $uplooseinpcs, $uplooseoutkg, $uplooseoutpcs);
   }
 
-  if (isset($_POST['add'])) {
-    // Header Data
-    $date = $_POST['date'];
-    $country = $_POST['country'];
-
-    // Arrays
-    $item_ids = isset($_POST['item_id']) ? $_POST['item_id'] : [];
-    $sizes = isset($_POST['size']) ? $_POST['size'] : [];
-    $mcs = isset($_POST['mc']) ? $_POST['mc'] : [];
-    $kgs = isset($_POST['kg']) ? $_POST['kg'] : [];
-    $pcss = isset($_POST['pcs']) ? $_POST['pcs'] : [];
-    $loose_out_kgs = isset($_POST['loose_out_kg']) ? $_POST['loose_out_kg'] : [];
-    $loose_out_pcss = isset($_POST['loose_out_pcs']) ? $_POST['loose_out_pcs'] : [];
-    $loose_in_kgs = isset($_POST['loose_in_kg']) ? $_POST['loose_in_kg'] : [];
-    $loose_in_pcss = isset($_POST['loose_in_pcs']) ? $_POST['loose_in_pcs'] : [];
-    $cc_kgs = isset($_POST['cc_kg']) ? $_POST['cc_kg'] : [];
-    $cc_pcss = isset($_POST['cc_pcs']) ? $_POST['cc_pcs'] : [];
-    $cutpiece_kgs = isset($_POST['cutpiece_kg']) ? $_POST['cutpiece_kg'] : [];
-    $cutpiece_pcss = isset($_POST['cutpiece_pcs']) ? $_POST['cutpiece_pcs'] : [];
-    $hhk_kgs = isset($_POST['hhk_kg']) ? $_POST['hhk_kg'] : [];
-    $hhk_pcss = isset($_POST['hhk_pcs']) ? $_POST['hhk_pcs'] : [];
-    $msl_kgs = isset($_POST['msl_kg']) ? $_POST['msl_kg'] : [];
-    $msl_pcss = isset($_POST['msl_pcs']) ? $_POST['msl_pcs'] : [];
-    $lanfish_kgs = isset($_POST['lanfish_kg']) ? $_POST['lanfish_kg'] : [];
-    $lanfish_pcss = isset($_POST['lanfish_pcs']) ? $_POST['lanfish_pcs'] : [];
-
-    foreach ($item_ids as $index => $item_id) {
-      $item_id = trim($item_id);
-      if (empty($item_id)) continue;
-
-      $size = isset($sizes[$index]) ? trim($sizes[$index]) : '';
-      $mc = isset($mcs[$index]) ? trim($mcs[$index]) : '';
-      $kg = isset($kgs[$index]) ? trim($kgs[$index]) : '';
-      $pcs = isset($pcss[$index]) ? trim($pcss[$index]) : '';
-      $looseinkg = isset($loose_in_kgs[$index]) ? trim($loose_in_kgs[$index]) : '';
-      $looseinpcs = isset($loose_in_pcss[$index]) ? trim($loose_in_pcss[$index]) : '';
-      $looseoutkg = isset($loose_out_kgs[$index]) ? trim($loose_out_kgs[$index]) : '';
-      $looseoutpcs = isset($loose_out_pcss[$index]) ? trim($loose_out_pcss[$index]) : '';
-      $cckg = isset($cc_kgs[$index]) ? trim($cc_kgs[$index]) : '';
-      $ccpcs = isset($cc_pcss[$index]) ? trim($cc_pcss[$index]) : '';
-      $cutpiecekg = isset($cutpiece_kgs[$index]) ? trim($cutpiece_kgs[$index]) : '';
-      $cutpiecepcs = isset($cutpiece_pcss[$index]) ? trim($cutpiece_pcss[$index]) : '';
-      $hhkkg = isset($hhk_kgs[$index]) ? trim($hhk_kgs[$index]) : '';
-      $hhkpcs = isset($hhk_pcss[$index]) ? trim($hhk_pcss[$index]) : '';
-      $mslkg = isset($msl_kgs[$index]) ? trim($msl_kgs[$index]) : '';
-      $mslpcs = isset($msl_pcss[$index]) ? trim($msl_pcss[$index]) : '';
-      $lanfishkg = isset($lanfish_kgs[$index]) ? trim($lanfish_kgs[$index]) : '';
-      $lanfishpcs = isset($lanfish_pcss[$index]) ? trim($lanfish_pcss[$index]) : '';
-
-      $query->addform10tcl($date, $item_id, $country, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs, $cckg, $ccpcs, $cutpiecekg, $cutpiecepcs, $hhkkg, $hhkpcs, $mslkg, $mslpcs, $lanfishkg, $lanfishpcs);
-    }
-  }
-
   // Handle Main Table Header Filters
   if (isset($_POST['view'])) {
     $_SESSION['search_tcl']['commondity'] = $_POST['commondity'];
@@ -120,7 +67,7 @@ $bootstrap->css();
         <div class="card-header bg-warning text-secondary" style="padding-bottom: 10px;">
           <form action="" method="post">
             <b class="h5">Link Mark Limited (F-10) TCL</b>
-            <button type="button" class="btn btn-success btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#addmodal">Add Form-10 Data</button>
+            <a href="add_form_10_tcl.php" class="btn btn-success btn-sm float-end ms-2">Add Form-10 Data</a>
 
             <?php if ($isViewMode && !empty($_SESSION['search_tcl']['searchdate']) && !empty($_SESSION['search_tcl']['commondity'])): ?>
               <a href="export.php?table_name=form_10_tcl&searchdate=<?= $_SESSION['search_tcl']['searchdate']; ?>&searchcommondity=<?= $_SESSION['search_tcl']['commondity']; ?>" class="btn btn-dark btn-sm float-end me-2">Export Excel</a>
@@ -427,88 +374,6 @@ $bootstrap->css();
             <?php } ?>
           </table>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal fade" id="addmodal">
-    <div class="modal-dialog modal-xl" style="max-width: 95%;">
-      <div class="modal-content" style="margin-top:70px !important;">
-        <div class="modal-header bg-warning text-dark">
-          <h1 class="modal-title fs-5">Add Form 10 TCL Data</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <form action="" method="post" autocomplete="off">
-          <div class="modal-body">
-            <div class="row g-3 mb-3">
-              <div class="col-md-3">
-                <label style="font-weight: bold;">Date</label>
-                <input type="date" name="date" class="form-control inpv2">
-              </div>
-              <div class="col-md-3">
-                <label style="font-weight: bold;">Country</label>
-                <input type="text" name="country" class="form-control inpv2">
-              </div>
-            </div>
-
-            <div class="mb-2 d-flex justify-content-between align-items-center mt-4">
-              <label style="font-weight: bold;">Form-10 TCL Lines</label>
-              <button type="button" class="btn btn-sm btn-outline-primary" onclick="addForm10TclLine();">Add Line</button>
-            </div>
-
-            <!-- Scroll-Free Grid Layout for Entry Lines -->
-            <div id="form10-tcl-lines">
-              <div class="card bg-light mb-3 entry-line border-secondary">
-                <div class="card-body position-relative pb-2">
-                  <button type="button" class="btn btn-danger btn-sm position-absolute" style="top: 10px; right: 10px; z-index: 10;" onclick="removeForm10Line(this);">×</button>
-
-                  <div class="row g-2 mb-2 pe-4">
-                    <div class="col-md-2">
-                      <label class="form-label text-dark" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">Commodity</label>
-                      <select name="item_id[]" class="form-control form-control-sm">
-                        <option value="">Select</option>
-                        <?php
-                        $form7commonditystmt = $pdo->prepare("SELECT id, name FROM products ORDER BY name ASC");
-                        $form7commonditystmt->execute();
-                        $form7commonditydatas = $form7commonditystmt->fetchall();
-                        foreach ($form7commonditydatas as $commonditydata) {
-                        ?>
-                          <option value="<?php echo htmlspecialchars($commonditydata['id']); ?>"><?php echo htmlspecialchars($commonditydata['name']); ?></option>
-                        <?php } ?>
-                      </select>
-                    </div>
-                    <div class="col"><label class="form-label text-dark" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">Size</label><input type="text" name="size[]" class="form-control form-control-sm"></div>
-                    <div class="col"><label class="form-label text-dark" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">MC</label><input type="number" name="mc[]" class="form-control form-control-sm"></div>
-                    <div class="col"><label class="form-label text-dark" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">Kg</label><input type="text" name="kg[]" class="form-control form-control-sm"></div>
-                    <div class="col"><label class="form-label text-dark" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">Pcs</label><input type="text" name="pcs[]" class="form-control form-control-sm"></div>
-                    <div class="col"><label class="form-label text-dark" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">L-Out Kg</label><input type="text" name="loose_out_kg[]" class="form-control form-control-sm"></div>
-                    <div class="col"><label class="form-label text-dark" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">L-Out Pcs</label><input type="number" name="loose_out_pcs[]" class="form-control form-control-sm"></div>
-                    <div class="col"><label class="form-label text-dark" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">L-In Kg</label><input type="text" name="loose_in_kg[]" class="form-control form-control-sm"></div>
-                    <div class="col"><label class="form-label text-dark" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">L-In Pcs</label><input type="number" name="loose_in_pcs[]" class="form-control form-control-sm"></div>
-                  </div>
-
-                  <div class="row g-2 pe-4">
-                    <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">CC Kg</label><input type="text" name="cc_kg[]" class="form-control form-control-sm"></div>
-                    <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">CC Pcs</label><input type="number" name="cc_pcs[]" class="form-control form-control-sm"></div>
-                    <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">Cut Kg</label><input type="text" name="cutpiece_kg[]" class="form-control form-control-sm"></div>
-                    <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">Cut Pcs</label><input type="number" name="cutpiece_pcs[]" class="form-control form-control-sm"></div>
-                    <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">HHK Kg</label><input type="text" name="hhk_kg[]" class="form-control form-control-sm"></div>
-                    <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">HHK Pcs</label><input type="number" name="hhk_pcs[]" class="form-control form-control-sm"></div>
-                    <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">MSL Kg</label><input type="text" name="msl_kg[]" class="form-control form-control-sm"></div>
-                    <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">MSL Pcs</label><input type="number" name="msl_pcs[]" class="form-control form-control-sm"></div>
-                    <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">Lan Kg</label><input type="text" name="lanfish_kg[]" class="form-control form-control-sm"></div>
-                    <div class="col"><label class="form-label text-secondary" style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">Lan Pcs</label><input type="number" name="lanfish_pcs[]" class="form-control form-control-sm"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="text-end mt-3">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-success" name="add">Save Form 10</button>
-            </div>
-          </div>
-        </form>
       </div>
     </div>
   </div>
