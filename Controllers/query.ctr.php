@@ -419,7 +419,7 @@ class Query
   // PRODUCT TYPES
   // ==========================================
 
-  public function addproducttype($name)
+  public function addproducttype($name, $rate)
   {
     global $pdo;
     $check = $pdo->prepare("SELECT * FROM product_types WHERE name = ?");
@@ -428,13 +428,13 @@ class Query
       echo "<script>swal('Error', 'Product type already exists!', 'error');</script>";
       return;
     }
-    $stmt = $pdo->prepare("INSERT INTO product_types (name) VALUES (?)");
-    if ($stmt->execute([$name])) {
+    $stmt = $pdo->prepare("INSERT INTO product_types (name, rate) VALUES (?, ?)");
+    if ($stmt->execute([$name, intval($rate)])) {
       echo "<script>swal('Success', 'Product Type added successfully', 'success').then(() => { window.location.href=window.location.href; });</script>";
     }
   }
 
-  public function updateproducttype($id, $name)
+  public function updateproducttype($id, $name, $rate)
   {
     global $pdo;
     $check = $pdo->prepare("SELECT * FROM product_types WHERE name = ? AND id != ?");
@@ -443,8 +443,8 @@ class Query
       echo "<script>swal('Error', 'Product type already exists!', 'error');</script>";
       return;
     }
-    $stmt = $pdo->prepare("UPDATE product_types SET name=? WHERE id=?");
-    if ($stmt->execute([$name, $id])) {
+    $stmt = $pdo->prepare("UPDATE product_types SET name = ?, rate = ? WHERE id = ?");
+    if ($stmt->execute([$name, intval($rate), $id])) {
       echo "<script>swal('Success', 'Product Type updated successfully', 'success').then(() => { window.location.href=window.location.href; });</script>";
     }
   }

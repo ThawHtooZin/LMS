@@ -35,10 +35,10 @@ $query = new Query();
                         $query->deleteproducttype($_POST['deleteid']);
                     }
                     if (isset($_POST['updatebutton'])) {
-                        $query->updateproducttype($_POST['updateid'], $_POST['name']);
+                        $query->updateproducttype($_POST['updateid'], $_POST['name'], $_POST['rate']);
                     }
                     if (isset($_POST['addbutton'])) {
-                        $query->addproducttype($_POST['name']);
+                        $query->addproducttype($_POST['name'], $_POST['rate']);
                     }
 
                     $pageno = !empty($_GET['pageno']) ? $_GET['pageno'] : 1;
@@ -53,9 +53,10 @@ $query = new Query();
 
                     <table class="table table-bordered table-striped rounded">
                         <tr>
-                            <th width="15%">ID</th>
-                            <th width="60%">Product Type Name</th>
-                            <th width="25%">Action</th>
+                            <th width="10%">ID</th>
+                            <th width="50%">Product Type Name</th>
+                            <th width="20%">Rate</th>
+                            <th width="20%">Action</th>
                         </tr>
                         <?php
                         $stmt = $pdo->prepare("SELECT * FROM product_types");
@@ -72,6 +73,7 @@ $query = new Query();
                             <tr>
                                 <td><?php echo $data['id']; ?></td>
                                 <td class="fw-bold text-primary"><?php echo htmlspecialchars($data['name']); ?></td>
+                                <td><?php echo htmlspecialchars($data['rate'] ?? 0); ?></td>
                                 <td>
                                     <button type="button" class="btn btn-warning btn-sm text-light" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $data['id']; ?>">Edit</button>
                                     <form action="product_types.php" method="post" style="display: inline !important;">
@@ -93,8 +95,12 @@ $query = new Query();
                                         <form action="product_types.php" method="post" autocomplete="off">
                                             <div class="modal-body">
                                                 <input type="hidden" name="updateid" value="<?php echo $data['id']; ?>">
-                                                <label>Product Type Name</label>
-                                                <input type="text" name="name" class="form-control" value="<?php echo htmlspecialchars($data['name']); ?>" required>
+
+                                                <label class="fw-bold mb-1">Product Type Name</label>
+                                                <input type="text" name="name" class="form-control mb-2" value="<?php echo htmlspecialchars($data['name']); ?>" required>
+
+                                                <label class="fw-bold mb-1">Rate (Integer)</label>
+                                                <input type="number" name="rate" class="form-control" value="<?php echo htmlspecialchars($data['rate'] ?? 0); ?>" required>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -144,8 +150,11 @@ $query = new Query();
                 </div>
                 <form action="product_types.php" method="post" autocomplete="off">
                     <div class="modal-body">
-                        <label>Product Type Name</label>
-                        <input type="text" name="name" class="form-control" placeholder="e.g. Fish, Packing Material, Services" required>
+                        <label class="fw-bold mb-1">Product Type Name</label>
+                        <input type="text" name="name" class="form-control mb-2" placeholder="e.g. Fish, Packing Material, Services" required>
+
+                        <label class="fw-bold mb-1">Rate (Integer)</label>
+                        <input type="text" name="rate" class="form-control" placeholder="e.g. 0" value="0" required>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
