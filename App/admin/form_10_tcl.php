@@ -56,6 +56,7 @@ $bootstrap->css();
   }
 
   $isViewMode = (!empty($_SESSION['search_tcl']['commondity']) || !empty($_SESSION['search_tcl']['searchdate']));
+  $hasBothFilters = (!empty($_SESSION['search_tcl']['commondity']) && !empty($_SESSION['search_tcl']['searchdate']));
   ?>
   <div class="row">
     <div class="sidebarcol" id="sidebar">
@@ -69,7 +70,7 @@ $bootstrap->css();
             <b class="h5">Link Mark Limited (F-10) TCL</b>
             <a href="add_form_10_tcl.php" class="btn btn-success btn-sm float-end ms-2">Add Form-10 Data</a>
 
-            <?php if ($isViewMode && !empty($_SESSION['search_tcl']['searchdate']) && !empty($_SESSION['search_tcl']['commondity'])): ?>
+            <?php if ($hasBothFilters): ?>
               <a href="export.php?table_name=form_10_tcl&searchdate=<?= $_SESSION['search_tcl']['searchdate']; ?>&searchcommondity=<?= $_SESSION['search_tcl']['commondity']; ?>" class="btn btn-dark btn-sm float-end me-2">Export Excel</a>
             <?php endif; ?>
 
@@ -79,7 +80,7 @@ $bootstrap->css();
             <select name="commondity" class="form-control inpv2 w-25 d-inline float-end me-2" style="width: 12% !important; height: 27px !important; padding-top: 1.5px !important;">
               <option value="">Select Commondity</option>
               <?php
-              $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stocktcl");
+              $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stocktcl WHERE item_id IS NOT NULL AND item_id != ''");
               $commonstmt->execute();
               $commondatas = $commonstmt->fetchall();
               foreach ($commondatas as $commondata) {
@@ -139,26 +140,27 @@ $bootstrap->css();
             $sql = "SELECT * FROM form10stocktcl";
             $conditions = [];
             $nodata = true;
+            $datas = [];
 
-            if ($isViewMode) {
-              if (!empty($_SESSION['search_tcl']['commondity'])) {
-                $conditions[] = "item_id = '" . $_SESSION['search_tcl']['commondity'] . "'";
-              }
-              if (!empty($_SESSION['search_tcl']['searchdate'])) {
-                $conditions[] = "date = '" . $_SESSION['search_tcl']['searchdate'] . "'";
-              }
-              if (count($conditions) > 0) {
-                $nodata = false;
-              }
+            // Independent filtering: works with single or dual filters
+            if (!empty($_SESSION['search_tcl']['commondity'])) {
+              $conditions[] = "item_id = '" . $_SESSION['search_tcl']['commondity'] . "'";
+              $nodata = false;
+            }
+            if (!empty($_SESSION['search_tcl']['searchdate'])) {
+              $conditions[] = "date = '" . $_SESSION['search_tcl']['searchdate'] . "'";
+              $nodata = false;
             }
 
-            if ($nodata) {
-              $datas = [];
-            } else {
-              $sql .= " WHERE " . implode(" AND ", $conditions);
+            try {
+              if (!$nodata) {
+                $sql .= " WHERE " . implode(" AND ", $conditions);
+              }
               $stmt = $pdo->prepare($sql);
               $stmt->execute();
-              $datas = $stmt->fetchall();
+              $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } catch (PDOException $e) {
+              $datas = [];
             }
 
             // Init Totals
@@ -322,24 +324,29 @@ $bootstrap->css();
             <?php } ?>
 
             <?php
-            // Calculate Form 7 Percentage if viewing specific report
+            // Calculate Form 7 Percentage safely only if BOTH filters are present and Form 7 data matches
             $percentage = "";
-            if ($isViewMode && !empty($_SESSION['search_tcl']['commondity']) && !empty($_SESSION['search_tcl']['searchdate'])) {
-              $c_id = $_SESSION['search_tcl']['commondity'];
-              $s_date = $_SESSION['search_tcl']['searchdate'];
+            if ($hasBothFilters) {
+              try {
+                $c_id = $_SESSION['search_tcl']['commondity'];
+                $s_date = $_SESSION['search_tcl']['searchdate'];
 
-              $lastsearchdatestmt = $pdo->prepare("SELECT * FROM form10stocktcl WHERE date<'$s_date' ORDER BY id DESC LIMIT 1");
-              $lastsearchdatestmt->execute();
-              $lastsearchdate = $lastsearchdatestmt->fetch(PDO::FETCH_ASSOC);
-              $l_date = !empty($lastsearchdate['date']) ? $lastsearchdate['date'] : '0000-00-00';
+                $lastsearchdatestmt = $pdo->prepare("SELECT * FROM form10stocktcl WHERE date < ? ORDER BY id DESC LIMIT 1");
+                $lastsearchdatestmt->execute([$s_date]);
+                $lastsearchdate = $lastsearchdatestmt->fetch(PDO::FETCH_ASSOC);
+                $l_date = !empty($lastsearchdate['date']) ? $lastsearchdate['date'] : '0000-00-00';
 
-              $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stocktcl WHERE item_id='$c_id' AND date BETWEEN '$l_date' AND '$s_date'");
-              $totalf7kgstmt->execute();
-              $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
+                $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stocktcl WHERE item_id = ? AND date BETWEEN ? AND ?");
+                $totalf7kgstmt->execute([$c_id, $l_date, $s_date]);
+                $totalf7kgdata = $totalf7kgstmt->fetch(PDO::FETCH_ASSOC);
 
-              if (round($totalf7kgdata['total_kg']) != 0) {
-                $result1 = round($t_total_kg, 2) - round($totalf7kgdata['total_kg'], 2);
-                $percentage = ($result1 / round($totalf7kgdata['total_kg'], 2)) * 100;
+                if ($totalf7kgdata && isset($totalf7kgdata['total_kg']) && floatval($totalf7kgdata['total_kg']) != 0) {
+                  $f7_kg = floatval($totalf7kgdata['total_kg']);
+                  $result1 = round($t_total_kg, 2) - round($f7_kg, 2);
+                  $percentage = ($result1 / round($f7_kg, 2)) * 100;
+                }
+              } catch (Exception $e) {
+                $percentage = "";
               }
             }
             ?>
@@ -370,8 +377,8 @@ $bootstrap->css();
                 <td style="font-weight:bold;"><?php echo round($t_total_kg, 2); ?></td>
                 <td></td>
                 <?php if ($isViewMode) { ?>
-                  <td style="font-weight:bold; <?php if (strpos(round($percentage, 2), '-') !== false) echo 'color:red;'; ?>">
-                    <?php echo ($percentage !== "") ? round($percentage, 2) . "%" : "-"; ?>
+                  <td style="font-weight:bold; <?php if ($percentage !== "" && strpos(round(floatval($percentage), 2), '-') !== false) echo 'color:red;'; ?>">
+                    <?php echo ($percentage !== "") ? round(floatval($percentage), 2) . "%" : "-"; ?>
                   </td>
                 <?php } ?>
               </tr>
@@ -381,6 +388,13 @@ $bootstrap->css();
       </div>
     </div>
   </div>
+
+  <script>
+    $(document).ready(function() {
+      // Force-hide stuck loader/spinner overlay
+      $('.loader, #preloader, .spinner-overlay, div:has(> .spinner-border)').fadeOut('fast');
+    });
+  </script>
 
   <?php $bootstrap->javascript(); ?>
 </body>
