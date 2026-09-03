@@ -37,70 +37,64 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type'])) {
     $action_type = $_POST['action_type'];
 
     if ($action_type == 'delete') {
-        $query->deletePurchase($purchase_id);
-        exit;
-    }
+        $saveResult = $query->deletePurchase($purchase_id);
+    } elseif ($action_type == 'void') {
+        $saveResult = $query->voidPurchase($purchase_id);
+    } else {
+        $contact_id = $_POST['contact_id'];
+        $date = $_POST['date'];
+        $tclfrozen = $_POST['tclfrozen'];
+        $due_date = !empty($_POST['due_date']) ? $_POST['due_date'] : NULL;
+        $voucher_no = $_POST['voucher_no'];
+        $currency = $_POST['currency'];
 
-    if ($action_type == 'void') {
-        $query->voidPurchase($purchase_id);
-        exit;
-    }
+        // STATUS PRESERVATION LOGIC:
+        $status = $current_status;
+        if (in_array($action_type, ['submit_approval'])) {
+            $status = 'AWAITING_APPROVAL';
+        } elseif (in_array($action_type, ['approve', 'approve_add_another', 'update_approved'])) {
+            $status = 'AWAITING_PAYMENT';
+        } elseif ($action_type == 'save_draft') {
+            $status = ($current_status === 'AWAITING_PAYMENT') ? 'AWAITING_PAYMENT' : 'DRAFT';
+        }
 
-    $contact_id = $_POST['contact_id'];
-    $date = $_POST['date'];
-    $tclfrozen = $_POST['tclfrozen'];
-    $due_date = !empty($_POST['due_date']) ? $_POST['due_date'] : NULL;
-    $voucher_no = $_POST['voucher_no'];
-    $currency = $_POST['currency'];
+        $subtotal = 0;
+        $lines = [];
+        if (isset($_POST['unit_price'])) {
+            for ($i = 0; $i < count($_POST['unit_price']); $i++) {
+                $viss = floatval($_POST['viss'][$i]);
+                $pcs = !empty($_POST['pcs'][$i]) ? intval($_POST['pcs'][$i]) : 0;
+                $price = floatval($_POST['unit_price'][$i]);
+                $acc = isset($_POST['account_code'][$i]) ? $_POST['account_code'][$i] : '';
+                $desc = isset($_POST['description'][$i]) ? $_POST['description'][$i] : '';
+                $prod = isset($_POST['product_id'][$i]) ? $_POST['product_id'][$i] : '';
 
-    // STATUS PRESERVATION LOGIC:
-    // If it was already AWAITING_PAYMENT, keep it as AWAITING_PAYMENT unless explicitly changed/submitted otherwise.
-    $status = $current_status;
-    if (in_array($action_type, ['submit_approval'])) {
-        $status = 'AWAITING_APPROVAL';
-    } elseif (in_array($action_type, ['approve', 'approve_add_another', 'update_approved'])) {
-        $status = 'AWAITING_PAYMENT';
-    } elseif ($action_type == 'save_draft') {
-        // If it was already approved, don't let a generic save turn it into a draft; keep it AWAITING_PAYMENT or DRAFT accordingly
-        $status = ($current_status === 'AWAITING_PAYMENT') ? 'AWAITING_PAYMENT' : 'DRAFT';
-    }
+                $multiplier = (strtolower($tclfrozen) === 'material') ? $pcs : $viss;
 
-    $subtotal = 0;
-    $lines = [];
-    if (isset($_POST['unit_price'])) {
-        for ($i = 0; $i < count($_POST['unit_price']); $i++) {
-            $viss = floatval($_POST['viss'][$i]);
-            $pcs = !empty($_POST['pcs'][$i]) ? intval($_POST['pcs'][$i]) : 0;
-            $price = floatval($_POST['unit_price'][$i]);
-            $acc = isset($_POST['account_code'][$i]) ? $_POST['account_code'][$i] : '';
-            $desc = isset($_POST['description'][$i]) ? $_POST['description'][$i] : '';
-            $prod = isset($_POST['product_id'][$i]) ? $_POST['product_id'][$i] : '';
-
-            $multiplier = (strtolower($tclfrozen) === 'material') ? $pcs : $viss;
-
-            if (!empty($prod) || !empty($desc) || !empty($acc) || $multiplier > 0 || $price > 0) {
-                $line_total = $multiplier * $price;
-                $subtotal += $line_total;
-                $lines[] = [
-                    'product_id' => !empty($prod) ? $prod : NULL,
-                    'account_id' => !empty($acc) ? $acc : NULL,
-                    'description' => $desc,
-                    'size' => $_POST['size'][$i],
-                    'viss' => $viss,
-                    'pcs' => $pcs > 0 ? $pcs : NULL,
-                    'unit_price' => $price,
-                    'line_amount' => $line_total
-                ];
+                if (!empty($prod) || !empty($desc) || !empty($acc) || $multiplier > 0 || $price > 0) {
+                    $line_total = $multiplier * $price;
+                    $subtotal += $line_total;
+                    $lines[] = [
+                        'product_id' => !empty($prod) ? $prod : NULL,
+                        'account_id' => !empty($acc) ? $acc : NULL,
+                        'description' => $desc,
+                        'size' => $_POST['size'][$i],
+                        'viss' => $viss,
+                        'pcs' => $pcs > 0 ? $pcs : NULL,
+                        'unit_price' => $price,
+                        'line_amount' => $line_total
+                    ];
+                }
             }
         }
+
+        $ctrl_action = 'standard';
+        if ($action_type == 'save_continue') $ctrl_action = 'continue_editing';
+        if ($action_type == 'save_add_another' || $action_type == 'approve_add_another') $ctrl_action = 'add_another';
+
+        // Capture response array
+        $saveResult = $query->savePurchase($purchase_id, $contact_id, $date, $tclfrozen, $due_date, $voucher_no, $currency, $status, $subtotal, $subtotal, $lines, $ctrl_action);
     }
-
-    $ctrl_action = 'standard';
-    if ($action_type == 'save_continue') $ctrl_action = 'continue_editing';
-    if ($action_type == 'save_add_another' || $action_type == 'approve_add_another') $ctrl_action = 'add_another';
-
-    // Capture response array
-    $saveResult = $query->savePurchase($purchase_id, $contact_id, $date, $tclfrozen, $due_date, $voucher_no, $currency, $status, $subtotal, $subtotal, $lines, $ctrl_action);
 }
 
 // Re-fetch data if status changed
@@ -189,7 +183,7 @@ foreach ($accounts as $acc) {
 <body>
     <?php echo $bootstrap->javascriptindex(); ?>
 
-    <!-- SweetAlert Script Block for Handling Responses & Audit Blocks -->
+    <!-- SweetAlert Script Block for Handling Responses & Redirects -->
     <?php if (!empty($saveResult)): ?>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -199,13 +193,13 @@ foreach ($accounts as $acc) {
                         text: <?= json_encode($saveResult['message']); ?>,
                         icon: "success"
                     }).then(function() {
-                        window.location.href = <?= json_encode($saveResult['redirect']); ?>;
+                        window.location.href = <?= json_encode($saveResult['redirect'] ?? 'purchase.php'); ?>;
                     });
                 <?php else: ?>
                     swal({
                         title: <?= json_encode($saveResult['title']); ?>,
                         text: <?= json_encode($saveResult['message']); ?>,
-                        icon: "error"
+                        icon: <?= json_encode($saveResult['type'] ?? 'error'); ?>
                     }).then(function() {
                         <?php if (isset($saveResult['redirect'])): ?>
                             window.location.href = <?= json_encode($saveResult['redirect']); ?>;
@@ -244,23 +238,25 @@ foreach ($accounts as $acc) {
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <?php if ($current_status === 'DRAFT' || $current_status === 'AWAITING_APPROVAL'): ?>
-                                    <li><a class="dropdown-item text-danger" onclick="if(confirm('Are you sure you want to delete this draft?')){ submitForm('delete'); }"><i class="bi bi-trash"></i> Delete</a></li>
+                                    <li><a class="dropdown-item text-danger" onclick="confirmAction('delete', 'Are you sure you want to delete this draft?')"><i class="bi bi-trash"></i> Delete</a></li>
                                 <?php elseif ($current_status === 'AWAITING_PAYMENT'): ?>
-                                    <li><a class="dropdown-item text-warning" onclick="if(confirm('Are you sure you want to void this approved bill?')){ submitForm('void'); }"><i class="bi bi-x-circle"></i> Void</a></li>
+                                    <li><a class="dropdown-item text-warning" onclick="confirmAction('void', 'Are you sure you want to void this approved bill?')"><i class="bi bi-x-circle"></i> Void</a></li>
                                 <?php endif; ?>
                             </ul>
                         </div>
                     </div>
 
-                    <div class="row mb-4 gx-3">
+                    <div class="row gx-3 mb-4">
                         <div class="col-md-3">
-                            <label class="fw-bold small mb-1">From</label>
-                            <select name="contact_id" class="form-control chosen-select" data-placeholder="Select supplier..." required <?php echo $is_locked ? 'disabled' : ''; ?>>
-                                <option value=""></option>
-                                <?php foreach ($suppliers as $sup): ?>
-                                    <option value="<?php echo $sup['id']; ?>" <?php echo ($purchase['contact_id'] == $sup['id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($sup['name']); ?></option>
-                                <?php endforeach; ?>
-                            </select>
+                            <div class="d-flex flex-column">
+                                <label class="fw-bold small mb-1">From</label>
+                                <select name="contact_id" class="form-control chosen-select" data-placeholder="Select supplier..." required <?php echo $is_locked ? 'disabled' : ''; ?>>
+                                    <option value=""></option>
+                                    <?php foreach ($suppliers as $sup): ?>
+                                        <option value="<?php echo $sup['id']; ?>" <?php echo ($purchase['contact_id'] == $sup['id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($sup['name']); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                         </div>
                         <div class="col-md-2">
                             <label class="fw-bold small mb-1">Date</label>
@@ -287,6 +283,7 @@ foreach ($accounts as $acc) {
 
                     <div class="row mb-3">
                         <div class="col-md-3">
+                            <label class="fw-bold small mb-1">Currency</label>
                             <select name="currency" class="form-select form-select-sm" <?php echo $is_locked ? 'disabled' : ''; ?>>
                                 <option value="MMK" <?php echo ($purchase['currency'] == 'MMK') ? 'selected' : ''; ?>>MMK (Base)</option>
                                 <?php foreach ($currencies as $c): ?>
@@ -365,7 +362,6 @@ foreach ($accounts as $acc) {
                     <div class="d-flex justify-content-between">
                         <?php if (!$is_locked): ?>
                             <div>
-                                <!-- If it's already AWAITING_PAYMENT, hide draft buttons and show a clean Update button -->
                                 <?php if ($current_status === 'AWAITING_PAYMENT'): ?>
                                     <button type="button" class="btn btn-success fw-bold px-4" onclick="submitForm('update_approved')">Update Bill</button>
                                 <?php else: ?>
@@ -447,7 +443,6 @@ foreach ($accounts as $acc) {
 
         function addNewLine() {
             if (isLocked) return;
-            // Standard add line template logic if needed
         }
 
         function calcTotals() {
@@ -477,6 +472,20 @@ foreach ($accounts as $acc) {
             });
             $('#subtotalDisplay').text(fTotal);
             $('#grandTotalDisplay').text(fTotal);
+        }
+
+        function confirmAction(action, message) {
+            swal({
+                title: "Are you sure?",
+                text: message,
+                icon: "warning",
+                buttons: ["Cancel", "Yes, Proceed"],
+                dangerMode: true,
+            }).then((willProceed) => {
+                if (willProceed) {
+                    submitForm(action);
+                }
+            });
         }
 
         function submitForm(action) {

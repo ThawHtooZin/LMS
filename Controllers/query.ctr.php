@@ -909,16 +909,12 @@ class Query
 
       if ($purchase['status'] === 'VOIDED') {
         $pdo->rollBack();
-        echo "<script>
-          swal({
-              title: 'Validation Error!',
-              text: 'This bill is already voided.',
-              icon: 'warning',
-          }).then(function() {
-              window.location.href = 'purchase.php';
-          });
-        </script>";
-        return;
+        return [
+          'status'  => false,
+          'title'   => 'Validation Error!',
+          'message' => 'This bill is already voided.',
+          'type'    => 'warning'
+        ];
       }
 
       $voucher_no = $purchase['voucher_no'];
@@ -940,24 +936,20 @@ class Query
 
       $pdo->commit();
 
-      echo "<script>
-        swal({
-            title: 'Success!',
-            text: 'Bill successfully voided. Financial and stock records have been reversed.',
-            icon: 'success',
-        }).then(function() {
-            window.location.href = 'purchase.php';
-        });
-    </script>";
+      return [
+        'status'   => true,
+        'title'    => 'Success!',
+        'message'  => 'Bill successfully voided. Financial and stock records have been reversed.',
+        'redirect' => 'purchase.php'
+      ];
     } catch (Exception $e) {
       $pdo->rollBack();
-      echo "<script>
-        swal({
-            title: 'Error!',
-            text: 'Failed to void bill. Error: " . addslashes($e->getMessage()) . "',
-            icon: 'error',
-        });
-    </script>";
+      return [
+        'status'  => false,
+        'title'   => 'Error!',
+        'message' => 'Failed to void bill. Error: ' . $e->getMessage(),
+        'type'    => 'error'
+      ];
     }
   }
 
