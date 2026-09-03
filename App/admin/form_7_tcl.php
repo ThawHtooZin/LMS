@@ -98,7 +98,7 @@ $bootstrap->css();
             <select name="searchsize" class="form-control inpv2 d-inline float-end ms-1" style="width:12%; height:26px !important; padding:0px 5px;">
               <option value="">Select Size</option>
               <?php
-              $sizestmt = $pdo->prepare("SELECT DISTINCT size FROM form7stocktcl");
+              $sizestmt = $pdo->prepare("SELECT DISTINCT size FROM form7stocktcl WHERE size IS NOT NULL AND size != ''");
               $sizestmt->execute();
               $sizedatas = $sizestmt->fetchAll(PDO::FETCH_ASSOC);
               foreach ($sizedatas as $sizedata) {
@@ -111,17 +111,22 @@ $bootstrap->css();
             <select name="commondity_id" class="form-control inpv2 d-inline float-end ms-1" style="width:12%; height:26px !important; padding:0px 5px;">
               <option value="">Select Commondity</option>
               <?php
-              $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stocktcl");
+              $commonstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form7stocktcl WHERE item_id IS NOT NULL AND item_id != ''");
               $commonstmt->execute();
               $commondatas = $commonstmt->fetchAll(PDO::FETCH_ASSOC);
               foreach ($commondatas as $commondata) {
                 $item_id = $commondata['item_id'];
-                $prodStmt = $pdo->prepare("SELECT name FROM products WHERE id = ? LIMIT 1");
+                $prodStmt = $pdo->prepare("SELECT id, name FROM products WHERE id = ? LIMIT 1");
                 $prodStmt->execute([$item_id]);
-                $prodName = $prodStmt->fetchColumn() ?: 'Unknown Product';
+                $prodData = $prodStmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($prodData) {
               ?>
-                <option value="<?php echo htmlspecialchars($item_id); ?>" <?php if (!empty($_SESSION['search']['searchcommondity']) && $_SESSION['search']['searchcommondity'] == $item_id) echo "selected"; ?>><?php echo htmlspecialchars($prodName); ?></option>
-              <?php } ?>
+                  <option value="<?php echo htmlspecialchars($prodData['id']); ?>" <?php if (!empty($_SESSION['search']['searchcommondity']) && $_SESSION['search']['searchcommondity'] == $prodData['id']) echo "selected"; ?>><?php echo htmlspecialchars($prodData['name']); ?></option>
+              <?php
+                }
+              }
+              ?>
             </select>
             <input type="date" name="searchdate" value="<?php echo !empty($_SESSION['search']['searchdate']) ? htmlspecialchars($_SESSION['search']['searchdate']) : ''; ?>" class="form-control inpv2 d-inline float-end" style="width:12%; height:26px !important; padding:0px 5px;">
           </div>
@@ -143,46 +148,45 @@ $bootstrap->css();
               <th>Action</th>
             </tr>
             <?php
-            // Setup Unified Fetching
+            // Setup Unified Fetching with safe error trapping
             $sql = "SELECT * FROM form7stocktcl";
             $conditions = [];
-            $nodata = true;
+            $datas = [];
 
             $search_commondity = !empty($_SESSION['search']['searchcommondity']) ? $_SESSION['search']['searchcommondity'] : '';
             $search_date = !empty($_SESSION['search']['searchdate']) ? $_SESSION['search']['searchdate'] : '';
             $search_size = !empty($_SESSION['search']['searchsize']) ? $_SESSION['search']['searchsize'] : '';
 
-            if ($search_commondity != '') {
+            if ($search_commondity !== '') {
               $conditions[] = "item_id = :commondity_id";
             }
-            if ($search_date != '') {
+            if ($search_date !== '') {
               $conditions[] = "date = :searchdate";
             }
-            if ($search_size != '') {
+            if ($search_size !== '') {
               $conditions[] = "size = :searchsize";
             }
-            if (count($conditions) > 0) {
-              $nodata = false;
-            }
 
-            if ($nodata) {
-              $datas = [];
-            } else {
-              $sql .= " WHERE " . implode(" AND ", $conditions);
+            try {
+              if (count($conditions) > 0) {
+                $sql .= " WHERE " . implode(" AND ", $conditions);
+              }
               $stmt = $pdo->prepare($sql);
 
-              if ($search_commondity != '') {
-                $stmt->bindParam(':commondity_id', $search_commondity, PDO::PARAM_STR);
+              if ($search_commondity !== '') {
+                $stmt->bindValue(':commondity_id', $search_commondity);
               }
-              if ($search_date != '') {
-                $stmt->bindParam(':searchdate', $search_date, PDO::PARAM_STR);
+              if ($search_date !== '') {
+                $stmt->bindValue(':searchdate', $search_date);
               }
-              if ($search_size != '') {
-                $stmt->bindParam(':searchsize', $search_size, PDO::PARAM_STR);
+              if ($search_size !== '') {
+                $stmt->bindValue(':searchsize', $search_size);
               }
 
               $stmt->execute();
               $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } catch (PDOException $e) {
+              $datas = [];
             }
 
             // Initialize Dynamic Totals
@@ -192,19 +196,31 @@ $bootstrap->css();
             $t_pcsf7 = 0;
 
             foreach ($datas as $form7data) {
-              $item_id = $form7data['item_id'];
+              $item_id = $form7data['item_id'] ?? 0;
+              $supplier_id = $form7data['supplier_name'] ?? '';
 
-              // REFACTORED: Direct Products table lookup
-              $prodStmt = $pdo->prepare("SELECT name FROM products WHERE id = ? LIMIT 1");
-              $prodStmt->execute([$item_id]);
-              $item_name_val = $prodStmt->fetchColumn() ?: 'Unknown Product';
+              $item_name_val = 'Unknown Product';
+              $supplier_name_val = $supplier_id;
 
-              $supplier_id = $form7data['supplier_name'];
+              try {
+                $prodStmt = $pdo->prepare("SELECT name FROM products WHERE id = ? LIMIT 1");
+                $prodStmt->execute([$item_id]);
+                $resName = $prodStmt->fetchColumn();
+                if ($resName) {
+                  $item_name_val = $resName;
+                }
 
-              // REFACTORED: Direct Contacts / Accodes table lookup for suppliers
-              $supStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ? UNION SELECT name FROM accodes WHERE code = ? LIMIT 1");
-              $supStmt->execute([$supplier_id, $supplier_id]);
-              $supplier_name_val = $supStmt->fetchColumn() ?: $supplier_id;
+                if (is_numeric($supplier_id)) {
+                  $supStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ? LIMIT 1");
+                  $supStmt->execute([$supplier_id]);
+                  $resSup = $supStmt->fetchColumn();
+                  if ($resSup) {
+                    $supplier_name_val = $resSup;
+                  }
+                }
+              } catch (Exception $e) {
+                // Fallback gracefully if lookup fails
+              }
 
               // Accumulate totals
               $t_viss += floatval($form7data['viss'] ?? 0);
@@ -361,7 +377,6 @@ $bootstrap->css();
                   <label>Fish Name</label>
                   <select class="form-control inpv2 mb-2" name="item_id">
                     <?php
-                    // REFACTORED: Pulled from products table
                     $itemstmt = $pdo->prepare("SELECT id, name FROM products");
                     $itemstmt->execute();
                     $itemdatas = $itemstmt->fetchAll(PDO::FETCH_ASSOC);
@@ -377,7 +392,6 @@ $bootstrap->css();
                   <label>Supplier Name</label>
                   <select class="form-control inpv2 mb-2" name="supplier_id">
                     <?php
-                    // REFACTORED: Pulled from contacts table for suppliers
                     $supplierstmt = $pdo->prepare("SELECT id, name FROM contacts WHERE is_supplier = 1 OR is_supplier = 0");
                     $supplierstmt->execute();
                     $supplierdatas = $supplierstmt->fetchAll(PDO::FETCH_ASSOC);
