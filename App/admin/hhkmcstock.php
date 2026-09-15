@@ -28,32 +28,18 @@ $query = new Query();
   if (isset($_POST['addbtn'])) {
     $date = $_POST['date'];
     $particular = $_POST['particular'];
-    $commondity_id = $_POST['commondity_id1'];
-    $fish_type = $_POST['fish_type'];
-    $country = $_POST['country'];
+    $commondity_id = $_POST['commondity_id2'] ?? $_POST['commondity_id1'] ?? '';
+    $fish_type = $_POST['fish_type2'] ?? $_POST['fish_type'] ?? 'G';
+    $country = $_POST['country2'] ?? $_POST['country'] ?? '';
     $size = $_POST['size'];
     $kg = $_POST['kg'];
     $mc = $_POST['mc'];
+
     $query->addmcstock($date, $particular, $country, $commondity_id, $fish_type, $size, $kg, $mc);
+
     $_SESSION['date'] = $_POST['date'];
     $_SESSION['particular'] = $_POST['particular'];
     $_SESSION['commondity_id2'] = $_POST['commondity_id2'] ?? '';
-    $_SESSION['size'] = $_POST['size'];
-  }
-
-  if (isset($_POST['addbtn2'])) {
-    $date = $_POST['date'];
-    $particular = $_POST['particular'];
-    $commondity_id = $_POST['commondity_id2'];
-    $fish_type = $_POST['fish_type2'];
-    $country = $_POST['country2'];
-    $size = $_POST['size'];
-    $kg = $_POST['kg'];
-    $mc = $_POST['mc'];
-    $query->addmcstock($date, $particular, $country, $commondity_id, $fish_type, $size, $kg, $mc);
-    $_SESSION['date'] = $_POST['date'];
-    $_SESSION['particular'] = $_POST['particular'];
-    $_SESSION['commondity_id2'] = $_POST['commondity_id2'];
     $_SESSION['size'] = $_POST['size'];
   }
 
@@ -99,13 +85,14 @@ $query = new Query();
 
   ?>
   <?php $bootstrap->javascript(); ?>
+
   <script>
     $(document).ready(() => {
-      $('#commondityid2').hide();
-      $('#commondityid4').hide();
-      $('#particular').on('keyup', () => {
+      // Reusable function to handle the toggling based on dropdown selection
+      function toggleParticularFields() {
         var particular = $('#particular').val();
-        if (particular.includes('balance') || particular.includes('Balance')) {
+
+        if (particular === 'Balance') {
           $('#commondityid2').show();
           $('#commondityid1').hide();
           $('#commondityid4').show();
@@ -120,12 +107,16 @@ $query = new Query();
           $('#country2').hide();
           $('#country1').show();
         }
-      });
-      $('#commondityid2').hide();
-      $('#commondityid4').hide();
-      $('#country2').hide();
+      }
+
+      // Trigger when the user changes the dropdown
+      $('#particular').on('change', toggleParticularFields);
+
+      // Trigger instantly on page load to ensure the correct fields are shown
+      toggleParticularFields();
     });
   </script>
+
   <?php
   $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM hhkmcstock WHERE country IS NOT NULL");
   $countrystmt->execute();
@@ -133,9 +124,7 @@ $query = new Query();
   ?>
   <div class="row">
     <div class="sidebarcol" id="sidebar">
-      <?php
-      include 'sidebar.php';
-      ?>
+      <?php include 'sidebar.php'; ?>
     </div>
     <div class="contentcol" id="content">
       <?php require 'navbar.php'; ?>
@@ -144,17 +133,9 @@ $query = new Query();
           <h5 style="font-weight:bold;" class="text-light d-inline">HHK MC STOCK</h5>
           <button type="button" class="btn btn-danger float-end ms-2" data-bs-toggle="modal" data-bs-target="#transfer">Transfer Mc</button>
           <button type="button" class="btn btn-secondary float-end ms-2 text-light" data-bs-toggle="modal" data-bs-target="#repackingout">Repacking Out Mc</button>
-          <?php
-          if (!empty($countrydatas)) {
-          ?>
-            <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#add">Add Mc Data</button>
-          <?php
-          } else {
-          ?>
-            <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#add2">Add Mc Data</button>
-          <?php
-          }
-          ?>
+
+          <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#add">Add Mc Data</button>
+
           <form class="d-inline" action="hhkmcstock.php" method="post">
             <button type="submit" class="btn btn-primary float-end me-2" name="searchcommonditybtn">View</button>
             <?php
@@ -164,8 +145,7 @@ $query = new Query();
             $searchtype = $typestmt->fetchall();
             ?>
             <select class="inpv2 form-control d-inline me-2 float-end" name="searchtype" style="width: 10%;">
-              <?php foreach ($searchtype as $type):
-              ?>
+              <?php foreach ($searchtype as $type): ?>
                 <option value="<?php echo htmlspecialchars($type['fish_type']); ?>"><?php echo htmlspecialchars($type['fish_type']); ?></option>
               <?php endforeach; ?>
             </select>
@@ -273,152 +253,9 @@ $query = new Query();
               }
               ?>
             </table>
-            <?php
-
-            $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
-            $form7commonditystmt->execute();
-            $form7commonditydatas = $form7commonditystmt->fetchall();
-            $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
-            $countrystmt->execute();
-            $countrydatas = $countrystmt->fetchall();
-            ?>
-
-            <!-- ADD MODAL 1 -->
-            <div class="modal fade" id="add">
-              <div class="modal-dialog" role="document">
-                <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
-                  <div class="modal-header bg-secondary text-light">
-                    <h1 class="modal-title fs-5">Add Data</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <form action="hhkmcstock.php" method="post">
-                    <div class="modal-body">
-                      <div class="row">
-                        <div class="col">
-                          <label>Date</label>
-                          <input type="date" name="date" class="form-control inpv2 mb-2" value="<?php if (!empty($_SESSION['date'])) {
-                                                                                                  echo $_SESSION['date'];
-                                                                                                } ?>">
-                          <label>Commodity</label>
-                          <div class="row">
-                            <div class="col">
-                              <select class="form-control inpv2 mb-2" name="commondity_id1" id="commondityid1">
-                                <?php
-                                if (!empty($form7commonditydatas)) {
-                                  foreach ($form7commonditydatas as $form7commonditydata) {
-                                    $item_id = $form7commonditydata['item_id'];
-                                    $commonditydata = $query->select('products', $item_id, 'id');
-                                ?>
-                                    <option value="<?php echo htmlspecialchars($commonditydata['id'] ?? ''); ?>" <?php if (!empty($_SESSION['commondity_id1'])) {
-                                                                                                                    if ($_SESSION['commondity_id1'] == ($commonditydata['id'] ?? '')) {
-                                                                                                                      echo "selected";
-                                                                                                                    }
-                                                                                                                  } ?>><?php echo htmlspecialchars($commonditydata['name'] ?? ''); ?></option>
-                                <?php
-                                  }
-                                }
-                                ?>
-                              </select>
-                            </div>
-                            <div class="col">
-                              <select name="fish_type" id="commondityid3" class="form-control inpv2">
-                                <option value="G">G</option>
-                                <option value="egg">egg</option>
-                                <option value="ggs">ggs</option>
-                                <option value="fillet">fillet</option>
-                                <option value="W">W</option>
-                                <option value="Cut_piece">Cut Piece</option>
-                                <option value="Scaless">Scaless</option>
-                                <option value="Bls">Bl's</option>
-                                <option value="iqf">IQF</option>
-                              </select>
-                            </div>
-                          </div>
-                          <div class="row">
-                            <div class="col">
-                              <select class="form-control inpv2 mb-2" name="commondity_id2" id="commondityid2">
-                                <?php
-                                $commonditydatastmt = $pdo->prepare("SELECT id, name FROM products ORDER BY name ASC");
-                                $commonditydatastmt->execute();
-                                $commonditydatas = $commonditydatastmt->fetchAll(PDO::FETCH_ASSOC);
-                                foreach ($commonditydatas as $commonditydata) {
-                                ?>
-                                  <option value="<?php echo htmlspecialchars($commonditydata['id']); ?>"><?php echo htmlspecialchars($commonditydata['name']); ?></option>
-                                <?php
-                                }
-                                ?>
-                              </select>
-                            </div>
-                            <div class="col">
-                              <select name="fish_type2" id="commondityid4" class="form-control inpv2">
-                                <option value="G">G</option>
-                                <option value="egg">egg</option>
-                                <option value="ggs">ggs</option>
-                                <option value="fillet">fillet</option>
-                                <option value="W">W</option>
-                                <option value="Cut_piece">Cut Piece</option>
-                                <option value="Scaless">Scaless</option>
-                                <option value="Bls">Bl's</option>
-                                <option value="iqf">IQF</option>
-                              </select>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col">
-                          <label>Particular</label>
-                          <textarea name="particular" rows="4" class="form-control inpv2 mb-2" id="particular"><?php if (!empty($_SESSION['particular'])) {
-                                                                                                                  echo $_SESSION['particular'];
-                                                                                                                } else {
-                                                                                                                  echo "From Form-10";
-                                                                                                                } ?></textarea>
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="col">
-                          <label>Country</label>
-                          <select class="form-control inpv2 mb-2" name="country" id="country1">
-                            <?php
-                            if (!empty($countrydatas)) {
-                              foreach ($countrydatas as $countrydata) {
-                            ?>
-                                <option value="<?php echo htmlspecialchars($countrydata['country']); ?>"><?php echo htmlspecialchars($countrydata['country']); ?></option>
-                            <?php
-                              }
-                            }
-                            ?>
-                          </select>
-                          <input type="text" name="balance_country" id="country2" class="hide form-control inpv2" value="<?php if (!empty($_SESSION['country'])) {
-                                                                                                                            echo htmlspecialchars($_SESSION['country']);
-                                                                                                                          } ?>">
-                        </div>
-                        <div class="col">
-                          <label>Size</label>
-                          <input type="text" name="size" class="form-control inpv2 mb-2" value="<?php if (!empty($_SESSION['size'])) {
-                                                                                                  echo htmlspecialchars($_SESSION['size']);
-                                                                                                } ?>">
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="col">
-                          <label>Kg</label>
-                          <input type="text" name="kg" class="form-control inpv2 mb-2">
-                        </div>
-                        <div class="col">
-                          <label>Mc</label>
-                          <input type="number" name="mc" class="form-control inpv2 mb-2">
-                        </div>
-                      </div>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                      <button type="submit" class="btn btn-success" name="addbtn">Add</button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
           <?php
           }
+
           $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock");
           $form7commonditystmt->execute();
           $form7commonditydatas = $form7commonditystmt->fetchall();
@@ -426,300 +263,314 @@ $query = new Query();
           $countrystmt->execute();
           $countrydatas = $countrystmt->fetchall();
           ?>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- ADD MODAL 2 -->
-  <div class="modal fade" id="add2">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
-        <div class="modal-header bg-secondary text-light">
-          <h1 class="modal-title fs-5">Add Data 2</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <form action="hhkmcstock.php" method="post">
-          <div class="modal-body">
-            <div class="row">
-              <div class="col">
-                <label>Date</label>
-                <input type="date" name="date" class="form-control inpv2 mb-2">
-                <label>Commodity</label>
-                <div class="row">
-                  <div class="col">
-                    <select class="form-control inpv2 mb-2" name="commondity_id1" id="commondityid1">
-                      <?php
-                      if (!empty($form7commonditydatas)) {
-                        foreach ($form7commonditydatas as $form7commonditydata) {
-                          $item_id = $form7commonditydata['item_id'];
-                          $commonditydata = $query->select('products', $item_id, 'id');
-                      ?>
-                          <option value="<?php echo htmlspecialchars($commonditydata['id'] ?? ''); ?>"><?php echo htmlspecialchars($commonditydata['name'] ?? ''); ?></option>
-                      <?php
-                        }
-                      }
-                      ?>
-                    </select>
-                    <select class="form-control inpv2 mb-2" name="commondity_id2" id="commondityid2">
-                      <?php
-                      $commonditydatastmt = $pdo->prepare("SELECT id, name FROM products ORDER BY name ASC");
-                      $commonditydatastmt->execute();
-                      $commonditydatas = $commonditydatastmt->fetchAll(PDO::FETCH_ASSOC);
-                      foreach ($commonditydatas as $commonditydata) {
-                      ?>
-                        <option value="<?php echo htmlspecialchars($commonditydata['id']); ?>"><?php echo htmlspecialchars($commonditydata['name']); ?></option>
-                      <?php
-                      }
-                      ?>
-                    </select>
-                  </div>
-                  <div class="col">
-                    <select name="fish_type2" class="form-control inpv2">
-                      <option value="G">G</option>
-                      <option value="egg">egg</option>
-                      <option value="ggs">ggs</option>
-                      <option value="fillet">fillet</option>
-                      <option value="W">W</option>
-                      <option value="Cut_piece">Cut Piece</option>
-                      <option value="Scaless">Scaless</option>
-                      <option value="Bls">Bl's</option>
-                      <option value="iqf">IQF</option>
-                    </select>
-                  </div>
+          <!-- UNIFIED ADD MODAL -->
+          <div class="modal fade" id="add">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+                <div class="modal-header bg-secondary text-light">
+                  <h1 class="modal-title fs-5">Add Data</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-              </div>
-              <div class="col">
-                <label>Particular</label>
-                <textarea name="particular" rows="4" class="form-control inpv2 mb-2" id="particular">From Form-10</textarea>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <label>Country</label>
-                <select class="form-control inpv2 mb-2" name="country2" id="country1">
-                  <?php
-                  foreach ($countrydatas as $countrydata) {
-                  ?>
-                    <option value="<?php echo htmlspecialchars($countrydata['country']); ?>"><?php echo htmlspecialchars($countrydata['country']); ?></option>
-                  <?php
-                  }
-                  ?>
-                </select>
-                <input type="text" name="country2" id="country2" class="form-control inpv2" value="<?php if (!empty($_SESSION['country'])) {
-                                                                                                      echo htmlspecialchars($_SESSION['country']);
-                                                                                                    } ?>">
-              </div>
-              <div class="col">
-                <label>Size</label>
-                <input type="text" name="size" class="form-control inpv2 mb-2">
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <label>Kg</label>
-                <input type="text" name="kg" class="form-control inpv2 mb-2">
-              </div>
-              <div class="col">
-                <label>Mc</label>
-                <input type="number" name="mc" class="form-control inpv2 mb-2">
+                <form action="hhkmcstock.php" method="post">
+                  <div class="modal-body">
+                    <div class="row">
+                      <div class="col">
+                        <label>Date</label>
+                        <input type="date" name="date" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($_SESSION['date'] ?? ''); ?>">
+                        <label>Commodity</label>
+                        <div class="row">
+                          <div class="col">
+                            <select class="form-control inpv2 mb-2" name="commondity_id1" id="commondityid1">
+                              <?php
+                              if (!empty($form7commonditydatas)) {
+                                foreach ($form7commonditydatas as $form7commonditydata) {
+                                  $item_id = $form7commonditydata['item_id'];
+                                  $commonditydata = $query->select('products', $item_id, 'id');
+                              ?>
+                                  <option value="<?php echo htmlspecialchars($commonditydata['id'] ?? ''); ?>"><?php echo htmlspecialchars($commonditydata['name'] ?? ''); ?></option>
+                              <?php
+                                }
+                              }
+                              ?>
+                            </select>
+                            <select class="form-control inpv2 mb-2" name="commondity_id2" id="commondityid2">
+                              <?php
+                              $commonditydatastmt = $pdo->prepare("SELECT id, name FROM products ORDER BY name ASC");
+                              $commonditydatastmt->execute();
+                              $commonditydatas = $commonditydatastmt->fetchAll(PDO::FETCH_ASSOC);
+                              foreach ($commonditydatas as $commonditydata) {
+                              ?>
+                                <option value="<?php echo htmlspecialchars($commonditydata['id']); ?>"><?php echo htmlspecialchars($commonditydata['name']); ?></option>
+                              <?php
+                              }
+                              ?>
+                            </select>
+                          </div>
+                          <div class="col">
+                            <select name="fish_type2" id="commondityid3" class="form-control inpv2">
+                              <option value="G">G</option>
+                              <option value="egg">egg</option>
+                              <option value="ggs">ggs</option>
+                              <option value="fillet">fillet</option>
+                              <option value="W">W</option>
+                              <option value="Cut_piece">Cut Piece</option>
+                              <option value="Scaless">Scaless</option>
+                              <option value="Bls">Bl's</option>
+                              <option value="iqf">IQF</option>
+                            </select>
+                            <select name="fish_type2" id="commondityid4" class="form-control inpv2">
+                              <option value="G">G</option>
+                              <option value="egg">egg</option>
+                              <option value="ggs">ggs</option>
+                              <option value="fillet">fillet</option>
+                              <option value="W">W</option>
+                              <option value="Cut_piece">Cut Piece</option>
+                              <option value="Scaless">Scaless</option>
+                              <option value="Bls">Bl's</option>
+                              <option value="iqf">IQF</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <label>Particular</label>
+                        <select name="particular" class="form-control inpv2 mb-2" id="particular">
+                          <option value="From Form-10" <?php echo (isset($_SESSION['particular']) && $_SESSION['particular'] == 'From Form-10') ? 'selected' : ''; ?>>From Form-10</option>
+                          <option value="Balance" <?php echo (isset($_SESSION['particular']) && $_SESSION['particular'] == 'Balance') ? 'selected' : ''; ?>>Balance</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col">
+                        <label>Country</label>
+                        <select class="form-control inpv2 mb-2" name="country2" id="country1">
+                          <?php
+                          foreach ($countrydatas as $countrydata) {
+                          ?>
+                            <option value="<?php echo htmlspecialchars($countrydata['country']); ?>"><?php echo htmlspecialchars($countrydata['country']); ?></option>
+                          <?php
+                          }
+                          ?>
+                        </select>
+                        <input type="text" name="country2" id="country2" class="form-control inpv2" value="<?php if (!empty($_SESSION['country'])) {
+                                                                                                              echo htmlspecialchars($_SESSION['country']);
+                                                                                                            } ?>">
+                      </div>
+                      <div class="col">
+                        <label>Size</label>
+                        <input type="text" name="size" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($_SESSION['size'] ?? ''); ?>">
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col">
+                        <label>Kg</label>
+                        <input type="text" name="kg" class="form-control inpv2 mb-2">
+                      </div>
+                      <div class="col">
+                        <label>Mc</label>
+                        <input type="number" name="mc" class="form-control inpv2 mb-2">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success" name="addbtn">Add</button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-success" name="addbtn2">Add</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
 
-  <!-- TRANSFER MODAL -->
-  <div class="modal fade" id="transfer">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
-        <div class="modal-header bg-warning text-light">
-          <h1 class="modal-title fs-5">Transfer Mc</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <form action="hhkmcstock.php" method="post">
-          <div class="modal-body">
-            <div class="row">
-              <div class="col">
-                <label>Date</label>
-                <input type="date" name="transferdate" class="form-control inpv2 mb-2">
-                <label>Commodity</label>
-                <div class="row">
-                  <div class="col">
-                    <select class="form-control inpv2 mb-2" name="transfercommondity_id">
-                      <?php
-                      $hhkmcdata = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock");
-                      $hhkmcdata->execute();
-                      $hhkmcdatas = $hhkmcdata->fetchall();
-                      if (!empty($hhkmcdatas)) {
-                        foreach ($hhkmcdatas as $hhkmcdata) {
-                          $item_id = $hhkmcdata['commondity_id'];
-                          $commonditydata = $query->select('products', $item_id, 'id');
-                      ?>
-                          <option value="<?php echo htmlspecialchars($commonditydata['id'] ?? ''); ?>"><?php echo htmlspecialchars($commonditydata['name'] ?? ''); ?></option>
-                      <?php
-                        }
-                      }
-                      ?>
-                    </select>
-                  </div>
-                  <div class="col">
-                    <select name="transferfish_type" id="commondityid3" class="form-control inpv2">
-                      <option value="G">G</option>
-                      <option value="egg">egg</option>
-                      <option value="ggs">ggs</option>
-                      <option value="fillet">fillet</option>
-                      <option value="W">W</option>
-                      <option value="Cut_piece">Cut Piece</option>
-                      <option value="Scaless">Scaless</option>
-                      <option value="Bls">Bl's</option>
-                      <option value="">IQF</option>
-                    </select>
-                  </div>
+          <!-- TRANSFER MODAL -->
+          <div class="modal fade" id="transfer">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+                <div class="modal-header bg-warning text-light">
+                  <h1 class="modal-title fs-5">Transfer Mc</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-              </div>
-              <div class="col">
-                <label>Particular</label>
-                <textarea name="transferparticular" rows="4" class="form-control inpv2 mb-2">HHK To GFC</textarea>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <label>Country</label>
-                <select class="form-control inpv2 mb-2" name="transfercountry">
-
-                  <?php
-                  if (!empty($countrydatas)) {
-                    foreach ($countrydatas as $countrydata) {
-                  ?>
-                      <option value="<?php echo htmlspecialchars($countrydata['country']); ?>"><?php echo htmlspecialchars($countrydata['country']); ?></option>
-                  <?php
-                    }
-                  }
-                  ?>
-                </select>
-              </div>
-              <div class="col">
-                <label>Size</label>
-                <input type="text" name="transfersize" class="form-control inpv2 mb-2">
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <label>Kg</label>
-                <input type="text" name="transferkg" class="form-control inpv2 mb-2">
-              </div>
-              <div class="col">
-                <label>Mc</label>
-                <input type="number" name="transfermc" class="form-control inpv2 mb-2">
+                <form action="hhkmcstock.php" method="post">
+                  <div class="modal-body">
+                    <div class="row">
+                      <div class="col">
+                        <label>Date</label>
+                        <input type="date" name="transferdate" class="form-control inpv2 mb-2">
+                        <label>Commodity</label>
+                        <div class="row">
+                          <div class="col">
+                            <select class="form-control inpv2 mb-2" name="transfercommondity_id">
+                              <?php
+                              $hhkmcdata = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock");
+                              $hhkmcdata->execute();
+                              $hhkmcdatas = $hhkmcdata->fetchall();
+                              if (!empty($hhkmcdatas)) {
+                                foreach ($hhkmcdatas as $hhkmcdata) {
+                                  $item_id = $hhkmcdata['commondity_id'];
+                                  $commonditydata = $query->select('products', $item_id, 'id');
+                              ?>
+                                  <option value="<?php echo htmlspecialchars($commonditydata['id'] ?? ''); ?>"><?php echo htmlspecialchars($commonditydata['name'] ?? ''); ?></option>
+                              <?php
+                                }
+                              }
+                              ?>
+                            </select>
+                          </div>
+                          <div class="col">
+                            <select name="transferfish_type" class="form-control inpv2">
+                              <option value="G">G</option>
+                              <option value="egg">egg</option>
+                              <option value="ggs">ggs</option>
+                              <option value="fillet">fillet</option>
+                              <option value="W">W</option>
+                              <option value="Cut_piece">Cut Piece</option>
+                              <option value="Scaless">Scaless</option>
+                              <option value="Bls">Bl's</option>
+                              <option value="">IQF</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <label>Particular</label>
+                        <textarea name="transferparticular" rows="4" class="form-control inpv2 mb-2">HHK To GFC</textarea>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col">
+                        <label>Country</label>
+                        <select class="form-control inpv2 mb-2" name="transfercountry">
+                          <?php
+                          if (!empty($countrydatas)) {
+                            foreach ($countrydatas as $countrydata) {
+                          ?>
+                              <option value="<?php echo htmlspecialchars($countrydata['country']); ?>"><?php echo htmlspecialchars($countrydata['country']); ?></option>
+                          <?php
+                            }
+                          }
+                          ?>
+                        </select>
+                      </div>
+                      <div class="col">
+                        <label>Size</label>
+                        <input type="text" name="transfersize" class="form-control inpv2 mb-2">
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col">
+                        <label>Kg</label>
+                        <input type="text" name="transferkg" class="form-control inpv2 mb-2">
+                      </div>
+                      <div class="col">
+                        <label>Mc</label>
+                        <input type="number" name="transfermc" class="form-control inpv2 mb-2">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success" name="transferbtn">Move</button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-success" name="transferbtn">Move</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
 
-  <!-- REPACKING OUT MODAL -->
-  <div class="modal fade" id="repackingout">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
-        <div class="modal-header bg-secondary text-light">
-          <h1 class="modal-title fs-5">Repacking Out Mc</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <form action="hhkmcstock.php" method="post">
-          <div class="modal-body">
-            <div class="row">
-              <div class="col">
-                <label>Date</label>
-                <input type="date" name="repackingoutdate" class="form-control inpv2 mb-2">
-                <label>Commodity</label>
-                <div class="row">
-                  <div class="col">
-                    <select class="form-control inpv2 mb-2" name="repackingoutcommondity_id">
-                      <?php
-                      $hhkmcdata = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock");
-                      $hhkmcdata->execute();
-                      $hhkmcdatas = $hhkmcdata->fetchall();
-                      if (!empty($hhkmcdatas)) {
-                        foreach ($hhkmcdatas as $hhkmcdata) {
-                          $item_id = $hhkmcdata['commondity_id'];
-                          $commonditydata = $query->select('products', $item_id, 'id');
-                      ?>
-                          <option value="<?php echo htmlspecialchars($commonditydata['id'] ?? ''); ?>"><?php echo htmlspecialchars($commonditydata['name'] ?? ''); ?></option>
-                      <?php
-                        }
-                      }
-                      ?>
-                    </select>
-                  </div>
-                  <div class="col">
-                    <select name="repackingoutfish_type" id="commondityid3" class="form-control inpv2">
-                      <option value="G">G</option>
-                      <option value="egg">egg</option>
-                      <option value="ggs">ggs</option>
-                      <option value="fillet">fillet</option>
-                      <option value="W">W</option>
-                      <option value="Cut_piece">Cut Piece</option>
-                      <option value="Scaless">Scaless</option>
-                      <option value="Bls">Bl's</option>
-                      <option value="">IQF</option>
-                    </select>
-                  </div>
+          <!-- REPACKING OUT MODAL -->
+          <div class="modal fade" id="repackingout">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+                <div class="modal-header bg-secondary text-light">
+                  <h1 class="modal-title fs-5">Repacking Out Mc</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-              </div>
-              <div class="col">
-                <label>Particular</label>
-                <textarea name="repackingoutparticular" rows="4" class="form-control inpv2 mb-2">HHK To GFC</textarea>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <label>Country</label>
-                <select class="form-control inpv2 mb-2" name="repackingoutcountry">
-                  <?php
-                  if (!empty($countrydatas)) {
-                    foreach ($countrydatas as $countrydata) {
-                  ?>
-                      <option value="<?php echo htmlspecialchars($countrydata['country']); ?>"><?php echo htmlspecialchars($countrydata['country']); ?></option>
-                  <?php
-                    }
-                  }
-                  ?>
-                </select>
-              </div>
-              <div class="col">
-                <label>Size</label>
-                <input type="text" name="repackingoutsize" class="form-control inpv2 mb-2">
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <label>Kg</label>
-                <input type="text" name="repackingoutkg" class="form-control inpv2 mb-2">
-              </div>
-              <div class="col">
-                <label>Mc</label>
-                <input type="number" name="repackingoutmc" class="form-control inpv2 mb-2">
+                <form action="hhkmcstock.php" method="post">
+                  <div class="modal-body">
+                    <div class="row">
+                      <div class="col">
+                        <label>Date</label>
+                        <input type="date" name="repackingoutdate" class="form-control inpv2 mb-2">
+                        <label>Commodity</label>
+                        <div class="row">
+                          <div class="col">
+                            <select class="form-control inpv2 mb-2" name="repackingoutcommondity_id">
+                              <?php
+                              $hhkmcdata = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock");
+                              $hhkmcdata->execute();
+                              $hhkmcdatas = $hhkmcdata->fetchall();
+                              if (!empty($hhkmcdatas)) {
+                                foreach ($hhkmcdatas as $hhkmcdata) {
+                                  $item_id = $hhkmcdata['commondity_id'];
+                                  $commonditydata = $query->select('products', $item_id, 'id');
+                              ?>
+                                  <option value="<?php echo htmlspecialchars($commonditydata['id'] ?? ''); ?>"><?php echo htmlspecialchars($commonditydata['name'] ?? ''); ?></option>
+                              <?php
+                                }
+                              }
+                              ?>
+                            </select>
+                          </div>
+                          <div class="col">
+                            <select name="repackingoutfish_type" class="form-control inpv2">
+                              <option value="G">G</option>
+                              <option value="egg">egg</option>
+                              <option value="ggs">ggs</option>
+                              <option value="fillet">fillet</option>
+                              <option value="W">W</option>
+                              <option value="Cut_piece">Cut Piece</option>
+                              <option value="Scaless">Scaless</option>
+                              <option value="Bls">Bl's</option>
+                              <option value="">IQF</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <label>Particular</label>
+                        <textarea name="repackingoutparticular" rows="4" class="form-control inpv2 mb-2">HHK To GFC</textarea>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col">
+                        <label>Country</label>
+                        <select class="form-control inpv2 mb-2" name="repackingoutcountry">
+                          <?php
+                          if (!empty($countrydatas)) {
+                            foreach ($countrydatas as $countrydata) {
+                          ?>
+                              <option value="<?php echo htmlspecialchars($countrydata['country']); ?>"><?php echo htmlspecialchars($countrydata['country']); ?></option>
+                          <?php
+                            }
+                          }
+                          ?>
+                        </select>
+                      </div>
+                      <div class="col">
+                        <label>Size</label>
+                        <input type="text" name="repackingoutsize" class="form-control inpv2 mb-2">
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col">
+                        <label>Kg</label>
+                        <input type="text" name="repackingoutkg" class="form-control inpv2 mb-2">
+                      </div>
+                      <div class="col">
+                        <label>Mc</label>
+                        <input type="number" name="repackingoutmc" class="form-control inpv2 mb-2">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success" name="repackingoutbtn">Add</button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-success" name="repackingoutbtn">Add</button>
-          </div>
-        </form>
+
+        </div>
       </div>
     </div>
   </div>

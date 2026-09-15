@@ -97,7 +97,10 @@ $bootstrap->css();
               foreach ($datas as $tclmcdata) {
                 $lastid = $tclmcdata['id'];
                 $item_id = $tclmcdata['item_id'];
-                $commonditydata = $query->select('item', $item_id, 'item_id');
+
+                // REFACTORED: Direct Products table lookup
+                $commonditydata = $query->select('products', $item_id, 'id');
+
                 $size = $tclmcdata['size'];
                 $kg = $tclmcdata['kg'];
                 $item_id = $tclmcdata['item_id'];
@@ -114,7 +117,7 @@ $bootstrap->css();
                         echo date("d-m-Y", strtotime($tclmcdata['date']));
                       } ?></td>
                   <td><?php if (empty($lastcommondity)) {
-                        echo $commonditydata['item_name'];
+                        echo htmlspecialchars($commonditydata['name'] ?? 'Unknown');
                       } ?></td>
                   <td><?php if (empty($checklastavaliable)) {
                         echo $tclmcdata['size'];
@@ -218,14 +221,17 @@ $bootstrap->css();
               $datas = $stmt->fetchall();
               foreach ($datas as $tclmcdata) {
                 $item_id = $tclmcdata['item_id'];
-                $commonditydata = $query->select('item', $item_id, 'item_id');
+
+                // REFACTORED: Direct Products table lookup
+                $commonditydata = $query->select('products', $item_id, 'id');
+
                 $size = $tclmcdata['size'];
                 $kg = $tclmcdata['kg'];
                 $item_id = $tclmcdata['item_id'];
               ?>
                 <tr>
                   <td><?php echo date("d-m-Y", strtotime($tclmcdata['date'])); ?></td>
-                  <td><?php echo $commonditydata['item_name']; ?></td>
+                  <td><?php echo htmlspecialchars($commonditydata['name'] ?? 'Unknown'); ?></td>
                   <td><?php echo $tclmcdata['size']; ?></td>
                   <td><?php echo $tclmcdata['pcs']; ?></td>
                   <td><?php echo $tclmcdata['kg']; ?></td>
@@ -233,7 +239,7 @@ $bootstrap->css();
                   <td>
                     <a href="tclmc_stock_info.php?id=<?php echo $tclmcdata['id']; ?>" class="btn btn-info btn-sm text-light">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-check" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z" />
+                        <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z" />
                       </svg></a>
                   </td>
                 </tr>
@@ -271,9 +277,11 @@ $bootstrap->css();
                   $form10commonditydatas = $form10commonditystmt->fetchall();
                   foreach ($form10commonditydatas as $form10commonditydata) {
                     $item_id = $form10commonditydata['item_id'];
-                    $commonditydata = $query->select('item', $item_id, 'item_id');
+
+                    // REFACTORED: Direct Products table lookup
+                    $commonditydata = $query->select('products', $item_id, 'id');
                   ?>
-                    <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                    <option value="<?php echo htmlspecialchars($commonditydata['id'] ?? ''); ?>"><?php echo htmlspecialchars($commonditydata['name'] ?? 'Unknown'); ?></option>
                   <?php
                   }
                   ?>
@@ -330,9 +338,11 @@ $bootstrap->css();
                   $form7commonditydatas = $form7commonditystmt->fetchall();
                   foreach ($form7commonditydatas as $form7commonditydata) {
                     $item_id = $form7commonditydata['item_id'];
-                    $commonditydata = $query->select('item', $item_id, 'item_id');
+
+                    // REFACTORED: Direct Products table lookup
+                    $commonditydata = $query->select('products', $item_id, 'id');
                   ?>
-                    <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
+                    <option value="<?php echo htmlspecialchars($commonditydata['id'] ?? ''); ?>"><?php echo htmlspecialchars($commonditydata['name'] ?? 'Unknown'); ?></option>
                   <?php
                   }
                   ?>
