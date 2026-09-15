@@ -427,22 +427,65 @@ foreach ($accounts as $acc) {
 
             calcTotals();
 
-            $('#addLineBtn').click(addNewLine);
+            if (!isLocked) {
+                $('#addLineBtn').click(() => addNewLine());
+            }
             $('#linesBody').on('input', '.calc-input', calcTotals);
+
+            // Auto-fill account code when product changes on new/existing rows
+            $('#linesBody').on('change', '.prod-select', function() {
+                let row = $(this).closest('tr');
+                let pId = $(this).val();
+                let accCode = prodMap[pId];
+                if (accCode) {
+                    row.find('.acc-select').val(accCode).trigger('chosen:updated');
+                } else {
+                    row.find('.acc-select').val('').trigger('chosen:updated');
+                }
+            });
         });
 
-        function toggleMaterialColumns(selectedType) {
+        function addNewLine(data = {}) {
+            if (isLocked) return;
+
+            let selectedType = $('#tclfrozenTypeSelect').val();
+            let displayStyle = (selectedType === 'Material') ? 'style="display:none;"' : '';
+
+            let tr = `
+                <tr>
+                    <td>
+                        <select name="product_id[]" class="form-control chosen-select prod-select">
+                            <option value="">- Product -</option>
+                            ${$('#prodTpl').html().replace('value="' + data.product_id + '"', 'value="' + data.product_id + '" selected')}
+                        </select>
+                    </td>
+                    <td><input type="text" name="description[]" value="${data.description || ''}"></td>
+                    <td class="col-fish-only" ${displayStyle}><input type="text" name="size[]" placeholder="e.g. 1up" value="${data.size || ''}"></td>
+                    <td class="col-fish-only" ${displayStyle}><input type="number" name="viss[]" step="0.01" class="calc-input viss-input" value="${data.viss || '0'}"></td>
+                    <td><input type="number" name="pcs[]" class="calc-input pcs-input" value="${data.pcs || ''}"></td>
+                    <td><input type="number" name="unit_price[]" step="0.01" class="calc-input price-input" value="${data.unit_price || ''}"></td>
+                    <td>
+                        <select name="account_code[]" class="form-control chosen-select acc-select">
+                            ${$('#accTpl').html().replace('value="' + data.account_code + '"', 'value="' + data.account_code + '" selected')}
+                        </select>
+                    </td>
+                    <td class="line-total text-end">0.00</td>
+                </tr>
+            `;
+            $('#linesBody').append(tr);
+            let newRow = $('#linesBody tr:last-child');
+
+            if (data.product_id) newRow.find('.prod-select').val(data.product_id);
+            if (data.account_code) newRow.find('.acc-select').val(data.account_code);
+
+            newRow.find('.chosen-select').chosen({
+                width: '100%',
+                search_contains: true
+            });
+
             if (selectedType === 'Material') {
                 $('.col-fish-only').hide();
-                $('#qtyHeaderTh').text('Quantity');
-            } else {
-                $('.col-fish-only').show();
-                $('#qtyHeaderTh').text('Pcs');
             }
-        }
-
-        function addNewLine() {
-            if (isLocked) return;
         }
 
         function calcTotals() {
