@@ -49,6 +49,7 @@ $query = new Query();
     $newparticular = $_POST['newparticular'];
     $newcommondity_id = $_POST['newcommondity_id'];
     $newfish_type = $_POST['newfish_type'];
+    $newremark = $_POST['newremark'];
 
     $newsize = $_POST['newsize'];
     $newkg = $_POST['newkg'];
@@ -56,7 +57,7 @@ $query = new Query();
     $newcountry = $_POST['newcountry'];
     $updateid = $_POST['upid'];
 
-    $query->updatehhkmcstock($newdate, $newparticular, $newcommondity_id, $newfish_type, $newsize, $newkg, $newmc, $newcountry, $updateid);
+    $query->updatehhkmcstock($newdate, $newparticular, $newcommondity_id, $newfish_type, $newsize, $newkg, $newmc, $newremark, $newcountry, $updateid);
   }
   ?>
   <div class="row">
@@ -302,7 +303,22 @@ $query = new Query();
                           </div>
                           <div class="col">
                             <label>Particular</label>
-                            <textarea name="newparticular" rows="4" class="form-control inpv2 mb-2"><?php echo htmlspecialchars($sizeinfodata['particular']); ?></textarea>
+                            <select name="newparticular" class="form-control inpv2 mb-2">
+                              <option value="repackingout" <?php if ($sizeinfodata['particular'] == 'repackingout') {
+                                                            echo "selected";
+                                                          } ?>>Repacking Out</option>
+                              <option value="hhktogfc" <?php if ($sizeinfodata['particular'] == 'hhktogfc') {
+                                                        echo "selected";
+                                                      } ?>>HHK to GFC</option>
+                              <option value="fromform10" <?php if ($sizeinfodata['particular'] == 'fromform10') {
+                                                            echo "selected";
+                                                          } ?>>From Form-10</option>
+                              <option value="balance" <?php if ($sizeinfodata['particular'] == 'balance') {
+                                                        echo "selected";
+                                                      } ?>>Balance</option>
+                            </select>
+                            <label>Remark</label>
+                            <input type="text" name="newremark" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($sizeinfodata['remark']); ?>">
                           </div>
                         </div>
                         <div class="row">

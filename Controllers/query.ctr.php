@@ -1133,7 +1133,7 @@ class Query
 
   // HHK QUERIES
 
-  function updatehhkmcstock($newdate, $newparticular, $newcommondity_id, $newfish_type, $newsize, $newkg, $newmc, $newcountry, $updateid)
+  function updatehhkmcstock($newdate, $newparticular, $newcommondity_id, $newfish_type, $newsize, $newkg, $newmc, $newremark, $newcountry, $updateid)
   {
     global $pdo;
     // echo $updateid;
@@ -1142,7 +1142,7 @@ class Query
     $olddata = $olddatastmt->fetch(PDO::FETCH_ASSOC);
 
     if (!empty($olddata)) {
-      if (str_contains($newparticular, "GFC") || str_contains($newparticular, "gfc")) {
+      if (str_contains($newparticular, "out") || str_contains($newparticular, "gfc")) {
         $balance_mc = $olddata['balance_mc'] - $newmc;
       } else {
         $balance_mc = $olddata['balance_mc'] + $newmc;
@@ -1151,7 +1151,7 @@ class Query
       $balance_mc = $newmc;
     }
 
-    $stmt = $pdo->prepare("UPDATE hhkmcstock SET date='$newdate', particular='$newparticular', commondity_id='$newcommondity_id', fish_type='$newfish_type', size='$newsize', kg='$newkg', mc='$newmc', country='$newcountry', balance_mc='$balance_mc' WHERE id='$updateid'");
+    $stmt = $pdo->prepare("UPDATE hhkmcstock SET date='$newdate', particular='$newparticular', commondity_id='$newcommondity_id', fish_type='$newfish_type', size='$newsize', kg='$newkg', mc='$newmc', remark='$newremark', country='$newcountry', balance_mc='$balance_mc' WHERE id='$updateid'");
     $stmt->execute();
 
     $updatedatastmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id = '$newcommondity_id' AND size = '$newsize' AND kg='$newkg' AND id > '$updateid'");
@@ -1165,7 +1165,7 @@ class Query
       $datasstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id = '$newcommondity_id' AND size = '$newsize' AND kg = '$newkg' AND fish_type='$newfish_type' AND id < '$id' ORDER BY id DESC");
       $datasstmt->execute();
       $datas = $datasstmt->fetch(PDO::FETCH_ASSOC);
-      if (str_contains($updatedata['particular'], "GFC") || str_contains($updatedata['particular'], "gfc")) {
+      if (str_contains($updatedata['particular'], "out") || str_contains($updatedata['particular'], "gfc")) {
         $balance_mc = $datas['balance_mc'] - $mc;
       } else {
         $balance_mc = $datas['balance_mc'] + $mc;
@@ -3473,7 +3473,7 @@ class Query
     $updatepackingmaterialstmt = $pdo->prepare("UPDATE packingmaterial SET commondity_id='$upitem_id', fish_size='$upsize' WHERE link_id='$upid'");
     $updatepackingmaterialstmt->execute();
   }
-  function addmcstock($date, $particular, $country, $commondity_id, $fish_type,  $size, $kg, $mc)
+  function addmcstock($date, $particular, $country, $commondity_id, $fish_type,  $size, $kg, $mc, $remark)
   {
     global $pdo;
 
@@ -3488,7 +3488,7 @@ class Query
     } else {
       $balance_mc = $mc;
     }
-    $addmcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc, fish_type) VALUES('$date', '$country', '$particular', '$commondity_id', :size, '$kg', '$mc', '$balance_mc', '$fish_type')");
+    $addmcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, size, kg, mc, balance_mc, fish_type, remark) VALUES('$date', '$country', '$particular', '$commondity_id', :size, '$kg', '$mc', '$balance_mc', '$fish_type', '$remark')");
     $addmcstmt->execute(
       array(':size' => $size)
     );
@@ -3524,7 +3524,7 @@ class Query
     }
   }
 
-  function transfermcstock($transferdate, $transferparticular, $transfercountry, $transfercommondity_id, $transferfish_type, $transfersize, $transferkg, $transfermc)
+  function transfermcstock($transferdate, $transferparticular, $transfercountry, $transfercommondity_id, $transferfish_type, $transfersize, $transferkg, $transfermc, $transferremark)
   {
     global $pdo;
 
@@ -3534,7 +3534,7 @@ class Query
 
     if (!empty($hhkmcdata['balance_mc'])) {
       $balance_mc = $hhkmcdata['balance_mc'] - $transfermc;
-      $transfermcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, fish_type, size, kg, mc, balance_mc) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transferfish_type', '$transfersize', '$transferkg', '$transfermc', '$balance_mc')");
+      $transfermcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, fish_type, size, kg, mc, balance_mc, remark) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transferfish_type', '$transfersize', '$transferkg', '$transfermc', '$balance_mc', '$transferremark')");
       $transfermcstmt->execute();
 
 
@@ -3548,11 +3548,11 @@ class Query
       $id = $hhk_id['id'];
       if (!empty($gfcmcdata)) {
         $balance_mc_for_gfc = $gfcmcdata['balance_mc'] + $transfermc;
-        $transfertogfcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, fish_type, size, kg, mc, balance_mc, hhk_id) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transferfish_type', '$transfersize', '$transferkg', '$transfermc', '$balance_mc_for_gfc', '$id')");
+        $transfertogfcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, fish_type, size, kg, mc, balance_mc, hhk_id, remark) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transferfish_type', '$transfersize', '$transferkg', '$transfermc', '$balance_mc_for_gfc', '$id', '$transferremark')");
         $transfertogfcstmt->execute();
       } else {
         $balance_mc_for_gfc = $transfermc;
-        $transfertogfcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, fish_type, size, kg, mc, balance_mc, hhk_id) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transferfish_type', '$transfersize', '$transferkg', '$transfermc', '$balance_mc_for_gfc', '$id')");
+        $transfertogfcstmt = $pdo->prepare("INSERT INTO gfcmcstock(date, country, particular, commondity_id, fish_type, size, kg, mc, balance_mc, hhk_id, remark) VALUES('$transferdate', '$transfercountry', '$transferparticular', '$transfercommondity_id', '$transferfish_type', '$transfersize', '$transferkg', '$transfermc', '$balance_mc_for_gfc', '$id', '$transferremark')");
         $transfertogfcstmt->execute();
       }
 
@@ -3564,7 +3564,7 @@ class Query
     }
   }
 
-  function repackingout($repackingoutdate, $repackingoutparticular, $repackingoutcountry, $repackingoutcommondity_id, $repackingoutfish_type, $repackingoutsize, $repackingoutkg, $repackingoutmc)
+  function repackingout($repackingoutdate, $repackingoutparticular, $repackingoutcountry, $repackingoutcommondity_id, $repackingoutfish_type, $repackingoutsize, $repackingoutkg, $repackingoutmc, $repackingoutremark)
   {
     global $pdo;
 
@@ -3574,7 +3574,7 @@ class Query
 
     if (!empty($hhkmcdata['balance_mc'])) {
       $balance_mc = $hhkmcdata['balance_mc'] - $repackingoutmc;
-      $transfermcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, fish_type, size, kg, mc, balance_mc) VALUES('$repackingoutdate', '$repackingoutcountry', '$repackingoutparticular', '$repackingoutcommondity_id', '$repackingoutfish_type', '$repackingoutsize', '$repackingoutkg', '$repackingoutmc', '$balance_mc')");
+      $transfermcstmt = $pdo->prepare("INSERT INTO hhkmcstock(date, country, particular, commondity_id, fish_type, size, kg, mc, balance_mc, remark) VALUES('$repackingoutdate', '$repackingoutcountry', '$repackingoutparticular', '$repackingoutcommondity_id', '$repackingoutfish_type', '$repackingoutsize', '$repackingoutkg', '$repackingoutmc', '$balance_mc', '$repackingoutremark')");
       $transfermcstmt->execute();
 
       if (!empty($transfermcstmt)) {

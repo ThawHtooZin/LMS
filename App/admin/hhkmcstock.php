@@ -31,11 +31,12 @@ $query = new Query();
     $commondity_id = $_POST['commondity_id2'] ?? $_POST['commondity_id1'] ?? '';
     $fish_type = $_POST['fish_type2'] ?? $_POST['fish_type'] ?? 'G';
     $country = $_POST['country2'] ?? $_POST['country'] ?? '';
+    $remark = $_POST['remark'] ?? '';
     $size = $_POST['size'];
     $kg = $_POST['kg'];
     $mc = $_POST['mc'];
 
-    $query->addmcstock($date, $particular, $country, $commondity_id, $fish_type, $size, $kg, $mc);
+    $query->addmcstock($date, $particular, $country, $commondity_id, $fish_type, $size, $kg, $mc, $remark);
 
     $_SESSION['date'] = $_POST['date'];
     $_SESSION['particular'] = $_POST['particular'];
@@ -52,12 +53,13 @@ $query = new Query();
     $transferkg = $_POST['transferkg'];
     $transfermc = $_POST['transfermc'];
     $transfercountry = $_POST['transfercountry'];
+    $transferremark = $_POST['transferremark'];
 
-    $transfercheckstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE size='$transfersize' AND country='$transfercountry' AND commondity_id='$transfercommondity_id' AND remark NOT LIKE '%packing%' AND particular LIKE '%From%'");
-    $transfercheckstmt->execute();
-    $transfercheck = $transfercheckstmt->fetch(PDO::FETCH_ASSOC);
+    // $transfercheckstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE size='$transfersize' AND country='$transfercountry' AND commondity_id='$transfercommondity_id' AND remark NOT LIKE '%packing%' AND particular LIKE '%From%'");
+    // $transfercheckstmt->execute();
+    // $transfercheck = $transfercheckstmt->fetch(PDO::FETCH_ASSOC);
 
-    $query->transfermcstock($transferdate, $transferparticular, $transfercountry, $transfercommondity_id, $transferfish_type, $transfersize, $transferkg, $transfermc);
+    $query->transfermcstock($transferdate, $transferparticular, $transfercountry, $transfercommondity_id, $transferfish_type, $transfersize, $transferkg, $transfermc, $transferremark);
   }
 
   if (isset($_POST['repackingoutbtn'])) {
@@ -69,8 +71,9 @@ $query = new Query();
     $repackingoutkg = $_POST['repackingoutkg'];
     $repackingoutmc = $_POST['repackingoutmc'];
     $repackingoutcountry = $_POST['repackingoutcountry'];
+    $repackingoutremark = $_POST['repackingoutremark'];
 
-    $query->repackingout($repackingoutdate, $repackingoutparticular, $repackingoutcountry, $repackingoutcommondity_id, $repackingoutfish_type, $repackingoutsize, $repackingoutkg, $repackingoutmc);
+    $query->repackingout($repackingoutdate, $repackingoutparticular, $repackingoutcountry, $repackingoutcommondity_id, $repackingoutfish_type, $repackingoutsize, $repackingoutkg, $repackingoutmc, $repackingoutremark);
   }
 
   $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM form10stock WHERE country IS NOT NULL");
@@ -92,7 +95,7 @@ $query = new Query();
       function toggleParticularFields() {
         var particular = $('#particular').val();
 
-        if (particular === 'Balance') {
+        if (particular === 'balance') {
           $('#commondityid2').show();
           $('#commondityid1').hide();
           $('#commondityid4').show();
@@ -217,14 +220,17 @@ $query = new Query();
                 $kg = $hhkstockdata['kg'];
                 $commondity_id = $hhkstockdata['commondity_id'];
 
+                // Total In Mc Calculation
                 $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular NOT LIKE '%out%' AND particular NOT LIKE '%to%'");
                 $totalmcstmt->execute();
                 $totalmcnotsub = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
 
+                // Total Transfer Mc Calculation
                 $totalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular NOT LIKE '%out%' AND particular LIKE '%to%'");
                 $totalmcsubnumstmt->execute();
                 $totalmcsubnum = $totalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
 
+                // Total Repacking Out Mc Calculation
                 $totalrepackinoutstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular LIKE '%out%' AND particular NOT LIKE '%to%'");
                 $totalrepackinoutstmt->execute();
                 $totalrepackinout = $totalrepackinoutstmt->fetch(PDO::FETCH_ASSOC);
@@ -336,9 +342,11 @@ $query = new Query();
                       <div class="col">
                         <label>Particular</label>
                         <select name="particular" class="form-control inpv2 mb-2" id="particular">
-                          <option value="From Form-10" <?php echo (isset($_SESSION['particular']) && $_SESSION['particular'] == 'From Form-10') ? 'selected' : ''; ?>>From Form-10</option>
-                          <option value="Balance" <?php echo (isset($_SESSION['particular']) && $_SESSION['particular'] == 'Balance') ? 'selected' : ''; ?>>Balance</option>
+                          <option value="fromform10" <?php echo (isset($_SESSION['particular']) && $_SESSION['particular'] == 'From Form-10') ? 'selected' : ''; ?>>From Form-10</option>
+                          <option value="balance" <?php echo (isset($_SESSION['particular']) && $_SESSION['particular'] == 'Balance') ? 'selected' : ''; ?>>Balance</option>
                         </select>
+                        <label>Remark</label>
+                        <input type="text" name="remark" class="form-control inpv2 mb-2">
                       </div>
                     </div>
                     <div class="row">
@@ -353,7 +361,7 @@ $query = new Query();
                           }
                           ?>
                         </select>
-                        <input type="text" name="country2" id="country2" class="form-control inpv2" value="<?php if (!empty($_SESSION['country'])) {
+                        <input type="text" name="country" id="country2" class="form-control inpv2" value="<?php if (!empty($_SESSION['country'])) {
                                                                                                               echo htmlspecialchars($_SESSION['country']);
                                                                                                             } ?>">
                       </div>
@@ -433,7 +441,11 @@ $query = new Query();
                       </div>
                       <div class="col">
                         <label>Particular</label>
-                        <textarea name="transferparticular" rows="4" class="form-control inpv2 mb-2">HHK To GFC</textarea>
+                        <select name="transferparticular" id="" class="form-control inpv2 mb-2">
+                          <option value="hhktogfc">HHK To GFC</option>
+                        </select>
+                        <label>Remark</label>
+                        <input type="text" name="transferremark" class="form-control inpv2 mb-2">
                       </div>
                     </div>
                     <div class="row">
@@ -527,7 +539,11 @@ $query = new Query();
                       </div>
                       <div class="col">
                         <label>Particular</label>
-                        <textarea name="repackingoutparticular" rows="4" class="form-control inpv2 mb-2">HHK To GFC</textarea>
+                        <select name="repackingoutparticular" class="form-control inpv2 mb-2">
+                          <option value="repackingout">Repacking Out</option>
+                        </select>
+                        <label>Remark</label>
+                        <input type="text" name="repackingoutremark" class="form-control inpv2 mb-2">
                       </div>
                     </div>
                     <div class="row">
