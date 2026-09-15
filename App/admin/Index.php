@@ -1,5 +1,8 @@
 <?php
 session_start();
+// Set your local timezone (e.g., Asia/Yangon)
+date_default_timezone_set('Asia/Yangon');
+
 include '../../Auth/authrize.ctr.php';
 include '../../Resources/resource.boot.php';
 include '../../Controllers/query.ctr.php';
@@ -15,16 +18,13 @@ $query = new Query();
 <head>
   <meta charset="utf-8">
   <title>Admin | Dashboard</title>
+  <?php $bootstrap->css(); ?>
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
 </head>
-<?php
-$bootstrap->css();
-?>
-<!-- Font Awesome CDN added here specifically for icons on this page -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
 
 <body>
   <?php
@@ -36,13 +36,9 @@ $bootstrap->css();
   ?>
   <div class="row">
     <div class="sidebarcol" id="sidebar">
-      <?php
-      include 'sidebar.php';
-      ?>
+      <?php include 'sidebar.php'; ?>
     </div>
     <div class="col p-4">
-      <!-- Top Navbar Placeholder -->
-      <!-- <?php require 'navbar.php'; ?> -->
 
       <!-- Welcome Back Hero Section -->
       <div class="welcome-card mb-5">
@@ -94,8 +90,9 @@ $bootstrap->css();
                 <i class="fas fa-clock info-icon"></i>
               </div>
               <p class="card-label">Current System Time</p>
+              <!-- Time display updated dynamically via JavaScript -->
               <h2 class="card-value" id="timer"><?= date('H:i:s'); ?></h2>
-              <p class="card-sub-value"><?= date('l, F j, Y'); ?></p>
+              <p class="card-sub-value" id="date-label"><?= date('l, F j, Y'); ?></p>
             </div>
           </div>
         </div>
@@ -128,9 +125,29 @@ $bootstrap->css();
 
     </div>
   </div>
-  <?php
-  $bootstrap->javascript();
-  ?>
+
+  <?php $bootstrap->javascript(); ?>
+
+  <!-- Live Clock Script -->
+  <script>
+    function updateLiveClock() {
+      const now = new Date();
+      
+      // Format Time (HH:MM:SS)
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('timer').textContent = `${hours}:${minutes}:${seconds}`;
+
+      // Format Date (Day, Month Date, Year)
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('date-label').textContent = now.toLocaleDateString('en-US', options);
+    }
+
+    // Run clock immediately and refresh every 1000ms (1 sec)
+    updateLiveClock();
+    setInterval(updateLiveClock, 1000);
+  </script>
 </body>
 
 </html>
