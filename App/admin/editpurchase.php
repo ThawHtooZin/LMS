@@ -177,6 +177,16 @@ foreach ($accounts as $acc) {
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
+
+        .error-border {
+            border-bottom: 2px solid #dc3545 !important;
+            box-shadow: 0 1px 0 0 #dc3545 !important;
+        }
+
+        .chosen-container.error-border .chosen-single {
+            border-bottom: 2px solid #dc3545 !important;
+            box-shadow: 0 1px 0 0 #dc3545 !important;
+        }
     </style>
 </head>
 
@@ -250,7 +260,7 @@ foreach ($accounts as $acc) {
                         <div class="col-md-3">
                             <div class="d-flex flex-column">
                                 <label class="fw-bold small mb-1">From</label>
-                                <select name="contact_id" class="form-control chosen-select" data-placeholder="Select supplier..." required <?php echo $is_locked ? 'disabled' : ''; ?>>
+                                <select name="contact_id" class="form-control chosen-select req-input" data-placeholder="Select supplier..." required <?php echo $is_locked ? 'disabled' : ''; ?>>
                                     <option value=""></option>
                                     <?php foreach ($suppliers as $sup): ?>
                                         <option value="<?php echo $sup['id']; ?>" <?php echo ($purchase['contact_id'] == $sup['id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($sup['name']); ?></option>
@@ -260,7 +270,7 @@ foreach ($accounts as $acc) {
                         </div>
                         <div class="col-md-2">
                             <label class="fw-bold small mb-1">Date</label>
-                            <input type="date" name="date" class="form-control" value="<?php echo htmlspecialchars($purchase['date']); ?>" required <?php echo $is_locked ? 'readonly' : ''; ?>>
+                            <input type="date" name="date" class="form-control req-input" value="<?php echo htmlspecialchars($purchase['date']); ?>" required <?php echo $is_locked ? 'readonly' : ''; ?>>
                         </div>
                         <div class="col-md-2">
                             <label class="fw-bold small mb-1">Type</label>
@@ -277,7 +287,7 @@ foreach ($accounts as $acc) {
                         </div>
                         <div class="col-md-3">
                             <label class="fw-bold small mb-1">Reference</label>
-                            <input type="text" name="voucher_no" class="form-control" value="<?php echo htmlspecialchars($purchase['voucher_no']); ?>" required <?php echo $is_locked ? 'readonly' : ''; ?>>
+                            <input type="text" name="voucher_no" class="form-control req-input" value="<?php echo htmlspecialchars($purchase['voucher_no']); ?>" required <?php echo $is_locked ? 'readonly' : ''; ?>>
                         </div>
                     </div>
 
@@ -403,6 +413,22 @@ foreach ($accounts as $acc) {
         </div>
     </div>
 
+    <select id="accTpl" style="display:none;">
+        <option value="">- Account -</option>
+        <?php foreach ($grouped_accs as $class => $accs): ?>
+            <optgroup label="<?php echo htmlspecialchars($class); ?>">
+                <?php foreach ($accs as $a): ?>
+                    <option value="<?php echo htmlspecialchars($a['code']); ?>"><?php echo htmlspecialchars($a['code'] . ' - ' . $a['name']); ?></option>
+                <?php endforeach; ?>
+            </optgroup>
+        <?php endforeach; ?>
+    </select>
+    <select id="prodTpl" style="display:none;">
+        <?php foreach ($products as $p): ?>
+            <option value="<?php echo htmlspecialchars($p['id']); ?>"><?php echo htmlspecialchars($p['code'] . ' - ' . $p['name']); ?></option>
+        <?php endforeach; ?>
+    </select>
+
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <?php echo $bootstrap->javascript(); ?>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
@@ -432,7 +458,15 @@ foreach ($accounts as $acc) {
             }
             $('#linesBody').on('input', '.calc-input', calcTotals);
 
-            // Auto-fill account code when product changes on new/existing rows
+            // Clear error borders when the user starts typing/selecting
+            $(document).on('input change', '.req-input, .error-border, select', function() {
+                $(this).removeClass('error-border');
+                if ($(this).is('select')) {
+                    $(this).next('.chosen-container').removeClass('error-border');
+                }
+            });
+
+            // Auto-fill account code when product changes
             $('#linesBody').on('change', '.prod-select', function() {
                 let row = $(this).closest('tr');
                 let pId = $(this).val();
@@ -444,6 +478,16 @@ foreach ($accounts as $acc) {
                 }
             });
         });
+
+        function toggleMaterialColumns(selectedType) {
+            if (selectedType === 'Material') {
+                $('.col-fish-only').hide();
+                $('#qtyHeaderTh').text('Quantity');
+            } else {
+                $('.col-fish-only').show();
+                $('#qtyHeaderTh').text('Pcs');
+            }
+        }
 
         function addNewLine(data = {}) {
             if (isLocked) return;
@@ -536,6 +580,50 @@ foreach ($accounts as $acc) {
                 swal('Strict Audit Block!', 'You cannot update paid or partially paid vouchers.', 'error');
                 return;
             }
+
+            let isValid = true;
+            let firstErrorField = null;
+
+            // Clear previous error styles
+            $('.error-border').removeClass('error-border');
+
+            // 1. Validate Required Header Fields
+            $('.req-input').each(function() {
+                if (!$(this).val() || $(this).val().trim() === "") {
+                    isValid = false;
+                    $(this).addClass('error-border');
+                    if ($(this).is('select')) {
+                        $(this).next('.chosen-container').addClass('error-border');
+                    }
+                    if (!firstErrorField) firstErrorField = $(this);
+                }
+            });
+
+            // 2. Validate That at Establish a Valid Line Item
+            let hasValidLine = false;
+            $('#linesBody tr').each(function() {
+                let prod = $(this).find('.prod-select').val();
+                let price = parseFloat($(this).find('.price-input').val()) || 0;
+
+                // Description and Pcs are optional; Product and Price are mandatory
+                if (prod && prod !== "" && price > 0) {
+                    hasValidLine = true;
+                }
+            });
+
+            if (!hasValidLine) {
+                isValid = false;
+                swal("Validation Error", "Please fill out at least one line item with a Product and Unit Price.", "warning");
+            }
+
+            if (!isValid) {
+                if (firstErrorField) {
+                    firstErrorField.focus();
+                    swal("Validation Error", "Please fill in all required fields highlighted in red.", "warning");
+                }
+                return;
+            }
+
             document.getElementById('action_type').value = action;
             document.getElementById('billForm').submit();
         }

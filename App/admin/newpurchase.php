@@ -489,13 +489,18 @@ foreach ($accounts as $acc) {
         }
 
         function submitForm(action) {
+            if (typeof isLocked !== 'undefined' && isLocked) {
+                swal('Strict Audit Block!', 'You cannot update paid or partially paid vouchers.', 'error');
+                return;
+            }
+
             let isValid = true;
             let firstErrorField = null;
 
             // Clear previous error styles
             $('.error-border').removeClass('error-border');
 
-            // 1. Validate Required Header Fields
+            // 1. Validate Required Header Fields (Everything with .req-input class)
             $('.req-input').each(function() {
                 if (!$(this).val() || $(this).val().trim() === "") {
                     isValid = false;
@@ -507,29 +512,71 @@ foreach ($accounts as $acc) {
                 }
             });
 
-            // 2. Validate That at Establish a Valid Line Item (Description & Pcs are now optional)
+            // 2. STRICT Line Item Validation
             let hasValidLine = false;
-            $('#linesBody tr').each(function() {
-                let prod = $(this).find('.prod-select').val();
-                let price = parseFloat($(this).find('.price-input').val()) || 0;
+            let selectedType = $('#tclfrozenTypeSelect').val();
 
-                // A line is valid if a product is selected and a unit price is provided. 
-                // Description and Pcs are optional and will not block validation.
-                if (prod && prod !== "" && price > 0) {
+            $('#linesBody tr').each(function() {
+                let prod = $(this).find('.prod-select');
+                let size = $(this).find('input[name="size[]"]');
+                let viss = $(this).find('.viss-input');
+                let pcs = $(this).find('.pcs-input');
+                let price = $(this).find('.price-input');
+                let acc = $(this).find('.acc-select');
+
+                let prodVal = prod.val();
+
+                // If a product is selected, enforce the "Nothing Else Can Be Empty" rule for this line
+                if (prodVal && prodVal !== "") {
                     hasValidLine = true;
+
+                    let priceVal = parseFloat(price.val()) || 0;
+                    if (priceVal <= 0) {
+                        isValid = false;
+                        price.addClass('error-border');
+                        if (!firstErrorField) firstErrorField = price;
+                    }
+
+                    if (!acc.val() || acc.val() === "") {
+                        isValid = false;
+                        acc.next('.chosen-container').addClass('error-border');
+                        if (!firstErrorField) firstErrorField = acc;
+                    }
+
+                    // Conditional strictness based on Fish vs Material
+                    if (selectedType !== 'Material') {
+                        // FISH: Size and Viss are STRICTLY REQUIRED. Pcs is optional.
+                        if (!size.val() || size.val().trim() === "") {
+                            isValid = false;
+                            size.addClass('error-border');
+                            if (!firstErrorField) firstErrorField = size;
+                        }
+                        if (parseFloat(viss.val()) <= 0 || isNaN(parseFloat(viss.val()))) {
+                            isValid = false;
+                            viss.addClass('error-border');
+                            if (!firstErrorField) firstErrorField = viss;
+                        }
+                    } else {
+                        // MATERIAL: Size/Viss are hidden. Pcs acts as quantity, so it becomes REQUIRED here.
+                        if (parseFloat(pcs.val()) <= 0 || isNaN(parseFloat(pcs.val()))) {
+                            isValid = false;
+                            pcs.addClass('error-border');
+                            if (!firstErrorField) firstErrorField = pcs;
+                        }
+                    }
                 }
             });
 
             if (!hasValidLine) {
-                isValid = false;
-                swal("Validation Error", "Please fill out at least one line item with a Product and Unit Price.", "warning");
+                swal("Validation Error", "You must fill out at least one Product line.", "warning");
+                return;
             }
 
             if (!isValid) {
                 if (firstErrorField) {
                     firstErrorField.focus();
-                    swal("Validation Error", "Please fill in all required fields highlighted in red.", "warning");
                 }
+                swal("Validation Error", "Description, PCS, and Due Date are optional. EVERYTHING ELSE MUST BE FILLED. Please complete the highlighted fields.", "warning");
                 return;
             }
 

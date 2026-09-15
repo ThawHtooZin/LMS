@@ -35,20 +35,24 @@ $bootstrap->css();
             $transfer_to = $_POST['transfer_to'];
             $voucher_no = $_POST['voucher_no'];
             $material = $_POST['material'];
-            $quantity = $_POST['quantity'];
+            $quantity = floatval($_POST['quantity']);
             $description = $_POST['description'];
 
-            $incheckstmt = $pdo->prepare("SELECT SUM(`in`) AS totalin FROM stock_output_group WHERE material_id = '$material'");
-            $incheckstmt->execute();
+            // FIX: Summing 'quantity' since 'in' doesn't exist
+            $incheckstmt = $pdo->prepare("SELECT SUM(`quantity`) AS totalin FROM stock_output_group WHERE material_id = ?");
+            $incheckstmt->execute([$material]);
             $incheckdata = $incheckstmt->fetch(PDO::FETCH_ASSOC);
-            $incheckdata = ['totalin' => 0];
 
-            $outcheckstmt = $pdo->prepare("SELECT SUM(`out`) AS totalout FROM stock_output_group WHERE material_id = '$material'");
-            $outcheckstmt->execute();
-            $outcheckdata = $outcheckstmt->fetch(PDO::FETCH_ASSOC);
-            $outcheckdata = ['totalout' => 0];
+            // FIX: Graceful fallback for missing 'out' column in DB
+            try {
+                $outcheckstmt = $pdo->prepare("SELECT SUM(`out`) AS totalout FROM stock_output_group WHERE material_id = ?");
+                $outcheckstmt->execute([$material]);
+                $outcheckdata = $outcheckstmt->fetch(PDO::FETCH_ASSOC);
+            } catch (PDOException $e) {
+                $outcheckdata = ['totalout' => 0];
+            }
 
-            $totalquantity = $incheckdata['totalin'] - $outcheckdata['totalout'];
+            $totalquantity = floatval($incheckdata['totalin'] ?? 0) - floatval($outcheckdata['totalout'] ?? 0);
 
             if ($totalquantity < $quantity) {
                 $quantity_error = "Not enough quantity";
@@ -80,24 +84,20 @@ $bootstrap->css();
                                             <option value="return">Return</option>
                                             <option value="damaged">Damaged</option>
                                         </select>
-                                        <!-- 
                                         <div id="transftertodiv" style="display:none;">
                                             <label>Transfer To</label>
                                             <select name="transfer_to" class="form-control">
                                                 <?php
-                                                // $coldstorestmt = $pdo->prepare("SELECT * FROM config_coldstore");
-                                                // $coldstorestmt->execute();
-                                                // $coldstores = $coldstorestmt->fetchAll();
-                                                // $coldstores = [];
-                                                // foreach ($coldstores as $coldstore): 
+                                                $coldstorestmt = $pdo->prepare("SELECT * FROM config_coldstore");
+                                                $coldstorestmt->execute();
+                                                $coldstores = $coldstorestmt->fetchAll(PDO::FETCH_ASSOC);
+                                                foreach ($coldstores as $coldstore):
                                                 ?>
-                                                    <option value="<?php // $coldstore['name'] 
-                                                                    ?>" style="text-transform: uppercase;"><?php // $coldstore['name'] 
-                                                                                                            ?></option>
-                                                <?php // endforeach; 
+                                                    <option value="<?php echo htmlspecialchars($coldstore['name']); ?>" style="text-transform: uppercase;"><?php echo htmlspecialchars($coldstore['name']); ?></option>
+                                                <?php endforeach;
                                                 ?>
                                             </select>
-                                        </div> -->
+                                        </div>
 
                                         <label>Date</label>
                                         <input type="date" name="date" class="form-control">
@@ -105,19 +105,21 @@ $bootstrap->css();
                                         <label>Packing Material Item</label>
                                         <select name="material" id="" class="form-control">
                                             <?php
-                                            $materialstmt = $pdo->prepare("SELECT material_id FROM stock_output_group GROUP BY material_id");
+                                            // FIX: Strict Mode compliance
+                                            $materialstmt = $pdo->prepare("SELECT DISTINCT material_id FROM stock_output_group WHERE material_id > 0");
                                             $materialstmt->execute();
-                                            $materials = $materialstmt->fetchAll();
-                                            $materials = [];
-                                            foreach ($materials as $material) {
-                                                $materialid = $material['material_id'];
-                                                $materialstmt = $pdo->prepare("SELECT * FROM materials WHERE id='$materialid'");
-                                                $materialstmt->execute();
-                                                $materialdata = $materialstmt->fetch(PDO::FETCH_ASSOC);
-                                                $materialdata = ['name' => ''];
+                                            $materials = $materialstmt->fetchAll(PDO::FETCH_ASSOC);
+                                            foreach ($materials as $mat) {
+                                                $materialid = $mat['material_id'];
+                                                // FIX: Point to unified products table
+                                                $mStmt = $pdo->prepare("SELECT * FROM products WHERE id=?");
+                                                $mStmt->execute([$materialid]);
+                                                $materialdata = $mStmt->fetch(PDO::FETCH_ASSOC);
+                                                if ($materialdata) {
                                             ?>
-                                                <option value="<?= $material['material_id']; ?>"><?= $materialdata['name']; ?></option>
+                                                    <option value="<?= htmlspecialchars($materialid); ?>"><?= htmlspecialchars($materialdata['name']); ?></option>
                                             <?php
+                                                }
                                             }
                                             ?>
                                         </select>
@@ -131,7 +133,7 @@ $bootstrap->css();
                                         if (isset($_POST['managebtn'])) {
                                             if (!empty($quantity_error)) {
                                         ?>
-                                                <p class="text-danger"><?= $quantity_error; ?></p>
+                                                <p class="text-danger"><?= htmlspecialchars($quantity_error); ?></p>
                                         <?php
                                             }
                                         }
@@ -153,7 +155,7 @@ $bootstrap->css();
                     <?php
 
                     if (!empty($_GET['pageno'])) {
-                        $pageno = $_GET['pageno'];
+                        $pageno = intval($_GET['pageno']);
                     } else {
                         $pageno = 1;
                     }
@@ -162,26 +164,28 @@ $bootstrap->css();
                     ?>
 
                     <div class="text-center">
-                        <?php
-                        ?>
                         <form action="" method="post">
                             <?php
-                            $stmt = $pdo->prepare("SELECT stock_to FROM stock_output_group GROUP BY stock_to");
+                            // FIX: Strict Mode compliance
+                            $stmt = $pdo->prepare("SELECT DISTINCT stock_to FROM stock_output_group WHERE stock_to IS NOT NULL AND stock_to != ''");
                             $stmt->execute();
-                            $datas = $stmt->fetchAll();
-                            $datas = [];
+                            $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
                             foreach ($datas as $data) {
                                 if (isset($_POST[$data['stock_to'] . 'btn'])) {
                                     $_SESSION['tabs'] = $data['stock_to'];
                                 }
                             }
+                            // Default tab if none selected
+                            if (!isset($_SESSION['tabs']) && !empty($datas)) {
+                                $_SESSION['tabs'] = $datas[0]['stock_to'];
+                            }
+
                             foreach ($datas as $data) {
                             ?>
-                                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark <?php if ($_SESSION['tabs'] == $data['stock_to']) {
+                                <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark <?php if (isset($_SESSION['tabs']) && $_SESSION['tabs'] == $data['stock_to']) {
                                                                                                 echo 'color';
-                                                                                            } else {
-                                                                                                echo '';
-                                                                                            } ?>" style="text-transform: uppercase; border:none;" name="<?= $data['stock_to']; ?>btn"><?= $data['stock_to']; ?></button>
+                                                                                            } ?>" style="text-transform: uppercase; border:none;" name="<?= htmlspecialchars($data['stock_to']); ?>btn"><?= htmlspecialchars($data['stock_to']); ?></button>
                             <?php
                             }
                             ?>
@@ -190,7 +194,6 @@ $bootstrap->css();
 
                     <table class="mt-3 table table-bordered table-striped rounded">
                         <tr>
-                            <!-- <th>Category Name</th> -->
                             <th style="width: 20px;">No.</th>
                             <th>Packing Material Item</th>
                             <th>In</th>
@@ -202,62 +205,54 @@ $bootstrap->css();
                         <?php
                         $stock_to = isset($_SESSION['tabs']) ? $_SESSION['tabs'] : '';
 
-                        $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$stock_to' GROUP BY material_id ORDER BY id");
-                        $stmt->execute();
-                        $rawResult = $stmt->fetchAll();
-                        $rawResult = [];
+                        // FIX: Strict Mode compliance
+                        $stmt = $pdo->prepare("SELECT DISTINCT material_id FROM stock_output_group WHERE stock_to = ?");
+                        $stmt->execute([$stock_to]);
+                        $rawResult = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                         $total_pages = ceil(count($rawResult) / $numOfrecs);
                         if ($total_pages == 0) $total_pages = 1;
 
-                        $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$stock_to' GROUP BY material_id ORDER BY id LIMIT $offset,$numOfrecs ");
-                        $stmt->execute();
-                        $datas = $stmt->fetchAll();
-                        $datas = [];
+                        // FIX: Strict Mode compliance
+                        $stmt = $pdo->prepare("SELECT DISTINCT material_id FROM stock_output_group WHERE stock_to = ? ORDER BY material_id LIMIT $offset, $numOfrecs");
+                        $stmt->execute([$stock_to]);
+                        $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         ?>
                         <?php
-                        $no = 1;
+                        $no = $offset + 1;
                         foreach ($datas as $data) {
                             $material_id = $data['material_id'];
 
-                            $stmt = $pdo->prepare("SELECT * FROM materials WHERE id='$material_id'");
-                            $stmt->execute();
-                            $material = $stmt->fetch(PDO::FETCH_ASSOC);
-                            $material = ['name' => ''];
+                            // FIX: Point to products (This was Line 220)
+                            $mStmt = $pdo->prepare("SELECT * FROM products WHERE id=?");
+                            $mStmt->execute([$material_id]);
+                            $material = $mStmt->fetch(PDO::FETCH_ASSOC) ?: ['name' => 'Unknown Product'];
 
-                            $insumstmt = $pdo->prepare("SELECT SUM(`in`) as totalin FROM stock_output_group WHERE material_id='$material_id' AND stock_to = '$stock_to'");
-                            $insumstmt->execute();
+                            // FIX: Summing quantity instead of in
+                            $insumstmt = $pdo->prepare("SELECT SUM(`quantity`) as totalin FROM stock_output_group WHERE material_id=? AND stock_to=?");
+                            $insumstmt->execute([$material_id, $stock_to]);
                             $totalin = $insumstmt->fetch(PDO::FETCH_ASSOC);
-                            $totalin = ['totalin' => ''];
 
-                            $outsumstmt = $pdo->prepare("SELECT SUM(`out`) as totalout FROM stock_output_group WHERE material_id='$material_id' AND stock_to = '$stock_to'");
-                            $outsumstmt->execute();
-                            $totalout = $outsumstmt->fetch(PDO::FETCH_ASSOC);
-                            $totalout = ['totalout' => ''];
+                            // FIX: Graceful fallback for missing out column
+                            try {
+                                $outsumstmt = $pdo->prepare("SELECT SUM(`out`) as totalout FROM stock_output_group WHERE material_id=? AND stock_to=?");
+                                $outsumstmt->execute([$material_id, $stock_to]);
+                                $totalout = $outsumstmt->fetch(PDO::FETCH_ASSOC);
+                            } catch (PDOException $e) {
+                                $totalout = ['totalout' => 0];
+                            }
 
-                            $balance = (int)$totalin['totalin'] - (int)$totalout['totalout'];
+                            $balance = floatval($totalin['totalin'] ?? 0) - floatval($totalout['totalout'] ?? 0);
                         ?>
 
                             <tr>
                                 <td><?php echo $no; ?></td>
-                                <td><?php echo $material['name']; ?></td>
-                                <td><?php if ($totalin['totalin'] == '') {
-                                        echo '-';
-                                    } else {
-                                        echo $totalin['totalin'];
-                                    }; ?></td>
-                                <td><?php if ($totalout['totalout'] == '') {
-                                        echo '-';
-                                    } else {
-                                        echo $totalout['totalout'];
-                                    }; ?></td>
-                                <td><?php if ($balance == '') {
-                                        echo '-';
-                                    } else {
-                                        echo $balance;
-                                    }; ?></td>
-                                <td><a href="material_gatepass_detail.php?id=<?= $data['material_id']; ?>" class="btn btn-primary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-check" viewBox="0 0 16 16">
-                                            <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z" />
+                                <td><?php echo htmlspecialchars($material['name'] ?? 'Unknown Product'); ?></td>
+                                <td><?php echo empty($totalin['totalin']) ? '-' : $totalin['totalin']; ?></td>
+                                <td><?php echo empty($totalout['totalout']) ? '-' : $totalout['totalout']; ?></td>
+                                <td><?php echo ($balance == 0 && empty($totalin['totalin'])) ? '-' : $balance; ?></td>
+                                <td><a href="material_gatepass_detail.php?id=<?= htmlspecialchars($material_id); ?>" class="btn btn-primary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-check" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z" />
                                         </svg></a></td>
                             </tr>
                             <!-- Data Update Modal -->
@@ -265,27 +260,22 @@ $bootstrap->css();
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header bg-warning text-light">
-                                            <h5 class="modal-title" id="updatemodallabel">Update An Material</h5>
+                                            <h5 class="modal-title" id="updatemodallabel">Update Material</h5>
                                             <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true" class="h3">&times;</span>
                                             </button>
                                         </div>
                                         <form action="" method="post" autocomplete="off">
                                             <div class="modal-body">
-                                                <?php
-                                                $id = $material_id;
-                                                $updatedata = $query->select('materials', $id, 'id');
-                                                $updatedata = ['name' => '', 'description' => ''];
-                                                ?>
                                                 <input type="hidden" name="id" value="<?php echo $material_id; ?>">
                                                 <label>Material Name</label>
-                                                <input type="text" name="name" class="form-control" placeholder="Name" value="<?php echo $updatedata['name']; ?>">
+                                                <input type="text" name="name" class="form-control" placeholder="Name" value="<?php echo htmlspecialchars($material['name'] ?? ''); ?>" readonly>
                                                 <label>Description</label>
-                                                <textarea name="description" class="form-control" placeholder="Description"><?php echo $updatedata['description']; ?></textarea>
+                                                <textarea name="description" class="form-control" placeholder="Description" readonly><?php echo htmlspecialchars($material['description'] ?? ''); ?></textarea>
+                                                <small class="text-danger mt-2 d-block">Note: Material details must be edited in the Products module.</small>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                <button type="submit" class="btn btn-warning" name="updatebutton">Update</button>
                                             </div>
                                         </form>
                                     </div>
@@ -345,10 +335,11 @@ $bootstrap->css();
                         <input type="text" name="name" class="form-control" placeholder="Name">
                         <label>Description</label>
                         <textarea name="description" class="form-control" placeholder="Description"></textarea>
+                        <small class="text-danger mt-2 d-block">Note: Please add new Materials via the Products module instead.</small>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success" name="addbutton">Add Material</button>
+                        <button type="button" class="btn btn-success" disabled>Add Material</button>
                     </div>
                 </form>
             </div>
