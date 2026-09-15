@@ -43,6 +43,13 @@ $query = new Query();
       font-weight: 600;
       font-size: 0.75rem;
     }
+    /* Center text and title inside SweetAlert modal */
+    .swal-modal {
+      text-align: center !important;
+    }
+    .swal-title, .swal-text {
+      text-align: center !important;
+    }
   </style>
 </head>
 
@@ -58,15 +65,30 @@ $query = new Query();
   }
   ?>
 
+  <!-- Dynamic SweetAlert Notifications -->
   <script type="text/javascript">
     <?php if (!empty($_GET['status']) && $_GET['status'] == 'success') : ?>
       swal('Success', 'Operation completed successfully.', 'success');
-    <?php elseif (!empty($_GET['status']) && $_GET['status'] == 'error') : ?>
-      swal('Error', 'An error occurred during execution.', 'error');
+    <?php elseif (!empty($_GET['status']) && $_GET['status'] == 'error') : 
+      $msg = $_GET['msg'] ?? '';
+      $errorText = 'An error occurred during execution.';
+      if ($msg === 'invalid_password') {
+        $errorText = 'Authentication failed: Incorrect admin password.';
+      } elseif ($msg === 'missing_credentials') {
+        $errorText = 'Please provide your admin password to authorize the restore.';
+      } elseif ($msg === 'invalid_file_type') {
+        $errorText = 'Invalid file format. Please upload a valid .sql file.';
+      } elseif ($msg === 'upload_failed') {
+        $errorText = 'File upload failed. Please try again.';
+      } elseif ($msg === 'restore_failed') {
+        $errorText = 'Failed to restore database. Please check your MySQL binary/file path.';
+      }
+    ?>
+      swal('Execution Failed', '<?= $errorText ?>', 'error');
     <?php endif; ?>
   </script>
 
-  <div class="row g-0">
+  <div class="row">
     <div class="sidebarcol" id="sidebar">
       <?php include 'sidebar.php'; ?>
     </div>
@@ -107,14 +129,14 @@ $query = new Query();
                   </div>
                 </div>
 
-                <!-- Single Table Export -->
+                <!-- Single Table Export (Maintenance Warning) -->
                 <div class="col-md-6">
                   <div class="action-tile p-3 h-100 d-flex align-items-center justify-content-between">
                     <div>
                       <h6 class="fw-semibold mb-1 text-dark">Export Single Table</h6>
                       <p class="text-muted small mb-0">Select and download data from a single database table.</p>
                     </div>
-                    <button type="button" class="btn btn-secondary btn-sm px-3 fw-semibold" data-bs-target="#backuponetable" data-bs-toggle="modal">Select Table</button>
+                    <button type="button" class="btn btn-secondary btn-sm px-3 fw-semibold" onclick="showUnderMaintenanceAlert('Export Single Table')">Select Table</button>
                   </div>
                 </div>
 
@@ -144,14 +166,14 @@ $query = new Query();
                   </div>
                 </div>
 
-                <!-- CSV / Excel Import -->
+                <!-- CSV / Excel Import (Maintenance Warning) -->
                 <div class="col-md-6">
                   <div class="action-tile p-3 h-100 d-flex align-items-center justify-content-between">
                     <div>
                       <h6 class="fw-semibold mb-1 text-dark">Import CSV / Excel Data</h6>
                       <p class="text-muted small mb-0">Bulk upload rows into a targeted table using CSV format.</p>
                     </div>
-                    <button type="button" class="btn btn-secondary btn-sm px-3 fw-semibold" data-bs-target="#importfromexcel" data-bs-toggle="modal">Import CSV</button>
+                    <button type="button" class="btn btn-secondary btn-sm px-3 fw-semibold" onclick="showUnderMaintenanceAlert('CSV / Excel Import')">Import CSV</button>
                   </div>
                 </div>
 
@@ -164,106 +186,126 @@ $query = new Query();
     </div>
   </div>
 
-  <!-- MODAL: Restore SQL File -->
-  <div class="modal fade" id="restoreModal" tabindex="-1">
+  <!-- MODAL 1: Restore SQL File & Authorization -->
+  <div class="modal fade" id="restoreModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-0 shadow">
         <div class="modal-header border-bottom py-3">
           <h6 class="modal-title fw-bold text-dark">Restore Database Snapshot</h6>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <form action="restore.php" method="post" enctype="multipart/form-data">
+        <form action="restore.php" method="post" enctype="multipart/form-data" id="restoreForm">
           <div class="modal-body p-4">
-            <div class="alert alert-light border small text-secondary mb-3">
-              <strong>Caution:</strong> Restoring an SQL file replaces conflicting database tables and data.
+            
+            <div class="alert alert-warning border small text-dark mb-3">
+              <strong>Caution:</strong> Restoring an SQL file replaces existing conflicting tables and data.
             </div>
+
+            <!-- SQL File Input -->
             <div class="mb-3">
               <label class="form-label small fw-semibold text-dark">SQL File (.sql)</label>
-              <input type="file" name="sql_file" class="form-control form-control-sm" accept=".sql" required>
+              <input type="file" name="sql_file" id="sql_file" class="form-control form-control-sm" accept=".sql" required>
             </div>
+
+            <!-- Admin Password Authentication -->
+            <div class="mb-3">
+              <label class="form-label small fw-semibold text-dark">Admin Password Authorization</label>
+              <input type="password" name="admin_password" id="admin_password" class="form-control form-control-sm" placeholder="Enter password to authorize" required>
+            </div>
+
           </div>
           <div class="modal-footer border-top py-2">
             <button type="button" class="btn btn-light btn-sm text-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-dark btn-sm fw-semibold" name="restorebtn">Execute Restore</button>
+            <button type="submit" class="btn btn-danger btn-sm fw-semibold" id="restoreSubmitBtn">Authorize & Restore</button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: Import Excel/CSV -->
-  <div class="modal fade" id="importfromexcel" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-0 shadow">
-        <div class="modal-header border-bottom py-3">
-          <h6 class="modal-title fw-bold text-dark">Import Data (CSV)</h6>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <!-- MODAL 2: Separate Loading Spinner Modal -->
+  <div class="modal fade" id="loadingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content border-0 shadow text-center p-4">
+        <div class="d-flex justify-content-center mb-3">
+          <div class="spinner-border text-danger" role="status" style="width: 2.5rem; height: 2.5rem;">
+            <span class="visually-hidden">Loading...</span>
+          </div>
         </div>
-        <form action="excelimport.php" method="post" enctype="multipart/form-data">
-          <div class="modal-body p-4">
-            <div class="mb-3">
-              <label class="form-label small fw-semibold text-dark">Target Table</label>
-              <select name="importtable" class="form-select form-select-sm text-capitalize" required>
-                <?php
-                $stmt = $pdo->prepare("SHOW TABLES");
-                $stmt->execute();
-                $tablesdatas = $stmt->fetchAll(PDO::FETCH_NUM);
-
-                foreach ($tablesdatas as $tablesdata) {
-                  echo "<option value=\"{$tablesdata[0]}\">{$tablesdata[0]}</option>";
-                }
-                ?>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label class="form-label small fw-semibold text-dark">File (.csv)</label>
-              <input type="file" name="excelfile" class="form-control form-control-sm" required>
-            </div>
-          </div>
-          <div class="modal-footer border-top py-2">
-            <button type="button" class="btn btn-light btn-sm text-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-dark btn-sm fw-semibold" name="excelimportbtn">Run Import</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: Single Table Backup -->
-  <div class="modal fade" id="backuponetable" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-0 shadow">
-        <div class="modal-header border-bottom py-3">
-          <h6 class="modal-title fw-bold text-dark">Select Table to Export</h6>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <form action="" method="post">
-          <div class="modal-body p-4">
-            <div class="mb-3">
-              <label class="form-label small fw-semibold text-dark">Available Tables</label>
-              <select name="tablename" class="form-select form-select-sm text-capitalize" required>
-                <?php
-                $stmt = $pdo->prepare("SHOW TABLES");
-                $stmt->execute();
-                $tablesdatas = $stmt->fetchAll(PDO::FETCH_NUM);
-
-                foreach ($tablesdatas as $tablesdata) {
-                  echo "<option value=\"{$tablesdata[0]}\">{$tablesdata[0]}</option>";
-                }
-                ?>
-              </select>
-            </div>
-          </div>
-          <div class="modal-footer border-top py-2">
-            <button type="button" class="btn btn-light btn-sm text-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-dark btn-sm fw-semibold" name="backuponetable">Download Table File</button>
-          </div>
-        </form>
+        <h6 class="fw-bold text-dark mb-1">Restoring Database</h6>
+        <p class="text-muted small mb-0">Please wait, executing SQL script...</p>
       </div>
     </div>
   </div>
 
   <?php $bootstrap->javascript(); ?>
+
+  <script>
+    // 1. Alert Function for Under Maintenance Features
+    function showUnderMaintenanceAlert(featureName) {
+      swal(
+        'Feature Under Maintenance',
+        `The "${featureName}" feature is currently being updated and will be available soon.`,
+        'warning'
+      );
+    }
+
+    // 2. Pre-Validation AJAX & Loading Spinner Delay Logic
+    document.getElementById('restoreForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const form = this;
+      const formData = new FormData(form);
+      formData.append('check_auth_only', '1');
+
+      // Verify password via AJAX first before showing loader
+      fetch('restore.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (!data.success) {
+          // If password validation fails, show SweetAlert error immediately
+          swal('Execution Failed', data.message, 'error');
+        } else {
+          // Hide form modal
+          const restoreModalEl = document.getElementById('restoreModal');
+          const restoreModal = bootstrap.Modal.getInstance(restoreModalEl) || new bootstrap.Modal(restoreModalEl);
+          restoreModal.hide();
+
+          // Show separate loading spinner modal
+          const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+          loadingModal.show();
+
+          // Hold spinner for 3 seconds before restoring database
+          setTimeout(() => {
+            const executeData = new FormData(form);
+            executeData.append('execute_restore', '1');
+
+            fetch('restore.php', {
+              method: 'POST',
+              body: executeData
+            })
+            .then(res => res.json())
+            .then(resData => {
+              if (resData.success) {
+                window.location.href = 'backupandrestore.php?status=success';
+              } else {
+                window.location.href = 'backupandrestore.php?status=error&msg=' + (resData.msg || 'restore_failed');
+              }
+            })
+            .catch(() => {
+              window.location.href = 'backupandrestore.php?status=error&msg=restore_failed';
+            });
+          }, 3000);
+        }
+      })
+      .catch(() => {
+        swal('Execution Failed', 'An error occurred during verification.', 'error');
+      });
+    });
+  </script>
 </body>
 
 </html>
