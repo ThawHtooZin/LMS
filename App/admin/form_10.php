@@ -15,12 +15,13 @@ $query = new Query();
 <head>
   <meta charset="utf-8">
   <title>Admin | Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
 </head>
 <?php
 $bootstrap->css();
 ?>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
 <body>
   <div class="row">
@@ -52,7 +53,6 @@ $bootstrap->css();
         .nav-card:hover {
           transform: translateY(-8px);
           box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
-          /* Info color border on hover */
           color: #333;
         }
 

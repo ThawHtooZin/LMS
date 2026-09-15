@@ -15,6 +15,9 @@ $query = new Query();
 <head>
   <meta charset="utf-8">
   <title>Admin | Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@700&display=swap" rel="stylesheet">
   <?php $bootstrap->css(); ?>
   <style>
     .nav-card {
@@ -36,6 +39,7 @@ $query = new Query();
     .nav-card:hover {
       transform: translateY(-5px);
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      color: #333;
     }
 
     .nav-card-title {
