@@ -33,10 +33,10 @@ $bootstrap->css();
         <div class="card-header bg-primary text-light" style="padding:-10px;">
           <?php
           $id = $_GET['id'];
-          // RULE 1: Items -> Products
+          // CORRECTED: Target products table
           $materialstmt = $pdo->prepare("SELECT * FROM products WHERE id = ? LIMIT 1");
           $materialstmt->execute([$id]);
-          $material = $materialstmt->fetch(PDO::FETCH_ASSOC) ?: ['name' => 'Unknown Material', 'unit' => ''];
+          $material = $materialstmt->fetch(PDO::FETCH_ASSOC) ?: ['name' => 'Unknown Product', 'unit' => ''];
           ?>
           <h5>Manage Store {<?= htmlspecialchars($material['name']); ?>} Detail</h5>
           <a href="material_store_house.php" class="float-end btn btn-secondary btn-sm">Back</a>
@@ -77,26 +77,33 @@ $bootstrap->css();
             $balance = 0;
             foreach ($datas as $data) {
               $material_id = $data['material_id'];
-              $supplier_id = $data['supplier_id'];
+              $supplier_id = $data['supplier_id'] ?? '';
 
-              // RULE 1: Products table
+              // CORRECTED: Target products table
               $mStmt = $pdo->prepare("SELECT * FROM products WHERE id = ? LIMIT 1");
               $mStmt->execute([$material_id]);
               $matData = $mStmt->fetch(PDO::FETCH_ASSOC) ?: ['name' => '', 'unit' => ''];
 
-              // RULE 3: Suppliers -> Contacts table
-              $suppStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ? LIMIT 1");
-              $suppStmt->execute([$supplier_id]);
-              $supplierName = $suppStmt->fetchColumn() ?: '';
+              // Safely look up supplier name without crashing on strings
+              $supplierName = $supplier_id;
+              if (is_numeric($supplier_id)) {
+                $suppStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ? LIMIT 1");
+                $suppStmt->execute([$supplier_id]);
+                $fetched = $suppStmt->fetchColumn();
+                if ($fetched) $supplierName = $fetched;
+              }
 
-              $in = floatval($data['in_quantity'] ?? 0);
-              $out = floatval($data['out_quantity'] ?? 0);
+              $in = floatval($data['in_quantity'] ?? $data['in'] ?? 0);
+              $out = floatval($data['out_quantity'] ?? $data['out'] ?? 0);
               $balance += $in - $out;
 
-              $outgroupid = $data['output_group'];
-              $outstmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE id = ? LIMIT 1");
-              $outstmt->execute([$outgroupid]);
-              $outdata = $outstmt->fetch(PDO::FETCH_ASSOC);
+              $outgroupid = $data['output_group'] ?? '';
+              $outdata = [];
+              if (!empty($outgroupid)) {
+                $outstmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE id = ? LIMIT 1");
+                $outstmt->execute([$outgroupid]);
+                $outdata = $outstmt->fetch(PDO::FETCH_ASSOC) ?: [];
+              }
             ?>
 
               <tr>
@@ -107,7 +114,7 @@ $bootstrap->css();
                 <td><?php echo !empty($outdata['voucher_no']) ? htmlspecialchars($outdata['voucher_no']) : ''; ?></td>
                 <td><?php echo empty($outdata['stock_to']) ? htmlspecialchars($supplierName) : ''; ?></td>
                 <td><?= htmlspecialchars($data['description'] ?? ''); ?></td>
-                <td><?php echo htmlspecialchars($matData['unit']); ?></td>
+                <td><?php echo htmlspecialchars($matData['unit'] ?? ''); ?></td>
                 <td style="color: green; font-weight: bolder;"><?php echo $in == 0 ? '-' : $in; ?></td>
                 <td style="color: red; font-weight: bolder;"><?php echo $out == 0 ? '-' : $out; ?></td>
                 <td style="color: blue; font-weight: bolder;"><?php echo $balance == 0 && $in == 0 && $out == 0 ? '-' : $balance; ?></td>

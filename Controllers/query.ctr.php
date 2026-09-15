@@ -1231,11 +1231,11 @@ class Query
     $datastmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='$commondity_id' ORDER BY id DESC");
     $datastmt->execute();
     $data = $datastmt->fetch(PDO::FETCH_ASSOC);
-    $commonditystmt = $pdo->prepare("SELECT * FROM category WHERE category_id='$commondity_id'");
+    $commonditystmt = $pdo->prepare("SELECT * FROM products WHERE id='$commondity_id'");
     $commonditystmt->execute();
     $commondity_name = $commonditystmt->fetch(PDO::FETCH_ASSOC);
 
-    $comname = $commondity_name['category_name'];
+    $comname = $commondity_name['name'] ?? '';
     if (!empty($data)) {
       if (str_contains(strtolower($comname), 'iqf')) {
         $iqfemptystmt = $pdo->prepare("SELECT * FROM coldstore WHERE commondity_id='$commondity_id' ORDER BY id DESC");
@@ -1515,11 +1515,11 @@ class Query
     $labourstmt->execute();
     $labour = $labourstmt->fetch(PDO::FETCH_ASSOC);
 
-    $commonditystmt = $pdo->prepare("SELECT * FROM category WHERE category_id='$commondity_id'");
+    $commonditystmt = $pdo->prepare("SELECT * FROM products WHERE id='$commondity_id'");
     $commonditystmt->execute();
     $commondity_name = $commonditystmt->fetch(PDO::FETCH_ASSOC);
 
-    $comname = $commondity_name['category_name'];
+    $comname = $commondity_name['name'] ?? '';
     if (!empty($labour)) {
       if (str_contains(strtolower($comname), 'iqf')) {
         $iqfemptystmt = $pdo->prepare("SELECT * FROM labour WHERE commondity_id='$commondity_id' ORDER BY id DESC");
@@ -1613,11 +1613,11 @@ class Query
   function updatecoldstore($indate, $outdate, $commondity_id, $mc, $kg, $coldstorerate, $labourrate, $processingrate, $updateid)
   {
     global $pdo;
-    $commonditystmt = $pdo->prepare("SELECT * FROM category WHERE category_id='$commondity_id'");
+    $commonditystmt = $pdo->prepare("SELECT * FROM products WHERE id='$commondity_id'");
     $commonditystmt->execute();
     $commondity_name = $commonditystmt->fetch(PDO::FETCH_ASSOC);
 
-    $comname = $commondity_name['category_name'];
+    $comname = $commondity_name['name'] ?? '';
 
     // ColdStore
     $datastmt = $pdo->prepare("SELECT * FROM coldstore WHERE id < '$updateid' AND commondity_id='$commondity_id'");
@@ -6073,20 +6073,26 @@ class Query
   {
     global $pdo;
 
-    $stmt = $pdo->prepare("INSERT INTO stock_output_group(date, stock_to, voucher_no, material_id, `in`) VALUES('$date', '$stockto', '$voucher_no', '$material', '$quantity')");
-    $stmt->execute();
-    $groupstmt = $pdo->prepare("SELECT * FROM stock_output_group ORDER BY id DESC");
-    $groupstmt->execute();
-    $groupdata = $groupstmt->fetch(PDO::FETCH_ASSOC);
+    // 1. Safe insertion with PDO parameters
+    $stmt = $pdo->prepare("INSERT INTO stock_output_group (`date`, `stock_to`, `voucher_no`, `material_id`, `quantity`) VALUES (?, ?, ?, ?, ?)");
+    $stmt->execute([$date, $stockto, $voucher_no, $material, $quantity]);
 
-    $materialstmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id='$material'");
-    $materialstmt->execute();
-    $materialdata = $materialstmt->fetch(PDO::FETCH_ASSOC);
-    $supplier = $materialdata['supplier_id'];
+    // 2. FIX: Prevent race conditions by grabbing the exact ID of the insert that just happened
+    $groupid = $pdo->lastInsertId();
 
-    $groupid = $groupdata['id'];
-    $storehousestmt = $pdo->prepare("INSERT INTO material_store_house(date, voucher_no, material_id, supplier_id, `out`, output_group) VALUES('$date', '$voucher_no', '$material', '$supplier', '$quantity', '$groupid')");
-    $storehousestmt->execute();
+    // 3. FIX: Grab the most recent supplier for this material safely
+    $materialstmt = $pdo->prepare("SELECT supplier_id FROM material_store_house WHERE material_id = ? AND supplier_id IS NOT NULL ORDER BY id DESC LIMIT 1");
+    $materialstmt->execute([$material]);
+    $supplier = $materialstmt->fetchColumn() ?: NULL;
+
+    // 4. FIX: Handle the column name safely (out_quantity vs out) using our fallback logic
+    try {
+      $storehousestmt = $pdo->prepare("INSERT INTO material_store_house (`date`, `voucher_no`, `material_id`, `supplier_id`, `out_quantity`, `output_group`) VALUES (?, ?, ?, ?, ?, ?)");
+      $storehousestmt->execute([$date, $voucher_no, $material, $supplier, $quantity, $groupid]);
+    } catch (PDOException $e) {
+      $storehousestmt = $pdo->prepare("INSERT INTO material_store_house (`date`, `voucher_no`, `material_id`, `supplier_id`, `out`, `output_group`) VALUES (?, ?, ?, ?, ?, ?)");
+      $storehousestmt->execute([$date, $voucher_no, $material, $supplier, $quantity, $groupid]);
+    }
   }
 
   function managestock($date, $stockto, $material, $quantity, $voucher_no, $action, $transfer_to, $description)

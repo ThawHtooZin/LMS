@@ -33,17 +33,21 @@ $bootstrap->css();
       $stockto = $_POST['stock_to'];
       $voucher_no = $_POST['voucher_no'];
       $material = $_POST['material'];
-      $quantity = $_POST['quantity'];
+      $quantity = floatval($_POST['quantity']);
 
-      $incheckstmt = $pdo->prepare("SELECT SUM(`in_quantity`) AS totalin FROM material_store_house WHERE material_id = ?");
-      $incheckstmt->execute([$material]);
-      $incheckdata = $incheckstmt->fetch(PDO::FETCH_ASSOC);
+      // BULLETPROOF SUMMATION: Avoids SQL column name crashes entirely
+      $checkstmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id = ?");
+      $checkstmt->execute([$material]);
+      $mat_rows = $checkstmt->fetchAll(PDO::FETCH_ASSOC);
 
-      $outcheckstmt = $pdo->prepare("SELECT SUM(`out_quantity`) AS totalout FROM material_store_house WHERE material_id = ?");
-      $outcheckstmt->execute([$material]);
-      $outcheckdata = $outcheckstmt->fetch(PDO::FETCH_ASSOC);
+      $totalin = 0;
+      $totalout = 0;
+      foreach ($mat_rows as $r) {
+        $totalin += floatval($r['in_quantity'] ?? $r['in'] ?? 0);
+        $totalout += floatval($r['out_quantity'] ?? $r['out'] ?? 0);
+      }
 
-      $totalquantity = floatval($incheckdata['totalin'] ?? 0) - floatval($outcheckdata['totalout'] ?? 0);
+      $totalquantity = $totalin - $totalout;
 
       if ($totalquantity < $quantity) {
         $quantity_error = "Not enough quantity";
@@ -84,11 +88,12 @@ $bootstrap->css();
                     <label>Packing Material Item</label>
                     <select name="material" class="form-control">
                       <?php
-                      $materialstmt = $pdo->prepare("SELECT DISTINCT material_id FROM material_store_house");
+                      $materialstmt = $pdo->prepare("SELECT DISTINCT material_id FROM material_store_house WHERE material_id > 0");
                       $materialstmt->execute();
                       $materials = $materialstmt->fetchAll(PDO::FETCH_ASSOC);
                       foreach ($materials as $mat) {
                         $materialid = $mat['material_id'];
+                        // CORRECTED: Point back to the unified products table
                         $mStmt = $pdo->prepare("SELECT * FROM products WHERE id = ? LIMIT 1");
                         $mStmt->execute([$materialid]);
                         $materialdata = $mStmt->fetch(PDO::FETCH_ASSOC);
@@ -140,12 +145,12 @@ $bootstrap->css();
             </tr>
 
             <?php
-            $stmt = $pdo->prepare("SELECT * FROM material_store_house GROUP BY material_id ORDER BY id");
+            $stmt = $pdo->prepare("SELECT DISTINCT material_id FROM material_store_house WHERE material_id IS NOT NULL AND material_id != '' ORDER BY material_id");
             $stmt->execute();
             $rawResult = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-            $stmt = $pdo->prepare("SELECT * FROM material_store_house GROUP BY material_id ORDER BY id LIMIT $offset, $numOfrecs");
+            $stmt = $pdo->prepare("SELECT DISTINCT material_id FROM material_store_house WHERE material_id IS NOT NULL AND material_id != '' ORDER BY material_id LIMIT $offset, $numOfrecs");
             $stmt->execute();
             $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -153,30 +158,34 @@ $bootstrap->css();
             foreach ($datas as $data) {
               $material_id = $data['material_id'];
 
-              // RULE 1: Items -> Products
+              // CORRECTED: Target products table
               $mStmt = $pdo->prepare("SELECT * FROM products WHERE id = ? LIMIT 1");
               $mStmt->execute([$material_id]);
               $material = $mStmt->fetch(PDO::FETCH_ASSOC) ?: ['name' => 'Unknown Product'];
 
-              $insumstmt = $pdo->prepare("SELECT SUM(`in_quantity`) as totalin FROM material_store_house WHERE material_id = ?");
-              $insumstmt->execute([$material_id]);
-              $totalin = $insumstmt->fetch(PDO::FETCH_ASSOC);
+              // BULLETPROOF SUMMATION
+              $chkStmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id = ?");
+              $chkStmt->execute([$material_id]);
+              $mat_rows = $chkStmt->fetchAll(PDO::FETCH_ASSOC);
 
-              $outsumstmt = $pdo->prepare("SELECT SUM(`out_quantity`) as totalout FROM material_store_house WHERE material_id = ?");
-              $outsumstmt->execute([$material_id]);
-              $totalout = $outsumstmt->fetch(PDO::FETCH_ASSOC);
+              $totalin = 0;
+              $totalout = 0;
+              foreach ($mat_rows as $r) {
+                $totalin += floatval($r['in_quantity'] ?? $r['in'] ?? 0);
+                $totalout += floatval($r['out_quantity'] ?? $r['out'] ?? 0);
+              }
 
-              $balance = floatval($totalin['totalin'] ?? 0) - floatval($totalout['totalout'] ?? 0);
+              $balance = $totalin - $totalout;
             ?>
 
               <tr>
                 <td><?php echo $no; ?></td>
                 <td><?php echo htmlspecialchars($material['name']); ?></td>
-                <td><?php echo empty($totalin['totalin']) ? '-' : $totalin['totalin']; ?></td>
-                <td><?php echo empty($totalout['totalout']) ? '-' : $totalout['totalout']; ?></td>
-                <td><?php echo ($balance == 0 && empty($totalin['totalin'])) ? '-' : $balance; ?></td>
-                <td><a href="material_store_house_detail.php?id=<?= htmlspecialchars($data['material_id']); ?>" class="btn btn-primary btn-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-check" viewBox="0 0 16 16">
-                      <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z" />
+                <td><?php echo $totalin == 0 ? '-' : $totalin; ?></td>
+                <td><?php echo $totalout == 0 ? '-' : $totalout; ?></td>
+                <td><?php echo ($balance == 0 && $totalin == 0) ? '-' : $balance; ?></td>
+                <td><a href="material_store_house_detail.php?id=<?= htmlspecialchars($material_id); ?>" class="btn btn-primary btn-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-check" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z" />
                     </svg></a></td>
               </tr>
             <?php
