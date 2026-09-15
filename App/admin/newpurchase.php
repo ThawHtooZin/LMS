@@ -489,6 +489,51 @@ foreach ($accounts as $acc) {
         }
 
         function submitForm(action) {
+            let isValid = true;
+            let firstErrorField = null;
+
+            // Clear previous error styles
+            $('.error-border').removeClass('error-border');
+
+            // 1. Validate Required Header Fields
+            $('.req-input').each(function() {
+                if (!$(this).val() || $(this).val().trim() === "") {
+                    isValid = false;
+                    $(this).addClass('error-border');
+                    if ($(this).is('select')) {
+                        $(this).next('.chosen-container').addClass('error-border');
+                    }
+                    if (!firstErrorField) firstErrorField = $(this);
+                }
+            });
+
+            // 2. Validate That at Establish a Valid Line Item (Description & Pcs are now optional)
+            let hasValidLine = false;
+            $('#linesBody tr').each(function() {
+                let prod = $(this).find('.prod-select').val();
+                let price = parseFloat($(this).find('.price-input').val()) || 0;
+
+                // A line is valid if a product is selected and a unit price is provided. 
+                // Description and Pcs are optional and will not block validation.
+                if (prod && prod !== "" && price > 0) {
+                    hasValidLine = true;
+                }
+            });
+
+            if (!hasValidLine) {
+                isValid = false;
+                swal("Validation Error", "Please fill out at least one line item with a Product and Unit Price.", "warning");
+            }
+
+            if (!isValid) {
+                if (firstErrorField) {
+                    firstErrorField.focus();
+                    swal("Validation Error", "Please fill in all required fields highlighted in red.", "warning");
+                }
+                return;
+            }
+
+            // If all checks pass, submit the form with the selected action
             document.getElementById('action_type').value = action;
             document.getElementById('billForm').submit();
         }
