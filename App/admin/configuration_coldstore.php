@@ -31,7 +31,7 @@ $bootstrap->css();
       <?php require 'navbar.php'; ?>
       <div class="card">
         <div class="card-header bg-primary text-light" style="padding:-10px;">
-          <p style="font-size: 26px;font-weight: bold;margin-left:450px; display:inline;">Manage Coldstore Configuration</p>
+          <p style="font-size: 26px;font-weight: bold; display:inline;">Manage Coldstore Configuration</p>
           <button type="button" class="btn btn-warning  btn-sm float-end" data-bs-toggle="modal" data-bs-target="#addmodal">
             Add ColdStore
           </button>

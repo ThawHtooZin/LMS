@@ -85,7 +85,7 @@ $bootstrap->css();
     </div>
     <div class="contentcol" id="content">
       <?php require 'navbar.php'; ?>
-      <div class="card mt-1">
+      <div class="card">
         <form action="" method="post">
           <div class="card-header bg-info text-light pb-3">
             <b class="h5">Link Mark Limited (F-7) TCL</b>

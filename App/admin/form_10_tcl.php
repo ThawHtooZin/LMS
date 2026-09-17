@@ -64,8 +64,8 @@ $bootstrap->css();
     </div>
     <div class="contentcol" id="content">
       <?php require 'navbar.php'; ?>
-      <div class="card mt-1">
-        <div class="card-header bg-warning text-secondary" style="padding-bottom: 10px;">
+      <div class="card">
+        <div class="card-header bg-warning text-light" style="padding-bottom: 10px;">
           <form action="" method="post">
             <b class="h5">Link Mark Limited (F-10) TCL</b>
             <a href="add_form_10_tcl.php" class="btn btn-success btn-sm float-end ms-2">Add Form-10 Data</a>

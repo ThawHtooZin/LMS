@@ -282,16 +282,40 @@ class Bootstrap
       #content{
         transition: all 0.5s ease;
       }
+      /* Standard modern Firefox syntax */
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+      }
+
+      /* Chrome, Edge, Safari, and modern browsers */
       ::-webkit-scrollbar {
-        width: 10px;
+        width: 8px;
+        height: 8px; /* Handles horizontal scrollbars too */
       }
+
       ::-webkit-scrollbar-track {
-        box-shadow: inset 0 0 5px grey !important;
-        border-radius: 10px !important;
+        background: transparent; /* Clean borderless track */
       }
+
       ::-webkit-scrollbar-thumb {
-        background:rgba(0,0,0,0.3) !important;
-        border-radius: 5px !important;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 20px;
+        border: 2px solid transparent; /* Creates breathing room around thumb */
+        background-clip: content-box;
+        transition: background 0.2s ease;
+      }
+
+      /* Interactive hover state */
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.4);
+        background-clip: content-box;
+      }
+
+      /* Active state when clicking/dragging */
+      ::-webkit-scrollbar-thumb:active {
+        background: rgba(0, 0, 0, 0.6);
+        background-clip: content-box;
       }
       .arrow {
         float:right;

@@ -74,7 +74,7 @@ $query = new Query();
     </div>
     <div class="contentcol" id="content">
       <?php require 'navbar.php'; ?>
-      <div class="card mt-1">
+      <div class="card">
         <div class="card-header bg-info">
 
           <h5 style="font-weight:bold;" class="text-light d-inline">GFC MC STOCK</h5>
