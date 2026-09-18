@@ -112,7 +112,7 @@ $bootstrap->css();
               $datas = $stmt->fetchAll();
               foreach ($datas as $data) {
                 $material_id = $data['material_id'];
-                $stmt = $pdo->prepare("SELECT * FROM materials WHERE id='$material_id'");
+                $stmt = $pdo->prepare("SELECT id, name, unit FROM products WHERE id='$material_id'");
                 $stmt->execute();
                 $material = $stmt->fetch(PDO::FETCH_ASSOC);
               ?>
@@ -141,7 +141,7 @@ $bootstrap->css();
       <div class="card">
         <div class="card-header bg-primary text-light" style="padding:-10px;">
           <?php
-          $materialstmt = $pdo->prepare("SELECT * FROM materials");
+          $materialstmt = $pdo->prepare("SELECT id, name, unit FROM products");
           $materialstmt->execute();
           $material = $materialstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -392,18 +392,21 @@ $bootstrap->css();
             $balance = 0;
             foreach ($datas as $data) {
               $material_id = $data['material_id'];
-              $supplier_id = $data['supplier_id'];
+              $supplier_id = $data['supplier_id'] ?? null;
 
-              $stmt = $pdo->prepare("SELECT * FROM materials WHERE id='$material_id'");
+              $stmt = $pdo->prepare("SELECT id, name, unit FROM products WHERE id='$material_id'");
               $stmt->execute();
               $material = $stmt->fetch(PDO::FETCH_ASSOC);
 
-              $supplierstmt = $pdo->prepare("SELECT * FROM supplier WHERE supplier_id='$supplier_id'");
-              $supplierstmt->execute();
-              $supplier = $supplierstmt->fetch(PDO::FETCH_ASSOC);
+              $supplier = null;
+              if ($supplier_id !== null && $supplier_id !== '') {
+                $supplierstmt = $pdo->prepare("SELECT id, name FROM contacts WHERE id='$supplier_id'");
+                $supplierstmt->execute();
+                $supplier = $supplierstmt->fetch(PDO::FETCH_ASSOC);
+              }
 
-              $in = $data['in'];
-              $out = $data['out'];
+              $in = (float) ($data['in_quantity'] ?? $data['in'] ?? 0);
+              $out = (float) ($data['out_quantity'] ?? $data['out'] ?? 0);
               // if(empty($_SESSION['in']) || empty($_SESSION['out'])){
               //   $totalinstmt = $pdo->prepare("SELECT SUM(`in`) as totalin FROM material_store_house WHERE material_id='$material_id'");
               //   $totalinstmt->execute();
@@ -449,7 +452,7 @@ $bootstrap->css();
                   $totaloutstmt->execute();
                   $totalout = $totaloutstmt->fetch(PDO::FETCH_ASSOC);
 
-                  $balance = $totalin['totalin'] - $totalout['totalout'];
+                  $balance = (float) ($totalin['totalin'] ?? 0) - (float) ($totalout['totalout'] ?? 0);
                 }
 
                 if (str_contains($filtertype, 'eachmaterialbalanceamount-')) {
@@ -478,7 +481,7 @@ $bootstrap->css();
                   $totaloutstmt->execute();
                   $totalout = $totaloutstmt->fetch(PDO::FETCH_ASSOC);
 
-                  $balance = $totalin['totalin'] - $totalout['totalout'];
+                  $balance = (float) ($totalin['totalin'] ?? 0) - (float) ($totalout['totalout'] ?? 0);
                 }
               }
             ?>
@@ -493,9 +496,9 @@ $bootstrap->css();
                     <td><?php echo $no; ?></td>
                     <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
                     <td><?php echo $data['voucher_no']; ?></td>
-                    <td><?php echo $supplier['supplier_name']; ?></td>
-                    <td><?php echo $material['name']; ?></td>
-                    <td><?php echo $material['unit']; ?></td>
+                    <td><?php echo $supplier['name'] ?? '-'; ?></td>
+                    <td><?php echo $material['name'] ?? '-'; ?></td>
+                    <td><?php echo $material['unit'] ?? '-'; ?></td>
                     <td style="color: green; font-weight: bolder;"><?php if ($in == '') {
                                                                       echo '-';
                                                                     } else {
@@ -518,9 +521,9 @@ $bootstrap->css();
                     <td><?php echo $no; ?></td>
                     <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
                     <td><?php echo $data['voucher_no']; ?></td>
-                    <td><?php echo $supplier['supplier_name']; ?></td>
-                    <td><?php echo $material['name']; ?></td>
-                    <td><?php echo $material['unit']; ?></td>
+                    <td><?php echo $supplier['name'] ?? '-'; ?></td>
+                    <td><?php echo $material['name'] ?? '-'; ?></td>
+                    <td><?php echo $material['unit'] ?? '-'; ?></td>
                     <td style="color: green; font-weight: bolder;"><?php if ($in == '') {
                                                                       echo '-';
                                                                     } else {
@@ -538,9 +541,9 @@ $bootstrap->css();
                     <td><?php echo $no; ?></td>
                     <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
                     <td><?php echo $data['voucher_no']; ?></td>
-                    <td><?php echo $supplier['supplier_name']; ?></td>
-                    <td><?php echo $material['name']; ?></td>
-                    <td><?php echo $material['unit']; ?></td>
+                    <td><?php echo $supplier['name'] ?? '-'; ?></td>
+                    <td><?php echo $material['name'] ?? '-'; ?></td>
+                    <td><?php echo $material['unit'] ?? '-'; ?></td>
                     <td style="color: red; font-weight: bolder;"><?php if ($out == '') {
                                                                     echo '-';
                                                                   } else {
@@ -558,9 +561,9 @@ $bootstrap->css();
                     <td><?php echo $no; ?></td>
                     <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
                     <td><?php echo $data['voucher_no']; ?></td>
-                    <td><?php echo $supplier['supplier_name']; ?></td>
-                    <td><?php echo $material['name']; ?></td>
-                    <td><?php echo $material['unit']; ?></td>
+                    <td><?php echo $supplier['name'] ?? '-'; ?></td>
+                    <td><?php echo $material['name'] ?? '-'; ?></td>
+                    <td><?php echo $material['unit'] ?? '-'; ?></td>
                     <td style="color: green; font-weight: bolder;"><?php if ($totalin['totalin'] == '') {
                                                                       echo '-';
                                                                     } else {
@@ -578,9 +581,9 @@ $bootstrap->css();
                     <td><?php echo $no; ?></td>
                     <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
                     <td><?php echo $data['voucher_no']; ?></td>
-                    <td><?php echo $supplier['supplier_name']; ?></td>
-                    <td><?php echo $material['name']; ?></td>
-                    <td><?php echo $material['unit']; ?></td>
+                    <td><?php echo $supplier['name'] ?? '-'; ?></td>
+                    <td><?php echo $material['name'] ?? '-'; ?></td>
+                    <td><?php echo $material['unit'] ?? '-'; ?></td>
                     <td style="color: blue; font-weight: bolder;"><?php if ($balance == '') {
                                                                     echo '-';
                                                                   } else {
@@ -593,9 +596,9 @@ $bootstrap->css();
                     <td><?php echo $no; ?></td>
                     <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
                     <td><?php echo $data['voucher_no']; ?></td>
-                    <td><?php echo $supplier['supplier_name']; ?></td>
-                    <td><?php echo $material['name']; ?></td>
-                    <td><?php echo $material['unit']; ?></td>
+                    <td><?php echo $supplier['name'] ?? '-'; ?></td>
+                    <td><?php echo $material['name'] ?? '-'; ?></td>
+                    <td><?php echo $material['unit'] ?? '-'; ?></td>
                     <td style="color: blue; font-weight: bolder;"><?php if ($balance == '') {
                                                                     echo '-';
                                                                   } else {

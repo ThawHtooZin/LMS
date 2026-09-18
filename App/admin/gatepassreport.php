@@ -107,12 +107,12 @@ $bootstrap->css();
                         <label id="packingmateriallabel" style="display: none;">Packing Material</label>
                         <select name="material" class="form-control inpv2" style="display: none;" id="packingmaterialinp">
                             <?php
-                            $stmt = $pdo->prepare("SELECT * FROM material_store_house GROUP BY material_id");
-                            $stmt->execute();
+                            $stmt = $pdo->prepare("SELECT DISTINCT material_id FROM stock_output_group WHERE stock_to = ?");
+                            $stmt->execute([$_SESSION['tabs'] ?? '']);
                             $datas = $stmt->fetchAll();
                             foreach ($datas as $data) {
                                 $material_id = $data['material_id'];
-                                $stmt = $pdo->prepare("SELECT * FROM materials WHERE id='$material_id'");
+                                $stmt = $pdo->prepare("SELECT id, name, unit FROM products WHERE id='$material_id'");
                                 $stmt->execute();
                                 $material = $stmt->fetch(PDO::FETCH_ASSOC);
                             ?>
@@ -141,7 +141,7 @@ $bootstrap->css();
             <div class="card">
                 <div class="card-header bg-primary text-light" style="padding:-10px;">
                     <?php
-                    $materialstmt = $pdo->prepare("SELECT * FROM materials");
+                    $materialstmt = $pdo->prepare("SELECT id, name, unit FROM products");
                     $materialstmt->execute();
                     $material = $materialstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -182,13 +182,18 @@ $bootstrap->css();
                         ?>
                         <form action="" method="post">
                             <?php
-                            $stmt = $pdo->prepare("SELECT stock_to FROM stock_output_group GROUP BY stock_to");
+                            $stmt = $pdo->prepare("SELECT DISTINCT stock_to FROM stock_output_group WHERE stock_to IS NOT NULL AND stock_to != ''");
                             $stmt->execute();
                             $datas = $stmt->fetchAll();
                             foreach ($datas as $data) {
-                                if (empty($_SESSION['tabs'])) {
+                                if (isset($_POST[$data['stock_to'] . 'btn'])) {
                                     $_SESSION['tabs'] = $data['stock_to'];
                                 }
+                            }
+                            if (!isset($_SESSION['tabs']) && !empty($datas)) {
+                                $_SESSION['tabs'] = $datas[0]['stock_to'];
+                            }
+                            foreach ($datas as $data) {
                             ?>
                                 <button type="submit" class="pb-2 pt-2 ps-4 pe-4 text-dark remainingstocklink" style="text-transform: uppercase; border:none;" name="<?= $data['stock_to']; ?>btn"><?= $data['stock_to']; ?></button>
                             <?php
@@ -328,72 +333,72 @@ $bootstrap->css();
                             $filtertype = $_SESSION['filtertype'];
 
                             if ($filtertype == 'all') {
-                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id");
+                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$_SESSION[tabs]' AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id");
                                 $stmt->execute();
                                 $rawResult = $stmt->fetchAll();
                                 $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-                                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id LIMIT :offset, :numOfrecs");
+                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$_SESSION[tabs]' AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id LIMIT :offset, :numOfrecs");
                                 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
                                 $stmt->bindValue(':numOfrecs', $numOfrecs, PDO::PARAM_INT);
                                 $stmt->execute();
                             }
 
                             if ($filtertype == 'totalin') {
-                                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `out` IS NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id");
+                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$_SESSION[tabs]' AND `quantity` IS NOT NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id");
                                 $stmt->execute();
                                 $rawResult = $stmt->fetchAll();
                                 $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-                                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `out` IS NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id LIMIT :offset, :numOfrecs");
+                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$_SESSION[tabs]' AND `quantity` IS NOT NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id LIMIT :offset, :numOfrecs");
                                 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
                                 $stmt->bindValue(':numOfrecs', $numOfrecs, PDO::PARAM_INT);
                                 $stmt->execute();
                             }
 
                             if ($filtertype == 'totalout') {
-                                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `in` IS NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id");
+                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$_SESSION[tabs]' AND `quantity` IS NOT NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id");
                                 $stmt->execute();
                                 $rawResult = $stmt->fetchAll();
                                 $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-                                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `in` IS NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id LIMIT :offset, :numOfrecs");
+                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$_SESSION[tabs]' AND `quantity` IS NOT NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id LIMIT :offset, :numOfrecs");
                                 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
                                 $stmt->bindValue(':numOfrecs', $numOfrecs, PDO::PARAM_INT);
                                 $stmt->execute();
                             }
                             if (str_contains($filtertype, needle: 'eachmaterialtotalinout-')) {
                                 $material_id = $_SESSION['material'];
-                                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id = '$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' GROUP BY material_id ORDER BY id");
+                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$_SESSION[tabs]' AND material_id = '$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id");
                                 $stmt->execute();
                                 $rawResult = $stmt->fetchAll();
                                 $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-                                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id = '$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' GROUP BY material_id ORDER BY id LIMIT :offset, :numOfrecs");
+                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$_SESSION[tabs]' AND material_id = '$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id LIMIT :offset, :numOfrecs");
                                 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
                                 $stmt->bindValue(':numOfrecs', $numOfrecs, PDO::PARAM_INT);
                                 $stmt->execute();
                             }
                             if (str_contains($filtertype, needle: 'eachmaterialbalance-')) {
                                 $material_id = $_SESSION['material'];
-                                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id = '$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' GROUP BY material_id ORDER BY id");
+                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$_SESSION[tabs]' AND material_id = '$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id");
                                 $stmt->execute();
                                 $rawResult = $stmt->fetchAll();
                                 $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-                                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id = '$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' GROUP BY material_id ORDER BY id LIMIT :offset, :numOfrecs");
+                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$_SESSION[tabs]' AND material_id = '$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id LIMIT :offset, :numOfrecs");
                                 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
                                 $stmt->bindValue(':numOfrecs', $numOfrecs, PDO::PARAM_INT);
                                 $stmt->execute();
                             }
                             if (str_contains($filtertype, needle: 'eachmaterialbalanceamount-')) {
                                 $material_id = $_SESSION['material'];
-                                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id = '$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' GROUP BY material_id ORDER BY id");
+                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$_SESSION[tabs]' AND material_id = '$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id");
                                 $stmt->execute();
                                 $rawResult = $stmt->fetchAll();
                                 $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-                                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id = '$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' GROUP BY material_id ORDER BY id LIMIT :offset, :numOfrecs");
+                                $stmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE stock_to = '$_SESSION[tabs]' AND material_id = '$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id LIMIT :offset, :numOfrecs");
                                 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
                                 $stmt->bindValue(':numOfrecs', $numOfrecs, PDO::PARAM_INT);
                                 $stmt->execute();
@@ -409,18 +414,21 @@ $bootstrap->css();
                         $balance = 0;
                         foreach ($datas as $data) {
                             $material_id = $data['material_id'];
-                            $supplier_id = $data['supplier_id'];
+                            $supplier_id = $data['supplier_id'] ?? null;
 
-                            $stmt = $pdo->prepare("SELECT * FROM materials WHERE id='$material_id'");
+                            $stmt = $pdo->prepare("SELECT id, name, unit FROM products WHERE id='$material_id'");
                             $stmt->execute();
                             $material = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                            $supplierstmt = $pdo->prepare("SELECT * FROM supplier WHERE supplier_id='$supplier_id'");
-                            $supplierstmt->execute();
-                            $supplier = $supplierstmt->fetch(PDO::FETCH_ASSOC);
+                            $supplier = null;
+                            if ($supplier_id !== null && $supplier_id !== '') {
+                                $supplierstmt = $pdo->prepare("SELECT id, name FROM contacts WHERE id='$supplier_id'");
+                                $supplierstmt->execute();
+                                $supplier = $supplierstmt->fetch(PDO::FETCH_ASSOC);
+                            }
 
-                            $in = $data['in'];
-                            $out = $data['out'];
+                            $in = (float) ($data['in_quantity'] ?? $data['quantity'] ?? $data['in'] ?? 0);
+                            $out = (float) ($data['out_quantity'] ?? $data['out'] ?? 0);
                             // if(empty($_SESSION['in']) || empty($_SESSION['out'])){
                             //   $totalinstmt = $pdo->prepare("SELECT SUM(`in`) as totalin FROM material_store_house WHERE material_id='$material_id'");
                             //   $totalinstmt->execute();
@@ -448,21 +456,21 @@ $bootstrap->css();
                                     $balance += $out;
                                 }
                                 if (str_contains($filtertype, 'eachmaterialtotalinout-')) {
-                                    $totalinstmt = $pdo->prepare("SELECT SUM(`in`) as totalin FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
+                                    $totalinstmt = $pdo->prepare("SELECT SUM(`quantity`) as totalin FROM stock_output_group WHERE stock_to = '$_SESSION[tabs]' AND material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
                                     $totalinstmt->execute();
                                     $totalin = $totalinstmt->fetch(PDO::FETCH_ASSOC);
 
-                                    $totaloutstmt = $pdo->prepare("SELECT SUM(`out`) as totalout FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
+                                    $totaloutstmt = $pdo->prepare("SELECT 0 as totalout FROM stock_output_group WHERE stock_to = '$_SESSION[tabs]' AND material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' LIMIT 1");
                                     $totaloutstmt->execute();
                                     $totalout = $totaloutstmt->fetch(PDO::FETCH_ASSOC);
                                 }
 
                                 if (str_contains($filtertype, 'eachmaterialbalance-')) {
-                                    $totalinstmt = $pdo->prepare("SELECT SUM(`in`) as totalin FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
+                                    $totalinstmt = $pdo->prepare("SELECT SUM(`quantity`) as totalin FROM stock_output_group WHERE stock_to = '$_SESSION[tabs]' AND material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
                                     $totalinstmt->execute();
                                     $totalin = $totalinstmt->fetch(PDO::FETCH_ASSOC);
 
-                                    $totaloutstmt = $pdo->prepare("SELECT SUM(`out`) as totalout FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
+                                    $totaloutstmt = $pdo->prepare("SELECT 0 as totalout FROM stock_output_group WHERE stock_to = '$_SESSION[tabs]' AND material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' LIMIT 1");
                                     $totaloutstmt->execute();
                                     $totalout = $totaloutstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -470,11 +478,11 @@ $bootstrap->css();
                                 }
 
                                 if (str_contains($filtertype, 'eachmaterialbalanceamount-')) {
-                                    $totalinstmt = $pdo->prepare("SELECT SUM(`in`) as totalin FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
+                                    $totalinstmt = $pdo->prepare("SELECT SUM(`quantity`) as totalin FROM stock_output_group WHERE stock_to = '$_SESSION[tabs]' AND material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
                                     $totalinstmt->execute();
                                     $totalin = $totalinstmt->fetch(PDO::FETCH_ASSOC);
 
-                                    $totaloutstmt = $pdo->prepare("SELECT SUM(`out`) as totalout FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
+                                    $totaloutstmt = $pdo->prepare("SELECT 0 as totalout FROM stock_output_group WHERE stock_to = '$_SESSION[tabs]' AND material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' LIMIT 1");
                                     $totaloutstmt->execute();
                                     $totalout = $totaloutstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -487,11 +495,11 @@ $bootstrap->css();
                                         $totalamount += $purchasedata['quantity'] * $purchasedata['rate'];
                                     }
 
-                                    $totalinstmt = $pdo->prepare("SELECT SUM(`in`) as totalin FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
+                                    $totalinstmt = $pdo->prepare("SELECT SUM(`quantity`) as totalin FROM stock_output_group WHERE stock_to = '$_SESSION[tabs]' AND material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
                                     $totalinstmt->execute();
                                     $totalin = $totalinstmt->fetch(PDO::FETCH_ASSOC);
 
-                                    $totaloutstmt = $pdo->prepare("SELECT SUM(`out`) as totalout FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
+                                    $totaloutstmt = $pdo->prepare("SELECT 0 as totalout FROM stock_output_group WHERE stock_to = '$_SESSION[tabs]' AND material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' LIMIT 1");
                                     $totaloutstmt->execute();
                                     $totalout = $totaloutstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -510,7 +518,7 @@ $bootstrap->css();
                                         <td><?php echo $no; ?></td>
                                         <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
                                         <td><?php echo $data['voucher_no']; ?></td>
-                                        <td><?php echo $material['name']; ?></td>
+                                        <td><?php echo $material['name'] ?? '-'; ?></td>
                                         <td style="color: green; font-weight: bolder;"><?php if ($in == '') {
                                                                                             echo '-';
                                                                                         } else {
@@ -533,9 +541,9 @@ $bootstrap->css();
                                         <td><?php echo $no; ?></td>
                                         <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
                                         <td><?php echo $data['voucher_no']; ?></td>
-                                        <td><?php echo $supplier['supplier_name']; ?></td>
-                                        <td><?php echo $material['name']; ?></td>
-                                        <td><?php echo $material['unit']; ?></td>
+                                        <td><?php echo $supplier['name'] ?? '-'; ?></td>
+                                        <td><?php echo $material['name'] ?? '-'; ?></td>
+                                        <td><?php echo $material['unit'] ?? '-'; ?></td>
                                         <td style="color: green; font-weight: bolder;"><?php if ($in == '') {
                                                                                             echo '-';
                                                                                         } else {
@@ -553,9 +561,9 @@ $bootstrap->css();
                                         <td><?php echo $no; ?></td>
                                         <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
                                         <td><?php echo $data['voucher_no']; ?></td>
-                                        <td><?php echo $supplier['supplier_name']; ?></td>
-                                        <td><?php echo $material['name']; ?></td>
-                                        <td><?php echo $material['unit']; ?></td>
+                                        <td><?php echo $supplier['name'] ?? '-'; ?></td>
+                                        <td><?php echo $material['name'] ?? '-'; ?></td>
+                                        <td><?php echo $material['unit'] ?? '-'; ?></td>
                                         <td style="color: red; font-weight: bolder;"><?php if ($out == '') {
                                                                                             echo '-';
                                                                                         } else {
@@ -573,9 +581,9 @@ $bootstrap->css();
                                         <td><?php echo $no; ?></td>
                                         <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
                                         <td><?php echo $data['voucher_no']; ?></td>
-                                        <td><?php echo $supplier['supplier_name']; ?></td>
-                                        <td><?php echo $material['name']; ?></td>
-                                        <td><?php echo $material['unit']; ?></td>
+                                        <td><?php echo $supplier['name'] ?? '-'; ?></td>
+                                        <td><?php echo $material['name'] ?? '-'; ?></td>
+                                        <td><?php echo $material['unit'] ?? '-'; ?></td>
                                         <td style="color: green; font-weight: bolder;"><?php if ($totalin['totalin'] == '') {
                                                                                             echo '-';
                                                                                         } else {
@@ -593,9 +601,9 @@ $bootstrap->css();
                                         <td><?php echo $no; ?></td>
                                         <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
                                         <td><?php echo $data['voucher_no']; ?></td>
-                                        <td><?php echo $supplier['supplier_name']; ?></td>
-                                        <td><?php echo $material['name']; ?></td>
-                                        <td><?php echo $material['unit']; ?></td>
+                                        <td><?php echo $supplier['name'] ?? '-'; ?></td>
+                                        <td><?php echo $material['name'] ?? '-'; ?></td>
+                                        <td><?php echo $material['unit'] ?? '-'; ?></td>
                                         <td style="color: blue; font-weight: bolder;"><?php if ($balance == '') {
                                                                                             echo '-';
                                                                                         } else {
@@ -608,9 +616,9 @@ $bootstrap->css();
                                         <td><?php echo $no; ?></td>
                                         <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
                                         <td><?php echo $data['voucher_no']; ?></td>
-                                        <td><?php echo $supplier['supplier_name']; ?></td>
-                                        <td><?php echo $material['name']; ?></td>
-                                        <td><?php echo $material['unit']; ?></td>
+                                        <td><?php echo $supplier['name'] ?? '-'; ?></td>
+                                        <td><?php echo $material['name'] ?? '-'; ?></td>
+                                        <td><?php echo $material['unit'] ?? '-'; ?></td>
                                         <td style="color: blue; font-weight: bolder;"><?php if ($balance == '') {
                                                                                             echo '-';
                                                                                         } else {

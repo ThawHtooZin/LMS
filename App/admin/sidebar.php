@@ -126,8 +126,8 @@ $permissions = $permission['permission'];
           <div class="collapse <?= $is_account_active ? 'show' : ''; ?>" id="account-collapse" data-bs-parent="#accordionsidebar">
             <ul class="btn-toggle-nav list-unstyled fw-normal ms-2">
               <?php if (str_contains($permissions, 'manage_sale')) { ?>
-                <li class="nav-item">
-                  <a href="sales.php" class="nav-link sub-menu  <?= ($current_page == 'sales.php') ? 'active' : ''; ?>" style="font-size:13px !important;">
+                <li class="nav-item" style="cursor: not-allowed !important;">
+                  <a href="sales.php" class="nav-link sub-menu  disabled <?= ($current_page == 'sales.php') ? 'active' : ''; ?>" style="font-size:13px !important;">
                     - Sales
                   </a>
                 </li>
