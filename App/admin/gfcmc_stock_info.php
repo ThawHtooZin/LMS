@@ -66,7 +66,7 @@ $query = new Query();
     </div>
     <div class="contentcol" id="content">
       <?php require 'navbar.php'; ?>
-      <div class="card mt-1">
+      <div class="card">
         <div class="card-header bg-info">
           <form class="" action="" method="post">
 

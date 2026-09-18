@@ -28,7 +28,9 @@ $query = new Query();
   if (isset($_POST['addbtn'])) {
     $date = $_POST['date'];
     $particular = $_POST['particular'];
-    $commondity_id = $_POST['commondity_id2'] ?? $_POST['commondity_id1'] ?? '';
+    $commondity_id = !empty($_POST['commondity_id2']) 
+      ? $_POST['commondity_id2'] 
+      : (!empty($_POST['commondity_id1']) ? $_POST['commondity_id1'] : '');
     $fish_type = $_POST['fish_type2'] ?? $_POST['fish_type'] ?? 'G';
     $country = $_POST['country2'] ?? $_POST['country'] ?? '';
     $remark = $_POST['remark'] ?? '';
@@ -131,7 +133,7 @@ $query = new Query();
     </div>
     <div class="contentcol" id="content">
       <?php require 'navbar.php'; ?>
-      <div class="card mt-1">
+      <div class="card">
         <div class="card-header bg-info">
           <h5 style="font-weight:bold;" class="text-light d-inline">HHK MC STOCK</h5>
           <button type="button" class="btn btn-danger float-end ms-2" data-bs-toggle="modal" data-bs-target="#transfer">Transfer Mc</button>
@@ -288,6 +290,7 @@ $query = new Query();
                         <div class="row">
                           <div class="col">
                             <select class="form-control inpv2 mb-2" name="commondity_id1" id="commondityid1">
+                              <option value="">form10</option>
                               <?php
                               if (!empty($form7commonditydatas)) {
                                 foreach ($form7commonditydatas as $form7commonditydata) {
@@ -301,6 +304,7 @@ $query = new Query();
                               ?>
                             </select>
                             <select class="form-control inpv2 mb-2" name="commondity_id2" id="commondityid2">
+                              <option value="">balance</option>
                               <?php
                               $commonditydatastmt = $pdo->prepare("SELECT id, name FROM products ORDER BY name ASC");
                               $commonditydatastmt->execute();

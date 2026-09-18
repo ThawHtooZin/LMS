@@ -93,7 +93,7 @@ $bootstrap->css();
     </div>
     <div class="contentcol" id="content">
       <?php require 'navbar.php'; ?>
-      <div class="card mt-1">
+      <div class="card">
         <form action="" method="post">
           <div class="card-header bg-info text-light pb-3">
 

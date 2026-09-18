@@ -61,7 +61,7 @@ $bootstrap->css();
       <?php require 'navbar.php'; ?>
       <div class="card">
         <div class="card-header bg-primary text-light" style="padding:-10px;">
-          <p style="font-size: 26px;font-weight: bold;margin-left:450px; display:inline;">Manage Packing Material (WareHouse)</p>
+          <p style="font-size: 26px;font-weight: bold; display:inline;">Manage Packing Material (WareHouse)</p>
           <button class="btn btn-warning float-end" data-bs-toggle="modal" data-bs-target="#outputmodal">Output</button>
           <div class="modal fade" style="margin-top: 75px;" id="outputmodal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">

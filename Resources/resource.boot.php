@@ -49,163 +49,169 @@ class Bootstrap
   function css()
   {
     echo '
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
-  .modal-body {
-    overflow: visible !important;
-  }
-  .modal .chosen-container {
-    width: 100% !important;
-  }
-  .modal .chosen-container .chosen-drop {
-    z-index: 99999 !important;
-  }
-    :root {
-      --primary-color: #2D4CCF;
-      --background-color: #F8F9FC;
-      --text-muted-color: #7B809A;
-      --accent-color: #B2C3F9;
-    }
+      :root {
+        --primary-color: #2D4CCF;
+        --background-color: #F8F9FC;
+        --text-muted-color: #7B809A;
+        --accent-color: #B2C3F9;
+      }
 
-    body {
-      background-color: var(--background-color);
-      color: #333;
-    }
+      body, html {
+        font-family: "Inter", sans-serif !important;
+        background-color: var(--background-color);
+        color: #333;
+      }
 
-    #content {
-      // padding: 30px;
-    }
+      .modal-body {
+        overflow: visible !important;
+      }
+      .modal .chosen-container {
+        width: 100% !important;
+      }
+      .modal .chosen-container .chosen-drop {
+        z-index: 99999 !important;
+      }
 
-    /* Welcome Card Styling */
-    .welcome-card {
-      background-color: var(--primary-color);
-      color: white;
-      border-radius: 15px;
-      padding: 60px 50px;
-      position: relative;
-      overflow: hidden;
-    }
+      #content {
+        /* padding: 30px; */
+      }
 
-    .welcome-card .card-title {
-      font-size: 2.5rem;
-      font-weight: bold;
-    }
+      /* Welcome Card Styling */
+      .welcome-card {
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 15px;
+        padding: 60px 50px;
+        position: relative;
+        overflow: hidden;
+      }
 
-    .welcome-card .card-subtitle {
-      color: rgba(255, 255, 255, 0.8);
-      font-size: 1rem;
-      max-width: 60%;
-    }
+      .welcome-card .card-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+      }
 
-    .shield-icon {
-      position: absolute;
-      right: 50px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 150px;
-      color: rgba(255, 255, 255, 0.15);
-    }
+      .welcome-card .card-subtitle {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1rem;
+        max-width: 60%;
+      }
 
-    /* Summary Card Styling */
-    .info-card {
-      border: none;
-      border-radius: 15px;
-      padding: 40px 20px;
-      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.03);
-    }
+      .shield-icon {
+        position: absolute;
+        right: 50px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 150px;
+        color: rgba(255, 255, 255, 0.15);
+      }
 
-    .info-icon-wrapper {
-      background-color: #E8EDFB;
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 25px auto;
-    }
+      /* Summary Card Styling */
+      .info-card {
+        border: none;
+        border-radius: 15px;
+        padding: 40px 20px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.03);
+      }
 
-    .info-icon {
-      font-size: 30px;
-      color: var(--primary-color);
-    }
+      .info-icon-wrapper {
+        background-color: #E8EDFB;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 25px auto;
+      }
 
-    .card-label {
-      color: var(--text-muted-color);
-      font-weight: 600;
-      text-transform: uppercase;
-      font-size: 0.8rem;
-      margin-bottom: 5px;
-    }
+      .info-icon {
+        font-size: 30px;
+        color: var(--primary-color);
+      }
 
-    .card-value {
-      font-size: 1.8rem;
-      font-weight: bold;
-      color: #111;
-      margin-bottom: 3px;
-    }
+      .card-label {
+        color: var(--text-muted-color);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        margin-bottom: 5px;
+      }
 
-    .card-sub-value {
-      color: var(--text-muted-color);
-      font-size: 0.9rem;
-    }
+      .card-value {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #111;
+        margin-bottom: 3px;
+      }
 
-    /* Badge Styling */
-    .badge-connected {
-      background-color: #E6EDFB;
-      color: var(--primary-color);
-      padding: 8px 15px;
-      border-radius: 20px;
-      font-weight: 600;
-      font-size: 0.8rem;
-      display: inline-flex;
-      align-items: center;
-    }
+      .card-sub-value {
+        color: var(--text-muted-color);
+        font-size: 0.9rem;
+      }
 
-    .badge-connected .dot {
-      width: 8px;
-      height: 8px;
-      background-color: var(--primary-color);
-      border-radius: 50%;
-      margin-right: 8px;
-    }
+      /* Badge Styling */
+      .badge-connected {
+        background-color: #E6EDFB;
+        color: var(--primary-color);
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        display: inline-flex;
+        align-items: center;
+      }
 
-    /* Footer Divider & Icons Styling */
-    .status-summary-header {
-      margin-top: 50px;
-      margin-bottom: 30px;
-      position: relative;
-    }
+      .badge-connected .dot {
+        width: 8px;
+        height: 8px;
+        background-color: var(--primary-color);
+        border-radius: 50%;
+        margin-right: 8px;
+      }
 
-    .status-summary-header span {
-      background-color: var(--background-color);
-      padding: 0 15px;
-      color: var(--text-muted-color);
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      font-weight: 600;
-    }
+      /* Footer Divider & Icons Styling */
+      .status-summary-header {
+        margin-top: 50px;
+        margin-bottom: 30px;
+        position: relative;
+      }
 
-    .status-summary-header .line {
-      height: 1px;
-      background-color: #ddd;
-      width: 100%;
-      position: absolute;
-      top: 50%;
-      z-index: -1;
-    }
+      .status-summary-header span {
+        background-color: var(--background-color);
+        padding: 0 15px;
+        color: var(--text-muted-color);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
 
-    .status-footer-icon {
-      color: var(--accent-color);
-      font-size: 1.2rem;
-      margin-right: 10px;
-    }
+      .status-summary-header .line {
+        height: 1px;
+        background-color: #ddd;
+        width: 100%;
+        position: absolute;
+        top: 50%;
+        z-index: -1;
+      }
 
-    .status-text {
-      color: #a0a0a0;
-      font-size: 0.9rem;
-      vertical-align: middle;
-    }
-</style>
+      .status-footer-icon {
+        color: var(--accent-color);
+        font-size: 1.2rem;
+        margin-right: 10px;
+      }
+
+      .status-text {
+        color: #a0a0a0;
+        font-size: 0.9rem;
+        vertical-align: middle;
+      }
+    </style>
     <link rel="stylesheet" href="../../Resources\bootstrap-5.3.1-dist\css\bootstrap.min.css">
     <script type="text/javascript">
     setInterval(function() {
@@ -276,16 +282,40 @@ class Bootstrap
       #content{
         transition: all 0.5s ease;
       }
+      /* Standard modern Firefox syntax */
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+      }
+
+      /* Chrome, Edge, Safari, and modern browsers */
       ::-webkit-scrollbar {
-        width: 10px;
+        width: 8px;
+        height: 8px; /* Handles horizontal scrollbars too */
       }
+
       ::-webkit-scrollbar-track {
-        box-shadow: inset 0 0 5px grey !important;
-        border-radius: 10px !important;
+        background: transparent; /* Clean borderless track */
       }
+
       ::-webkit-scrollbar-thumb {
-        background:rgba(0,0,0,0.3) !important;
-        border-radius: 5px !important;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 20px;
+        border: 2px solid transparent; /* Creates breathing room around thumb */
+        background-clip: content-box;
+        transition: background 0.2s ease;
+      }
+
+      /* Interactive hover state */
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.4);
+        background-clip: content-box;
+      }
+
+      /* Active state when clicking/dragging */
+      ::-webkit-scrollbar-thumb:active {
+        background: rgba(0, 0, 0, 0.6);
+        background-clip: content-box;
       }
       .arrow {
         float:right;

@@ -44,7 +44,7 @@ $bootstrap->css();
     </div>
     <div class="contentcol" id="content">
       <?php require 'navbar.php'; ?>
-      <div class="card mt-1">
+      <div class="card">
         <div class="card-header bg-info">
           <form class="" action="tclmcstock.php" method="post">
             <h5 style="font-weight:bold;" class="text-light d-inline">TCL MC STOCK</h5>
@@ -256,7 +256,7 @@ $bootstrap->css();
   </div>
   <div class="modal fade" id="add">
     <div class="modal-dialog" role="document">
-      <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
         <div class="modal-header bg-secondary text-light">
           <h1 class="modal-title fs-5">Add Data</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -319,7 +319,7 @@ $bootstrap->css();
   </div>
   <div class="modal fade" id="transfer">
     <div class="modal-dialog" role="document">
-      <div class="modal-content" style="width: 650px; !important; margin-top:70px !important;">
+      <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
         <div class="modal-header bg-warning text-light">
           <h1 class="modal-title fs-5">Tranfer Mc</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
