@@ -8,6 +8,45 @@ $auth = new auth();
 $auth->checkadmin();
 $query = new Query();
 
+function selectTestingExportProduct($productId)
+{
+  global $pdo;
+  $stmt = $pdo->prepare("SELECT id, name AS item_name FROM products WHERE id = :id LIMIT 1");
+  $stmt->execute([':id' => $productId]);
+  return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function selectTestingExportAccount($code)
+{
+  global $pdo;
+  $stmt = $pdo->prepare("SELECT code, name FROM accodes WHERE code = :code LIMIT 1");
+  $stmt->execute([':code' => $code]);
+  return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function selectTestingExportContact($contactId)
+{
+  global $pdo;
+  $stmt = $pdo->prepare("SELECT id, name FROM contacts WHERE id = :id LIMIT 1");
+  $stmt->execute([':id' => $contactId]);
+  return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function selectTestingExportParty($value)
+{
+  $contact = selectTestingExportContact($value);
+  if ($contact !== false) {
+    return $contact;
+  }
+
+  $account = selectTestingExportAccount($value);
+  if ($account !== false) {
+    return $account;
+  }
+
+  return ['name' => $value];
+}
+
 
 if ($_GET['table_name'] == 'general_ledger') {
   if (!empty($_GET['date_from'])) {
@@ -105,20 +144,20 @@ if ($_GET['table_name'] == 'general_ledger') {
 
         if (!empty($acnamedontloop) && $acnamedontloop > 1) {
           $gldatas = $query->search('general_ledger', 'ac_code', $accode);
-          $acnametoshow = $query->select('acname', $accode, 'code_no');
+          $acnametoshow = selectTestingExportAccount($accode);
         } else {
           $gldatas = $query->search('general_ledger', 'ac_code', $ac_code);
-          $acnametoshow = $query->select('acname', $ac_code, 'code_no');
+          $acnametoshow = selectTestingExportAccount($ac_code);
         }
     ?>
         <tr>
-          <td colspan="7"><b><u><?php echo "Account No. : " . $ac_code . " - " . $acnametoshow['ac_name']; ?></u></b></td>
+          <td colspan="7"><b><u><?php echo "Account No. : " . $ac_code . " - " . $acnametoshow['name']; ?></u></b></td>
         </tr>
         <?php
         foreach ($gldatas as $gldata) : ?>
           <?php
           $ac_code = $gldata['ac_code'];
-          $acname = $query->select('acname', $ac_code, 'code_no');
+          $acname = selectTestingExportAccount($ac_code);
 
 
           // acnamechange
@@ -131,8 +170,8 @@ if ($_GET['table_name'] == 'general_ledger') {
           if (str_contains($accode, '4000/')) {
             $acname = 'Supplier';
           } else {
-            $acnamedata = $query->select('acname', $accode, 'code_no');
-            $acname = $acnamedata['ac_name'];
+            $acnamedata = selectTestingExportAccount($accode);
+            $acname = $acnamedata['name'];
           }
           // acnamechange
 
@@ -178,15 +217,15 @@ if ($_GET['table_name'] == 'general_ledger') {
         $accodedata = $accodestmt->fetchall();
         $accode = $accodedata[$i]['ac_code'];
         $gldatas = $query->search('general_ledger', 'ac_code', $accode);
-        $acname = $query->select('acname', $accode, 'code_no');
+        $acname = selectTestingExportAccount($accode);
       ?>
         <tr>
-          <td colspan="7"><b><u><?php echo "Account No. : " . $accode . " - " . $acname['ac_name']; ?></u></b></td>
+          <td colspan="7"><b><u><?php echo "Account No. : " . $accode . " - " . $acname['name']; ?></u></b></td>
         </tr>
         <?php foreach ($gldatas as $gldata) : ?>
           <?php
           $ac_code = $gldata['ac_code'];
-          $acname = $query->select('acname', $ac_code, 'code_no');
+          $acname = selectTestingExportAccount($ac_code);
 
           // acnamechange
           $voucher_no = $gldata['voucherno'];
@@ -198,8 +237,8 @@ if ($_GET['table_name'] == 'general_ledger') {
           if (str_contains($accode, '4000/')) {
             $acname = 'Supplier';
           } else {
-            $acnamedata = $query->select('acname', $accode, 'code_no');
-            $acname = $acnamedata['ac_name'];
+            $acnamedata = selectTestingExportAccount($accode);
+            $acname = $acnamedata['name'];
           }
           // acnamechange
 
@@ -217,7 +256,7 @@ if ($_GET['table_name'] == 'general_ledger') {
         <?php
 
         $ac_code = $gldata['ac_code'];
-        $acname = $query->select('acname', $ac_code, 'code_no');
+        $acname = selectTestingExportAccount($ac_code);
         $debitstmt = $pdo->prepare("SELECT SUM(debit) AS total_debit FROM general_ledger WHERE ac_code='$ac_code'");
         $debitstmt->execute();
         $totaldebit = $debitstmt->fetch(PDO::FETCH_ASSOC);
@@ -440,7 +479,7 @@ if ($_GET['table_name'] == 'sales') {
       $accodedata = $accodestmt->fetchall();
       $accode = $accodedata[$i]['ac_code'];
       $gldatas = $query->search('general_ledger', 'ac_code', $accode);
-      $acname = $query->select('acname', $accode, 'code_no');
+      $acname = selectTestingExportAccount($accode);
     ?>
       <tr style="background-color: lightgray;">
         <th>Date</th>
@@ -463,7 +502,7 @@ if ($_GET['table_name'] == 'sales') {
         if (!empty($acselect['ac_code'])) {
           $accode = $acselect['ac_code'];
 
-          $acname = $query->select('acname', $accode, 'code_no');
+          $acname = selectTestingExportAccount($accode);
         }
 
         $dollarratestmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='credit'");
@@ -477,7 +516,7 @@ if ($_GET['table_name'] == 'sales') {
         <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $gldata['id']; ?>">
           <td><?php echo date('d/m/Y', strtotime($gldata['date'])); ?></td>
           <td><?php echo $gldata['voucherno']; ?></td>
-          <td><?php echo $acname['ac_name']; ?></td>
+          <td><?php echo $acname['name']; ?></td>
           <td><?php echo $gldata['narration']; ?></td>
           <td><?php echo $gldata['debit']; ?></td>
           <td><?php echo $dollarrate['usd_amount']; ?></td>
@@ -487,7 +526,7 @@ if ($_GET['table_name'] == 'sales') {
       <?php
 
       $ac_code = $gldata['ac_code'];
-      $acname = $query->select('acname', $ac_code, 'code_no');
+      $acname = selectTestingExportAccount($ac_code);
       $debitstmt = $pdo->prepare("SELECT SUM(debit) AS total_debit FROM general_ledger WHERE ac_code='$ac_code'");
       $debitstmt->execute();
       $totaldebit = $debitstmt->fetch(PDO::FETCH_ASSOC);
@@ -551,13 +590,13 @@ if ($_GET['table_name'] == 'receivable') {
       $receivabledatas = [];
     }
     foreach ($receivabledatas as $receivabledata) :
-      $ac_name = $query->select('acname', $receivabledata['ac_code'], 'code_no');
+      $ac_name = selectTestingExportAccount($receivabledata['ac_code']);
     ?>
       <tr>
         <td><?php if ($receivabledata['date'] != '0000-00-00') {
               echo date('d-m-Y', strtotime($receivabledata['date']));
             }; ?></td>
-        <!-- <td><?php //if(!empty($receivabledata['invoice_amount'])){ if(!empty($ac_name['ac_name'])){ echo $ac_name['ac_name'];} }
+        <!-- <td><?php //if(!empty($receivabledata['invoice_amount'])){ if(!empty($ac_name['name'])){ echo $ac_name['name'];} }
                   ?></td> -->
         <td><?php echo $receivabledata['sr_no']; ?></td>
         <td><?php echo $receivabledata['container_no']; ?></td>
@@ -653,14 +692,14 @@ if ($_GET['table_name'] == 'payable') {
         $balance =  ($openingamt + $purchaseamt['purchase_amount']) - $paidamt['paid_amount'];
 
         $supplier_id = $payablesupplier['supplier_id'];
-        $supplierdata = $query->select('acname', $supplier_id, 'code_no');
+        $supplierdata = selectTestingExportContact($supplier_id);
 
       ?>
         <tr style="<?php if ($balance == 0 && $addamount == 0 && $paidamount == 0) {
                       echo 'display:none;';
                     } ?>">
           <td><?= $id; ?></td>
-          <td><?= $supplierdata['ac_name']; ?></td>
+          <td><?= $supplierdata['name']; ?></td>
           <td><?= $balance; ?></td>
           <td><?php if ($addamount != 0) {
                 echo $addamount;
@@ -725,9 +764,9 @@ if ($_GET['table_name'] == 'actualinvoice') {
         <td class="float-start" style="font-weight: bold;">
           <?php
           $customer_id = $infodata['customer_id'];
-          $acnamedata = $query->select('acname', $customer_id, 'code_no');
+          $acnamedata = selectTestingExportContact($customer_id);
           $customerdata = $query->select('customers', $customer_id, 'customer_id');
-          echo $acnamedata['ac_name'];
+          echo $acnamedata['name'];
           ?><br><?php
                 echo $customerdata['customer_detail'];
                 ?><br><?php
@@ -780,7 +819,7 @@ if ($_GET['table_name'] == 'actualinvoice') {
       foreach ($datas as $packingstockinfodata) {
 
         $item_id = $packingstockinfodata['commondity_id'];
-        $commonditydata = $query->select('item', $item_id, 'item_id');
+        $commonditydata = selectTestingExportProduct($item_id);
         $lastid = $packingstockinfodata['id'];
         $size = $packingstockinfodata['size'];
         $infoid = $packingstockinfodata['infoid'];
@@ -877,9 +916,9 @@ if ($_GET['table_name'] == 'actualpackinglist') {
         <td class="float-start" style="font-weight: bold;">
           <?php
           $customer_id = $infodata['customer_id'];
-          $acnamedata = $query->select('acname', $customer_id, 'code_no');
+          $acnamedata = selectTestingExportContact($customer_id);
           $customerdata = $query->select('customers', $customer_id, 'customer_id');
-          echo $acnamedata['ac_name'];
+          echo $acnamedata['name'];
           ?><br><?php
                 echo $customerdata['customer_detail'];
                 ?><br><?php
@@ -932,7 +971,7 @@ if ($_GET['table_name'] == 'actualpackinglist') {
       foreach ($datas as $packingstockinfodata) {
 
         $item_id = $packingstockinfodata['commondity_id'];
-        $commonditydata = $query->select('item', $item_id, 'item_id');
+        $commonditydata = selectTestingExportProduct($item_id);
         $lastid = $packingstockinfodata['id'];
         $size = $packingstockinfodata['size'];
         $infoid = $packingstockinfodata['infoid'];
@@ -1114,7 +1153,7 @@ if ($_GET['table_name'] == 'mcstockreport') {
         $size = $hhkdata['size'];
         $item_id = $hhkdata['commondity_id'];
         $country = $hhkdata['country'];
-        $commonditydata = $query->select('item', $item_id, 'item_id');
+        $commonditydata = selectTestingExportProduct($item_id);
 
         $hhkcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE size='$size' AND commondity_id='$item_id'");
         $hhkcommonditystmt->execute();
@@ -1263,7 +1302,7 @@ if ($_GET['table_name'] == "tclmcstock" && !empty($_GET['date'])) {
     foreach ($datas as $tclmcdata) {
       $lastid = $tclmcdata['id'];
       $item_id = $tclmcdata['item_id'];
-      $commonditydata = $query->select('item', $item_id, 'item_id');
+      $commonditydata = selectTestingExportProduct($item_id);
       $size = $tclmcdata['size'];
       $kg = $tclmcdata['kg'];
       $item_id = $tclmcdata['item_id'];
@@ -1402,7 +1441,7 @@ if ($_GET['table_name'] == "tclmcstock" && !empty($_GET['date'])) {
       foreach ($datas as $tclmcdata) {
         $lastid = $tclmcdata['id'];
         $item_id = $tclmcdata['item_id'];
-        $commonditydata = $query->select('item', $item_id, 'item_id');
+        $commonditydata = selectTestingExportProduct($item_id);
         $size = $tclmcdata['size'];
         $kg = $tclmcdata['kg'];
         $item_id = $tclmcdata['item_id'];
@@ -1598,7 +1637,7 @@ if ($_GET['table_name'] == 'actualtruckinvoice') {
 
         foreach ($datas as $packingstockinfodata) {
           $item_id = $packingstockinfodata['item_id'];
-          $commonditydata = $query->select('item', $item_id, 'item_id');
+          $commonditydata = selectTestingExportProduct($item_id);
           $lastid = $packingstockinfodata['id'];
           $size = $packingstockinfodata['size'];
           $checklast = $pdo->prepare("SELECT * FROM truckactualinvoice WHERE id < $lastid AND item_id='$item_id' AND size='$size' AND invoice_no='$invoice_no'");
@@ -1796,7 +1835,7 @@ if ($_GET['table_name'] == 'foambox') {
         $datas = $stmt->fetchall();
         foreach ($datas as $packingstockinfodata) {
           $item_id = $packingstockinfodata['item_id'];
-          $commonditydata = $query->select('item', $item_id, 'item_id');
+          $commonditydata = selectTestingExportProduct($item_id);
           $lastid = $packingstockinfodata['id'];
           $size = $packingstockinfodata['size'];
           $checklast = $pdo->prepare("SELECT * FROM truckfoambox WHERE id < $lastid AND item_id='$item_id' AND size='$size' AND invoice_no='$invoice_no'");
@@ -1976,7 +2015,7 @@ if ($_GET['table_name'] == 'declarepacking') {
         $datas = $stmt->fetchall();
         foreach ($datas as $packingstockinfodata) {
           $item_id = $packingstockinfodata['item_id'];
-          $commonditydata = $query->select('item', $item_id, 'item_id');
+          $commonditydata = selectTestingExportProduct($item_id);
           $lastid = $packingstockinfodata['id'];
           $size = $packingstockinfodata['size'];
           $checklast = $pdo->prepare("SELECT * FROM truckdeclare WHERE id < $lastid AND item_id='$item_id' AND size='$size' AND invoice_no='$invoice_no'");
@@ -2164,7 +2203,7 @@ if ($_GET['table_name'] == 'truckactualpackinglist') {
         $datas = $stmt->fetchall();
         foreach ($datas as $packingstockinfodata) {
           $item_id = $packingstockinfodata['item_id'];
-          $commonditydata = $query->select('item', $item_id, 'item_id');
+          $commonditydata = selectTestingExportProduct($item_id);
           $lastid = $packingstockinfodata['id'];
           $size = $packingstockinfodata['size'];
           $invoice_no = $packingstockinfodata['invoice_no'];
@@ -2332,9 +2371,9 @@ if ($_GET['table_name'] == 'form_10_tcl') {
     foreach ($datas as $data) {
       $item_id = $data['item_id'];
       $size = $data['size'];
-      $commonditydata = $query->select('item', $item_id, 'item_id');
+      $commonditydata = selectTestingExportProduct($item_id);
       $supplierid = $data['supplier_id'];
-      $supplier_name = $query->select('acname', $supplierid, 'code_no');
+      $supplier_name = selectTestingExportParty($supplierid);
 
       $raw_viss_tmt = $pdo->prepare("SELECT SUM(viss) AS raw_viss FROM form7stocktcl WHERE item_id='$item_id' AND size='$size'");
       $raw_viss_tmt->execute();
@@ -2539,7 +2578,7 @@ if ($_GET['table_name'] == 'trucktotalcosting') {
       $datas = $stmt->fetchall();
       foreach ($datas as $data) {
         $item_id = $data['item_id'];
-        $commonditydata = $query->select('item', $item_id, 'item_id');
+        $commonditydata = selectTestingExportProduct($item_id);
         $size = $data['size'];
         $lastid = $data['id'];
         $invoice_no = $_GET['invoice_no'];
@@ -2819,9 +2858,9 @@ if ($_GET['table_name'] == "form10frozen") {
       $date = $form7data['date'];
       $fish_type = $form7data['fish_type'];
 
-      $commonditydata = $query->select('item', $item_id, 'item_id');
+      $commonditydata = selectTestingExportProduct($item_id);
       $supplier_id = $form7data['supplier_name'];
-      $supplier_name = $query->select('acname', $supplier_id, 'code_no');
+      $supplier_name = selectTestingExportParty($supplier_id);
 
       $form10datastmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$item_id' AND country='$country' AND size='$size' AND fish_type='$fish_type' AND date='$searchdate'");
       $form10datastmt->execute();
@@ -2845,7 +2884,7 @@ if ($_GET['table_name'] == "form10frozen") {
           }
             } ?></td>
         <td><?php if (empty($lastcommondity)) {
-              echo $supplier_name['ac_name'];
+              echo $supplier_name['name'];
             } ?></td>
         <td><?php if (empty($lastcommondity)) {
               echo $form7data['country'];
@@ -3013,7 +3052,7 @@ if ($_GET['table_name'] == "purchase") {
       $supplierid = $purchasedata['supplier_id'];
       $supplier_name = $query->select('supplier', $supplierid, 'supplier_id');
       $itemid = $purchasedata['commodity'];
-      $item_name = $query->select('item', $itemid, 'item_id');
+      $item_name = selectTestingExportProduct($itemid);
     ?>
       <input type="hidden" name="updateid" value="<?php echo $purchasedata['no']; ?>">
 

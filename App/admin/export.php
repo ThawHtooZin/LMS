@@ -7,6 +7,40 @@ $auth = new auth();
 $auth->checkadmin();
 $query = new Query();
 
+function selectExportProduct($productId)
+{
+  global $pdo;
+  $stmt = $pdo->prepare("SELECT id, name AS item_name FROM products WHERE id = :id LIMIT 1");
+  $stmt->execute([':id' => $productId]);
+  return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function selectExportAccount($code)
+{
+  global $pdo;
+  $stmt = $pdo->prepare("SELECT code, name FROM accodes WHERE code = :code LIMIT 1");
+  $stmt->execute([':code' => $code]);
+  return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function selectExportContact($contactId)
+{
+  global $pdo;
+  $stmt = $pdo->prepare("SELECT id, name FROM contacts WHERE id = :id LIMIT 1");
+  $stmt->execute([':id' => $contactId]);
+  return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function selectExportParty($value)
+{
+  $contact = selectExportContact($value);
+  if ($contact !== false) {
+    return $contact;
+  }
+
+  return selectExportAccount($value);
+}
+
 if (isset($_GET['table_name']) && $_GET['table_name'] == 'general_ledger') {
   $date_from = $_GET['date_from'] ?? '';
   $date_to = $_GET['date_to'] ?? '';
@@ -271,41 +305,41 @@ if ($_GET['table_name'] == 'sales') {
 ?>
   <table border="1">
     <?php
-    $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger WHERE ac_code LIKE '5000%'");
-    $acnamecountstmt->execute();
-    $acnamecount = $acnamecountstmt->fetchColumn();
+    $accountCountStmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger WHERE ac_code LIKE '5000%'");
+    $accountCountStmt->execute();
+    $accountCount = $accountCountStmt->fetchColumn();
 
 
     if (!empty($date_from) && !empty($date_to)) {
       $date_from = $_GET['date_from'];
       $date_to = $_GET['date_to'];
-      $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date` BETWEEN '$date_from' AND '$date_to' AND ac_code LIKE '5000%'");
-      $acnamecountstmt->execute();
-      $acnamecount = $acnamecountstmt->fetchColumn();
-      $acnamedontloop = 2;
+      $accountCountStmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date` BETWEEN '$date_from' AND '$date_to' AND ac_code LIKE '5000%'");
+      $accountCountStmt->execute();
+      $accountCount = $accountCountStmt->fetchColumn();
+      $accountDontLoop = 2;
     } elseif (!empty($date_to) || !empty($date_from)) {
       if (!empty($date_from)) {
         $date_from = $_GET['date_from'];
-        $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date`='$date_from' AND ac_code LIKE '5000%'");
-        $acnamecountstmt->execute();
-        $acnamecount = $acnamecountstmt->fetchColumn();
-        $acnamedontloop = 2;
+        $accountCountStmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date`='$date_from' AND ac_code LIKE '5000%'");
+        $accountCountStmt->execute();
+        $accountCount = $accountCountStmt->fetchColumn();
+        $accountDontLoop = 2;
       } elseif (!empty($date_to)) {
         $date_to = $_GET['date_to'];
-        $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date`='$date_to' AND ac_code LIKE '5000%'");
-        $acnamecountstmt->execute();
-        $acnamecount = $acnamecountstmt->fetchColumn();
-        $acnamedontloop = 2;
+        $accountCountStmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date`='$date_to' AND ac_code LIKE '5000%'");
+        $accountCountStmt->execute();
+        $accountCount = $accountCountStmt->fetchColumn();
+        $accountDontLoop = 2;
       }
     }
 
-    for ($i = 0; $i < $acnamecount; $i++) {
+    for ($i = 0; $i < $accountCount; $i++) {
       $accodestmt = $pdo->prepare("SELECT DISTINCT ac_code FROM general_ledger WHERE ac_code LIKE '5000%'");
       $accodestmt->execute();
       $accodedata = $accodestmt->fetchall();
       $accode = $accodedata[$i]['ac_code'];
       $gldatas = $query->search('general_ledger', 'ac_code', $accode);
-      $acname = $query->select('acname', $accode, 'code_no');
+      $account = selectExportAccount($accode);
     ?>
       <tr style="background-color: lightgray;">
         <th>Date</th>
@@ -319,7 +353,7 @@ if ($_GET['table_name'] == 'sales') {
       <?php foreach ($gldatas as $gldata) : ?>
 
         <?php
-        // acnamechange
+        // Resolve the offset account for this voucher.
         $voucher_no = $gldata['voucherno'];
         $ac_code = $gldata['ac_code'];
         $acselectstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no='$voucher_no' AND ac_code!='$ac_code'");
@@ -328,21 +362,21 @@ if ($_GET['table_name'] == 'sales') {
         if (!empty($acselect['ac_code'])) {
           $accode = $acselect['ac_code'];
 
-          $acname = $query->select('acname', $accode, 'code_no');
+          $account = selectExportAccount($accode);
         }
 
         $dollarratestmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no='$voucher_no' AND debitorcredit='credit'");
         $dollarratestmt->execute();
         $dollarrate = $dollarratestmt->fetch(PDO::FETCH_ASSOC);
 
-        // acnamechange
+        // Resolve the offset account for this voucher.
 
         $balance = $gldata['balance'] / $dollarrate['dollar_rate'];
         ?>
         <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $gldata['id']; ?>">
           <td><?php echo date('d/m/Y', strtotime($gldata['date'])); ?></td>
           <td><?php echo $gldata['voucherno']; ?></td>
-          <td><?php echo $acname['ac_name']; ?></td>
+          <td><?php echo $account['name']; ?></td>
           <td><?php echo $gldata['narration']; ?></td>
           <td><?php echo $gldata['debit']; ?></td>
           <td><?php echo $dollarrate['usd_amount']; ?></td>
@@ -352,7 +386,7 @@ if ($_GET['table_name'] == 'sales') {
       <?php
 
       $ac_code = $gldata['ac_code'];
-      $acname = $query->select('acname', $ac_code, 'code_no');
+      $account = selectExportAccount($ac_code);
       $debitstmt = $pdo->prepare("SELECT SUM(debit) AS total_debit FROM general_ledger WHERE ac_code='$ac_code'");
       $debitstmt->execute();
       $totaldebit = $debitstmt->fetch(PDO::FETCH_ASSOC);
@@ -416,13 +450,13 @@ if ($_GET['table_name'] == 'receivable') {
       $receivabledatas = [];
     }
     foreach ($receivabledatas as $receivabledata) :
-      $ac_name = $query->select('acname', $receivabledata['ac_code'], 'code_no');
+      $account = selectExportAccount($receivabledata['ac_code']);
     ?>
       <tr>
         <td><?php if ($receivabledata['date'] != '0000-00-00') {
               echo date('d-m-Y', strtotime($receivabledata['date']));
             }; ?></td>
-        <!-- <td><?php //if(!empty($receivabledata['invoice_amount'])){ if(!empty($ac_name['ac_name'])){ echo $ac_name['ac_name'];} }
+        <!-- <td><?php //if(!empty($receivabledata['invoice_amount'])){ if(!empty($account['name'])){ echo $account['name'];} }
                   ?></td> -->
         <td><?php echo $receivabledata['sr_no']; ?></td>
         <td><?php echo $receivabledata['container_no']; ?></td>
@@ -494,12 +528,12 @@ if ($_GET['table_name'] == 'payable') {
       $paidamount = !empty($paidamt['paid_amount']) ? $paidamt['paid_amount'] : 0;
       $balance = ($openingamt + $addamount) - $paidamount;
 
-      $supplierdata = $query->select('acname', $supplier_id, 'code_no');
+      $supplierdata = selectExportContact($supplier_id);
       $id++;
     ?>
       <tr>
         <td><?= $id; ?></td>
-        <td><?= $supplierdata['ac_name']; ?></td>
+        <td><?= $supplierdata['name']; ?></td>
         <td><?= $openingamt; ?></td>
         <td><?= $addamount; ?></td>
         <td><?= $paidamount; ?></td>
@@ -537,9 +571,9 @@ if ($_GET['table_name'] == 'actualinvoice') {
         <td class="float-start" style="font-weight: bold;">
           <?php
           $customer_id = $infodata['customer_id'];
-          $acnamedata = $query->select('acname', $customer_id, 'code_no');
+          $accountData = selectExportContact($customer_id);
           $customerdata = $query->select('customers', $customer_id, 'customer_id');
-          echo $acnamedata['ac_name'];
+          echo $accountData['name'];
           ?><br><?php
                 echo $customerdata['customer_detail'];
                 ?><br><?php
@@ -592,7 +626,7 @@ if ($_GET['table_name'] == 'actualinvoice') {
       foreach ($datas as $packingstockinfodata) {
 
         $item_id = $packingstockinfodata['commondity_id'];
-        $commonditydata = $query->select('item', $item_id, 'item_id');
+        $commonditydata = selectExportProduct($item_id);
         $lastid = $packingstockinfodata['id'];
         $size = $packingstockinfodata['size'];
         $infoid = $packingstockinfodata['infoid'];
@@ -689,9 +723,9 @@ if ($_GET['table_name'] == 'actualpackinglist') {
         <td class="float-start" style="font-weight: bold;">
           <?php
           $customer_id = $infodata['customer_id'];
-          $acnamedata = $query->select('acname', $customer_id, 'code_no');
+          $accountData = selectExportContact($customer_id);
           $customerdata = $query->select('customers', $customer_id, 'customer_id');
-          echo $acnamedata['ac_name'];
+          echo $accountData['name'];
           ?><br><?php
                 echo $customerdata['customer_detail'];
                 ?><br><?php
@@ -744,7 +778,7 @@ if ($_GET['table_name'] == 'actualpackinglist') {
       foreach ($datas as $packingstockinfodata) {
 
         $item_id = $packingstockinfodata['commondity_id'];
-        $commonditydata = $query->select('item', $item_id, 'item_id');
+        $commonditydata = selectExportProduct($item_id);
         $lastid = $packingstockinfodata['id'];
         $size = $packingstockinfodata['size'];
         $infoid = $packingstockinfodata['infoid'];
@@ -926,7 +960,7 @@ if ($_GET['table_name'] == 'mcstockreport') {
         $size = $hhkdata['size'];
         $item_id = $hhkdata['commondity_id'];
         $country = $hhkdata['country'];
-        $commonditydata = $query->select('item', $item_id, 'item_id');
+        $commonditydata = selectExportProduct($item_id);
 
         $hhkcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE size='$size' AND commondity_id='$item_id'");
         $hhkcommonditystmt->execute();
@@ -1127,7 +1161,7 @@ if ($_GET['table_name'] == 'mcstockreportwithdate') {
         $item_id = $hhkdata['commondity_id'];
         $country = $hhkdata['country'];
         $fish_type = $hhkdata['fish_type'];
-        $commonditydata = $query->select('item', $item_id, 'item_id');
+        $commonditydata = selectExportProduct($item_id);
 
         $kg = $hhkdata['kg'];
 
@@ -1242,7 +1276,7 @@ if ($_GET['table_name'] == "tclmcstock" && !empty($_GET['date'])) {
     foreach ($datas as $tclmcdata) {
       $lastid = $tclmcdata['id'];
       $item_id = $tclmcdata['item_id'];
-      $commonditydata = $query->select('item', $item_id, 'item_id');
+      $commonditydata = selectExportProduct($item_id);
       $size = $tclmcdata['size'];
       $kg = $tclmcdata['kg'];
       $item_id = $tclmcdata['item_id'];
@@ -1381,7 +1415,7 @@ if ($_GET['table_name'] == "tclmcstock" && !empty($_GET['date'])) {
       foreach ($datas as $tclmcdata) {
         $lastid = $tclmcdata['id'];
         $item_id = $tclmcdata['item_id'];
-        $commonditydata = $query->select('item', $item_id, 'item_id');
+        $commonditydata = selectExportProduct($item_id);
         $size = $tclmcdata['size'];
         $kg = $tclmcdata['kg'];
         $item_id = $tclmcdata['item_id'];
@@ -1577,7 +1611,7 @@ if ($_GET['table_name'] == 'actualtruckinvoice') {
 
         foreach ($datas as $packingstockinfodata) {
           $item_id = $packingstockinfodata['item_id'];
-          $commonditydata = $query->select('item', $item_id, 'item_id');
+          $commonditydata = selectExportProduct($item_id);
           $lastid = $packingstockinfodata['id'];
           $size = $packingstockinfodata['size'];
           $checklast = $pdo->prepare("SELECT * FROM truckactualinvoice WHERE id < $lastid AND item_id='$item_id' AND size='$size' AND invoice_no='$invoice_no'");
@@ -1775,7 +1809,7 @@ if ($_GET['table_name'] == 'foambox') {
         $datas = $stmt->fetchall();
         foreach ($datas as $packingstockinfodata) {
           $item_id = $packingstockinfodata['item_id'];
-          $commonditydata = $query->select('item', $item_id, 'item_id');
+          $commonditydata = selectExportProduct($item_id);
           $lastid = $packingstockinfodata['id'];
           $size = $packingstockinfodata['size'];
           $checklast = $pdo->prepare("SELECT * FROM truckfoambox WHERE id < $lastid AND item_id='$item_id' AND size='$size' AND invoice_no='$invoice_no'");
@@ -1955,7 +1989,7 @@ if ($_GET['table_name'] == 'declarepacking') {
         $datas = $stmt->fetchall();
         foreach ($datas as $packingstockinfodata) {
           $item_id = $packingstockinfodata['item_id'];
-          $commonditydata = $query->select('item', $item_id, 'item_id');
+          $commonditydata = selectExportProduct($item_id);
           $lastid = $packingstockinfodata['id'];
           $size = $packingstockinfodata['size'];
           $checklast = $pdo->prepare("SELECT * FROM truckdeclare WHERE id < $lastid AND item_id='$item_id' AND size='$size' AND invoice_no='$invoice_no'");
@@ -2143,7 +2177,7 @@ if ($_GET['table_name'] == 'truckactualpackinglist') {
         $datas = $stmt->fetchall();
         foreach ($datas as $packingstockinfodata) {
           $item_id = $packingstockinfodata['item_id'];
-          $commonditydata = $query->select('item', $item_id, 'item_id');
+          $commonditydata = selectExportProduct($item_id);
           $lastid = $packingstockinfodata['id'];
           $size = $packingstockinfodata['size'];
           $invoice_no = $packingstockinfodata['invoice_no'];
@@ -2311,9 +2345,9 @@ if ($_GET['table_name'] == 'form_10_tcl') {
     foreach ($datas as $data) {
       $item_id = $data['item_id'];
       $size = $data['size'];
-      $commonditydata = $query->select('item', $item_id, 'item_id');
+      $commonditydata = selectExportProduct($item_id);
       $supplierid = $data['supplier_id'];
-      $supplier_name = $query->select('acname', $supplierid, 'code_no');
+      $supplier_name = selectExportParty($supplierid);
 
       $raw_viss_tmt = $pdo->prepare("SELECT SUM(viss) AS raw_viss FROM form7stocktcl WHERE item_id='$item_id' AND size='$size'");
       $raw_viss_tmt->execute();
@@ -2518,7 +2552,7 @@ if ($_GET['table_name'] == 'trucktotalcosting') {
       $datas = $stmt->fetchall();
       foreach ($datas as $data) {
         $item_id = $data['item_id'];
-        $commonditydata = $query->select('item', $item_id, 'item_id');
+        $commonditydata = selectExportProduct($item_id);
         $size = $data['size'];
         $lastid = $data['id'];
         $invoice_no = $_GET['invoice_no'];
@@ -2795,9 +2829,9 @@ if ($_GET['table_name'] == "form10frozen") {
       echo $datesList = implode(', ', $quotedDates);
 
 
-      $commonditydata = $query->select('item', $item_id, 'item_id');
+      $commonditydata = selectExportProduct($item_id);
       $supplierid = $data['supplier_id'];
-      $supplier_name = $query->select('acname', $supplierid, 'code_no');
+      $supplier_name = selectExportParty($supplierid);
 
       $form7datastmt = $pdo->prepare("SELECT * FROM form7stock WHERE item_id='$item_id' AND country='$country' AND date IN ($datesList)");
       $form7datastmt->execute();
@@ -2808,8 +2842,8 @@ if ($_GET['table_name'] == "form10frozen") {
       foreach ($form7datas as $form7data) {
         $itemid = $form7data['item_id'];
         $supplierid = $form7data['supplier_name'];
-        $commonditydata2 = $query->select('item', $itemid, 'item_id');
-        $supplier_name2 = $query->select('acname', $supplierid, 'code_no');
+        $commonditydata2 = selectExportProduct($itemid);
+        $supplier_name2 = selectExportParty($supplierid);
       }
       $form7datastmt = $pdo->prepare("SELECT * FROM form7stock WHERE supplier_name = '$supplierid' AND item_id='$item_id' AND country='$country'");
       $form7datastmt->execute();
@@ -2839,7 +2873,7 @@ if ($_GET['table_name'] == "form10frozen") {
               echo $commonditydata2['item_name'];
             } ?></td>
         <td><?php if (empty($lastcommondity)) {
-              echo $supplier_name2['ac_name'];
+              echo $supplier_name2['name'];
             } ?></td>
         <td><?php if (empty($lastcommondity)) {
               echo $form7['country'];
@@ -3004,7 +3038,7 @@ if ($_GET['table_name'] == "purchase") {
       $supplierid = $purchasedata['supplier_id'];
       $supplier_name = $query->select('supplier', $supplierid, 'supplier_id');
       $itemid = $purchasedata['commodity'];
-      $item_name = $query->select('item', $itemid, 'item_id');
+      $item_name = selectExportProduct($itemid);
     ?>
       <input type="hidden" name="updateid" value="<?php echo $purchasedata['no']; ?>">
 
