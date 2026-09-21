@@ -72,17 +72,22 @@ $bootstrap->css();
   }
 
   if (isset($_POST['bankingbtn'])) {
-    if (!empty($_POST['company_name'])) {
-      $company_name = $_POST['company_name'];
-      $company_address = $_POST['company_address'];
-      $usd = $_POST['usd'];
-      $account_type = $_POST['account_type'];
-      $bank_name = $_POST['bank_name'];
-      $swift_code = $_POST['swift_code'];
-      $bank_branch_address = $_POST['bank_branch_address'];
+    if (!empty($_POST['bank_id'])) {
+      $bank_id = $_POST['bank_id'];
       $infoid = $_GET['infoid'];
 
-      $query->addbankdetail($company_name, $company_address, $usd, $account_type, $bank_name, $swift_code, $bank_branch_address, $infoid);
+      // Capture the live data the user fills in
+      $company_name = $_POST['company_name'] ?? null;
+      $company_address = $_POST['company_address'] ?? null;
+      $usd = $_POST['usd'] ?? null;
+      $account_type = $_POST['account_type'] ?? null;
+      $bank_name = $_POST['bank_name'] ?? null;
+      $swift_code = $_POST['swift_code'] ?? null;
+      $bank_branch_address = $_POST['bank_branch_address'] ?? null;
+
+      $query->updatebankdetail($bank_id, $infoid, $company_name, $company_address, $usd, $account_type, $bank_name, $swift_code, $bank_branch_address);
+    } else {
+      echo "<script>swal('Warning', 'Please select a Master Bank first.', 'warning');</script>";
     }
   }
 
@@ -884,133 +889,130 @@ $bootstrap->css();
             <h2 class="d-inline">TOTAL USD : <?php echo $totalusddata['total_usd'] ?? 0; ?></h2>
             <br><br>
             <?php
-            $packingstockinfobankstmt = $pdo->prepare("SELECT * FROM bankdetail WHERE infoid='$infoid'");
-            $packingstockinfobankstmt->execute();
-            $packingstockinfobankdata = $packingstockinfobankstmt->fetch(PDO::FETCH_ASSOC);
+            // Fetch Master System Banks
+            $sysBankStmt = $pdo->prepare("SELECT * FROM bankdetail WHERE account_code IS NOT NULL ORDER BY bank_name ASC");
+            $sysBankStmt->execute();
+            $systemBanks = $sysBankStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Fetch the Currently Linked Bank for this Invoice
+            $currentBankStmt = $pdo->prepare("
+                SELECT b.* FROM packingliststock p 
+                INNER JOIN bankdetail b ON p.bank_id = b.id 
+                WHERE p.id = ?
+            ");
+            $currentBankStmt->execute([$infoid]);
+            $packingstockinfobankdata = $currentBankStmt->fetch(PDO::FETCH_ASSOC);
+            $linked_bank_id = $packingstockinfobankdata['id'] ?? '';
             ?>
+
             <form action="" method="post">
-              <table>
+              <table class="table table-borderless">
                 <tr>
-                  <td>
-                    <p class="h5">Bank Details</p>
-                  </td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td>
-                    <p>Company Name : </p>
-                  </td>
-                  <td class="inputs">
-                    <p><input type="text" name="company_name" class="form-control inpv2" placeholder="Enter Company Name" value="<?php if (!empty($packingstockinfobankdata)) {
-                                                                                                                                    echo htmlspecialchars($packingstockinfobankdata['company_name']);
-                                                                                                                                  } ?>"></p>
-                  </td>
-                  <td style="visibility:hidden;">--------------</td>
-                  <td class="datas">
-                    <p><?php if (!empty($packingstockinfobankdata['company_name'])) {
-                          echo htmlspecialchars($packingstockinfobankdata['company_name']);
-                        }; ?></p>
+                  <td colspan="2">
+                    <p class="h5 fw-bold border-bottom pb-2">Link Bank Details</p>
                   </td>
                 </tr>
+
                 <tr>
-                  <td>
-                    <p>Company Address : </p>
+                  <td width="30%">
+                    <p class="fw-bold text-primary mb-0 mt-2">Select Master Bank : </p>
                   </td>
-                  <td class="inputs">
-                    <p><input type="text" name="company_address" class="form-control inpv2" placeholder="Enter Company Address" value="<?php if (!empty($packingstockinfobankdata)) {
-                                                                                                                                          echo htmlspecialchars($packingstockinfobankdata['company_address']);
-                                                                                                                                        } ?>"></p>
-                  </td>
-                  <td style="visibility:hidden;">--------------</td>
-                  <td class="datas">
-                    <p><?php if (!empty($packingstockinfobankdata['company_address'])) {
-                          echo htmlspecialchars($packingstockinfobankdata['company_address']);
-                        }; ?></p>
+                  <td width="70%">
+                    <select name="bank_id" id="systemBankSelect" class="form-select border-primary fw-bold" required>
+                      <option value="">-- Choose a Bank Account --</option>
+                      <?php foreach ($systemBanks as $sb): ?>
+                        <option value="<?= $sb['id'] ?>" <?= ($linked_bank_id == $sb['id']) ? 'selected' : '' ?>
+                          data-cname="<?= htmlspecialchars($sb['company_name'] ?? '') ?>"
+                          data-caddress="<?= htmlspecialchars($sb['company_address'] ?? '') ?>"
+                          data-usd="<?= htmlspecialchars($sb['usd'] ?? '') ?>"
+                          data-acctype="<?= htmlspecialchars($sb['account_type'] ?? '') ?>"
+                          data-bname="<?= htmlspecialchars($sb['bank_name'] ?? '') ?>"
+                          data-swift="<?= htmlspecialchars($sb['swift_code'] ?? '') ?>"
+                          data-baddress="<?= htmlspecialchars($sb['bank_branch_address'] ?? '') ?>"><?= htmlspecialchars($sb['bank_name'] . ' (' . $sb['account_code'] . ')') ?></option>
+                      <?php endforeach; ?>
+                    </select>
                   </td>
                 </tr>
+
                 <tr>
                   <td>
-                    <p>USD A/C : </p>
+                    <p class="text-muted mb-0 mt-2">Company Name : </p>
                   </td>
-                  <td class="inputs">
-                    <p><input type="text" name="usd" class="form-control inpv2" placeholder="Enter USD A/C" value="<?php if (!empty($packingstockinfobankdata)) {
-                                                                                                                      echo htmlspecialchars($packingstockinfobankdata['usd']);
-                                                                                                                    } ?>"></p>
-                  </td>
-                  <td style="visibility:hidden;">--------------</td>
-                  <td class="datas">
-                    <p><?php if (!empty($packingstockinfobankdata['usd'])) {
-                          echo htmlspecialchars($packingstockinfobankdata['usd']);
-                        }; ?></p>
+                  <td>
+                    <input type="text" name="company_name" id="inp_company_name" class="form-control bg-light" value="<?= htmlspecialchars($packingstockinfobankdata['company_name'] ?? '') ?>">
                   </td>
                 </tr>
                 <tr>
                   <td>
-                    <p>Account Type : </p>
+                    <p class="text-muted mb-0 mt-2">Company Address : </p>
                   </td>
-                  <td class="inputs">
-                    <p><input type="text" name="account_type" class="form-control inpv2" placeholder="Enter Account Type" value="<?php if (!empty($packingstockinfobankdata)) {
-                                                                                                                                    echo htmlspecialchars($packingstockinfobankdata['account_type']);
-                                                                                                                                  } ?>"></p>
-                  </td>
-                  <td style="visibility:hidden;">--------------</td>
-                  <td class="datas">
-                    <p><?php if (!empty($packingstockinfobankdata['account_type'])) {
-                          echo htmlspecialchars($packingstockinfobankdata['account_type']);
-                        }; ?></p>
+                  <td>
+                    <input type="text" name="company_address" id="inp_company_address" class="form-control bg-light" value="<?= htmlspecialchars($packingstockinfobankdata['company_address'] ?? '') ?>">
                   </td>
                 </tr>
                 <tr>
                   <td>
-                    <p>Bank Name : </p>
+                    <p class="text-muted mb-0 mt-2">USD A/C : </p>
                   </td>
-                  <td class="inputs">
-                    <p><input type="text" name="bank_name" class="form-control inpv2" placeholder="Enter Bank Name" value="<?php if (!empty($packingstockinfobankdata)) {
-                                                                                                                              echo htmlspecialchars($packingstockinfobankdata['bank_name']);
-                                                                                                                            } ?>"></p>
-                  </td>
-                  <td style="visibility:hidden;">--------------</td>
-                  <td class="datas">
-                    <p><?php if (!empty($packingstockinfobankdata['bank_name'])) {
-                          echo htmlspecialchars($packingstockinfobankdata['bank_name']);
-                        }; ?></p>
+                  <td>
+                    <input type="text" name="usd" id="inp_usd" class="form-control bg-light" value="<?= htmlspecialchars($packingstockinfobankdata['usd'] ?? '') ?>">
                   </td>
                 </tr>
                 <tr>
                   <td>
-                    <p>Swift Code : </p>
+                    <p class="text-muted mb-0 mt-2">Account Type : </p>
                   </td>
-                  <td class="inputs">
-                    <p><input type="text" name="swift_code" class="form-control inpv2" placeholder="Enter Swift Code" value="<?php if (!empty($packingstockinfobankdata)) {
-                                                                                                                                echo htmlspecialchars($packingstockinfobankdata['swift_code']);
-                                                                                                                              } ?>"></p>
-                  </td>
-                  <td style="visibility:hidden;">--------------</td>
-                  <td class="datas">
-                    <p><?php if (!empty($packingstockinfobankdata['swift_code'])) {
-                          echo htmlspecialchars($packingstockinfobankdata['swift_code']);
-                        }; ?></p>
+                  <td>
+                    <input type="text" name="account_type" id="inp_account_type" class="form-control bg-light" value="<?= htmlspecialchars($packingstockinfobankdata['account_type'] ?? '') ?>">
                   </td>
                 </tr>
                 <tr>
                   <td>
-                    <p>Bank Branch Address : </p>
+                    <p class="text-muted mb-0 mt-2">Bank Name : </p>
                   </td>
-                  <td class="inputs">
-                    <p><input type="text" name="bank_branch_address" class="form-control inpv2" placeholder="Enter Bank Branch Address" value="<?php if (!empty($packingstockinfobankdata)) {
-                                                                                                                                                  echo htmlspecialchars($packingstockinfobankdata['bank_branch_address']);
-                                                                                                                                                } ?>"></p>
+                  <td>
+                    <input type="text" name="bank_name" id="inp_bank_name" class="form-control bg-light" value="<?= htmlspecialchars($packingstockinfobankdata['bank_name'] ?? '') ?>">
                   </td>
-                  <td style="visibility:hidden;">--------------</td>
-                  <td class="datas">
-                    <p><?php if (!empty($packingstockinfobankdata['bank_branch_address'])) {
-                          echo htmlspecialchars($packingstockinfobankdata['bank_branch_address']);
-                        }; ?></p>
+                </tr>
+                <tr>
+                  <td>
+                    <p class="text-muted mb-0 mt-2">Swift Code : </p>
+                  </td>
+                  <td>
+                    <input type="text" name="swift_code" id="inp_swift_code" class="form-control bg-light" value="<?= htmlspecialchars($packingstockinfobankdata['swift_code'] ?? '') ?>">
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <p class="text-muted mb-0 mt-2">Branch Address : </p>
+                  </td>
+                  <td>
+                    <input type="text" name="bank_branch_address" id="inp_bank_branch_address" class="form-control bg-light" value="<?= htmlspecialchars($packingstockinfobankdata['bank_branch_address'] ?? '') ?>">
                   </td>
                 </tr>
               </table>
-              <button type="submit" class="inputs btn btn-success text-light" name="bankingbtn">Done</button>
+              <button type="submit" class="btn btn-success fw-bold px-4" name="bankingbtn">Save Bank Link</button>
             </form>
+
+            <script>
+              $(document).ready(function() {
+                $('#systemBankSelect').change(function() {
+                  var selectedOption = $(this).find('option:selected');
+                  if ($(this).val() !== '') {
+                    $('#inp_company_name').val(selectedOption.data('cname'));
+                    $('#inp_company_address').val(selectedOption.data('caddress'));
+                    $('#inp_usd').val(selectedOption.data('usd'));
+                    $('#inp_account_type').val(selectedOption.data('acctype'));
+                    $('#inp_bank_name').val(selectedOption.data('bname'));
+                    $('#inp_swift_code').val(selectedOption.data('swift'));
+                    $('#inp_bank_branch_address').val(selectedOption.data('baddress'));
+                  } else {
+                    // Clear if they unselect
+                    $('input[id^="inp_"]').val('');
+                  }
+                });
+              });
+            </script>
           </div>
           <!-- =============================================================== -->
           <div class="modal fade" id="add" tabindex="-1" aria-hidden="true">
@@ -1173,14 +1175,6 @@ $bootstrap->css();
   <script type="text/javascript">
     $(document).ready(function() {
       <?php
-      if (!empty($packingstockinfobankdata)) {
-        echo '
-        $(".datas").show();
-        $(".inputs").hide();
-        ';
-      }
-      ?>
-      <?php
       if (isset($_SESSION['tabs']) && $_SESSION['tabs'] == 'actualinvoice') {
         echo '
          $("#actualinvoice").hide();
@@ -1209,10 +1203,6 @@ $bootstrap->css();
          ';
       }
       ?>
-      $('.datas').on('click', () => {
-        $('.inputs').show();
-        $('.datas').hide();
-      });
     });
   </script>
   <?php

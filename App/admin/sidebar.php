@@ -126,8 +126,8 @@ $permissions = $permission['permission'];
           <div class="collapse <?= $is_account_active ? 'show' : ''; ?>" id="account-collapse" data-bs-parent="#accordionsidebar">
             <ul class="btn-toggle-nav list-unstyled fw-normal ms-2">
               <?php if (str_contains($permissions, 'manage_sale')) { ?>
-                <li class="nav-item" style="cursor: not-allowed !important;">
-                  <a href="sales.php" class="nav-link sub-menu  disabled <?= ($current_page == 'sales.php') ? 'active' : ''; ?>" style="font-size:13px !important;">
+                <li class="nav-item">
+                  <a href="sales.php" class="nav-link sub-menu  <?= ($current_page == 'sales.php') ? 'active' : ''; ?>" style="font-size:13px !important;">
                     - Sales
                   </a>
                 </li>
@@ -212,6 +212,7 @@ $permissions = $permission['permission'];
         'products.php',
         'product_types.php',
         'currency.php',
+        'banks.php', // ADDED HERE
         'unit.php'
       ];
 
@@ -225,7 +226,8 @@ $permissions = $permission['permission'];
         str_contains($permissions, 'manage_product_types') ||
         str_contains($permissions, 'manage_currency') ||
         str_contains($permissions, 'manage_unit') ||
-        str_contains($permissions, 'manage_coa')
+        str_contains($permissions, 'manage_coa') ||
+        str_contains($permissions, 'manage_bank') // ADDED HERE
       ) {
       ?>
         <li class="p-1" style="font-weight:bold;">
@@ -269,6 +271,14 @@ $permissions = $permission['permission'];
                 <li class="nav-item">
                   <a href="currency.php" class="nav-link sub-menu  <?= ($current_page == 'currency.php') ? 'active' : ''; ?>" style="font-size:13px !important;">
                     - Currencies
+                  </a>
+                </li>
+              <?php } ?>
+              <!-- ADDED BANKS LINK HERE -->
+              <?php if (str_contains($permissions, 'manage_bank')) { ?>
+                <li class="nav-item">
+                  <a href="banks.php" class="nav-link sub-menu  <?= ($current_page == 'banks.php') ? 'active' : ''; ?>" style="font-size:13px !important;">
+                    - Manage Banks
                   </a>
                 </li>
               <?php } ?>

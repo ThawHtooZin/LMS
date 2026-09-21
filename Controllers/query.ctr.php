@@ -573,6 +573,88 @@ class Query
     }
   }
 
+  // ==========================================
+  // SYSTEM BANKS (Linked to accodes & bankdetail)
+  // ==========================================
+
+  public function addSystemBank($code, $name, $account_type, $swift_code, $branch_address, $company_name, $company_address, $usd, $branch_name)
+  {
+    global $pdo;
+
+    $check = $pdo->prepare("SELECT * FROM accodes WHERE code = ?");
+    $check->execute([$code]);
+    if ($check->rowCount() > 0) {
+      echo "<script>swal('Error', 'Account code already exists in Chart of Accounts!', 'error');</script>";
+      return;
+    }
+
+    try {
+      $pdo->beginTransaction();
+
+      $stmtAcc = $pdo->prepare("INSERT INTO accodes (code, name, type, class, description) VALUES (?, ?, 'Current Asset', 'ASSETS', 'System Bank Account')");
+      $stmtAcc->execute([$code, $name]);
+
+      $stmtBank = $pdo->prepare("INSERT INTO bankdetail (account_code, bank_name, account_type, swift_code, bank_branch_address, company_name, company_address, usd, branch_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+      $stmtBank->execute([$code, $name, $account_type, $swift_code, $branch_address, $company_name, $company_address, $usd, $branch_name]);
+
+      $pdo->commit();
+      echo "<script>swal('Success', 'Bank Account added successfully', 'success').then(() => { window.location.href=window.location.href; });</script>";
+    } catch (Exception $e) {
+      $pdo->rollBack();
+      echo "<script>swal('Error', 'Failed to add Bank Account: " . addslashes($e->getMessage()) . "', 'error');</script>";
+    }
+  }
+
+  public function updateSystemBank($id, $old_code, $new_code, $name, $account_type, $swift_code, $branch_address, $company_name, $company_address, $usd, $branch_name)
+  {
+    global $pdo;
+
+    if ($old_code !== $new_code) {
+      $check = $pdo->prepare("SELECT * FROM accodes WHERE code = ?");
+      $check->execute([$new_code]);
+      if ($check->rowCount() > 0) {
+        echo "<script>swal('Error', 'New Account code already exists!', 'error');</script>";
+        return;
+      }
+    }
+
+    try {
+      $pdo->beginTransaction();
+
+      $stmtAcc = $pdo->prepare("UPDATE accodes SET code = ?, name = ? WHERE code = ?");
+      $stmtAcc->execute([$new_code, $name, $old_code]);
+
+      $stmtBank = $pdo->prepare("UPDATE bankdetail SET account_code = ?, bank_name = ?, account_type = ?, swift_code = ?, bank_branch_address = ?, company_name = ?, company_address = ?, usd = ?, branch_name = ? WHERE id = ?");
+      $stmtBank->execute([$new_code, $name, $account_type, $swift_code, $branch_address, $company_name, $company_address, $usd, $branch_name, $id]);
+
+      $pdo->commit();
+      echo "<script>swal('Success', 'Bank Account updated successfully', 'success').then(() => { window.location.href=window.location.href; });</script>";
+    } catch (Exception $e) {
+      $pdo->rollBack();
+      echo "<script>swal('Error', 'Failed to update Bank Account.', 'error');</script>";
+    }
+  }
+
+  public function deleteSystemBank($id, $account_code)
+  {
+    global $pdo;
+    try {
+      $pdo->beginTransaction();
+
+      $stmtBank = $pdo->prepare("DELETE FROM bankdetail WHERE id = ?");
+      $stmtBank->execute([$id]);
+
+      $stmtAcc = $pdo->prepare("DELETE FROM accodes WHERE code = ?");
+      $stmtAcc->execute([$account_code]);
+
+      $pdo->commit();
+      echo "<script>swal('Success', 'Bank Account deleted successfully', 'success').then(() => { window.location.href=window.location.href; });</script>";
+    } catch (Exception $e) {
+      $pdo->rollBack();
+      echo "<script>swal('Action Denied', 'Cannot delete this Bank Account because it has transaction history.', 'error');</script>";
+    }
+  }
+
   function additem($table, $item_name)
   {
     global $pdo;
@@ -1023,7 +1105,7 @@ class Query
     }
   }
 
-  public function paySupplierBalance($supplier_id, $payment_date, $payment_account, $reference, $payment_amount)
+  public function paySupplierBalance($supplier_id, $payment_date, $payment_account, $reference, $check_number, $description, $payment_amount)
   {
     global $pdo;
     try {
@@ -1038,16 +1120,20 @@ class Query
       $supStmt->execute([$supplier_id]);
       $supplier_name = $supStmt->fetchColumn();
 
-      // FIXED: Updated from AUTHORISED to AWAITING_PAYMENT
       $stmt = $pdo->prepare("SELECT id, voucher_no, grand_total, paid_amount FROM purchases WHERE contact_id = ? AND status = 'AWAITING_PAYMENT' ORDER BY date ASC, id ASC");
       $stmt->execute([$supplier_id]);
       $bills = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
       $remaining_payment = $payment_amount;
       $sr_no = 'PAY-' . time();
-      $narration = "Payment to $supplier_name - Ref: $reference";
 
-      $allocStmt = $pdo->prepare("INSERT INTO purchase_payments (purchase_id, payment_date, payment_account, reference, amount) VALUES (?, ?, ?, ?, ?)");
+      // Custom GL Narration Logic
+      $narration = !empty($description) ? $description : "Payment to $supplier_name - Ref: $reference";
+      if (!empty($check_number)) {
+        $narration .= " (Check: $check_number)";
+      }
+
+      $allocStmt = $pdo->prepare("INSERT INTO purchase_payments (purchase_id, payment_date, payment_account, reference, check_number, description, amount) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
       foreach ($bills as $bill) {
         if ($remaining_payment <= 0) break;
@@ -1061,13 +1147,13 @@ class Query
         } else {
           $apply_amount = $remaining_payment;
           $new_paid = $bill['paid_amount'] + $apply_amount;
-          $new_status = 'AWAITING_PAYMENT'; // Retain status if partially paid
+          $new_status = 'AWAITING_PAYMENT';
         }
 
         $upd = $pdo->prepare("UPDATE purchases SET paid_amount = ?, status = ? WHERE id = ?");
         $upd->execute([$new_paid, $new_status, $bill['id']]);
 
-        $allocStmt->execute([$bill['id'], $payment_date, $payment_account, $reference, $apply_amount]);
+        $allocStmt->execute([$bill['id'], $payment_date, $payment_account, $reference, $check_number, $description, $apply_amount]);
 
         $remaining_payment -= $apply_amount;
       }
@@ -1075,9 +1161,11 @@ class Query
       $actual_applied = $payment_amount - $remaining_payment;
 
       if ($actual_applied > 0) {
+        // Debit Accounts Payable Control (e.g., Code 2000)
         $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, '2000', ?, '0', ?, ?)");
         $glDebit->execute([$payment_date, $reference, $actual_applied, $narration, $sr_no]);
 
+        // Credit the specific Asset/Bank Account used
         $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, ?, '0', ?, ?, ?)");
         $glCredit->execute([$payment_date, $reference, $payment_account, $actual_applied, $narration, $sr_no]);
       }
@@ -1122,6 +1210,226 @@ class Query
     }
   }
 
+  public function saveSale($contact_id, $date, $due_date, $voucher_no, $currency, $status, $grand_total, $lines, $action_type)
+  {
+    global $pdo;
+    try {
+      $dupStmt = $pdo->prepare("SELECT COUNT(*) FROM sales WHERE voucher_no = ?");
+      $dupStmt->execute([$voucher_no]);
+      if ($dupStmt->fetchColumn() > 0) {
+        return ['status' => false, 'title' => 'Duplicate Invoice!', 'message' => 'The invoice reference number already exists.'];
+      }
+
+      $pdo->beginTransaction();
+
+      $ex_rate = 1.0000;
+      if ($currency !== 'MMK') {
+        $rateStmt = $pdo->prepare("SELECT rate FROM exchange_rates WHERE currency_code = ? AND effective_date <= ? ORDER BY effective_date DESC LIMIT 1");
+        $rateStmt->execute([$currency, $date]);
+        $rate_row = $rateStmt->fetch(PDO::FETCH_ASSOC);
+        if ($rate_row) {
+          $ex_rate = $rate_row['rate'];
+        }
+      }
+
+      $custStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ?");
+      $custStmt->execute([$contact_id]);
+      $customer_name = $custStmt->fetchColumn();
+
+      $stmt = $pdo->prepare("INSERT INTO sales (voucher_no, contact_id, date, due_date, currency, exchange_rate, status, grand_total, paid_amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0.00)");
+      $stmt->execute([$voucher_no, $contact_id, $date, $due_date, $currency, $ex_rate, $status, $grand_total]);
+      $sale_id = $pdo->lastInsertId();
+
+      $line_stmt = $pdo->prepare("INSERT INTO sale_lines (sale_id, container_no, account_id, line_amount) VALUES (?, ?, ?, ?)");
+      $sr_no = 'SL-' . time();
+
+      foreach ($lines as $line) {
+        if ($status === 'AWAITING_PAYMENT' and empty($line['account_id'])) {
+          $pdo->rollBack();
+          return ['status' => false, 'title' => 'Validation Error!', 'message' => 'Missing Revenue Account on a line.'];
+        }
+
+        $line_stmt->execute([
+          $sale_id,
+          $line['container_no'],
+          $line['account_id'],
+          $line['line_amount']
+        ]);
+
+        if ($status === 'AWAITING_PAYMENT') {
+          // FIX: Removed 'container_no' from the GL insert to prevent the 1054 Crash
+          $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, ?, '0', ?, ?, ?)");
+          $narr = !empty($line['container_no']) ? "Sale Revenue (Cont: " . $line['container_no'] . ")" : "Sale Revenue";
+          $glCredit->execute([$date, $voucher_no, $line['account_id'], $line['line_amount'], $narr, $sr_no]);
+        }
+      }
+
+      if ($status === 'AWAITING_PAYMENT') {
+        $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, '600', ?, '0', ?, ?)");
+        $glDebit->execute([$date, $voucher_no, $grand_total, "Total Invoice - $customer_name", $sr_no]);
+      }
+
+      $pdo->commit();
+
+      $redirect = 'sales.php';
+      if ($action_type == 'continue_editing') {
+        $redirect = "editsales.php?id=" . $sale_id;
+      }
+      if ($action_type == 'add_another') {
+        $redirect = "newsales.php";
+      }
+
+      return ['status' => true, 'title' => 'Success!', 'message' => 'Sale saved successfully', 'redirect' => $redirect];
+    } catch (Exception $e) {
+      $pdo->rollBack();
+      return ['status' => false, 'title' => 'Error!', 'message' => $e->getMessage()];
+    }
+  }
+
+  public function updateSale($id, $contact_id, $date, $due_date, $voucher_no, $currency, $status, $grand_total, $lines, $action_type)
+  {
+    global $pdo;
+    try {
+      $dupStmt = $pdo->prepare("SELECT COUNT(*) FROM sales WHERE voucher_no = ? AND id != ?");
+      $dupStmt->execute([$voucher_no, $id]);
+      if ($dupStmt->fetchColumn() > 0) {
+        return ['status' => false, 'title' => 'Duplicate Invoice!', 'message' => 'Voucher number already exists.'];
+      }
+
+      $pdo->beginTransaction();
+
+      $checkStmt = $pdo->prepare("SELECT paid_amount, voucher_no FROM sales WHERE id = ?");
+      $checkStmt->execute([$id]);
+      $saleData = $checkStmt->fetch(PDO::FETCH_ASSOC);
+
+      if (floatval($saleData['paid_amount']) > 0) {
+        $pdo->rollBack();
+        return ['status' => false, 'title' => 'Strict Audit Block!', 'message' => 'Cannot update paid invoices.', 'redirect' => 'sales.php'];
+      }
+
+      $ex_rate = 1.0000;
+      if ($currency !== 'MMK') {
+        $rateStmt = $pdo->prepare("SELECT rate FROM exchange_rates WHERE currency_code = ? AND effective_date <= ? ORDER BY effective_date DESC LIMIT 1");
+        $rateStmt->execute([$currency, $date]);
+        $rate_row = $rateStmt->fetch(PDO::FETCH_ASSOC);
+        if ($rate_row) {
+          $ex_rate = $rate_row['rate'];
+        }
+      }
+
+      $custStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ?");
+      $custStmt->execute([$contact_id]);
+      $customer_name = $custStmt->fetchColumn();
+
+      $stmt = $pdo->prepare("UPDATE sales SET voucher_no=?, contact_id=?, date=?, due_date=?, currency=?, exchange_rate=?, status=?, grand_total=? WHERE id=?");
+      $stmt->execute([$voucher_no, $contact_id, $date, $due_date, $currency, $ex_rate, $status, $grand_total, $id]);
+
+      $pdo->prepare("DELETE FROM general_ledger WHERE voucherno = ?")->execute([$saleData['voucher_no']]);
+      $pdo->prepare("DELETE FROM sale_lines WHERE sale_id = ?")->execute([$id]);
+
+      $line_stmt = $pdo->prepare("INSERT INTO sale_lines (sale_id, container_no, account_id, line_amount) VALUES (?, ?, ?, ?)");
+      $sr_no = 'SL-' . time();
+
+      foreach ($lines as $line) {
+        if ($status === 'AWAITING_PAYMENT' and empty($line['account_id'])) {
+          $pdo->rollBack();
+          return ['status' => false, 'title' => 'Validation Error!', 'message' => 'Missing Revenue Account.'];
+        }
+
+        $line_stmt->execute([
+          $id,
+          $line['container_no'],
+          $line['account_id'],
+          $line['line_amount']
+        ]);
+
+        if ($status === 'AWAITING_PAYMENT') {
+          $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, ?, '0', ?, ?, ?)");
+          $narr = !empty($line['container_no']) ? "Updated Sale Revenue (Cont: " . $line['container_no'] . ")" : "Updated Sale Revenue";
+          $glCredit->execute([$date, $voucher_no, $line['account_id'], $line['line_amount'], $narr, $sr_no]);
+        }
+      }
+
+      if ($status === 'AWAITING_PAYMENT') {
+        $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, '600', ?, '0', ?, ?)");
+        $glDebit->execute([$date, $voucher_no, $grand_total, "Updated Invoice - $customer_name", $sr_no]);
+      }
+
+      $pdo->commit();
+
+      $redirect = 'sales.php';
+      if ($action_type == 'continue_editing') {
+        $redirect = "editsales.php?id=" . $id;
+      }
+      if ($action_type == 'add_another') {
+        $redirect = "newsales.php";
+      }
+
+      return ['status' => true, 'title' => 'Success!', 'message' => 'Sale updated successfully', 'redirect' => $redirect];
+    } catch (Exception $e) {
+      $pdo->rollBack();
+      return ['status' => false, 'title' => 'Error!', 'message' => $e->getMessage()];
+    }
+  }
+
+  public function voidSale($id)
+  {
+    global $pdo;
+    try {
+      $pdo->beginTransaction();
+      $stmt = $pdo->prepare("SELECT voucher_no, status FROM sales WHERE id = ?");
+      $stmt->execute([$id]);
+      $sale = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      if (!$sale) throw new Exception("Invoice not found.");
+      if ($sale['status'] === 'VOIDED') {
+        $pdo->rollBack();
+        return ['status' => false, 'type' => 'warning', 'title' => 'Warning!', 'message' => 'This invoice is already voided.'];
+      }
+
+      if ($sale['voucher_no']) {
+        $pdo->prepare("DELETE FROM general_ledger WHERE voucherno = ?")->execute([$sale['voucher_no']]);
+      }
+
+      $pdo->prepare("UPDATE sales SET status = 'VOIDED' WHERE id = ?")->execute([$id]);
+      $pdo->commit();
+
+      return ['status' => true, 'title' => 'Success!', 'message' => 'Invoice successfully voided. General ledger entries reversed.', 'redirect' => 'sales.php'];
+    } catch (Exception $e) {
+      $pdo->rollBack();
+      return ['status' => false, 'type' => 'error', 'title' => 'Error!', 'message' => 'Failed to void invoice. Error: ' . $e->getMessage()];
+    }
+  }
+
+  public function deleteSale($id)
+  {
+    global $pdo;
+    try {
+      $pdo->beginTransaction();
+      $stmt = $pdo->prepare("SELECT voucher_no, status, paid_amount FROM sales WHERE id = ?");
+      $stmt->execute([$id]);
+      $sale = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      if (!$sale) throw new Exception("Invoice not found.");
+      if (floatval($sale['paid_amount']) > 0 || $sale['status'] === 'AWAITING_PAYMENT') {
+        $pdo->rollBack();
+        return ['status' => false, 'type' => 'error', 'title' => 'Strict Audit Block!', 'message' => 'Cannot delete an Approved or Paid invoice.'];
+      }
+
+      if ($sale['voucher_no']) {
+        $pdo->prepare("DELETE FROM general_ledger WHERE voucherno = ?")->execute([$sale['voucher_no']]);
+      }
+
+      $pdo->prepare("DELETE FROM sale_lines WHERE sale_id = ?")->execute([$id]);
+      $pdo->prepare("DELETE FROM sales WHERE id = ?")->execute([$id]);
+
+      $pdo->commit();
+      return ['status' => true, 'title' => 'Success!', 'message' => 'Draft deleted successfully', 'redirect' => 'sales.php'];
+    } catch (Exception $e) {
+      $pdo->rollBack();
+      return ['status' => false, 'type' => 'error', 'title' => 'Error!', 'message' => 'Failed to delete invoice.'];
+    }
+  }
 
   function addcontainer($container_no, $country, $date)
   {
@@ -3436,23 +3744,27 @@ class Query
     $updatestockstmt->execute();
   }
 
-  function addbankdetail($company_name, $company_address, $usd, $account_type, $bank_name, $swift_code, $bank_branch_address, $infoid)
+  public function updatebankdetail($bank_id, $infoid, $company_name, $company_address, $usd, $account_type, $bank_name, $swift_code, $bank_branch_address)
   {
     global $pdo;
+    try {
+      $pdo->beginTransaction();
 
-    $stmt = $pdo->prepare("SELECT * FROM bankdetail WHERE infoid='$infoid'");
-    $stmt->execute();
-    $checkavaliable = $stmt->fetch(PDO::FETCH_ASSOC);
+      // 1. Link the Bank to the specific Invoice
+      $stmt1 = $pdo->prepare("UPDATE packingliststock SET bank_id = ? WHERE id = ?");
+      $stmt1->execute([$bank_id, $infoid]);
 
-    if (!empty($checkavaliable)) {
-      $updatebankdetailstmt = $pdo->prepare("UPDATE bankdetail SET company_name='$company_name',company_address='$company_address',usd='$usd',account_type='$account_type',bank_name='$bank_name',swift_code='$swift_code',bank_branch_address='$bank_branch_address' WHERE infoid='$infoid'");
-      $updatebankdetailstmt->execute();
-    } else {
-      $addbankdetailstmt = $pdo->prepare("INSERT INTO bankdetail(company_name, company_address, usd, account_type, bank_name, swift_code, bank_branch_address, infoid) VALUES('$company_name', '$company_address', '$usd', '$account_type', '$bank_name', '$swift_code', '$bank_branch_address', '$infoid');");
-      $addbankdetailstmt->execute();
+      // 2. Update the Master Bank Record with the Logistics team's data
+      $stmt2 = $pdo->prepare("UPDATE bankdetail SET company_name = ?, company_address = ?, usd = ?, account_type = ?, bank_name = ?, swift_code = ?, bank_branch_address = ? WHERE id = ?");
+      $stmt2->execute([$company_name, $company_address, $usd, $account_type, $bank_name, $swift_code, $bank_branch_address, $bank_id]);
+
+      $pdo->commit();
+      echo "<script>swal('Success', 'Bank details linked and master record updated.', 'success');</script>";
+    } catch (Exception $e) {
+      $pdo->rollBack();
+      echo "<script>swal('Error', 'Failed to link and update bank details.', 'error');</script>";
     }
   }
-
   function updatepackinglist($upitem_id, $upsize, $upkgperbox, $upmc, $upid)
   {
     global $pdo;
