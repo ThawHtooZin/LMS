@@ -221,7 +221,9 @@ $accounts = $pdo->query("SELECT code, name, class FROM accodes WHERE class = 'RE
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <?php if ($current_status === 'DRAFT' || $current_status === 'AWAITING_APPROVAL'): ?>
                                     <li><a class="dropdown-item text-danger" onclick="confirmAction('delete', 'Are you sure you want to delete this draft?')"><i class="bi bi-trash"></i> Delete</a></li>
-                                <?php elseif ($current_status === 'AWAITING_PAYMENT'): ?>
+
+                                <?php elseif ($current_status === 'AWAITING_PAYMENT' && !$is_locked): ?>
+                                    <!-- This only shows if it is Awaiting Payment AND the paid amount is exactly 0 -->
                                     <li><a class="dropdown-item text-warning" onclick="confirmAction('void', 'Are you sure you want to void this approved invoice?')"><i class="bi bi-x-circle"></i> Void</a></li>
                                 <?php endif; ?>
                             </ul>

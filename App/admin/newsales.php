@@ -175,7 +175,7 @@ $accounts = $pdo->query("SELECT code, name, class FROM accodes WHERE class = 'RE
 
                     <div class="row mb-4 gx-3">
                         <div class="col-md-3">
-                            <label class="fw-bold small mb-1">To</label>
+                            <label class="fw-bold small mb-1">To</label><br>
                             <select name="contact_id" class="form-control chosen-select req-input" data-placeholder="Select customer...">
                                 <option value=""></option>
                                 <?php foreach ($customers as $cust): ?>

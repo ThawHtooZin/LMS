@@ -3133,6 +3133,71 @@ class Query
     $addpaymentstmt->execute();
   }
 
+  public function receiveCustomerBalance($customer_id, $payment_date, $payment_account, $reference, $check_number, $description, $payment_amount)
+  {
+    global $pdo;
+    $original_amount = floatval($payment_amount);
+
+    try {
+      $pdo->beginTransaction();
+
+      // Fetch open invoices for this customer ordered FIFO
+      $stmt = $pdo->prepare("
+              SELECT id, grand_total, paid_amount, (grand_total - paid_amount) AS outstanding 
+              FROM sales 
+              WHERE contact_id = ? AND status = 'AWAITING_PAYMENT' 
+              ORDER BY date ASC, id ASC
+          ");
+      $stmt->execute([$customer_id]);
+      $invoices = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      if (empty($invoices) || $original_amount <= 0) {
+        throw new Exception("No outstanding invoices found or invalid payment amount.");
+      }
+
+      $remaining_payment = $original_amount;
+
+      foreach ($invoices as $inv) {
+        if ($remaining_payment <= 0) {
+          break;
+        }
+
+        $invoice_id = $inv['id'];
+        $outstanding = floatval($inv['outstanding']);
+
+        if ($outstanding <= 0) {
+          continue;
+        }
+
+        // Determine allocation for this invoice
+        $allocate = min($remaining_payment, $outstanding);
+        $new_paid = floatval($inv['paid_amount']) + $allocate;
+
+        // Determine if fully paid
+        $new_status = ($new_paid >= floatval($inv['grand_total'])) ? 'PAID' : 'AWAITING_PAYMENT';
+
+        // Update invoice
+        $updStmt = $pdo->prepare("UPDATE sales SET paid_amount = ?, status = ? WHERE id = ?");
+        $updStmt->execute([$new_paid, $new_status, $invoice_id]);
+
+        // Insert into sale_payments history
+        $payStmt = $pdo->prepare("
+                  INSERT INTO sale_payments (sale_id, payment_date, payment_account, reference, check_number, description, amount) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?)
+              ");
+        $payStmt->execute([$invoice_id, $payment_date, $payment_account, $reference, $check_number, $description, $allocate]);
+
+        $remaining_payment -= $allocate;
+      }
+
+      $pdo->commit();
+      return ['status' => true, 'amount' => $original_amount];
+    } catch (Exception $e) {
+      $pdo->rollBack();
+      return ['status' => false, 'message' => $e->getMessage()];
+    }
+  }
+
   function updatepackingmaterial($upid, $plastic, $jcv, $inner_box, $sticker, $mc_plastic, $carton_box, $tape, $penon, $p_sticker, $plastic_rope, $micellion, $processing, $plastic_size, $pcsperlb, $pcspermc, $tdydollorprice)
   {
     global $pdo;

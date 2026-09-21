@@ -242,15 +242,14 @@ foreach ($accounts as $acc) {
                             <?php endif; ?>
                         </div>
                         <div class="btn-group">
-                            <a href="print_purchase.php?id=<?php echo $purchase_id; ?>" target="_blank" class="btn btn-outline-secondary btn-sm fw-bold"><i class="bi bi-printer"></i> Print PDF</a>
-                            <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold ms-2" data-bs-toggle="dropdown" aria-expanded="false">
-                                Purchase Options
-                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold ms-2" data-bs-toggle="dropdown" aria-expanded="false">Invoice Options</button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <?php if ($current_status === 'DRAFT' || $current_status === 'AWAITING_APPROVAL'): ?>
                                     <li><a class="dropdown-item text-danger" onclick="confirmAction('delete', 'Are you sure you want to delete this draft?')"><i class="bi bi-trash"></i> Delete</a></li>
-                                <?php elseif ($current_status === 'AWAITING_PAYMENT'): ?>
-                                    <li><a class="dropdown-item text-warning" onclick="confirmAction('void', 'Are you sure you want to void this approved bill?')"><i class="bi bi-x-circle"></i> Void</a></li>
+
+                                <?php elseif ($current_status === 'AWAITING_PAYMENT' && !$is_locked): ?>
+                                    <!-- This only shows if it is Awaiting Payment AND the paid amount is exactly 0 -->
+                                    <li><a class="dropdown-item text-warning" onclick="confirmAction('void', 'Are you sure you want to void this approved invoice?')"><i class="bi bi-x-circle"></i> Void</a></li>
                                 <?php endif; ?>
                             </ul>
                         </div>

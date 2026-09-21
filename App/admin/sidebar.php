@@ -90,7 +90,7 @@ $permissions = $permission['permission'];
         'cashbook.php',
         'acpayable.php',
         'accountpayable.php',
-        'accountreceivable.php',
+        'acreceivable.php',
         'transaction.php',
         'general_ledger.php',
         'ledger_record.php',
@@ -108,7 +108,7 @@ $permissions = $permission['permission'];
         str_contains($permissions, 'manage_purchase') ||
         str_contains($permissions, 'manage_cashbook') ||
         str_contains($permissions, 'manage_accountpayable') ||
-        str_contains($permissions, 'manage_accountreceivable') ||
+        str_contains($permissions, 'manage_acreceivable') ||
         str_contains($permissions, 'manage_general_ledger') ||
         str_contains($permissions, 'manage_ledger_record') ||
         str_contains($permissions, 'manage_acpayable') ||
@@ -160,10 +160,10 @@ $permissions = $permission['permission'];
                   </a>
                 </li>
               <?php } ?>
-              <?php if (str_contains($permissions, 'manage_accountreceivable')) { ?>
+              <?php if (str_contains($permissions, 'manage_acreceivable')) { ?>
                 <li class="nav-item">
-                  <a href="accountreceivable.php" class="nav-link sub-menu  <?= ($current_page == 'accountreceivable.php') ? 'active' : ''; ?>" style="font-size:13px !important;">
-                    - Account Receivable
+                  <a href="acreceivable.php" class="nav-link sub-menu  <?= ($current_page == 'acreceivable.php') ? 'active' : ''; ?>" style="font-size:13px !important;">
+                    - A/C Receivable
                   </a>
                 </li>
               <?php } ?>
