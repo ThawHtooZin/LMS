@@ -27,13 +27,26 @@ $bootstrap->css();
 <body>
   <?php
   if (isset($_POST['add'])) {
-    $commondity = $_POST['commondity_id'];
-    $size = $_POST['size'];
-    $packingkgperbox = $_POST['packingkgperbox'];
-    $mc = $_POST['mc'];
-    $infoid = $_POST['infoid'];
+      $infoid = $_POST['infoid'] ?? '';
+      
+      // Check if commondity_id array exists
+      if (!empty($_POST['commondity_id']) && is_array($_POST['commondity_id'])) {
+          
+          foreach ($_POST['commondity_id'] as $key => $commondity) {
+              // Skip empty commodity selections
+              if (empty($commondity)) {
+                  continue;
+              }
 
-    $query->addpackinglistinfo($commondity, $size, $packingkgperbox, $mc, $infoid);
+              // Get matching row values by array key index
+              $size = $_POST['size'][$key] ?? '';
+              $packingkgperbox = $_POST['packingkgperbox'][$key] ?? '';
+              $mc = $_POST['mc'][$key] ?? '';
+
+              // Execute database insert per row
+              $query->addpackinglistinfo($commondity, $size, $packingkgperbox, $mc, $infoid);
+          }
+      }
   }
 
   if (isset($_POST['updatebtn'])) {
@@ -1002,77 +1015,159 @@ $bootstrap->css();
             </script>
           </div>
           <!-- =============================================================== -->
-          <div class="modal fade" id="add">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+          <div class="modal fade" id="add" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content" style="margin-top: 50px !important;">
+                
+                <!-- Modal Header -->
                 <div class="modal-header bg-info text-light">
-                  <h1 class="modal-title fs-5">Add Packing Stock</h1>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  <h5 class="modal-title fs-5">Add Packing Stock</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                  <form action="" method="post">
-                    <input type="hidden" name="infoid" value="<?php echo $_GET['infoid'] ?? ''; ?>">
-                    <div class="modal-body">
-                      <div class="row">
-                        <div class="col">
-                          <label>Commondity</label>
-                          <?php
-                          // 1. Fetch the data FIRST
-                          $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock WHERE item_id IS NOT NULL AND item_id != ''");
-                          $form7commonditystmt->execute();
-                          $form7commonditydatas = $form7commonditystmt->fetchall();
 
-                          // Filter valid items from products table
-                          $validItems = [];
-                          if (!empty($form7commonditydatas)) {
-                            foreach ($form7commonditydatas as $form7commonditydata) {
-                              $item_id = $form7commonditydata['item_id'];
-                              $commonditydata = $query->select('products', $item_id, 'id');
-                              if ($commonditydata && !empty($commonditydata['name'])) {
-                                $validItems[] = $commonditydata;
-                              }
-                            }
-                          }
-                          ?>
-                          <select class="form-control inpv2 mb-2" name="commondity_id" <?php if (empty($validItems)) echo 'disabled required'; ?>>
-                            <?php if (!empty($validItems)): ?>
-                              <option value="">Select Item...</option>
-                              <?php foreach ($validItems as $cData): ?>
-                                <option value="<?php echo htmlspecialchars($cData['id']); ?>"><?php echo htmlspecialchars($cData['name']); ?></option>
-                              <?php endforeach; ?>
-                            <?php else: ?>
-                              <option value="">Empty</option>
-                            <?php endif; ?>
-                          </select>
-                          <?php if (empty($validItems)): ?>
-                            <p class="text-danger small fw-bold mb-0 mt-1">Nothing On Stock</p>
-                          <?php endif; ?>
-                        </div>
-                        <div class="col">
-                          <label>Size</label>
-                          <input type="text" name="size" class="form-control inpv2 mb-2">
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="col">
-                          <label>Packing Kg Per Box</label>
-                          <input type="text" name="packingkgperbox" class="form-control inpv2 mb-2">
-                        </div>
-                        <div class="col">
-                          <label>Mc</label>
-                          <input type="number" name="mc" class="form-control inpv2 mb-2">
-                        </div>
-                      </div>
+                <?php
+                // Fetch valid stock items FIRST
+                $form7commonditystmt =$pdo->prepare("SELECT DISTINCT item_id FROM form10stock WHERE item_id IS NOT NULL AND item_id != ''");
+                $form7commonditystmt->execute();
+                $form7commonditydatas =$form7commonditystmt->fetchAll();
+
+                $validItems = [];
+                if (!empty($form7commonditydatas)) {
+                  foreach ($form7commonditydatas as $form7commonditydata) {$item_id = $form7commonditydata['item_id'];$commonditydata = $query->select('products',$item_id, 'id');
+                    if ($commonditydata && !empty($commonditydata['name'])) {
+                      $validItems[] =$commonditydata;
+                    }
+                  }
+                }
+                ?>
+
+                <!-- Hidden Commodity Options Template for JS Cloning -->
+                <select id="itemTpl" style="display:none;">
+                  <?php if (!empty($validItems)): ?>
+                    <option value="">Select Item...</option>
+                    <?php foreach ($validItems as$cData): ?>
+                      <option value="<?php echo htmlspecialchars($cData['id']); ?>"><?php echo htmlspecialchars($cData['name']); ?></option>
+                    <?php endforeach; ?>
+                  <?php else: ?>
+                    <option value="">Empty</option>
+                  <?php endif; ?>
+                </select>
+
+                <form action="" method="post" id="packingStockForm">
+                  <input type="hidden" name="infoid" value="<?php echo htmlspecialchars($_GET['infoid'] ?? ''); ?>">
+
+                  <div class="modal-body">
+                    <?php if (empty($validItems)): ?>
+                      <p class="text-danger small fw-bold mb-2">Nothing On Stock</p>
+                    <?php endif; ?>
+
+                    <div class="table-responsive">
+                      <table class="table table-bordered table-sm align-middle" id="packingStockTable">
+                        <thead>
+                          <!-- Hardcoded Inline Style to Override Global Black Header CSS -->
+                          <tr style="background-color: #17a2b8 !important; color: #ffffff !important;">
+                            <th width="35%" class="p-2" style="background-color: #17a2b8 !important; color: #ffffff !important;">Commodity</th>
+                            <th width="20%" class="p-2" style="background-color: #17a2b8 !important; color: #ffffff !important;">Size</th>
+                            <th width="25%" class="p-2" style="background-color: #17a2b8 !important; color: #ffffff !important;">Packing Kg / Box</th>
+                            <th width="15%" class="p-2" style="background-color: #17a2b8 !important; color: #ffffff !important;">MC</th>
+                            <th width="5%" class="text-center p-2" style="background-color: #17a2b8 !important; color: #ffffff !important;">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody id="packing-stock-lines">
+                          <!-- Row 1 -->
+                          <tr>
+                            <td class="p-2">
+                              <select name="commondity_id[]" class="form-control form-control-sm chosen-select" <?php if (empty($validItems)) echo 'disabled required'; ?>>
+                                <?php if (!empty($validItems)): ?>
+                                  <option value="">Select Item...</option>
+                                  <?php foreach ($validItems as$cData): ?>
+                                    <option value="<?php echo htmlspecialchars($cData['id']); ?>"><?php echo htmlspecialchars($cData['name']); ?></option>
+                                  <?php endforeach; ?>
+                                <?php else: ?>
+                                  <option value="">Empty</option>
+                                <?php endif; ?>
+                              </select>
+                            </td>
+                            <td class="p-2"><input type="text" name="size[]" class="form-control form-control-sm inpv2"></td>
+                            <td class="p-2"><input type="text" name="packingkgperbox[]" class="form-control form-control-sm inpv2"></td>
+                            <td class="p-2"><input type="number" name="mc[]" class="form-control form-control-sm inpv2"></td>
+                            <td class="text-center p-2">
+                              <button type="button" class="btn btn-outline-danger btn-sm fw-bold border-0" onclick="removePackingLine(this)">×</button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="submit" class="btn btn-success" name="add">Add</button>
-                </div>
+
+                    <button type="button" class="btn btn-outline-info btn-sm fw-bold mt-2" onclick="addPackingLine()" <?php if (empty($validItems)) echo 'disabled'; ?>>+ Add Line</button>
+                  </div>
+
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success" name="add" <?php if (empty($validItems)) echo 'disabled'; ?>>Add Stock</button>
+                  </div>
                 </form>
               </div>
             </div>
           </div>
+
+          <!-- JavaScript for Dynamic Lines and Chosen Plugin Re-initialization -->
+          <script>
+          $(document).ready(function() {
+              // Initialize Chosen plugin on initial load
+              initChosen();
+          });
+
+          function initChosen() {
+              if ($.fn.chosen) {
+                  $('.chosen-select').chosen({ width: '100%' });
+              }
+          }
+
+          function addPackingLine() {
+              let itemOptions = $('#itemTpl').html();
+              let tr = `
+                  <tr>
+                      <td class="p-2">
+                          <select name="commondity_id[]" class="form-control form-control-sm chosen-select">
+                              ${itemOptions}
+                          </select>
+                      </td>
+                      <td class="p-2"><input type="text" name="size[]" class="form-control form-control-sm inpv2"></td>
+                      <td class="p-2"><input type="text" name="packingkgperbox[]" class="form-control form-control-sm inpv2"></td>
+                      <td class="p-2"><input type="number" name="mc[]" class="form-control form-control-sm inpv2"></td>
+                      <td class="text-center p-2">
+                          <button type="button" class="btn btn-outline-danger btn-sm fw-bold border-0" onclick="removePackingLine(this)">×</button>
+                      </td>
+                  </tr>
+              `;
+              
+              let $newRow =$(tr);
+              $('#packing-stock-lines').append($newRow);
+              
+              // Initialize Chosen on newly added dropdown
+              $newRow.find('.chosen-select').chosen({ width: '100%' });
+          }
+
+          function removePackingLine(button) {
+              let tbody = $('#packing-stock-lines');
+              if (tbody.find('tr').length > 1) {
+                  let $tr =$(button).closest('tr');
+                  
+                  // Destroy chosen instance before removing DOM node
+                  if ($.fn.chosen) {
+                      $tr.find('.chosen-select').chosen('destroy');
+                  }
+                  $tr.remove();
+              } else {
+                  if (typeof swal === "function") {
+                      swal('Warning!', 'You must keep at least one entry line.', 'warning');
+                  } else {
+                      alert('You must keep at least one entry line.');
+                  }
+              }
+          }
+          </script>
         </div>
       </div>
     </div>
