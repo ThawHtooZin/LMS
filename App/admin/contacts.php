@@ -197,6 +197,7 @@ $query = new Query();
                                                     <option value="Fish Supplier" <?php echo ($data['contact_type'] == 'Fish Supplier') ? 'selected' : ''; ?>>Fish Supplier</option>
                                                     <option value="Material Supplier" <?php echo ($data['contact_type'] == 'Material Supplier') ? 'selected' : ''; ?>>Material Supplier</option>
                                                     <option value="Cold Store Factory" <?php echo ($data['contact_type'] == 'Cold Store Factory') ? 'selected' : ''; ?>>Cold Store Factory</option>
+                                                    <option value="Export Customer" <?php echo ($data['contact_type'] == 'Export Customer') ? 'selected' : ''; ?>>Export Customer</option>
                                                     <option value="Other" <?php echo ($data['contact_type'] == 'Other') ? 'selected' : ''; ?>>Other</option>
                                                 </select>
 
@@ -278,6 +279,7 @@ $query = new Query();
                             <option value="Fish Supplier" selected>Fish Supplier</option>
                             <option value="Material Supplier">Material Supplier</option>
                             <option value="Cold Store Factory">Cold Store Factory</option>
+                            <option value="Export Customer">Export Customer</option>
                             <option value="Other">Other</option>
                         </select>
 
