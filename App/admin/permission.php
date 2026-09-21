@@ -67,7 +67,8 @@ $query = new Query();
       'packing_material_report',
       'temp_pm_stock',
       'profit_loss_report',
-      'manage_manual_journals' // The new permission
+      'manage_manual_journals',
+      'manage_bank' // Added Bank Permission
     ];
 
     $selected_permissions = [];
@@ -242,11 +243,10 @@ $query = new Query();
                   <td><input type="checkbox" name="manage_currency" <?= isChecked('manage_currency', $permissionshow) ?>></td>
                 </tr>
                 <tr>
-                  <!-- FIXED: Placed Manual Journals in the correct grid structure -->
                   <td>Manage Manual Journals</td>
                   <td><input type="checkbox" name="manage_manual_journals" <?= isChecked('manage_manual_journals', $permissionshow) ?>></td>
-                  <td></td>
-                  <td></td>
+                  <td>Manage Banks</td>
+                  <td><input type="checkbox" name="manage_bank" <?= isChecked('manage_bank', $permissionshow) ?>></td>
                 </tr>
                 <tr>
                   <td colspan="4" class="text-end">
