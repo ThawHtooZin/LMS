@@ -703,28 +703,28 @@ class Query
   // UNIFIED CONTACTS FUNCTIONS
   // ==========================================
 
-  public function addcontact($name, $phone, $email, $address, $is_supplier, $is_customer, $contact_type)
+  public function addcontact($name, $phone, $email, $address, $is_supplier, $is_customer, $contact_type, $customer_details = '')
   {
-    global $pdo;
-    $stmt = $pdo->prepare("INSERT INTO contacts (name, contact_type, phone, email, address, is_supplier, is_customer) VALUES (?, ?, ?, ?, ?, ?, ?)");
+      global $pdo;
+      $stmt = $pdo->prepare("INSERT INTO contacts (name, contact_type, details, phone, email, address, is_supplier, is_customer) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
-    if ($stmt->execute([$name, $contact_type, $phone, $email, $address, $is_supplier, $is_customer])) {
-      echo "<script>swal('Success', 'Contact added successfully', 'success').then(() => { window.location.href='contacts.php'; });</script>";
-    } else {
-      echo "<script>swal('Error', 'Failed to add contact', 'error');</script>";
-    }
+      if ($stmt->execute([$name, $contact_type, $customer_details, $phone, $email, $address, $is_supplier, $is_customer])) {
+          echo "<script>swal('Success', 'Contact added successfully', 'success').then(() => { window.location.href='contacts.php'; });</script>";
+      } else {
+          echo "<script>swal('Error', 'Failed to add contact', 'error');</script>";
+      }
   }
 
-  public function updatecontact($id, $name, $phone, $email, $address, $is_supplier, $is_customer, $contact_type)
+  public function updatecontact($id, $name, $phone, $email, $address, $is_supplier, $is_customer, $contact_type, $customer_details = '')
   {
-    global $pdo;
-    $stmt = $pdo->prepare("UPDATE contacts SET name=?, contact_type=?, phone=?, email=?, address=?, is_supplier=?, is_customer=? WHERE id=?");
+      global $pdo;
+      $stmt = $pdo->prepare("UPDATE contacts SET name=?, contact_type=?, details=?, phone=?, email=?, address=?, is_supplier=?, is_customer=? WHERE id=?");
 
-    if ($stmt->execute([$name, $contact_type, $phone, $email, $address, $is_supplier, $is_customer, $id])) {
-      echo "<script>swal('Success', 'Contact updated successfully', 'success').then(() => { window.location.href='contacts.php'; });</script>";
-    } else {
-      echo "<script>swal('Error', 'Failed to update contact', 'error');</script>";
-    }
+      if ($stmt->execute([$name, $contact_type, $customer_details, $phone, $email, $address, $is_supplier, $is_customer, $id])) {
+          echo "<script>swal('Success', 'Contact updated successfully', 'success').then(() => { window.location.href='contacts.php'; });</script>";
+      } else {
+          echo "<script>swal('Error', 'Failed to update contact', 'error');</script>";
+      }
   }
 
   public function deletecontact($id)

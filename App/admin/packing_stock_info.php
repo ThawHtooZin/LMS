@@ -187,12 +187,26 @@ $bootstrap->css();
               $customer_id = $infodata['customer_id'] ?? 0;
               $customerdata = $query->select('contacts', $customer_id, 'id');
 
-              echo htmlspecialchars($customerdata['name'] ?? 'Unknown Customer');
-              ?><br><?php
-                    echo htmlspecialchars($customerdata['phone'] ?? '');
-                    ?><br><?php
-                          echo htmlspecialchars($customerdata['address'] ?? '');
-                          ?>
+              // Name (defaults to 'Unknown Customer' if empty)
+              $name = !empty($customerdata['name']) ? $customerdata['name'] : 'Unknown Customer';
+              echo htmlspecialchars($name);
+
+              // Customer Details (or customer_details)
+              $details = $customerdata['customer_details'] ?? ($customerdata['details'] ?? '');
+              if (!empty($details)) {
+                  echo '<br>' . htmlspecialchars($details);
+              }
+
+              // Phone
+              if (!empty($customerdata['phone'])) {
+                  echo '<br>' . htmlspecialchars($customerdata['phone']);
+              }
+
+              // Address
+              if (!empty($customerdata['address'])) {
+                  echo '<br>' . htmlspecialchars($customerdata['address']);
+              }
+              ?>
             </div>
             <div class="col-3">
               Date : <?php echo isset($infodata['date']) ? date('d-m-Y', strtotime($infodata['date'])) : '';  ?>

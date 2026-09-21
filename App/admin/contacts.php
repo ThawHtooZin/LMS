@@ -44,12 +44,12 @@ $query = new Query();
                         $address = $_POST['address'];
                         $is_supplier = ($_POST['contact_role'] == 'supplier') ? 1 : 0;
                         $is_customer = ($_POST['contact_role'] == 'customer') ? 1 : 0;
-
-                        // NEW: Capture Contact Type
                         $contact_type = $_POST['contact_type'];
+                        
+                        // NEW: Capture Customer Details if Export Customer
+                        $customer_details = $_POST['customer_details'] ?? '';
 
-                        // We pass $contact_type as the 8th parameter (Phase 4 will update this function)
-                        $query->updatecontact($id, $name, $phone, $email, $address, $is_supplier, $is_customer, $contact_type);
+                        $query->updatecontact($id, $name, $phone, $email, $address, $is_supplier, $is_customer, $contact_type, $customer_details);
                     }
                     if (isset($_POST['addbutton'])) {
                         $name = $_POST['name'];
@@ -58,12 +58,12 @@ $query = new Query();
                         $address = $_POST['address'];
                         $is_supplier = ($_POST['contact_role'] == 'supplier') ? 1 : 0;
                         $is_customer = ($_POST['contact_role'] == 'customer') ? 1 : 0;
-
-                        // NEW: Capture Contact Type
                         $contact_type = $_POST['contact_type'];
 
-                        // We pass $contact_type as the 7th parameter (Phase 4 will update this function)
-                        $query->addcontact($name, $phone, $email, $address, $is_supplier, $is_customer, $contact_type);
+                        // Capture Customer Details if Export Customer
+                        $customer_details = $_POST['customer_details'] ?? '';
+
+                        $query->addcontact($name, $phone, $email, $address, $is_supplier, $is_customer, $contact_type, $customer_details);
                     }
                     ?>
 
@@ -79,7 +79,7 @@ $query = new Query();
 
                     $keyword = isset($_GET['search_keyword']) ? trim($_GET['search_keyword']) : '';
                     $role = isset($_GET['filter_role']) ? $_GET['filter_role'] : '';
-                    $type_filter = isset($_GET['filter_type']) ? $_GET['filter_type'] : ''; // NEW FILTER
+                    $type_filter = isset($_GET['filter_type']) ? $_GET['filter_type'] : '';
 
                     $qs = "";
                     if (!empty($keyword)) $qs .= "&search_keyword=" . urlencode($keyword);
@@ -97,12 +97,12 @@ $query = new Query();
                             <option value="customer" <?php if ($role == 'customer') echo 'selected'; ?>>Customer</option>
                         </select>
 
-                        <!-- NEW: Type Filter -->
                         <select name="filter_type" class="form-control d-inline" style="width:15%; padding: 0px 5px !important; margin: 0 !important; font-size: 15px !important;">
                             <option value="">All Types</option>
                             <option value="Fish Supplier" <?php if ($type_filter == 'Fish Supplier') echo 'selected'; ?>>Fish Supplier</option>
                             <option value="Material Supplier" <?php if ($type_filter == 'Material Supplier') echo 'selected'; ?>>Material Supplier</option>
                             <option value="Cold Store Factory" <?php if ($type_filter == 'Cold Store Factory') echo 'selected'; ?>>Cold Store Factory</option>
+                            <option value="Export Customer" <?php if ($type_filter == 'Export Customer') echo 'selected'; ?>>Export Customer</option>
                             <option value="Other" <?php if ($type_filter == 'Other') echo 'selected'; ?>>Other</option>
                         </select>
 
@@ -136,7 +136,6 @@ $query = new Query();
                         } elseif ($role == 'customer') {
                             $where .= " AND is_customer=1";
                         }
-                        // NEW: Apply Type Filter
                         if ($type_filter != '') {
                             $where .= " AND contact_type='$type_filter'";
                         }
@@ -156,7 +155,6 @@ $query = new Query();
                             <tr>
                                 <td><?php echo $data['id']; ?></td>
                                 <td><?php echo htmlspecialchars($data['name']); ?></td>
-                                <!-- NEW: Show Type -->
                                 <td class="fw-bold text-secondary"><?php echo htmlspecialchars($data['contact_type']); ?></td>
                                 <td><?php echo htmlspecialchars($data['phone']); ?></td>
                                 <td><?php echo htmlspecialchars($data['email']); ?></td>
@@ -191,15 +189,20 @@ $query = new Query();
                                                 <label class="fw-bold mt-2">Contact Name</label>
                                                 <input type="text" name="name" class="form-control" value="<?php echo htmlspecialchars($data['name']); ?>" required>
 
-                                                <!-- NEW: Update Contact Type -->
                                                 <label class="fw-bold mt-2">Contact Type</label>
-                                                <select name="contact_type" class="form-control" required>
+                                                <select name="contact_type" class="form-control contact-type-select" required>
                                                     <option value="Fish Supplier" <?php echo ($data['contact_type'] == 'Fish Supplier') ? 'selected' : ''; ?>>Fish Supplier</option>
                                                     <option value="Material Supplier" <?php echo ($data['contact_type'] == 'Material Supplier') ? 'selected' : ''; ?>>Material Supplier</option>
                                                     <option value="Cold Store Factory" <?php echo ($data['contact_type'] == 'Cold Store Factory') ? 'selected' : ''; ?>>Cold Store Factory</option>
                                                     <option value="Export Customer" <?php echo ($data['contact_type'] == 'Export Customer') ? 'selected' : ''; ?>>Export Customer</option>
                                                     <option value="Other" <?php echo ($data['contact_type'] == 'Other') ? 'selected' : ''; ?>>Other</option>
                                                 </select>
+
+                                                <!-- DYNAMIC CUSTOMER DETAILS INPUT FOR UPDATE -->
+                                                <div class="customer-details-container mt-2" style="<?php echo ($data['contact_type'] == 'Export Customer') ? '' : 'display: none;'; ?>">
+                                                    <label class="fw-bold text-primary">Customer Details</label>
+                                                    <input type="text" name="customer_details" class="form-control" placeholder="e.g. Country, Export License / Port info" value="<?php echo htmlspecialchars($data['details'] ?? ''); ?>">
+                                                </div>
 
                                                 <label class="fw-bold mt-2">Contact Phone</label>
                                                 <input type="text" name="phone" class="form-control" value="<?php echo htmlspecialchars($data['phone']); ?>">
@@ -237,19 +240,11 @@ $query = new Query();
                         <ul class="pagination">
                             <li class="page-item"><a class="page-link" href="?pageno=1<?php echo $qs; ?>">First</a></li>
                             <li class="page-item <?php if ($pageno <= 1) echo 'disabled'; ?>">
-                                <a class="page-link" href="<?php if ($pageno <= 1) {
-                                                                echo '#';
-                                                            } else {
-                                                                echo "?pageno=" . ($pageno - 1) . $qs;
-                                                            } ?>">Previous</a>
+                                <a class="page-link" href="<?php if ($pageno <= 1) { echo '#'; } else { echo "?pageno=" . ($pageno - 1) . $qs; } ?>">Previous</a>
                             </li>
                             <li class="page-item"><a class="page-link" href="#"><?php echo $pageno; ?></a></li>
                             <li class="page-item <?php if ($pageno >= $total_pages) echo 'disabled'; ?>">
-                                <a class="page-link" href="<?php if ($pageno >= $total_pages) {
-                                                                echo '#';
-                                                            } else {
-                                                                echo "?pageno=" . ($pageno + 1) . $qs;
-                                                            } ?>">Next</a>
+                                <a class="page-link" href="<?php if ($pageno >= $total_pages) { echo '#'; } else { echo "?pageno=" . ($pageno + 1) . $qs; } ?>">Next</a>
                             </li>
                             <li class="page-item"><a class="page-link" href="?pageno=<?php echo $total_pages . $qs; ?>">Last</a> </li>
                         </ul>
@@ -273,15 +268,20 @@ $query = new Query();
                         <label class="fw-bold">Contact Name</label>
                         <input type="text" name="name" class="form-control" placeholder="e.g., Shwe Myay" required>
 
-                        <!-- NEW: Add Contact Type -->
                         <label class="fw-bold mt-2">Contact Type</label>
-                        <select name="contact_type" class="form-control" required>
+                        <select name="contact_type" class="form-control contact-type-select" required>
                             <option value="Fish Supplier" selected>Fish Supplier</option>
                             <option value="Material Supplier">Material Supplier</option>
                             <option value="Cold Store Factory">Cold Store Factory</option>
                             <option value="Export Customer">Export Customer</option>
                             <option value="Other">Other</option>
                         </select>
+
+                        <!-- DYNAMIC CUSTOMER DETAILS INPUT FOR ADD -->
+                        <div class="customer-details-container mt-2" style="display: none;">
+                            <label class="fw-bold text-primary">Customer Details</label>
+                            <input type="text" name="customer_details" class="form-control" placeholder="e.g. Country, Export License / Port info">
+                        </div>
 
                         <label class="fw-bold mt-2">Contact Phone</label>
                         <input type="text" name="phone" class="form-control" placeholder="09xxxxxxxxx">
@@ -325,6 +325,25 @@ $query = new Query();
                 }
             });
         }
+
+        // Toggle Customer Details based on Contact Type selection
+        document.addEventListener('change', function (e) {
+            if (e.target && e.target.classList.contains('contact-type-select')) {
+                const modalBody = e.target.closest('.modal-body');
+                const customerContainer = modalBody.querySelector('.customer-details-container');
+                const roleCustomerRadio = modalBody.querySelector('input[name="contact_role"][value="customer"]');
+                
+                if (e.target.value === 'Export Customer') {
+                    $(customerContainer).slideDown();
+                    // Auto-select "Customer" role radio option
+                    if(roleCustomerRadio) {
+                        roleCustomerRadio.checked = true;
+                    }
+                } else {
+                    $(customerContainer).slideUp();
+                }
+            }
+        });
     </script>
     <?php $bootstrap->javascript(); ?>
 </body>
