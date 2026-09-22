@@ -285,12 +285,11 @@ $query = new Query();
                     <div class="row">
                       <div class="col">
                         <label>Date</label>
-                        <input type="date" name="date" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($_SESSION['date'] ?? ''); ?>">
+                        <input type="date" name="date" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($_SESSION['date'] ?? ''); ?>" required>
                         <label>Commodity</label>
                         <div class="row">
                           <div class="col">
-                            <select class="form-control inpv2 mb-2" name="commondity_id1" id="commondityid1">
-                              <option value="">form10</option>
+                            <select class="form-control inpv2 mb-2" name="commondity_id1" id="commondityid1" required>
                               <?php
                               if (!empty($form7commonditydatas)) {
                                 foreach ($form7commonditydatas as $form7commonditydata) {
@@ -303,8 +302,7 @@ $query = new Query();
                               }
                               ?>
                             </select>
-                            <select class="form-control inpv2 mb-2" name="commondity_id2" id="commondityid2">
-                              <option value="">balance</option>
+                            <select class="form-control inpv2 mb-2" name="commondity_id2" id="commondityid2" required>
                               <?php
                               $commonditydatastmt = $pdo->prepare("SELECT id, name FROM products ORDER BY name ASC");
                               $commonditydatastmt->execute();
@@ -318,7 +316,7 @@ $query = new Query();
                             </select>
                           </div>
                           <div class="col">
-                            <select name="fish_type2" id="commondityid3" class="form-control inpv2">
+                            <select name="fish_type2" id="commondityid3" class="form-control inpv2" required>
                               <option value="G">G</option>
                               <option value="egg">egg</option>
                               <option value="ggs">ggs</option>
@@ -329,7 +327,7 @@ $query = new Query();
                               <option value="Bls">Bl's</option>
                               <option value="iqf">IQF</option>
                             </select>
-                            <select name="fish_type2" id="commondityid4" class="form-control inpv2">
+                            <select name="fish_type2" id="commondityid4" class="form-control inpv2" required>
                               <option value="G">G</option>
                               <option value="egg">egg</option>
                               <option value="ggs">ggs</option>
@@ -345,18 +343,19 @@ $query = new Query();
                       </div>
                       <div class="col">
                         <label>Particular</label>
-                        <select name="particular" class="form-control inpv2 mb-2" id="particular">
+                        <select name="particular" class="form-control inpv2 mb-2" id="particular" required>
                           <option value="fromform10" <?php echo (isset($_SESSION['particular']) && $_SESSION['particular'] == 'From Form-10') ? 'selected' : ''; ?>>From Form-10</option>
                           <option value="balance" <?php echo (isset($_SESSION['particular']) && $_SESSION['particular'] == 'Balance') ? 'selected' : ''; ?>>Balance</option>
                         </select>
                         <label>Remark</label>
+                        <!-- REMARK FIELD: NOT REQUIRED -->
                         <input type="text" name="remark" class="form-control inpv2 mb-2">
                       </div>
                     </div>
                     <div class="row">
                       <div class="col">
                         <label>Country</label>
-                        <select class="form-control inpv2 mb-2" name="country2" id="country1">
+                        <select class="form-control inpv2 mb-2" name="country2" id="country1" required>
                           <?php
                           foreach ($countrydatas as $countrydata) {
                           ?>
@@ -367,21 +366,21 @@ $query = new Query();
                         </select>
                         <input type="text" name="country" id="country2" class="form-control inpv2" value="<?php if (!empty($_SESSION['country'])) {
                                                                                                               echo htmlspecialchars($_SESSION['country']);
-                                                                                                            } ?>">
+                                                                                                            } ?>" required>
                       </div>
                       <div class="col">
                         <label>Size</label>
-                        <input type="text" name="size" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($_SESSION['size'] ?? ''); ?>">
+                        <input type="text" name="size" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($_SESSION['size'] ?? ''); ?>" required>
                       </div>
                     </div>
                     <div class="row">
                       <div class="col">
                         <label>Kg</label>
-                        <input type="text" name="kg" class="form-control inpv2 mb-2">
+                        <input type="text" name="kg" class="form-control inpv2 mb-2" required>
                       </div>
                       <div class="col">
                         <label>Mc</label>
-                        <input type="number" name="mc" class="form-control inpv2 mb-2">
+                        <input type="number" name="mc" class="form-control inpv2 mb-2" required>
                       </div>
                     </div>
                   </div>

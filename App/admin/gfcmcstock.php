@@ -237,11 +237,11 @@ $query = new Query();
             <div class="row">
               <div class="col">
                 <label>Date</label>
-                <input type="date" name="date" class="form-control inpv2 mb-2">
+                <input type="date" name="date" class="form-control inpv2 mb-2" required>
                 <label>Commodity</label>
                 <div class="d-flex">
                   <div class="col">
-                    <select class="form-control inpv2 mb-2" name="commondity_id">
+                    <select class="form-control inpv2 mb-2" name="commondity_id" required>
                       <?php
                       // Optimized: single query to fetch all products
                       $commonditydatastmt = $pdo->prepare("SELECT id, name FROM products ORDER BY name ASC");
@@ -256,7 +256,7 @@ $query = new Query();
                     </select>
                   </div>
                   <div class="col ms-2">
-                    <select name="fish_type1" id="commondityid3" class="form-control inpv2">
+                    <select name="fish_type1" id="commondityid3" class="form-control inpv2" required>
                       <option value="G">G</option>
                       <option value="egg">egg</option>
                       <option value="ggs">ggs</option>
@@ -272,27 +272,27 @@ $query = new Query();
               </div>
               <div class="col">
                 <label>Particular</label>
-                <textarea name="particular" rows="4" class="form-control inpv2 mb-2" id="particular">Balance</textarea>
+                <textarea name="particular" rows="4" class="form-control inpv2 mb-2" id="particular" required>Balance</textarea>
               </div>
             </div>
             <div class="row">
               <div class="col">
                 <label>Country</label>
-                <input type="text" name="country" class="form-control inpv2">
+                <input type="text" name="country" class="form-control inpv2" required>
               </div>
               <div class="col">
                 <label>Size</label>
-                <input type="text" name="size" class="form-control inpv2 mb-2">
+                <input type="text" name="size" class="form-control inpv2 mb-2" required>
               </div>
             </div>
             <div class="row">
               <div class="col">
                 <label>Kg</label>
-                <input type="text" name="kg" class="form-control inpv2 mb-2">
+                <input type="text" name="kg" class="form-control inpv2 mb-2" required>
               </div>
               <div class="col">
                 <label>Mc</label>
-                <input type="number" name="mc" class="form-control inpv2 mb-2">
+                <input type="number" name="mc" class="form-control inpv2 mb-2" required>
               </div>
             </div>
           </div>
@@ -318,11 +318,11 @@ $query = new Query();
             <div class="row">
               <div class="col">
                 <label>Date</label>
-                <input type="date" name="exportdate" class="form-control inpv2 mb-2">
+                <input type="date" name="exportdate" class="form-control inpv2 mb-2" required>
                 <div class="d-flex">
                   <div class="col">
                     <label>Commodity</label>
-                    <select class="form-control inpv2 mb-2" name="exportcommondity_id">
+                    <select class="form-control inpv2 mb-2" name="exportcommondity_id" required>
                       <?php
                       $form7commonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM gfcmcstock");
                       $form7commonditystmt->execute();
@@ -339,7 +339,7 @@ $query = new Query();
                     </select>
                   </div>
                   <div class="col ms-2 mt-4">
-                    <select name="exportfish_type" id="commondityid3" class="form-control inpv2">
+                    <select name="exportfish_type" id="commondityid3" class="form-control inpv2" required>
                       <option value="G">G</option>
                       <option value="egg">egg</option>
                       <option value="ggs">ggs</option>
@@ -355,13 +355,13 @@ $query = new Query();
               </div>
               <div class="col">
                 <label>Particular</label>
-                <textarea name="exportparticular" rows="4" class="form-control inpv2 mb-2">Ship/</textarea>
+                <textarea name="exportparticular" rows="4" class="form-control inpv2 mb-2" required>Ship/</textarea>
               </div>
             </div>
             <div class="row">
               <div class="col">
                 <label>Country</label>
-                <select class="form-control inpv2 mb-2" name="exportcountry">
+                <select class="form-control inpv2 mb-2" name="exportcountry" required>
                   <?php
                   $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM gfcmcstock WHERE country IS NOT NULL");
                   $countrystmt->execute();
@@ -376,17 +376,17 @@ $query = new Query();
               </div>
               <div class="col">
                 <label>Size</label>
-                <input type="text" name="exportsize" class="form-control inpv2 mb-2">
+                <input type="text" name="exportsize" class="form-control inpv2 mb-2" required>
               </div>
             </div>
             <div class="row">
               <div class="col">
                 <label>Kg</label>
-                <input type="text" name="exportkg" class="form-control inpv2 mb-2">
+                <input type="text" name="exportkg" class="form-control inpv2 mb-2" required>
               </div>
               <div class="col">
                 <label>Mc</label>
-                <input type="number" name="exportmc" class="form-control inpv2 mb-2">
+                <input type="number" name="exportmc" class="form-control inpv2 mb-2" required>
               </div>
             </div>
           </div>
