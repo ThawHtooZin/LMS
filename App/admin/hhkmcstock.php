@@ -32,7 +32,7 @@ $query = new Query();
       ? $_POST['commondity_id2'] 
       : (!empty($_POST['commondity_id1']) ? $_POST['commondity_id1'] : '');
     $fish_type = $_POST['fish_type2'] ?? $_POST['fish_type'] ?? 'G';
-    $country = $_POST['country2'] ?? $_POST['country'] ?? '';
+    $country = !empty($_POST['country']) ? $_POST['country'] : (!empty($_POST['country2']) ? $_POST['country2'] : '');
     $remark = $_POST['remark'] ?? '';
     $size = $_POST['size'];
     $kg = $_POST['kg'];
