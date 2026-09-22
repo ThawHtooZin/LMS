@@ -249,11 +249,11 @@ $query = new Query();
                         <div class="row">
                           <div class="col">
                             <label>Date</label>
-                            <input type="date" name="newdate" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($sizeinfodata['date']); ?>">
+                            <input type="date" name="newdate" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($sizeinfodata['date']); ?>" required>
                             <label>Commodity</label>
                             <div class="d-flex">
                               <div class="col">
-                                <select class="form-control inpv2 mb-2" name="newcommondity_id">
+                                <select class="form-control inpv2 mb-2" name="newcommondity_id" required>
                                   <?php
                                   $prodStmt = $pdo->prepare("SELECT id, name FROM products ORDER BY name ASC");
                                   $prodStmt->execute();
@@ -269,7 +269,7 @@ $query = new Query();
                                 </select>
                               </div>
                               <div class="col ms-2">
-                                <select name="newfish_type" id="commondityid3" class="form-control inpv2">
+                                <select name="newfish_type" id="commondityid3" class="form-control inpv2" required>
                                   <option value="G" <?php if ($sizeinfodata['fish_type'] == 'G') {
                                                       echo "selected";
                                                     } ?>>G</option>
@@ -303,13 +303,13 @@ $query = new Query();
                           </div>
                           <div class="col">
                             <label>Particular</label>
-                            <select name="newparticular" class="form-control inpv2 mb-2">
+                            <select name="newparticular" class="form-control inpv2 mb-2" required>
                               <option value="repackingout" <?php if ($sizeinfodata['particular'] == 'repackingout') {
-                                                            echo "selected";
-                                                          } ?>>Repacking Out</option>
+                                                              echo "selected";
+                                                            } ?>>Repacking Out</option>
                               <option value="hhktogfc" <?php if ($sizeinfodata['particular'] == 'hhktogfc') {
-                                                        echo "selected";
-                                                      } ?>>HHK to GFC</option>
+                                                          echo "selected";
+                                                        } ?>>HHK to GFC</option>
                               <option value="fromform10" <?php if ($sizeinfodata['particular'] == 'fromform10') {
                                                             echo "selected";
                                                           } ?>>From Form-10</option>
@@ -318,13 +318,14 @@ $query = new Query();
                                                       } ?>>Balance</option>
                             </select>
                             <label>Remark</label>
+                            <!-- REMARK FIELD: NOT REQUIRED -->
                             <input type="text" name="newremark" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($sizeinfodata['remark']); ?>">
                           </div>
                         </div>
                         <div class="row">
                           <div class="col">
                             <label>Country</label>
-                            <select class="form-control inpv2 mb-2" name="newcountry">
+                            <select class="form-control inpv2 mb-2" name="newcountry" required>
                               <?php
                               $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM hhkmcstock WHERE country IS NOT NULL");
                               $countrystmt->execute();
@@ -341,17 +342,17 @@ $query = new Query();
                           </div>
                           <div class="col">
                             <label>Size</label>
-                            <input type="text" name="newsize" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($sizeinfodata['size']); ?>">
+                            <input type="text" name="newsize" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($sizeinfodata['size']); ?>" required>
                           </div>
                         </div>
                         <div class="row">
                           <div class="col">
                             <label>Kg</label>
-                            <input type="text" name="newkg" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($sizeinfodata['kg']); ?>">
+                            <input type="text" name="newkg" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($sizeinfodata['kg']); ?>" required>
                           </div>
                           <div class="col">
                             <label>Mc</label>
-                            <input type="number" name="newmc" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($sizeinfodata['mc']); ?>">
+                            <input type="number" name="newmc" class="form-control inpv2 mb-2" value="<?php echo htmlspecialchars($sizeinfodata['mc']); ?>" required>
                           </div>
                         </div>
                       </div>
