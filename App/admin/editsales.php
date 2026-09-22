@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' and isset($_POST['action_type'])) {
         $contact_id   = $_POST['contact_id'];
         $date         = $_POST['date'];
         $due_date     = !empty($_POST['due_date']) ? $_POST['due_date'] : NULL;
-        $voucher_no   = $_POST['voucher_no'];
+        $sr_no        = $_POST['sr_no'];
         $currency     = $_POST['currency'];
 
         $status = $current_status;
@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' and isset($_POST['action_type'])) {
             $ctrl_action = 'add_another';
         }
 
-        $saveResult = $query->updateSale($sale_id, $contact_id, $date, $due_date, $voucher_no, $currency, $status, $grand_total, $lines, $ctrl_action);
+        $saveResult = $query->updateSale($sale_id, $contact_id, $date, $due_date, $sr_no, $currency, $status, $grand_total, $lines, $ctrl_action);
     }
 }
 
@@ -207,7 +207,7 @@ $accounts = $pdo->query("SELECT code, name, class FROM accodes WHERE class = 'RE
                 <input type="hidden" name="action_type" id="action_type" value="save_draft">
                 <div class="bg-white p-4 shadow-sm rounded m-2">
                     <div class="text-muted small"><a href="sales.php" class="text-decoration-none">Sales overview</a> > Invoices ></div>
-                    <div class="xero-title">Edit Invoice <?= htmlspecialchars($sale['voucher_no']); ?></div>
+                    <div class="xero-title">Edit Sale <?= htmlspecialchars($sale['sr_no']); ?></div>
 
                     <div class="d-flex justify-content-between align-items-center status-header">
                         <div>
@@ -223,7 +223,6 @@ $accounts = $pdo->query("SELECT code, name, class FROM accodes WHERE class = 'RE
                                     <li><a class="dropdown-item text-danger" onclick="confirmAction('delete', 'Are you sure you want to delete this draft?')"><i class="bi bi-trash"></i> Delete</a></li>
 
                                 <?php elseif ($current_status === 'AWAITING_PAYMENT' && !$is_locked): ?>
-                                    <!-- This only shows if it is Awaiting Payment AND the paid amount is exactly 0 -->
                                     <li><a class="dropdown-item text-warning" onclick="confirmAction('void', 'Are you sure you want to void this approved invoice?')"><i class="bi bi-x-circle"></i> Void</a></li>
                                 <?php endif; ?>
                             </ul>
@@ -250,8 +249,8 @@ $accounts = $pdo->query("SELECT code, name, class FROM accodes WHERE class = 'RE
                             <input type="date" name="due_date" class="form-control" value="<?= htmlspecialchars($sale['due_date']); ?>" <?= $is_locked ? 'readonly' : ''; ?>>
                         </div>
                         <div class="col-md-3">
-                            <label class="fw-bold small mb-1">Invoice #</label>
-                            <input type="text" name="voucher_no" class="form-control req-input" value="<?= htmlspecialchars($sale['voucher_no']); ?>" <?= $is_locked ? 'readonly' : ''; ?>>
+                            <label class="fw-bold small mb-1">SR #</label>
+                            <input type="text" name="sr_no" class="form-control req-input" value="<?= htmlspecialchars($sale['sr_no']); ?>" <?= $is_locked ? 'readonly' : ''; ?>>
                         </div>
                     </div>
 

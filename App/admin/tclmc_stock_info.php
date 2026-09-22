@@ -26,126 +26,122 @@ $bootstrap->css();
 <body>
   <?php
   $id = $_GET['id'];
+
   if (isset($_POST['transferbtn'])) {
     $transfer_to = $_POST['transfer_to'];
     $transfer_mc = $_POST['transfer_mc'];
-
-    $transfercheckstmt = $pdo->prepare("SELECT * FROM tclmcstock WHERE id='$id'");
-    $transfercheckstmt->execute();
-    $transfercheck = $transfercheckstmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($transfercheck['grandtotal_mc'] >= $transfer_mc) {
-      echo $query->transfermcstocktcl($transfer_to, $transfer_mc, $id);
-    } else {
-      echo '<script>swal("Sorry!", "Not Enough Mc!", "warning");</script>';
-    }
+    echo $query->transfermcstocktcl($transfer_to, $transfer_mc, $id);
   }
 
   if (isset($_POST['exportbtn'])) {
     $loading_no = $_POST['loading_no'];
     $loading_mc = $_POST['loading_mc'];
-
-    $loadcheckstmt = $pdo->prepare("SELECT * FROM tclmcstock WHERE id='$id'");
-    $loadcheckstmt->execute();
-    $loadcheck = $loadcheckstmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($loadcheck['grandtotal_mc'] >= $loading_mc) {
-      echo $query->loadmcstocktcl($loading_no, $loading_mc, $id);
-    } else {
-      echo '<script>swal("Sorry!", "Not Enough Mc!", "warning");</script>';
-    }
+    echo $query->loadmcstocktcl($loading_no, $loading_mc, $id);
   }
   ?>
   <div class="row">
     <div class="sidebarcol" id="sidebar">
-      <?php
-      include 'sidebar.php';
-      ?>
+      <?php include 'sidebar.php'; ?>
     </div>
     <div class="contentcol" id="content">
       <?php require 'navbar.php'; ?>
       <div class="card">
         <div class="card-header bg-info">
-          <form class="" action="" method="post">
-
-
-            <h5 style="font-weight:bold;" class="text-light d-inline">TCL MC STOCK INFO</h5>
-            <button type="button" class="btn btn-danger btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#transfer">Transfer Mc</button>
-            <button type="button" class="btn btn-warning btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#export">Export Mc</button>
-            <a href="tclmcstock.php" type="button" class="btn btn-secondary btn-sm float-end ms-2">Back</a>
+          <h5 style="font-weight:bold;" class="text-light d-inline">TCL MC STOCK INFO</h5>
+          <button type="button" class="btn btn-danger btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#transfer">Transfer Mc</button>
+          <button type="button" class="btn btn-warning btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#export">Export Mc</button>
+          <a href="tclmcstock.php" type="button" class="btn btn-secondary btn-sm float-end ms-2">Back</a>
         </div>
-        </form>
         <div class="card-body">
           <?php
-          $infostmt = $pdo->prepare("SELECT * FROM tclmcstock WHERE id='$id'");
-          $infostmt->execute();
+          $infostmt = $pdo->prepare("SELECT * FROM tclmcstock WHERE id = ?");
+          $infostmt->execute([$id]);
           $infodata = $infostmt->fetch(PDO::FETCH_ASSOC);
+
+          $item_id = $infodata['item_id'];
+          $productstmt = $pdo->prepare("SELECT id, name AS item_name FROM products WHERE id = ? LIMIT 1");
+          $productstmt->execute([$item_id]);
+          $commonditydata = $productstmt->fetch(PDO::FETCH_ASSOC);
           ?>
-          <div class="row">
-            <div class="col-7">
-              <table class="table table-hover table-bordered table-striped">
-                <tr>
-                  <th>Date</th>
-                  <th>Fish Name</th>
-                  <th>Size</th>
-                  <th>Pcs</th>
-                  <th>Kg</th>
-                  <th>Opening Mc</th>
-                  <th>Form 10 Mc</th>
-                </tr>
-                <?php
-                $kg = $infodata['kg'];
-                $item_id = $infodata['item_id'];
-                $productstmt = $pdo->prepare("SELECT id, name AS item_name FROM products WHERE id = :id LIMIT 1");
-                $productstmt->execute([':id' => $item_id]);
-                $commonditydata = $productstmt->fetch(PDO::FETCH_ASSOC);
-                ?>
-                <tr>
-                  <td><?php echo date('d-m-Y', strtotime($infodata['date'])); ?></td>
-                  <td><?php echo htmlspecialchars($commonditydata['item_name'] ?? 'Unknown'); ?></td>
-                  <td><?php echo htmlspecialchars($infodata['size'] ?? ''); ?></td>
-                  <td><?php echo htmlspecialchars($infodata['pcs'] ?? ''); ?></td>
-                  <td><?php echo htmlspecialchars($infodata['kg'] ?? ''); ?></td>
-                  <td><?php echo htmlspecialchars($infodata['opening_mc'] ?? ''); ?></td>
-                  <td><?php echo htmlspecialchars($infodata['form10mc'] ?? ''); ?></td>
-                </tr>
-              </table>
-            </div>
-            <div class="col-5">
-              <table class="table table-hover table-bordered table-striped">
-                <tr>
-                  <th>Transfer To <?php if (!empty($infodata['transfer_to_where'])) {
-                                    echo htmlspecialchars($infodata['transfer_to_where']);
-                                  }; ?></th>
-                  <th>Loading <?php if (!empty($infodata['loading_no'])) {
-                                echo htmlspecialchars($infodata['loading_no']);
-                              }; ?></th>
-                  <th>Grand Total Mc</th>
-                </tr>
-                <tr>
-                  <td><?php if ($infodata['transfer_mc'] != 0) {
-                        echo htmlspecialchars($infodata['transfer_mc']);
-                      } else {
-                        echo '-';
-                      }; ?></td>
-                  <td><?php if ($infodata['loading_mc'] != 0) {
-                        echo htmlspecialchars($infodata['loading_mc']);
-                      } else {
-                        echo '-';
-                      }; ?></td>
-                  <td><?php if ($infodata['grandtotal_mc'] != 0) {
-                        echo htmlspecialchars($infodata['grandtotal_mc']);
-                      } else {
-                        echo '-';
-                      }; ?></td>
-                </tr>
-              </table>
-            </div>
-          </div>
+
+          <h5 class="mb-3 text-primary" style="font-weight:bold;">Master Carton Details</h5>
+          <table class="table table-hover table-bordered table-striped">
+            <thead class="table-light">
+              <tr>
+                <th>Date</th>
+                <th>Fish Name</th>
+                <th>Size</th>
+                <th>Pcs</th>
+                <th>Kg</th>
+                <th>Opening Mc</th>
+                <th>Form 10 Mc</th>
+                <th class="bg-warning text-dark text-center">Current Balance (Mc)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><?= date('d-m-Y', strtotime($infodata['date'])); ?></td>
+                <td><?= htmlspecialchars($commonditydata['item_name'] ?? 'Unknown'); ?></td>
+                <td><?= htmlspecialchars($infodata['size'] ?? ''); ?></td>
+                <td><?= htmlspecialchars($infodata['pcs'] ?? ''); ?></td>
+                <td><?= htmlspecialchars($infodata['kg'] ?? ''); ?></td>
+                <td><?= htmlspecialchars($infodata['opening_mc'] ?? ''); ?></td>
+                <td><?= htmlspecialchars($infodata['form10mc'] ?? ''); ?></td>
+                <td class="fw-bold fs-5 text-danger text-center"><?= htmlspecialchars($infodata['grandtotal_mc'] ?? '0'); ?></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h5 class="mt-4 mb-3 text-secondary" style="font-weight:bold;">Transaction Ledger (Transfers & Exports)</h5>
+          <table class="table table-hover table-bordered table-striped">
+            <thead class="table-dark">
+              <tr>
+                <th>No.</th>
+                <th>Date</th>
+                <th>Transaction Type</th>
+                <th>Destination / Loading No</th>
+                <th>Quantity (Mc)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php
+              $transStmt = $pdo->prepare("SELECT * FROM tclmc_transactions WHERE tclmc_id = ? ORDER BY id ASC");
+              $transStmt->execute([$id]);
+              $transactions = $transStmt->fetchAll(PDO::FETCH_ASSOC);
+
+              if (empty($transactions)) {
+                echo '<tr><td colspan="5" class="text-center text-muted">No transactions recorded yet.</td></tr>';
+              } else {
+                $count = 1;
+                $totalQuantity = 0;
+
+                foreach ($transactions as $trx) {
+                  $totalQuantity += (float)$trx['quantity'];
+
+                  $typeBadge = $trx['type'] === 'transfer' ? '<span class="badge bg-info text-dark">Transfer</span>' : '<span class="badge bg-success">Export</span>';
+                  echo '<tr>';
+                  echo '<td>' . $count++ . '</td>';
+                  echo '<td>' . date('d-m-Y', strtotime($trx['transaction_date'])) . '</td>';
+                  echo '<td>' . $typeBadge . '</td>';
+                  echo '<td>' . htmlspecialchars($trx['destination']) . '</td>';
+                  echo '<td class="fw-bold text-danger">-' . htmlspecialchars($trx['quantity']) . '</td>';
+                  echo '</tr>';
+                }
+
+                echo '<tr class="table-light">';
+                echo '<td colspan="4" class="text-end fw-bold">Total Reduced:</td>';
+                echo '<td class="fw-bold text-danger">-' . htmlspecialchars($totalQuantity) . '</td>';
+                echo '</tr>';
+              }
+              ?>
+            </tbody>
+          </table>
+
         </div>
       </div>
     </div>
   </div>
+
   <div class="modal fade" id="export">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -156,9 +152,9 @@ $bootstrap->css();
         <form action="" method="post">
           <div class="modal-body">
             <label>Loading No</label>
-            <input type="text" name="loading_no" class="form-control inpv2 mb-3 mt-1">
+            <input type="text" name="loading_no" class="form-control inpv2 mb-3 mt-1" required>
             <label>Loading Mc</label>
-            <input type="number" name="loading_mc" class="form-control inpv2 mb-3 mt-1">
+            <input type="number" name="loading_mc" class="form-control inpv2 mb-3 mt-1" max="<?= htmlspecialchars($infodata['grandtotal_mc']); ?>" required>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -168,6 +164,7 @@ $bootstrap->css();
       </div>
     </div>
   </div>
+
   <div class="modal fade" id="transfer">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -178,9 +175,9 @@ $bootstrap->css();
         <form action="" method="post">
           <div class="modal-body">
             <label>Transfer To</label>
-            <input type="text" name="transfer_to" class="form-control inpv2 mb-3 mt-1" value="HHK">
+            <input type="text" name="transfer_to" class="form-control inpv2 mb-3 mt-1" value="HHK" required>
             <label>Transfer Mc</label>
-            <input type="number" name="transfer_mc" class="form-control inpv2 mb-3 mt-1">
+            <input type="number" name="transfer_mc" class="form-control inpv2 mb-3 mt-1" max="<?= htmlspecialchars($infodata['grandtotal_mc']); ?>" required>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

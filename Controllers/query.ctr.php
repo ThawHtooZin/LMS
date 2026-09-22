@@ -705,26 +705,26 @@ class Query
 
   public function addcontact($name, $phone, $email, $address, $is_supplier, $is_customer, $contact_type, $customer_details = '')
   {
-      global $pdo;
-      $stmt = $pdo->prepare("INSERT INTO contacts (name, contact_type, details, phone, email, address, is_supplier, is_customer) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    global $pdo;
+    $stmt = $pdo->prepare("INSERT INTO contacts (name, contact_type, details, phone, email, address, is_supplier, is_customer) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
-      if ($stmt->execute([$name, $contact_type, $customer_details, $phone, $email, $address, $is_supplier, $is_customer])) {
-          echo "<script>swal('Success', 'Contact added successfully', 'success').then(() => { window.location.href='contacts.php'; });</script>";
-      } else {
-          echo "<script>swal('Error', 'Failed to add contact', 'error');</script>";
-      }
+    if ($stmt->execute([$name, $contact_type, $customer_details, $phone, $email, $address, $is_supplier, $is_customer])) {
+      echo "<script>swal('Success', 'Contact added successfully', 'success').then(() => { window.location.href='contacts.php'; });</script>";
+    } else {
+      echo "<script>swal('Error', 'Failed to add contact', 'error');</script>";
+    }
   }
 
   public function updatecontact($id, $name, $phone, $email, $address, $is_supplier, $is_customer, $contact_type, $customer_details = '')
   {
-      global $pdo;
-      $stmt = $pdo->prepare("UPDATE contacts SET name=?, contact_type=?, details=?, phone=?, email=?, address=?, is_supplier=?, is_customer=? WHERE id=?");
+    global $pdo;
+    $stmt = $pdo->prepare("UPDATE contacts SET name=?, contact_type=?, details=?, phone=?, email=?, address=?, is_supplier=?, is_customer=? WHERE id=?");
 
-      if ($stmt->execute([$name, $contact_type, $customer_details, $phone, $email, $address, $is_supplier, $is_customer, $id])) {
-          echo "<script>swal('Success', 'Contact updated successfully', 'success').then(() => { window.location.href='contacts.php'; });</script>";
-      } else {
-          echo "<script>swal('Error', 'Failed to update contact', 'error');</script>";
-      }
+    if ($stmt->execute([$name, $contact_type, $customer_details, $phone, $email, $address, $is_supplier, $is_customer, $id])) {
+      echo "<script>swal('Success', 'Contact updated successfully', 'success').then(() => { window.location.href='contacts.php'; });</script>";
+    } else {
+      echo "<script>swal('Error', 'Failed to update contact', 'error');</script>";
+    }
   }
 
   public function deletecontact($id)
@@ -4081,33 +4081,68 @@ class Query
     $addtclmcstmt = $pdo->prepare("INSERT INTO tclmcstock(date, item_id, size, pcs, kg, form10mc, grandtotal_mc) VALUES('$date', '$item_id', '$size', '$pcs', '$kg', '$form10_mc', '$form10_mc')");
     $addtclmcstmt->execute();
   }
-
-  function transfermcstocktcl($transfer_to, $transfer_mc, $id)
+  public function transfermcstocktcl($transfer_to, $transfer_mc, $id)
   {
     global $pdo;
 
-    $transfercheckstmt = $pdo->prepare("SELECT * FROM tclmcstock WHERE id='$id'");
-    $transfercheckstmt->execute();
-    $transfercheck = $transfercheckstmt->fetch(PDO::FETCH_ASSOC);
+    $transfercheckstmt = $pdo->prepare("SELECT grandtotal_mc FROM tclmcstock WHERE id = ?");
+    $transfercheckstmt->execute([$id]);
+    $current_total = $transfercheckstmt->fetchColumn();
 
-    $grandtotal_mc = $transfercheck['grandtotal_mc'] - $transfer_mc;
-    $transferstmt = $pdo->prepare("UPDATE tclmcstock SET transfer_to_where='$transfer_to', transfer_mc='$transfer_mc', grandtotal_mc='$grandtotal_mc' WHERE id='$id'");
-    $transferstmt->execute();
-    return '<script>swal("Success!", "Successfully Transfered!", "success");</script>';
+    if ($current_total < $transfer_mc) {
+      return '<script>swal("Error!", "Not enough MC!", "error");</script>';
+    }
+
+    $grandtotal_mc = $current_total - $transfer_mc;
+    $date = date('Y-m-d');
+
+    $pdo->beginTransaction();
+    try {
+      $transferstmt = $pdo->prepare("UPDATE tclmcstock SET grandtotal_mc = ? WHERE id = ?");
+      $transferstmt->execute([$grandtotal_mc, $id]);
+
+      $logStmt = $pdo->prepare("INSERT INTO tclmc_transactions (tclmc_id, transaction_date, type, destination, quantity) VALUES (?, ?, 'transfer', ?, ?)");
+      $logStmt->execute([$id, $date, $transfer_to, $transfer_mc]);
+
+      $pdo->commit();
+      // Forcing a hard GET redirect to wipe POST memory completely
+      return '<script>swal("Success!", "Successfully Transferred!", "success").then(() => { window.location.href = "tclmc_stock_info.php?id=' . $id . '"; });</script>';
+    } catch (Exception $e) {
+      $pdo->rollBack();
+      return '<script>swal("Error!", "Transaction failed.", "error");</script>';
+    }
   }
 
-  function loadmcstocktcl($loading_no, $loading_mc, $id)
+  public function loadmcstocktcl($loading_no, $loading_mc, $id)
   {
     global $pdo;
 
-    $loadcheckstmt = $pdo->prepare("SELECT * FROM tclmcstock WHERE id='$id'");
-    $loadcheckstmt->execute();
-    $loadcheck = $loadcheckstmt->fetch(PDO::FETCH_ASSOC);
+    $loadcheckstmt = $pdo->prepare("SELECT grandtotal_mc FROM tclmcstock WHERE id = ?");
+    $loadcheckstmt->execute([$id]);
+    $current_total = $loadcheckstmt->fetchColumn();
 
-    $grandtotal_mc = $loadcheck['grandtotal_mc'] - $loading_mc;
-    $loadstmt = $pdo->prepare("UPDATE tclmcstock SET loading_no='$loading_no', loading_mc='$loading_mc', grandtotal_mc='$grandtotal_mc' WHERE id='$id'");
-    $loadstmt->execute();
-    return '<script>swal("Success!", "Successfully Loaded!", "success");</script>';
+    if ($current_total < $loading_mc) {
+      return '<script>swal("Error!", "Not enough MC!", "error");</script>';
+    }
+
+    $grandtotal_mc = $current_total - $loading_mc;
+    $date = date('Y-m-d');
+
+    $pdo->beginTransaction();
+    try {
+      $loadstmt = $pdo->prepare("UPDATE tclmcstock SET grandtotal_mc = ? WHERE id = ?");
+      $loadstmt->execute([$grandtotal_mc, $id]);
+
+      $logStmt = $pdo->prepare("INSERT INTO tclmc_transactions (tclmc_id, transaction_date, type, destination, quantity) VALUES (?, ?, 'export', ?, ?)");
+      $logStmt->execute([$id, $date, $loading_no, $loading_mc]);
+
+      $pdo->commit();
+      // Forcing a hard GET redirect to wipe POST memory completely
+      return '<script>swal("Success!", "Successfully Loaded!", "success").then(() => { window.location.href = "tclmc_stock_info.php?id=' . $id . '"; });</script>';
+    } catch (Exception $e) {
+      $pdo->rollBack();
+      return '<script>swal("Error!", "Transaction failed.", "error");</script>';
+    }
   }
 
   function addtruckpackinglist($date, $invoice_no, $truck_no)

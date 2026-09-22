@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' and isset($_POST['action_type'])) {
     $contact_id   = $_POST['contact_id'];
     $date         = $_POST['date'];
     $due_date     = !empty($_POST['due_date']) ? $_POST['due_date'] : NULL;
-    $voucher_no   = $_POST['voucher_no'];
+    $sr_no        = $_POST['sr_no'];
     $currency     = $_POST['currency'];
     $action_type  = $_POST['action_type'];
 
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' and isset($_POST['action_type'])) {
     if ($action_type == 'save_add_another' or $action_type == 'approve_add_another') {
         $ctrl_action = 'add_another';
     }
-    $saveResult = $query->saveSale($contact_id, $date, $due_date, $voucher_no, $currency, $status, $grand_total, $lines, $ctrl_action);
+    $saveResult = $query->saveSale($contact_id, $date, $due_date, $sr_no, $currency, $status, $grand_total, $lines, $ctrl_action);
 
     if ($saveResult['status'] === true) {
         unset($_SESSION['old_sale']);
@@ -171,7 +171,7 @@ $accounts = $pdo->query("SELECT code, name, class FROM accodes WHERE class = 'RE
                 <input type="hidden" name="action_type" id="action_type" value="save_draft">
                 <div class="bg-white p-4 shadow-sm rounded m-2">
                     <div class="text-muted small"><a href="sales.php" class="text-decoration-none">Sales overview</a> > Invoices ></div>
-                    <div class="xero-title">New Invoice</div>
+                    <div class="xero-title">New Sale</div>
 
                     <div class="row mb-4 gx-3">
                         <div class="col-md-3">
@@ -192,8 +192,8 @@ $accounts = $pdo->query("SELECT code, name, class FROM accodes WHERE class = 'RE
                             <input type="date" name="due_date" class="form-control" value="<?= htmlspecialchars($old['due_date'] ?? ''); ?>">
                         </div>
                         <div class="col-md-3">
-                            <label class="fw-bold small mb-1">Invoice #</label>
-                            <input type="text" name="voucher_no" class="form-control req-input" placeholder="INV-0001" value="<?= htmlspecialchars($old['voucher_no'] ?? ''); ?>">
+                            <label class="fw-bold small mb-1">SR #</label>
+                            <input type="text" name="sr_no" class="form-control req-input" placeholder="SR-0001" value="<?= htmlspecialchars($old['sr_no'] ?? ''); ?>">
                         </div>
                     </div>
 

@@ -25,7 +25,7 @@ if ($status_filter !== 'all') {
 }
 
 if (!empty($search)) {
-  $where[] = "(s.voucher_no LIKE ? OR c.name LIKE ?)";
+  $where[] = "(s.sr_no LIKE ? OR c.name LIKE ?)";
   $params[] = "%$search%";
   $params[] = "%$search%";
 }
@@ -75,7 +75,7 @@ $whereSql = implode(" AND ", $where);
       <?php require 'navbar.php'; ?>
       <div class="bg-white p-4 shadow-sm rounded mt-3 ms-2 me-2">
         <div class="d-flex justify-content-between align-items-center mb-2">
-          <div class="xero-title mb-0">Sales Invoices</div>
+          <div class="xero-title mb-0">Sales Overview</div>
           <a href="newsales.php" class="btn btn-primary fw-bold">New Sale</a>
         </div>
 
@@ -97,7 +97,7 @@ $whereSql = implode(" AND ", $where);
         <table class="table table-bordered table-hover">
           <thead class="table-dark">
             <tr>
-              <th>Invoice #</th>
+              <th>SR #</th>
               <th>Customer</th>
               <th>Containers</th>
               <th>Date</th>
@@ -126,7 +126,7 @@ $whereSql = implode(" AND ", $where);
 
             if (count($sales) === 0): ?>
               <tr>
-                <td colspan="10" class="text-center text-muted py-4">No invoices found.</td>
+                <td colspan="10" class="text-center text-muted py-4">No sales found.</td>
               </tr>
               <?php else:
               foreach ($sales as $sale):
@@ -140,7 +140,7 @@ $whereSql = implode(" AND ", $where);
                 }
               ?>
                 <tr class="clickable-row" data-href="editsales.php?id=<?= $sale['id']; ?>" style="cursor: pointer;">
-                  <td class="fw-bold text-primary"><?= htmlspecialchars($sale['voucher_no']); ?></td>
+                  <td class="fw-bold text-primary"><?= htmlspecialchars($sale['sr_no']); ?></td>
                   <td><?= htmlspecialchars($sale['customer_name']); ?></td>
                   <td><?= htmlspecialchars($sale['containers'] ?? '-'); ?></td>
                   <td><?= date('d M Y', strtotime($sale['date'])); ?></td>
@@ -165,7 +165,6 @@ $whereSql = implode(" AND ", $where);
   <script>
     $(document).ready(function() {
       $(".clickable-row").click(function(e) {
-        // Prevent row click if the user clicks the Delete button
         if (!$(e.target).closest('a, button').length) {
           window.location = $(this).data("href");
         }

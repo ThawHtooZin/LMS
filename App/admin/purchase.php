@@ -116,32 +116,28 @@ $tabs = ['All', 'Draft', 'Awaiting Approval', 'Awaiting Payment', 'Paid'];
     <div class="contentcol" id="content">
       <?php require 'navbar.php'; ?>
 
-      <div class="card shadow-sm border-0">
+      <div class="card shadow-sm border-0 mt-3 ms-2 me-2">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="mb-0 text-dark fw-bold">Purchases</h4>
             <a href="newpurchase.php" class="btn btn-success fw-bold">New Purchase</a>
           </div>
 
-          <!-- Tabs -->
-          <ul class="nav nav-tabs mb-3 border-bottom-0">
-            <?php foreach ($tabs as $t): ?>
-              <li class="nav-item">
-                <a class="nav-link <?php echo $tab === $t ? 'active' : ''; ?>" href="?tab=<?php echo urlencode($t); ?>"><?php echo $t; ?></a>
-              </li>
-            <?php endforeach; ?>
-          </ul>
+          <div class="d-flex justify-content-between align-items-end mb-3 border-bottom">
+            <ul class="nav nav-tabs border-bottom-0">
+              <?php foreach ($tabs as $t): ?>
+                <li class="nav-item">
+                  <a class="nav-link <?php echo $tab === $t ? 'active' : ''; ?>" href="?tab=<?php echo urlencode($t); ?>&search=<?php echo urlencode($search); ?>"><?php echo $t; ?></a>
+                </li>
+              <?php endforeach; ?>
+            </ul>
 
-          <!-- Filters -->
-          <form method="GET" class="row gx-2 mb-3 align-items-center">
-            <input type="hidden" name="tab" value="<?php echo htmlspecialchars($tab); ?>">
-            <div class="col-md-4">
-              <input type="text" name="search" class="form-control" placeholder="Search contact or reference..." value="<?php echo htmlspecialchars($search); ?>">
-            </div>
-            <div class="col-md-2">
-              <button type="submit" class="btn btn-primary fw-bold w-100">Filter</button>
-            </div>
-          </form>
+            <form method="GET" class="d-flex pb-2">
+              <input type="hidden" name="tab" value="<?php echo htmlspecialchars($tab); ?>">
+              <input type="text" name="search" class="form-control form-control-sm me-2" placeholder="Search..." value="<?php echo htmlspecialchars($search); ?>" style="width: 250px;">
+              <button type="submit" class="btn btn-secondary btn-sm fw-bold">Search</button>
+            </form>
+          </div>
 
           <!-- Data Table -->
           <table class="table table-striped align-middle border">
@@ -149,7 +145,7 @@ $tabs = ['All', 'Draft', 'Awaiting Approval', 'Awaiting Payment', 'Paid'];
               <tr>
                 <th>Suppliers Name</th>
                 <th>Status</th>
-                <th>Reference</th>
+                <th>SR #</th>
                 <th>Date</th>
                 <th>Due Date</th>
                 <th class="text-end">Paid</th>
