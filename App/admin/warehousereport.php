@@ -323,29 +323,29 @@ $bootstrap->css();
               }
 
               if ($filtertype == 'totalin') {
-                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `out` IS NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id");
+                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `out_quantity` IS NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id");
                 $stmt->execute();
                 $rawResult = $stmt->fetchAll();
                 $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `out` IS NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id LIMIT :offset, :numOfrecs");
+                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `out_quantity` IS NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id LIMIT :offset, :numOfrecs");
                 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
                 $stmt->bindValue(':numOfrecs', $numOfrecs, PDO::PARAM_INT);
                 $stmt->execute();
               }
 
               if ($filtertype == 'totalout') {
-                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `in` IS NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id");
+                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `in_quantity` IS NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id");
                 $stmt->execute();
                 $rawResult = $stmt->fetchAll();
                 $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `in` IS NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id LIMIT :offset, :numOfrecs");
+                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `in_quantity` IS NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id LIMIT :offset, :numOfrecs");
                 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
                 $stmt->bindValue(':numOfrecs', $numOfrecs, PDO::PARAM_INT);
                 $stmt->execute();
               }
-              if (str_contains($filtertype, needle: 'eachmaterialtotalinout-')) {
+              if (str_contains($filtertype, 'eachmaterialtotalinout-')) {
                 $material_id = $_SESSION['material'];
                 $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id = '$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' GROUP BY material_id ORDER BY id");
                 $stmt->execute();
@@ -357,7 +357,7 @@ $bootstrap->css();
                 $stmt->bindValue(':numOfrecs', $numOfrecs, PDO::PARAM_INT);
                 $stmt->execute();
               }
-              if (str_contains($filtertype, needle: 'eachmaterialbalance-')) {
+              if (str_contains($filtertype, 'eachmaterialbalance-')) {
                 $material_id = $_SESSION['material'];
                 $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id = '$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' GROUP BY material_id ORDER BY id");
                 $stmt->execute();
@@ -369,7 +369,7 @@ $bootstrap->css();
                 $stmt->bindValue(':numOfrecs', $numOfrecs, PDO::PARAM_INT);
                 $stmt->execute();
               }
-              if (str_contains($filtertype, needle: 'eachmaterialbalanceamount-')) {
+              if (str_contains($filtertype, 'eachmaterialbalanceamount-')) {
                 $material_id = $_SESSION['material'];
                 $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id = '$material_id' AND `date` BETWEEN '$startdate' AND '$enddate' GROUP BY material_id ORDER BY id");
                 $stmt->execute();
@@ -407,20 +407,6 @@ $bootstrap->css();
 
               $in = (float) ($data['in_quantity'] ?? $data['in'] ?? 0);
               $out = (float) ($data['out_quantity'] ?? $data['out'] ?? 0);
-              // if(empty($_SESSION['in']) || empty($_SESSION['out'])){
-              //   $totalinstmt = $pdo->prepare("SELECT SUM(`in`) as totalin FROM material_store_house WHERE material_id='$material_id'");
-              //   $totalinstmt->execute();
-              //   $totalin = $totalinstmt->fetch(PDO::FETCH_ASSOC);
-
-              //   $totaloutstmt = $pdo->prepare("SELECT SUM(`out`) as totalout FROM material_store_house WHERE material_id='$material_id'");
-              //   $totaloutstmt->execute();
-              //   $totalout = $totaloutstmt->fetch(PDO::FETCH_ASSOC);
-              //   $balance = $totalin['totalin'] - $totalout['totalout'];
-              // }else{
-              //   $outbalance +=  $out;
-              //   $inbalance +=  $in;
-              //   $balance += $in - $out;
-              // }
 
               if (!empty($_SESSION['filtertype'])) {
                 $filtertype = $_SESSION['filtertype'];
@@ -434,21 +420,21 @@ $bootstrap->css();
                   $balance += $out;
                 }
                 if (str_contains($filtertype, 'eachmaterialtotalinout-')) {
-                  $totalinstmt = $pdo->prepare("SELECT SUM(`in`) as totalin FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
+                  $totalinstmt = $pdo->prepare("SELECT SUM(`in_quantity`) as totalin FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
                   $totalinstmt->execute();
                   $totalin = $totalinstmt->fetch(PDO::FETCH_ASSOC);
 
-                  $totaloutstmt = $pdo->prepare("SELECT SUM(`out`) as totalout FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
+                  $totaloutstmt = $pdo->prepare("SELECT SUM(`out_quantity`) as totalout FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
                   $totaloutstmt->execute();
                   $totalout = $totaloutstmt->fetch(PDO::FETCH_ASSOC);
                 }
 
                 if (str_contains($filtertype, 'eachmaterialbalance-')) {
-                  $totalinstmt = $pdo->prepare("SELECT SUM(`in`) as totalin FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
+                  $totalinstmt = $pdo->prepare("SELECT SUM(`in_quantity`) as totalin FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
                   $totalinstmt->execute();
                   $totalin = $totalinstmt->fetch(PDO::FETCH_ASSOC);
 
-                  $totaloutstmt = $pdo->prepare("SELECT SUM(`out`) as totalout FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
+                  $totaloutstmt = $pdo->prepare("SELECT SUM(`out_quantity`) as totalout FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
                   $totaloutstmt->execute();
                   $totalout = $totaloutstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -456,11 +442,11 @@ $bootstrap->css();
                 }
 
                 if (str_contains($filtertype, 'eachmaterialbalanceamount-')) {
-                  $totalinstmt = $pdo->prepare("SELECT SUM(`in`) as totalin FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
+                  $totalinstmt = $pdo->prepare("SELECT SUM(`in_quantity`) as totalin FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
                   $totalinstmt->execute();
                   $totalin = $totalinstmt->fetch(PDO::FETCH_ASSOC);
 
-                  $totaloutstmt = $pdo->prepare("SELECT SUM(`out`) as totalout FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
+                  $totaloutstmt = $pdo->prepare("SELECT SUM(`out_quantity`) as totalout FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
                   $totaloutstmt->execute();
                   $totalout = $totaloutstmt->fetch(PDO::FETCH_ASSOC);
 
@@ -473,11 +459,11 @@ $bootstrap->css();
                     $totalamount += $purchasedata['quantity'] * $purchasedata['rate'];
                   }
 
-                  $totalinstmt = $pdo->prepare("SELECT SUM(`in`) as totalin FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
+                  $totalinstmt = $pdo->prepare("SELECT SUM(`in_quantity`) as totalin FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
                   $totalinstmt->execute();
                   $totalin = $totalinstmt->fetch(PDO::FETCH_ASSOC);
 
-                  $totaloutstmt = $pdo->prepare("SELECT SUM(`out`) as totalout FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
+                  $totaloutstmt = $pdo->prepare("SELECT SUM(`out_quantity`) as totalout FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
                   $totaloutstmt->execute();
                   $totalout = $totaloutstmt->fetch(PDO::FETCH_ASSOC);
 
