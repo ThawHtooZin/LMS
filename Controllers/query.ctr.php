@@ -868,8 +868,8 @@ class Query
               $formstmt->execute([$date, $prod_id, $supplier_name, $line['size'], $line['viss'], $kg, $pcs, $link_id]);
             }
           } elseif ($lowerType === 'material') {
-            $storehousestmt = $pdo->prepare("INSERT INTO material_store_house (date, voucher_no, supplier_id, material_id, in_quantity) VALUES (?, ?, ?, ?, ?)");
-            $storehousestmt->execute([$date, $voucher_no, $contact_id, $prod_id, $pcs]);
+            $storehousestmt = $pdo->prepare("INSERT INTO material_store_house (date, voucher_no, supplier_id, material_id, in_quantity, description, action) VALUES (?, ?, ?, ?, ?, ?, 'Purchase')");
+            $storehousestmt->execute([$date, $voucher_no, $contact_id, $prod_id, $pcs, $line['description']]);
           }
 
           $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, ?, ?, '0', ?, ?)");
@@ -6446,57 +6446,52 @@ class Query
   }
 
 
-  function outputmaterial($date, $stockto, $material, $quantity, $voucher_no)
+  public function outputmaterial($date, $stockto, $material, $quantity, $voucher_no)
   {
     global $pdo;
 
-    // 1. Safe insertion with PDO parameters
-    $stmt = $pdo->prepare("INSERT INTO stock_output_group (`date`, `stock_to`, `voucher_no`, `material_id`, `quantity`) VALUES (?, ?, ?, ?, ?)");
+    // 1. Warehouse output becomes Gate Pass input
+    $stmt = $pdo->prepare("INSERT INTO stock_output_group (`date`, `stock_to`, `voucher_no`, `material_id`, `in_quantity`) VALUES (?, ?, ?, ?, ?)");
     $stmt->execute([$date, $stockto, $voucher_no, $material, $quantity]);
 
-    // 2. FIX: Prevent race conditions by grabbing the exact ID of the insert that just happened
+    // 2. Prevent race conditions
     $groupid = $pdo->lastInsertId();
 
-    // 3. FIX: Grab the most recent supplier for this material safely
+    // 3. Grab the most recent supplier
     $materialstmt = $pdo->prepare("SELECT supplier_id FROM material_store_house WHERE material_id = ? AND supplier_id IS NOT NULL ORDER BY id DESC LIMIT 1");
     $materialstmt->execute([$material]);
     $supplier = $materialstmt->fetchColumn() ?: NULL;
 
-    // 4. FIX: Handle the column name safely (out_quantity vs out) using our fallback logic
-    try {
-      $storehousestmt = $pdo->prepare("INSERT INTO material_store_house (`date`, `voucher_no`, `material_id`, `supplier_id`, `out_quantity`, `output_group`) VALUES (?, ?, ?, ?, ?, ?)");
-      $storehousestmt->execute([$date, $voucher_no, $material, $supplier, $quantity, $groupid]);
-    } catch (PDOException $e) {
-      $storehousestmt = $pdo->prepare("INSERT INTO material_store_house (`date`, `voucher_no`, `material_id`, `supplier_id`, `out`, `output_group`) VALUES (?, ?, ?, ?, ?, ?)");
-      $storehousestmt->execute([$date, $voucher_no, $material, $supplier, $quantity, $groupid]);
-    }
+    // 4. Clean insert with the 'Out' action flag
+    $storehousestmt = $pdo->prepare("INSERT INTO material_store_house (`date`, `voucher_no`, `material_id`, `supplier_id`, `out_quantity`, `output_group`, `action`) VALUES (?, ?, ?, ?, ?, ?, 'Out')");
+    $storehousestmt->execute([$date, $voucher_no, $material, $supplier, $quantity, $groupid]);
   }
 
-  function managestock($date, $stockto, $material, $quantity, $voucher_no, $action, $transfer_to, $description)
+  public function managestock($date, $stockto, $material, $quantity, $voucher_no, $action, $transfer_to, $description)
   {
     global $pdo;
 
-    if ($action == 'use') {
-      $stmt = $pdo->prepare("INSERT INTO stock_output_group(date, stock_to, voucher_no, description, material_id, `out`, action) VALUES('$date', '$stockto', '$voucher_no', '$description', '$material', '$quantity', '$action')");
-      $stmt->execute();
-    }
+    // 1. ALL ACTIONS: Deduct from the current gate pass location (out_quantity)
+    $stmt = $pdo->prepare("INSERT INTO stock_output_group (`date`, `stock_to`, `voucher_no`, `description`, `material_id`, `out_quantity`, `action`) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->execute([$date, $stockto, $voucher_no, $description, $material, $quantity, $action]);
+
+    // 2. TRANSFER ACTION: Add to the new gate pass destination (in_quantity)
     if ($action == 'transfer') {
-      $stmt = $pdo->prepare("INSERT INTO stock_output_group(date, stock_to, voucher_no, description, material_id, `out`, action) VALUES('$date', '$stockto', '$voucher_no', '$description', '$material', '$quantity', '$action')");
-      $stmt->execute();
-      $stmt = $pdo->prepare("INSERT INTO stock_output_group(date, stock_to, voucher_no, description, material_id, `in`, action) VALUES('$date', '$transfer_to', '$voucher_no', '$description', '$material', '$quantity', '$action')");
-      $stmt->execute();
+      $stmt = $pdo->prepare("INSERT INTO stock_output_group (`date`, `stock_to`, `voucher_no`, `description`, `material_id`, `in_quantity`, `action`) VALUES (?, ?, ?, ?, ?, ?, ?)");
+      $stmt->execute([$date, $transfer_to, $voucher_no, $description, $material, $quantity, $action]);
     }
 
+    // 3. RETURN ACTION: Send back to the main material warehouse (in_quantity)
     if ($action == 'return') {
-      $stmt = $pdo->prepare("INSERT INTO stock_output_group(date, stock_to, voucher_no, description, material_id, `out`, action) VALUES('$date', '$stockto', '$voucher_no', '$description', '$material', '$quantity', '$action')");
-      $stmt->execute();
-      $stmt = $pdo->prepare("INSERT INTO material_store_house(date, voucher_no, material_id, description, `in_quantity`, action) VALUES('$date', '$voucher_no', '$material', '$description', '$quantity', '$action')");
-      $stmt->execute();
-    }
-
-    if ($action == 'damaged') {
-      $stmt = $pdo->prepare("INSERT INTO stock_output_group(date, stock_to, voucher_no, description, material_id, `out`, action) VALUES('$date', '$stockto', '$voucher_no', '$description', '$material', '$quantity', '$action')");
-      $stmt->execute();
+      try {
+        // Attempts to insert with description and action if you added those columns to material_store_house
+        $stmt = $pdo->prepare("INSERT INTO material_store_house (`date`, `voucher_no`, `material_id`, `description`, `in_quantity`, `action`) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$date, $voucher_no, $material, $description, $quantity, $action]);
+      } catch (PDOException $e) {
+        // Fallback to core warehouse schema if action/description columns do not exist
+        $stmt = $pdo->prepare("INSERT INTO material_store_house (`date`, `voucher_no`, `material_id`, `in_quantity`) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$date, $voucher_no, $material, $quantity]);
+      }
     }
   }
 
