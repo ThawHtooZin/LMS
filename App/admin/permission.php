@@ -137,7 +137,7 @@ $query = new Query();
                 <tr>
                   <td>Manage Sale</td>
                   <td><input type="checkbox" name="manage_sale" <?= isChecked('manage_sale', $permissionshow) ?>></td>
-                  <td>Manage Products & Services</td>
+                  <td>Manage Products</td>
                   <td><input type="checkbox" name="manage_products" <?= isChecked('manage_products', $permissionshow) ?>></td>
                 </tr>
                 <tr>

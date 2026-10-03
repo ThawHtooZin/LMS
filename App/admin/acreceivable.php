@@ -58,7 +58,7 @@ $query = new Query();
                       COALESCE(SUM(s.grand_total - s.paid_amount), 0) AS balance_owed
                   FROM contacts c
                   INNER JOIN sales s ON c.id = s.contact_id
-                  WHERE c.is_customer = 1 AND s.status != 'VOIDED'
+                  WHERE c.is_customer = 1 AND s.status IN ('AWAITING_PAYMENT', 'PAID')
                   GROUP BY c.id, c.name
                   HAVING total_billed > 0
                   ORDER BY balance_owed DESC, c.name ASC

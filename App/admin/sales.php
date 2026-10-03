@@ -9,11 +9,13 @@ $auth->checkadmin();
 $bootstrap = new Bootstrap();
 $query = new Query();
 
-if (isset($_GET['delete'])) {
-  $query->deleteSale(intval($_GET['delete']));
+$deleteResult = null;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_sale_id'])) {
+  $deleteResult = $query->deleteSale(intval($_POST['delete_sale_id']));
 }
 
-$status_filter = isset($_GET['status']) ? $_GET['status'] : 'all';
+$allowed_statuses = ['all', 'draft', 'awaiting_approval', 'awaiting_payment', 'paid', 'voided'];
+$status_filter = isset($_GET['status']) && in_array($_GET['status'], $allowed_statuses, true) ? $_GET['status'] : 'all';
 $search        = isset($_GET['search']) ? $_GET['search'] : '';
 
 $where = ["1=1"];
@@ -83,8 +85,10 @@ $whereSql = implode(" AND ", $where);
           <ul class="nav nav-tabs border-bottom-0">
             <li class="nav-item"><a class="nav-link <?= $status_filter == 'all' ? 'active' : ''; ?>" href="?status=all&search=<?= urlencode($search); ?>">All</a></li>
             <li class="nav-item"><a class="nav-link <?= $status_filter == 'draft' ? 'active' : ''; ?>" href="?status=draft&search=<?= urlencode($search); ?>">Draft</a></li>
+            <li class="nav-item"><a class="nav-link <?= $status_filter == 'awaiting_approval' ? 'active' : ''; ?>" href="?status=awaiting_approval&search=<?= urlencode($search); ?>">Awaiting Approval</a></li>
             <li class="nav-item"><a class="nav-link <?= $status_filter == 'awaiting_payment' ? 'active' : ''; ?>" href="?status=awaiting_payment&search=<?= urlencode($search); ?>">Awaiting Payment</a></li>
             <li class="nav-item"><a class="nav-link <?= $status_filter == 'paid' ? 'active' : ''; ?>" href="?status=paid&search=<?= urlencode($search); ?>">Paid</a></li>
+            <li class="nav-item"><a class="nav-link <?= $status_filter == 'voided' ? 'active' : ''; ?>" href="?status=voided&search=<?= urlencode($search); ?>">Voided</a></li>
           </ul>
 
           <form method="GET" class="d-flex pb-2">
@@ -138,6 +142,12 @@ $whereSql = implode(" AND ", $where);
                 if ($sale['status'] == 'PAID') {
                   $badge = 'bg-success';
                 }
+                if ($sale['status'] == 'AWAITING_APPROVAL') {
+                  $badge = 'bg-info text-dark';
+                }
+                if ($sale['status'] == 'VOIDED') {
+                  $badge = 'bg-danger';
+                }
               ?>
                 <tr class="clickable-row" data-href="editsales.php?id=<?= $sale['id']; ?>" style="cursor: pointer;">
                   <td class="fw-bold text-primary"><?= htmlspecialchars($sale['sr_no']); ?></td>
@@ -151,7 +161,10 @@ $whereSql = implode(" AND ", $where);
                   <td><span class="badge <?= $badge; ?>"><?= htmlspecialchars($sale['status']); ?></span></td>
                   <td>
                     <?php if ($sale['status'] === 'DRAFT'): ?>
-                      <a href="sales.php?delete=<?= $sale['id']; ?>" class="btn btn-sm btn-outline-danger border-0 action-btn" onclick="return confirm('Delete this draft?');"><i class="bi bi-trash"></i></a>
+                      <form method="post" class="d-inline action-btn" onsubmit="return confirm('Delete this draft?');">
+                        <input type="hidden" name="delete_sale_id" value="<?= (int)$sale['id']; ?>">
+                        <button type="submit" class="btn btn-sm btn-outline-danger border-0"><i class="bi bi-trash"></i></button>
+                      </form>
                     <?php endif; ?>
                   </td>
                 </tr>
@@ -172,6 +185,19 @@ $whereSql = implode(" AND ", $where);
     });
   </script>
   <?php echo $bootstrap->javascript(); ?>
+  <?php if ($deleteResult !== null): ?>
+    <script>
+      swal(
+        <?= json_encode($deleteResult['title'] ?? ($deleteResult['status'] ? 'Deleted' : 'Delete failed')); ?>,
+        <?= json_encode($deleteResult['message'] ?? 'The deletion request did not return a result.'); ?>,
+        <?= json_encode($deleteResult['status'] ? 'success' : 'error'); ?>
+      ).then(function() {
+        <?php if (!empty($deleteResult['status'])): ?>
+          window.location.href = 'sales.php';
+        <?php endif; ?>
+      });
+    </script>
+  <?php endif; ?>
 </body>
 
 </html>

@@ -256,7 +256,7 @@ $permissions = $permission['permission'];
               <?php if (str_contains($permissions, 'manage_products')) { ?>
                 <li class="nav-item">
                   <a href="products.php" class="nav-link sub-menu  <?= ($current_page == 'products.php') ? 'active' : ''; ?>" style="font-size:13px !important;">
-                    - Products & Services
+                    - Products
                   </a>
                 </li>
               <?php } ?>

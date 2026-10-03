@@ -40,7 +40,7 @@ foreach ($all_accounts as $acc) {
 
 <head>
     <meta charset="utf-8">
-    <title>Manage Products & Services</title>
+    <title>Manage Products</title>
     <?php $bootstrap->css(); ?>
     <!-- Chosen CSS for Snappy Searchable Dropdowns -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">
@@ -92,7 +92,7 @@ foreach ($all_accounts as $acc) {
             <?php require 'navbar.php'; ?>
             <div class="card">
                 <div class="card-header bg-warning text-light" style="padding:-10px;">
-                    <b>Manage Products & Services</b>
+                    <b>Manage Products</b>
                 </div>
                 <div class="card-body">
                     <?php

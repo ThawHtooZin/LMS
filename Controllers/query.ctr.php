@@ -25,6 +25,7 @@ class Query
 
     if (!empty($userdata)) {
       if ($userdata['password'] == $password) {
+        session_regenerate_id(true);
         $_SESSION['role'] = $userdata['role'];
         $_SESSION['username'] = $username;
         $_SESSION['logged_in'] = true;
@@ -83,10 +84,10 @@ class Query
       $params[':date_from'] = $date_from;
       $params[':date_to'] = $date_to;
     } elseif (!empty($date_from)) {
-      $conditions[] = "gl.date = :date_from";
+      $conditions[] = "gl.date >= :date_from";
       $params[':date_from'] = $date_from;
     } elseif (!empty($date_to)) {
-      $conditions[] = "gl.date = :date_to";
+      $conditions[] = "gl.date <= :date_to";
       $params[':date_to'] = $date_to;
     }
 
@@ -1116,13 +1117,33 @@ class Query
         throw new Exception("Payment amount must be greater than zero.");
       }
 
+      $accountStmt = $pdo->prepare("SELECT code FROM accodes WHERE code = ? AND class = 'ASSETS'");
+      $accountStmt->execute([$payment_account]);
+      if (!$accountStmt->fetchColumn()) {
+        throw new Exception("Select a valid Asset account for the payment.");
+      }
+
       $supStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ?");
       $supStmt->execute([$supplier_id]);
       $supplier_name = $supStmt->fetchColumn();
+      if (!$supplier_name) {
+        throw new Exception("Supplier not found.");
+      }
 
-      $stmt = $pdo->prepare("SELECT id, voucher_no, grand_total, paid_amount FROM purchases WHERE contact_id = ? AND status = 'AWAITING_PAYMENT' ORDER BY date ASC, id ASC");
+      $stmt = $pdo->prepare("SELECT id, voucher_no, grand_total, paid_amount FROM purchases WHERE contact_id = ? AND status = 'AWAITING_PAYMENT' ORDER BY date ASC, id ASC FOR UPDATE");
       $stmt->execute([$supplier_id]);
       $bills = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $total_outstanding = 0.0;
+      foreach ($bills as $bill) {
+        $total_outstanding += max(0, floatval($bill['grand_total']) - floatval($bill['paid_amount']));
+      }
+      if ($total_outstanding <= 0) {
+        throw new Exception("Supplier has no outstanding bills.");
+      }
+      if (round($payment_amount, 2) > round($total_outstanding, 2)) {
+        throw new Exception("Payment amount cannot exceed the supplier's outstanding balance of " . number_format($total_outstanding, 2) . ".");
+      }
 
       $remaining_payment = $payment_amount;
       $sr_no = 'PAY-' . time();
@@ -1298,9 +1319,17 @@ class Query
 
       $pdo->beginTransaction();
 
-      $checkStmt = $pdo->prepare("SELECT paid_amount, voucher_no FROM sales WHERE id = ?");
+      $checkStmt = $pdo->prepare("SELECT paid_amount, voucher_no, status FROM sales WHERE id = ? FOR UPDATE");
       $checkStmt->execute([$id]);
       $saleData = $checkStmt->fetch(PDO::FETCH_ASSOC);
+
+      if (!$saleData) {
+        throw new Exception("Invoice not found.");
+      }
+      if ($saleData['status'] === 'VOIDED') {
+        $pdo->rollBack();
+        return ['status' => false, 'title' => 'Voided Invoice!', 'message' => 'Voided invoices cannot be edited or approved.'];
+      }
 
       if (floatval($saleData['paid_amount']) > 0) {
         $pdo->rollBack();
@@ -1377,7 +1406,7 @@ class Query
     global $pdo;
     try {
       $pdo->beginTransaction();
-      $stmt = $pdo->prepare("SELECT voucher_no, status FROM sales WHERE id = ?");
+      $stmt = $pdo->prepare("SELECT voucher_no, status, paid_amount FROM sales WHERE id = ? FOR UPDATE");
       $stmt->execute([$id]);
       $sale = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -1385,6 +1414,15 @@ class Query
       if ($sale['status'] === 'VOIDED') {
         $pdo->rollBack();
         return ['status' => false, 'type' => 'warning', 'title' => 'Warning!', 'message' => 'This invoice is already voided.'];
+      }
+      if ($sale['status'] !== 'AWAITING_PAYMENT') {
+        $pdo->rollBack();
+        return ['status' => false, 'type' => 'warning', 'title' => 'Cannot Void Invoice', 'message' => 'Only approved unpaid invoices can be voided.'];
+      }
+
+      if (floatval($sale['paid_amount']) > 0) {
+        $pdo->rollBack();
+        return ['status' => false, 'type' => 'warning', 'title' => 'Cannot Void Invoice', 'message' => 'Paid or partially paid invoices cannot be voided.'];
       }
 
       if ($sale['voucher_no']) {
@@ -3141,18 +3179,42 @@ class Query
     try {
       $pdo->beginTransaction();
 
-      // Fetch open invoices for this customer ordered FIFO
+      $customerStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ? AND is_customer = 1");
+      $customerStmt->execute([$customer_id]);
+      $customer_name = $customerStmt->fetchColumn();
+      if (!$customer_name) {
+        throw new Exception("Customer not found.");
+      }
+
+      $accountStmt = $pdo->prepare("SELECT code FROM accodes WHERE code = ? AND class = 'ASSETS'");
+      $accountStmt->execute([$payment_account]);
+      if (!$accountStmt->fetchColumn()) {
+        throw new Exception("Select a valid Asset account for the deposit.");
+      }
+
       $stmt = $pdo->prepare("
               SELECT id, grand_total, paid_amount, (grand_total - paid_amount) AS outstanding 
               FROM sales 
               WHERE contact_id = ? AND status = 'AWAITING_PAYMENT' 
               ORDER BY date ASC, id ASC
+              FOR UPDATE
           ");
       $stmt->execute([$customer_id]);
       $invoices = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-      if (empty($invoices) || $original_amount <= 0) {
-        throw new Exception("No outstanding invoices found or invalid payment amount.");
+      if ($original_amount <= 0) {
+        throw new Exception("Payment amount must be greater than zero.");
+      }
+
+      $total_outstanding = 0.0;
+      foreach ($invoices as $invoice) {
+        $total_outstanding += max(0, floatval($invoice['outstanding']));
+      }
+      if ($total_outstanding <= 0) {
+        throw new Exception("Customer has no outstanding invoices.");
+      }
+      if (round($original_amount, 2) > round($total_outstanding, 2)) {
+        throw new Exception("Payment amount cannot exceed the customer's outstanding balance of " . number_format($total_outstanding, 2) . ".");
       }
 
       $remaining_payment = $original_amount;
@@ -3190,10 +3252,26 @@ class Query
         $remaining_payment -= $allocate;
       }
 
+      $actual_applied = $original_amount - $remaining_payment;
+      $receipt_voucher = 'CR-' . date('YmdHis') . '-' . mt_rand(10, 99);
+      $sr_no = 'CR-' . time();
+      $narration = !empty($description) ? $description : "Payment from $customer_name - Ref: $reference";
+      if (!empty($check_number)) {
+        $narration .= " (Check: $check_number)";
+      }
+
+      $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, ?, ?, '0', ?, ?)");
+      $glDebit->execute([$payment_date, $receipt_voucher, $payment_account, $actual_applied, $narration, $sr_no]);
+
+      $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, '600', '0', ?, ?, ?)");
+      $glCredit->execute([$payment_date, $receipt_voucher, $actual_applied, $narration, $sr_no]);
+
       $pdo->commit();
-      return ['status' => true, 'amount' => $original_amount];
+      return ['status' => true, 'amount' => $actual_applied];
     } catch (Exception $e) {
-      $pdo->rollBack();
+      if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+      }
       return ['status' => false, 'message' => $e->getMessage()];
     }
   }
@@ -4599,6 +4677,16 @@ class Query
     global $pdo;
     try {
       $pdo->beginTransaction();
+
+      $statusStmt = $pdo->prepare("SELECT status FROM manual_journals WHERE id = ? FOR UPDATE");
+      $statusStmt->execute([$journal_id]);
+      $current_status = $statusStmt->fetchColumn();
+      if ($current_status === false) {
+        throw new Exception("Manual journal not found.");
+      }
+      if ($current_status !== 'DRAFT') {
+        throw new Exception("Posted journals are read-only and cannot be updated or posted again.");
+      }
 
       $total_debit = 0;
       $total_credit = 0;
@@ -6371,40 +6459,55 @@ class Query
   function create_coldstore($name)
   {
     global $pdo;
-    $stmt = $pdo->prepare("INSERT INTO config_coldstore(name) VALUES('$name');");
-    $stmt->execute();
+    $name = trim($name);
+    if ($name === '') {
+      return ['status' => false, 'message' => 'Coldstore name is required.'];
+    }
+    $stmt = $pdo->prepare("INSERT INTO config_coldstore(name) VALUES(?)");
+    $stmt->execute([$name]);
+    return ['status' => true, 'message' => 'Coldstore added successfully.'];
   }
 
   function update_coldstore($name, $id)
   {
     global $pdo;
-    $checkstmt = $pdo->prepare("SELECT * FROM config_coldstore");
-    $checkstmt->execute();
-    $checkdata = $checkstmt->fetchall();
-    if (!empty($checkdata)) {
-      $stmt = $pdo->prepare("UPDATE config_coldstore SET name='$name' WHERE id='$id'");
-      $stmt->execute();
+    $name = trim($name);
+    $id = filter_var($id, FILTER_VALIDATE_INT);
+    if ($name === '') {
+      return ['status' => false, 'message' => 'Coldstore name is required.'];
     }
+    if (!$id || $id < 1) {
+      return ['status' => false, 'message' => 'Select a valid coldstore.'];
+    }
+    $checkstmt = $pdo->prepare("SELECT id FROM config_coldstore WHERE id = ?");
+    $checkstmt->execute([$id]);
+    if (!$checkstmt->fetchColumn()) {
+      return ['status' => false, 'message' => 'Coldstore was not found.'];
+    }
+    $stmt = $pdo->prepare("UPDATE config_coldstore SET name = ? WHERE id = ?");
+    $stmt->execute([$name, $id]);
+    return ['status' => true, 'message' => 'Coldstore updated successfully.'];
   }
 
   function delete_coldstore($id)
   {
     global $pdo;
-    $checkstmt = $pdo->prepare("SELECT * FROM config_coldstore WHERE id='$id'");
-    $checkstmt->execute();
-    $checkdata = $checkstmt->fetchall();
-
-    if (!empty($checkdata)) {
-      $stmt = $pdo->prepare("DELETE FROM config_coldstore WHERE id='$id'");
-      $stmt->execute();
+    $id = filter_var($id, FILTER_VALIDATE_INT);
+    if (!$id || $id < 1) {
+      return ['status' => false, 'message' => 'Select a valid coldstore.'];
     }
+    $stmt = $pdo->prepare("DELETE FROM config_coldstore WHERE id = ?");
+    $stmt->execute([$id]);
+    if ($stmt->rowCount() === 0) {
+      return ['status' => false, 'message' => 'Coldstore was not found.'];
+    }
+    return ['status' => true, 'message' => 'Coldstore deleted successfully.'];
   }
 
 
   function addmaterialpurchase($table, $date, $voucher_no, $supplier_name, $material, $quantity, $rate)
   {
     global $pdo;
-
     $amount = $quantity * $rate;
     $stmt = $pdo->prepare("INSERT INTO $table(date, voucher_no, supplier_id, material_id, quantity, rate) VALUES('$date', '$voucher_no', '$supplier_name', '$material', '$quantity', '$rate')");
     $stmt->execute();
@@ -6426,7 +6529,6 @@ class Query
   function updatematerialpurchase($table, $up_date, $up_voucher_no, $up_supplier_name, $up_material, $up_quantity, $up_rate, $up_id)
   {
     global $pdo;
-
     $amount = $up_quantity * $up_rate;
     $stmt = $pdo->prepare("UPDATE $table SET date='$up_date', voucher_no='$up_voucher_no', supplier_id='$up_supplier_name', material_id='$up_material', quantity='$up_quantity', rate='$up_rate' WHERE id='$up_id'");
     $stmt->execute();
@@ -6439,7 +6541,6 @@ class Query
   function updatematerial_warehouse($table, $up_date, $up_supplier_name, $up_voucher_no, $up_material, $up_quantity)
   {
     global $pdo;
-
     $stmt = $pdo->prepare("UPDATE $table SET date='$up_date', supplier_id='$up_supplier_name', voucher_no='$up_voucher_no', material_id='$up_material', in_quantity='$up_quantity' WHERE voucher_no='$up_voucher_no'");
     $stmt->execute();
   }
@@ -6459,13 +6560,9 @@ class Query
   function deletematerial_payable($table, $deletesupplier_id, $deleteid)
   {
     global $pdo;
-    $stmt = $pdo->prepare("DELETE FROM $table WHERE supplier_id = '$deletesupplier_id' AND link_id='$deleteid'");
-    $stmt->execute();
-    if ($stmt) {
-      return $successmessage = "Payable Voucher Deleted Successfully";
-    } else {
-      return $errmessage = "Error accors when deleted Payable Voucher";
-    }
+    $stmt = $pdo->prepare("DELETE FROM $table WHERE supplier_id = ? AND link_id=?");
+    $stmt->execute([$deletesupplier_id, $deleteid]);
+    return $stmt->rowCount() > 0 ? "Payable Voucher Deleted Successfully" : "No legacy payable record was found.";
   }
 
   function deletematerial_warehouse($table, $deletevoucher_no)
@@ -6484,22 +6581,56 @@ class Query
   public function outputmaterial($date, $stockto, $material, $quantity, $voucher_no)
   {
     global $pdo;
+    $quantity = filter_var($quantity, FILTER_VALIDATE_FLOAT);
+    if ($quantity === false || $quantity <= 0) {
+      throw new InvalidArgumentException("Output quantity must be greater than zero.");
+    }
+    if (trim((string)$voucher_no) === '') {
+      throw new InvalidArgumentException("GatePass Voucher No is required.");
+    }
 
-    // 1. Warehouse output becomes Gate Pass input
-    $stmt = $pdo->prepare("INSERT INTO stock_output_group (`date`, `stock_to`, `voucher_no`, `material_id`, `in_quantity`) VALUES (?, ?, ?, ?, ?)");
-    $stmt->execute([$date, $stockto, $voucher_no, $material, $quantity]);
+    $pdo->beginTransaction();
+    try {
+      $destinationStmt = $pdo->prepare("SELECT name FROM config_coldstore WHERE name = ?");
+      $destinationStmt->execute([$stockto]);
+      if (!$destinationStmt->fetchColumn()) {
+        throw new InvalidArgumentException("Select a valid coldstore destination.");
+      }
 
-    // 2. Prevent race conditions
-    $groupid = $pdo->lastInsertId();
+      $productStmt = $pdo->prepare("SELECT id FROM products WHERE id = ?");
+      $productStmt->execute([$material]);
+      if (!$productStmt->fetchColumn()) {
+        throw new InvalidArgumentException("Select a valid packing material item.");
+      }
 
-    // 3. Grab the most recent supplier
-    $materialstmt = $pdo->prepare("SELECT supplier_id FROM material_store_house WHERE material_id = ? AND supplier_id IS NOT NULL ORDER BY id DESC LIMIT 1");
-    $materialstmt->execute([$material]);
-    $supplier = $materialstmt->fetchColumn() ?: NULL;
+      $stockStmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id = ? FOR UPDATE");
+      $stockStmt->execute([$material]);
+      $stockRows = $stockStmt->fetchAll(PDO::FETCH_ASSOC);
+      $available = 0.0;
+      foreach ($stockRows as $row) {
+        $available += floatval($row['in_quantity'] ?? $row['in'] ?? 0) - floatval($row['out_quantity'] ?? $row['out'] ?? 0);
+      }
+      if ($quantity > $available) {
+        throw new InvalidArgumentException("Not enough quantity. Available stock: " . number_format($available, 2) . ".");
+      }
 
-    // 4. Clean insert with the 'Out' action flag
-    $storehousestmt = $pdo->prepare("INSERT INTO material_store_house (`date`, `voucher_no`, `material_id`, `supplier_id`, `out_quantity`, `output_group`, `action`) VALUES (?, ?, ?, ?, ?, ?, 'Out')");
-    $storehousestmt->execute([$date, $voucher_no, $material, $supplier, $quantity, $groupid]);
+      $stmt = $pdo->prepare("INSERT INTO stock_output_group (`date`, `stock_to`, `voucher_no`, `material_id`, `in_quantity`) VALUES (?, ?, ?, ?, ?)");
+      $stmt->execute([$date, $stockto, $voucher_no, $material, $quantity]);
+      $groupid = $pdo->lastInsertId();
+
+      $materialstmt = $pdo->prepare("SELECT supplier_id FROM material_store_house WHERE material_id = ? AND supplier_id IS NOT NULL ORDER BY id DESC LIMIT 1");
+      $materialstmt->execute([$material]);
+      $supplier = $materialstmt->fetchColumn() ?: null;
+
+      $storehousestmt = $pdo->prepare("INSERT INTO material_store_house (`date`, `voucher_no`, `material_id`, `supplier_id`, `description`, `out_quantity`, `output_group`, `action`) VALUES (?, ?, ?, ?, '', ?, ?, 'Out')");
+      $storehousestmt->execute([$date, $voucher_no, $material, $supplier ?? '', $quantity, $groupid]);
+      $pdo->commit();
+    } catch (Throwable $e) {
+      if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+      }
+      throw $e;
+    }
   }
 
   public function managestock($date, $stockto, $material, $quantity, $voucher_no, $action, $transfer_to, $description)

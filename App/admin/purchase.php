@@ -38,7 +38,7 @@ $stmt = $pdo->prepare("
 $stmt->execute();
 $bills = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$tabs = ['All', 'Draft', 'Awaiting Approval', 'Awaiting Payment', 'Paid'];
+$tabs = ['All', 'Draft', 'Awaiting Approval', 'Awaiting Payment', 'Paid', 'Voided'];
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -96,6 +96,12 @@ $tabs = ['All', 'Draft', 'Awaiting Approval', 'Awaiting Payment', 'Paid'];
       background-color: #d1ecf1;
       color: #0c5460;
       border: 1px solid #bee5eb;
+    }
+
+    .bg-voided {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
     }
 
     .clickable-row {
@@ -164,6 +170,7 @@ $tabs = ['All', 'Draft', 'Awaiting Approval', 'Awaiting Payment', 'Paid'];
                   if ($b['status'] == 'AWAITING_APPROVAL') $status_class = 'bg-awaiting-approval';
                   if ($b['status'] == 'PAID') $status_class = 'bg-paid';
                   if ($b['status'] == 'AWAITING_PAYMENT') $status_class = 'bg-awaiting-payment';
+                  if ($b['status'] == 'VOIDED') $status_class = 'bg-voided';
 
                   $due = floatval($b['grand_total']) - floatval($b['paid_amount']);
                   $paid = floatval($b['paid_amount']);

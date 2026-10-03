@@ -115,7 +115,7 @@ foreach ($asset_accounts as $acc) {
     <?php if ($paymentResult !== null): ?>
         <script>
             <?php if ($paymentResult['status'] === true): ?>
-                swal("Success!", "Payment of <?= number_format($paymentResult['amount'], 2); ?> received successfully across open invoices.", "success").then(function() {
+                swal("Success!", "Payment of <?= number_format($paymentResult['amount'], 2); ?> received and posted successfully across open invoices.", "success").then(function() {
                     window.location.href = "acreceivabledetail.php?customer_id=<?= $customer_id; ?>";
                 });
             <?php else: ?>

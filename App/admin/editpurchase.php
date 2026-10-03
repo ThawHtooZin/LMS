@@ -103,7 +103,7 @@ $stmt->execute([$purchase_id]);
 $purchase = $stmt->fetch(PDO::FETCH_ASSOC);
 $current_status = $purchase['status'];
 
-$suppliers = $pdo->query("SELECT id, name FROM contacts WHERE is_supplier = 1 OR is_supplier = 0 ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
+$suppliers = $pdo->query("SELECT id, name FROM contacts WHERE is_supplier = 1 ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
 $products = $pdo->query("SELECT id, code, name, purchase_account FROM products WHERE is_purchased = 1 ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
 $currencies = $pdo->query("SELECT code, name FROM system_currencies ORDER BY code ASC")->fetchAll(PDO::FETCH_ASSOC);
 

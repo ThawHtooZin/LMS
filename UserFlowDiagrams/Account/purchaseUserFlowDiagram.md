@@ -131,7 +131,7 @@ flowchart TD
 ## Rules and details
 
 - The overview has **All, Draft, Awaiting Approval, Awaiting Payment, and Paid** tabs. Select a row to open it. The displayed **Amount** is the outstanding amount (`grand total - paid amount`); Paid is shown separately.
-- There is no dedicated **Voided** tab. Voided records are included in **All**, where they can be searched by supplier name or voucher reference. Their status currently lacks its own styling in the list.
+- The overview has a **Voided** tab and distinct status styling for voided purchases.
 - Purchase header fields: supplier, date, type (**Frozen**, **TCL**, **Material**, or **Other**), optional due date, voucher/reference number, and currency (MMK or an active currency). The voucher/reference must be unique.
 - Add item rows with **Add a new line**. Each row can contain product, description, size, Viss, Pcs, unit price, and account. Product choices are limited to products marked as purchasable. Selecting a product can automatically fill its configured purchase account.
 - There is no visible remove-row button. A row with no entered values is skipped when saving; the form does not offer an explicit row-removal action.
@@ -142,4 +142,4 @@ flowchart TD
 - Approval posts a debit for each item line to its selected account and a credit for the bill total to payable control account `2000` in the General Ledger. The approved purchase type also determines its operational stock movement: Frozen and TCL post to their respective stock records; Material adds quantity to Packing Material W/H. These effects are refreshed when an approved unpaid purchase is updated and removed when it is voided.
 - On an existing bill, Draft and Awaiting Approval records can be deleted. Awaiting Payment records with no payment can be voided. Any paid or partially paid purchase is locked against editing; approved purchases with no payment can be updated.
 - A void action is available only for an unpaid Awaiting Payment purchase. It removes the related general-ledger entries and the applicable frozen/TCL stock or material-store movement, then marks the purchase **VOIDED**. A paid/part-paid purchase cannot be voided through this action.
-- **Current inconsistency to fix later:** New Purchase filters the supplier list to suppliers, but Edit Purchase currently includes non-supplier contacts too. This is recorded in the root [TODO.md](../../TODO.md).
+- Edit Purchase, like New Purchase, limits the supplier picker to suppliers.

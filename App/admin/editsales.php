@@ -25,7 +25,7 @@ if (!$sale) {
     exit;
 }
 
-$is_locked = floatval($sale['paid_amount']) > 0;
+$is_locked = floatval($sale['paid_amount']) > 0 || $sale['status'] === 'VOIDED';
 $current_status = $sale['status'];
 
 $lStmt = $pdo->prepare("SELECT * FROM sale_lines WHERE sale_id = ? ORDER BY id ASC");
@@ -94,6 +94,7 @@ $stmt = $pdo->prepare("SELECT * FROM sales WHERE id = ?");
 $stmt->execute([$sale_id]);
 $sale = $stmt->fetch(PDO::FETCH_ASSOC);
 $current_status = $sale['status'];
+$is_locked = floatval($sale['paid_amount']) > 0 || $current_status === 'VOIDED';
 
 $customers = $pdo->query("SELECT id, name FROM contacts WHERE is_customer = 1 ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
 $currencies = $pdo->query("SELECT code, name FROM system_currencies ORDER BY code ASC")->fetchAll(PDO::FETCH_ASSOC);
@@ -212,7 +213,9 @@ $accounts = $pdo->query("SELECT code, name, class FROM accodes WHERE class = 'RE
                     <div class="d-flex justify-content-between align-items-center status-header">
                         <div>
                             Status: <span class="badge bg-secondary"><?php echo ucfirst(strtolower(str_replace('_', ' ', $current_status))); ?></span>
-                            <?php if ($is_locked): ?>
+                            <?php if ($current_status === 'VOIDED'): ?>
+                                <span class="badge bg-danger ms-2">Voided (Read Only)</span>
+                            <?php elseif ($is_locked): ?>
                                 <span class="badge bg-danger ms-2">Locked (Paid / Partially Paid)</span>
                             <?php endif; ?>
                         </div>

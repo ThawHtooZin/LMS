@@ -1,4 +1,6 @@
 <?php
+ini_set('session.gc_maxlifetime', '10800');
+session_set_cookie_params(10800, '/');
 session_start();
 
 include 'Resources/resource.boot.php';

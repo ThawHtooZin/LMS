@@ -9,7 +9,7 @@ $auth->checkadmin();
 $bootstrap = new Bootstrap();
 $query = new Query();
 
-$id = $_GET['id'] ?? null;
+$id = isset($_GET['id']) ? filter_var($_GET['id'], FILTER_VALIDATE_INT) : null;
 if (!$id) {
     header("Location: manual_journals.php");
     exit;

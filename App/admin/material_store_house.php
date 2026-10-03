@@ -29,31 +29,19 @@ $bootstrap->css();
     </div>
     <?php
     if (isset($_POST['outputbtn'])) {
-      $date = $_POST['date'];
-      $stockto = $_POST['stock_to'];
-      $voucher_no = $_POST['voucher_no'];
-      $material = $_POST['material'];
-      $quantity = floatval($_POST['quantity']);
-
-      // BULLETPROOF SUMMATION: Avoids SQL column name crashes entirely
-      $checkstmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id = ?");
-      $checkstmt->execute([$material]);
-      $mat_rows = $checkstmt->fetchAll(PDO::FETCH_ASSOC);
-
-      $totalin = 0;
-      $totalout = 0;
-      foreach ($mat_rows as $r) {
-        $totalin += floatval($r['in_quantity'] ?? $r['in'] ?? 0);
-        $totalout += floatval($r['out_quantity'] ?? $r['out'] ?? 0);
-      }
-
-      $totalquantity = $totalin - $totalout;
-
-      if ($totalquantity < $quantity) {
-        $quantity_error = "Not enough quantity";
-        echo "<script>swal('Not enough quantity!', 'Only have " . $totalquantity . "', 'warning');</script>";
-      } else {
+      $date = $_POST['date'] ?? '';
+      $stockto = $_POST['stock_to'] ?? '';
+      $voucher_no = $_POST['voucher_no'] ?? '';
+      $material = $_POST['material'] ?? '';
+      $quantity = $_POST['quantity'] ?? '';
+      try {
         $query->outputmaterial($date, $stockto, $material, $quantity, $voucher_no);
+        $output_success = 'Packing material output was recorded successfully.';
+      } catch (InvalidArgumentException $e) {
+        $quantity_error = $e->getMessage();
+      } catch (Throwable $e) {
+        error_log('Packing material output failed: ' . $e->getMessage());
+        $quantity_error = 'The output could not be recorded due to a system error.';
       }
     }
     ?>
@@ -129,6 +117,12 @@ $bootstrap->css();
           </div>
         </div>
         <div class="card-body">
+          <?php if (!empty($output_success)): ?>
+            <div class="alert alert-success"><?= htmlspecialchars($output_success); ?></div>
+          <?php endif; ?>
+          <?php if (!empty($quantity_error)): ?>
+            <div class="alert alert-danger"><?= htmlspecialchars($quantity_error); ?></div>
+          <?php endif; ?>
           <?php
           $pageno = !empty($_GET['pageno']) ? intval($_GET['pageno']) : 1;
           $numOfrecs = 13;

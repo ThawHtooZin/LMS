@@ -38,38 +38,26 @@ $bootstrap->css();
         </div>
         <div class="card-body">
           <?php
-          if (isset($_POST['deletebutton'])) {
-            $deleteid = $_POST['deleteid'];
-            $message = $query->delete_coldstore($deleteid);
-          }
-          if (isset($_POST['updatebutton'])) {
-            $name = $_POST['name'];
-            $id = $_POST['id'];
-
-            $message = $query->update_coldstore($name, $id);
-          }
-          if (isset($_POST['addbutton'])) {
-            $name = $_POST['name'];
-
-            $message = $query->create_coldstore($name);
+          $actionResult = null;
+          try {
+            if (isset($_POST['deletebutton'])) {
+              $actionResult = $query->delete_coldstore($_POST['deleteid'] ?? 0);
+            } elseif (isset($_POST['updatebutton'])) {
+              $actionResult = $query->update_coldstore($_POST['name'] ?? '', $_POST['id'] ?? 0);
+            } elseif (isset($_POST['addbutton'])) {
+              $actionResult = $query->create_coldstore($_POST['name'] ?? '');
+            }
+          } catch (Throwable $e) {
+            error_log('Coldstore configuration action failed: ' . $e->getMessage());
+            $actionResult = ['status' => false, 'message' => 'The coldstore change could not be saved due to a system error.'];
           }
           ?>
-          <?php
-          if (!empty($message)) {
-            if (strpos($message, 'Successfully')) {
-              $successmessage = $message;
-            }
-
-            if (strpos($message, 'Error')) {
-              $errmessage = $message;
-            }
-
-            if (strpos($message, 'following')) {
-              $errormessage = $message;
-            }
-          }
-
-          ?>
+          <?php if ($actionResult !== null): ?>
+            <div class="alert alert-<?= $actionResult['status'] ? 'success' : 'danger'; ?> alert-dismissible fade show" role="alert">
+              <?= htmlspecialchars($actionResult['message']); ?>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          <?php endif; ?>
 
           <?php
 
@@ -105,7 +93,7 @@ $bootstrap->css();
 
               <tr>
                 <td><?php echo $no; ?></td>
-                <td><?php echo $itemdata['name']; ?></td>
+                <td><?php echo htmlspecialchars($itemdata['name']); ?></td>
                 <td>
                   <input type="hidden" name="updateid" value="<?php echo $itemdata['id']; ?>">
                   <button type="submit" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $itemdata['id']; ?>">
@@ -116,7 +104,7 @@ $bootstrap->css();
                   </button>
                   <form action="configuration_coldstore.php" method="post" style="display: inline !important;">
                     <input type="hidden" name="deleteid" value="<?php echo $itemdata['id']; ?>">
-                    <button type="submit" name="deletebutton" class="btn btn-danger btn-sm">
+                    <button type="submit" name="deletebutton" class="btn btn-danger btn-sm" onclick="return confirm('Delete this coldstore destination?')">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
                         <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z" />
                       </svg>
@@ -142,7 +130,7 @@ $bootstrap->css();
                         ?>
                         <input type="hidden" name="id" value="<?php echo $itemdata['id']; ?>">
                         <label>ColdStore Name</label>
-                        <input type="text" name="name" class="form-control" placeholder="Name" value="<?php echo $updatedata['name']; ?>">
+                        <input type="text" name="name" class="form-control" placeholder="Name" value="<?php echo htmlspecialchars($updatedata['name']); ?>" required>
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -203,7 +191,7 @@ $bootstrap->css();
         <form action="configuration_coldstore.php" method="post" autocomplete="off">
           <div class="modal-body">
             <label>ColdStore Name</label>
-            <input type="text" name="name" class="form-control" placeholder="Name">
+            <input type="text" name="name" class="form-control" placeholder="Name" required>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

@@ -1,6 +1,6 @@
 # Products User Flow Diagram
 
-> The current page uses "Products & Services" wording. The todo list tracks changing it to "Products" because the system does not have services.
+> Products configured here are used in purchase, sales, and stock workflows.
 
 ```mermaid
 flowchart TD
