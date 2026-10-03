@@ -1,0 +1,21 @@
+# Todo
+
+- [ ] Set the login cookie lifetime to 3 hours. After it expires, require the user to log in again.
+- [ ] Change "Products & Services" wording to "Products" because the system does not have services.
+- [ ] Restrict the supplier picker in Edit Purchase to suppliers, matching the New Purchase page.
+- [ ] Add a Voided tab to the Purchases overview.
+- [ ] Add a clear Voided status style in Purchases; voided bills currently appear without their own status styling.
+- [ ] Validate supplier payment amounts against the supplier's total outstanding balance on the server; the current maximum is only a browser-side limit.
+- [ ] Add Awaiting Approval and Voided tabs/status styles to the Sales overview.
+- [ ] Prevent editing or re-approving Voided sales invoices.
+- [ ] Show the result when deleting a draft sale from the Sales overview.
+- [ ] Validate customer receipt amounts against total outstanding on the server and report the actual amount allocated.
+- [ ] Post customer receipt transactions to the General Ledger.
+- [ ] Exclude Draft and Awaiting Approval sales from A/C Receivable customer billed/paid/balance totals.
+- [ ] Enforce Posted manual journals as read-only in the update handler so a crafted request cannot change them or add duplicate General Ledger entries.
+- [ ] Make General Ledger Date From-only and Date To-only filters use open-ended date ranges instead of exact-day matching.
+- [ ] Require a non-empty coldstore name and show success/error feedback for Configuration Coldstore add, update, and delete actions.
+- [ ] Validate Packing Material W/H outputs server-side: require a positive quantity and valid stock-to destination and material.
+- [ ] Preserve the running balance across Packing Material W/H detail pages instead of restarting it at zero on each page.
+- [ ] Synchronize Packing Material Purchase edits and deletions to only the matching warehouse stock-in line; voucher-wide updates/deletions can corrupt other lines in a multi-item voucher.
+- [ ] Confirm and correct the Packing Material Purchase payable workflow: it creates a purchases record as AUTHORISED, while A/C Payable only includes AWAITING_PAYMENT and PAID bills.

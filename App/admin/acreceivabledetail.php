@@ -37,7 +37,7 @@ $customer_name = $custStmt->fetchColumn();
 
 // Fetch all Awaiting Payment and Paid Invoices for this customer
 $billsStmt = $pdo->prepare("
-    SELECT id, date, voucher_no, grand_total, paid_amount, (grand_total - paid_amount) AS outstanding, status 
+    SELECT id, date, sr_no AS voucher_no, grand_total, paid_amount, (grand_total - paid_amount) AS outstanding, status
     FROM sales 
     WHERE contact_id = ? AND status IN ('AWAITING_PAYMENT', 'PAID') 
     ORDER BY date ASC, id ASC
