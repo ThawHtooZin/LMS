@@ -4258,29 +4258,34 @@ class Query
   {
     global $pdo;
 
-    $totalnetweight = $kgperbox * $mc;
-    $totalgrossweight = $mc * 60;
+    $totalnetweight = floatval($kgperbox) * floatval($mc);
+    $totalgrossweight = floatval($mc) * 60;
 
+    $date = date('Y-m-d');
+    if (!empty($infoid)) {
+      $datestmt = $pdo->prepare("SELECT date FROM truckpackingliststock WHERE id = ?");
+      $datestmt->execute([$infoid]);
+      $datedata = $datestmt->fetch(PDO::FETCH_ASSOC);
+      if (!empty($datedata['date']) && $datedata['date'] !== '0000-00-00') {
+        $date = $datedata['date'];
+      }
+    }
 
-    $addtruckpackingliststmt = $pdo->prepare("INSERT INTO truckpackingliststockinfo(item_id, size, pcsperbox, kgperbox, mc, netweight, totalgrossweight, invoice_no) VALUES('$commondity', '$size', '$pcsperbox', '$kgperbox', '$mc', '$totalnetweight', '$totalgrossweight', '$invoice_no')");
-    $addtruckpackingliststmt->execute();
+    $addtruckpackingliststmt = $pdo->prepare("INSERT INTO truckpackingliststockinfo(item_id, size, pcsperbox, kgperbox, mc, netweight, totalgrossweight, invoice_no) VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
+    $addtruckpackingliststmt->execute([$commondity, $size, $pcsperbox, $kgperbox, $mc, $totalnetweight, $totalgrossweight, $invoice_no]);
+    $lastid = $pdo->lastInsertId();
 
-    $getidstmt = $pdo->prepare("SELECT * FROM truckpackingliststockinfo ORDER BY id DESC");
-    $getidstmt->execute();
-    $getid = $getidstmt->fetch(PDO::FETCH_ASSOC);
-    $lastid = $getid['id'];
+    $addinvoicestmt = $pdo->prepare("INSERT INTO truckactualinvoice(item_id, size, pcsperbox, kgperbox, mc, netweight, usd, total_usd, invoice_no, link_id) VALUES(?, ?, ?, ?, ?, ?, 0, 0, ?, ?)");
+    $addinvoicestmt->execute([$commondity, $size, $pcsperbox, $kgperbox, $mc, $totalnetweight, $invoice_no, $lastid]);
 
-    $addinvoicestmt = $pdo->prepare("INSERT INTO truckactualinvoice(item_id, size, pcsperbox, kgperbox, mc, netweight, invoice_no, link_id) VALUES('$commondity', '$size', '$pcsperbox', '$kgperbox', '$mc', '$totalnetweight', '$invoice_no', '$lastid')");
-    $addinvoicestmt->execute();
+    $addfoambox = $pdo->prepare("INSERT INTO truckfoambox(item_id, size, pcsperbox, kgperbox, mc, netweight, foambox_no, total_foambox_no, invoice_no, link_id) VALUES(?, ?, ?, ?, ?, ?, '', 0, ?, ?)");
+    $addfoambox->execute([$commondity, $size, $pcsperbox, $kgperbox, $mc, $totalnetweight, $invoice_no, $lastid]);
 
-    $addfoambox = $pdo->prepare("INSERT INTO truckfoambox(item_id, size, pcsperbox, kgperbox, mc, netweight, invoice_no, link_id) VALUES('$commondity', '$size', '$pcsperbox', '$kgperbox', '$mc', '$totalnetweight', '$invoice_no', '$lastid')");
-    $addfoambox->execute();
+    $adddeclarestmt = $pdo->prepare("INSERT INTO truckdeclare(item_id, size, pcsperbox, kgperbox, mc, netweight, invoice_no, link_id) VALUES(?, ?, ?, 0, ?, 0, ?, ?)");
+    $adddeclarestmt->execute([$commondity, $size, $pcsperbox, $mc, $invoice_no, $lastid]);
 
-    $adddeclare = $pdo->prepare("INSERT INTO truckdeclare(item_id, size, pcsperbox, mc, invoice_no, link_id) VALUES('$commondity', '$size', '$pcsperbox', '$mc', '$invoice_no', '$lastid')");
-    $adddeclare->execute();
-
-    $adddeclare = $pdo->prepare("INSERT INTO trucktotalcosting(item_id, size, total_kg, invoice_no, link_id, infoid) VALUES('$commondity', '$size', '$totalnetweight', '$invoice_no', '$lastid', '$infoid')");
-    $adddeclare->execute();
+    $addcoststmt = $pdo->prepare("INSERT INTO trucktotalcosting(date, item_id, size, total_kg, priceperviss, priceperkg, percentage, packing_charges, mtorst, ygntomtorst_charges, mtorsttotechnck_charges, labour_charges, packingandtransport, total, grand_total, rate, costing_usd, selling_rate, profitperkg, original_cost, selling_amount, profit, invoice_no, link_id, infoid) VALUES(?, ?, ?, ?, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ?, ?, ?)");
+    $addcoststmt->execute([$date, $commondity, $size, $totalnetweight, $invoice_no, $lastid, $infoid]);
   }
 
   function updatetruckpackinglistinfo($commondity, $size, $pcsperbox, $kgperbox, $mc, $updateid)

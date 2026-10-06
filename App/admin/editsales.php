@@ -107,69 +107,9 @@ $accounts = $pdo->query("SELECT code, name, class FROM accodes WHERE class = 'RE
     <meta charset="utf-8">
     <title>Edit Sale</title>
     <?php echo $bootstrap->css(); ?>
+    <link rel="stylesheet" href="../../Resources/dist/css/account-purchase-sales.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">
-    <style>
-        .chosen-container-single .chosen-single {
-            height: 38px !important;
-            border: 1px solid #ced4da !important;
-            border-radius: 0.375rem !important;
-            line-height: 36px !important;
-            background: #fff !important;
-            box-shadow: none !important;
-        }
-
-        .table-lines input {
-            font-size: 14px;
-            border-radius: 4px;
-            border: 1px solid #ced4da;
-            width: 100%;
-            padding: 6px;
-        }
-
-        .xero-title {
-            font-size: 24px;
-            font-weight: normal;
-            color: #202e3c;
-            margin-bottom: 20px;
-        }
-
-        .total-box {
-            border-top: 2px solid #000;
-            border-bottom: 2px solid #000;
-            padding: 10px 0;
-            margin-top: 20px;
-        }
-
-        .btn-group .btn-main {
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-        }
-
-        .btn-group .btn-drop {
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
-            border-left: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .status-header {
-            font-size: 14px;
-            font-weight: bold;
-            color: #666;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        .error-border {
-            border-bottom: 2px solid #dc3545 !important;
-            box-shadow: 0 1px 0 0 #dc3545 !important;
-        }
-
-        .chosen-container.error-border .chosen-single {
-            border-bottom: 2px solid #dc3545 !important;
-            box-shadow: 0 1px 0 0 #dc3545 !important;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css">
 </head>
 
 <body>
@@ -206,11 +146,11 @@ $accounts = $pdo->query("SELECT code, name, class FROM accodes WHERE class = 'RE
             <?php require 'navbar.php'; ?>
             <form action="" method="post" id="saleForm">
                 <input type="hidden" name="action_type" id="action_type" value="save_draft">
-                <div class="bg-white p-4 shadow-sm rounded m-2">
-                    <div class="text-muted small"><a href="sales.php" class="text-decoration-none">Sales overview</a> > Invoices ></div>
-                    <div class="xero-title">Edit Sale <?= htmlspecialchars($sale['sr_no']); ?></div>
+                <div class="account-doc-panel">
+                    <div class="account-breadcrumb"><a href="sales.php">Sales overview</a> &rsaquo; Invoices</div>
+                    <div class="account-doc-title">Edit Sale <?= htmlspecialchars($sale['sr_no']); ?></div>
 
-                    <div class="d-flex justify-content-between align-items-center status-header">
+                    <div class="d-flex justify-content-between align-items-center account-status-header">
                         <div>
                             Status: <span class="badge bg-secondary"><?php echo ucfirst(strtolower(str_replace('_', ' ', $current_status))); ?></span>
                             <?php if ($current_status === 'VOIDED'): ?>
@@ -272,7 +212,7 @@ $accounts = $pdo->query("SELECT code, name, class FROM accodes WHERE class = 'RE
 
                     <div style="overflow: visible;">
                         <table class="table table-borderless table-lines" id="linesTable">
-                            <thead class="table-dark">
+                            <thead>
                                 <tr>
                                     <th width="35%">Container Reference</th>
                                     <th width="40%">Revenue Account</th>

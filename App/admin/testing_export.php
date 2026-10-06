@@ -780,7 +780,7 @@ if ($_GET['table_name'] == 'actualinvoice') {
       foreach ($datas as $packingstockinfodata) {
 
         $item_id = $packingstockinfodata['commondity_id'];
-        $commonditydata = $query->select('item', $item_id, 'item_id');
+        $commonditydata = $query->select('products', $item_id, 'id');
         $lastid = $packingstockinfodata['id'];
         $size = $packingstockinfodata['size'];
         $infoid = $packingstockinfodata['infoid'];
@@ -797,7 +797,7 @@ if ($_GET['table_name'] == 'actualinvoice') {
                 echo $no;
               } ?></td>
           <td><?php if (empty($lastcommondity)) {
-                echo $commonditydata['item_name'];
+                echo $commonditydata['name'];
               }; ?></td>
           <td><?php if (empty($checklastavaliable)) {
                 echo $packingstockinfodata['size'];
@@ -808,7 +808,7 @@ if ($_GET['table_name'] == 'actualinvoice') {
           <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $packingstockinfodata['id']; ?>"><?php if ($packingstockinfodata['usd'] != 0) {
                                                                                                                 echo $packingstockinfodata['usd'];
                                                                                                               } ?></td>
-          <td <?php if (str_contains(strtolower($commonditydata['item_name']), 'bala')) {
+          <td <?php if (str_contains(strtolower($commonditydata['name']), 'bala')) {
                 echo 'data-bs-toggle="modal"';
               } ?> data-bs-target="#updatetotalusd<?php echo $packingstockinfodata['id']; ?>"><?php if ($packingstockinfodata['total_usd'] != 0) {
                                                                                                 echo $packingstockinfodata['total_usd'];
@@ -932,7 +932,7 @@ if ($_GET['table_name'] == 'actualpackinglist') {
       foreach ($datas as $packingstockinfodata) {
 
         $item_id = $packingstockinfodata['commondity_id'];
-        $commonditydata = $query->select('item', $item_id, 'item_id');
+        $commonditydata = $query->select('products', $item_id, 'id');
         $lastid = $packingstockinfodata['id'];
         $size = $packingstockinfodata['size'];
         $infoid = $packingstockinfodata['infoid'];
@@ -949,7 +949,7 @@ if ($_GET['table_name'] == 'actualpackinglist') {
                 echo $no;
               } ?></td>
           <td><?php if (empty($lastcommondity)) {
-                echo $commonditydata['item_name'];
+                echo $commonditydata['name'];
               }; ?></td>
           <td><?php if (empty($checklastavaliable)) {
                 echo $packingstockinfodata['size'];
@@ -960,7 +960,7 @@ if ($_GET['table_name'] == 'actualpackinglist') {
           <td data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $packingstockinfodata['id']; ?>"><?php if ($packingstockinfodata['usd'] != 0) {
                                                                                                                 echo $packingstockinfodata['usd'];
                                                                                                               } ?></td>
-          <td <?php if (str_contains(strtolower($commonditydata['item_name']), 'bala')) {
+          <td <?php if (str_contains(strtolower($commonditydata['name']), 'bala')) {
                 echo 'data-bs-toggle="modal"';
               } ?> data-bs-target="#updatetotalusd<?php echo $packingstockinfodata['id']; ?>"><?php if ($packingstockinfodata['total_usd'] != 0) {
                                                                                                 echo $packingstockinfodata['total_usd'];
@@ -1114,7 +1114,7 @@ if ($_GET['table_name'] == 'mcstockreport') {
         $size = $hhkdata['size'];
         $item_id = $hhkdata['commondity_id'];
         $country = $hhkdata['country'];
-        $commonditydata = $query->select('item', $item_id, 'item_id');
+        $commonditydata = $query->select('products', $item_id, 'id');
 
         $hhkcommonditystmt = $pdo->prepare("SELECT DISTINCT commondity_id FROM hhkmcstock WHERE size='$size' AND commondity_id='$item_id'");
         $hhkcommonditystmt->execute();
@@ -1157,7 +1157,7 @@ if ($_GET['table_name'] == 'mcstockreport') {
                 echo $id;
               } ?></td>
           <td><?php if (empty($lastcommondity)) {
-                echo $commonditydata['item_name'];
+                echo $commonditydata['name'];
               } ?></td>
           <td><?php if (empty($lastcommondity)) {
                 echo $country;
@@ -1263,7 +1263,7 @@ if ($_GET['table_name'] == "tclmcstock" && !empty($_GET['date'])) {
     foreach ($datas as $tclmcdata) {
       $lastid = $tclmcdata['id'];
       $item_id = $tclmcdata['item_id'];
-      $commonditydata = $query->select('item', $item_id, 'item_id');
+      $commonditydata = $query->select('products', $item_id, 'id');
       $size = $tclmcdata['size'];
       $kg = $tclmcdata['kg'];
       $item_id = $tclmcdata['item_id'];
@@ -1280,7 +1280,7 @@ if ($_GET['table_name'] == "tclmcstock" && !empty($_GET['date'])) {
                                         echo date("d-m-Y", strtotime($tclmcdata['date']));
                                       } ?></td>
         <td style="text-align:right;"><?php if (empty($lastcommondity)) {
-                                        echo $commonditydata['item_name'];
+                                        echo $commonditydata['name'];
                                       } ?></td>
         <td style="text-align:right;"><?php if (empty($checklastavaliable)) {
                                         echo $tclmcdata['size'];
@@ -1402,7 +1402,7 @@ if ($_GET['table_name'] == "tclmcstock" && !empty($_GET['date'])) {
       foreach ($datas as $tclmcdata) {
         $lastid = $tclmcdata['id'];
         $item_id = $tclmcdata['item_id'];
-        $commonditydata = $query->select('item', $item_id, 'item_id');
+        $commonditydata = $query->select('products', $item_id, 'id');
         $size = $tclmcdata['size'];
         $kg = $tclmcdata['kg'];
         $item_id = $tclmcdata['item_id'];
@@ -1419,7 +1419,7 @@ if ($_GET['table_name'] == "tclmcstock" && !empty($_GET['date'])) {
                                           echo date("d-m-Y", strtotime($tclmcdata['date']));
                                         } ?></td>
           <td style="text-align:right;"><?php if (empty($lastcommondity)) {
-                                          echo $commonditydata['item_name'];
+                                          echo $commonditydata['name'];
                                         } ?></td>
           <td style="text-align:right;"><?php if (empty($checklastavaliable)) {
                                           echo $tclmcdata['size'];
@@ -1598,7 +1598,7 @@ if ($_GET['table_name'] == 'actualtruckinvoice') {
 
         foreach ($datas as $packingstockinfodata) {
           $item_id = $packingstockinfodata['item_id'];
-          $commonditydata = $query->select('item', $item_id, 'item_id');
+          $commonditydata = $query->select('products', $item_id, 'id');
           $lastid = $packingstockinfodata['id'];
           $size = $packingstockinfodata['size'];
           $checklast = $pdo->prepare("SELECT * FROM truckactualinvoice WHERE id < $lastid AND item_id='$item_id' AND size='$size' AND invoice_no='$invoice_no'");
@@ -1613,7 +1613,7 @@ if ($_GET['table_name'] == 'actualtruckinvoice') {
                   echo $no1;
                 }; ?></td>
             <td><?php if (empty($lastcommondity)) {
-                  echo $commonditydata['item_name'];
+                  echo $commonditydata['name'];
                 }; ?></td>
             <td><?php if (empty($checklastavaliable)) {
                   echo $packingstockinfodata['size'];
@@ -1796,7 +1796,7 @@ if ($_GET['table_name'] == 'foambox') {
         $datas = $stmt->fetchall();
         foreach ($datas as $packingstockinfodata) {
           $item_id = $packingstockinfodata['item_id'];
-          $commonditydata = $query->select('item', $item_id, 'item_id');
+          $commonditydata = $query->select('products', $item_id, 'id');
           $lastid = $packingstockinfodata['id'];
           $size = $packingstockinfodata['size'];
           $checklast = $pdo->prepare("SELECT * FROM truckfoambox WHERE id < $lastid AND item_id='$item_id' AND size='$size' AND invoice_no='$invoice_no'");
@@ -1811,7 +1811,7 @@ if ($_GET['table_name'] == 'foambox') {
                   echo $no2;
                 }; ?></td>
             <td><?php if (empty($lastcommondity)) {
-                  echo $commonditydata['item_name'];
+                  echo $commonditydata['name'];
                 }; ?></td>
             <td><?php if (empty($checklastavaliable)) {
                   echo $packingstockinfodata['size'];
@@ -1976,7 +1976,7 @@ if ($_GET['table_name'] == 'declarepacking') {
         $datas = $stmt->fetchall();
         foreach ($datas as $packingstockinfodata) {
           $item_id = $packingstockinfodata['item_id'];
-          $commonditydata = $query->select('item', $item_id, 'item_id');
+          $commonditydata = $query->select('products', $item_id, 'id');
           $lastid = $packingstockinfodata['id'];
           $size = $packingstockinfodata['size'];
           $checklast = $pdo->prepare("SELECT * FROM truckdeclare WHERE id < $lastid AND item_id='$item_id' AND size='$size' AND invoice_no='$invoice_no'");
@@ -1991,7 +1991,7 @@ if ($_GET['table_name'] == 'declarepacking') {
                   echo $no3;
                 }; ?></td>
             <td><?php if (empty($lastcommondity)) {
-                  echo $commonditydata['item_name'];
+                  echo $commonditydata['name'];
                 }; ?></td>
             <td><?php if (empty($checklastavaliable)) {
                   echo $packingstockinfodata['size'];
@@ -2164,7 +2164,7 @@ if ($_GET['table_name'] == 'truckactualpackinglist') {
         $datas = $stmt->fetchall();
         foreach ($datas as $packingstockinfodata) {
           $item_id = $packingstockinfodata['item_id'];
-          $commonditydata = $query->select('item', $item_id, 'item_id');
+          $commonditydata = $query->select('products', $item_id, 'id');
           $lastid = $packingstockinfodata['id'];
           $size = $packingstockinfodata['size'];
           $invoice_no = $packingstockinfodata['invoice_no'];
@@ -2180,7 +2180,7 @@ if ($_GET['table_name'] == 'truckactualpackinglist') {
                   echo $no;
                 }; ?></td>
             <td><?php if (empty($lastcommondity)) {
-                  echo $commonditydata['item_name'];
+                  echo $commonditydata['name'];
                 }; ?></td>
             <td><?php if (empty($checklastavaliable)) {
                   echo $packingstockinfodata['size'];
@@ -2332,7 +2332,7 @@ if ($_GET['table_name'] == 'form_10_tcl') {
     foreach ($datas as $data) {
       $item_id = $data['item_id'];
       $size = $data['size'];
-      $commonditydata = $query->select('item', $item_id, 'item_id');
+      $commonditydata = $query->select('products', $item_id, 'id');
       $supplierid = $data['supplier_id'];
       $supplier_name = $query->select('acname', $supplierid, 'code_no');
 
@@ -2346,7 +2346,7 @@ if ($_GET['table_name'] == 'form_10_tcl') {
     ?>
       <tr>
         <td><?php echo date('d-m-Y', strtotime($data['date'])); ?></td>
-        <td><?php echo $commonditydata['item_name']; ?></td>
+        <td><?php echo $commonditydata['name']; ?></td>
         <td><?php echo $data['size']; ?></td>
         <td><?php echo $raw_viss_datas['raw_viss']; ?></td>
         <td><?php echo $data['size']; ?></td>
@@ -2539,7 +2539,7 @@ if ($_GET['table_name'] == 'trucktotalcosting') {
       $datas = $stmt->fetchall();
       foreach ($datas as $data) {
         $item_id = $data['item_id'];
-        $commonditydata = $query->select('item', $item_id, 'item_id');
+        $commonditydata = $query->select('products', $item_id, 'id');
         $size = $data['size'];
         $lastid = $data['id'];
         $invoice_no = $_GET['invoice_no'];
@@ -2555,7 +2555,7 @@ if ($_GET['table_name'] == 'trucktotalcosting') {
       ?>
         <tr data-bs-toggle='modal' data-bs-target="#updatetotalcosting<?php echo $data['id']; ?>">
           <td><?php if (empty($lastcommondity)) {
-                echo $commonditydata['item_name'];
+                echo $commonditydata['name'];
               }; ?></td>
           <td><?php if (empty($checklastavaliable)) {
                 echo $data['size'];
@@ -2805,7 +2805,7 @@ if ($_GET['table_name'] == "form10frozen") {
             $size = $form7data['size'];
             $date = $form7data['date'];
             $supplierid = $form7data['supplier_name'];
-            $commonditydata = $query->select('item', $item_id, 'item_id');
+            $commonditydata = $query->select('products', $item_id, 'id');
             $supplier_name = $query->select('acname', $supplierid, 'code_no');
 
           $lastcommondity = $pdo->prepare("SELECT * FROM form7stock WHERE id < $lastid AND item_id='$item_id' AND date = '$date'");
@@ -2819,7 +2819,7 @@ if ($_GET['table_name'] == "form10frozen") {
                   }
                 } ?></td>
             <td><?php if (empty($lastcommondity)) {
-                  echo $commonditydata['item_name'];
+                  echo $commonditydata['name'];
                 } ?></td>
             <td><?php if (empty($lastcommondity)) {
                   echo $supplier_name['ac_name'];
@@ -2903,7 +2903,7 @@ if ($_GET['table_name'] == "form10frozen") {
           $size = $data['size'];
           $date = $data['date'];
 
-          $commonditydata = $query->select('item', $item_id, 'item_id');
+          $commonditydata = $query->select('products', $item_id, 'id');
           $supplierid = $data['supplier_id'];
           $supplier_name = $query->select('acname', $supplierid, 'code_no');
           $lastcommondity = $pdo->prepare("SELECT * FROM form10stock WHERE id < $lastid AND item_id='$item_id' AND date = '$date'");
@@ -3056,9 +3056,9 @@ if ($_GET['table_name'] == "purchase") {
     foreach ($purchasedatas as $purchasedata) {
       $idd++;
       $supplierid = $purchasedata['supplier_id'];
-      $supplier_name = $query->select('supplier', $supplierid, 'supplier_id');
+      $supplier_name = $query->select('contacts', $supplierid, 'id');
       $itemid = $purchasedata['commodity'];
-      $item_name = $query->select('item', $itemid, 'item_id');
+      $item_name = $query->select('products', $itemid, 'id');
     ?>
       <input type="hidden" name="updateid" value="<?php echo $purchasedata['no']; ?>">
 
@@ -3067,8 +3067,8 @@ if ($_GET['table_name'] == "purchase") {
         <td><?php echo date('d-m-Y', strtotime($purchasedata['date'])); ?></td>
         <td><?php echo $purchasedata['voucher_no']; ?></td>
         <td><?php echo $purchasedata['tclfrozen']; ?></td>
-        <td><?php echo $supplier_name['supplier_name']; ?></td>
-        <td><?php echo $item_name['item_name']; ?></td>
+        <td><?php echo $supplier_name['name'] ?? ''; ?></td>
+        <td><?php echo $item_name['name']; ?></td>
         <td><?php echo $purchasedata['size']; ?></td>
         <td><?php echo $purchasedata['viss']; ?></td>
         <td><?php echo floatval($purchasedata['viss']) * 1.634; ?></td>
@@ -3086,7 +3086,7 @@ if ($_GET['table_name'] == "purchase") {
 }
 if ($_GET['table_name'] == "payabledetail") {
   $supplier_id = $_GET['supplier_id'];
-  $supplierstmt = $pdo->prepare("SELECT * FROM supplier WHERE supplier_id='$supplier_id'");
+  $supplierstmt = $pdo->prepare("SELECT id, name AS supplier_name FROM contacts WHERE id='$supplier_id'");
   $supplierstmt->execute();
   $supplier_name = $supplierstmt->fetch(PDO::FETCH_ASSOC);
 

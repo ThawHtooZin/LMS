@@ -146,7 +146,7 @@ $query = new Query();
                 $datas = $stmt->fetchall();
                 foreach ($datas as $data) {
                   $item_id = $data['item_id'];
-                  $commonditydata = $query->select('item', $item_id, 'item_id');
+                  $commonditydata = $query->select('products', $item_id, 'id');
                   $size = $data['size'];
                   $lastid = $data['id'];
                   $invoice_no = $_GET['invoice_no'];
@@ -162,7 +162,7 @@ $query = new Query();
                   ?>
                   <tr data-bs-toggle='modal' data-bs-target="#updatetotalcosting<?php echo $data['id']; ?>">
                     <!-- <td><?php// echo date('d-m-Y', strtotime($invoice_nodata['date']));  ?></td> -->
-                    <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
+                    <td><?php if(empty($lastcommondity)){ echo $commonditydata['name']; }; ?></td>
                     <td><?php if(empty($checklastavaliable)){echo $data['size'];} ?></td>
                     <td><?php if($ttlkgdata['total_kg'] != 0){echo $ttlkgdata['total_kg'];}else{ echo "-";} ?></td>
                     <td><?php if($data['priceperviss'] != 0){echo $data['priceperviss'];}else{ echo "-";} ?></td>
@@ -269,7 +269,7 @@ $query = new Query();
                       $lastid = $data['id'];
                       $item_id = $data['item_id'];
                       $size = $data['size'];
-                      $commonditydata = $query->select('item', $item_id, 'item_id');
+                      $commonditydata = $query->select('products', $item_id, 'id');
                       $checklast = $pdo->prepare("SELECT * FROM trucktotalcosting WHERE id < $lastid AND invoice_no='$invoice_no' AND item_id='$item_id' AND size='$size'");
                       $checklast->execute();
                       $checklastavaliable2 = $checklast->fetch(PDO::FETCH_ASSOC);
@@ -278,7 +278,7 @@ $query = new Query();
                       $lastcommondity2 = $lastcommondity->fetch(PDO::FETCH_ASSOC);
                       ?>
                       <tr data-bs-toggle='modal' data-bs-target="#updatetotal<?php echo $data['id']; ?>">
-                        <td><?php if(empty($lastcommondity2)){ echo $commonditydata['item_name']; }; ?></td>
+                        <td><?php if(empty($lastcommondity2)){ echo $commonditydata['name']; }; ?></td>
                         <td><?php if(empty($checklastavaliable2)){echo $data['size'];} ?></td>
                         <td><?php if($data['total'] != 0){ echo $data['total']; }else{ echo '-';} ?></td>
                         <td><?php if($data['grand_total'] != 0){ echo $data['grand_total']; }else{ echo '-';} ?></td>
@@ -336,7 +336,7 @@ $query = new Query();
                     $datas = $stmt->fetchall();
                     foreach ($datas as $data) {
                       $item_id = $data['item_id'];
-                      $commonditydata = $query->select('item', $item_id, 'item_id');
+                      $commonditydata = $query->select('products', $item_id, 'id');
                       ?>
                       <tr data-bs-toggle='modal' data-bs-target="#updateprofit<?php echo $data['id']; ?>">
                         <td><?php if($data['selling_rate'] != 0){ echo $data['selling_rate']; }else{ echo '-';} ?></td>

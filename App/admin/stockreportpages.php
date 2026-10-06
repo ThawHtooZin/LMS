@@ -21,9 +21,9 @@
                                 $hhkmcstockcommonditydatas = $hhkmcstockcommonditystmt->fetchAll();
                                 foreach($hhkmcstockcommonditydatas as $hhkmcstockcommonditydata){
                                     $item_id = $hhkmcstockcommonditydata['commondity_id'];
-                                    $commonditydata = $query->select('item', $item_id, 'item_id');
+                                    $commonditydata = $query->select('products', $item_id, 'id');
                                     ?>
-                                    <option value="<?= $hhkmcstockcommonditydata['commondity_id']; ?>"><?= $commonditydata['item_name'];?></option>
+                                    <option value="<?= $hhkmcstockcommonditydata['commondity_id']; ?>"><?= $commonditydata['name'];?></option>
                                     <?php
                                 }
                             ?>
@@ -81,11 +81,11 @@
                                     foreach($looseindatas as $looseindata){
                                     $looseinno++;
                                     $item_id = $looseindata['commondity_id'];
-                                    $commonditydata = $query->select('item', $item_id, 'item_id');
+                                    $commonditydata = $query->select('products', $item_id, 'id');
                                     ?>
                                     <tr>
                                         <td><?= $looseinno; ?></td>
-                                        <td><?= $commonditydata['item_name']; ?></td>
+                                        <td><?= $commonditydata['name']; ?></td>
                                         <td><?= $looseindata['country']; ?></td>
                                         <td><?= $looseindata['loosein_size']; ?></td>
                                         <td><?= $looseindata['loosein_kg']; ?></td>
@@ -125,11 +125,11 @@
                                     foreach($looseoutdatas as $looseoutdata){
                                     $looseoutno++;
                                     $item_id = $looseoutdata['commondity_id'];
-                                    $commonditydata = $query->select('item', $item_id, 'item_id');
+                                    $commonditydata = $query->select('products', $item_id, 'id');
                                     ?>
                                     <tr>
                                         <td><?= $looseoutno; ?></td>
-                                        <td><?= $commonditydata['item_name']; ?></td>
+                                        <td><?= $commonditydata['name']; ?></td>
                                         <td><?= $looseoutdata['country']; ?></td>
                                         <td><?= $looseoutdata['looseout_size']; ?></td>
                                         <td><?= $looseoutdata['looseout_kg']; ?></td>
@@ -160,9 +160,9 @@
                                 $hhkmcstockcommonditydatas = $hhkmcstockcommonditystmt->fetchAll();
                                 foreach($hhkmcstockcommonditydatas as $hhkmcstockcommonditydata){
                                     $item_id = $hhkmcstockcommonditydata['commondity_id'];
-                                    $commonditydata = $query->select('item', $item_id, 'item_id');
+                                    $commonditydata = $query->select('products', $item_id, 'id');
                                     ?>
-                                    <option value="<?= $hhkmcstockcommonditydata['commondity_id']; ?>"><?= $commonditydata['item_name'];?></option>
+                                    <option value="<?= $hhkmcstockcommonditydata['commondity_id']; ?>"><?= $commonditydata['name'];?></option>
                                     <?php
                                 }
                             ?>
@@ -208,7 +208,7 @@
                                     foreach ($datas as $hhkstockdata) {
                                         $hhkkgno++;
                                         $item_id = $hhkstockdata['commondity_id'];
-                                        $commonditydata = $query->select('item', $item_id, 'item_id');
+                                        $commonditydata = $query->select('products', $item_id, 'id');
                                         $size = $hhkstockdata['size'];
                                         $kg = $hhkstockdata['kg'];
                                         $commondity_id = $hhkstockdata['commondity_id'];
@@ -228,7 +228,7 @@
                                     ?>
                                     <tr style="<?php if($totalmc == '0'){ echo 'display:none;'; } ?>">
                                         <td><?= $hhkkgno; ?></td>
-                                        <td><?php echo $commonditydata['item_name']; ?></td>
+                                        <td><?php echo $commonditydata['name']; ?></td>
                                         <td><?php echo $hhkstockdata['country']; ?></td>
                                         <td><?php echo $hhkstockdata['size']; ?></td>
                                         <td><?php echo $hhkstockdata['kg']; ?></td>
@@ -288,9 +288,9 @@
                                 $gfcmcstockcommonditydatas = $gfcmcstockcommonditystmt->fetchAll();
                                 foreach($gfcmcstockcommonditydatas as $gfcmcstockcommonditydata){
                                     $item_id = $gfcmcstockcommonditydata['commondity_id'];
-                                    $commonditydata = $query->select('item', $item_id, 'item_id');
+                                    $commonditydata = $query->select('products', $item_id, 'id');
                                     ?>
-                                    <option value="<?= $gfcmcstockcommonditydata['commondity_id']; ?>"><?= $commonditydata['item_name'];?></option>
+                                    <option value="<?= $gfcmcstockcommonditydata['commondity_id']; ?>"><?= $commonditydata['name'];?></option>
                                     <?php
                                 }
                             ?>
@@ -348,11 +348,11 @@
                                     foreach($looseindatas as $looseindata){
                                     $looseinno++;
                                     $item_id = $looseindata['commondity_id'];
-                                    $commonditydata = $query->select('item', $item_id, 'item_id');
+                                    $commonditydata = $query->select('products', $item_id, 'id');
                                     ?>
                                     <tr>
                                         <td><?= $looseinno; ?></td>
-                                        <td><?= $commonditydata['item_name']; ?></td>
+                                        <td><?= $commonditydata['name']; ?></td>
                                         <td><?= $looseindata['country']; ?></td>
                                         <td><?= $looseindata['loosein_size']; ?></td>
                                         <td><?= $looseindata['loosein_kg']; ?></td>
@@ -392,11 +392,11 @@
                                     foreach($looseoutdatas as $looseoutdata){
                                     $looseoutno++;
                                     $item_id = $looseoutdata['commondity_id'];
-                                    $commonditydata = $query->select('item', $item_id, 'item_id');
+                                    $commonditydata = $query->select('products', $item_id, 'id');
                                     ?>
                                     <tr>
                                         <td><?= $looseoutno; ?></td>
-                                        <td><?= $commonditydata['item_name']; ?></td>
+                                        <td><?= $commonditydata['name']; ?></td>
                                         <td><?= $looseoutdata['country']; ?></td>
                                         <td><?= $looseoutdata['looseout_size']; ?></td>
                                         <td><?= $looseoutdata['looseout_kg']; ?></td>
@@ -427,9 +427,9 @@
                                 $gfcmcstockcommonditydatas = $gfcmcstockcommonditystmt->fetchAll();
                                 foreach($gfcmcstockcommonditydatas as $gfcmcstockcommonditydata){
                                     $item_id = $gfcmcstockcommonditydata['commondity_id'];
-                                    $commonditydata = $query->select('item', $item_id, 'item_id');
+                                    $commonditydata = $query->select('products', $item_id, 'id');
                                     ?>
-                                    <option value="<?= $gfcmcstockcommonditydata['commondity_id']; ?>"><?= $commonditydata['item_name'];?></option>
+                                    <option value="<?= $gfcmcstockcommonditydata['commondity_id']; ?>"><?= $commonditydata['name'];?></option>
                                     <?php
                                 }
                             ?>
@@ -475,7 +475,7 @@
                                     foreach ($datas as $gfcstockdata) {
                                         $gfckgno++;
                                         $item_id = $gfcstockdata['commondity_id'];
-                                        $commonditydata = $query->select('item', $item_id, 'item_id');
+                                        $commonditydata = $query->select('products', $item_id, 'id');
                                         $size = $gfcstockdata['size'];
                                         $kg = $gfcstockdata['kg'];
                                         $commondity_id = $gfcstockdata['commondity_id'];
@@ -495,7 +495,7 @@
                                     ?>
                                     <tr style="<?php if($totalmc == '0'){ echo 'display:none;'; } ?>">
                                         <td><?= $gfckgno; ?></td>
-                                        <td><?php echo $commonditydata['item_name']; ?></td>
+                                        <td><?php echo $commonditydata['name']; ?></td>
                                         <td><?php echo $gfcstockdata['country']; ?></td>
                                         <td><?php echo $gfcstockdata['size']; ?></td>
                                         <td><?php echo $gfcstockdata['kg']; ?></td>

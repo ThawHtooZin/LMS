@@ -25,14 +25,20 @@ $query = new Query();
   <body>
     <?php
     if(isset($_POST['add'])){
-      $commondity = $_POST['item_id'];
-      $size = $_POST['size'];
-      $pcsperbox = $_POST['pcsperbox'];
-      $kgperbox = $_POST['kgperbox'];
-      $mc = $_POST['mc'];
-      $invoice_no = $_POST['invoice_no'];
-      $infoid = $_GET['infoid'];
-      $query->addtruckpackinglistinfo($commondity, $size, $pcsperbox, $kgperbox, $mc, $invoice_no, $infoid);
+      $invoice_no = $_POST['invoice_no'] ?? '';
+      $infoid = $_GET['infoid'] ?? '';
+      if (!empty($_POST['item_id']) && is_array($_POST['item_id'])) {
+        foreach ($_POST['item_id'] as $key => $commondity) {
+          if (empty($commondity)) {
+            continue;
+          }
+          $size = $_POST['size'][$key] ?? '';
+          $pcsperbox = $_POST['pcsperbox'][$key] ?? '';
+          $kgperbox = $_POST['kgperbox'][$key] ?? '';
+          $mc = $_POST['mc'][$key] ?? '';
+          $query->addtruckpackinglistinfo($commondity, $size, $pcsperbox, $kgperbox, $mc, $invoice_no, $infoid);
+        }
+      }
     }
 
     if(isset($_POST['updatepackinglist'])){
@@ -124,9 +130,9 @@ $query = new Query();
                     $commonditydatas = $commonditystmt->fetchall();
 
                     foreach ($commonditydatas as $commonditydata) {
-                      $commondityname = $query->select('item', $commonditydata['item_id'], 'item_id');
+                      $commondityname = $query->select('products', $commonditydata['item_id'], 'id');
                       ?>
-                      <option value="<?= $commonditydata['item_id']; ?>"><?= $commondityname['item_name']; ?></option>
+                      <option value="<?= $commonditydata['item_id']; ?>"><?= $commondityname['name']; ?></option>
                       <?php
                     } ?>
                   </select>
@@ -190,7 +196,7 @@ $query = new Query();
                           $datas = $stmt->fetchall();
                           foreach ($datas as $packingstockinfodata) {
                             $item_id = $packingstockinfodata['item_id'];
-                            $commonditydata = $query->select('item', $item_id, 'item_id');
+                            $commonditydata = $query->select('products', $item_id, 'id');
                             $lastid = $packingstockinfodata['id'];
                             $size = $packingstockinfodata['size'];
                             $invoice_no = $packingstockinfodata['invoice_no'];
@@ -203,7 +209,7 @@ $query = new Query();
                          ?>
                         <tr>
                           <td><?php if(empty($lastcommondity)){ echo $no;}; ?></td>
-                          <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
+                          <td><?php if(empty($lastcommondity)){ echo $commonditydata['name']; }; ?></td>
                           <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['size'];} ?></td>
                           <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['size'];} ?></td>
                           <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['pcsperbox'];} ?></td>
@@ -312,7 +318,7 @@ $query = new Query();
                           $datas = $stmt->fetchall();
                           foreach ($datas as $packingstockinfodata) {
                             $item_id = $packingstockinfodata['item_id'];
-                            $commonditydata = $query->select('item', $item_id, 'item_id');
+                            $commonditydata = $query->select('products', $item_id, 'id');
                             $lastid = $packingstockinfodata['id'];
                             $size = $packingstockinfodata['size'];
                             $invoice_no = $packingstockinfodata['invoice_no'];
@@ -325,7 +331,7 @@ $query = new Query();
                          ?>
                         <tr>
                           <td><?php if(empty($lastcommondity)){ echo $no;}; ?></td>
-                          <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
+                          <td><?php if(empty($lastcommondity)){ echo $commonditydata['name']; }; ?></td>
                           <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['size'];} ?></td>
                           <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['pcsperbox'];} ?></td>
                           <td><?php echo $packingstockinfodata['kgperbox']; ?></td>
@@ -354,14 +360,11 @@ $query = new Query();
                                     <label>Commondity</label>
                                     <select class="form-control inpv2 mb-2" name="upitem_id">
                                       <?php
-                                      $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stocktcl");
-                                      $form7commonditystmt->execute();
-                                      $form7commonditydatas = $form7commonditystmt->fetchall();
-                                      foreach ($form7commonditydatas as $form7commonditydata) {
-                                        $item_id = $form7commonditydata['item_id'];
-                                        $commonditydata = $query->select('item', $item_id, 'item_id');
+                                      $productstmt = $pdo->prepare("SELECT id, name FROM products ORDER BY name ASC");
+                                      $productstmt->execute();
+                                      foreach ($productstmt->fetchAll() as $productdata) {
                                         ?>
-                                        <option value="<?php echo $commonditydata['item_id']; ?>" <?php if($packingstockinfodata['item_id'] == $commonditydata['item_id']){ echo 'selected';} ?>><?php echo $commonditydata['item_name']; ?></option>
+                                        <option value="<?php echo $productdata['id']; ?>" <?php if($packingstockinfodata['item_id'] == $productdata['id']){ echo 'selected';} ?>><?php echo htmlspecialchars($productdata['name']); ?></option>
                                         <?php
                                       }
                                       ?>
@@ -522,7 +525,7 @@ $query = new Query();
 
                          foreach ($datas as $packingstockinfodata) {
                            $item_id = $packingstockinfodata['item_id'];
-                           $commonditydata = $query->select('item', $item_id, 'item_id');
+                           $commonditydata = $query->select('products', $item_id, 'id');
                            $lastid = $packingstockinfodata['id'];
                            $size = $packingstockinfodata['size'];
                            $checklast = $pdo->prepare("SELECT * FROM truckactualinvoice WHERE id < $lastid AND item_id='$item_id' AND size='$size' AND invoice_no='$invoice_no'");
@@ -534,7 +537,7 @@ $query = new Query();
                              ?>
                              <tr data-bs-toggle="modal" data-bs-target="#usdadd<?php echo $packingstockinfodata['id']; ?>">
                                <td><?php if(empty($lastcommondity)){ echo $no1;}; ?></td>
-                               <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
+                               <td><?php if(empty($lastcommondity)){ echo $commonditydata['name']; }; ?></td>
                                <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['size'];} ?></td>
                                <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['pcsperbox'];} ?></td>
                                <td><?php echo $packingstockinfodata['kgperbox']; ?></td>
@@ -666,7 +669,7 @@ $query = new Query();
 
                          foreach ($datas as $packingstockinfodata) {
                            $item_id = $packingstockinfodata['item_id'];
-                           $commonditydata = $query->select('item', $item_id, 'item_id');
+                           $commonditydata = $query->select('products', $item_id, 'id');
                            $lastid = $packingstockinfodata['id'];
                            $size = $packingstockinfodata['size'];
                            $checklast = $pdo->prepare("SELECT * FROM truckactualinvoice WHERE id < $lastid AND item_id='$item_id' AND size='$size' AND invoice_no='$invoice_no'");
@@ -678,7 +681,7 @@ $query = new Query();
                              ?>
                              <tr data-bs-toggle="modal" data-bs-target="#usdadd<?php echo $packingstockinfodata['id']; ?>">
                                <td><?php if(empty($lastcommondity)){ echo $no1;}; ?></td>
-                               <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
+                               <td><?php if(empty($lastcommondity)){ echo $commonditydata['name']; }; ?></td>
                                <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['size'];} ?></td>
                                <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['pcsperbox'];} ?></td>
                                <td><?php echo $packingstockinfodata['kgperbox']; ?></td>
@@ -841,7 +844,7 @@ $query = new Query();
                       $datas = $stmt->fetchall();
                       foreach ($datas as $packingstockinfodata) {
                         $item_id = $packingstockinfodata['item_id'];
-                        $commonditydata = $query->select('item', $item_id, 'item_id');
+                        $commonditydata = $query->select('products', $item_id, 'id');
                         $lastid = $packingstockinfodata['id'];
                         $size = $packingstockinfodata['size'];
                         $checklast = $pdo->prepare("SELECT * FROM truckfoambox WHERE id < $lastid AND item_id='$item_id' AND size='$size' AND invoice_no='$invoice_no'");
@@ -853,7 +856,7 @@ $query = new Query();
                      ?>
                     <tr>
                       <td><?php if(empty($lastcommondity)){ echo $no2;}; ?></td>
-                      <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
+                      <td><?php if(empty($lastcommondity)){ echo $commonditydata['name']; }; ?></td>
                       <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['size'];} ?></td>
                       <td><?php echo $packingstockinfodata['pcsperbox']; ?></td>
                       <td><?php echo $packingstockinfodata['kgperbox']; ?></td>
@@ -976,7 +979,7 @@ $query = new Query();
                    $datas = $stmt->fetchall();
                    foreach ($datas as $packingstockinfodata) {
                      $item_id = $packingstockinfodata['item_id'];
-                     $commonditydata = $query->select('item', $item_id, 'item_id');
+                     $commonditydata = $query->select('products', $item_id, 'id');
                      $lastid = $packingstockinfodata['id'];
                      $size = $packingstockinfodata['size'];
                      $checklast = $pdo->prepare("SELECT * FROM truckfoambox WHERE id < $lastid AND item_id='$item_id' AND size='$size' AND invoice_no='$invoice_no'");
@@ -988,7 +991,7 @@ $query = new Query();
                   ?>
                  <tr>
                    <td><?php if(empty($lastcommondity)){ echo $no2;}; ?></td>
-                   <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
+                   <td><?php if(empty($lastcommondity)){ echo $commonditydata['name']; }; ?></td>
                    <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['size'];} ?></td>
                    <td><?php echo $packingstockinfodata['pcsperbox']; ?></td>
                    <td><?php echo $packingstockinfodata['kgperbox']; ?></td>
@@ -1133,7 +1136,7 @@ $query = new Query();
                        $datas = $stmt->fetchall();
                        foreach ($datas as $packingstockinfodata) {
                          $item_id = $packingstockinfodata['item_id'];
-                         $commonditydata = $query->select('item', $item_id, 'item_id');
+                         $commonditydata = $query->select('products', $item_id, 'id');
                          $lastid = $packingstockinfodata['id'];
                          $size = $packingstockinfodata['size'];
                          $checklast = $pdo->prepare("SELECT * FROM truckdeclare WHERE id < $lastid AND item_id='$item_id' AND size='$size' AND invoice_no='$invoice_no'");
@@ -1145,7 +1148,7 @@ $query = new Query();
                       ?>
                      <tr data-bs-toggle="modal" data-bs-target="#updatekgperbox<?php echo $packingstockinfodata['id']; ?>">
                        <td><?php if(empty($lastcommondity)){ echo $no3;}; ?></td>
-                       <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
+                       <td><?php if(empty($lastcommondity)){ echo $commonditydata['name']; }; ?></td>
                        <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['size'];} ?></td>
                        <td><?php echo $packingstockinfodata['pcsperbox']; ?></td>
                        <td><?php if($packingstockinfodata['kgperbox'] != 0){ echo $packingstockinfodata['kgperbox'];}else{ echo "-"; }; ?></td>
@@ -1264,7 +1267,7 @@ $query = new Query();
                    $datas = $stmt->fetchall();
                    foreach ($datas as $packingstockinfodata) {
                      $item_id = $packingstockinfodata['item_id'];
-                     $commonditydata = $query->select('item', $item_id, 'item_id');
+                     $commonditydata = $query->select('products', $item_id, 'id');
                      $lastid = $packingstockinfodata['id'];
                      $size = $packingstockinfodata['size'];
                      $checklast = $pdo->prepare("SELECT * FROM truckdeclare WHERE id < $lastid AND item_id='$item_id' AND size='$size' AND invoice_no='$invoice_no'");
@@ -1276,7 +1279,7 @@ $query = new Query();
                   ?>
                  <tr data-bs-toggle="modal" data-bs-target="#updatekgperbox<?php echo $packingstockinfodata['id']; ?>">
                    <td><?php if(empty($lastcommondity)){ echo $no3;}; ?></td>
-                   <td><?php if(empty($lastcommondity)){ echo $commonditydata['item_name']; }; ?></td>
+                   <td><?php if(empty($lastcommondity)){ echo $commonditydata['name']; }; ?></td>
                    <td><?php if(empty($checklastavaliable)){echo $packingstockinfodata['size'];} ?></td>
                    <td><?php echo $packingstockinfodata['pcsperbox']; ?></td>
                    <td><?php if($packingstockinfodata['kgperbox'] != 0){ echo $packingstockinfodata['kgperbox'];}else{ echo "-"; }; ?></td>
@@ -1381,66 +1384,136 @@ $query = new Query();
            }
               ?>
              <!-- =============================================================== -->
-             <div class="modal fade" id="add">
-               <div class="modal-dialog" role="document">
-                 <div class="modal-content" style="width: 650px !important; margin-top:70px !important;">
+             <div class="modal fade" id="add" tabindex="-1" aria-hidden="true">
+               <div class="modal-dialog modal-lg" role="document">
+                 <div class="modal-content" style="margin-top: 50px !important;">
                    <div class="modal-header bg-info text-light">
-                     <h1 class="modal-title fs-5">Add Packing Stock</h1>
-                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                     <h5 class="modal-title fs-5">Add Packing Stock</h5>
+                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                    </div>
-                   <div class="modal-body">
-                     <form action="" method="post">
-                       <input type="hidden" name="invoice_no" value="<?php echo $_GET['invoice_no']; ?>">
+
+                   <?php
+                   $stockstmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stocktcl WHERE item_id IS NOT NULL AND item_id != ''");
+                   $stockstmt->execute();
+                   $stockdatas = $stockstmt->fetchAll();
+                   $validItems = [];
+                   foreach ($stockdatas as $stockdata) {
+                     $stockproduct = $query->select('products', $stockdata['item_id'], 'id');
+                     if ($stockproduct && !empty($stockproduct['name'])) {
+                       $validItems[] = $stockproduct;
+                     }
+                   }
+                   ?>
+
+                   <select id="truckItemTpl" style="display:none;">
+                     <?php if (!empty($validItems)): ?>
+                       <option value="">Select Item...</option>
+                       <?php foreach ($validItems as $cData): ?>
+                         <option value="<?php echo htmlspecialchars($cData['id']); ?>"><?php echo htmlspecialchars($cData['name']); ?></option>
+                       <?php endforeach; ?>
+                     <?php else: ?>
+                       <option value="">Empty</option>
+                     <?php endif; ?>
+                   </select>
+
+                   <form action="" method="post" id="truckPackingStockForm">
+                     <input type="hidden" name="invoice_no" value="<?php echo htmlspecialchars($_GET['invoice_no'] ?? ''); ?>">
                      <div class="modal-body">
-                       <div class="row">
-                         <div class="col">
-                           <label>Commondity</label>
-                           <select class="form-control inpv2 mb-2" name="item_id">
-                             <?php
-                             $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stocktcl");
-                             $form7commonditystmt->execute();
-                             $form7commonditydatas = $form7commonditystmt->fetchall();
-                             foreach ($form7commonditydatas as $form7commonditydata) {
-                               $item_id = $form7commonditydata['item_id'];
-                               $commonditydata = $query->select('item', $item_id, 'item_id');
-                               ?>
-                               <option value="<?php echo $commonditydata['item_id']; ?>"><?php echo $commonditydata['item_name']; ?></option>
-                               <?php
-                             }
-                             ?>
-                           </select>
-                         </div>
-                         <div class="col">
-                           <label>Size</label>
-                           <input type="text" name="size" class="form-control inpv2 mb-2">
-                         </div>
+                       <?php if (empty($validItems)): ?>
+                         <p class="text-danger small fw-bold mb-2">Nothing On Stock</p>
+                       <?php endif; ?>
+                       <div class="table-responsive">
+                         <table class="table table-bordered table-sm align-middle" id="truckPackingStockTable">
+                           <thead>
+                             <tr>
+                               <th width="30%">Commodity</th>
+                               <th width="15%">Size</th>
+                               <th width="15%">Pcs / Box</th>
+                               <th width="20%">Packing Kg / Box</th>
+                               <th width="15%">MC</th>
+                               <th width="5%" class="text-center">Action</th>
+                             </tr>
+                           </thead>
+                           <tbody id="truck-packing-stock-lines">
+                             <tr>
+                               <td class="p-2">
+                                 <select name="item_id[]" class="form-control form-control-sm chosen-select" <?php if (empty($validItems)) echo 'disabled'; ?>>
+                                   <?php if (!empty($validItems)): ?>
+                                     <option value="">Select Item...</option>
+                                     <?php foreach ($validItems as $cData): ?>
+                                       <option value="<?php echo htmlspecialchars($cData['id']); ?>"><?php echo htmlspecialchars($cData['name']); ?></option>
+                                     <?php endforeach; ?>
+                                   <?php else: ?>
+                                     <option value="">Empty</option>
+                                   <?php endif; ?>
+                                 </select>
+                               </td>
+                               <td class="p-2"><input type="text" name="size[]" class="form-control form-control-sm inpv2" <?php if (empty($validItems)) echo 'disabled'; ?>></td>
+                               <td class="p-2"><input type="number" name="pcsperbox[]" class="form-control form-control-sm inpv2" <?php if (empty($validItems)) echo 'disabled'; ?>></td>
+                               <td class="p-2"><input type="text" name="kgperbox[]" class="form-control form-control-sm inpv2" <?php if (empty($validItems)) echo 'disabled'; ?>></td>
+                               <td class="p-2"><input type="number" name="mc[]" class="form-control form-control-sm inpv2" <?php if (empty($validItems)) echo 'disabled'; ?>></td>
+                               <td class="text-center p-2">
+                                 <button type="button" class="btn btn-outline-danger btn-sm fw-bold border-0" onclick="removeTruckPackingLine(this)">×</button>
+                               </td>
+                             </tr>
+                           </tbody>
+                         </table>
                        </div>
-                       <div class="row">
-                         <div class="col">
-                           <label>Pcs Per Box</label>
-                           <input type="number" name="pcsperbox" class="form-control inpv2 mb-2">
-                         </div>
-                         <div class="col">
-                           <label>Kg Per Box</label>
-                           <input type="text" name="kgperbox" class="form-control inpv2 mb-2">
-                         </div>
-                       </div>
-                       <div class="row">
-                         <div class="col">
-                           <label>Mc</label>
-                           <input type="number" name="mc" class="form-control inpv2 mb-2">
-                         </div>
-                         <div class="col mt-4">
-                           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                           <button type="submit" class="btn btn-success" name="add">Add</button>
-                         </div>
-                       </div>
+                       <button type="button" class="btn btn-outline-info btn-sm fw-bold mt-2" onclick="addTruckPackingLine()" <?php if (empty($validItems)) echo 'disabled'; ?>>+ Add Line</button>
                      </div>
-                   </div>
+                     <div class="modal-footer">
+                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                       <button type="submit" class="btn btn-success" name="add" <?php if (empty($validItems)) echo 'disabled'; ?>>Add Stock</button>
+                     </div>
                    </form>
                  </div>
                </div>
              </div>
+             <script>
+             $(document).ready(function() {
+               if ($.fn.chosen) {
+                 $('#add .chosen-select').chosen({ width: '100%' });
+               }
+             });
+
+             function addTruckPackingLine() {
+               let itemOptions = $('#truckItemTpl').html();
+               let tr = `
+                 <tr>
+                   <td class="p-2">
+                     <select name="item_id[]" class="form-control form-control-sm chosen-select">
+                       ${itemOptions}
+                     </select>
+                   </td>
+                   <td class="p-2"><input type="text" name="size[]" class="form-control form-control-sm inpv2"></td>
+                   <td class="p-2"><input type="number" name="pcsperbox[]" class="form-control form-control-sm inpv2"></td>
+                   <td class="p-2"><input type="text" name="kgperbox[]" class="form-control form-control-sm inpv2"></td>
+                   <td class="p-2"><input type="number" name="mc[]" class="form-control form-control-sm inpv2"></td>
+                   <td class="text-center p-2">
+                     <button type="button" class="btn btn-outline-danger btn-sm fw-bold border-0" onclick="removeTruckPackingLine(this)">×</button>
+                   </td>
+                 </tr>
+               `;
+               let $newRow = $(tr);
+               $('#truck-packing-stock-lines').append($newRow);
+               $newRow.find('.chosen-select').chosen({ width: '100%' });
+             }
+
+             function removeTruckPackingLine(button) {
+               let tbody = $('#truck-packing-stock-lines');
+               if (tbody.find('tr').length > 1) {
+                 let $tr = $(button).closest('tr');
+                 if ($.fn.chosen) {
+                   $tr.find('.chosen-select').chosen('destroy');
+                 }
+                 $tr.remove();
+               } else if (typeof swal === "function") {
+                 swal('Warning!', 'You must keep at least one entry line.', 'warning');
+               } else {
+                 alert('You must keep at least one entry line.');
+               }
+             }
+             </script>
           </div>
         </div>
       </div>

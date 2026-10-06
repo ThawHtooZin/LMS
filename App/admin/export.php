@@ -3036,7 +3036,7 @@ if ($_GET['table_name'] == "purchase") {
     foreach ($purchasedatas as $purchasedata) {
       $idd++;
       $supplierid = $purchasedata['supplier_id'];
-      $supplier_name = $query->select('supplier', $supplierid, 'supplier_id');
+      $supplier_name = $query->select('contacts', $supplierid, 'id');
       $itemid = $purchasedata['commodity'];
       $item_name = selectExportProduct($itemid);
     ?>
@@ -3047,7 +3047,7 @@ if ($_GET['table_name'] == "purchase") {
         <td><?php echo date('d-m-Y', strtotime($purchasedata['date'])); ?></td>
         <td><?php echo $purchasedata['voucher_no']; ?></td>
         <td><?php echo $purchasedata['tclfrozen']; ?></td>
-        <td><?php echo $supplier_name['supplier_name']; ?></td>
+        <td><?php echo $supplier_name['name'] ?? ''; ?></td>
         <td><?php echo $item_name['item_name']; ?></td>
         <td><?php echo $purchasedata['size']; ?></td>
         <td><?php echo $purchasedata['viss']; ?></td>
@@ -3066,7 +3066,7 @@ if ($_GET['table_name'] == "purchase") {
 }
 if ($_GET['table_name'] == "payabledetail") {
   $supplier_id = $_GET['supplier_id'];
-  $supplierstmt = $pdo->prepare("SELECT * FROM supplier WHERE supplier_id='$supplier_id'");
+  $supplierstmt = $pdo->prepare("SELECT id, name AS supplier_name FROM contacts WHERE id='$supplier_id'");
   $supplierstmt->execute();
   $supplier_name = $supplierstmt->fetch(PDO::FETCH_ASSOC);
 

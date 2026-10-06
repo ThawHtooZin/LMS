@@ -192,16 +192,16 @@ $bootstrap->css();
               $supplierdatastmt->execute();
               $supplierdatas = $supplierdatastmt->fetchall();
               foreach ($supplierdatas as $supplierdata) {
-                $supplier_name = $query->select('supplier', $supplierdata['supplier_id'], 'supplier_id');
+                $supplier_name = $query->select('contacts', $supplierdata['supplier_id'], 'id');
               ?>
-                <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo $supplier_name['supplier_name']; ?> - <?= $supplierdata['supplier_id']; ?></option>
+                <option value="<?php echo $supplierdata['supplier_id']; ?>"><?php echo htmlspecialchars($supplier_name['name'] ?? ''); ?></option>
               <?php } ?>
             </select>
             <button type="submit" name="total" class="btn btn-primary btn-sm">Search</button>
             <span>Material:</span>
             <select class="form-control d-inline" name="material_id" style="width:15%;">
               <?php
-              $materialdatas = $query->selectall('materials');
+              $materialdatas = $query->selectall('products');
               foreach ($materialdatas as $materialdata) {
               ?>
                 <option value="<?php echo $materialdata['id']; ?>"><?php echo $materialdata['name']; ?></option>
@@ -255,15 +255,15 @@ $bootstrap->css();
             foreach ($purchasedatas as $purchasedata) {
               $idd++;
               $supplierid = $purchasedata['supplier_id'];
-              $supplier_name = $query->select('supplier', $supplierid, 'supplier_id');
+              $supplier_name = $query->select('contacts', $supplierid, 'id');
               $materialid = $purchasedata['material_id'];
-              $material_name = $query->select('materials', $materialid, 'id');
+              $material_name = $query->select('products', $materialid, 'id');
             ?>
               <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $purchasedata['id'];  ?>" style="cursor: pointer !important;">
                 <td><?php echo $idd; ?></td>
                 <td><?php echo date('d-m-Y', strtotime($purchasedata['date'])); ?></td>
                 <td><?php echo $purchasedata['voucher_no']; ?></td>
-                <td><?php echo $supplier_name['supplier_name'] ?></td>
+                <td><?php echo htmlspecialchars($supplier_name['name'] ?? ''); ?></td>
                 <td><?php echo $material_name['name'] ?></td>
                 <td><?php echo $purchasedata['quantity'] ?></td>
                 <td><?php echo $purchasedata['rate'] ?></td>
@@ -318,7 +318,7 @@ $bootstrap->css();
                               <input type="text" id="addac_code" name="up_supplier_code_no" class="form-control inpv2" value="<?php echo $purchasedata['supplier_id']; ?>">
                             </div>
                             <div style="width: 10%;">
-                              <a href="supplier.php" target="_blank" style="width: 10%; padding: 2.5px; color:black; text-align: center;">
+                              <a href="contacts.php" target="_blank" style="width: 10%; padding: 2.5px; color:black; text-align: center;">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
                                   <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
                                 </svg>
@@ -335,7 +335,7 @@ $bootstrap->css();
                           <label style="font-weight: bold;">Material</label>
                           <select class="form-control inpv2 mb-2" name="up_material">
                             <?php
-                            $materialdatas = $query->selectall('materials');
+                            $materialdatas = $query->selectall('products');
                             foreach ($materialdatas as $materialdata) {
                             ?>
                               <option value="<?php echo $materialdata['id']; ?>" <?php if ($materialdata['id'] == $purchasedata['material_id']) {
@@ -412,9 +412,9 @@ $bootstrap->css();
                   <select name="supplier_code_no" id="addac_code" class="chzn-select form-control" style="width: 100%;" required>
                     <option value="">Select Supplier</option>
                     <?php
-                    $supplier_list = $query->selectall('supplier');
+                    $supplier_list = $pdo->query("SELECT id, name FROM contacts WHERE is_supplier = 1 ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
                     foreach ($supplier_list as $s) {
-                      echo "<option value='" . $s['supplier_id'] . "'>" . $s['supplier_name'] . " - " . $s['supplier_id'] . "</option>";
+                      echo "<option value='" . $s['id'] . "'>" . htmlspecialchars($s['name']) . "</option>";
                     }
                     ?>
                   </select>
@@ -438,7 +438,7 @@ $bootstrap->css();
                   </tr>
                 </thead>
                 <tbody id="material-lines">
-                  <?php $materialdatas = $query->selectall('materials'); ?>
+                  <?php $materialdatas = $query->selectall('products'); ?>
                   <tr>
                     <td>
                       <select class="form-control" name="material[]">
@@ -475,7 +475,7 @@ $bootstrap->css();
           <select name="material[]" class="form-control">
             <option value="">Select Material</option>
             <?php
-            $jsmaterialdatas = $query->selectall('materials');
+            $jsmaterialdatas = $query->selectall('products');
             foreach ($jsmaterialdatas as $materialdata) {
               echo '<option value="' . $materialdata['id'] . '">' . addslashes($materialdata['name']) . '</option>';
             }

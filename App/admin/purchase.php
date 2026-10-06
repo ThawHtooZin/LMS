@@ -47,71 +47,7 @@ $tabs = ['All', 'Draft', 'Awaiting Approval', 'Awaiting Payment', 'Paid', 'Voide
   <meta charset="utf-8">
   <title>Purchases Overview</title>
   <?php $bootstrap->css(); ?>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css">
-  <style>
-    .nav-tabs .nav-link {
-      color: #555;
-      font-weight: bold;
-      border: none;
-      border-bottom: 3px solid transparent;
-      padding: 10px 15px;
-    }
-
-    .nav-tabs .nav-link.active {
-      color: #17a2b8;
-      border-bottom: 3px solid #17a2b8;
-      background: transparent;
-    }
-
-    .nav-tabs .nav-link:hover {
-      border-bottom: 3px solid #ddd;
-    }
-
-    .status-badge {
-      font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-weight: bold;
-    }
-
-    .bg-draft {
-      background-color: #e9ecef;
-      color: #495057;
-      border: 1px solid #ced4da;
-    }
-
-    .bg-awaiting-payment {
-      background-color: #fff3cd;
-      color: #856404;
-      border: 1px solid #ffeeba;
-    }
-
-    .bg-awaiting-approval {
-      background-color: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
-
-    .bg-paid {
-      background-color: #d1ecf1;
-      color: #0c5460;
-      border: 1px solid #bee5eb;
-    }
-
-    .bg-voided {
-      background-color: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
-
-    .clickable-row {
-      cursor: pointer;
-    }
-
-    .clickable-row:hover {
-      background-color: #f8f9fa !important;
-    }
-  </style>
+  <link rel="stylesheet" href="../../Resources/dist/css/account-purchase-sales.css">
 </head>
 
 <body>
@@ -122,15 +58,16 @@ $tabs = ['All', 'Draft', 'Awaiting Approval', 'Awaiting Payment', 'Paid', 'Voide
     <div class="contentcol" id="content">
       <?php require 'navbar.php'; ?>
 
-      <div class="card shadow-sm border-0 mt-3 ms-2 me-2">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="mb-0 text-dark fw-bold">Purchases</h4>
+      <div class="account-page-wrap">
+        <div class="account-panel">
+        <div class="account-panel-body">
+          <div class="account-toolbar">
+            <h1 class="account-page-title">Purchases</h1>
             <a href="newpurchase.php" class="btn btn-success fw-bold">New Purchase</a>
           </div>
 
-          <div class="d-flex justify-content-between align-items-end mb-3 border-bottom">
-            <ul class="nav nav-tabs border-bottom-0">
+          <div class="account-toolbar-tabs">
+            <ul class="nav nav-tabs account-tabs border-bottom-0">
               <?php foreach ($tabs as $t): ?>
                 <li class="nav-item">
                   <a class="nav-link <?php echo $tab === $t ? 'active' : ''; ?>" href="?tab=<?php echo urlencode($t); ?>&search=<?php echo urlencode($search); ?>"><?php echo $t; ?></a>
@@ -138,16 +75,15 @@ $tabs = ['All', 'Draft', 'Awaiting Approval', 'Awaiting Payment', 'Paid', 'Voide
               <?php endforeach; ?>
             </ul>
 
-            <form method="GET" class="d-flex pb-2">
+            <form method="GET" class="account-search-form">
               <input type="hidden" name="tab" value="<?php echo htmlspecialchars($tab); ?>">
-              <input type="text" name="search" class="form-control form-control-sm me-2" placeholder="Search..." value="<?php echo htmlspecialchars($search); ?>" style="width: 250px;">
+              <input type="text" name="search" class="form-control form-control-sm me-2" placeholder="Search supplier or voucher..." value="<?php echo htmlspecialchars($search); ?>">
               <button type="submit" class="btn btn-secondary btn-sm fw-bold">Search</button>
             </form>
           </div>
 
-          <!-- Data Table -->
-          <table class="table table-striped align-middle border">
-            <thead class="table-light">
+          <table class="table table-striped align-middle border account-table">
+            <thead>
               <tr>
                 <th>Suppliers Name</th>
                 <th>Status</th>
@@ -189,6 +125,7 @@ $tabs = ['All', 'Draft', 'Awaiting Approval', 'Awaiting Payment', 'Paid', 'Voide
             </tbody>
           </table>
 
+        </div>
         </div>
       </div>
     </div>
