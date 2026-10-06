@@ -12,7 +12,7 @@ $query = new Query();
 // Handle Form 10 Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add'])) {
     $date        = $_POST['date'] ?? '';
-    $supplier_id = $_POST['supplier_id'] ?? '';
+    $contact_id = $_POST['contact_id'] ?? $_POST['supplier_id'] ?? '';
     $country     = $_POST['country'] ?? '';
     $type        = $_POST['type'] ?? 'frozen';
 
@@ -28,7 +28,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add'])) {
     $loose_out_pcss = $_POST['loose_out_pcs'] ?? [];
 
     $saved_count = 0;
+    $save_error = null;
 
+    try {
     foreach ($item_ids as $index => $item_id) {
         $item_id = trim($item_id);
         if (empty($item_id)) {
@@ -50,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add'])) {
             $date,
             $item_id,
             $fish_type,
-            $supplier_id,
+            $contact_id,
             $country,
             $type,
             $size,
@@ -64,10 +66,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add'])) {
         );
         $saved_count++;
     }
+    } catch (InvalidArgumentException $e) {
+        $save_error = $e->getMessage();
+    }
 
-    if ($saved_count > 0) {
+    if ($save_error !== null) {
+        $saveResult = [
+            'status'  => false,
+            'title'   => 'Validation Error',
+            'message' => $save_error,
+        ];
+    } elseif ($saved_count > 0) {
         $_SESSION['date']        = $date;
-        $_SESSION['supplier_id'] = $supplier_id;
+        $_SESSION['contact_id'] = $contact_id;
         $_SESSION['country']     = $country;
 
         $saveResult = [
@@ -87,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add'])) {
 }
 
 // Fetch suppliers & commodities
-$suppliers = $pdo->query("SELECT id, name FROM contacts WHERE is_supplier = 1 OR is_supplier = 0 ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
+$suppliers = $pdo->query("SELECT id, name FROM contacts WHERE is_supplier = 1 ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
 $prodFilterStmt = $pdo->query("SELECT id, name FROM products ORDER BY name ASC");
 $prodFilterDatas = $prodFilterStmt ? $prodFilterStmt->fetchAll(PDO::FETCH_ASSOC) : [];
 ?>
@@ -203,10 +214,10 @@ $prodFilterDatas = $prodFilterStmt ? $prodFilterStmt->fetchAll(PDO::FETCH_ASSOC)
                         </div>
                         <div class="col-md-3">
                             <label class="fw-bold small mb-1">Supplier</label><br>
-                            <select name="supplier_id" class="form-control chosen-select req-input" data-placeholder="Select Supplier">
+                            <select name="contact_id" class="form-control chosen-select req-input" data-placeholder="Select Supplier">
                                 <option value=""></option>
                                 <?php foreach ($suppliers as $sup): ?>
-                                    <option value="<?php echo $sup['id']; ?>" <?php echo (!empty($_SESSION['supplier_id']) && $_SESSION['supplier_id'] == $sup['id']) ? 'selected' : ''; ?>>
+                                    <option value="<?php echo $sup['id']; ?>" <?php echo (!empty($_SESSION['contact_id']) && $_SESSION['contact_id'] == $sup['id']) ? 'selected' : ''; ?>>
                                         <?php echo htmlspecialchars($sup['name']); ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -364,7 +375,7 @@ $prodFilterDatas = $prodFilterStmt ? $prodFilterStmt->fetchAll(PDO::FETCH_ASSOC)
             let isValid = true;
             $('.error-border').removeClass('error-border');
 
-            let supplier = $('select[name="supplier_id"]');
+            let supplier = $('select[name="contact_id"]');
             if (!supplier.val()) {
                 supplier.next('.chosen-container').addClass('error-border');
                 isValid = false;

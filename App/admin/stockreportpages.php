@@ -1,18 +1,20 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
     <?php
-        if(!empty($_SESSION) && !empty($_SESSION['stockreporttype'])){
+        $stockReportType = $stockReportType ?? ($_SESSION['stockreporttype'] ?? null);
+        $reportFormAction = 'mainstockreport.php?type=' . urlencode((string)$stockReportType);
+
+        if (!empty($stockReportType)) {
+            if ($stockReportType === 'mcreport') {
+                ?>
+                <p class="mb-3">View HHK / GFC MC stock by country, fish type, and commodity.</p>
+                <a href="stockreport.php" class="btn btn-primary">Open Mc Report</a>
+                <?php
+            }
             // ================================================
             // HHK Loose Report
-            if($_SESSION['stockreporttype'] == 'hhkloosereport'){
+            if($stockReportType == 'hhkloosereport'){
                 ?>
-                <form method="post" style="width: 450px; display: inline-flex;">
-                    <div class="col-5 me-2">
+                <form method="post" action="<?= htmlspecialchars($reportFormAction); ?>" class="row g-2 align-items-end stock-report-filter mb-3">
+                    <div class="col-md-5">
                         <select name="hhkcommondityinput" class="form-control inpv2">
                             <option value="">Select Commondity</option>
                             <?php
@@ -29,14 +31,14 @@
                             ?>
                         </select>
                     </div>
-                    <div class="col-5 me-1">
+                    <div class="col-md-5">
                         <select name="hhkinoutinput" class="form-control inpv2">
                             <option value="">Select Loose In Or Out</option>
                             <option value="loosein">Loose In</option>
                             <option value="looseout">Loose Out</option>
                         </select>
                     </div>
-                    <div class="col-2">
+                    <div class="col-md-auto">
                         <button class="btn btn-success" type="submit" name="chooseinorout">Select</button>
                     </div>
                 </form>
@@ -59,15 +61,16 @@
                     if (isset($_POST['chooseinorout'])) {
                         if($_POST['hhkinoutinput'] == 'loosein'){
                             ?>
-                                <table class="table table-striped table-hover" style="margin-top: 13px;">
-                                    <tr>
+                                <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-hover stock-report-table w-100 mb-0">
+                                    <thead><tr>
                                         <th>No</th>
                                         <th>Commondity</th>
                                         <th>Country</th>
                                         <th>Size</th>
-                                        <th>Kg</th>
-                                        <th>Pcs</th>
-                                    </tr>
+                                        <th class="text-end">Kg</th>
+                                        <th class="text-end">Pcs</th>
+                                    </tr></thead><tbody>
                                     <?php
                                     if(empty($_POST['hhkcommondityinput'])){
                                         $looseinstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE loosein_size!=''AND loosein_kg!=''AND loosein_pcs!='0'");
@@ -94,7 +97,8 @@
                                     <?php                                    
                                     }
                                     ?>
-                                </table>
+                                </tbody></table>
+                                </div>
                             <?php
                         }
                     }
@@ -103,15 +107,16 @@
                     if (isset($_POST['chooseinorout'])) {
                         if($_POST['hhkinoutinput'] == 'looseout'){
                             ?>
-                                <table class="table table-striped table-hover" style="margin-top: 13px;">
-                                    <tr>
+                                <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-hover stock-report-table w-100 mb-0">
+                                    <thead><tr>
                                         <th>No</th>
                                         <th>Commondity</th>
                                         <th>Country</th>
                                         <th>Size</th>
-                                        <th>Kg</th>
-                                        <th>Pcs</th>
-                                    </tr>
+                                        <th class="text-end">Kg</th>
+                                        <th class="text-end">Pcs</th>
+                                    </tr></thead><tbody>
                                     <?php
                                     if(empty($_POST['hhkcommondityinput'])){
                                         $looseoutstmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE looseout_size!=''AND looseout_kg!=''AND looseout_pcs!='0'");
@@ -138,7 +143,8 @@
                                     <?php                                    
                                     }
                                     ?>
-                                </table>
+                                </tbody></table>
+                                </div>
                             <?php
                         }
                     }
@@ -148,10 +154,10 @@
             }
             // ==================================================================
             // HHK KG REPORT
-            if($_SESSION['stockreporttype'] == 'hhkkgreport'){
+            if($stockReportType == 'hhkkgreport'){
                 ?>
-                <form method="post" style="width: 450px; display: inline-flex;">
-                    <div class="col-10 me-2">
+                <form method="post" action="<?= htmlspecialchars($reportFormAction); ?>" class="row g-2 align-items-end stock-report-filter mb-3">
+                    <div class="col-md-10">
                         <select name="hhkkgcommondityinput" class="form-control inpv2">
                             <option value="">Select Commondity</option>
                             <?php
@@ -168,122 +174,85 @@
                             ?>
                         </select>
                     </div>
-                    <div class="col-2">
+                    <div class="col-md-auto">
                         <button class="btn btn-success" type="submit" name="choosekgcommondity">Select</button>
                     </div>
                 </form>
-                <?php
-                    if (isset($_POST['choosekgcommondity'])) {
-                        // if($_POST['hhkinoutinput'] == 'loosein'){
-                        //     ?>
-                                 <!-- <h4 class="float-end">HHK Loose In</h4> -->
-                             <?php
-                        // }
-                        
-                    }
-                ?>
-                <div class="content">
-                    <?php
-                            ?>
-                                <table class="table table-striped table-hover" style="margin-top: 13px;">
-                                    <tr>
+                <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-hover stock-report-table w-100 mb-0">
+                                    <thead><tr>
                                         <th>No</th>
                                         <th>Commondity</th>
                                         <th>Country</th>
                                         <th>Size</th>
-                                        <th>Kg</th>
-                                        <th>Mc</th>
-                                    </tr>
+                                        <th class="text-end">Kg</th>
+                                        <th class="text-end">Mc</th>
+                                    </tr></thead>
+                                    <tbody>
                                     <?php
-                                    if(isset($_POST['choosekgcommondity'])){
+                                    if(isset($_POST['choosekgcommondity']) && $_POST['hhkkgcommondityinput'] !== ''){
                                         $searchcommondity = $_POST['hhkkgcommondityinput'];
                                         $stmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE commondity_id='$searchcommondity' GROUP BY commondity_id,size");
                                     }else{
                                         $stmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE particular LIKE '%from%' GROUP BY commondity_id,size");
                                     }
-                                    $totalkg = 0;
+                                    $sumDisplayKg = 0;
+                                    $sumDisplayMc = 0;
                                     $stmt->execute();
                                     $datas = $stmt->fetchall();
                                     $hhkkgno = 0;
                                     foreach ($datas as $hhkstockdata) {
-                                        $hhkkgno++;
                                         $item_id = $hhkstockdata['commondity_id'];
                                         $commonditydata = $query->select('products', $item_id, 'id');
                                         $size = $hhkstockdata['size'];
-                                        $kg = $hhkstockdata['kg'];
                                         $commondity_id = $hhkstockdata['commondity_id'];
-                                        $sizestmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE size='$size' ORDER BY id DESC");
-                                        $sizestmt->execute();
-                                        $sizedata = $sizestmt->fetch(PDO::FETCH_ASSOC);
                                         $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND commondity_id='$commondity_id' AND particular NOT LIKE '%to%'");
                                         $totalmcstmt->execute();
                                         $totalmcnotsub = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
                                         $totalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND commondity_id='$commondity_id' AND particular LIKE '%to%'");
                                         $totalmcsubnumstmt->execute();
                                         $totalmcsubnum = $totalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
-                                        $totalmc = $totalmcnotsub['total_mc'] - $totalmcsubnum['total_mc'];
-                                        if($totalmc != 0){
-                                            $totalkg = $totalkg + $hhkstockdata['kg'];
+                                        $rowMc = (float)$totalmcnotsub['total_mc'] - (float)$totalmcsubnum['total_mc'];
+                                        if ($rowMc == 0) {
+                                            continue;
                                         }
+                                        $hhkkgno++;
+                                        $sumDisplayKg += (float)$hhkstockdata['kg'];
+                                        $sumDisplayMc += $rowMc;
                                     ?>
-                                    <tr style="<?php if($totalmc == '0'){ echo 'display:none;'; } ?>">
+                                    <tr>
                                         <td><?= $hhkkgno; ?></td>
-                                        <td><?php echo $commonditydata['name']; ?></td>
-                                        <td><?php echo $hhkstockdata['country']; ?></td>
-                                        <td><?php echo $hhkstockdata['size']; ?></td>
-                                        <td><?php echo $hhkstockdata['kg']; ?></td>
-                                        <td><?php echo $totalmc; ?></td>
+                                        <td><?php echo htmlspecialchars($commonditydata['name'] ?? ''); ?></td>
+                                        <td><?php echo htmlspecialchars($hhkstockdata['country']); ?></td>
+                                        <td><?php echo htmlspecialchars($hhkstockdata['size']); ?></td>
+                                        <td class="text-end"><?php echo htmlspecialchars((string)$hhkstockdata['kg']); ?></td>
+                                        <td class="text-end"><?php echo $rowMc; ?></td>
                                     </tr>
                                     <?php
                                     }
-                                    if(isset($_POST['choosekgcommondity'])){              
-                                        $totalmctostmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE particular LIKE '%to%' AND commondity_id='$searchcommondity'");
-                                        $totalmctostmt->execute();
-                                        $totalmcto = $totalmctostmt->fetch(PDO::FETCH_ASSOC);
-                                        $totalmcfromstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE particular LIKE '%from%' AND commondity_id='$searchcommondity'");
-                                        $totalmcfromstmt->execute();
-                                        $totalmcfrom = $totalmcfromstmt->fetch(PDO::FETCH_ASSOC);
-                                        
-                                        $totalmc = $totalmcfrom['total_mc'] - $totalmcto['total_mc'];
-                                        
-                                    }else{
-                                        $totalkgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM hhkmcstock WHERE particular LIKE '%to%' AND mc!='0'");
-                                        $totalkgstmt->execute();
-                                        $totalkg = $totalkgstmt->fetch(PDO::FETCH_ASSOC);
-    
-                                        $totalkg = $totalkg['total_kg'];
-    
-                                        $totalmctostmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE particular LIKE '%to%'");
-                                        $totalmctostmt->execute();
-                                        $totalmcto = $totalmctostmt->fetch(PDO::FETCH_ASSOC);
-                                        $totalmcfromstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE particular LIKE '%from%'");
-                                        $totalmcfromstmt->execute();
-                                        $totalmcfrom = $totalmcfromstmt->fetch(PDO::FETCH_ASSOC);
-    
-                                        $totalmc = $totalmcfrom['total_mc'] - $totalmcto['total_mc'];
-                                    }
                                     ?>
-                                    <tr style="font-weight:bold;">
-                                        <td colspan="4">Total:</td>
-                                        <td><?php if(str_contains('-', $totalkg)){ echo '0'; }else{ echo $totalkg; }; ?></td>
-                                        <td><?php if(str_contains('-', $totalmc)){ echo '0'; }else{ echo $totalmc; }; ?></td>
+                                    </tbody>
+                                    <tfoot>
+                                    <tr>
+                                        <td colspan="4" class="text-end">Total:</td>
+                                        <td class="text-end"><?= $sumDisplayKg; ?></td>
+                                        <td class="text-end"><?= $sumDisplayMc; ?></td>
                                     </tr>
+                                    </tfoot>
                                 </table>
-                            <?php
-                    ?>
                 </div>
                 <?php
             }
             // ================================================
             // GFC Loose Report
-            if($_SESSION['stockreporttype'] == 'gfcloosereport'){
+            if($stockReportType == 'gfcloosereport'){
                 ?>
-                <form method="post" style="width: 450px; display: inline-flex;">
-                    <div class="col-5 me-2">
+                <form method="post" action="<?= htmlspecialchars($reportFormAction); ?>" class="row g-2 align-items-end stock-report-filter mb-3">
+                    <div class="col-md-5">
                         <select name="gfccommondityinput" class="form-control inpv2">
                             <option value="">Select Commondity</option>
                             <?php
-                                $gfcmcstockcommonditystmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE loosein_size!='' OR loosein_kg!='' OR loosein_pcs!='0' OR looseout_size!='' AND looseout_kg!='' OR looseout_pcs!='0' GROUP BY commondity_id");
+                                $gfcmcstockcommonditystmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE loosein_size!='' OR loosein_kg!='' OR loosein_pcs!='0' OR looseout_size!='' AND looseout_kg!='' OR looseout_pcs!='0' GROUP BY commondity_id");
                                 $gfcmcstockcommonditystmt->execute();
                                 $gfcmcstockcommonditydatas = $gfcmcstockcommonditystmt->fetchAll();
                                 foreach($gfcmcstockcommonditydatas as $gfcmcstockcommonditydata){
@@ -296,14 +265,14 @@
                             ?>
                         </select>
                     </div>
-                    <div class="col-5 me-1">
+                    <div class="col-md-5">
                         <select name="gfcinoutinput" class="form-control inpv2">
                             <option value="">Select Loose In Or Out</option>
                             <option value="loosein">Loose In</option>
                             <option value="looseout">Loose Out</option>
                         </select>
                     </div>
-                    <div class="col-2">
+                    <div class="col-md-auto">
                         <button class="btn btn-success" type="submit" name="chooseinorout">Select</button>
                     </div>
                 </form>
@@ -311,12 +280,12 @@
                     if (isset($_POST['chooseinorout'])) {
                         if($_POST['gfcinoutinput'] == 'loosein'){
                             ?>
-                                <h4 class="float-end">GFC Loose In</h4>
+                                <h5 class="mb-2">GFC Loose In</h5>
                             <?php
                         }
                         if($_POST['gfcinoutinput'] == 'looseout'){
                             ?>
-                                <h4 class="float-end">GFC Loose Out</h4>
+                                <h5 class="mb-2">GFC Loose Out</h5>
                             <?php
                         }
                     }
@@ -326,15 +295,16 @@
                     if (isset($_POST['chooseinorout'])) {
                         if($_POST['gfcinoutinput'] == 'loosein'){
                             ?>
-                                <table class="table table-striped table-hover" style="margin-top: 13px;">
-                                    <tr>
+                                <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-hover stock-report-table w-100 mb-0">
+                                    <thead><tr>
                                         <th>No</th>
                                         <th>Commondity</th>
                                         <th>Country</th>
                                         <th>Size</th>
-                                        <th>Kg</th>
-                                        <th>Pcs</th>
-                                    </tr>
+                                        <th class="text-end">Kg</th>
+                                        <th class="text-end">Pcs</th>
+                                    </tr></thead><tbody>
                                     <?php
                                     if(empty($_POST['gfccommondityinput'])){
                                         $looseinstmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE loosein_size!=''AND loosein_kg!=''AND loosein_pcs!='0'");
@@ -361,7 +331,8 @@
                                     <?php                                    
                                     }
                                     ?>
-                                </table>
+                                </tbody></table>
+                                </div>
                             <?php
                         }
                     }
@@ -370,15 +341,16 @@
                     if (isset($_POST['chooseinorout'])) {
                         if($_POST['gfcinoutinput'] == 'looseout'){
                             ?>
-                                <table class="table table-striped table-hover" style="margin-top: 13px;">
-                                    <tr>
+                                <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-hover stock-report-table w-100 mb-0">
+                                    <thead><tr>
                                         <th>No</th>
                                         <th>Commondity</th>
                                         <th>Country</th>
                                         <th>Size</th>
-                                        <th>Kg</th>
-                                        <th>Pcs</th>
-                                    </tr>
+                                        <th class="text-end">Kg</th>
+                                        <th class="text-end">Pcs</th>
+                                    </tr></thead><tbody>
                                     <?php
                                     if(empty($_POST['gfccommondityinput'])){
                                         $looseoutstmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE looseout_size!=''AND looseout_kg!=''AND looseout_pcs!='0'");
@@ -405,7 +377,8 @@
                                     <?php                                    
                                     }
                                     ?>
-                                </table>
+                                </tbody></table>
+                                </div>
                             <?php
                         }
                     }
@@ -415,10 +388,10 @@
             }
             // ==================================================================
             // gfc KG REPORT
-            if($_SESSION['stockreporttype'] == 'gfckgreport'){
+            if($stockReportType == 'gfckgreport'){
                 ?>
-                <form method="post" style="width: 450px; display: inline-flex;">
-                    <div class="col-10 me-2">
+                <form method="post" action="<?= htmlspecialchars($reportFormAction); ?>" class="row g-2 align-items-end stock-report-filter mb-3">
+                    <div class="col-md-10">
                         <select name="gfckgcommondityinput" class="form-control inpv2">
                             <option value="">Select Commondity</option>
                             <?php
@@ -435,119 +408,76 @@
                             ?>
                         </select>
                     </div>
-                    <div class="col-2">
+                    <div class="col-md-auto">
                         <button class="btn btn-success" type="submit" name="choosekgcommondity">Select</button>
                     </div>
                 </form>
-                <?php
-                    if (isset($_POST['choosekgcommondity'])) {
-                        // if($_POST['gfcinoutinput'] == 'loosein'){
-                        //     ?>
-                                 <!-- <h4 class="float-end">gfc Loose In</h4> -->
-                             <?php
-                        // }
-                        
-                    }
-                ?>
-                <div class="content">
-                    <?php
-                            ?>
-                                <table class="table table-striped table-hover" style="margin-top: 13px;">
-                                    <tr>
+                <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-hover stock-report-table w-100 mb-0">
+                                    <thead><tr>
                                         <th>No</th>
                                         <th>Commondity</th>
                                         <th>Country</th>
                                         <th>Size</th>
-                                        <th>Kg</th>
-                                        <th>Mc</th>
-                                    </tr>
+                                        <th class="text-end">Kg</th>
+                                        <th class="text-end">Mc</th>
+                                    </tr></thead>
+                                    <tbody>
                                     <?php
-                                    if(isset($_POST['choosekgcommondity'])){
+                                    if(isset($_POST['choosekgcommondity']) && $_POST['gfckgcommondityinput'] !== ''){
                                         $searchcommondity = $_POST['gfckgcommondityinput'];
                                         $stmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE commondity_id='$searchcommondity' GROUP BY commondity_id,size");
                                     }else{
                                         $stmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE particular LIKE '%to%' GROUP BY commondity_id,size");
-                                    }   
-                                    $totalkg = 0;
+                                    }
+                                    $sumDisplayKg = 0;
+                                    $sumDisplayMc = 0;
                                     $stmt->execute();
                                     $datas = $stmt->fetchall();
                                     $gfckgno = 0;
                                     foreach ($datas as $gfcstockdata) {
-                                        $gfckgno++;
                                         $item_id = $gfcstockdata['commondity_id'];
                                         $commonditydata = $query->select('products', $item_id, 'id');
                                         $size = $gfcstockdata['size'];
-                                        $kg = $gfcstockdata['kg'];
                                         $commondity_id = $gfcstockdata['commondity_id'];
-                                        $sizestmt = $pdo->prepare("SELECT * FROM gfcmcstock WHERE size='$size' ORDER BY id DESC");
-                                        $sizestmt->execute();
-                                        $sizedata = $sizestmt->fetch(PDO::FETCH_ASSOC);
                                         $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND commondity_id='$commondity_id' AND particular='HHK to GFC'");
                                         $totalmcstmt->execute();
                                         $totalmcnotsub = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
                                         $totalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE size='$size' AND commondity_id='$commondity_id' AND particular!='HHK to GFC'");
                                         $totalmcsubnumstmt->execute();
                                         $totalmcsubnum = $totalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
-                                        $totalmc = $totalmcnotsub['total_mc'] - $totalmcsubnum['total_mc'];
-                                        if($totalmc != 0){
-                                            $totalkg = $totalkg + $gfcstockdata['kg'];
+                                        $rowMc = (float)$totalmcnotsub['total_mc'] - (float)$totalmcsubnum['total_mc'];
+                                        if ($rowMc == 0) {
+                                            continue;
                                         }
+                                        $gfckgno++;
+                                        $sumDisplayKg += (float)$gfcstockdata['kg'];
+                                        $sumDisplayMc += $rowMc;
                                     ?>
-                                    <tr style="<?php if($totalmc == '0'){ echo 'display:none;'; } ?>">
+                                    <tr>
                                         <td><?= $gfckgno; ?></td>
-                                        <td><?php echo $commonditydata['name']; ?></td>
-                                        <td><?php echo $gfcstockdata['country']; ?></td>
-                                        <td><?php echo $gfcstockdata['size']; ?></td>
-                                        <td><?php echo $gfcstockdata['kg']; ?></td>
-                                        <td><?php echo $totalmc; ?></td>
+                                        <td><?php echo htmlspecialchars($commonditydata['name'] ?? ''); ?></td>
+                                        <td><?php echo htmlspecialchars($gfcstockdata['country']); ?></td>
+                                        <td><?php echo htmlspecialchars($gfcstockdata['size']); ?></td>
+                                        <td class="text-end"><?php echo htmlspecialchars((string)$gfcstockdata['kg']); ?></td>
+                                        <td class="text-end"><?php echo $rowMc; ?></td>
                                     </tr>
                                     <?php
                                     }
-                                    if(isset($_POST['choosekgcommondity'])){
-                                        $totalmctostmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE particular LIKE '%ship%' AND commondity_id='$searchcommondity'");
-                                        $totalmctostmt->execute();
-                                        $totalmcto = $totalmctostmt->fetch(PDO::FETCH_ASSOC);
-                                        $totalmcfromstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE particular LIKE '%to%' AND commondity_id='$searchcommondity'");
-                                        $totalmcfromstmt->execute();
-                                        $totalmcfrom = $totalmcfromstmt->fetch(PDO::FETCH_ASSOC);
-    
-                                        $totalmc = $totalmcfrom['total_mc'] - $totalmcto['total_mc'];
-                                    }else{
-                                        $totalkgfromstmt = $pdo->prepare("SELECT kg FROM gfcmcstock WHERE particular LIKE '%to%' AND mc!='0' GROUP BY commondity_id,size");
-                                        $totalkgfromstmt->execute();
-                                        $totalkgdatas = $totalkgfromstmt->fetchALL();
-
-                                        foreach($totalkgdatas as $totalkgdata){
-                                            $totalkgdata = floatval($totalkgdata) + floatval($totalkgdata['kg']);
-                                        }
-                                        // echo "<pre>";
-                                        // print_r($totalkgfrom);
-                                        // echo "<br>";
-                                        // print_r($totalkgto);
-                                        // exit();
-    
-                                        $totalmctostmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE particular LIKE '%ship%'");
-                                        $totalmctostmt->execute();
-                                        $totalmcto = $totalmctostmt->fetch(PDO::FETCH_ASSOC);
-                                        $totalmcfromstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM gfcmcstock WHERE particular LIKE '%to%'");
-                                        $totalmcfromstmt->execute();
-                                        $totalmcfrom = $totalmcfromstmt->fetch(PDO::FETCH_ASSOC);
-    
-                                        $totalmc = $totalmcfrom['total_mc'] - $totalmcto['total_mc'];
-                                    }
                                     ?>
-                                    <tr style="font-weight:bold;">
-                                        <td colspan="4">Total:</td>
-                                        <td><?php if(str_contains('-', $totalkg)){ echo '0'; }else{ echo $totalkg; }; ?></td>
-                                        <td><?php if(str_contains('-', $totalmc)){ echo '0'; }else{ echo $totalmc; }; ?></td>
+                                    </tbody>
+                                    <tfoot>
+                                    <tr>
+                                        <td colspan="4" class="text-end">Total:</td>
+                                        <td class="text-end"><?= $sumDisplayKg; ?></td>
+                                        <td class="text-end"><?= $sumDisplayMc; ?></td>
                                     </tr>
+                                    </tfoot>
                                 </table>
-                            <?php
-                    ?>
                 </div>
                 <?php
             }
+        } else {
+            echo '<p class="text-muted mb-0">Unknown or missing report type. Use Back and choose a report from the menu.</p>';
         }
     ?>
-</body>
-</html>

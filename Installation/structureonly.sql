@@ -279,13 +279,13 @@ CREATE TABLE `form7stock` (
   `country` varchar(155) DEFAULT NULL,
   `type` varchar(255) NOT NULL,
   `size` varchar(11) NOT NULL,
-  `viss` varchar(11) NOT NULL,
-  `kg` varchar(15) NOT NULL,
-  `pcspervr` varchar(15) NOT NULL,
-  `pcsperf7` int(11) NOT NULL,
-  `link_id` int(11) NOT NULL,
-  `water_kg` int(11) NOT NULL,
-  `fish_type` varchar(255) NOT NULL
+  `viss` varchar(11) DEFAULT NULL,
+  `kg` varchar(15) DEFAULT NULL,
+  `pcspervr` varchar(15) DEFAULT NULL,
+  `pcsperf7` int(11) DEFAULT NULL,
+  `link_id` int(11) DEFAULT NULL,
+  `water_kg` int(11) DEFAULT NULL,
+  `fish_type` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -296,17 +296,17 @@ CREATE TABLE `form7stock` (
 
 CREATE TABLE `form7stocktcl` (
   `id` int(11) NOT NULL,
-  `date` date NOT NULL,
+  `date` date DEFAULT NULL,
   `item_id` varchar(11) NOT NULL,
   `supplier_name` varchar(255) NOT NULL,
   `country` varchar(155) DEFAULT NULL,
   `type` varchar(255) NOT NULL,
   `size` varchar(11) NOT NULL,
-  `viss` varchar(11) NOT NULL,
-  `kg` varchar(15) NOT NULL,
-  `pcspervr` varchar(15) NOT NULL,
-  `pcsperf7` int(11) NOT NULL,
-  `link_id` int(11) NOT NULL
+  `viss` varchar(11) DEFAULT NULL,
+  `kg` varchar(15) DEFAULT NULL,
+  `pcspervr` varchar(15) DEFAULT NULL,
+  `pcsperf7` int(11) DEFAULT NULL,
+  `link_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -319,21 +319,22 @@ CREATE TABLE `form10stock` (
   `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `item_id` varchar(11) NOT NULL,
-  `supplier_id` varchar(20) NOT NULL,
+  `contact_id` int(11) DEFAULT NULL,
+  `supplier_id` varchar(20) DEFAULT NULL,
   `country` varchar(11) NOT NULL,
   `type` varchar(255) NOT NULL,
   `size` varchar(11) NOT NULL,
-  `pcsform10` int(11) NOT NULL,
-  `mc` int(11) NOT NULL,
-  `kg` varchar(11) NOT NULL,
-  `pcs` int(11) NOT NULL,
-  `looseinkg` varchar(11) NOT NULL,
-  `looseinpcs` int(11) NOT NULL,
-  `looseoutkg` varchar(11) NOT NULL,
-  `looseoutpcs` int(11) NOT NULL,
-  `total_kg` varchar(11) NOT NULL,
-  `percentage` varchar(11) NOT NULL,
-  `fish_type` varchar(255) NOT NULL
+  `pcsform10` int(11) DEFAULT NULL,
+  `mc` int(11) DEFAULT NULL,
+  `kg` varchar(11) DEFAULT NULL,
+  `pcs` int(11) DEFAULT NULL,
+  `looseinkg` varchar(11) DEFAULT NULL,
+  `looseinpcs` int(11) DEFAULT NULL,
+  `looseoutkg` varchar(11) DEFAULT NULL,
+  `looseoutpcs` int(11) DEFAULT NULL,
+  `total_kg` varchar(11) DEFAULT NULL,
+  `percentage` varchar(11) DEFAULT NULL,
+  `fish_type` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -346,18 +347,19 @@ CREATE TABLE `form10stocktcl` (
   `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `item_id` varchar(11) NOT NULL,
-  `supplier_id` varchar(20) NOT NULL,
+  `contact_id` int(11) DEFAULT NULL,
+  `supplier_id` varchar(20) DEFAULT NULL,
   `country` varchar(11) NOT NULL,
   `type` varchar(255) NOT NULL,
   `size` varchar(11) NOT NULL,
-  `pcsform10` int(11) NOT NULL,
-  `mc` int(11) NOT NULL,
-  `kg` varchar(11) NOT NULL,
-  `pcs` int(11) NOT NULL,
-  `looseinkg` varchar(11) NOT NULL,
-  `looseinpcs` int(11) NOT NULL,
-  `looseoutkg` varchar(11) NOT NULL,
-  `looseoutpcs` int(11) NOT NULL,
+  `pcsform10` int(11) DEFAULT NULL,
+  `mc` int(11) DEFAULT NULL,
+  `kg` varchar(11) DEFAULT NULL,
+  `pcs` int(11) DEFAULT NULL,
+  `looseinkg` varchar(11) DEFAULT NULL,
+  `looseinpcs` int(11) DEFAULT NULL,
+  `looseoutkg` varchar(11) DEFAULT NULL,
+  `looseoutpcs` int(11) DEFAULT NULL,
   `cc_pcs` int(11) DEFAULT NULL,
   `cc_kg` float DEFAULT NULL,
   `msl_pcs` int(11) DEFAULT NULL,
@@ -1123,15 +1125,11 @@ CREATE TABLE `tclmcstock` (
   `date` date NOT NULL,
   `item_id` varchar(9) NOT NULL,
   `size` varchar(9) NOT NULL,
-  `pcs` int(9) NOT NULL,
-  `kg` float NOT NULL,
-  `opening_mc` int(11) NOT NULL,
-  `form10mc` int(11) NOT NULL,
-  `transfer_to_where` varchar(11) NOT NULL,
-  `transfer_mc` int(11) NOT NULL,
-  `loading_no` text NOT NULL,
-  `loading_mc` int(11) NOT NULL,
-  `grandtotal_mc` bigint(77) NOT NULL
+  `pcs` int(9) DEFAULT NULL,
+  `kg` float DEFAULT NULL,
+  `opening_mc` int(11) DEFAULT NULL,
+  `form10mc` int(11) DEFAULT NULL,
+  `grandtotal_mc` bigint(77) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------

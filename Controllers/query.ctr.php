@@ -869,7 +869,7 @@ class Query
               $formstmt->execute([$date, $prod_id, $supplier_name, $line['size'], $line['viss'], $kg, $pcs, $link_id]);
             }
           } elseif ($lowerType === 'material') {
-            $storehousestmt = $pdo->prepare("INSERT INTO material_store_house (date, voucher_no, supplier_id, material_id, in_quantity, description, action) VALUES (?, ?, ?, ?, ?, ?, 'Purchase')");
+            $storehousestmt = $pdo->prepare("INSERT INTO material_store_house (date, voucher_no, contact_id, material_id, in_quantity, description, action) VALUES (?, ?, ?, ?, ?, ?, 'Purchase')");
             $storehousestmt->execute([$date, $voucher_no, $contact_id, $prod_id, $pcs, $line['description']]);
           }
 
@@ -1235,7 +1235,7 @@ class Query
   {
     global $pdo;
     try {
-      $dupStmt = $pdo->prepare("SELECT COUNT(*) FROM sales WHERE voucher_no = ?");
+      $dupStmt = $pdo->prepare("SELECT COUNT(*) FROM sales WHERE sr_no = ?");
       $dupStmt->execute([$voucher_no]);
       if ($dupStmt->fetchColumn() > 0) {
         return ['status' => false, 'title' => 'Duplicate Invoice!', 'message' => 'The invoice reference number already exists.'];
@@ -1257,7 +1257,7 @@ class Query
       $custStmt->execute([$contact_id]);
       $customer_name = $custStmt->fetchColumn();
 
-      $stmt = $pdo->prepare("INSERT INTO sales (voucher_no, contact_id, date, due_date, currency, exchange_rate, status, grand_total, paid_amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0.00)");
+      $stmt = $pdo->prepare("INSERT INTO sales (sr_no, contact_id, date, due_date, currency, exchange_rate, status, grand_total, paid_amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0.00)");
       $stmt->execute([$voucher_no, $contact_id, $date, $due_date, $currency, $ex_rate, $status, $grand_total]);
       $sale_id = $pdo->lastInsertId();
 
@@ -1302,7 +1302,9 @@ class Query
 
       return ['status' => true, 'title' => 'Success!', 'message' => 'Sale saved successfully', 'redirect' => $redirect];
     } catch (Exception $e) {
-      $pdo->rollBack();
+      if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+      }
       return ['status' => false, 'title' => 'Error!', 'message' => $e->getMessage()];
     }
   }
@@ -1311,7 +1313,7 @@ class Query
   {
     global $pdo;
     try {
-      $dupStmt = $pdo->prepare("SELECT COUNT(*) FROM sales WHERE voucher_no = ? AND id != ?");
+      $dupStmt = $pdo->prepare("SELECT COUNT(*) FROM sales WHERE sr_no = ? AND id != ?");
       $dupStmt->execute([$voucher_no, $id]);
       if ($dupStmt->fetchColumn() > 0) {
         return ['status' => false, 'title' => 'Duplicate Invoice!', 'message' => 'Voucher number already exists.'];
@@ -1319,7 +1321,7 @@ class Query
 
       $pdo->beginTransaction();
 
-      $checkStmt = $pdo->prepare("SELECT paid_amount, voucher_no, status FROM sales WHERE id = ? FOR UPDATE");
+      $checkStmt = $pdo->prepare("SELECT paid_amount, sr_no, status FROM sales WHERE id = ? FOR UPDATE");
       $checkStmt->execute([$id]);
       $saleData = $checkStmt->fetch(PDO::FETCH_ASSOC);
 
@@ -1350,10 +1352,10 @@ class Query
       $custStmt->execute([$contact_id]);
       $customer_name = $custStmt->fetchColumn();
 
-      $stmt = $pdo->prepare("UPDATE sales SET voucher_no=?, contact_id=?, date=?, due_date=?, currency=?, exchange_rate=?, status=?, grand_total=? WHERE id=?");
+      $stmt = $pdo->prepare("UPDATE sales SET sr_no=?, contact_id=?, date=?, due_date=?, currency=?, exchange_rate=?, status=?, grand_total=? WHERE id=?");
       $stmt->execute([$voucher_no, $contact_id, $date, $due_date, $currency, $ex_rate, $status, $grand_total, $id]);
 
-      $pdo->prepare("DELETE FROM general_ledger WHERE voucherno = ?")->execute([$saleData['voucher_no']]);
+      $pdo->prepare("DELETE FROM general_ledger WHERE voucherno = ?")->execute([$saleData['sr_no']]);
       $pdo->prepare("DELETE FROM sale_lines WHERE sale_id = ?")->execute([$id]);
 
       $line_stmt = $pdo->prepare("INSERT INTO sale_lines (sale_id, container_no, account_id, line_amount) VALUES (?, ?, ?, ?)");
@@ -1396,7 +1398,9 @@ class Query
 
       return ['status' => true, 'title' => 'Success!', 'message' => 'Sale updated successfully', 'redirect' => $redirect];
     } catch (Exception $e) {
-      $pdo->rollBack();
+      if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+      }
       return ['status' => false, 'title' => 'Error!', 'message' => $e->getMessage()];
     }
   }
@@ -1406,7 +1410,7 @@ class Query
     global $pdo;
     try {
       $pdo->beginTransaction();
-      $stmt = $pdo->prepare("SELECT voucher_no, status, paid_amount FROM sales WHERE id = ? FOR UPDATE");
+      $stmt = $pdo->prepare("SELECT sr_no, status, paid_amount FROM sales WHERE id = ? FOR UPDATE");
       $stmt->execute([$id]);
       $sale = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -1425,8 +1429,8 @@ class Query
         return ['status' => false, 'type' => 'warning', 'title' => 'Cannot Void Invoice', 'message' => 'Paid or partially paid invoices cannot be voided.'];
       }
 
-      if ($sale['voucher_no']) {
-        $pdo->prepare("DELETE FROM general_ledger WHERE voucherno = ?")->execute([$sale['voucher_no']]);
+      if ($sale['sr_no']) {
+        $pdo->prepare("DELETE FROM general_ledger WHERE voucherno = ?")->execute([$sale['sr_no']]);
       }
 
       $pdo->prepare("UPDATE sales SET status = 'VOIDED' WHERE id = ?")->execute([$id]);
@@ -1434,7 +1438,9 @@ class Query
 
       return ['status' => true, 'title' => 'Success!', 'message' => 'Invoice successfully voided. General ledger entries reversed.', 'redirect' => 'sales.php'];
     } catch (Exception $e) {
-      $pdo->rollBack();
+      if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+      }
       return ['status' => false, 'type' => 'error', 'title' => 'Error!', 'message' => 'Failed to void invoice. Error: ' . $e->getMessage()];
     }
   }
@@ -1444,7 +1450,7 @@ class Query
     global $pdo;
     try {
       $pdo->beginTransaction();
-      $stmt = $pdo->prepare("SELECT voucher_no, status, paid_amount FROM sales WHERE id = ?");
+      $stmt = $pdo->prepare("SELECT sr_no, status, paid_amount FROM sales WHERE id = ?");
       $stmt->execute([$id]);
       $sale = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -1454,8 +1460,8 @@ class Query
         return ['status' => false, 'type' => 'error', 'title' => 'Strict Audit Block!', 'message' => 'Cannot delete an Approved or Paid invoice.'];
       }
 
-      if ($sale['voucher_no']) {
-        $pdo->prepare("DELETE FROM general_ledger WHERE voucherno = ?")->execute([$sale['voucher_no']]);
+      if ($sale['sr_no']) {
+        $pdo->prepare("DELETE FROM general_ledger WHERE voucherno = ?")->execute([$sale['sr_no']]);
       }
 
       $pdo->prepare("DELETE FROM sale_lines WHERE sale_id = ?")->execute([$id]);
@@ -1464,7 +1470,9 @@ class Query
       $pdo->commit();
       return ['status' => true, 'title' => 'Success!', 'message' => 'Draft deleted successfully', 'redirect' => 'sales.php'];
     } catch (Exception $e) {
-      $pdo->rollBack();
+      if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+      }
       return ['status' => false, 'type' => 'error', 'title' => 'Error!', 'message' => 'Failed to delete invoice.'];
     }
   }
@@ -3713,27 +3721,92 @@ class Query
     }
   }
 
-  function addform10($date, $item_id, $fish_type, $supplier_id, $country, $type, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs)
+  private function normalizeSupplierContactId($contact_id, $required = false)
   {
     global $pdo;
 
-    $form7stmt = $pdo->prepare("SELECT * FROM form7stock WHERE item_id='$item_id' AND size='$size'");
-    $form7stmt->execute();
-    $form7data = $form7stmt->fetch(PDO::FETCH_ASSOC);
-    $total_kg = (floatval($kg) + floatval($looseinkg)) - floatval($looseoutkg);
-    $addform10 = (floatval($pcs) + floatval($looseinpcs)) - floatval($looseoutpcs);
-    $addform10stmt = $pdo->prepare("INSERT INTO form10stock(date, item_id, supplier_id, country, type, size, pcsform10, mc, kg, pcs, looseinkg, looseinpcs, looseoutkg, looseoutpcs, total_kg, fish_type) VALUES('$date', '$item_id', '$supplier_id', '$country', '$type', '$size', '$addform10', '$mc', '$kg', '$pcs', '$looseinkg', '$looseinpcs', '$looseoutkg', '$looseoutpcs', '$total_kg', '$fish_type')");
-    $addform10stmt->execute();
+    if ($contact_id === '' || $contact_id === null) {
+      if ($required) {
+        throw new InvalidArgumentException('Select a supplier from contacts.');
+      }
+      return null;
+    }
+
+    $contact_id = (int)$contact_id;
+    $stmt = $pdo->prepare('SELECT id FROM contacts WHERE id = ? AND is_supplier = 1 LIMIT 1');
+    $stmt->execute([$contact_id]);
+    if (!$stmt->fetchColumn()) {
+      throw new InvalidArgumentException('The selected party is not marked as a supplier in contacts.');
+    }
+
+    return $contact_id;
   }
 
-  function addform10tcl($date, $item_id, $country, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs, $cckg, $ccpcs, $cutpiecekg, $cutpiecepcs, $hhkkg, $hhkpcs, $mslkg, $mslpcs, $lanfishkg, $lanfishpcs)
+  private function form10Float($value)
+  {
+    if ($value === '' || $value === null) {
+      return 0.0;
+    }
+    return floatval($value);
+  }
+
+  private function form10Int($value)
+  {
+    return (int)round($this->form10Float($value));
+  }
+
+  private function form10AmountString($value)
+  {
+    if ($value === '' || $value === null) {
+      return '0';
+    }
+    return (string)$value;
+  }
+
+  function addform10($date, $item_id, $fish_type, $contact_id, $country, $type, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs)
   {
     global $pdo;
 
-    $total_kg = (floatval($kg) + floatval($looseinkg) + floatval($cckg) + floatval($cutpiecekg) + floatval($hhkkg) + floatval($mslkg) + floatval($lanfishkg)) - floatval($looseoutkg);
-    $addform10 = (floatval($pcs) + floatval($looseinpcs) + floatval($ccpcs) + floatval($cutpiecepcs) + floatval($hhkpcs) + floatval($mslpcs) + floatval($lanfishpcs)) - floatval($looseoutpcs);
-    $addform10stmt = $pdo->prepare("INSERT INTO form10stocktcl(date, item_id, country, type, size, pcsform10, mc, kg, pcs, looseinkg, looseinpcs, looseoutkg, looseoutpcs, cc_kg, cc_pcs, cutpiece_kg, cutpiece_pcs, hhk_kg, hhk_pcs, msl_kg, msl_pcs, lanfish_kg, lanfish_pcs, total_kg) VALUES('$date', '$item_id', '$country', 'TCL', '$size', '$addform10', '$mc', '$kg', '$pcs', '$looseinkg', '$looseinpcs', '$looseoutkg', '$looseoutpcs','$cckg','$ccpcs', '$cutpiecekg', '$cutpiecepcs', '$hhkkg','$hhkpcs','$mslkg','$mslpcs','$lanfishkg','$lanfishpcs', '$total_kg')");
-    $addform10stmt->execute();
+    $contact_id = $this->normalizeSupplierContactId($contact_id, true);
+    $mc = $this->form10Int($mc);
+    $pcs = $this->form10Int($pcs);
+    $looseinpcs = $this->form10Int($looseinpcs);
+    $looseoutpcs = $this->form10Int($looseoutpcs);
+    $kg = $this->form10AmountString($kg);
+    $looseinkg = $this->form10AmountString($looseinkg);
+    $looseoutkg = $this->form10AmountString($looseoutkg);
+    $total_kg = (string)(($this->form10Float($kg) + $this->form10Float($looseinkg)) - $this->form10Float($looseoutkg));
+    $addform10 = $this->form10Int($pcs + $looseinpcs - $looseoutpcs);
+    $addform10stmt = $pdo->prepare('INSERT INTO form10stock (date, item_id, contact_id, country, type, size, pcsform10, mc, kg, pcs, looseinkg, looseinpcs, looseoutkg, looseoutpcs, total_kg, fish_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    $addform10stmt->execute([$date, $item_id, $contact_id, $country, $type, $size, $addform10, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs, $total_kg, $fish_type]);
+  }
+
+  function addform10tcl($date, $item_id, $country, $size, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs, $cckg, $ccpcs, $cutpiecekg, $cutpiecepcs, $hhkkg, $hhkpcs, $mslkg, $mslpcs, $lanfishkg, $lanfishpcs, $contact_id = null)
+  {
+    global $pdo;
+
+    $contact_id = $this->normalizeSupplierContactId($contact_id, false);
+    $mc = $this->form10Int($mc);
+    $pcs = $this->form10Int($pcs);
+    $looseinpcs = $this->form10Int($looseinpcs);
+    $looseoutpcs = $this->form10Int($looseoutpcs);
+    $ccpcs = $this->form10Int($ccpcs);
+    $cutpiecepcs = $this->form10Int($cutpiecepcs);
+    $hhkpcs = $this->form10Int($hhkpcs);
+    $mslpcs = $this->form10Int($mslpcs);
+    $lanfishpcs = $this->form10Int($lanfishpcs);
+    $kg = $this->form10AmountString($kg);
+    $looseinkg = $this->form10AmountString($looseinkg);
+    $looseoutkg = $this->form10AmountString($looseoutkg);
+    $cckg = $this->form10Float($cckg);
+    $cutpiecekg = $this->form10Float($cutpiecekg);
+    $hhkkg = $this->form10Float($hhkkg);
+    $mslkg = $this->form10Float($mslkg);
+    $lanfishkg = $this->form10Float($lanfishkg);
+    $total_kg = (string)(($this->form10Float($kg) + $this->form10Float($looseinkg) + $cckg + $cutpiecekg + $hhkkg + $mslkg + $lanfishkg) - $this->form10Float($looseoutkg));
+    $addform10 = $this->form10Int($pcs + $looseinpcs + $ccpcs + $cutpiecepcs + $hhkpcs + $mslpcs + $lanfishpcs - $looseoutpcs);
+    $addform10stmt = $pdo->prepare('INSERT INTO form10stocktcl (date, item_id, contact_id, country, type, size, pcsform10, mc, kg, pcs, looseinkg, looseinpcs, looseoutkg, looseoutpcs, cc_kg, cc_pcs, cutpiece_kg, cutpiece_pcs, hhk_kg, hhk_pcs, msl_kg, msl_pcs, lanfish_kg, lanfish_pcs, total_kg) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    $addform10stmt->execute([$date, $item_id, $contact_id, $country, 'TCL', $size, $addform10, $mc, $kg, $pcs, $looseinkg, $looseinpcs, $looseoutkg, $looseoutpcs, $cckg, $ccpcs, $cutpiecekg, $cutpiecepcs, $hhkkg, $hhkpcs, $mslkg, $mslpcs, $lanfishkg, $lanfishpcs, $total_kg]);
   }
 
   function addpackinglist($date, $customer_id, $country, $invoiceno, $containerno, $vessel_name, $voyname, $fda)
@@ -4105,9 +4178,10 @@ class Query
     $item_id = $sizedata['item_id'];
     $country = $sizedata['country'];
     $type = $sizedata['type'];
+    $date = $sizedata['date'];
     $supplier_name = $sizedata['supplier_name'];
     $link_id = $sizedata['link_id'];
-    $addsizestmt = $pdo->prepare("INSERT INTO form7stocktcl(item_id, supplier_name, country, type, size, link_id) VALUES('$item_id', '$supplier_name', '$country', '$type', '$size', '$link_id')");
+    $addsizestmt = $pdo->prepare("INSERT INTO form7stocktcl(date, item_id, supplier_name, country, type, size, link_id) VALUES('$date', '$item_id', '$supplier_name', '$country', '$type', '$size', '$link_id')");
     $addsizestmt->execute();
   }
 
@@ -4156,8 +4230,13 @@ class Query
   {
     global $pdo;
 
-    $addtclmcstmt = $pdo->prepare("INSERT INTO tclmcstock(date, item_id, size, pcs, kg, form10mc, grandtotal_mc) VALUES('$date', '$item_id', '$size', '$pcs', '$kg', '$form10_mc', '$form10_mc')");
-    $addtclmcstmt->execute();
+    $pcs = $this->form10Int($pcs);
+    $kg = $this->form10Float($kg);
+    $form10_mc = $this->form10Int($form10_mc);
+    $opening_mc = 0;
+
+    $addtclmcstmt = $pdo->prepare('INSERT INTO tclmcstock (date, item_id, size, pcs, kg, opening_mc, form10mc, grandtotal_mc) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+    $addtclmcstmt->execute([$date, $item_id, $size, $pcs, $kg, $opening_mc, $form10_mc, $form10_mc]);
   }
   public function transfermcstocktcl($transfer_to, $transfer_mc, $id)
   {
@@ -6051,24 +6130,39 @@ class Query
     $stmt->execute();
   }
 
-  function updateform10($updateid, $newdate, $upitem_id, $upfish_type, $upsupplier_id, $upcountry, $uptype, $upsize, $upmc, $upkg, $uppcs, $uplooseinkg, $uplooseinpcs, $uplooseoutkg, $uplooseoutpcs)
+  function updateform10($updateid, $newdate, $upitem_id, $upfish_type, $upcontact_id, $upcountry, $uptype, $upsize, $upmc, $upkg, $uppcs, $uplooseinkg, $uplooseinpcs, $uplooseoutkg, $uplooseoutpcs)
   {
     global $pdo;
 
-    $total_kg = (floatval($upkg) + floatval($uplooseinkg)) - floatval($uplooseoutkg);
-    $updateform10pcs = (floatval($uppcs) + floatval($uplooseinpcs)) - floatval($uplooseoutpcs);
-    $updateform10stmt = $pdo->prepare("UPDATE form10stock SET date='$newdate', item_id='$upitem_id', supplier_id='$upsupplier_id', country='$upcountry', type='$uptype', size='$upsize',pcsform10='$updateform10pcs', mc='$upmc', kg='$upkg', pcs='$uppcs', looseinkg='$uplooseinkg', looseinpcs='$uplooseinpcs', looseoutkg='$uplooseoutkg', looseoutpcs='$uplooseoutpcs', total_kg='$total_kg', fish_type='$upfish_type' WHERE id='$updateid'");
-    $updateform10stmt->execute();
+    $upcontact_id = $this->normalizeSupplierContactId($upcontact_id, true);
+    $upmc = $this->form10Int($upmc);
+    $uppcs = $this->form10Int($uppcs);
+    $uplooseinpcs = $this->form10Int($uplooseinpcs);
+    $uplooseoutpcs = $this->form10Int($uplooseoutpcs);
+    $upkg = $this->form10AmountString($upkg);
+    $uplooseinkg = $this->form10AmountString($uplooseinkg);
+    $uplooseoutkg = $this->form10AmountString($uplooseoutkg);
+    $total_kg = (string)(($this->form10Float($upkg) + $this->form10Float($uplooseinkg)) - $this->form10Float($uplooseoutkg));
+    $updateform10pcs = $this->form10Int($uppcs + $uplooseinpcs - $uplooseoutpcs);
+    $updateform10stmt = $pdo->prepare('UPDATE form10stock SET date=?, item_id=?, contact_id=?, country=?, type=?, size=?, pcsform10=?, mc=?, kg=?, pcs=?, looseinkg=?, looseinpcs=?, looseoutkg=?, looseoutpcs=?, total_kg=?, fish_type=? WHERE id=?');
+    $updateform10stmt->execute([$newdate, $upitem_id, $upcontact_id, $upcountry, $uptype, $upsize, $updateform10pcs, $upmc, $upkg, $uppcs, $uplooseinkg, $uplooseinpcs, $uplooseoutkg, $uplooseoutpcs, $total_kg, $upfish_type, $updateid]);
   }
 
   function updateform10tcl($updateid, $newdate, $upitem_id, $upcountry, $upsize, $upmc, $upkg, $uppcs, $uplooseinkg, $uplooseinpcs, $uplooseoutkg, $uplooseoutpcs)
   {
     global $pdo;
 
-    $total_kg = (floatval($upkg) + floatval($uplooseinkg)) - floatval($uplooseoutkg);
-    $updateform10pcs = (floatval($uppcs) + floatval($uplooseinpcs)) - floatval($uplooseoutpcs);
-    $updateform10stmt = $pdo->prepare("UPDATE form10stocktcl SET date='$newdate', item_id='$upitem_id', country='$upcountry', type='TCL', size='$upsize',pcsform10='$updateform10pcs', mc='$upmc', kg='$upkg', pcs='$uppcs', looseinkg='$uplooseinkg', looseinpcs='$uplooseinpcs', looseoutkg='$uplooseoutkg', looseoutpcs='$uplooseoutpcs', total_kg='$total_kg' WHERE id='$updateid'");
-    $updateform10stmt->execute();
+    $upmc = $this->form10Int($upmc);
+    $uppcs = $this->form10Int($uppcs);
+    $uplooseinpcs = $this->form10Int($uplooseinpcs);
+    $uplooseoutpcs = $this->form10Int($uplooseoutpcs);
+    $upkg = $this->form10AmountString($upkg);
+    $uplooseinkg = $this->form10AmountString($uplooseinkg);
+    $uplooseoutkg = $this->form10AmountString($uplooseoutkg);
+    $total_kg = (string)(($this->form10Float($upkg) + $this->form10Float($uplooseinkg)) - $this->form10Float($uplooseoutkg));
+    $updateform10pcs = $this->form10Int($uppcs + $uplooseinpcs - $uplooseoutpcs);
+    $updateform10stmt = $pdo->prepare('UPDATE form10stocktcl SET date=?, item_id=?, country=?, type=?, size=?, pcsform10=?, mc=?, kg=?, pcs=?, looseinkg=?, looseinpcs=?, looseoutkg=?, looseoutpcs=?, total_kg=? WHERE id=?');
+    $updateform10stmt->execute([$newdate, $upitem_id, $upcountry, 'TCL', $upsize, $updateform10pcs, $upmc, $upkg, $uppcs, $uplooseinkg, $uplooseinpcs, $uplooseoutkg, $uplooseoutpcs, $total_kg, $updateid]);
   }
 
   function addhhkremark($remark, $remarkid)
@@ -6527,7 +6621,7 @@ class Query
       echo '<script>swal("Error!", "Error occurs when adding Purchase Voucher", "error");</script>';
     }
 
-    $storehousestmt = $pdo->prepare("INSERT INTO material_store_house(date, voucher_no, supplier_id, material_id, `in_quantity`) VALUES('$date', '$voucher_no','$supplier_name', '$material', '$quantity')");
+    $storehousestmt = $pdo->prepare("INSERT INTO material_store_house(date, voucher_no, contact_id, material_id, `in_quantity`) VALUES('$date', '$voucher_no','$supplier_name', '$material', '$quantity')");
     $storehousestmt->execute();
   }
 
@@ -6546,7 +6640,7 @@ class Query
   function updatematerial_warehouse($table, $up_date, $up_supplier_name, $up_voucher_no, $up_material, $up_quantity)
   {
     global $pdo;
-    $stmt = $pdo->prepare("UPDATE $table SET date='$up_date', supplier_id='$up_supplier_name', voucher_no='$up_voucher_no', material_id='$up_material', in_quantity='$up_quantity' WHERE voucher_no='$up_voucher_no'");
+    $stmt = $pdo->prepare("UPDATE $table SET date='$up_date', contact_id='$up_supplier_name', voucher_no='$up_voucher_no', material_id='$up_material', in_quantity='$up_quantity' WHERE voucher_no='$up_voucher_no'");
     $stmt->execute();
   }
 
@@ -6623,12 +6717,13 @@ class Query
       $stmt->execute([$date, $stockto, $voucher_no, $material, $quantity]);
       $groupid = $pdo->lastInsertId();
 
-      $materialstmt = $pdo->prepare("SELECT supplier_id FROM material_store_house WHERE material_id = ? AND supplier_id IS NOT NULL ORDER BY id DESC LIMIT 1");
+      $materialstmt = $pdo->prepare("SELECT COALESCE(contact_id, NULLIF(supplier_id, '')) AS contact_id FROM material_store_house WHERE material_id = ? AND (contact_id IS NOT NULL OR (supplier_id IS NOT NULL AND supplier_id != '')) ORDER BY id DESC LIMIT 1");
       $materialstmt->execute([$material]);
-      $supplier = $materialstmt->fetchColumn() ?: null;
+      $supplierContact = $materialstmt->fetchColumn();
+      $supplierContact = ($supplierContact !== false && $supplierContact !== '') ? (int)$supplierContact : null;
 
-      $storehousestmt = $pdo->prepare("INSERT INTO material_store_house (`date`, `voucher_no`, `material_id`, `supplier_id`, `description`, `out_quantity`, `output_group`, `action`) VALUES (?, ?, ?, ?, '', ?, ?, 'Out')");
-      $storehousestmt->execute([$date, $voucher_no, $material, $supplier ?? '', $quantity, $groupid]);
+      $storehousestmt = $pdo->prepare("INSERT INTO material_store_house (`date`, `voucher_no`, `material_id`, `contact_id`, `description`, `out_quantity`, `output_group`, `action`) VALUES (?, ?, ?, ?, '', ?, ?, 'Out')");
+      $storehousestmt->execute([$date, $voucher_no, $material, $supplierContact, $quantity, $groupid]);
       $pdo->commit();
     } catch (Throwable $e) {
       if ($pdo->inTransaction()) {
@@ -6940,10 +7035,10 @@ class Query
     $stmt = $pdo->prepare("UPDATE form7stocktcl SET supplier_name='$toaccode' WHERE supplier_name='$fromaccode'");
     $stmt->execute();
     // Form 10 Frozen
-    $stmt = $pdo->prepare("UPDATE form10stock SET supplier_id='$toaccode' WHERE supplier_id='$fromaccode'");
+    $stmt = $pdo->prepare("UPDATE form10stock SET contact_id='$toaccode' WHERE contact_id='$fromaccode' OR supplier_id='$fromaccode'");
     $stmt->execute();
     // Form 10 TCL
-    $stmt = $pdo->prepare("UPDATE form10stocktcl SET supplier_id='$toaccode' WHERE supplier_id='$fromaccode'");
+    $stmt = $pdo->prepare("UPDATE form10stocktcl SET contact_id='$toaccode' WHERE contact_id='$fromaccode' OR supplier_id='$fromaccode'");
     $stmt->execute();
     // Packing List
     $stmt = $pdo->prepare("UPDATE packingliststock SET customer_id='$toaccode' WHERE customer_id='$fromaccode'");

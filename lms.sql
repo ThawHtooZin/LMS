@@ -478,13 +478,13 @@ CREATE TABLE `form7stock` (
   `country` varchar(155) DEFAULT NULL,
   `type` varchar(255) NOT NULL,
   `size` varchar(11) NOT NULL,
-  `viss` varchar(11) NOT NULL,
-  `kg` varchar(15) NOT NULL,
-  `pcspervr` varchar(15) NOT NULL,
-  `pcsperf7` int(11) NOT NULL,
-  `link_id` int(11) NOT NULL,
-  `water_kg` int(11) NOT NULL,
-  `fish_type` varchar(255) NOT NULL
+  `viss` varchar(11) DEFAULT NULL,
+  `kg` varchar(15) DEFAULT NULL,
+  `pcspervr` varchar(15) DEFAULT NULL,
+  `pcsperf7` int(11) DEFAULT NULL,
+  `link_id` int(11) DEFAULT NULL,
+  `water_kg` int(11) DEFAULT NULL,
+  `fish_type` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -506,17 +506,17 @@ INSERT INTO `form7stock` (`id`, `date`, `item_id`, `supplier_name`, `country`, `
 
 CREATE TABLE `form7stocktcl` (
   `id` int(11) NOT NULL,
-  `date` date NOT NULL,
+  `date` date DEFAULT NULL,
   `item_id` varchar(11) NOT NULL,
   `supplier_name` varchar(255) NOT NULL,
   `country` varchar(155) DEFAULT NULL,
   `type` varchar(255) NOT NULL,
   `size` varchar(11) NOT NULL,
-  `viss` varchar(11) NOT NULL,
-  `kg` varchar(15) NOT NULL,
-  `pcspervr` varchar(15) NOT NULL,
-  `pcsperf7` int(11) NOT NULL,
-  `link_id` int(11) NOT NULL
+  `viss` varchar(11) DEFAULT NULL,
+  `kg` varchar(15) DEFAULT NULL,
+  `pcspervr` varchar(15) DEFAULT NULL,
+  `pcsperf7` int(11) DEFAULT NULL,
+  `link_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -539,21 +539,22 @@ CREATE TABLE `form10stock` (
   `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `item_id` varchar(11) NOT NULL,
-  `supplier_id` varchar(20) NOT NULL,
+  `contact_id` int(11) DEFAULT NULL,
+  `supplier_id` varchar(20) DEFAULT NULL,
   `country` varchar(11) NOT NULL,
   `type` varchar(255) NOT NULL,
   `size` varchar(11) NOT NULL,
-  `pcsform10` int(11) NOT NULL,
-  `mc` int(11) NOT NULL,
-  `kg` varchar(11) NOT NULL,
-  `pcs` int(11) NOT NULL,
-  `looseinkg` varchar(11) NOT NULL,
-  `looseinpcs` int(11) NOT NULL,
-  `looseoutkg` varchar(11) NOT NULL,
-  `looseoutpcs` int(11) NOT NULL,
-  `total_kg` varchar(11) NOT NULL,
-  `percentage` varchar(11) NOT NULL,
-  `fish_type` varchar(255) NOT NULL
+  `pcsform10` int(11) DEFAULT NULL,
+  `mc` int(11) DEFAULT NULL,
+  `kg` varchar(11) DEFAULT NULL,
+  `pcs` int(11) DEFAULT NULL,
+  `looseinkg` varchar(11) DEFAULT NULL,
+  `looseinpcs` int(11) DEFAULT NULL,
+  `looseoutkg` varchar(11) DEFAULT NULL,
+  `looseoutpcs` int(11) DEFAULT NULL,
+  `total_kg` varchar(11) DEFAULT NULL,
+  `percentage` varchar(11) DEFAULT NULL,
+  `fish_type` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -582,18 +583,19 @@ CREATE TABLE `form10stocktcl` (
   `id` int(11) NOT NULL,
   `date` date NOT NULL,
   `item_id` varchar(11) NOT NULL,
-  `supplier_id` varchar(20) NOT NULL,
+  `contact_id` int(11) DEFAULT NULL,
+  `supplier_id` varchar(20) DEFAULT NULL,
   `country` varchar(11) NOT NULL,
   `type` varchar(255) NOT NULL,
   `size` varchar(11) NOT NULL,
-  `pcsform10` int(11) NOT NULL,
-  `mc` int(11) NOT NULL,
-  `kg` varchar(11) NOT NULL,
-  `pcs` int(11) NOT NULL,
-  `looseinkg` varchar(11) NOT NULL,
-  `looseinpcs` int(11) NOT NULL,
-  `looseoutkg` varchar(11) NOT NULL,
-  `looseoutpcs` int(11) NOT NULL,
+  `pcsform10` int(11) DEFAULT NULL,
+  `mc` int(11) DEFAULT NULL,
+  `kg` varchar(11) DEFAULT NULL,
+  `pcs` int(11) DEFAULT NULL,
+  `looseinkg` varchar(11) DEFAULT NULL,
+  `looseinpcs` int(11) DEFAULT NULL,
+  `looseoutkg` varchar(11) DEFAULT NULL,
+  `looseoutpcs` int(11) DEFAULT NULL,
   `cc_pcs` int(11) DEFAULT NULL,
   `cc_kg` float DEFAULT NULL,
   `msl_pcs` int(11) DEFAULT NULL,
@@ -604,8 +606,8 @@ CREATE TABLE `form10stocktcl` (
   `lanfish_kg` float DEFAULT NULL,
   `cutpiece_pcs` int(11) DEFAULT NULL,
   `cutpiece_kg` float DEFAULT NULL,
-  `total_kg` varchar(11) NOT NULL,
-  `percentage` varchar(11) NOT NULL
+  `total_kg` varchar(11) DEFAULT NULL,
+  `percentage` varchar(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --

@@ -2333,7 +2333,7 @@ if ($_GET['table_name'] == 'form_10_tcl') {
       $item_id = $data['item_id'];
       $size = $data['size'];
       $commonditydata = $query->select('products', $item_id, 'id');
-      $supplierid = $data['supplier_id'];
+      $supplierid = $data['contact_id'] ?? $data['supplier_id'] ?? '';
       $supplier_name = $query->select('acname', $supplierid, 'code_no');
 
       $raw_viss_tmt = $pdo->prepare("SELECT SUM(viss) AS raw_viss FROM form7stocktcl WHERE item_id='$item_id' AND size='$size'");
@@ -2839,7 +2839,7 @@ if ($_GET['table_name'] == "form10frozen") {
         $supplieridstmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
         $supplieridstmt->execute();
         $supplierdata = $supplieridstmt->fetch(PDO::FETCH_ASSOC);
-        $supplier_id = $supplierdata['supplier_id'];
+        $supplier_id = $supplierdata['contact_id'] ?? $supplierdata['supplier_id'] ?? '';
 
         $totalform7viss = $pdo->prepare("SELECT SUM(viss) AS totalform7viss FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id'");
         $totalform7viss->execute();
@@ -2904,7 +2904,7 @@ if ($_GET['table_name'] == "form10frozen") {
           $date = $data['date'];
 
           $commonditydata = $query->select('products', $item_id, 'id');
-          $supplierid = $data['supplier_id'];
+          $supplierid = $data['contact_id'] ?? $data['supplier_id'] ?? '';
           $supplier_name = $query->select('acname', $supplierid, 'code_no');
           $lastcommondity = $pdo->prepare("SELECT * FROM form10stock WHERE id < $lastid AND item_id='$item_id' AND date = '$date'");
           $lastcommondity->execute();
@@ -2932,7 +2932,7 @@ if ($_GET['table_name'] == "form10frozen") {
         $supplieridstmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
         $supplieridstmt->execute();
         $supplierdata = $supplieridstmt->fetch(PDO::FETCH_ASSOC);
-        $supplier_id = $supplierdata['supplier_id'];
+        $supplier_id = $supplierdata['contact_id'] ?? $supplierdata['supplier_id'] ?? '';
         $date = $supplierdata['date'];
 
 

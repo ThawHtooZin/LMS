@@ -9,7 +9,18 @@ $auth->checkadmin();
 $bootstrap = new Bootstrap();
 $query = new Query();
 
+$allowedReportTypes = ['hhkloosereport', 'hhkkgreport', 'gfcloosereport', 'gfckgreport', 'mcreport'];
 $reportType = $_GET['type'] ?? null;
+if ($reportType !== null && !in_array($reportType, $allowedReportTypes, true)) {
+    $reportType = null;
+}
+if (!empty($reportType)) {
+    $_SESSION['stockreporttype'] = $reportType;
+}
+$stockReportType = $reportType ?? ($_SESSION['stockreporttype'] ?? null);
+if ($stockReportType !== null && !in_array($stockReportType, $allowedReportTypes, true)) {
+    $stockReportType = null;
+}
 
 // Function to add box only for Balance reports
 function getIcon($svg, $title)
@@ -66,6 +77,21 @@ $reports = array_map(function ($r) {
             font-size: 1.5rem;
             margin-top: 10px;
         }
+
+        .stock-report-filter {
+            max-width: 640px;
+        }
+
+        .stock-report-table thead th {
+            background: #212529;
+            color: #fff;
+            vertical-align: middle;
+        }
+
+        .stock-report-table tfoot td {
+            font-weight: bold;
+            background: #f8f9fa;
+        }
     </style>
 </head>
 
@@ -75,7 +101,7 @@ $reports = array_map(function ($r) {
         <div class="contentcol">
             <?php require 'navbar.php'; ?>
 
-            <div class="container-fluid d-flex flex-column justify-content-center" style="min-height: 80vh;">
+            <div class="container-fluid py-3<?= empty($reportType) ? ' d-flex flex-column justify-content-center' : ''; ?>"<?= empty($reportType) ? ' style="min-height: 80vh;"' : ''; ?>>
                 <?php if (empty($reportType)): ?>
                     <div class="row justify-content-center g-4 mb-4">
                         <?php foreach (array_slice($reports, 0, 3) as $r): ?>
@@ -100,7 +126,7 @@ $reports = array_map(function ($r) {
                 <?php else: ?>
                     <div class="card">
                         <div class="card-header bg-info text-light d-flex justify-content-between">
-                            <h4 class="mb-0">Report: <?php echo htmlspecialchars($reportType); ?></h4>
+                            <h4 class="mb-0">Report: <?php echo htmlspecialchars($stockReportType ?? ''); ?></h4>
                             <a href="mainstockreport.php" class="btn btn-light btn-sm">Back</a>
                         </div>
                         <div class="card-body"><?php include 'stockreportpages.php'; ?></div>

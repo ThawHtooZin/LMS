@@ -1,8 +1,8 @@
 <?php
 
-define('MYSQL_USER','root');
-define('MYSQL_PASSWORD','');
-define('MYSQL_HOST','localhost');
+define('MYSQL_USER', 'root');
+define('MYSQL_PASSWORD', '');
+define('MYSQL_HOST', '127.0.0.1');
 define('MYSQL_DATABASE', 'lms');
 
 $options = array(
@@ -10,7 +10,8 @@ $options = array(
 );
 
 $pdo = new PDO(
-  'mysql:host='.MYSQL_HOST.';dbname='.MYSQL_DATABASE,MYSQL_USER,MYSQL_PASSWORD,$options
-  )
-
- ?>
+  'mysql:host=' . MYSQL_HOST . ';dbname=' . MYSQL_DATABASE,
+  MYSQL_USER,
+  MYSQL_PASSWORD,
+  $options
+);

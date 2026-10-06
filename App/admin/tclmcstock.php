@@ -8,6 +8,28 @@ $auth = new auth();
 $auth->checkadmin();
 $bootstrap = new Bootstrap();
 $query = new Query();
+
+function tclmcTransactionTotal(PDO $pdo, int $tclmcId, string $type): int
+{
+  $stmt = $pdo->prepare('SELECT COALESCE(SUM(quantity), 0) FROM tclmc_transactions WHERE tclmc_id = ? AND type = ?');
+  $stmt->execute([$tclmcId, $type]);
+  return (int)$stmt->fetchColumn();
+}
+
+function tclmcDateTransactionTotal(PDO $pdo, string $date, string $type): int
+{
+  $stmt = $pdo->prepare('SELECT COALESCE(SUM(t.quantity), 0) FROM tclmc_transactions t INNER JOIN tclmcstock s ON s.id = t.tclmc_id WHERE s.date = ? AND t.type = ?');
+  $stmt->execute([$date, $type]);
+  return (int)$stmt->fetchColumn();
+}
+
+function tclmcDateTransactionLabel(PDO $pdo, string $date, string $type): string
+{
+  $stmt = $pdo->prepare('SELECT t.destination FROM tclmc_transactions t INNER JOIN tclmcstock s ON s.id = t.tclmc_id WHERE s.date = ? AND t.type = ? ORDER BY t.id ASC LIMIT 1');
+  $stmt->execute([$date, $type]);
+  $label = $stmt->fetchColumn();
+  return $label !== false ? (string)$label : '';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -66,9 +88,8 @@ $bootstrap->css();
           <?php
           if (!empty($_POST['date']) && isset($_POST['search'])) {
             $date = $_POST['date'];
-            $headerstmt = $pdo->prepare("SELECT * FROM tclmcstock WHERE date='$date'");
-            $headerstmt->execute();
-            $headerdata = $headerstmt->fetch(PDO::FETCH_ASSOC);
+            $transferHeader = tclmcDateTransactionLabel($pdo, $date, 'transfer');
+            $loadingHeader = tclmcDateTransactionLabel($pdo, $date, 'export');
           ?>
             <table class="table table-hover table-bordered table-striped" id="<?php //echo $countrydata['country']; 
                                                                               ?>table">
@@ -80,13 +101,11 @@ $bootstrap->css();
                 <th>Kg</th>
                 <th>Opening Mc</th>
                 <th>Form-10 Mc</th>
-                <th>Transfer to <?php if (!empty($headerdata)) {
-                                  echo $headerdata['transfer_to_where'];
+                <th>Transfer to<?php if ($transferHeader !== '') {
+                                  echo ' ' . htmlspecialchars($transferHeader);
                                 } ?></th>
-                <th>loading <?php if (!empty($headerdata)) {
-                              if ($headerdata['loading_no'] != 0) {
-                                echo $headerdata['loading_no'];
-                              }
+                <th>Loading<?php if ($loadingHeader !== '') {
+                              echo ' ' . htmlspecialchars($loadingHeader);
                             } ?></th>
                 <th>Grand Total Mc</th>
               </tr>
@@ -111,6 +130,8 @@ $bootstrap->css();
                 $lastcommondity = $pdo->prepare("SELECT * FROM tclmcstock WHERE id < $lastid AND item_id='$item_id' AND date='$date'");
                 $lastcommondity->execute();
                 $lastcommondity = $lastcommondity->fetch(PDO::FETCH_ASSOC);
+                $rowTransferMc = tclmcTransactionTotal($pdo, (int)$tclmcdata['id'], 'transfer');
+                $rowLoadingMc = tclmcTransactionTotal($pdo, (int)$tclmcdata['id'], 'export');
               ?>
                 <tr>
                   <td><?php if (empty($lastcommondity)) {
@@ -130,13 +151,13 @@ $bootstrap->css();
                         echo "-";
                       } ?></td>
                   <td><?php echo $tclmcdata['form10mc']; ?></td>
-                  <td><?php if ($tclmcdata['transfer_mc'] != 0) {
-                        echo $tclmcdata['transfer_mc'];
+                  <td><?php if ($rowTransferMc != 0) {
+                        echo $rowTransferMc;
                       } else {
                         echo "-";
                       } ?></td>
-                  <td><?php if ($tclmcdata['loading_mc'] != 0) {
-                        echo $tclmcdata['loading_mc'];
+                  <td><?php if ($rowLoadingMc != 0) {
+                        echo $rowLoadingMc;
                       } else {
                         echo "-";
                       } ?></td>
@@ -158,13 +179,8 @@ $bootstrap->css();
               $form10mctotalstmt->execute();
               $form10mctotaldatas = $form10mctotalstmt->fetch(PDO::FETCH_ASSOC);
 
-              $transfermctotalstmt = $pdo->prepare("SELECT SUM(transfer_mc) AS transfermc FROM tclmcstock WHERE date='$date'");
-              $transfermctotalstmt->execute();
-              $transfermctotaldatas = $transfermctotalstmt->fetch(PDO::FETCH_ASSOC);
-
-              $loadingmctotalstmt = $pdo->prepare("SELECT SUM(loading_mc) AS loadingmc FROM tclmcstock WHERE date='$date'");
-              $loadingmctotalstmt->execute();
-              $loadingmctotaldatas = $loadingmctotalstmt->fetch(PDO::FETCH_ASSOC);
+              $transfermcTotal = tclmcDateTransactionTotal($pdo, $date, 'transfer');
+              $loadingmcTotal = tclmcDateTransactionTotal($pdo, $date, 'export');
 
               $grandtotalmctotalstmt = $pdo->prepare("SELECT SUM(grandtotal_mc) AS grandtotalmc FROM tclmcstock WHERE date='$date'");
               $grandtotalmctotalstmt->execute();
@@ -182,13 +198,13 @@ $bootstrap->css();
                                               } else {
                                                 echo "-";
                                               } ?></td>
-                <td style="font-weight:bold;"><?php if ($transfermctotaldatas['transfermc'] != 0) {
-                                                echo $transfermctotaldatas['transfermc'];
+                <td style="font-weight:bold;"><?php if ($transfermcTotal != 0) {
+                                                echo $transfermcTotal;
                                               } else {
                                                 echo "-";
                                               } ?></td>
-                <td style="font-weight:bold;"><?php if ($loadingmctotaldatas['loadingmc'] != 0) {
-                                                echo $loadingmctotaldatas['loadingmc'];
+                <td style="font-weight:bold;"><?php if ($loadingmcTotal != 0) {
+                                                echo $loadingmcTotal;
                                               } else {
                                                 echo "-";
                                               } ?></td>
@@ -206,17 +222,13 @@ $bootstrap->css();
             <table class="table table-hover table-bordered table-striped" id="<?php //echo $countrydata['country']; 
                                                                               ?>table">
               <tr>
-                <th>Date</th>
                 <th>Fish Name</th>
                 <th>Size</th>
-                <th>Pcs</th>
-                <th>Kg</th>
-                <th>Grand Total Mc</th>
+                <th>Balance Mc</th>
                 <th>Action</th>
               </tr>
               <?php
-              // $country = $countrydata['country'];
-              $stmt = $pdo->prepare("SELECT * FROM tclmcstock");
+              $stmt = $pdo->prepare('SELECT item_id, size, SUM(COALESCE(grandtotal_mc, 0)) AS grandtotal_mc FROM tclmcstock GROUP BY item_id, size ORDER BY item_id, size');
               $stmt->execute();
               $datas = $stmt->fetchall();
               foreach ($datas as $tclmcdata) {
@@ -226,18 +238,13 @@ $bootstrap->css();
                 $commonditydata = $query->select('products', $item_id, 'id');
 
                 $size = $tclmcdata['size'];
-                $kg = $tclmcdata['kg'];
-                $item_id = $tclmcdata['item_id'];
               ?>
                 <tr>
-                  <td><?php echo date("d-m-Y", strtotime($tclmcdata['date'])); ?></td>
                   <td><?php echo htmlspecialchars($commonditydata['name'] ?? 'Unknown'); ?></td>
-                  <td><?php echo $tclmcdata['size']; ?></td>
-                  <td><?php echo $tclmcdata['pcs']; ?></td>
-                  <td><?php echo $tclmcdata['kg']; ?></td>
-                  <td><?php echo $tclmcdata['grandtotal_mc']; ?></td>
+                  <td><?php echo htmlspecialchars($tclmcdata['size']); ?></td>
+                  <td><?php echo (int)$tclmcdata['grandtotal_mc']; ?></td>
                   <td>
-                    <a href="tclmc_stock_info.php?id=<?php echo $tclmcdata['id']; ?>" class="btn btn-info btn-sm text-light">
+                    <a href="tclmc_stock_info.php?item_id=<?php echo urlencode((string)$item_id); ?>&amp;sizeinfo=<?php echo urlencode((string)$size); ?>" class="btn btn-info btn-sm text-light">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-check" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z" />
                       </svg></a>

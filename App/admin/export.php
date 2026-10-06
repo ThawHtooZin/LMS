@@ -2346,7 +2346,7 @@ if ($_GET['table_name'] == 'form_10_tcl') {
       $item_id = $data['item_id'];
       $size = $data['size'];
       $commonditydata = selectExportProduct($item_id);
-      $supplierid = $data['supplier_id'];
+      $supplierid = $data['contact_id'] ?? $data['supplier_id'] ?? '';
       $supplier_name = selectExportParty($supplierid);
 
       $raw_viss_tmt = $pdo->prepare("SELECT SUM(viss) AS raw_viss FROM form7stocktcl WHERE item_id='$item_id' AND size='$size'");
@@ -2830,7 +2830,7 @@ if ($_GET['table_name'] == "form10frozen") {
 
 
       $commonditydata = selectExportProduct($item_id);
-      $supplierid = $data['supplier_id'];
+      $supplierid = $data['contact_id'] ?? $data['supplier_id'] ?? '';
       $supplier_name = selectExportParty($supplierid);
 
       $form7datastmt = $pdo->prepare("SELECT * FROM form7stock WHERE item_id='$item_id' AND country='$country' AND date IN ($datesList)");
@@ -2903,7 +2903,7 @@ if ($_GET['table_name'] == "form10frozen") {
     $supplieridstmt = $pdo->prepare("SELECT * FROM form10stock WHERE item_id='$commondity_id' AND country='$country' AND date='$searchdate'");
     $supplieridstmt->execute();
     $supplierdata = $supplieridstmt->fetch(PDO::FETCH_ASSOC);
-    $supplier_id = $supplierdata['supplier_id'];
+    $supplier_id = $supplierdata['contact_id'] ?? $supplierdata['supplier_id'] ?? '';
 
 
     $totalf7kgstmt = $pdo->prepare("SELECT SUM(kg) AS total_kg FROM form7stock WHERE item_id='$commondity_id' AND country='$country' AND supplier_name='$supplier_id' AND date IN ($datesList)");

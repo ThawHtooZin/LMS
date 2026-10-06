@@ -1380,6 +1380,7 @@ $query = new Query();
                  <th>Mc</th>
                  <th>Net Weight</th>
                </tr>
+             </table>
              <?php
            }
               ?>

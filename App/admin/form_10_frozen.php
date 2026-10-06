@@ -32,7 +32,7 @@ $bootstrap->css();
     $newdate = $_POST['update'];
     $upitem_id = $_POST['upitem_id'];
     $upfish_type = $_POST['upfish_type'];
-    $upsupplier_id = $_POST['upsupplier_id'];
+    $upcontact_id = $_POST['upcontact_id'] ?? $_POST['upsupplier_id'] ?? '';
     $upcountry = $_POST['upcountry'];
     $uptype = $_POST['uptype'];
     $upsize = $_POST['upsize'];
@@ -44,7 +44,7 @@ $bootstrap->css();
     $uplooseoutkg = $_POST['uploose_out_kg'];
     $uplooseoutpcs = $_POST['uploose_out_pcs'];
 
-    $query->updateform10($updateid, $newdate, $upitem_id, $upfish_type, $upsupplier_id, $upcountry, $uptype, $upsize, $upmc, $upkg, $uppcs, $uplooseinkg, $uplooseinpcs, $uplooseoutkg, $uplooseoutpcs);
+    $query->updateform10($updateid, $newdate, $upitem_id, $upfish_type, $upcontact_id, $upcountry, $uptype, $upsize, $upmc, $upkg, $uppcs, $uplooseinkg, $uplooseinpcs, $uplooseoutkg, $uplooseoutpcs);
   }
 
   if (isset($_POST['searchbtn'])) {
@@ -304,9 +304,9 @@ $bootstrap->css();
               $prodStmt->execute([$item_id]);
               $item_name = $prodStmt->fetchColumn() ?: 'Unknown';
 
-              $supplierid = $data['supplier_id'];
+              $supplierid = $data['contact_id'] ?? $data['supplier_id'] ?? null;
 
-              $supStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ? LIMIT 1");
+              $supStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ? AND is_supplier = 1 LIMIT 1");
               $supStmt->execute([$supplierid]);
               $supplier_name_val = $supStmt->fetchColumn() ?: $supplierid;
 
@@ -378,14 +378,15 @@ $bootstrap->css();
                             </div>
                             <div class="col">
                               <label>Supplier Name</label>
-                              <select name="upsupplier_id" class="form-control inpv2">
+                              <select name="upcontact_id" class="form-control inpv2">
                                 <?php
-                                $supplier_id_stmt = $pdo->prepare("SELECT id, name FROM contacts WHERE is_supplier = 1 OR is_supplier = 0");
+                                $supplier_id_stmt = $pdo->prepare("SELECT id, name FROM contacts WHERE is_supplier = 1 ORDER BY name ASC");
                                 $supplier_id_stmt->execute();
                                 $supplier_id_datas = $supplier_id_stmt->fetchAll(PDO::FETCH_ASSOC);
+                                $selected_contact = $updatedata['contact_id'] ?? $updatedata['supplier_id'] ?? '';
                                 foreach ($supplier_id_datas as $supplier_name_opt) {
                                 ?>
-                                  <option value="<?php echo htmlspecialchars($supplier_name_opt['id']); ?>" <?php if (($updatedata['supplier_id'] ?? '') == $supplier_name_opt['id']) echo "selected"; ?>><?php echo htmlspecialchars($supplier_name_opt['name']); ?></option>
+                                  <option value="<?php echo htmlspecialchars($supplier_name_opt['id']); ?>" <?php if ($selected_contact == $supplier_name_opt['id']) echo "selected"; ?>><?php echo htmlspecialchars($supplier_name_opt['name']); ?></option>
                                 <?php } ?>
                               </select>
                             </div>
