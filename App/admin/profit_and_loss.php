@@ -230,12 +230,12 @@ $net_profit = $gross_profit - $total_expense - $total_uncat;
                         <?php foreach ($income_accounts as $acc): ?>
                             <tr>
                                 <td><?= htmlspecialchars($acc['name']) ?> (<?= $acc['code'] ?>)</td>
-                                <td class="text-right text-primary"><?= number_format($acc['balance'], 2) ?></td>
+                                <td class="text-right text-primary"><?= format_lms_amount($acc['balance']) ?></td>
                             </tr>
                         <?php endforeach; ?>
                         <tr class="total-row">
                             <td>Total Trading Income</td>
-                            <td class="text-right"><?= number_format($total_income, 2) ?></td>
+                            <td class="text-right"><?= format_lms_amount($total_income) ?></td>
                         </tr>
 
                         <!-- COST OF SALES -->
@@ -248,18 +248,18 @@ $net_profit = $gross_profit - $total_expense - $total_uncat;
                         <?php foreach ($cos_accounts as $acc): ?>
                             <tr>
                                 <td><?= htmlspecialchars($acc['name']) ?> (<?= $acc['code'] ?>)</td>
-                                <td class="text-right text-primary"><?= number_format($acc['balance'], 2) ?></td>
+                                <td class="text-right text-primary"><?= format_lms_amount($acc['balance']) ?></td>
                             </tr>
                         <?php endforeach; ?>
                         <tr class="total-row">
                             <td>Total Cost of Sales</td>
-                            <td class="text-right"><?= number_format($total_cos, 2) ?></td>
+                            <td class="text-right"><?= format_lms_amount($total_cos) ?></td>
                         </tr>
 
                         <!-- GROSS PROFIT -->
                         <tr class="total-row">
                             <td class="pt-3 pb-3">Gross Profit</td>
-                            <td class="text-right pt-3 pb-3"><?= number_format($gross_profit, 2) ?></td>
+                            <td class="text-right pt-3 pb-3"><?= format_lms_amount($gross_profit) ?></td>
                         </tr>
 
                         <!-- OPERATING EXPENSES -->
@@ -272,12 +272,12 @@ $net_profit = $gross_profit - $total_expense - $total_uncat;
                         <?php foreach ($expense_accounts as $acc): ?>
                             <tr>
                                 <td><?= htmlspecialchars($acc['name']) ?> (<?= $acc['code'] ?>)</td>
-                                <td class="text-right text-primary"><?= number_format($acc['balance'], 2) ?></td>
+                                <td class="text-right text-primary"><?= format_lms_amount($acc['balance']) ?></td>
                             </tr>
                         <?php endforeach; ?>
                         <tr class="total-row">
                             <td>Total Operating Expenses</td>
-                            <td class="text-right"><?= number_format($total_expense, 2) ?></td>
+                            <td class="text-right"><?= format_lms_amount($total_expense) ?></td>
                         </tr>
 
                         <!-- UNCATEGORIZED SAFETY NET -->
@@ -288,19 +288,19 @@ $net_profit = $gross_profit - $total_expense - $total_uncat;
                             <?php foreach ($uncategorized_expenses as $acc): ?>
                                 <tr>
                                     <td><?= htmlspecialchars($acc['name']) ?> (<?= $acc['code'] ?>)</td>
-                                    <td class="text-right text-danger"><?= number_format($acc['balance'], 2) ?></td>
+                                    <td class="text-right text-danger"><?= format_lms_amount($acc['balance']) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                             <tr class="total-row">
                                 <td class="text-danger">Total Uncategorized</td>
-                                <td class="text-right text-danger"><?= number_format($total_uncat, 2) ?></td>
+                                <td class="text-right text-danger"><?= format_lms_amount($total_uncat) ?></td>
                             </tr>
                         <?php endif; ?>
 
                         <!-- NET PROFIT -->
                         <tr class="grand-total">
                             <td class="pt-4 pb-4">Net Profit</td>
-                            <td class="text-right pt-4 pb-4"><?= $net_profit < 0 ? '(' . number_format(abs($net_profit), 2) . ')' : number_format($net_profit, 2) ?></td>
+                            <td class="text-right pt-4 pb-4"><?= $net_profit < 0 ? '(' . format_lms_amount(abs($net_profit)) . ')' : format_lms_amount($net_profit) ?></td>
                         </tr>
                     </table>
                 </div>

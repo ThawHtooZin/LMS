@@ -368,10 +368,10 @@ $query = new Query();
                   <td><?php echo htmlspecialchars($item_name_val); ?></td>
                   <td><?php echo htmlspecialchars($purchasedata['size'] ?? ''); ?></td>
                   <td><?php echo htmlspecialchars($purchasedata['viss'] ?? ''); ?></td>
-                  <td><?php echo number_format(floatval($purchasedata['viss'] ?? 0) * 1.634, 2); ?></td>
+                  <td><?php echo format_lms_amount(floatval($purchasedata['viss'] ?? 0) * 1.634); ?></td>
                   <td><?php echo htmlspecialchars($purchasedata['pcs'] ?? ''); ?></td>
-                  <td><?php echo number_format($purchasedata['unit_price'] ?? 0, 2); ?></td>
-                  <td><?php echo number_format($purchasedata['line_amount'] ?? 0, 2); ?></td>
+                  <td><?php echo format_lms_amount($purchasedata['unit_price'] ?? 0); ?></td>
+                  <td><?php echo format_lms_amount($purchasedata['line_amount'] ?? 0); ?></td>
                 </tr>
               <?php } ?>
 
@@ -379,7 +379,7 @@ $query = new Query();
                 <tr class="table-info fw-bold">
                   <td colspan="10"></td>
                   <td>Total Amount:</td>
-                  <td><?php echo number_format($total_amount_supplier_search['total_amount'] ?? 0, 2); ?></td>
+                  <td><?php echo format_lms_amount($total_amount_supplier_search['total_amount'] ?? 0); ?></td>
                 </tr>
               <?php } ?>
 
@@ -387,18 +387,18 @@ $query = new Query();
                 <tr class="table-info fw-bold">
                   <td colspan="10"></td>
                   <td>Total Amount:</td>
-                  <td><?php echo number_format($total_amount_commodity_search['total_amount'] ?? 0, 2); ?></td>
+                  <td><?php echo format_lms_amount($total_amount_commodity_search['total_amount'] ?? 0); ?></td>
                 </tr>
                 <?php if (!empty($total_amount_commodity_search_viss)) { ?>
                   <tr class="table-info fw-bold">
                     <td colspan="10"></td>
                     <td>Total Viss:</td>
-                    <td><?php echo number_format($total_amount_commodity_search_viss['total_viss'] ?? 0, 2); ?></td>
+                    <td><?php echo format_lms_amount($total_amount_commodity_search_viss['total_viss'] ?? 0); ?></td>
                   </tr>
                   <tr class="table-info fw-bold">
                     <td colspan="10"></td>
                     <td>Total Kg:</td>
-                    <td><?php echo number_format(floatval($total_amount_commodity_search_viss['total_viss'] ?? 0) * 1.634, 2); ?></td>
+                    <td><?php echo format_lms_amount(floatval($total_amount_commodity_search_viss['total_viss'] ?? 0) * 1.634); ?></td>
                   </tr>
                 <?php } ?>
               <?php } ?>
@@ -407,7 +407,7 @@ $query = new Query();
                 <tr class="table-info fw-bold">
                   <td colspan="10"></td>
                   <td>Total Amount:</td>
-                  <td><?php echo number_format($total_amount_dbw_search['total_amount'] ?? 0, 2); ?></td>
+                  <td><?php echo format_lms_amount($total_amount_dbw_search['total_amount'] ?? 0); ?></td>
                 </tr>
               <?php } ?>
 
@@ -415,7 +415,7 @@ $query = new Query();
                 <tr class="table-info fw-bold">
                   <td colspan="10"></td>
                   <td>Total Amount:</td>
-                  <td><?php echo number_format($total_amount_dbw_supplier_search['total_amount'] ?? 0, 2); ?></td>
+                  <td><?php echo format_lms_amount($total_amount_dbw_supplier_search['total_amount'] ?? 0); ?></td>
                 </tr>
               <?php } ?>
 
@@ -423,7 +423,7 @@ $query = new Query();
                 <tr class="table-info fw-bold">
                   <td colspan="10"></td>
                   <td>Total Amount:</td>
-                  <td><?php echo number_format($total_amount_dbw_commodity_search['total_amount'] ?? 0, 2); ?></td>
+                  <td><?php echo format_lms_amount($total_amount_dbw_commodity_search['total_amount'] ?? 0); ?></td>
                 </tr>
               <?php } ?>
 
@@ -431,17 +431,17 @@ $query = new Query();
                 <tr class="table-info fw-bold">
                   <td colspan="10"></td>
                   <td>Total Amount:</td>
-                  <td><?php echo number_format($total_amount_commodity_and_size_search['total_amount'] ?? 0, 2); ?></td>
+                  <td><?php echo format_lms_amount($total_amount_commodity_and_size_search['total_amount'] ?? 0); ?></td>
                 </tr>
                 <tr class="table-info fw-bold">
                   <td colspan="10"></td>
                   <td>Total Viss:</td>
-                  <td><?php echo number_format($total_amount_commodity_and_size_search_viss['total_viss'] ?? 0, 2); ?></td>
+                  <td><?php echo format_lms_amount($total_amount_commodity_and_size_search_viss['total_viss'] ?? 0); ?></td>
                 </tr>
                 <tr class="table-info fw-bold">
                   <td colspan="10"></td>
                   <td>Total Kg:</td>
-                  <td><?php echo number_format(floatval($total_amount_commodity_and_size_search_viss['total_viss'] ?? 0) * 1.634, 2); ?></td>
+                  <td><?php echo format_lms_amount(floatval($total_amount_commodity_and_size_search_viss['total_viss'] ?? 0) * 1.634); ?></td>
                 </tr>
               <?php } ?>
             </tbody>

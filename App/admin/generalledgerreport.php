@@ -9,6 +9,26 @@ $auth->checkadmin();
 $bootstrap = new Bootstrap();
 $query = new Query();
 
+function glReportAccountLabel(Query $query, string $acCode): string
+{
+  $row = $query->select('acname', $acCode, 'code_no');
+  return !empty($row['ac_name']) ? $row['ac_name'] : $acCode;
+}
+
+function glReportVoucherCurrency(PDO $pdo, string $voucherNo): string
+{
+  $stmt = $pdo->prepare('SELECT currency FROM sales WHERE sr_no = ? LIMIT 1');
+  $stmt->execute([$voucherNo]);
+  $currency = $stmt->fetchColumn();
+  if ($currency) {
+    return (string)$currency;
+  }
+  $stmt = $pdo->prepare('SELECT currency FROM purchases WHERE voucher_no = ? LIMIT 1');
+  $stmt->execute([$voucherNo]);
+  $currency = $stmt->fetchColumn();
+  return $currency ? (string)$currency : 'MMK';
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -158,146 +178,89 @@ $bootstrap->css();
               <th>Credit</th>
               <th>Currency</th>
               <th>Balance</th>
-              <th>Action</th>
             </tr>
             <?php
-            $search = false;
-            if ($search == true) {
-              $date_from = $_POST['date_from'];
-              $date_to = $_POST['date_to'];
-              $ac_code = $_POST['ac_code'];
-              if (isset($_POST['accountanddbwsearch'])) {
-                $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date` BETWEEN '$date_from' AND '$date_to' AND ac_code='$ac_code'");
-                $acnamecountstmt->execute();
-                $acnamecount = $acnamecountstmt->fetchColumn();
-                $acnamedontloop = 1;
-              }
-              if (isset($_POST['dbwsearch'])) {
-                $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date` BETWEEN '$date_from' AND '$date_to'");
-                $acnamecountstmt->execute();
-                $acnamecount = $acnamecountstmt->fetchColumn();
-                $acnamedontloop = 2;
-              }
-              if (isset($_POST['accountsearch'])) {
-                $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE ac_code='$ac_code'");
-                $acnamecountstmt->execute();
-                $acnamecount = $acnamecountstmt->fetchColumn();
-                $acnamedontloop = 1;
-                $acnamecount = 1;
-              }
-              if (isset($_POST['datesearch'])) {
-                $date = $_POST['date'];
-                $acnamecountstmt = $pdo->prepare("SELECT COUNT(DISTINCT ac_code) FROM general_ledger  WHERE `date`='$date'");
-                $acnamecountstmt->execute();
-                $acnamecount = $acnamecountstmt->fetchColumn();
-                $acnamedontloop = 2;
-              }
-              for ($i = 0; $i < $acnamecount; $i++) {
-                $accodestmt = $pdo->prepare("SELECT DISTINCT ac_code FROM general_ledger");
-                $accodestmt->execute();
-                $accodedata = $accodestmt->fetchall();
-                $accode = $accodedata[$i]['ac_code'];
+            $search = isset($_POST['accountsearch'])
+              || isset($_POST['dbwsearch'])
+              || isset($_POST['datesearch'])
+              || isset($_POST['accountanddbwsearch']);
+            if ($search) {
+              $filterAcCode = trim($_POST['ac_code'] ?? '');
+              $dateFrom = $_POST['dbwstartdate'] ?? '';
+              $dateTo = $_POST['dbwenddate'] ?? '';
+              $singleDate = $_POST['date'] ?? '';
 
-                if (!empty($acnamedontloop) && $acnamedontloop > 1) {
-                  $gldatas = $query->search('general_ledger', 'ac_code', $accode);
-                  $acnametoshow = $query->select('acname', $accode, 'code_no');
-                } else {
-                  $gldatas = $query->search('general_ledger', 'ac_code', $ac_code);
-                  $acnametoshow = $query->select('acname', $ac_code, 'code_no');
+              $accountCodes = [];
+              if ((isset($_POST['accountsearch']) || isset($_POST['accountanddbwsearch'])) && $filterAcCode !== '') {
+                $accountCodes = [$filterAcCode];
+              } elseif (isset($_POST['dbwsearch']) && $dateFrom !== '' && $dateTo !== '') {
+                $accodestmt = $pdo->prepare('SELECT DISTINCT ac_code FROM general_ledger WHERE date BETWEEN ? AND ? ORDER BY ac_code ASC');
+                $accodestmt->execute([$dateFrom, $dateTo]);
+                $accountCodes = array_column($accodestmt->fetchAll(PDO::FETCH_ASSOC), 'ac_code');
+              } elseif (isset($_POST['datesearch']) && $singleDate !== '') {
+                $accodestmt = $pdo->prepare('SELECT DISTINCT ac_code FROM general_ledger WHERE date = ? ORDER BY ac_code ASC');
+                $accodestmt->execute([$singleDate]);
+                $accountCodes = array_column($accodestmt->fetchAll(PDO::FETCH_ASSOC), 'ac_code');
+              }
+
+              foreach ($accountCodes as $sectionAcCode) {
+                $sql = 'SELECT * FROM general_ledger WHERE ac_code = ?';
+                $params = [$sectionAcCode];
+                if (isset($_POST['accountanddbwsearch']) && $dateFrom !== '' && $dateTo !== '') {
+                  $sql .= ' AND date BETWEEN ? AND ?';
+                  $params[] = $dateFrom;
+                  $params[] = $dateTo;
+                } elseif (isset($_POST['dbwsearch']) && $dateFrom !== '' && $dateTo !== '') {
+                  $sql .= ' AND date BETWEEN ? AND ?';
+                  $params[] = $dateFrom;
+                  $params[] = $dateTo;
+                } elseif (isset($_POST['datesearch']) && $singleDate !== '') {
+                  $sql .= ' AND date = ?';
+                  $params[] = $singleDate;
                 }
+                $sql .= ' ORDER BY date ASC, id ASC';
+                $glstmt = $pdo->prepare($sql);
+                $glstmt->execute($params);
+                $gldatas = $glstmt->fetchAll(PDO::FETCH_ASSOC);
+                if (empty($gldatas)) {
+                  continue;
+                }
+
+                $sectionLabel = glReportAccountLabel($query, $sectionAcCode);
             ?>
                 <tr>
-                  <td colspan="8"><b><u><?php echo "Account No. : " . $ac_code . " - " . $acnametoshow['ac_name']; ?></u></b></td>
+                  <td colspan="8"><b><u><?= 'Account No. : ' . htmlspecialchars($sectionAcCode) . ' - ' . htmlspecialchars($sectionLabel); ?></u></b></td>
                 </tr>
                 <?php
-                foreach ($gldatas as $gldata) : ?>
-                  <?php
-                  $ac_code = $gldata['ac_code'];
-                  $gldata['transactionid'];
-                  $acname = $query->select('acname', $ac_code, 'code_no');
-
-
-                  // acnamechange
-                  $voucher_no = $gldata['voucherno'];
-                  $ac_code = $gldata['ac_code'];
-                  $acselectstmt = $pdo->prepare("SELECT * FROM transaction WHERE voucher_no=:voucher_no AND ac_code!='$ac_code'");
-                  $acselectstmt->execute(
-                    array(':voucher_no' => $voucher_no)
-                  );
-                  $acselect = $acselectstmt->fetch(PDO::FETCH_ASSOC);
-                  $accode = $acselect['ac_code'];
-                  if (str_contains($accode, '4000/')) {
-                    $acname = 'Supplier';
-                  } else {
-                    $acnamedata = $query->select('acname', $accode, 'code_no');
-                    $acname = $acnamedata['ac_name'];
-                  }
-                  // acnamechange
-
-                  $balance = $gldata['debit'] - $gldata['credit'];
-
-                  if ($gldata['debit'] == 0 && $gldata['credit'] == 0) {
-                    $debitorcredit = 'balance';
-                  } elseif ($gldata['debit'] != 0) {
-                    $debitorcredit = 'debit';
-                  } else {
-                    $debitorcredit = 'credit';
-                  }
-                  $transactionid = $gldata['transactionid'];
-                  if (str_contains($gldata['ac_code'], '3300/')) {
-                    $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit'");
-                  } else {
-                    $currencystmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='$debitorcredit' AND transactionid='$transactionid'");
-                  }
-                  $currencystmt->execute(
-                    array(':voucher_no' => $voucher_no)
-                  );
-                  $currencydata = $currencystmt->fetch(PDO::FETCH_ASSOC);
+                $runningBalance = 0.0;
+                $totalDebit = 0.0;
+                $totalCredit = 0.0;
+                foreach ($gldatas as $gldata) {
+                  $debit = (float)$gldata['debit'];
+                  $credit = (float)$gldata['credit'];
+                  $runningBalance += $debit - $credit;
+                  $totalDebit += $debit;
+                  $totalCredit += $credit;
+                  $acName = glReportAccountLabel($query, $gldata['ac_code']);
+                  $currency = glReportVoucherCurrency($pdo, $gldata['voucherno']);
                   ?>
                   <tr>
-                    <td><?php echo date('d/m/Y', strtotime($gldata['date'])); ?></td>
-                    <td><?php echo $gldata['voucherno']; ?></td>
-                    <td><?php echo $acname; ?></td>
-                    <td><?php echo $gldata['narration']; ?></td>
-                    <td><?php echo $gldata['debit']; ?></td>
-                    <td><?php echo $gldata['credit']; ?></td>
-                    <td><?php if ($currencydata['usd_amount'] == 0) {
-                          echo 'MMK';
-                        } else {
-                          echo 'USD';
-                        } ?></td>
-                    <td><?php echo $gldata['balance']; ?></td>
-                    <td>
-                      <a href="edittransaction.php?voucher_no=<?= $gldata['voucherno']; ?>&file=general_ledger&transactionid=<?= $gldata['transactionid']; ?>&id=<?= $gldata['id']; ?>" style="<?php if (str_contains(strtolower($acname), 'purchase')) {
-                                                                                                                                                                                                  echo "display:none;";
-                                                                                                                                                                                                } ?>">
-                        <button type="submit" class="btn btn-warning btn-sm text-light" name="updatebutton"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
-                          </svg>
-                        </button>
-                      </a>
-                    </td>
+                    <td><?= date('d/m/Y', strtotime($gldata['date'])); ?></td>
+                    <td><?= htmlspecialchars($gldata['voucherno']); ?></td>
+                    <td><?= htmlspecialchars($acName); ?></td>
+                    <td><?= htmlspecialchars($gldata['narration']); ?></td>
+                    <td class="text-end"><?= format_lms_amount($debit, true); ?></td>
+                    <td class="text-end"><?= format_lms_amount($credit, true); ?></td>
+                    <td><?= htmlspecialchars($currency); ?></td>
+                    <td class="text-end"><?= format_lms_amount($runningBalance); ?></td>
                   </tr>
-                <?php endforeach;
-                $debitstmt = $pdo->prepare("SELECT SUM(debit) AS total_debit FROM general_ledger WHERE ac_code='$ac_code'");
-                $debitstmt->execute();
-                $totaldebit = $debitstmt->fetch(PDO::FETCH_ASSOC);
-                $creditstmt = $pdo->prepare("SELECT SUM(credit) AS total_credit FROM general_ledger WHERE ac_code='$ac_code'");
-                $creditstmt->execute();
-                $totalcredit = $creditstmt->fetch(PDO::FETCH_ASSOC);
-                $totalbalance = $totaldebit['total_debit'] - $totalcredit['total_credit'];
-                $balance = $totaldebit['total_debit'] - $totalcredit['total_credit'];
-                ?>
+                <?php } ?>
                 <tr style="font-weight:bold;">
-                  <td>Total:</td>
+                  <td colspan="4" class="text-end">Total:</td>
+                  <td class="text-end"><?= format_lms_amount($totalDebit); ?></td>
+                  <td class="text-end"><?= format_lms_amount($totalCredit); ?></td>
                   <td></td>
-                  <td></td>
-                  <td></td>
-                  <td><?= $totaldebit['total_debit']; ?></td>
-                  <td><?= $totalcredit['total_credit']; ?></td>
-                  <td><?= $totalbalance; ?></td>
-                  <td></td>
+                  <td class="text-end"><?= format_lms_amount($runningBalance); ?></td>
                 </tr>
             <?php
               }

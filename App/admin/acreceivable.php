@@ -79,9 +79,9 @@ $query = new Query();
                 <tr>
                   <td><?= $id++; ?></td>
                   <td class="fw-bold"><?= htmlspecialchars($cust['customer_name']); ?></td>
-                  <td class="text-secondary"><?= number_format($cust['total_billed'], 2); ?></td>
-                  <td class="text-success"><?= number_format($cust['total_paid'], 2); ?></td>
-                  <td class="fw-bold text-danger"><?= number_format($cust['balance_owed'], 2); ?></td>
+                  <td class="text-secondary"><?= format_lms_amount($cust['total_billed']); ?></td>
+                  <td class="text-success"><?= format_lms_amount($cust['total_paid']); ?></td>
+                  <td class="fw-bold text-danger"><?= format_lms_amount($cust['balance_owed']); ?></td>
                   <td class="text-center">
                     <a href="acreceivabledetail.php?customer_id=<?= $cust['customer_id']; ?>" class="btn btn-primary btn-sm">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-check" viewBox="0 0 16 16">
@@ -93,9 +93,9 @@ $query = new Query();
               <?php endforeach; ?>
               <tr class="table-light border-top border-dark" style="font-weight: bold;">
                 <td colspan="2" class="text-end">TOTALS:</td>
-                <td><?= number_format($grand_billed, 2); ?></td>
-                <td class="text-success"><?= number_format($grand_paid, 2); ?></td>
-                <td class="text-danger"><?= number_format($grand_owed, 2); ?></td>
+                <td><?= format_lms_amount($grand_billed); ?></td>
+                <td class="text-success"><?= format_lms_amount($grand_paid); ?></td>
+                <td class="text-danger"><?= format_lms_amount($grand_owed); ?></td>
                 <td></td>
               </tr>
             </tbody>

@@ -117,8 +117,8 @@ $tabs = ['All', 'Draft', 'Awaiting Approval', 'Awaiting Payment', 'Paid', 'Voide
                     <td><?php echo htmlspecialchars($b['voucher_no']); ?></td>
                     <td><?php echo date('M d, Y', strtotime($b['date'])); ?></td>
                     <td><?php echo !empty($b['due_date']) ? date('M d, Y', strtotime($b['due_date'])) : '-'; ?></td>
-                    <td class="text-end text-muted"><?php echo number_format($paid, 2); ?></td>
-                    <td class="text-end fw-bold"><?php echo number_format($due, 2); ?></td>
+                    <td class="text-end text-muted"><?php echo format_lms_amount($paid); ?></td>
+                    <td class="text-end fw-bold"><?php echo format_lms_amount($due); ?></td>
                   </tr>
                 <?php endforeach; ?>
               <?php endif; ?>

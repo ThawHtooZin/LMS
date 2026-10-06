@@ -202,16 +202,16 @@ foreach ($accounts as $acc) {
                                     <tr>
                                         <td><?= htmlspecialchars($l['description']) ?></td>
                                         <td><?= htmlspecialchars($acc_display) ?></td>
-                                        <td class="text-end"><?= number_format($l['debit'], 2) ?></td>
-                                        <td class="text-end"><?= number_format($l['credit'], 2) ?></td>
+                                        <td class="text-end"><?= format_lms_amount($l['debit']) ?></td>
+                                        <td class="text-end"><?= format_lms_amount($l['credit']) ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
                             <tfoot>
                                 <tr class="fw-bold border-top border-dark">
                                     <td colspan="2" class="text-end">TOTAL</td>
-                                    <td class="text-end"><?= number_format($tot_d, 2) ?></td>
-                                    <td class="text-end"><?= number_format($tot_c, 2) ?></td>
+                                    <td class="text-end"><?= format_lms_amount($tot_d) ?></td>
+                                    <td class="text-end"><?= format_lms_amount($tot_c) ?></td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -340,8 +340,8 @@ foreach ($accounts as $acc) {
                 totalCredit += parseFloat(input.value) || 0;
             });
 
-            document.getElementById('totalDebit').innerText = totalDebit.toFixed(2);
-            document.getElementById('totalCredit').innerText = totalCredit.toFixed(2);
+            document.getElementById('totalDebit').innerText = Math.round(totalDebit).toLocaleString(undefined, { maximumFractionDigits: 0 });
+            document.getElementById('totalCredit').innerText = Math.round(totalCredit).toLocaleString(undefined, { maximumFractionDigits: 0 });
 
             const color = (totalDebit === totalCredit && totalDebit !== 0) ? '#15803d' : '#ef4444';
             document.getElementById('totalDebit').style.color = color;

@@ -297,11 +297,11 @@ foreach ($accounts as $acc) {
                         <div class="col-md-5">
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="fw-bold text-muted">Subtotal</span>
-                                <span id="subtotalDisplay">0.00</span>
+                                <span id="subtotalDisplay">0</span>
                             </div>
                             <div class="d-flex justify-content-between align-items-center total-box">
                                 <h3 class="mb-0 fw-bold">TOTAL</h3>
-                                <h3 class="mb-0 fw-bold" id="grandTotalDisplay">0.00</h3>
+                                <h3 class="mb-0 fw-bold" id="grandTotalDisplay">0</h3>
                             </div>
                         </div>
                     </div>
@@ -485,15 +485,13 @@ foreach ($accounts as $acc) {
                 }
 
                 let t = multiplier * p;
-                $(this).find('.line-total').text(t.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
+                $(this).find('.line-total').text(Math.round(t).toLocaleString(undefined, {
+                    maximumFractionDigits: 0
                 }));
                 total += t;
             });
-            let fTotal = total.toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
+            let fTotal = Math.round(total).toLocaleString(undefined, {
+                maximumFractionDigits: 0
             });
             $('#subtotalDisplay').text(fTotal);
             $('#grandTotalDisplay').text(fTotal);

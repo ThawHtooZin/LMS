@@ -76,10 +76,10 @@
                     <td><?php echo htmlspecialchars($t['voucherno']); ?></td>
                     <td><?php echo htmlspecialchars($offset_name); ?></td>
                     <td><?php echo htmlspecialchars($t['narration']); ?></td>
-                    <td><?php echo number_format($debit, 2); ?></td>
-                    <td><?php echo number_format($credit, 2); ?></td>
+                    <td><?php echo format_lms_amount($debit); ?></td>
+                    <td><?php echo format_lms_amount($credit); ?></td>
                     <td><?php echo $currency_display; ?></td>
-                    <td><?php echo number_format($realbalance, 2); ?></td>
+                    <td><?php echo format_lms_amount($realbalance); ?></td>
                     <td>
                         <a href="edittransaction.php?voucher_no=<?= urlencode($t['voucherno']); ?>&file=general_ledger&id=<?= $t['id']; ?>" style="<?php if (str_contains(strtolower((string)$offset_name), 'purchase')) {
                                                                                                                                                         echo "display:none;";
@@ -98,10 +98,10 @@
                 <td></td>
                 <td></td>
                 <td></td>
-                <td><?= number_format($t_debit, 2); ?></td>
-                <td><?= number_format($t_credit, 2); ?></td>
+                <td><?= format_lms_amount($t_debit); ?></td>
+                <td><?= format_lms_amount($t_credit); ?></td>
                 <td></td>
-                <td><?= number_format($t_debit - $t_credit, 2); ?></td>
+                <td><?= format_lms_amount($t_debit - $t_credit); ?></td>
                 <td></td>
             </tr>
     <?php

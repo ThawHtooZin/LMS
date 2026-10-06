@@ -95,7 +95,7 @@ $journals = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <tr class="clickable-row" onclick="window.location.href='view_journal.php?id=<?= $j['id'] ?>'">
                                         <td class="fw-bold text-primary"><?= date('d M Y', strtotime($j['journal_date'])) ?></td>
                                         <td><?= htmlspecialchars($j['narration']) ?></td>
-                                        <td><?= number_format($j['total_amount'], 2) ?></td>
+                                        <td><?= format_lms_amount($j['total_amount']) ?></td>
                                         <td>
                                             <?php if ($j['status'] === 'DRAFT'): ?>
                                                 <span class="status-draft">Draft</span>

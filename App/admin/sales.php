@@ -133,9 +133,9 @@ function sale_status_badge_class($status)
                       <td class="text-muted small"><?= htmlspecialchars($sale['containers'] ?? '-'); ?></td>
                       <td><?= date('M d, Y', strtotime($sale['date'])); ?></td>
                       <td><?= !empty($sale['due_date']) ? date('M d, Y', strtotime($sale['due_date'])) : '-'; ?></td>
-                      <td class="text-end fw-bold"><?= number_format($sale['grand_total'], 2); ?> <?= htmlspecialchars($sale['currency']); ?></td>
-                      <td class="text-end text-muted"><?= number_format($sale['paid_amount'], 2); ?></td>
-                      <td class="text-end fw-bold"><?= number_format($due, 2); ?></td>
+                      <td class="text-end fw-bold"><?= format_lms_amount($sale['grand_total']); ?> <?= htmlspecialchars($sale['currency']); ?></td>
+                      <td class="text-end text-muted"><?= format_lms_amount($sale['paid_amount']); ?></td>
+                      <td class="text-end fw-bold"><?= format_lms_amount($due); ?></td>
                       <td><span class="status-badge <?= $status_class; ?>"><?= ucfirst(strtolower(str_replace('_', ' ', $sale['status']))); ?></span></td>
                       <td class="text-center">
                         <?php if ($sale['status'] === 'DRAFT'): ?>

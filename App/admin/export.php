@@ -118,10 +118,10 @@ if (isset($_GET['table_name']) && $_GET['table_name'] == 'general_ledger') {
           <td><?php echo htmlspecialchars($t['voucherno']); ?></td>
           <td><?php echo htmlspecialchars($offset_name); ?></td>
           <td><?php echo htmlspecialchars($t['narration']); ?></td>
-          <td><?php echo number_format($debit, 2); ?></td>
-          <td><?php echo number_format($credit, 2); ?></td>
+          <td><?php echo format_lms_amount($debit); ?></td>
+          <td><?php echo format_lms_amount($credit); ?></td>
           <td><?php echo $currency_display; ?></td>
-          <td><?php echo number_format($realbalance, 2); ?></td>
+          <td><?php echo format_lms_amount($realbalance); ?></td>
         </tr>
       <?php } ?>
       <tr style="font-weight:bold; background-color:#f1f1f1;">
@@ -129,10 +129,10 @@ if (isset($_GET['table_name']) && $_GET['table_name'] == 'general_ledger') {
         <td></td>
         <td></td>
         <td></td>
-        <td><?= number_format($t_debit, 2); ?></td>
-        <td><?= number_format($t_credit, 2); ?></td>
+        <td><?= format_lms_amount($t_debit); ?></td>
+        <td><?= format_lms_amount($t_credit); ?></td>
         <td></td>
-        <td><?= number_format($t_debit - $t_credit, 2); ?></td>
+        <td><?= format_lms_amount($t_debit - $t_credit); ?></td>
       </tr>
     <?php
     }

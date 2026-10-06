@@ -158,7 +158,7 @@ $lines = $line_stmt->fetchAll(PDO::FETCH_ASSOC);
                     </tr>
                     <tr>
                         <th>Total</th>
-                        <td><?= $purchase['currency']; ?> <?= number_format($purchase['grand_total'], 2); ?></td>
+                        <td><?= $purchase['currency']; ?> <?= format_lms_amount($purchase['grand_total']); ?></td>
                     </tr>
                 </table>
             </div>
@@ -204,8 +204,8 @@ $lines = $line_stmt->fetchAll(PDO::FETCH_ASSOC);
                             <?php endif; ?>
                         </td>
                         <td class="text-end"><?= $qty . $qty_label; ?></td>
-                        <td class="text-end"><?= number_format($line['unit_price'], 2); ?></td>
-                        <td class="text-end"><?= number_format($line['line_amount'], 2); ?></td>
+                        <td class="text-end"><?= format_lms_amount($line['unit_price']); ?></td>
+                        <td class="text-end"><?= format_lms_amount($line['line_amount']); ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -217,20 +217,20 @@ $lines = $line_stmt->fetchAll(PDO::FETCH_ASSOC);
                 <table class="totals-table w-100">
                     <tr>
                         <th>Subtotal</th>
-                        <td><?= number_format($purchase['subtotal'], 2); ?></td>
+                        <td><?= format_lms_amount($purchase['subtotal']); ?></td>
                     </tr>
                     <tr class="grand-total">
                         <th>TOTAL <?= $purchase['currency']; ?></th>
-                        <td><?= number_format($purchase['grand_total'], 2); ?></td>
+                        <td><?= format_lms_amount($purchase['grand_total']); ?></td>
                     </tr>
                     <?php if ($purchase['paid_amount'] > 0): ?>
                         <tr>
                             <th>Less Amount Paid</th>
-                            <td class="text-danger">- <?= number_format($purchase['paid_amount'], 2); ?></td>
+                            <td class="text-danger">- <?= format_lms_amount($purchase['paid_amount']); ?></td>
                         </tr>
                         <tr>
                             <th>Amount Due <?= $purchase['currency']; ?></th>
-                            <td><?= number_format($purchase['grand_total'] - $purchase['paid_amount'], 2); ?></td>
+                            <td><?= format_lms_amount($purchase['grand_total'] - $purchase['paid_amount']); ?></td>
                         </tr>
                     <?php endif; ?>
                 </table>

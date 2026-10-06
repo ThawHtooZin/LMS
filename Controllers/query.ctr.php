@@ -2,6 +2,7 @@
 
 include "database.db.php";
 
+require_once __DIR__ . '/../Resources/lms_format.php';
 require 'ValidatorInstance.php';
 
 class Query
@@ -152,9 +153,31 @@ class Query
     return $names;
   }
 
+  function mapAccodeLegacyRow($row)
+  {
+    if (!$row || !is_array($row)) {
+      return [];
+    }
+    $row['code_no'] = $row['code'] ?? ($row['code_no'] ?? '');
+    $row['ac_name'] = $row['name'] ?? ($row['ac_name'] ?? '');
+    $row['ac_type'] = $row['class'] ?? ($row['type'] ?? ($row['ac_type'] ?? ''));
+    return $row;
+  }
+
+  function accodeLookupColumn($select_id)
+  {
+    return $select_id === 'code_no' ? 'code' : $select_id;
+  }
+
   function selectall($table)
   {
     global $pdo;
+    if ($table === 'acname') {
+      $stmt = $pdo->prepare('SELECT * FROM accodes ORDER BY code ASC');
+      $stmt->execute();
+      $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      return array_map([$this, 'mapAccodeLegacyRow'], $rows);
+    }
     $stmt = $pdo->prepare("SELECT * FROM $table");
     $stmt->execute();
     return $stmt->fetchall();
@@ -171,6 +194,12 @@ class Query
   function select($table, $id, $select_id)
   {
     global $pdo;
+    if ($table === 'acname') {
+      $column = $this->accodeLookupColumn($select_id);
+      $stmt = $pdo->prepare("SELECT * FROM accodes WHERE `$column` = ? LIMIT 1");
+      $stmt->execute([$id]);
+      return $this->mapAccodeLegacyRow($stmt->fetch(PDO::FETCH_ASSOC));
+    }
     $stmt = $pdo->prepare("SELECT * FROM $table WHERE $select_id='$id'");
     $stmt->execute();
     return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -179,6 +208,13 @@ class Query
   function selectcontain($table, $column, $containwhat)
   {
     global $pdo;
+    if ($table === 'acname') {
+      $column = $this->accodeLookupColumn($column);
+      $stmt = $pdo->prepare("SELECT * FROM accodes WHERE `$column` LIKE ? ORDER BY code ASC");
+      $stmt->execute(['%' . $containwhat . '%']);
+      $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      return array_map([$this, 'mapAccodeLegacyRow'], $rows);
+    }
     $stmt = $pdo->prepare("SELECT * FROM $table WHERE $column LIKE '%$containwhat%'");
     $stmt->execute();
     return $stmt->fetchall();
@@ -195,6 +231,13 @@ class Query
   function search($table, $search_row, $serach_id)
   {
     global $pdo;
+    if ($table === 'acname') {
+      $column = $this->accodeLookupColumn($search_row);
+      $stmt = $pdo->prepare("SELECT * FROM accodes WHERE `$column` = ? ORDER BY code ASC");
+      $stmt->execute([$serach_id]);
+      $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      return array_map([$this, 'mapAccodeLegacyRow'], $rows);
+    }
     $stmt = $pdo->prepare("SELECT * FROM $table WHERE $search_row='$serach_id'");
     $stmt->execute();
     return $stmt->fetchall();
@@ -1142,7 +1185,7 @@ class Query
         throw new Exception("Supplier has no outstanding bills.");
       }
       if (round($payment_amount, 2) > round($total_outstanding, 2)) {
-        throw new Exception("Payment amount cannot exceed the supplier's outstanding balance of " . number_format($total_outstanding, 2) . ".");
+        throw new Exception("Payment amount cannot exceed the supplier's outstanding balance of " . format_lms_amount($total_outstanding) . ".");
       }
 
       $remaining_payment = $payment_amount;
@@ -3222,7 +3265,7 @@ class Query
         throw new Exception("Customer has no outstanding invoices.");
       }
       if (round($original_amount, 2) > round($total_outstanding, 2)) {
-        throw new Exception("Payment amount cannot exceed the customer's outstanding balance of " . number_format($total_outstanding, 2) . ".");
+        throw new Exception("Payment amount cannot exceed the customer's outstanding balance of " . format_lms_amount($total_outstanding) . ".");
       }
 
       $remaining_payment = $original_amount;
@@ -5720,10 +5763,8 @@ class Query
       $sr_no = $transactiondata['sr_no'];
       $container_no = $transactiondata['container_no'];
       $bank_charges = $transactiondata['bank_charges'];
-      $actypestmt = $pdo->prepare("SELECT * FROM acname WHERE code_no='$ac_code'");
-      $actypestmt->execute();
-      $acid = $actypestmt->fetch(PDO::FETCH_ASSOC);
-      $acid = $acid['ac_type'];
+      $acidRow = $this->select('acname', $ac_code, 'code_no');
+      $acid = $acidRow['ac_type'] ?? '';
 
       $balancestmt = $pdo->prepare("SELECT * FROM general_ledger WHERE ac_code='$ac_code' ORDER BY id DESC");
       $balancestmt->execute();
@@ -6946,10 +6987,7 @@ class Query
 
   function selectacname($code_no)
   {
-    global $pdo;
-    $stmt = $pdo->prepare("SELECT * FROM accodes WHERE code='$code_no'");
-    $stmt->execute();
-    return $stmt->fetch(PDO::FETCH_ASSOC);
+    return $this->select('acname', $code_no, 'code_no');
   }
 
   function checkifacexists($accode)

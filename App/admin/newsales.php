@@ -171,7 +171,7 @@ $accounts = $pdo->query("SELECT code, name, class FROM accodes WHERE class = 'RE
                         <div class="col-md-5">
                             <div class="d-flex justify-content-between align-items-center total-box">
                                 <h3 class="mb-0 fw-bold">TOTAL</h3>
-                                <h3 class="mb-0 fw-bold" id="grandTotalDisplay">0.00</h3>
+                                <h3 class="mb-0 fw-bold" id="grandTotalDisplay">0</h3>
                             </div>
                         </div>
                     </div>
@@ -291,9 +291,8 @@ $accounts = $pdo->query("SELECT code, name, class FROM accodes WHERE class = 'RE
                     total += amt;
                 }
             });
-            let fTotal = total.toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
+            let fTotal = Math.round(total).toLocaleString(undefined, {
+                maximumFractionDigits: 0
             });
             $('#grandTotalDisplay').text(fTotal);
         }

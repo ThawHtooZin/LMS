@@ -164,7 +164,7 @@ $bootstrap->css();
                 <h6>AC Code</h6>
                 <select name="balanceac" class="form-control inpv2">
                   <?php
-                  $acstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no LIKE '3600%'");
+                  $acstmt = $pdo->prepare("SELECT code AS code_no, name AS ac_name, class AS ac_type FROM accodes WHERE code LIKE '3600%'");
                   $acstmt->execute();
                   $acdatas = $acstmt->fetchAll();
                   foreach ($acdatas as $acdata) {
@@ -393,7 +393,7 @@ $bootstrap->css();
             }
 
             $crossac_nameid = $cashdata['crossac_name'];
-            $crossacnamestmt = $pdo->prepare("SELECT * FROM acname WHERE code_no='$crossac_nameid'");
+            $crossacnamestmt = $pdo->prepare("SELECT code AS code_no, name AS ac_name, class AS ac_type FROM accodes WHERE code='$crossac_nameid'");
             $crossacnamestmt->execute();
             $crossacnamedata = $crossacnamestmt->fetch(PDO::FETCH_ASSOC);
 
@@ -466,7 +466,7 @@ $bootstrap->css();
                         <h6>AC Code</h6>
                         <select name="updatebalanceaccode" class="form-control inpv2">
                           <?php
-                          $acstmt = $pdo->prepare("SELECT * FROM acname WHERE code_no LIKE '3600%'");
+                          $acstmt = $pdo->prepare("SELECT code AS code_no, name AS ac_name, class AS ac_type FROM accodes WHERE code LIKE '3600%'");
                           $acstmt->execute();
                           $acdatas = $acstmt->fetchAll();
                           foreach ($acdatas as $acdata) {

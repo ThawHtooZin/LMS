@@ -252,8 +252,8 @@ foreach ($accounts as $acc) {
                 totalCredit += parseFloat(input.value) || 0;
             });
 
-            document.getElementById('totalDebit').innerText = totalDebit.toFixed(2);
-            document.getElementById('totalCredit').innerText = totalCredit.toFixed(2);
+            document.getElementById('totalDebit').innerText = Math.round(totalDebit).toLocaleString(undefined, { maximumFractionDigits: 0 });
+            document.getElementById('totalCredit').innerText = Math.round(totalCredit).toLocaleString(undefined, { maximumFractionDigits: 0 });
 
             const color = (totalDebit === totalCredit && totalDebit !== 0) ? '#15803d' : '#ef4444';
             document.getElementById('totalDebit').style.color = color;

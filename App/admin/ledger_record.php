@@ -23,7 +23,7 @@ $query = new Query();
   <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Cormorant+Garamond:wght@300&family=Teko:wght@700&display=swap" rel="stylesheet">
   <body>
     <?php
-    $actypestmt = $pdo->prepare("SELECT DISTINCT ac_type FROM acname");
+    $actypestmt = $pdo->prepare("SELECT DISTINCT class AS ac_type FROM accodes WHERE class IS NOT NULL AND class != '' ORDER BY class");
     $actypestmt->execute();
     $actypedatas = $actypestmt->fetchall();
 
@@ -83,9 +83,9 @@ $query = new Query();
               <?php
               foreach ($actypedatas as $actypedata) :
 
-                $actypename = $query->select("actype", $actypedata['ac_type'], 'acid');
+                $classSlug = preg_replace('/[^a-zA-Z0-9_-]/', '_', $actypedata['ac_type']);
                 ?>
-                <button type="submit" class="pb-2 pt-2 ps-3 pe-3 text-dark rounded <?= $actypename['ac_type']; ?>" style="text-decoration:none; border:none;" name="<?= $actypedata['ac_type']; ?>"><?= $actypename['ac_type']; ?></button>
+                <button type="submit" class="pb-2 pt-2 ps-3 pe-3 text-dark rounded <?= htmlspecialchars($classSlug); ?>" style="text-decoration:none; border:none;" name="<?= htmlspecialchars($actypedata['ac_type']); ?>"><?= htmlspecialchars($actypedata['ac_type']); ?></button>
                 <?php
               endforeach;
               ?>
@@ -99,9 +99,9 @@ $query = new Query();
               if(isset($_POST["{$actypedata['ac_type']}"])){
                 $_SESSION['ledgerrecordtabs'] = "{$actypedata['ac_type']}";
               }
-              $actypename = $query->select("actype", $actypedata['ac_type'], 'acid');
+              $classSlug = preg_replace('/[^a-zA-Z0-9_-]/', '_', $actypedata['ac_type']);
               ?>
-            <table class="table taber-hover table-striped <?= $actypename['ac_type']; ?>table hide">
+            <table class="table taber-hover table-striped <?= htmlspecialchars($classSlug); ?>table hide">
               <tr>
                 <th>Date</th>
                 <th>Vr. No</th>

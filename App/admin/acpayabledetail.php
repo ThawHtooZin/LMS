@@ -115,7 +115,7 @@ foreach ($asset_accounts as $acc) {
   <?php if ($paymentResult !== null): ?>
     <script>
       <?php if ($paymentResult['status'] === true): ?>
-        swal("Success!", "Payment of <?= number_format($paymentResult['amount'], 2); ?> applied successfully across open bills.", "success").then(function() {
+        swal("Success!", "Payment of <?= format_lms_amount($paymentResult['amount']); ?> applied successfully across open bills.", "success").then(function() {
           window.location.href = "acpayabledetail.php?supplier_id=<?= $supplier_id; ?>";
         });
       <?php else: ?>
@@ -165,17 +165,17 @@ foreach ($asset_accounts as $acc) {
                   <tr>
                     <td><?= date('d-m-Y', strtotime($bill['date'])); ?></td>
                     <td class="fw-bold text-primary"><?= htmlspecialchars($bill['voucher_no']); ?></td>
-                    <td><?= number_format($bill['grand_total'], 2); ?></td>
+                    <td><?= format_lms_amount($bill['grand_total']); ?></td>
                     <td>
                       <?php if ($bill['paid_amount'] > 0): ?>
                         <a href="#history-<?= $bill['id']; ?>" data-bs-toggle="collapse" class="text-success text-decoration-none fw-bold accordion-toggle">
-                          <?= number_format($bill['paid_amount'], 2); ?> <i class="bi bi-chevron-down ms-1" style="font-size:11px;"></i>
+                          <?= format_lms_amount($bill['paid_amount']); ?> <i class="bi bi-chevron-down ms-1" style="font-size:11px;"></i>
                         </a>
                       <?php else: ?>
-                        <?= number_format($bill['paid_amount'], 2); ?>
+                        <?= format_lms_amount($bill['paid_amount']); ?>
                       <?php endif; ?>
                     </td>
-                    <td class="fw-bold"><?= number_format($bill['outstanding'], 2); ?></td>
+                    <td class="fw-bold"><?= format_lms_amount($bill['outstanding']); ?></td>
                     <td>
                       <?php if ($bill['outstanding'] == 0): ?>
                         <span class="badge bg-success">Paid</span>
@@ -208,7 +208,7 @@ foreach ($asset_accounts as $acc) {
                                 <td><?= htmlspecialchars($pay['reference']); ?></td>
                                 <td><?= htmlspecialchars($pay['check_number'] ?? '-'); ?></td>
                                 <td class="text-muted"><?= htmlspecialchars($pay['description'] ?? '-'); ?></td>
-                                <td class="fw-bold text-success"><?= number_format($pay['amount'], 2); ?></td>
+                                <td class="fw-bold text-success"><?= format_lms_amount($pay['amount']); ?></td>
                               </tr>
                             <?php endforeach; ?>
                           <?php else: ?>
@@ -275,8 +275,8 @@ foreach ($asset_accounts as $acc) {
 
               <div class="mb-2">
                 <label class="form-label fw-bold small">Payment Amount</label>
-                <input type="number" name="payment_amount" step="0.01" max="<?= $total_outstanding; ?>" class="form-control form-control-lg text-success fw-bold" placeholder="Max: <?= number_format($total_outstanding, 2); ?>" required>
-                <small class="text-muted">Total Outstanding: <?= number_format($total_outstanding, 2); ?></small>
+                <input type="number" name="payment_amount" step="0.01" max="<?= $total_outstanding; ?>" class="form-control form-control-lg text-success fw-bold" placeholder="Max: <?= format_lms_amount($total_outstanding); ?>" required>
+                <small class="text-muted">Total Outstanding: <?= format_lms_amount($total_outstanding); ?></small>
               </div>
             </div>
             <div class="modal-footer">
