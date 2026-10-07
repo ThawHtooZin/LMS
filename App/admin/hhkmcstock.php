@@ -28,11 +28,15 @@ $query = new Query();
   if (isset($_POST['addbtn'])) {
     $date = $_POST['date'];
     $particular = $_POST['particular'];
-    $commondity_id = !empty($_POST['commondity_id2']) 
-      ? $_POST['commondity_id2'] 
-      : (!empty($_POST['commondity_id1']) ? $_POST['commondity_id1'] : '');
-    $fish_type = $_POST['fish_type2'] ?? $_POST['fish_type'] ?? 'G';
-    $country = !empty($_POST['country']) ? $_POST['country'] : (!empty($_POST['country2']) ? $_POST['country2'] : '');
+    if ($particular === 'balance') {
+      $commondity_id = $_POST['commondity_id2'] ?? '';
+      $fish_type = $_POST['fish_type2'] ?? 'G';
+      $country = $_POST['country'] ?? '';
+    } else {
+      $commondity_id = $_POST['commondity_id1'] ?? '';
+      $fish_type = $_POST['fish_type1'] ?? 'G';
+      $country = $_POST['country2'] ?? '';
+    }
     $remark = $_POST['remark'] ?? '';
     $size = $_POST['size'];
     $kg = $_POST['kg'];
@@ -95,23 +99,10 @@ $query = new Query();
     $(document).ready(() => {
       // Reusable function to handle the toggling based on dropdown selection
       function toggleParticularFields() {
-        var particular = $('#particular').val();
+        var isBalance = $('#particular').val() === 'balance';
 
-        if (particular === 'balance') {
-          $('#commondityid2').show();
-          $('#commondityid1').hide();
-          $('#commondityid4').show();
-          $('#commondityid3').hide();
-          $('#country2').show();
-          $('#country1').hide();
-        } else {
-          $('#commondityid2').hide();
-          $('#commondityid1').show();
-          $('#commondityid4').hide();
-          $('#commondityid3').show();
-          $('#country2').hide();
-          $('#country1').show();
-        }
+        $('#commondityid2, #commondityid4, #country2').toggle(isBalance).prop('disabled', !isBalance);
+        $('#commondityid1, #commondityid3, #country1').toggle(!isBalance).prop('disabled', isBalance);
       }
 
       // Trigger when the user changes the dropdown
@@ -316,7 +307,7 @@ $query = new Query();
                             </select>
                           </div>
                           <div class="col">
-                            <select name="fish_type2" id="commondityid3" class="form-control inpv2" required>
+                            <select name="fish_type1" id="commondityid3" class="form-control inpv2" required>
                               <option value="G">G</option>
                               <option value="egg">egg</option>
                               <option value="ggs">ggs</option>
@@ -344,8 +335,8 @@ $query = new Query();
                       <div class="col">
                         <label>Particular</label>
                         <select name="particular" class="form-control inpv2 mb-2" id="particular" required>
-                          <option value="fromform10" <?php echo (isset($_SESSION['particular']) && $_SESSION['particular'] == 'From Form-10') ? 'selected' : ''; ?>>From Form-10</option>
-                          <option value="balance" <?php echo (isset($_SESSION['particular']) && $_SESSION['particular'] == 'Balance') ? 'selected' : ''; ?>>Balance</option>
+                          <option value="fromform10" <?php echo (($_SESSION['particular'] ?? 'fromform10') === 'fromform10') ? 'selected' : ''; ?>>From Form-10</option>
+                          <option value="balance" <?php echo (($_SESSION['particular'] ?? '') === 'balance') ? 'selected' : ''; ?>>Balance</option>
                         </select>
                         <label>Remark</label>
                         <!-- REMARK FIELD: NOT REQUIRED -->

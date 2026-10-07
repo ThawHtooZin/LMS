@@ -529,12 +529,12 @@ CREATE TABLE `hhkmcstock` (
   `kg` varchar(11) NOT NULL,
   `mc` int(11) NOT NULL,
   `balance_mc` bigint(17) NOT NULL,
-  `loosein_size` varchar(20) NOT NULL,
-  `loosein_kg` varchar(20) NOT NULL,
-  `loosein_pcs` bigint(15) NOT NULL,
-  `looseout_size` varchar(20) NOT NULL,
-  `looseout_kg` varchar(20) NOT NULL,
-  `looseout_pcs` bigint(15) NOT NULL,
+  `loosein_size` varchar(20) NOT NULL DEFAULT '',
+  `loosein_kg` varchar(20) NOT NULL DEFAULT '',
+  `loosein_pcs` bigint(15) NOT NULL DEFAULT 0,
+  `looseout_size` varchar(20) NOT NULL DEFAULT '',
+  `looseout_kg` varchar(20) NOT NULL DEFAULT '',
+  `looseout_pcs` bigint(15) NOT NULL DEFAULT 0,
   `remark` text NOT NULL,
   `fish_type` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
