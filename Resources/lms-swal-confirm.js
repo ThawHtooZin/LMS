@@ -11,25 +11,47 @@
     });
   }
 
+  function submitDeleteForm(button) {
+    var form = button.form || (button.closest ? button.closest('form') : null);
+    if (!form) {
+      return;
+    }
+    if (button.name && !form.querySelector('input[type="hidden"][name="' + button.name + '"]')) {
+      var hidden = document.createElement('input');
+      hidden.type = 'hidden';
+      hidden.name = button.name;
+      hidden.value = button.value || '1';
+      form.appendChild(hidden);
+    }
+    form.submit();
+  }
+
   /** Delete button inside a form (submits closest form on confirm). */
   global.lmsConfirmDelete = function (button, text, title) {
-    showConfirm({ title: title, text: text }).then(function (confirmed) {
-      if (!confirmed) {
+    if (typeof global.swal !== 'function') {
+      if (global.confirm(text || 'Are you sure?')) {
+        submitDeleteForm(button);
+      }
+      return;
+    }
+    try {
+      var pending = showConfirm({ title: title, text: text });
+      if (!pending || typeof pending.then !== 'function') {
+        if (global.confirm(text || 'Are you sure?')) {
+          submitDeleteForm(button);
+        }
         return;
       }
-      var form = button.closest('form');
-      if (!form) {
-        return;
+      pending.then(function (confirmed) {
+        if (confirmed) {
+          submitDeleteForm(button);
+        }
+      });
+    } catch (e) {
+      if (global.confirm(text || 'Are you sure?')) {
+        submitDeleteForm(button);
       }
-      if (button.name) {
-        var hidden = document.createElement('input');
-        hidden.type = 'hidden';
-        hidden.name = button.name;
-        hidden.value = button.value || '1';
-        form.appendChild(hidden);
-      }
-      form.submit();
-    });
+    }
   };
 
   /** Form onsubmit handler — always return false. */
