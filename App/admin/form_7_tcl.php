@@ -303,7 +303,7 @@ $bootstrap->css();
               $t_pcs += floatval($form7data['pcspervr'] ?? 0);
               $t_pcsf7 += floatval($form7data['pcsperf7'] ?? 0);
             ?>
-              <tr data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>" style="cursor:pointer;">
+              <tr>
                 <td onclick="event.stopPropagation();"><input type="checkbox" class="row-checkbox" value="<?php echo $form7data['id']; ?>"></td>
                 <td><?php if (!empty($form7data['date']) && $form7data['date'] != "0000-00-00") echo date('d-m-Y', strtotime($form7data['date'])); ?></td>
                 <td><?php echo htmlspecialchars($item_name_val); ?></td>
@@ -314,7 +314,7 @@ $bootstrap->css();
                 <td><?php echo htmlspecialchars($form7data['viss'] ?? ''); ?></td>
                 <td><?php if (!empty($form7data['kg'])) echo round($form7data['kg'], 2); ?></td>
                 <td><?php echo htmlspecialchars($form7data['pcspervr'] ?? ''); ?></td>
-                <td><?php if (!empty($form7data['pcsperf7'])) echo htmlspecialchars($form7data['pcsperf7']); ?></td>
+                <td  data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $form7data['id']; ?>" style="cursor:pointer;"><?php if (!empty($form7data['pcsperf7'])) echo htmlspecialchars($form7data['pcsperf7']); ?></td>
                 <td onclick="event.stopPropagation();">
                   <form action="" method="post">
                     <input type="hidden" name="deleteid" value="<?php echo $form7data['id']; ?>">
