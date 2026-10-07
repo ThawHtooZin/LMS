@@ -4238,6 +4238,15 @@ class Query
     $addstmt->execute();
   }
 
+  function addform7tcl($date, $item_id, $supplier_name, $size, $viss)
+  {
+    global $pdo;
+
+    $kg = floatval($viss) * 1.634;
+    $stmt = $pdo->prepare("INSERT INTO form7stocktcl (date, item_id, supplier_name, country, type, size, viss, kg) VALUES (?, ?, ?, 'DAKA', 'TCl', ?, ?, ?)");
+    $stmt->execute([$date, $item_id, $supplier_name, $size, $viss, $kg]);
+  }
+
   function deleteform7($table, $idtodelete)
   {
     global $pdo;

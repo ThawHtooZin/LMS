@@ -544,8 +544,7 @@ $bootstrap->css();
               <div class="col">
                 <label>Type</label>
                 <select class="form-control inpv2 mb-2" name="type" required>
-                  <option value="">Select Type</option>
-                  <option value="frozen">Frozen</option>
+                  <option value="frozen" selected>Frozen</option>
                   <option value="tcl">TCl</option>
                 </select>
               </div>

@@ -26,40 +26,115 @@ $bootstrap->css();
 <body>
   <?php
 
+  $form7Alert = function ($message) {
+    echo '<script>swal("Error!", ' . json_encode($message) . ', "error");</script>';
+  };
+  $allowedTypes = ['frozen', 'tcl'];
+
   if (isset($_POST['update'])) {
-    $pcsperf7 = $_POST['pcsperf7'];
-    $updateid = $_POST['id'];
+    $pcsperf7 = trim($_POST['pcsperf7'] ?? '');
+    $updateid = $_POST['id'] ?? '';
 
-    $existing_data = $query->select('form7stocktcl', $updateid, 'id');
-    $country = isset($_POST['country']) ? $_POST['country'] : $existing_data['country'];
-
-    $query->updatetclcountry($country, $pcsperf7, $updateid);
+    if (!ctype_digit((string) $updateid) || (int) $updateid < 1) {
+      $form7Alert('Invalid row to update.');
+    } elseif ($pcsperf7 === '' || filter_var($pcsperf7, FILTER_VALIDATE_INT) === false || (int) $pcsperf7 < 0) {
+      $form7Alert('Pcs per F-7 must be a whole number zero or greater.');
+    } else {
+      $existing_data = $query->select('form7stocktcl', $updateid, 'id');
+      if (!$existing_data) {
+        $form7Alert('Row not found.');
+      } else {
+        $country = isset($_POST['country']) ? $_POST['country'] : $existing_data['country'];
+        $query->updatetclcountry($country, $pcsperf7, $updateid);
+      }
+    }
   }
 
   if (isset($_POST['addsize'])) {
-    $id = $_POST['id'];
-    $size = $_POST['size'];
-    $query->addsizetcl($id, $size);
+    $id = $_POST['id'] ?? '';
+    $size = trim($_POST['size'] ?? '');
+
+    if (!ctype_digit((string) $id) || (int) $id < 1) {
+      $form7Alert('Invalid row to update.');
+    } elseif ($size === '') {
+      $form7Alert('Size is required.');
+    } elseif (strlen($size) > 11) {
+      $form7Alert('Size must be 11 characters or fewer.');
+    } else {
+      $source = $query->select('form7stocktcl', $id, 'id');
+      if (!$source) {
+        $form7Alert('Row not found.');
+      } else {
+        $query->addsizetcl($id, $size);
+      }
+    }
   }
 
   if (isset($_POST['bulk_update_btn'])) {
-    $bulk_ids = $_POST['bulk_ids'];
-    $bulk_country = trim($_POST['bulk_country']);
+    $bulk_ids = $_POST['bulk_ids'] ?? '';
+    $bulk_country = trim($_POST['bulk_country'] ?? '');
+    $idParts = array_filter(array_map('trim', explode(',', (string) $bulk_ids)), function ($id) {
+      return ctype_digit($id) && (int) $id > 0;
+    });
 
-    if (!empty($bulk_ids) && $bulk_country !== '') {
-      $query->bulkUpdateForm7Tcl($bulk_ids, $bulk_country);
+    if (count($idParts) === 0) {
+      $form7Alert('Select at least one row to update.');
+    } elseif ($bulk_country === '') {
+      $form7Alert('Country is required.');
+    } elseif (strlen($bulk_country) > 155) {
+      $form7Alert('Country must be 155 characters or fewer.');
+    } else {
+      $query->bulkUpdateForm7Tcl(implode(',', $idParts), $bulk_country);
     }
   }
 
   if (isset($_POST['addform7'])) {
-    $date = $_POST['date'];
-    $commondity_id = $_POST['item_id'];
-    $supplier_name = $_POST['supplier_id'];
-    $type = $_POST['type'];
-    $size = $_POST['size'];
-    $viss = $_POST['viss'];
+    $date = trim($_POST['date'] ?? '');
+    $commondity_id = trim($_POST['item_id'] ?? '');
+    $supplier_name = trim($_POST['supplier_id'] ?? '');
+    $type = strtolower(trim($_POST['type'] ?? ''));
+    $size = trim($_POST['size'] ?? '');
+    $viss = trim($_POST['viss'] ?? '');
 
-    $query->addform7($date, $commondity_id, $supplier_name, $type, $size, $viss);
+    $dateOk = (bool) preg_match('/^\d{4}-\d{2}-\d{2}$/', $date);
+    if ($dateOk) {
+      $parts = explode('-', $date);
+      $dateOk = checkdate((int) $parts[1], (int) $parts[2], (int) $parts[0]);
+    }
+
+    $itemOk = ctype_digit($commondity_id);
+    if ($itemOk) {
+      $itemStmt = $pdo->prepare("SELECT id FROM products WHERE id = ?");
+      $itemStmt->execute([(int) $commondity_id]);
+      $itemOk = (bool) $itemStmt->fetchColumn();
+    }
+
+    $supplierOk = ctype_digit($supplier_name);
+    if ($supplierOk) {
+      $supplierStmt = $pdo->prepare("SELECT id FROM contacts WHERE id = ?");
+      $supplierStmt->execute([(int) $supplier_name]);
+      $supplierOk = (bool) $supplierStmt->fetchColumn();
+    }
+
+    if (!$dateOk) {
+      $form7Alert('Date is required.');
+    } elseif (!$itemOk) {
+      $form7Alert('Fish Name is required.');
+    } elseif (!$supplierOk) {
+      $form7Alert('Supplier Name is required.');
+    } elseif (!in_array($type, $allowedTypes, true)) {
+      $form7Alert('Select a type.');
+    } elseif ($size === '') {
+      $form7Alert('Size is required.');
+    } elseif (strlen($size) > 11) {
+      $form7Alert('Size must be 11 characters or fewer.');
+    } elseif ($viss === '' || !is_numeric($viss) || floatval($viss) <= 0 || strlen($viss) > 11) {
+      $form7Alert('Viss must be a number greater than zero (11 characters or fewer).');
+    } elseif ($type === 'tcl') {
+      $query->addform7tcl($date, $commondity_id, $supplier_name, $size, $viss);
+    } else {
+      $query->addform7($date, $commondity_id, $supplier_name, $type, $size, $viss);
+    }
   }
 
   if (isset($_POST['deleteform7'])) {
@@ -261,7 +336,7 @@ $bootstrap->css();
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                      <form action="" method="post">
+                      <form action="" method="post" novalidate onsubmit="return validatePcsPerF7(this)">
                         <input type="hidden" name="id" value="<?php echo $form7data['id']; ?>">
                         <div class="modal-body">
                           <?php
@@ -271,7 +346,7 @@ $bootstrap->css();
                           <div class="row">
                             <div class="col">
                               <label>Pcs Per F7</label>
-                              <input type="text" name="pcsperf7" class="form-control inpv2 mt-1" value="<?php echo htmlspecialchars($updata['pcsperf7'] ?? ''); ?>">
+                              <input type="number" name="pcsperf7" min="0" step="1" class="form-control inpv2 mt-1" value="<?php echo htmlspecialchars($updata['pcsperf7'] ?? ''); ?>" required>
                             </div>
                           </div>
                         </div>
@@ -293,11 +368,11 @@ $bootstrap->css();
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                      <form action="" method="post">
+                      <form action="" method="post" novalidate onsubmit="return validateForm7Size(this)">
                         <input type="hidden" name="id" value="<?php echo $form7data['id']; ?>">
                         <div class="modal-body">
                           <label>Size</label>
-                          <input type="text" name="size" class="form-control inpv2 mt-2">
+                          <input type="text" name="size" maxlength="11" class="form-control inpv2 mt-2" required>
                         </div>
                         <div class="modal-footer">
                           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -340,12 +415,12 @@ $bootstrap->css();
           <h5 class="modal-title">Bulk Update TCL Form-7 Data</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <form action="" method="post">
+        <form action="" method="post" novalidate onsubmit="return validateBulkCountry(this)">
           <div class="modal-body">
             <input type="hidden" name="bulk_ids" id="bulk_ids" value="">
             <div class="mb-3">
-              <label class="fw-bold">Country (Leave blank to ignore)</label>
-              <input type="text" name="bulk_country" class="form-control inpv2">
+              <label class="fw-bold">Country</label>
+              <input type="text" name="bulk_country" maxlength="155" class="form-control inpv2" required>
             </div>
           </div>
           <div class="modal-footer">
@@ -366,16 +441,17 @@ $bootstrap->css();
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form action="" method="post">
+          <form action="" method="post" novalidate onsubmit="return validateAddForm7(this)">
             <div class="modal-body">
               <div class="row">
                 <div class="col">
                   <label>Date</label>
-                  <input type="date" name="date" class="form-control inpv2 mb-2">
+                  <input type="date" name="date" class="form-control inpv2 mb-2" required>
                 </div>
                 <div class="col">
                   <label>Fish Name</label>
-                  <select class="form-control inpv2 mb-2" name="item_id">
+                  <select class="form-control inpv2 mb-2" name="item_id" required>
+                    <option value="">Select Fish Name</option>
                     <?php
                     $itemstmt = $pdo->prepare("SELECT id, name FROM products");
                     $itemstmt->execute();
@@ -390,7 +466,8 @@ $bootstrap->css();
               <div class="row">
                 <div class="col">
                   <label>Supplier Name</label>
-                  <select class="form-control inpv2 mb-2" name="supplier_id">
+                  <select class="form-control inpv2 mb-2" name="supplier_id" required>
+                    <option value="">Select Supplier</option>
                     <?php
                     $supplierstmt = $pdo->prepare("SELECT id, name FROM contacts WHERE is_supplier = 1 OR is_supplier = 0");
                     $supplierstmt->execute();
@@ -403,21 +480,20 @@ $bootstrap->css();
                 </div>
                 <div class="col">
                   <label>Type</label>
-                  <select class="form-control inpv2 mb-2" name="type">
-                    <option value="">Select Type</option>
+                  <select class="form-control inpv2 mb-2" name="type" required>
+                    <option value="tcl" selected>TCl</option>
                     <option value="frozen">Frozen</option>
-                    <option value="tcl">TCl</option>
                   </select>
                 </div>
               </div>
               <div class="row">
                 <div class="col">
                   <label>Size</label>
-                  <input type="text" name="size" class="form-control inpv2 mb-2">
+                  <input type="text" name="size" maxlength="11" class="form-control inpv2 mb-2" required>
                 </div>
                 <div class="col">
                   <label>Viss</label>
-                  <input type="text" name="viss" Class="form-control inpv2 mb-2">
+                  <input type="number" name="viss" min="0.001" step="any" class="form-control inpv2 mb-2" required>
                 </div>
               </div>
             </div>
@@ -435,6 +511,104 @@ $bootstrap->css();
     function toggleAllRows(source) {
       const checkboxes = document.querySelectorAll('.row-checkbox');
       checkboxes.forEach(cb => cb.checked = source.checked);
+    }
+
+    function markInvalid(input, invalid) {
+      if (!input) return;
+      input.classList.toggle('redborder', invalid);
+    }
+
+    document.addEventListener('input', function (event) {
+      if (event.target && event.target.classList) {
+        event.target.classList.remove('redborder');
+      }
+    });
+    document.addEventListener('change', function (event) {
+      if (event.target && event.target.classList) {
+        event.target.classList.remove('redborder');
+      }
+    });
+
+    function validateAddForm7(form) {
+      let message = '';
+      const dateBad = !form.date.value;
+      markInvalid(form.date, dateBad);
+      if (dateBad) message = message || 'Date is required.';
+
+      const itemBad = !form.item_id.value;
+      markInvalid(form.item_id, itemBad);
+      if (itemBad) message = message || 'Fish Name is required.';
+
+      const supplierBad = !form.supplier_id.value;
+      markInvalid(form.supplier_id, supplierBad);
+      if (supplierBad) message = message || 'Supplier Name is required.';
+
+      const typeBad = form.type.value !== 'frozen' && form.type.value !== 'tcl';
+      markInvalid(form.type, typeBad);
+      if (typeBad) message = message || 'Select a type.';
+
+      const size = form.size.value.trim();
+      const sizeBad = size === '' || size.length > 11;
+      markInvalid(form.size, sizeBad);
+      if (size === '') message = message || 'Size is required.';
+      else if (size.length > 11) message = message || 'Size must be 11 characters or fewer.';
+
+      const viss = form.viss.value.trim();
+      const vissNum = Number(viss);
+      const vissBad = viss === '' || Number.isNaN(vissNum) || vissNum <= 0 || viss.length > 11;
+      markInvalid(form.viss, vissBad);
+      if (vissBad) message = message || 'Viss must be a number greater than zero (11 characters or fewer).';
+
+      if (message) {
+        swal('Warning', message, 'warning');
+        return false;
+      }
+      form.size.value = size;
+      form.viss.value = viss;
+      return true;
+    }
+
+    function validatePcsPerF7(form) {
+      const value = form.pcsperf7.value.trim();
+      const bad = !/^\d+$/.test(value);
+      markInvalid(form.pcsperf7, bad);
+      if (bad) {
+        swal('Warning', 'Pcs per F-7 must be a whole number zero or greater.', 'warning');
+        return false;
+      }
+      return true;
+    }
+
+    function validateForm7Size(form) {
+      const size = form.size.value.trim();
+      const bad = size === '' || size.length > 11;
+      markInvalid(form.size, bad);
+      if (size === '') {
+        swal('Warning', 'Size is required.', 'warning');
+        return false;
+      }
+      if (size.length > 11) {
+        swal('Warning', 'Size must be 11 characters or fewer.', 'warning');
+        return false;
+      }
+      form.size.value = size;
+      return true;
+    }
+
+    function validateBulkCountry(form) {
+      const country = form.bulk_country.value.trim();
+      const bad = country === '' || country.length > 155;
+      markInvalid(form.bulk_country, bad);
+      if (country === '') {
+        swal('Warning', 'Country is required.', 'warning');
+        return false;
+      }
+      if (country.length > 155) {
+        swal('Warning', 'Country must be 155 characters or fewer.', 'warning');
+        return false;
+      }
+      form.bulk_country.value = country;
+      return true;
     }
 
     function openBulkModal() {

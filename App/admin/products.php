@@ -73,8 +73,23 @@ foreach ($all_accounts as $acc) {
             padding-left: 20px;
         }
 
-        .chosen-container {
+        .modal .chosen-container {
+            display: block !important;
             width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .modal .chosen-container-single .chosen-single {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .modal .chosen-container .chosen-drop {
+            width: 100% !important;
+            left: 0 !important;
+            box-sizing: border-box;
         }
 
         .chosen-container-single .chosen-search input[type="text"] {
@@ -207,7 +222,9 @@ foreach ($all_accounts as $acc) {
                         $productdatas = $stmt->fetchAll();
                         ?>
 
-                        <?php foreach ($productdatas as $data) { ?>
+                        <?php
+                        $updateModals = '';
+                        foreach ($productdatas as $data) { ?>
                             <tr>
                                 <td class="fw-bold"><?php echo htmlspecialchars($data['code']); ?></td>
                                 <td><?php echo htmlspecialchars($data['name']); ?></td>
@@ -224,9 +241,10 @@ foreach ($all_accounts as $acc) {
                                 </td>
                             </tr>
 
+                            <?php ob_start(); ?>
                             <!-- Data Update Modal -->
                             <div class="modal fade" id="updatemodal<?php echo $data['id']; ?>" tabindex="-1" role="dialog">
-                                <div class="modal-dialog modal-lg" role="document">
+                                <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header bg-warning text-light">
                                             <h5 class="modal-title">Edit Product/Service</h5>
@@ -314,8 +332,11 @@ foreach ($all_accounts as $acc) {
                                     </div>
                                 </div>
                             </div>
-                        <?php }; ?>
+                            <?php
+                            $updateModals .= ob_get_clean();
+                        }; ?>
                     </table>
+                    <?php echo $updateModals; ?>
                     <br>
 
                     <!-- Pagination -->
@@ -348,7 +369,7 @@ foreach ($all_accounts as $acc) {
 
     <!-- Data Add Modal -->
     <div class="modal fade" id="addmodal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-secondary text-light">
                     <h5 class="modal-title">New Product or Service</h5>
@@ -453,10 +474,18 @@ foreach ($all_accounts as $acc) {
 
             // Re-initialize chosen when Modals open to correct dynamic width rendering bugs
             $('.modal').on('shown.bs.modal', function() {
-                $(this).find('.chosen-select').chosen('destroy').chosen({
-                    width: '100%',
-                    search_contains: true,
-                    no_results_text: "No account found matching:"
+                var $modal = $(this);
+                $modal.find('.chosen-select').each(function() {
+                    var $select = $(this);
+                    if ($select.data('chosen')) {
+                        $select.chosen('destroy');
+                    }
+                    $select.chosen({
+                        width: '100%',
+                        search_contains: true,
+                        no_results_text: "No account found matching:"
+                    });
+                    $select.next('.chosen-container').css({ width: '100%', maxWidth: '100%' });
                 });
             });
 
