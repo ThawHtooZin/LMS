@@ -1,13 +1,13 @@
--- MariaDB dump 10.19  Distrib 10.4.28-MariaDB, for Win64 (AMD64)
+-- MariaDB dump 10.19  Distrib 10.4.32-MariaDB, for Win64 (AMD64)
 --
--- Host: localhost    Database: lms
+-- Host: 127.0.0.1    Database: lms
 -- ------------------------------------------------------
--- Server version	10.4.34-MariaDB-log
+-- Server version	10.4.32-MariaDB
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+/*!40101 SET NAMES utf8 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -35,7 +35,6 @@ CREATE TABLE `accodes` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `accodes`
 --
 
@@ -45,7 +44,7 @@ INSERT INTO `accodes` VALUES (1,'1501','Main Cash Kyats','Current Asset','ASSETS
 /*!40000 ALTER TABLE `accodes` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `accounts`
 --
 
@@ -63,7 +62,6 @@ CREATE TABLE `accounts` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `accounts`
 --
 
@@ -73,7 +71,7 @@ INSERT INTO `accounts` VALUES (1,'Administrator','protechadmin2024***','admin@gm
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `actualinvoice`
 --
 
@@ -96,7 +94,6 @@ CREATE TABLE `actualinvoice` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `actualinvoice`
 --
 
@@ -105,7 +102,7 @@ LOCK TABLES `actualinvoice` WRITE;
 /*!40000 ALTER TABLE `actualinvoice` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `bankdetail`
 --
 
@@ -128,7 +125,6 @@ CREATE TABLE `bankdetail` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `bankdetail`
 --
 
@@ -138,7 +134,7 @@ INSERT INTO `bankdetail` VALUES (4,'1503','','','','','UAB Bank','','',''),(5,'1
 /*!40000 ALTER TABLE `bankdetail` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `cashbook`
 --
 
@@ -163,7 +159,6 @@ CREATE TABLE `cashbook` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `cashbook`
 --
 
@@ -172,7 +167,7 @@ LOCK TABLES `cashbook` WRITE;
 /*!40000 ALTER TABLE `cashbook` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `category`
 --
 
@@ -189,7 +184,6 @@ CREATE TABLE `category` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `category`
 --
 
@@ -198,7 +192,7 @@ LOCK TABLES `category` WRITE;
 /*!40000 ALTER TABLE `category` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `coldstore`
 --
 
@@ -223,7 +217,6 @@ CREATE TABLE `coldstore` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `coldstore`
 --
 
@@ -232,7 +225,7 @@ LOCK TABLES `coldstore` WRITE;
 /*!40000 ALTER TABLE `coldstore` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `config_coldstore`
 --
 
@@ -247,7 +240,6 @@ CREATE TABLE `config_coldstore` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `config_coldstore`
 --
 
@@ -256,7 +248,7 @@ LOCK TABLES `config_coldstore` WRITE;
 /*!40000 ALTER TABLE `config_coldstore` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `contacts`
 --
 
@@ -267,28 +259,26 @@ CREATE TABLE `contacts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `contact_type` varchar(50) NOT NULL DEFAULT 'Fish Supplier',
-  `details` text DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
   `phone` varchar(255) DEFAULT NULL,
   `address` text DEFAULT NULL,
   `is_supplier` tinyint(1) NOT NULL DEFAULT 0,
   `is_customer` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=158 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=157 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `contacts`
 --
 
 LOCK TABLES `contacts` WRITE;
 /*!40000 ALTER TABLE `contacts` DISABLE KEYS */;
-INSERT INTO `contacts` VALUES (1,'Ko Ko','Fish Supplier',NULL,'','','',1,0),(2,'4 Zaw','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(3,'4 Zaw (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(4,'AK','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(5,'Arr Kae','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(6,'Aung Naing Oo','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(7,'Bar Bu lay','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(8,'Chit Oo (D51)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(9,'Htet Aung Lin','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(10,'Htay Win','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(11,'Kyaw Zay Ya (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(12,'Kyaw Zin','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(13,'KTO','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(14,'Kaung Myat','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(15,'Lie Chit','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(16,'M.A','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(17,'Maung Soe','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(18,'Mg Mg Nyunt','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(19,'Nanda','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(20,'Naing Win','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(21,'Phone Naing','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(22,'Shwe Late','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(23,'Shwe Late (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(24,'Soe Min','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(25,'Si Thu (22)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(26,'Si Thu (22) (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(27,'Soe Thein','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(28,'Soe Thein (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(29,'Soe Naing','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(30,'Soe Naing (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(31,'Thet Paing','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(32,'Thein Htay','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(33,'Thin Thin Yee','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(34,'Thin Thin Yee (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(35,'Thet Oo','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(36,'Thar Hla','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(37,'Thaung Tun','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(38,'Than Than Myint (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(39,'Tun Zaw Min (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(40,'Win Bo','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(41,'Win Bo (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(42,'Ye Yint','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(43,'Zaw Zaw Latt','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(44,'Zaw Zaw Latt (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(45,'Shwe Myay','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(46,'Carton Box (Myo Myint Mo Oo)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(47,'Carton Box (Myanmar HJ)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(48,'Carton Box( Syan Pyae)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(49,'Hlaing Htake Khaung','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(50,'GFC','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(51,'Aung Kyaw Moe','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(52,'Aung Myo Min','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(53,'Aung Zaw Oo','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(54,'A Thay Lay','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(55,'Cho Mg','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(56,'Kyaw Zay Ya','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(57,'Ka Yin Lay','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(58,'Khin Mg Myint','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(59,'Mg Mg Soe','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(60,'Moe Kyaw','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(61,'Parami (Balachaung)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(62,'Tun Zaw Min','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(63,'Zaw Myat Thu','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(64,'Ko Ma Noe','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(65,'Dry Fish (Shwe Hinn Thar)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(66,'Dry Fish (Myo Thant)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(67,'Kyaw Thein Than','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(68,'GM','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(69,'Dry Fish (Zabu Thein)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(70,'Ko Myo','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(71,'Market By','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(72,'Tun Tun','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(73,'Min Lwin','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(74,'Khaing Lay','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(75,'Thet Lwin','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(76,'Nay Lin','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(77,'Tun Naing','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(78,'Ko Pan','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(79,'Aye Ko','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(80,'Nyan Tun','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(81,'Thet Oo (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(82,'Aung Zaw Oo (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(83,'Aye Htike Ko','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(84,'Mg Mg Nyunt (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(85,'Arr Kae (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(86,'Thiha','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(87,'Ko Hlawn','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(88,'Aung Kyaw Moe (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(89,'Aye Htike Ko (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(90,'Kaung Myat Tun','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(91,'Than Soe','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(92,'Than Than Myint','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(93,'San San Yee','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(94,'Tun Kyaw','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(95,'Tommy','Fish Supplier',NULL,NULL,'09977221152','Yangon',1,0),(96,'Carton Box (Pan Thazin)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(97,'Dalian Ice','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(98,'Plastic (Golden Fish)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(99,'Ko Ka Lar','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(100,'Ar Kar','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(101,'Win Aye','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(102,'Bar Bu Lay (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(103,'Promise (Inner Box)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(104,'Kyaw Min Lat','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(105,'Kyaw Lin Tun','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(106,'Kyi Lwin','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(107,'Golden Bag','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(108,'Chit Ko','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(109,'O.D.A','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(110,'Tin Hlaing','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(111,'Ko Min','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(112,'Aung Kyaw','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(113,'Zaw Win Naing','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(114,'Zay Yar Lin','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(115,'Thein Linn Oo','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(116,'Soe Min (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(117,'Carton Box (Win Pyae)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(118,'Kyaw Min Latt (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(119,'Aung Kyaw (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(120,'Tin Hlaing (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(121,'A Nge Lay','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(122,'A.K (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(123,'Ye Yint (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(124,'Zaw Win Naing (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(125,'Phoe Zaw','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(126,'Carton Box (May Kha San)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(127,'Aye Aye Maw','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(128,'Aung Tun','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(129,'Win Thein','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(130,'Thet Paing (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(131,'Aung Naing Oo (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(132,'A Nge Lay (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(133,'Phoe Zaw (TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(134,'Peter','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(135,'Ye Ko','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(136,'Aung Kyaw Thant','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(137,'Kyaw Zin Phyo','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(138,'Hman Kyi','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(139,'Oak Kar','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(140,'Hla Hla Win','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(141,'Thin Zar','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(142,'ACE (Myanmar) USD A/C','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(143,'Cho Mg(TCL)','Fish Supplier',NULL,NULL,NULL,NULL,1,0),(145,'Other Receivable-Best Brand A/C','Export Customer',NULL,'','','',0,1),(146,'South Asia Food-USA A/C','Export Customer',NULL,NULL,NULL,'',0,1),(147,'Jamuna Food-Canada A/C','Export Customer',NULL,NULL,NULL,'',0,1),(148,'ITALY','Export Customer',NULL,NULL,NULL,'',0,1),(149,'Western Trader (Kolkata)','Export Customer',NULL,NULL,NULL,'',0,1),(150,'Bangladesh (Frozen)','Export Customer',NULL,NULL,NULL,'',0,1),(151,'Bangladesh (Chill/Technak)','Export Customer',NULL,NULL,NULL,'',0,1),(152,'BRUNEI A/C','Export Customer',NULL,NULL,NULL,'',0,1),(153,'SC Fruit A/C - Mango A/C','Export Customer',NULL,NULL,NULL,'',0,1),(154,'SC Fruit A/C - Apple A/C','Export Customer',NULL,NULL,NULL,'',0,1),(155,'H - Trader A/C','Export Customer',NULL,NULL,NULL,'',0,1),(156,'Link Mark Impex','Export Customer',NULL,NULL,NULL,'',0,1);
+INSERT INTO `contacts` VALUES (1,'Ko Ko','Fish Supplier','','','',1,0),(2,'4 Zaw','Fish Supplier',NULL,NULL,NULL,1,0),(3,'4 Zaw (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(4,'AK','Fish Supplier',NULL,NULL,NULL,1,0),(5,'Arr Kae','Fish Supplier',NULL,NULL,NULL,1,0),(6,'Aung Naing Oo','Fish Supplier',NULL,NULL,NULL,1,0),(7,'Bar Bu lay','Fish Supplier',NULL,NULL,NULL,1,0),(8,'Chit Oo (D51)','Fish Supplier',NULL,NULL,NULL,1,0),(9,'Htet Aung Lin','Fish Supplier',NULL,NULL,NULL,1,0),(10,'Htay Win','Fish Supplier',NULL,NULL,NULL,1,0),(11,'Kyaw Zay Ya (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(12,'Kyaw Zin','Fish Supplier',NULL,NULL,NULL,1,0),(13,'KTO','Fish Supplier',NULL,NULL,NULL,1,0),(14,'Kaung Myat','Fish Supplier',NULL,NULL,NULL,1,0),(15,'Lie Chit','Fish Supplier',NULL,NULL,NULL,1,0),(16,'M.A','Fish Supplier',NULL,NULL,NULL,1,0),(17,'Maung Soe','Fish Supplier',NULL,NULL,NULL,1,0),(18,'Mg Mg Nyunt','Fish Supplier',NULL,NULL,NULL,1,0),(19,'Nanda','Fish Supplier',NULL,NULL,NULL,1,0),(20,'Naing Win','Fish Supplier',NULL,NULL,NULL,1,0),(21,'Phone Naing','Fish Supplier',NULL,NULL,NULL,1,0),(22,'Shwe Late','Fish Supplier',NULL,NULL,NULL,1,0),(23,'Shwe Late (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(24,'Soe Min','Fish Supplier',NULL,NULL,NULL,1,0),(25,'Si Thu (22)','Fish Supplier',NULL,NULL,NULL,1,0),(26,'Si Thu (22) (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(27,'Soe Thein','Fish Supplier',NULL,NULL,NULL,1,0),(28,'Soe Thein (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(29,'Soe Naing','Fish Supplier',NULL,NULL,NULL,1,0),(30,'Soe Naing (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(31,'Thet Paing','Fish Supplier',NULL,NULL,NULL,1,0),(32,'Thein Htay','Fish Supplier',NULL,NULL,NULL,1,0),(33,'Thin Thin Yee','Fish Supplier',NULL,NULL,NULL,1,0),(34,'Thin Thin Yee (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(35,'Thet Oo','Fish Supplier',NULL,NULL,NULL,1,0),(36,'Thar Hla','Fish Supplier',NULL,NULL,NULL,1,0),(37,'Thaung Tun','Fish Supplier',NULL,NULL,NULL,1,0),(38,'Than Than Myint (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(39,'Tun Zaw Min (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(40,'Win Bo','Fish Supplier',NULL,NULL,NULL,1,0),(41,'Win Bo (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(42,'Ye Yint','Fish Supplier',NULL,NULL,NULL,1,0),(43,'Zaw Zaw Latt','Fish Supplier',NULL,NULL,NULL,1,0),(44,'Zaw Zaw Latt (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(45,'Shwe Myay','Fish Supplier',NULL,NULL,NULL,1,0),(46,'Carton Box (Myo Myint Mo Oo)','Fish Supplier',NULL,NULL,NULL,1,0),(47,'Carton Box (Myanmar HJ)','Fish Supplier',NULL,NULL,NULL,1,0),(48,'Carton Box( Syan Pyae)','Fish Supplier',NULL,NULL,NULL,1,0),(49,'Hlaing Htake Khaung','Fish Supplier',NULL,NULL,NULL,1,0),(50,'GFC','Fish Supplier',NULL,NULL,NULL,1,0),(51,'Aung Kyaw Moe','Fish Supplier',NULL,NULL,NULL,1,0),(52,'Aung Myo Min','Fish Supplier',NULL,NULL,NULL,1,0),(53,'Aung Zaw Oo','Fish Supplier',NULL,NULL,NULL,1,0),(54,'A Thay Lay','Fish Supplier',NULL,NULL,NULL,1,0),(55,'Cho Mg','Fish Supplier',NULL,NULL,NULL,1,0),(56,'Kyaw Zay Ya','Fish Supplier',NULL,NULL,NULL,1,0),(57,'Ka Yin Lay','Fish Supplier',NULL,NULL,NULL,1,0),(58,'Khin Mg Myint','Fish Supplier',NULL,NULL,NULL,1,0),(59,'Mg Mg Soe','Fish Supplier',NULL,NULL,NULL,1,0),(60,'Moe Kyaw','Fish Supplier',NULL,NULL,NULL,1,0),(61,'Parami (Balachaung)','Fish Supplier',NULL,NULL,NULL,1,0),(62,'Tun Zaw Min','Fish Supplier',NULL,NULL,NULL,1,0),(63,'Zaw Myat Thu','Fish Supplier',NULL,NULL,NULL,1,0),(64,'Ko Ma Noe','Fish Supplier',NULL,NULL,NULL,1,0),(65,'Dry Fish (Shwe Hinn Thar)','Fish Supplier',NULL,NULL,NULL,1,0),(66,'Dry Fish (Myo Thant)','Fish Supplier',NULL,NULL,NULL,1,0),(67,'Kyaw Thein Than','Fish Supplier',NULL,NULL,NULL,1,0),(68,'GM','Fish Supplier',NULL,NULL,NULL,1,0),(69,'Dry Fish (Zabu Thein)','Fish Supplier',NULL,NULL,NULL,1,0),(70,'Ko Myo','Fish Supplier',NULL,NULL,NULL,1,0),(71,'Market By','Fish Supplier',NULL,NULL,NULL,1,0),(72,'Tun Tun','Fish Supplier',NULL,NULL,NULL,1,0),(73,'Min Lwin','Fish Supplier',NULL,NULL,NULL,1,0),(74,'Khaing Lay','Fish Supplier',NULL,NULL,NULL,1,0),(75,'Thet Lwin','Fish Supplier',NULL,NULL,NULL,1,0),(76,'Nay Lin','Fish Supplier',NULL,NULL,NULL,1,0),(77,'Tun Naing','Fish Supplier',NULL,NULL,NULL,1,0),(78,'Ko Pan','Fish Supplier',NULL,NULL,NULL,1,0),(79,'Aye Ko','Fish Supplier',NULL,NULL,NULL,1,0),(80,'Nyan Tun','Fish Supplier',NULL,NULL,NULL,1,0),(81,'Thet Oo (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(82,'Aung Zaw Oo (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(83,'Aye Htike Ko','Fish Supplier',NULL,NULL,NULL,1,0),(84,'Mg Mg Nyunt (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(85,'Arr Kae (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(86,'Thiha','Fish Supplier',NULL,NULL,NULL,1,0),(87,'Ko Hlawn','Fish Supplier',NULL,NULL,NULL,1,0),(88,'Aung Kyaw Moe (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(89,'Aye Htike Ko (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(90,'Kaung Myat Tun','Fish Supplier',NULL,NULL,NULL,1,0),(91,'Than Soe','Fish Supplier',NULL,NULL,NULL,1,0),(92,'Than Than Myint','Fish Supplier',NULL,NULL,NULL,1,0),(93,'San San Yee','Fish Supplier',NULL,NULL,NULL,1,0),(94,'Tun Kyaw','Fish Supplier',NULL,NULL,NULL,1,0),(95,'Tommy','Fish Supplier',NULL,'09977221152','Yangon',1,0),(96,'Carton Box (Pan Thazin)','Fish Supplier',NULL,NULL,NULL,1,0),(97,'Dalian Ice','Fish Supplier',NULL,NULL,NULL,1,0),(98,'Plastic (Golden Fish)','Fish Supplier',NULL,NULL,NULL,1,0),(99,'Ko Ka Lar','Fish Supplier',NULL,NULL,NULL,1,0),(100,'Ar Kar','Fish Supplier',NULL,NULL,NULL,1,0),(101,'Win Aye','Fish Supplier',NULL,NULL,NULL,1,0),(102,'Bar Bu Lay (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(103,'Promise (Inner Box)','Fish Supplier',NULL,NULL,NULL,1,0),(104,'Kyaw Min Lat','Fish Supplier',NULL,NULL,NULL,1,0),(105,'Kyaw Lin Tun','Fish Supplier',NULL,NULL,NULL,1,0),(106,'Kyi Lwin','Fish Supplier',NULL,NULL,NULL,1,0),(107,'Golden Bag','Fish Supplier',NULL,NULL,NULL,1,0),(108,'Chit Ko','Fish Supplier',NULL,NULL,NULL,1,0),(109,'O.D.A','Fish Supplier',NULL,NULL,NULL,1,0),(110,'Tin Hlaing','Fish Supplier',NULL,NULL,NULL,1,0),(111,'Ko Min','Fish Supplier',NULL,NULL,NULL,1,0),(112,'Aung Kyaw','Fish Supplier',NULL,NULL,NULL,1,0),(113,'Zaw Win Naing','Fish Supplier',NULL,NULL,NULL,1,0),(114,'Zay Yar Lin','Fish Supplier',NULL,NULL,NULL,1,0),(115,'Thein Linn Oo','Fish Supplier',NULL,NULL,NULL,1,0),(116,'Soe Min (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(117,'Carton Box (Win Pyae)','Fish Supplier',NULL,NULL,NULL,1,0),(118,'Kyaw Min Latt (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(119,'Aung Kyaw (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(120,'Tin Hlaing (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(121,'A Nge Lay','Fish Supplier',NULL,NULL,NULL,1,0),(122,'A.K (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(123,'Ye Yint (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(124,'Zaw Win Naing (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(125,'Phoe Zaw','Fish Supplier',NULL,NULL,NULL,1,0),(126,'Carton Box (May Kha San)','Fish Supplier',NULL,NULL,NULL,1,0),(127,'Aye Aye Maw','Fish Supplier',NULL,NULL,NULL,1,0),(128,'Aung Tun','Fish Supplier',NULL,NULL,NULL,1,0),(129,'Win Thein','Fish Supplier',NULL,NULL,NULL,1,0),(130,'Thet Paing (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(131,'Aung Naing Oo (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(132,'A Nge Lay (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(133,'Phoe Zaw (TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(134,'Peter','Fish Supplier',NULL,NULL,NULL,1,0),(135,'Ye Ko','Fish Supplier',NULL,NULL,NULL,1,0),(136,'Aung Kyaw Thant','Fish Supplier',NULL,NULL,NULL,1,0),(137,'Kyaw Zin Phyo','Fish Supplier',NULL,NULL,NULL,1,0),(138,'Hman Kyi','Fish Supplier',NULL,NULL,NULL,1,0),(139,'Oak Kar','Fish Supplier',NULL,NULL,NULL,1,0),(140,'Hla Hla Win','Fish Supplier',NULL,NULL,NULL,1,0),(141,'Thin Zar','Fish Supplier',NULL,NULL,NULL,1,0),(142,'ACE (Myanmar) USD A/C','Fish Supplier',NULL,NULL,NULL,1,0),(143,'Cho Mg(TCL)','Fish Supplier',NULL,NULL,NULL,1,0),(145,'Other Receivable-Best Brand A/C','Export Customer','','','',0,1),(146,'South Asia Food-USA A/C','Export Customer',NULL,NULL,'',0,1),(147,'Jamuna Food-Canada A/C','Export Customer',NULL,NULL,'',0,1),(148,'ITALY','Export Customer',NULL,NULL,'',0,1),(149,'Western Trader (Kolkata)','Export Customer',NULL,NULL,'',0,1),(150,'Bangladesh (Frozen)','Export Customer',NULL,NULL,'',0,1),(151,'Bangladesh (Chill/Technak)','Export Customer',NULL,NULL,'',0,1),(152,'BRUNEI A/C','Export Customer',NULL,NULL,'',0,1),(153,'SC Fruit A/C - Mango A/C','Export Customer',NULL,NULL,'',0,1),(154,'SC Fruit A/C - Apple A/C','Export Customer',NULL,NULL,'',0,1),(155,'H - Trader A/C','Export Customer',NULL,NULL,'',0,1),(156,'Link Mark Impex','Export Customer',NULL,NULL,'',0,1);
 /*!40000 ALTER TABLE `contacts` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `container`
 --
 
@@ -305,7 +295,6 @@ CREATE TABLE `container` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `container`
 --
 
@@ -314,7 +303,7 @@ LOCK TABLES `container` WRITE;
 /*!40000 ALTER TABLE `container` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `exchange_rates`
 --
 
@@ -332,7 +321,6 @@ CREATE TABLE `exchange_rates` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `exchange_rates`
 --
 
@@ -341,7 +329,7 @@ LOCK TABLES `exchange_rates` WRITE;
 /*!40000 ALTER TABLE `exchange_rates` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `form10stock`
 --
 
@@ -352,28 +340,26 @@ CREATE TABLE `form10stock` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `date` date NOT NULL,
   `item_id` varchar(11) NOT NULL,
-  `contact_id` int(11) DEFAULT NULL,
-  `supplier_id` varchar(20) DEFAULT NULL,
+  `supplier_id` varchar(20) NOT NULL,
   `country` varchar(11) NOT NULL,
   `type` varchar(255) NOT NULL,
   `size` varchar(11) NOT NULL,
-  `pcsform10` int(11) DEFAULT NULL,
-  `mc` int(11) DEFAULT NULL,
-  `kg` varchar(11) DEFAULT NULL,
-  `pcs` int(11) DEFAULT NULL,
-  `looseinkg` varchar(11) DEFAULT NULL,
-  `looseinpcs` int(11) DEFAULT NULL,
-  `looseoutkg` varchar(11) DEFAULT NULL,
-  `looseoutpcs` int(11) DEFAULT NULL,
-  `total_kg` varchar(11) DEFAULT NULL,
-  `percentage` varchar(11) DEFAULT NULL,
-  `fish_type` varchar(255) DEFAULT NULL,
+  `pcsform10` int(11) NOT NULL,
+  `mc` int(11) NOT NULL,
+  `kg` varchar(11) NOT NULL,
+  `pcs` int(11) NOT NULL,
+  `looseinkg` varchar(11) NOT NULL,
+  `looseinpcs` int(11) NOT NULL,
+  `looseoutkg` varchar(11) NOT NULL,
+  `looseoutpcs` int(11) NOT NULL,
+  `total_kg` varchar(11) NOT NULL,
+  `percentage` varchar(11) NOT NULL,
+  `fish_type` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `form10stock`
 --
 
@@ -382,7 +368,7 @@ LOCK TABLES `form10stock` WRITE;
 /*!40000 ALTER TABLE `form10stock` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `form10stocktcl`
 --
 
@@ -393,19 +379,18 @@ CREATE TABLE `form10stocktcl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `date` date NOT NULL,
   `item_id` varchar(11) NOT NULL,
-  `contact_id` int(11) DEFAULT NULL,
-  `supplier_id` varchar(20) DEFAULT NULL,
+  `supplier_id` varchar(20) NOT NULL,
   `country` varchar(11) NOT NULL,
   `type` varchar(255) NOT NULL,
   `size` varchar(11) NOT NULL,
-  `pcsform10` int(11) DEFAULT NULL,
-  `mc` int(11) DEFAULT NULL,
-  `kg` varchar(11) DEFAULT NULL,
-  `pcs` int(11) DEFAULT NULL,
-  `looseinkg` varchar(11) DEFAULT NULL,
-  `looseinpcs` int(11) DEFAULT NULL,
-  `looseoutkg` varchar(11) DEFAULT NULL,
-  `looseoutpcs` int(11) DEFAULT NULL,
+  `pcsform10` int(11) NOT NULL,
+  `mc` int(11) NOT NULL,
+  `kg` varchar(11) NOT NULL,
+  `pcs` int(11) NOT NULL,
+  `looseinkg` varchar(11) NOT NULL,
+  `looseinpcs` int(11) NOT NULL,
+  `looseoutkg` varchar(11) NOT NULL,
+  `looseoutpcs` int(11) NOT NULL,
   `cc_pcs` int(11) DEFAULT NULL,
   `cc_kg` float DEFAULT NULL,
   `msl_pcs` int(11) DEFAULT NULL,
@@ -416,14 +401,13 @@ CREATE TABLE `form10stocktcl` (
   `lanfish_kg` float DEFAULT NULL,
   `cutpiece_pcs` int(11) DEFAULT NULL,
   `cutpiece_kg` float DEFAULT NULL,
-  `total_kg` varchar(11) DEFAULT NULL,
-  `percentage` varchar(11) DEFAULT NULL,
+  `total_kg` varchar(11) NOT NULL,
+  `percentage` varchar(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `form10stocktcl`
 --
 
@@ -432,7 +416,7 @@ LOCK TABLES `form10stocktcl` WRITE;
 /*!40000 ALTER TABLE `form10stocktcl` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `form7stock`
 --
 
@@ -447,19 +431,18 @@ CREATE TABLE `form7stock` (
   `country` varchar(155) DEFAULT NULL,
   `type` varchar(255) NOT NULL,
   `size` varchar(11) NOT NULL,
-  `viss` varchar(11) DEFAULT NULL,
-  `kg` varchar(15) DEFAULT NULL,
-  `pcspervr` varchar(15) DEFAULT NULL,
-  `pcsperf7` int(11) DEFAULT NULL,
-  `link_id` int(11) DEFAULT NULL,
-  `water_kg` int(11) DEFAULT NULL,
-  `fish_type` varchar(255) DEFAULT NULL,
+  `viss` varchar(11) NOT NULL,
+  `kg` varchar(15) NOT NULL,
+  `pcspervr` varchar(15) NOT NULL,
+  `pcsperf7` int(11) NOT NULL,
+  `link_id` int(11) NOT NULL,
+  `water_kg` int(11) NOT NULL,
+  `fish_type` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `form7stock`
 --
 
@@ -468,7 +451,7 @@ LOCK TABLES `form7stock` WRITE;
 /*!40000 ALTER TABLE `form7stock` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `form7stocktcl`
 --
 
@@ -477,23 +460,22 @@ DROP TABLE IF EXISTS `form7stocktcl`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `form7stocktcl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `date` date DEFAULT NULL,
+  `date` date NOT NULL,
   `item_id` varchar(11) NOT NULL,
   `supplier_name` varchar(255) NOT NULL,
   `country` varchar(155) DEFAULT NULL,
   `type` varchar(255) NOT NULL,
   `size` varchar(11) NOT NULL,
-  `viss` varchar(11) DEFAULT NULL,
-  `kg` varchar(15) DEFAULT NULL,
-  `pcspervr` varchar(15) DEFAULT NULL,
-  `pcsperf7` int(11) DEFAULT NULL,
-  `link_id` int(11) DEFAULT NULL,
+  `viss` varchar(11) NOT NULL,
+  `kg` varchar(15) NOT NULL,
+  `pcspervr` varchar(15) NOT NULL,
+  `pcsperf7` int(11) NOT NULL,
+  `link_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `form7stocktcl`
 --
 
@@ -502,7 +484,7 @@ LOCK TABLES `form7stocktcl` WRITE;
 /*!40000 ALTER TABLE `form7stocktcl` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `general_ledger`
 --
 
@@ -523,7 +505,6 @@ CREATE TABLE `general_ledger` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `general_ledger`
 --
 
@@ -532,7 +513,7 @@ LOCK TABLES `general_ledger` WRITE;
 /*!40000 ALTER TABLE `general_ledger` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `gfcdryfishcoldstore`
 --
 
@@ -554,7 +535,6 @@ CREATE TABLE `gfcdryfishcoldstore` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `gfcdryfishcoldstore`
 --
 
@@ -563,7 +543,7 @@ LOCK TABLES `gfcdryfishcoldstore` WRITE;
 /*!40000 ALTER TABLE `gfcdryfishcoldstore` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `gfcdryfishlabour`
 --
 
@@ -584,7 +564,6 @@ CREATE TABLE `gfcdryfishlabour` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `gfcdryfishlabour`
 --
 
@@ -593,7 +572,7 @@ LOCK TABLES `gfcdryfishlabour` WRITE;
 /*!40000 ALTER TABLE `gfcdryfishlabour` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `gfcfishcoldstore`
 --
 
@@ -617,7 +596,6 @@ CREATE TABLE `gfcfishcoldstore` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `gfcfishcoldstore`
 --
 
@@ -626,7 +604,7 @@ LOCK TABLES `gfcfishcoldstore` WRITE;
 /*!40000 ALTER TABLE `gfcfishcoldstore` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `gfcfishlabour`
 --
 
@@ -647,7 +625,6 @@ CREATE TABLE `gfcfishlabour` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `gfcfishlabour`
 --
 
@@ -656,7 +633,7 @@ LOCK TABLES `gfcfishlabour` WRITE;
 /*!40000 ALTER TABLE `gfcfishlabour` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `gfcmcstock`
 --
 
@@ -687,7 +664,6 @@ CREATE TABLE `gfcmcstock` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `gfcmcstock`
 --
 
@@ -696,7 +672,7 @@ LOCK TABLES `gfcmcstock` WRITE;
 /*!40000 ALTER TABLE `gfcmcstock` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `gfctotal`
 --
 
@@ -722,7 +698,6 @@ CREATE TABLE `gfctotal` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `gfctotal`
 --
 
@@ -731,7 +706,7 @@ LOCK TABLES `gfctotal` WRITE;
 /*!40000 ALTER TABLE `gfctotal` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `hhkmcstock`
 --
 
@@ -761,7 +736,6 @@ CREATE TABLE `hhkmcstock` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `hhkmcstock`
 --
 
@@ -770,7 +744,7 @@ LOCK TABLES `hhkmcstock` WRITE;
 /*!40000 ALTER TABLE `hhkmcstock` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `hhkstock`
 --
 
@@ -795,7 +769,6 @@ CREATE TABLE `hhkstock` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `hhkstock`
 --
 
@@ -804,7 +777,7 @@ LOCK TABLES `hhkstock` WRITE;
 /*!40000 ALTER TABLE `hhkstock` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `invoice_costing`
 --
 
@@ -839,7 +812,6 @@ CREATE TABLE `invoice_costing` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `invoice_costing`
 --
 
@@ -848,7 +820,7 @@ LOCK TABLES `invoice_costing` WRITE;
 /*!40000 ALTER TABLE `invoice_costing` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `labour`
 --
 
@@ -872,7 +844,6 @@ CREATE TABLE `labour` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `labour`
 --
 
@@ -881,7 +852,7 @@ LOCK TABLES `labour` WRITE;
 /*!40000 ALTER TABLE `labour` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `manual_journal_lines`
 --
 
@@ -902,7 +873,6 @@ CREATE TABLE `manual_journal_lines` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `manual_journal_lines`
 --
 
@@ -911,7 +881,7 @@ LOCK TABLES `manual_journal_lines` WRITE;
 /*!40000 ALTER TABLE `manual_journal_lines` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `manual_journals`
 --
 
@@ -929,7 +899,6 @@ CREATE TABLE `manual_journals` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `manual_journals`
 --
 
@@ -938,7 +907,7 @@ LOCK TABLES `manual_journals` WRITE;
 /*!40000 ALTER TABLE `manual_journals` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `material_purchase`
 --
 
@@ -958,7 +927,6 @@ CREATE TABLE `material_purchase` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `material_purchase`
 --
 
@@ -967,7 +935,7 @@ LOCK TABLES `material_purchase` WRITE;
 /*!40000 ALTER TABLE `material_purchase` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `material_store_house`
 --
 
@@ -980,9 +948,8 @@ CREATE TABLE `material_store_house` (
   `time` time DEFAULT current_timestamp(),
   `voucher_no` text NOT NULL,
   `description` varchar(255) NOT NULL,
-  `supplier_id` text DEFAULT NULL,
+  `supplier_id` text NOT NULL,
   `material_id` int(11) NOT NULL,
-  `contact_id` int(11) DEFAULT NULL,
   `in_quantity` int(11) DEFAULT NULL,
   `out_quantity` int(11) DEFAULT NULL,
   `output_group` int(11) DEFAULT NULL,
@@ -992,7 +959,6 @@ CREATE TABLE `material_store_house` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `material_store_house`
 --
 
@@ -1001,7 +967,7 @@ LOCK TABLES `material_store_house` WRITE;
 /*!40000 ALTER TABLE `material_store_house` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `migrations`
 --
 
@@ -1017,7 +983,6 @@ CREATE TABLE `migrations` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `migrations`
 --
 
@@ -1026,7 +991,7 @@ LOCK TABLES `migrations` WRITE;
 /*!40000 ALTER TABLE `migrations` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `msl_total_charges`
 --
 
@@ -1053,7 +1018,6 @@ CREATE TABLE `msl_total_charges` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `msl_total_charges`
 --
 
@@ -1062,7 +1026,7 @@ LOCK TABLES `msl_total_charges` WRITE;
 /*!40000 ALTER TABLE `msl_total_charges` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `mslcoldstore`
 --
 
@@ -1087,7 +1051,6 @@ CREATE TABLE `mslcoldstore` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `mslcoldstore`
 --
 
@@ -1096,7 +1059,7 @@ LOCK TABLES `mslcoldstore` WRITE;
 /*!40000 ALTER TABLE `mslcoldstore` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `mslexportcharges`
 --
 
@@ -1120,7 +1083,6 @@ CREATE TABLE `mslexportcharges` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `mslexportcharges`
 --
 
@@ -1129,7 +1091,7 @@ LOCK TABLES `mslexportcharges` WRITE;
 /*!40000 ALTER TABLE `mslexportcharges` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `mslfreezing`
 --
 
@@ -1153,7 +1115,6 @@ CREATE TABLE `mslfreezing` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `mslfreezing`
 --
 
@@ -1162,7 +1123,7 @@ LOCK TABLES `mslfreezing` WRITE;
 /*!40000 ALTER TABLE `mslfreezing` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `mslrepacking`
 --
 
@@ -1183,7 +1144,6 @@ CREATE TABLE `mslrepacking` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `mslrepacking`
 --
 
@@ -1192,7 +1152,7 @@ LOCK TABLES `mslrepacking` WRITE;
 /*!40000 ALTER TABLE `mslrepacking` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `mslstock`
 --
 
@@ -1214,7 +1174,6 @@ CREATE TABLE `mslstock` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `mslstock`
 --
 
@@ -1223,7 +1182,7 @@ LOCK TABLES `mslstock` WRITE;
 /*!40000 ALTER TABLE `mslstock` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `packingliststock`
 --
 
@@ -1246,7 +1205,6 @@ CREATE TABLE `packingliststock` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `packingliststock`
 --
 
@@ -1255,7 +1213,7 @@ LOCK TABLES `packingliststock` WRITE;
 /*!40000 ALTER TABLE `packingliststock` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `packingliststockinfo`
 --
 
@@ -1278,7 +1236,6 @@ CREATE TABLE `packingliststockinfo` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `packingliststockinfo`
 --
 
@@ -1287,7 +1244,7 @@ LOCK TABLES `packingliststockinfo` WRITE;
 /*!40000 ALTER TABLE `packingliststockinfo` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `packingmaterial`
 --
 
@@ -1322,7 +1279,6 @@ CREATE TABLE `packingmaterial` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `packingmaterial`
 --
 
@@ -1331,7 +1287,7 @@ LOCK TABLES `packingmaterial` WRITE;
 /*!40000 ALTER TABLE `packingmaterial` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `permission`
 --
 
@@ -1347,7 +1303,6 @@ CREATE TABLE `permission` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `permission`
 --
 
@@ -1357,7 +1312,7 @@ INSERT INTO `permission` VALUES (1,1,'manage_accounts,manage_role,manage_sale,ma
 /*!40000 ALTER TABLE `permission` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `processing`
 --
 
@@ -1381,7 +1336,6 @@ CREATE TABLE `processing` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `processing`
 --
 
@@ -1390,7 +1344,7 @@ LOCK TABLES `processing` WRITE;
 /*!40000 ALTER TABLE `processing` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `product_types`
 --
 
@@ -1406,7 +1360,6 @@ CREATE TABLE `product_types` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `product_types`
 --
 
@@ -1416,7 +1369,7 @@ INSERT INTO `product_types` VALUES (1,'Fish',3),(2,'Packing Material',0);
 /*!40000 ALTER TABLE `product_types` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `products`
 --
 
@@ -1440,7 +1393,6 @@ CREATE TABLE `products` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `products`
 --
 
@@ -1450,7 +1402,7 @@ INSERT INTO `products` VALUES (2,'A001','Ayer',NULL,1,NULL,1,'5000',0,NULL),(3,'
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `purchase_lines`
 --
 
@@ -1476,7 +1428,6 @@ CREATE TABLE `purchase_lines` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `purchase_lines`
 --
 
@@ -1485,7 +1436,7 @@ LOCK TABLES `purchase_lines` WRITE;
 /*!40000 ALTER TABLE `purchase_lines` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `purchase_payments`
 --
 
@@ -1508,7 +1459,6 @@ CREATE TABLE `purchase_payments` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `purchase_payments`
 --
 
@@ -1517,7 +1467,7 @@ LOCK TABLES `purchase_payments` WRITE;
 /*!40000 ALTER TABLE `purchase_payments` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `purchases`
 --
 
@@ -1545,7 +1495,6 @@ CREATE TABLE `purchases` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `purchases`
 --
 
@@ -1554,7 +1503,7 @@ LOCK TABLES `purchases` WRITE;
 /*!40000 ALTER TABLE `purchases` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `receivable`
 --
 
@@ -1579,7 +1528,6 @@ CREATE TABLE `receivable` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `receivable`
 --
 
@@ -1588,7 +1536,7 @@ LOCK TABLES `receivable` WRITE;
 /*!40000 ALTER TABLE `receivable` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `repacking`
 --
 
@@ -1612,7 +1560,6 @@ CREATE TABLE `repacking` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `repacking`
 --
 
@@ -1621,7 +1568,7 @@ LOCK TABLES `repacking` WRITE;
 /*!40000 ALTER TABLE `repacking` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `repackingout`
 --
 
@@ -1640,7 +1587,6 @@ CREATE TABLE `repackingout` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `repackingout`
 --
 
@@ -1649,7 +1595,7 @@ LOCK TABLES `repackingout` WRITE;
 /*!40000 ALTER TABLE `repackingout` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `role`
 --
 
@@ -1664,7 +1610,6 @@ CREATE TABLE `role` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `role`
 --
 
@@ -1674,7 +1619,7 @@ INSERT INTO `role` VALUES (1,'Admin'),(2,'Stock'),(3,'Shippment'),(4,'TCL'),(5,'
 /*!40000 ALTER TABLE `role` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `sale_lines`
 --
 
@@ -1694,7 +1639,6 @@ CREATE TABLE `sale_lines` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `sale_lines`
 --
 
@@ -1703,7 +1647,7 @@ LOCK TABLES `sale_lines` WRITE;
 /*!40000 ALTER TABLE `sale_lines` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `sale_payments`
 --
 
@@ -1726,7 +1670,6 @@ CREATE TABLE `sale_payments` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `sale_payments`
 --
 
@@ -1735,7 +1678,7 @@ LOCK TABLES `sale_payments` WRITE;
 /*!40000 ALTER TABLE `sale_payments` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `sales`
 --
 
@@ -1759,7 +1702,6 @@ CREATE TABLE `sales` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `sales`
 --
 
@@ -1768,7 +1710,7 @@ LOCK TABLES `sales` WRITE;
 /*!40000 ALTER TABLE `sales` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `stock_output_group`
 --
 
@@ -1792,7 +1734,6 @@ CREATE TABLE `stock_output_group` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `stock_output_group`
 --
 
@@ -1801,7 +1742,7 @@ LOCK TABLES `stock_output_group` WRITE;
 /*!40000 ALTER TABLE `stock_output_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `system_currencies`
 --
 
@@ -1818,7 +1759,6 @@ CREATE TABLE `system_currencies` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `system_currencies`
 --
 
@@ -1827,7 +1767,7 @@ LOCK TABLES `system_currencies` WRITE;
 /*!40000 ALTER TABLE `system_currencies` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `tclmc_transactions`
 --
 
@@ -1847,7 +1787,6 @@ CREATE TABLE `tclmc_transactions` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `tclmc_transactions`
 --
 
@@ -1856,7 +1795,7 @@ LOCK TABLES `tclmc_transactions` WRITE;
 /*!40000 ALTER TABLE `tclmc_transactions` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `tclmcstock`
 --
 
@@ -1868,17 +1807,16 @@ CREATE TABLE `tclmcstock` (
   `date` date NOT NULL,
   `item_id` varchar(9) NOT NULL,
   `size` varchar(9) NOT NULL,
-  `pcs` int(9) DEFAULT NULL,
-  `kg` float DEFAULT NULL,
-  `opening_mc` int(11) DEFAULT NULL,
-  `form10mc` int(11) DEFAULT NULL,
-  `grandtotal_mc` bigint(77) DEFAULT NULL,
+  `pcs` int(9) NOT NULL,
+  `kg` float NOT NULL,
+  `opening_mc` int(11) NOT NULL,
+  `form10mc` int(11) NOT NULL,
+  `grandtotal_mc` bigint(77) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `tclmcstock`
 --
 
@@ -1887,7 +1825,7 @@ LOCK TABLES `tclmcstock` WRITE;
 /*!40000 ALTER TABLE `tclmcstock` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `total_charges`
 --
 
@@ -1917,7 +1855,6 @@ CREATE TABLE `total_charges` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `total_charges`
 --
 
@@ -1926,7 +1863,7 @@ LOCK TABLES `total_charges` WRITE;
 /*!40000 ALTER TABLE `total_charges` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `truckactualinvoice`
 --
 
@@ -1950,7 +1887,6 @@ CREATE TABLE `truckactualinvoice` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `truckactualinvoice`
 --
 
@@ -1960,7 +1896,7 @@ INSERT INTO `truckactualinvoice` VALUES (1,'25','2up',10,20,10,200,0,0,'221',1),
 /*!40000 ALTER TABLE `truckactualinvoice` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `truckdeclare`
 --
 
@@ -1982,7 +1918,6 @@ CREATE TABLE `truckdeclare` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `truckdeclare`
 --
 
@@ -1992,7 +1927,7 @@ INSERT INTO `truckdeclare` VALUES (1,'25','2up',10,0,10,0,'221',1),(2,'25','3up'
 /*!40000 ALTER TABLE `truckdeclare` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `truckfoambox`
 --
 
@@ -2016,7 +1951,6 @@ CREATE TABLE `truckfoambox` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `truckfoambox`
 --
 
@@ -2026,7 +1960,7 @@ INSERT INTO `truckfoambox` VALUES (1,'25','2up',10,20,10,200,'','0','221',1),(2,
 /*!40000 ALTER TABLE `truckfoambox` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `truckpackingliststock`
 --
 
@@ -2043,7 +1977,6 @@ CREATE TABLE `truckpackingliststock` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `truckpackingliststock`
 --
 
@@ -2052,7 +1985,7 @@ LOCK TABLES `truckpackingliststock` WRITE;
 /*!40000 ALTER TABLE `truckpackingliststock` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `truckpackingliststockinfo`
 --
 
@@ -2074,7 +2007,6 @@ CREATE TABLE `truckpackingliststockinfo` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `truckpackingliststockinfo`
 --
 
@@ -2083,7 +2015,7 @@ LOCK TABLES `truckpackingliststockinfo` WRITE;
 /*!40000 ALTER TABLE `truckpackingliststockinfo` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `truckpackingmaterial`
 --
 
@@ -2109,7 +2041,6 @@ CREATE TABLE `truckpackingmaterial` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `truckpackingmaterial`
 --
 
@@ -2118,7 +2049,7 @@ LOCK TABLES `truckpackingmaterial` WRITE;
 /*!40000 ALTER TABLE `truckpackingmaterial` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `trucktotalcosting`
 --
 
@@ -2157,7 +2088,6 @@ CREATE TABLE `trucktotalcosting` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
-
 -- Dumping data for table `trucktotalcosting`
 --
 
@@ -2166,7 +2096,7 @@ LOCK TABLES `trucktotalcosting` WRITE;
 /*!40000 ALTER TABLE `trucktotalcosting` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
+--
 -- Table structure for table `userlogs`
 --
 
@@ -2183,18 +2113,8 @@ CREATE TABLE `userlogs` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=925 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2026-10-07 11:18:55
-
+--
 -- Dumping data for table `userlogs`
 --
 
@@ -2203,7 +2123,6 @@ LOCK TABLES `userlogs` WRITE;
 INSERT INTO `userlogs` VALUES (870,'10:40:59.000000','2026-06-22','admin@gmail.com','protechadmin','Login Failed'),(871,'10:41:02.000000','2026-06-22','admin@gmail.com','password','Login Failed'),(872,'10:41:15.000000','2026-06-22','admin@gmail.com','protechadmin','Login Failed'),(873,'10:41:23.000000','2026-06-22','Administrator','protechadmin2024***','Login Success'),(874,'08:48:10.000000','2026-06-25','Administrator','','Logout Success'),(875,'12:57:23.000000','2026-06-29','Administrator','protechadmin2024***','Login Success'),(876,'03:30:48.000000','2026-07-02','Administrator','','Logout Success'),(877,'03:30:56.000000','2026-07-02','UMyoWinSwe','password','Login Success'),(878,'03:31:05.000000','2026-07-02','UMyoWinSwe','','Logout Success'),(879,'03:31:06.000000','2026-07-02','Administrator','protechadmin2024***','Login Success'),(880,'03:31:39.000000','2026-07-02','Administrator','','Logout Success'),(881,'03:31:46.000000','2026-07-02','Administrator','protechadmin2024***','Login Success'),(882,'03:31:57.000000','2026-07-02','Administrator','','Logout Success'),(883,'03:32:04.000000','2026-07-02','UMyoWinSwe','password','Login Success'),(884,'03:35:52.000000','2026-07-02','UMyoWinSwe','','Logout Success'),(885,'03:35:53.000000','2026-07-02','Administrator','protechadmin2024***','Login Success'),(886,'02:02:45.000000','2026-08-11','Administrator','','Logout Success'),(887,'02:02:49.000000','2026-08-11','Administrator','protechadmin2024***','Login Success'),(888,'05:26:32.000000','2026-08-24','Administrator','','Logout Success'),(889,'05:26:49.000000','2026-08-24','UMyoWinSwe','password','Login Success'),(890,'05:27:06.000000','2026-08-24','UMyoWinSwe','','Logout Success'),(891,'05:27:08.000000','2026-08-24','Administrator','protechadmin2024***','Login Success'),(892,'10:00:01.000000','2026-09-03','Administrator','','Logout Success'),(893,'10:00:32.000000','2026-09-03','Administrator','protechadmin2024***','Login Success'),(894,'10:33:05.000000','2026-09-03','Administrator','','Logout Success'),(895,'10:33:07.000000','2026-09-03','admin@gmail.com','admin','Login Failed'),(896,'10:33:11.000000','2026-09-03','Administrator','protechadmin2024***','Login Success'),(897,'10:33:50.000000','2026-09-03','Administrator','','Logout Success'),(898,'10:33:55.000000','2026-09-03','Administrator','protechadmin2024***','Login Success'),(899,'11:21:29.000000','2026-09-03','Administrator','','Logout Success'),(900,'11:23:55.000000','2026-09-03','admin@gmail.com','admin','Login Failed'),(901,'11:23:56.000000','2026-09-03','admin@gmail.com','admin','Login Failed'),(902,'11:23:59.000000','2026-09-03','Administrator','protechadmin2024***','Login Success'),(903,'11:24:01.000000','2026-09-03','Administrator','','Logout Success'),(904,'11:24:04.000000','2026-09-03','admin@gmail.com','admin','Login Failed'),(905,'11:24:04.000000','2026-09-03','admin@gmail.com','admin','Login Failed'),(906,'11:24:12.000000','2026-09-03','Administrator','protechadmin2','Login Password Invalid'),(907,'11:24:13.000000','2026-09-03','admin@gmail.com','admin','Login Failed'),(908,'11:24:26.000000','2026-09-03','Administrator','protechadmin2024***','Login Success'),(909,'11:51:41.000000','2026-09-03','Administrator','','Logout Success'),(910,'11:51:42.000000','2026-09-03','Administrator','protechadmin2024***','Login Success'),(911,'11:01:58.000000','2026-09-15','Administrator','protechadmin2024***','Login Success'),(912,'10:51:07.000000','2026-09-17','Administrator','protechadmin2024***','Login Success'),(913,'04:56:14.000000','2026-09-18','Administrator','protechadmin2024***','Login Success'),(914,'10:01:29.000000','2026-09-21','Administrator','protechadmin2024***','Login Success'),(915,'10:08:58.000000','2026-09-21','Administrator','','Logout Success'),(916,'10:09:02.000000','2026-09-21','Administrator','protechadmin2024***','Login Success'),(917,'11:40:17.000000','2026-09-22','Administrator','','Logout Success'),(918,'11:40:19.000000','2026-09-22','Administrator','protechadmin2024***','Login Success'),(919,'11:41:07.000000','2026-09-22','Administrator','','Logout Success'),(920,'11:41:09.000000','2026-09-22','Administrator','protechadmin2024***','Login Success'),(921,'11:54:39.000000','2026-09-22','Administrator','','Logout Success'),(922,'11:54:40.000000','2026-09-22','Administrator','protechadmin2024***','Login Success'),(923,'09:59:05.000000','2026-10-05','Administrator','protechadmin2024***','Login Success'),(924,'01:39:34.000000','2026-10-06','Administrator','protechadmin2024***','Login Success');
 /*!40000 ALTER TABLE `userlogs` ENABLE KEYS */;
 UNLOCK TABLES;
-
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -2214,4 +2133,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-10-07 11:18:55
+-- Dump completed on 2026-10-07 10:40:58

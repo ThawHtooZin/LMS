@@ -371,8 +371,8 @@ CREATE TABLE `form10stocktcl` (
   `lanfish_kg` float DEFAULT NULL,
   `cutpiece_pcs` int(11) DEFAULT NULL,
   `cutpiece_kg` float DEFAULT NULL,
-  `total_kg` varchar(11) NOT NULL,
-  `percentage` varchar(11) NOT NULL
+  `total_kg` varchar(11) DEFAULT NULL,
+  `percentage` varchar(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -668,8 +668,9 @@ CREATE TABLE `material_store_house` (
   `time` time DEFAULT current_timestamp(),
   `voucher_no` text NOT NULL,
   `description` varchar(255) NOT NULL,
-  `supplier_id` text NOT NULL,
+  `supplier_id` text DEFAULT NULL,
   `material_id` int(11) NOT NULL,
+  `contact_id` int(11) DEFAULT NULL,
   `in_quantity` int(11) DEFAULT NULL,
   `out_quantity` int(11) DEFAULT NULL,
   `output_group` int(11) DEFAULT NULL,
