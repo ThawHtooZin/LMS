@@ -367,7 +367,7 @@ $bootstrap->css();
                                                                                                                                         echo 'disabled';
                                                                                                                                       } ?> style="padding-top: 2px; padding-bottom: 2px;">
                         <button type="submit" class="btn btn-warning mt-3 btn-sm" style="width: 47%; " name="update">Update</button>
-                        <button type="submit" class="btn btn-danger mt-3 btn-sm" style="width: 47%; margin-left:10px;" name="delete">Delete</button>
+                        <button type="button" class="btn btn-danger mt-3 btn-sm" style="width: 47%; margin-left:10px;" name="delete" onclick="lmsConfirmDelete(this, 'Are you sure you want to delete this transaction?');">Delete</button>
                       </div>
                     </div>
                 </div>

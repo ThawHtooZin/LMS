@@ -6718,6 +6718,508 @@ class Query
   }
 
 
+  public function updateMaterialStoreHouseDetail($rowId, $materialId, array $input)
+  {
+    global $pdo;
+    $rowId = (int)$rowId;
+    $materialId = (int)$materialId;
+
+    $pdo->beginTransaction();
+    try {
+      $rowStmt = $pdo->prepare("SELECT * FROM material_store_house WHERE id = ? AND material_id = ? FOR UPDATE");
+      $rowStmt->execute([$rowId, $materialId]);
+      $row = $rowStmt->fetch(PDO::FETCH_ASSOC);
+      if (!$row) {
+        throw new InvalidArgumentException('Movement was not found.');
+      }
+
+      $date = trim((string)($input['date'] ?? ''));
+      $parsedDate = DateTime::createFromFormat('Y-m-d', $date);
+      if (!$parsedDate || $parsedDate->format('Y-m-d') !== $date) {
+        throw new InvalidArgumentException('Enter a valid date.');
+      }
+
+      $description = trim((string)($input['description'] ?? ''));
+      if (strlen($description) > 255) {
+        throw new InvalidArgumentException('Description must be 255 characters or fewer.');
+      }
+
+      $quantity = filter_var($input['quantity'] ?? null, FILTER_VALIDATE_FLOAT);
+      if ($quantity === false || $quantity <= 0 || $quantity > 1000000000) {
+        throw new InvalidArgumentException('Quantity must be greater than zero.');
+      }
+
+      $voucher = trim((string)($input['voucher_no'] ?? ''));
+      $currentIn = floatval($row['in_quantity'] ?? $row['in'] ?? 0);
+      $currentOut = floatval($row['out_quantity'] ?? $row['out'] ?? 0);
+      $isLinkedOutput = !empty($row['output_group']);
+      $isOutbound = $isLinkedOutput || ($currentOut > 0 && $currentIn <= 0);
+
+      $stockStmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id = ? FOR UPDATE");
+      $stockStmt->execute([$materialId]);
+      $stockRows = $stockStmt->fetchAll(PDO::FETCH_ASSOC);
+      $warehouseBalance = 0.0;
+      foreach ($stockRows as $stockRow) {
+        $warehouseBalance += floatval($stockRow['in_quantity'] ?? $stockRow['in'] ?? 0)
+          - floatval($stockRow['out_quantity'] ?? $stockRow['out'] ?? 0);
+      }
+
+      if ($isLinkedOutput) {
+        $stockTo = trim((string)($input['stock_to'] ?? ''));
+        if ($stockTo === '' || $voucher === '') {
+          throw new InvalidArgumentException('Stock To and GatePass Voucher No are required.');
+        }
+
+        $groupStmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE id = ? FOR UPDATE");
+        $groupStmt->execute([(int)$row['output_group']]);
+        $group = $groupStmt->fetch(PDO::FETCH_ASSOC);
+        if (!$group) {
+          throw new InvalidArgumentException('The linked coldstore issue was not found.');
+        }
+
+        $oldDest = (string)($group['stock_to'] ?? '');
+        $destinationStmt = $pdo->prepare("SELECT name FROM config_coldstore WHERE name = ?");
+        $destinationStmt->execute([$stockTo]);
+        if (!$destinationStmt->fetchColumn() && $stockTo !== $oldDest) {
+          throw new InvalidArgumentException('Select a valid coldstore destination.');
+        }
+
+        $available = $warehouseBalance + $currentOut;
+        if ($quantity > $available + 0.0001) {
+          throw new InvalidArgumentException('Not enough quantity. Available stock: ' . number_format($available, 2) . '.');
+        }
+
+        $oldGroupIn = floatval($group['in_quantity'] ?? 0);
+        $locations = array_values(array_unique(array_filter([$oldDest, $stockTo], function ($location) {
+          return $location !== '';
+        })));
+        $locationBalances = [];
+        $lockStmt = $pdo->prepare("SELECT id FROM stock_output_group WHERE material_id = ? AND stock_to = ? FOR UPDATE");
+        $balanceStmt = $pdo->prepare("SELECT COALESCE(SUM(in_quantity), 0) - COALESCE(SUM(out_quantity), 0) FROM stock_output_group WHERE material_id = ? AND stock_to = ?");
+        foreach ($locations as $location) {
+          $lockStmt->execute([(string)$materialId, $location]);
+          $lockStmt->fetchAll();
+          $balanceStmt->execute([(string)$materialId, $location]);
+          $locationBalances[$location] = (float)$balanceStmt->fetchColumn();
+        }
+
+        if ($stockTo === $oldDest) {
+          $remaining = ($locationBalances[$oldDest] ?? 0) - $oldGroupIn + $quantity;
+          if ($remaining < -0.0001) {
+            throw new InvalidArgumentException('The coldstore does not have enough remaining stock for this change.');
+          }
+        } else {
+          $remaining = ($locationBalances[$oldDest] ?? 0) - $oldGroupIn;
+          if ($oldDest !== '' && $remaining < -0.0001) {
+            throw new InvalidArgumentException('This issue cannot move because the current coldstore has already used the stock.');
+          }
+        }
+
+        $houseStmt = $pdo->prepare("UPDATE material_store_house SET date = ?, voucher_no = ?, description = ?, out_quantity = ? WHERE id = ? AND material_id = ?");
+        $houseStmt->execute([$date, $voucher, $description, $quantity, $rowId, $materialId]);
+
+        $groupUpdate = $pdo->prepare("UPDATE stock_output_group SET date = ?, stock_to = ?, voucher_no = ?, description = ?, in_quantity = ? WHERE id = ?");
+        $groupUpdate->execute([$date, $stockTo, $voucher, $description, $quantity, (int)$row['output_group']]);
+      } elseif ($isOutbound) {
+        if ($voucher === '') {
+          throw new InvalidArgumentException('Voucher No is required.');
+        }
+        $available = $warehouseBalance + $currentOut;
+        if ($quantity > $available + 0.0001) {
+          throw new InvalidArgumentException('Not enough quantity. Available stock: ' . number_format($available, 2) . '.');
+        }
+
+        $houseStmt = $pdo->prepare("UPDATE material_store_house SET date = ?, voucher_no = ?, description = ?, out_quantity = ? WHERE id = ? AND material_id = ?");
+        $houseStmt->execute([$date, $voucher, $description, $quantity, $rowId, $materialId]);
+      } else {
+        throw new InvalidArgumentException('Incoming stock is not edited here.');
+      }
+
+      $pdo->commit();
+      return ['status' => true, 'message' => 'Movement updated successfully.'];
+    } catch (InvalidArgumentException $e) {
+      if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+      }
+      return ['status' => false, 'message' => $e->getMessage()];
+    } catch (Throwable $e) {
+      if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+      }
+      error_log('Material store house update failed: ' . $e->getMessage());
+      return ['status' => false, 'message' => 'The movement could not be updated due to a system error.'];
+    }
+  }
+
+  public function matchGatepassTransferPair(array $row, array $candidates)
+  {
+    $in = floatval($row['in_quantity'] ?? $row['in'] ?? 0);
+    $out = floatval($row['out_quantity'] ?? $row['out'] ?? 0);
+    $lookingForIn = $out > 0 && $in <= 0;
+    $lookingForOut = $in > 0 && $out <= 0;
+    if (!$lookingForIn && !$lookingForOut) {
+      return null;
+    }
+
+    $qty = $lookingForIn ? $out : $in;
+    $voucher = (string)($row['voucher_no'] ?? '');
+    $location = (string)($row['stock_to'] ?? '');
+    $rowId = (int)($row['id'] ?? 0);
+    $matches = [];
+    foreach ($candidates as $candidate) {
+      if (!is_array($candidate) || (int)($candidate['id'] ?? 0) === $rowId) {
+        continue;
+      }
+      if (strtolower(trim((string)($candidate['action'] ?? ''))) !== 'transfer') {
+        continue;
+      }
+      if ((string)($candidate['voucher_no'] ?? '') !== $voucher) {
+        continue;
+      }
+      if ((string)($candidate['stock_to'] ?? '') === $location) {
+        continue;
+      }
+      $candidateIn = floatval($candidate['in_quantity'] ?? $candidate['in'] ?? 0);
+      $candidateOut = floatval($candidate['out_quantity'] ?? $candidate['out'] ?? 0);
+      if ($lookingForIn && !($candidateIn > 0 && $candidateOut <= 0 && abs($candidateIn - $qty) < 0.001)) {
+        continue;
+      }
+      if ($lookingForOut && !($candidateOut > 0 && $candidateIn <= 0 && abs($candidateOut - $qty) < 0.001)) {
+        continue;
+      }
+      $matches[] = $candidate;
+    }
+
+    if (count($matches) === 1) {
+      return $matches[0];
+    }
+    if (count($matches) > 1) {
+      usort($matches, function ($left, $right) use ($rowId) {
+        return abs((int)$left['id'] - $rowId) <=> abs((int)$right['id'] - $rowId);
+      });
+      if (abs((int)$matches[0]['id'] - $rowId) < abs((int)$matches[1]['id'] - $rowId)) {
+        return $matches[0];
+      }
+    }
+    return null;
+  }
+
+  public function updateMaterialGatepassDetail($rowId, $materialId, $location, array $input)
+  {
+    global $pdo;
+    $rowId = (int)$rowId;
+    $materialId = (int)$materialId;
+    $location = trim((string)$location);
+
+    $pdo->beginTransaction();
+    try {
+      if ($location === '') {
+        throw new InvalidArgumentException('Open this material from a coldstore tab before updating a movement.');
+      }
+
+      $parsed = $this->gatepassDetailInput($input);
+      $date = $parsed['date'];
+      $description = $parsed['description'];
+      $quantity = $parsed['quantity'];
+      $voucher = $parsed['voucher'];
+
+      $warehouseBalance = $this->lockWarehouseBalance($materialId);
+      $allStmt = $pdo->prepare("SELECT * FROM stock_output_group WHERE material_id = ? FOR UPDATE");
+      $allStmt->execute([(string)$materialId]);
+      $allRows = $allStmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $row = null;
+      foreach ($allRows as $candidate) {
+        if ((int)($candidate['id'] ?? 0) === $rowId && (string)($candidate['stock_to'] ?? '') === $location) {
+          $row = $candidate;
+          break;
+        }
+      }
+      if (!$row) {
+        throw new InvalidArgumentException('Movement was not found.');
+      }
+
+      $action = strtolower(trim((string)($row['action'] ?? '')));
+      $currentIn = floatval($row['in_quantity'] ?? $row['in'] ?? 0);
+      $currentOut = floatval($row['out_quantity'] ?? $row['out'] ?? 0);
+      $isIn = $currentIn > 0 && $currentOut <= 0;
+      $isOut = $currentOut > 0 && $currentIn <= 0;
+      if (!$isIn && !$isOut) {
+        throw new InvalidArgumentException('This movement cannot be updated because both In and Out quantities are set.');
+      }
+
+      if ($action === 'transfer') {
+        $this->applyGatepassTransferUpdate($row, $allRows, $materialId, $date, $voucher, $description, $quantity, $input);
+      } elseif ($action === 'return' && $isOut) {
+        $this->applyGatepassReturnUpdate($row, $allRows, $materialId, $warehouseBalance, $date, $voucher, $description, $quantity);
+      } elseif (($action === 'use' || $action === 'damaged' || $action === '') && $isOut) {
+        $this->applyGatepassIssueUpdate($row, $allRows, $date, $voucher, $description, $quantity);
+      } elseif ($action === '' && $isIn) {
+        $this->applyGatepassReceiptUpdate($row, $allRows, $materialId, $warehouseBalance, $date, $voucher, $description, $quantity, $input);
+      } else {
+        throw new InvalidArgumentException('This movement type cannot be updated.');
+      }
+
+      $pdo->commit();
+      return ['status' => true, 'message' => 'Movement updated successfully.'];
+    } catch (InvalidArgumentException $e) {
+      if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+      }
+      return ['status' => false, 'message' => $e->getMessage()];
+    } catch (Throwable $e) {
+      if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+      }
+      error_log('Material gate pass update failed: ' . $e->getMessage());
+      return ['status' => false, 'message' => 'The movement could not be updated due to a system error.'];
+    }
+  }
+
+  private function gatepassDetailInput(array $input)
+  {
+    $date = trim((string)($input['date'] ?? ''));
+    $parsedDate = DateTime::createFromFormat('Y-m-d', $date);
+    if (!$parsedDate || $parsedDate->format('Y-m-d') !== $date) {
+      throw new InvalidArgumentException('Enter a valid date.');
+    }
+
+    $description = trim((string)($input['description'] ?? ''));
+    if (strlen($description) > 255) {
+      throw new InvalidArgumentException('Description must be 255 characters or fewer.');
+    }
+
+    $quantity = filter_var($input['quantity'] ?? null, FILTER_VALIDATE_FLOAT);
+    if ($quantity === false || $quantity <= 0 || $quantity > 1000000000) {
+      throw new InvalidArgumentException('Quantity must be greater than zero.');
+    }
+
+    $voucher = trim((string)($input['voucher_no'] ?? ''));
+    if ($voucher === '' || strlen($voucher) > 255) {
+      throw new InvalidArgumentException('Voucher No is required and must be 255 characters or fewer.');
+    }
+
+    return [
+      'date' => $date,
+      'description' => $description,
+      'quantity' => (float)$quantity,
+      'voucher' => $voucher
+    ];
+  }
+
+  private function lockWarehouseBalance($materialId)
+  {
+    global $pdo;
+    $stockStmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id = ? FOR UPDATE");
+    $stockStmt->execute([(int)$materialId]);
+    $balance = 0.0;
+    foreach ($stockStmt->fetchAll(PDO::FETCH_ASSOC) as $stockRow) {
+      $balance += floatval($stockRow['in_quantity'] ?? $stockRow['in'] ?? 0)
+        - floatval($stockRow['out_quantity'] ?? $stockRow['out'] ?? 0);
+    }
+    return $balance;
+  }
+
+  private function gatepassBalances(array $rows)
+  {
+    $balances = [];
+    foreach ($rows as $candidate) {
+      $place = (string)($candidate['stock_to'] ?? '');
+      if (!isset($balances[$place])) {
+        $balances[$place] = 0.0;
+      }
+      $balances[$place] += floatval($candidate['in_quantity'] ?? $candidate['in'] ?? 0)
+        - floatval($candidate['out_quantity'] ?? $candidate['out'] ?? 0);
+    }
+    return $balances;
+  }
+
+  private function gatepassColdstoreAllowed($name, $currentName)
+  {
+    global $pdo;
+    $name = trim((string)$name);
+    if ($name === '') {
+      return false;
+    }
+    $stmt = $pdo->prepare("SELECT name FROM config_coldstore WHERE name = ?");
+    $stmt->execute([$name]);
+    if ($stmt->fetchColumn()) {
+      return true;
+    }
+    return $name === (string)$currentName;
+  }
+
+  private function applyGatepassIssueUpdate(array $row, array $allRows, $date, $voucher, $description, $quantity)
+  {
+    global $pdo;
+    $location = (string)($row['stock_to'] ?? '');
+    $currentOut = floatval($row['out_quantity'] ?? $row['out'] ?? 0);
+    $available = ($this->gatepassBalances($allRows)[$location] ?? 0) + $currentOut;
+    if ($quantity > $available + 0.0001) {
+      throw new InvalidArgumentException('Not enough quantity. Available stock: ' . number_format($available, 2) . '.');
+    }
+
+    $stmt = $pdo->prepare("UPDATE stock_output_group SET date = ?, voucher_no = ?, description = ?, out_quantity = ? WHERE id = ?");
+    $stmt->execute([$date, $voucher, $description, $quantity, (int)$row['id']]);
+  }
+
+  private function applyGatepassReceiptUpdate(array $row, array $allRows, $materialId, $warehouseBalance, $date, $voucher, $description, $quantity, array $input)
+  {
+    global $pdo;
+    $oldLocation = (string)($row['stock_to'] ?? '');
+    $currentIn = floatval($row['in_quantity'] ?? $row['in'] ?? 0);
+    $newLocation = trim((string)($input['stock_to'] ?? ''));
+    if ($newLocation === '') {
+      throw new InvalidArgumentException('Stock To is required.');
+    }
+    if (!$this->gatepassColdstoreAllowed($newLocation, $oldLocation)) {
+      throw new InvalidArgumentException('Select a valid coldstore destination.');
+    }
+
+    $houseStmt = $pdo->prepare("SELECT * FROM material_store_house WHERE output_group = ? FOR UPDATE");
+    $houseStmt->execute([(int)$row['id']]);
+    $houseRows = $houseStmt->fetchAll(PDO::FETCH_ASSOC);
+    if (count($houseRows) > 1) {
+      throw new InvalidArgumentException('This receipt is linked to more than one warehouse movement.');
+    }
+    $linkedHouse = null;
+    if (count($houseRows) === 1) {
+      if ((int)$houseRows[0]['material_id'] !== (int)$materialId) {
+        throw new InvalidArgumentException('This receipt is linked to a different packing material.');
+      }
+      $linkedHouse = $houseRows[0];
+    }
+
+    if ($linkedHouse) {
+      $houseOut = floatval($linkedHouse['out_quantity'] ?? $linkedHouse['out'] ?? 0);
+      $available = $warehouseBalance + $houseOut;
+      if ($quantity > $available + 0.0001) {
+        throw new InvalidArgumentException('Not enough quantity. Available stock: ' . number_format($available, 2) . '.');
+      }
+    }
+
+    $balances = $this->gatepassBalances($allRows);
+    if ($newLocation === $oldLocation) {
+      $remaining = ($balances[$oldLocation] ?? 0) - $currentIn + $quantity;
+      if ($remaining < -0.0001) {
+        throw new InvalidArgumentException('The coldstore does not have enough remaining stock for this change.');
+      }
+    } else {
+      $remaining = ($balances[$oldLocation] ?? 0) - $currentIn;
+      if ($remaining < -0.0001) {
+        throw new InvalidArgumentException('This receipt cannot move because the current coldstore has already used the stock.');
+      }
+    }
+
+    if ($linkedHouse) {
+      $houseUpdate = $pdo->prepare("UPDATE material_store_house SET date = ?, voucher_no = ?, description = ?, out_quantity = ? WHERE id = ? AND material_id = ?");
+      $houseUpdate->execute([$date, $voucher, $description, $quantity, (int)$linkedHouse['id'], (int)$materialId]);
+    }
+
+    $groupUpdate = $pdo->prepare("UPDATE stock_output_group SET date = ?, stock_to = ?, voucher_no = ?, description = ?, in_quantity = ? WHERE id = ?");
+    $groupUpdate->execute([$date, $newLocation, $voucher, $description, $quantity, (int)$row['id']]);
+  }
+
+  private function applyGatepassTransferUpdate(array $row, array $allRows, $materialId, $date, $voucher, $description, $quantity, array $input)
+  {
+    global $pdo;
+    $currentIn = floatval($row['in_quantity'] ?? $row['in'] ?? 0);
+    $currentOut = floatval($row['out_quantity'] ?? $row['out'] ?? 0);
+    $isOutLeg = $currentOut > 0;
+    $pair = $this->matchGatepassTransferPair($row, $allRows);
+    $oldVoucher = (string)($row['voucher_no'] ?? '');
+    $currentQty = $isOutLeg ? $currentOut : $currentIn;
+    $voucherChanged = $voucher !== $oldVoucher;
+    $qtyChanged = abs($quantity - $currentQty) >= 0.001;
+    $destinationKey = $isOutLeg ? 'transfer_to' : 'stock_to';
+    $destinationSent = array_key_exists($destinationKey, $input);
+    $postedDestination = trim((string)($input[$destinationKey] ?? ''));
+
+    if (!$pair) {
+      if ($voucherChanged || $qtyChanged || ($destinationSent && $postedDestination !== '')) {
+        throw new InvalidArgumentException('This transfer is linked to another coldstore movement that could not be matched.');
+      }
+      $stmt = $pdo->prepare("UPDATE stock_output_group SET date = ?, description = ? WHERE id = ? AND material_id = ?");
+      $stmt->execute([$date, $description, (int)$row['id'], (string)$materialId]);
+      return;
+    }
+
+    $outRow = $isOutLeg ? $row : $pair;
+    $inRow = $isOutLeg ? $pair : $row;
+    $source = (string)($outRow['stock_to'] ?? '');
+    $dest = (string)($inRow['stock_to'] ?? '');
+    $newDest = $destinationSent ? $postedDestination : $dest;
+    if ($newDest === '') {
+      throw new InvalidArgumentException('Transfer destination is required.');
+    }
+    if ($newDest === $source) {
+      throw new InvalidArgumentException('Transfer destination must be a different coldstore.');
+    }
+    if (!$this->gatepassColdstoreAllowed($newDest, $dest)) {
+      throw new InvalidArgumentException('Select a valid coldstore destination.');
+    }
+
+    $sourceQty = floatval($outRow['out_quantity'] ?? $outRow['out'] ?? 0);
+    $destQty = floatval($inRow['in_quantity'] ?? $inRow['in'] ?? 0);
+    $balances = $this->gatepassBalances($allRows);
+    $available = ($balances[$source] ?? 0) + $sourceQty;
+    if ($quantity > $available + 0.0001) {
+      throw new InvalidArgumentException('Not enough quantity. Available stock: ' . number_format($available, 2) . '.');
+    }
+    $remaining = $newDest === $dest
+      ? ($balances[$dest] ?? 0) - $destQty + $quantity
+      : ($balances[$dest] ?? 0) - $destQty;
+    if ($remaining < -0.0001) {
+      throw new InvalidArgumentException('The destination coldstore does not have enough remaining stock for this change.');
+    }
+
+    $outUpdate = $pdo->prepare("UPDATE stock_output_group SET date = ?, voucher_no = ?, description = ?, out_quantity = ? WHERE id = ?");
+    $outUpdate->execute([$date, $voucher, $description, $quantity, (int)$outRow['id']]);
+    $inUpdate = $pdo->prepare("UPDATE stock_output_group SET date = ?, stock_to = ?, voucher_no = ?, description = ?, in_quantity = ? WHERE id = ?");
+    $inUpdate->execute([$date, $newDest, $voucher, $description, $quantity, (int)$inRow['id']]);
+  }
+
+  private function applyGatepassReturnUpdate(array $row, array $allRows, $materialId, $warehouseBalance, $date, $voucher, $description, $quantity)
+  {
+    global $pdo;
+    $location = (string)($row['stock_to'] ?? '');
+    $currentOut = floatval($row['out_quantity'] ?? $row['out'] ?? 0);
+    $available = ($this->gatepassBalances($allRows)[$location] ?? 0) + $currentOut;
+    if ($quantity > $available + 0.0001) {
+      throw new InvalidArgumentException('Not enough quantity. Available stock: ' . number_format($available, 2) . '.');
+    }
+
+    $oldVoucher = (string)($row['voucher_no'] ?? '');
+    $pairStmt = $pdo->prepare("SELECT * FROM material_store_house WHERE material_id = ? AND action = 'return' FOR UPDATE");
+    $pairStmt->execute([(int)$materialId]);
+    $pairs = [];
+    foreach ($pairStmt->fetchAll(PDO::FETCH_ASSOC) as $pair) {
+      $sameVoucher = (string)($pair['voucher_no'] ?? '') === $oldVoucher;
+      $sameQty = abs(floatval($pair['in_quantity'] ?? $pair['in'] ?? 0) - $currentOut) < 0.001;
+      if ($sameVoucher && $sameQty) {
+        $pairs[] = $pair;
+      }
+    }
+
+    $voucherChanged = $voucher !== $oldVoucher;
+    $qtyChanged = abs($quantity - $currentOut) >= 0.001;
+    if (count($pairs) === 1) {
+      $pair = $pairs[0];
+      $pairIn = floatval($pair['in_quantity'] ?? $pair['in'] ?? 0);
+      $remaining = $warehouseBalance - $pairIn + $quantity;
+      if ($remaining < -0.0001) {
+        throw new InvalidArgumentException('Reducing this return would make the warehouse balance negative.');
+      }
+      $pairUpdate = $pdo->prepare("UPDATE material_store_house SET date = ?, voucher_no = ?, description = ?, in_quantity = ? WHERE id = ? AND material_id = ?");
+      $pairUpdate->execute([$date, $voucher, $description, $quantity, (int)$pair['id'], (int)$materialId]);
+    } elseif ($voucherChanged || $qtyChanged) {
+      throw new InvalidArgumentException('This return is linked to a warehouse receipt that could not be matched. Update it from Packing Material W/H.');
+    }
+
+    $stmt = $pdo->prepare("UPDATE stock_output_group SET date = ?, voucher_no = ?, description = ?, out_quantity = ? WHERE id = ?");
+    $stmt->execute([$date, $voucher, $description, $quantity, (int)$row['id']]);
+  }
+
   public function outputmaterial($date, $stockto, $material, $quantity, $voucher_no)
   {
     global $pdo;

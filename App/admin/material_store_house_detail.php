@@ -8,6 +8,24 @@ $auth = new auth();
 $auth->checkadmin();
 $bootstrap = new Bootstrap();
 $query = new Query();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['updatemovement']) && !empty($_SESSION['logged_in'])) {
+  $postedMaterial = (int)($_POST['material_id'] ?? 0);
+  $postedPage = max(1, (int)($_POST['pageno'] ?? 1));
+  $_SESSION['store_detail_flash'] = $query->updateMaterialStoreHouseDetail(
+    (int)($_POST['movement_id'] ?? 0),
+    $postedMaterial,
+    $_POST
+  );
+  header('Location: material_store_house_detail.php?id=' . $postedMaterial . '&pageno=' . $postedPage);
+  exit;
+}
+
+$updateResult = null;
+if (!empty($_SESSION['store_detail_flash']) && is_array($_SESSION['store_detail_flash'])) {
+  $updateResult = $_SESSION['store_detail_flash'];
+  unset($_SESSION['store_detail_flash']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -42,10 +60,20 @@ $bootstrap->css();
           <a href="material_store_house.php" class="float-end btn btn-secondary btn-sm">Back</a>
         </div>
         <div class="card-body">
+          <?php if ($updateResult !== null): ?>
+            <div class="alert alert-<?= $updateResult['status'] ? 'success' : 'danger'; ?> alert-dismissible fade show" role="alert">
+              <?= htmlspecialchars($updateResult['message'] ?? ''); ?>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          <?php endif; ?>
           <?php
           $pageno = !empty($_GET['pageno']) ? intval($_GET['pageno']) : 1;
           $numOfrecs = 13;
           $offset = ($pageno - 1) * $numOfrecs;
+
+          $coldstoreStmt = $pdo->prepare("SELECT name FROM config_coldstore ORDER BY name ASC");
+          $coldstoreStmt->execute();
+          $coldstores = $coldstoreStmt->fetchAll(PDO::FETCH_ASSOC);
           ?>
           <table class="mt-3 table table-bordered table-striped rounded">
             <tr>
@@ -60,6 +88,7 @@ $bootstrap->css();
               <th>In</th>
               <th>Out</th>
               <th>Balance</th>
+              <th>Action</th>
             </tr>
 
             <?php
@@ -82,7 +111,10 @@ $bootstrap->css();
             }
             foreach ($datas as $data) {
               $material_id = $data['material_id'];
-              $supplier_id = $data['supplier_id'] ?? '';
+              $supplier_id = $data['contact_id'] ?? '';
+              if ($supplier_id === '' || $supplier_id === null) {
+                $supplier_id = $data['supplier_id'] ?? '';
+              }
 
               // CORRECTED: Target products table
               $mStmt = $pdo->prepare("SELECT * FROM products WHERE id = ? LIMIT 1");
@@ -109,6 +141,12 @@ $bootstrap->css();
                 $outstmt->execute([$outgroupid]);
                 $outdata = $outstmt->fetch(PDO::FETCH_ASSOC) ?: [];
               }
+
+              $isLinkedOutput = !empty($outgroupid);
+              $isOutbound = $isLinkedOutput || ($out > 0 && $in <= 0);
+              $dateValue = (!empty($data['date']) && $data['date'] != '0000-00-00') ? $data['date'] : '';
+              $voucherValue = $isLinkedOutput ? ($outdata['voucher_no'] ?? '') : ($data['voucher_no'] ?? '');
+              $stockToValue = $outdata['stock_to'] ?? '';
             ?>
 
               <tr>
@@ -123,7 +161,71 @@ $bootstrap->css();
                 <td style="color: green; font-weight: bolder;"><?php echo $in == 0 ? '-' : $in; ?></td>
                 <td style="color: red; font-weight: bolder;"><?php echo $out == 0 ? '-' : $out; ?></td>
                 <td style="color: blue; font-weight: bolder;"><?php echo $balance == 0 && $in == 0 && $out == 0 ? '-' : $balance; ?></td>
+                <td>
+                  <?php if ($isOutbound): ?>
+                    <button type="button" class="btn btn-warning text-light btn-sm" data-bs-toggle="modal" data-bs-target="#updatemodal<?= (int)$data['id']; ?>">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                        <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                      </svg>
+                    </button>
+                  <?php endif; ?>
+                </td>
               </tr>
+              <?php if ($isOutbound): ?>
+              <div class="modal fade" id="updatemodal<?= (int)$data['id']; ?>" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <form action="material_store_house_detail.php?id=<?= urlencode($id); ?>&pageno=<?= (int)$pageno; ?>" method="post" autocomplete="off">
+                      <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title">Update Output</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <input type="hidden" name="movement_id" value="<?= (int)$data['id']; ?>">
+                        <input type="hidden" name="material_id" value="<?= (int)$id; ?>">
+                        <input type="hidden" name="pageno" value="<?= (int)$pageno; ?>">
+
+                        <label>Date</label>
+                        <input type="date" name="date" class="form-control" value="<?= htmlspecialchars($dateValue); ?>" required>
+
+                        <?php if ($isLinkedOutput): ?>
+                          <label>Stock To</label>
+                          <select name="stock_to" class="form-control" required>
+                            <?php
+                            $stockToListed = false;
+                            foreach ($coldstores as $coldstore):
+                              if ((string)$coldstore['name'] === (string)$stockToValue) {
+                                $stockToListed = true;
+                              }
+                            ?>
+                              <option value="<?= htmlspecialchars($coldstore['name']); ?>" <?= (string)$coldstore['name'] === (string)$stockToValue ? 'selected' : ''; ?>><?= htmlspecialchars($coldstore['name']); ?></option>
+                            <?php endforeach; ?>
+                            <?php if ($stockToValue !== '' && !$stockToListed): ?>
+                              <option value="<?= htmlspecialchars($stockToValue); ?>" selected><?= htmlspecialchars($stockToValue); ?></option>
+                            <?php endif; ?>
+                          </select>
+                          <label>GatePass Voucher No</label>
+                        <?php else: ?>
+                          <label>Voucher No</label>
+                        <?php endif; ?>
+                        <input type="text" name="voucher_no" class="form-control" value="<?= htmlspecialchars($voucherValue); ?>" required>
+
+                        <label>Description</label>
+                        <input type="text" name="description" class="form-control" maxlength="255" value="<?= htmlspecialchars($data['description'] ?? ''); ?>">
+
+                        <label>Out Quantity</label>
+                        <input type="number" name="quantity" class="form-control" min="0.01" step="0.01" value="<?= htmlspecialchars((string)$out); ?>" required>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-warning" name="updatemovement">Update</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <?php endif; ?>
             <?php
               $no++;
             };

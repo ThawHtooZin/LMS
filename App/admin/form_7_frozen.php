@@ -25,54 +25,135 @@ $bootstrap->css();
 <body>
   <?php
 
+  $form7Alert = function ($message) {
+    echo '<script>swal("Error!", ' . json_encode($message) . ', "error");</script>';
+  };
+  $allowedFishTypes = ['G', 'egg', 'ggs', 'fillet', 'W', 'Cut_piece', 'Scaless', 'Bls', 'iqf'];
+  $allowedTypes = ['frozen', 'tcl'];
+
   if (isset($_POST['update'])) {
-    $pcsperf7 = $_POST['pcsperf7'];
-    $updateid = $_POST['id'];
+    $pcsperf7 = trim($_POST['pcsperf7'] ?? '');
+    $updateid = $_POST['id'] ?? '';
 
-    // Fetch existing country so it is not overwritten
-    $existing_data = $query->select('form7stock', $updateid, 'id');
-    $country = $existing_data ? ($existing_data['country'] ?? '') : '';
-
-    $query->updatefrozencountry($country, $pcsperf7, $updateid);
+    if (!ctype_digit((string) $updateid) || (int) $updateid < 1) {
+      $form7Alert('Invalid row to update.');
+    } elseif ($pcsperf7 === '' || filter_var($pcsperf7, FILTER_VALIDATE_INT) === false || (int) $pcsperf7 < 0) {
+      $form7Alert('Pcs per F-7 must be a whole number zero or greater.');
+    } else {
+      $existing_data = $query->select('form7stock', $updateid, 'id');
+      if (!$existing_data) {
+        $form7Alert('Row not found.');
+      } else {
+        $country = $existing_data['country'] ?? '';
+        $query->updatefrozencountry($country, $pcsperf7, $updateid);
+      }
+    }
   }
 
   if (isset($_POST['addsize'])) {
-    $id = $_POST['id'];
-    $size = $_POST['size'];
-    $query->addsize($id, $size);
+    $id = $_POST['id'] ?? '';
+    $size = trim($_POST['size'] ?? '');
+
+    if (!ctype_digit((string) $id) || (int) $id < 1) {
+      $form7Alert('Invalid row to update.');
+    } elseif ($size === '') {
+      $form7Alert('Size is required.');
+    } elseif (strlen($size) > 11) {
+      $form7Alert('Size must be 11 characters or fewer.');
+    } else {
+      $source = $query->select('form7stock', $id, 'id');
+      if (!$source) {
+        $form7Alert('Row not found.');
+      } else {
+        $query->addsize($id, $size);
+      }
+    }
   }
 
   if (isset($_POST['bulk_update_btn'])) {
-    $bulk_ids = $_POST['bulk_ids'];
-    $bulk_country = trim($_POST['bulk_country']);
-    $bulk_fish_type = trim($_POST['bulk_fish_type']);
+    $bulk_ids = $_POST['bulk_ids'] ?? '';
+    $bulk_country = trim($_POST['bulk_country'] ?? '');
+    $bulk_fish_type = trim($_POST['bulk_fish_type'] ?? '');
+    $idParts = array_filter(array_map('trim', explode(',', (string) $bulk_ids)), function ($id) {
+      return ctype_digit($id) && (int) $id > 0;
+    });
 
-    if (!empty($bulk_ids)) {
-      $query->bulkUpdateForm7Frozen($bulk_ids, $bulk_country, $bulk_fish_type);
+    if (count($idParts) === 0) {
+      $form7Alert('Select at least one row to update.');
+    } elseif ($bulk_country === '' && $bulk_fish_type === '') {
+      $form7Alert('Enter a country or select a fish type. Leave a field blank only to keep its current value.');
+    } elseif (strlen($bulk_country) > 155) {
+      $form7Alert('Country must be 155 characters or fewer.');
+    } elseif ($bulk_fish_type !== '' && !in_array($bulk_fish_type, $allowedFishTypes, true)) {
+      $form7Alert('Select a valid fish type.');
+    } else {
+      $query->bulkUpdateForm7Frozen(implode(',', $idParts), $bulk_country, $bulk_fish_type);
     }
   }
 
   if (isset($_POST['addform7'])) {
-    $date = $_POST['date'];
-    $commondity_id = $_POST['item_id'];
-    $supplier_name = $_POST['supplier_id'];
-    $type = $_POST['type'];
-    $size = $_POST['size'];
-    $viss = $_POST['viss'];
+    $date = trim($_POST['date'] ?? '');
+    $commondity_id = trim($_POST['item_id'] ?? '');
+    $supplier_name = trim($_POST['supplier_id'] ?? '');
+    $type = trim($_POST['type'] ?? '');
+    $size = trim($_POST['size'] ?? '');
+    $viss = trim($_POST['viss'] ?? '');
 
-    $query->addform7($date, $commondity_id, $supplier_name, $type, $size, $viss);
+    $dateOk = (bool) preg_match('/^\d{4}-\d{2}-\d{2}$/', $date);
+    if ($dateOk) {
+      $parts = explode('-', $date);
+      $dateOk = checkdate((int) $parts[1], (int) $parts[2], (int) $parts[0]);
+    }
+
+    if (!$dateOk) {
+      $form7Alert('Date is required.');
+    } elseif ($commondity_id === '' || strlen($commondity_id) > 11) {
+      $form7Alert('Fish Name is required.');
+    } elseif ($supplier_name === '' || strlen($supplier_name) > 255) {
+      $form7Alert('Supplier Name is required.');
+    } elseif (!in_array($type, $allowedTypes, true)) {
+      $form7Alert('Select a type.');
+    } elseif ($size === '') {
+      $form7Alert('Size is required.');
+    } elseif (strlen($size) > 11) {
+      $form7Alert('Size must be 11 characters or fewer.');
+    } elseif ($viss === '' || !is_numeric($viss) || floatval($viss) <= 0 || strlen($viss) > 11) {
+      $form7Alert('Viss must be a number greater than zero (11 characters or fewer).');
+    } else {
+      $query->addform7($date, $commondity_id, $supplier_name, $type, $size, $viss);
+    }
   }
 
   if (isset($_POST['deleteform7'])) {
-    $deleteid = $_POST['deleteid'];
-    $query->form7frozendelete($deleteid);
+    $deleteid = $_POST['deleteid'] ?? '';
+    if (!ctype_digit((string) $deleteid) || (int) $deleteid < 1) {
+      $form7Alert('Invalid row to delete.');
+    } else {
+      $query->form7frozendelete($deleteid);
+    }
   }
 
   if (isset($_POST['waterkgupdate'])) {
-    $waterkgid = $_POST['waterkgid'];
-    $waterkg = $_POST['waterkg'];
+    $waterkgid = $_POST['waterkgid'] ?? '';
+    $waterkg = trim($_POST['waterkg'] ?? '');
 
-    $query->waterkg($waterkgid, $waterkg);
+    if (!ctype_digit((string) $waterkgid) || (int) $waterkgid < 1) {
+      $form7Alert('Invalid row to update.');
+    } elseif ($waterkg === '' || filter_var($waterkg, FILTER_VALIDATE_INT) === false || (int) $waterkg < 0) {
+      $form7Alert('Water Kg must be a whole number zero or greater.');
+    } else {
+      $row = $query->select('form7stock', $waterkgid, 'id');
+      if (!$row) {
+        $form7Alert('Row not found.');
+      } else {
+        $originalKg = floatval($row['viss'] ?? 0) * 1.634;
+        if ((float) $waterkg > $originalKg) {
+          $form7Alert('Water Kg cannot be greater than Original Kg (' . round($originalKg, 4) . ').');
+        } else {
+          $query->waterkg($waterkgid, $waterkg);
+        }
+      }
+    }
   }
 
   if (isset($_POST['searchbtn'])) {
@@ -252,7 +333,7 @@ $bootstrap->css();
                 <td>
                   <form action="form_7_frozen.php" method="post">
                     <input type="hidden" name="deleteid" value="<?php echo $form7data['id']; ?>">
-                    <button type="submit" name="deleteform7" class="btn btn-danger btn-sm">
+                    <button type="button" name="deleteform7" class="btn btn-danger btn-sm" onclick="lmsConfirmDelete(this, 'Are you sure you want to delete this Form 7 record?');">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
                         <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z" />
                       </svg>
@@ -269,23 +350,23 @@ $bootstrap->css();
                       <h1 class="modal-title fs-5">Add WaterKg</h1>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
-                      <form action="form_7_frozen.php" method="post">
+                    <form action="form_7_frozen.php" method="post" novalidate onsubmit="return validateWaterKg(this)">
+                      <div class="modal-body">
                         <input type="hidden" name="waterkgid" value="<?php echo $form7data['id']; ?>">
-                        <div class="modal-body">
-                          <?php
-                          $idd = $form7data['id'];
-                          $updata = $query->select('form7stock', $idd, 'id');
-                          $safe_waterkg = $updata ? ($updata['water_kg'] ?? '') : '';
-                          ?>
-                          <label>Water Kg</label>
-                          <input type="text" name="waterkg" class="form-control inpv2 mt-1" value="<?php echo htmlspecialchars($safe_waterkg); ?>">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                      <button type="submit" class="btn btn-warning" name="waterkgupdate">Update</button>
-                    </div>
+                        <?php
+                        $idd = $form7data['id'];
+                        $updata = $query->select('form7stock', $idd, 'id');
+                        $safe_waterkg = $updata ? ($updata['water_kg'] ?? '') : '';
+                        $originalKg = floatval($form7data['viss'] ?? 0) * 1.634;
+                        ?>
+                        <label>Water Kg</label>
+                        <input type="number" name="waterkg" min="0" step="1" max="<?php echo htmlspecialchars((string) $originalKg); ?>" class="form-control inpv2 mt-1" value="<?php echo htmlspecialchars((string) $safe_waterkg); ?>" required>
+                        <small class="text-muted">Whole number from 0 up to Original Kg (<?php echo round($originalKg, 4); ?>).</small>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-warning" name="waterkgupdate">Update</button>
+                      </div>
                     </form>
                   </div>
                 </div>
@@ -299,27 +380,22 @@ $bootstrap->css();
                       <h1 class="modal-title fs-5">Update Data</h1>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
-                      <form action="form_7_frozen.php" method="post">
+                    <form action="form_7_frozen.php" method="post" novalidate onsubmit="return validatePcsPerF7(this)">
+                      <div class="modal-body">
                         <input type="hidden" name="id" value="<?php echo $form7data['id']; ?>">
-                        <div class="modal-body">
-                          <?php
-                          $idd = $form7data['id'];
-                          $updata = $query->select('form7stock', $idd, 'id');
-                          $safe_pcsperf7 = $updata ? ($updata['pcsperf7'] ?? '') : '';
-                          ?>
-                          <div class="row">
-                            <div class="col">
-                              <label>Pcs Per F7</label>
-                              <input type="text" name="pcsperf7" class="form-control inpv2 mt-1" value="<?php echo htmlspecialchars($safe_pcsperf7); ?>">
-                            </div>
-                          </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                      <button type="submit" class="btn btn-warning" name="update">Update</button>
-                    </div>
+                        <?php
+                        $idd = $form7data['id'];
+                        $updata = $query->select('form7stock', $idd, 'id');
+                        $safe_pcsperf7 = $updata ? ($updata['pcsperf7'] ?? '') : '';
+                        ?>
+                        <label>Pcs Per F7</label>
+                        <input type="number" name="pcsperf7" min="0" step="1" class="form-control inpv2 mt-1" value="<?php echo htmlspecialchars((string) $safe_pcsperf7); ?>" required>
+                        <small class="text-muted">Whole number, zero or greater.</small>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-warning" name="update">Update</button>
+                      </div>
                     </form>
                   </div>
                 </div>
@@ -333,27 +409,22 @@ $bootstrap->css();
                       <h1 class="modal-title fs-5">Add Size</h1>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
-                      <form action="form_7_frozen.php" method="post">
+                    <form action="form_7_frozen.php" method="post" novalidate onsubmit="return validateForm7Size(this)">
+                      <div class="modal-body">
                         <input type="hidden" name="id" value="<?php echo $form7data['id']; ?>">
-                        <div class="modal-body">
-                          <?php
-                          $idd = $form7data['id'];
-                          $updata = $query->select('form7stock', $idd, 'id');
-                          $safe_size = $updata ? ($updata['size'] ?? '') : '';
-                          ?>
-                          <div class="row">
-                            <div class="col">
-                              <label>Size</label>
-                              <input type="text" name="size" class="form-control inpv2 mt-1" value="<?php echo htmlspecialchars($safe_size); ?>">
-                            </div>
-                          </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                      <button type="submit" class="btn btn-warning" name="addsize">Update</button>
-                    </div>
+                        <?php
+                        $idd = $form7data['id'];
+                        $updata = $query->select('form7stock', $idd, 'id');
+                        $safe_size = $updata ? ($updata['size'] ?? '') : '';
+                        ?>
+                        <label>Size</label>
+                        <input type="text" name="size" maxlength="11" class="form-control inpv2 mt-1" value="<?php echo htmlspecialchars($safe_size); ?>" required>
+                        <small class="text-muted">Required. Up to 11 characters. This adds a new row with the size you enter.</small>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-warning" name="addsize">Update</button>
+                      </div>
                     </form>
                   </div>
                 </div>
@@ -392,13 +463,13 @@ $bootstrap->css();
           <h5 class="modal-title">Bulk Update Form-7 Data</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <form action="form_7_frozen.php" method="post">
+        <form action="form_7_frozen.php" method="post" novalidate onsubmit="return validateBulkForm7(this)">
           <div class="modal-body">
             <input type="hidden" name="bulk_ids" id="bulk_ids" value="">
 
             <div class="mb-3">
               <label class="fw-bold">Country (Leave blank to ignore)</label>
-              <input type="text" name="bulk_country" class="form-control inpv2">
+              <input type="text" name="bulk_country" maxlength="155" class="form-control inpv2">
             </div>
 
             <div class="mb-3">
@@ -434,68 +505,66 @@ $bootstrap->css();
           <h1 class="modal-title fs-5">Add New Data</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
-          <form action="form_7_frozen.php" method="post">
-            <div class="modal-body">
-              <div class="row">
-                <div class="col">
-                  <label>Date</label>
-                  <input type="date" name="date" class="form-control inpv2 mb-2">
-                </div>
-                <div class="col">
-                  <label>Fish Name</label>
-                  <select class="form-control inpv2 mb-2" name="item_id">
-                    <?php
-                    // REFACTORED: Pulled directly from new 'products' table
-                    $itemdatas = $query->selectall('products');
-                    foreach ($itemdatas as $itemdata) {
-                    ?>
-                      <option value="<?php echo htmlspecialchars($itemdata['id']); ?>"><?php echo htmlspecialchars($itemdata['name']); ?></option>
-                    <?php } ?>
-                  </select>
-                </div>
+        <form action="form_7_frozen.php" method="post" novalidate onsubmit="return validateAddForm7(this)">
+          <div class="modal-body">
+            <div class="row">
+              <div class="col">
+                <label>Date</label>
+                <input type="date" name="date" class="form-control inpv2 mb-2" required>
               </div>
-              <div class="row">
-                <div class="col">
-                  <label>Supplier Name</label>
-                  <select class="form-control inpv2 mb-2" name="supplier_id">
-                    <?php
-                    // REFACTORED: Pulled directly from new 'accodes' or 'contacts' table
-                    $supplierstmt = $pdo->prepare("SELECT code AS code_no, name AS ac_name FROM accodes UNION SELECT id AS code_no, name AS ac_name FROM contacts");
-                    $supplierstmt->execute();
-                    $supplierdatas = $supplierstmt->fetchAll(PDO::FETCH_ASSOC);
-
-                    foreach ($supplierdatas as $supplierdata) {
-                    ?>
-                      <option value="<?php echo htmlspecialchars($supplierdata['code_no']); ?>"><?php echo htmlspecialchars($supplierdata['ac_name']); ?></option>
-                    <?php } ?>
-                  </select>
-                </div>
-                <div class="col">
-                  <label>Type</label>
-                  <select class="form-control inpv2 mb-2" name="type">
-                    <option value="">Select Type</option>
-                    <option value="frozen">Frozen</option>
-                    <option value="tcl">TCl</option>
-                  </select>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <label>Size</label>
-                  <input type="text" name="size" class="form-control inpv2 mb-2">
-                </div>
-                <div class="col">
-                  <label>Viss</label>
-                  <input type="text" name="viss" Class="form-control inpv2 mb-2">
-                </div>
+              <div class="col">
+                <label>Fish Name</label>
+                <select class="form-control inpv2 mb-2" name="item_id" required>
+                  <option value="">Select Fish Name</option>
+                  <?php
+                  $itemdatas = $query->selectall('products');
+                  foreach ($itemdatas as $itemdata) {
+                  ?>
+                    <option value="<?php echo htmlspecialchars($itemdata['id']); ?>"><?php echo htmlspecialchars($itemdata['name']); ?></option>
+                  <?php } ?>
+                </select>
               </div>
             </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-success" name="addform7">Add</button>
-        </div>
+            <div class="row">
+              <div class="col">
+                <label>Supplier Name</label>
+                <select class="form-control inpv2 mb-2" name="supplier_id" required>
+                  <option value="">Select Supplier</option>
+                  <?php
+                  $supplierstmt = $pdo->prepare("SELECT code AS code_no, name AS ac_name FROM accodes UNION SELECT id AS code_no, name AS ac_name FROM contacts");
+                  $supplierstmt->execute();
+                  $supplierdatas = $supplierstmt->fetchAll(PDO::FETCH_ASSOC);
+
+                  foreach ($supplierdatas as $supplierdata) {
+                  ?>
+                    <option value="<?php echo htmlspecialchars($supplierdata['code_no']); ?>"><?php echo htmlspecialchars($supplierdata['ac_name']); ?></option>
+                  <?php } ?>
+                </select>
+              </div>
+              <div class="col">
+                <label>Type</label>
+                <select class="form-control inpv2 mb-2" name="type" required>
+                  <option value="">Select Type</option>
+                  <option value="frozen">Frozen</option>
+                  <option value="tcl">TCl</option>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>Size</label>
+                <input type="text" name="size" maxlength="11" class="form-control inpv2 mb-2" required>
+              </div>
+              <div class="col">
+                <label>Viss</label>
+                <input type="number" name="viss" min="0.001" step="any" class="form-control inpv2 mb-2" required>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-success" name="addform7">Add</button>
+          </div>
         </form>
       </div>
     </div>
@@ -505,6 +574,131 @@ $bootstrap->css();
     function toggleAllRows(source) {
       const checkboxes = document.querySelectorAll('.row-checkbox');
       checkboxes.forEach(cb => cb.checked = source.checked);
+    }
+
+    function markInvalid(input, invalid) {
+      if (!input) return;
+      input.classList.toggle('redborder', invalid);
+    }
+
+    document.addEventListener('input', function (event) {
+      if (event.target && event.target.classList) {
+        event.target.classList.remove('redborder');
+      }
+    });
+    document.addEventListener('change', function (event) {
+      if (event.target && event.target.classList) {
+        event.target.classList.remove('redborder');
+      }
+    });
+
+    function validateAddForm7(form) {
+      let message = '';
+      const dateBad = !form.date.value;
+      markInvalid(form.date, dateBad);
+      if (dateBad) message = message || 'Date is required.';
+
+      const itemBad = !form.item_id.value;
+      markInvalid(form.item_id, itemBad);
+      if (itemBad) message = message || 'Fish Name is required.';
+
+      const supplierBad = !form.supplier_id.value;
+      markInvalid(form.supplier_id, supplierBad);
+      if (supplierBad) message = message || 'Supplier Name is required.';
+
+      const typeBad = form.type.value !== 'frozen' && form.type.value !== 'tcl';
+      markInvalid(form.type, typeBad);
+      if (typeBad) message = message || 'Select a type.';
+
+      const size = form.size.value.trim();
+      const sizeBad = size === '' || size.length > 11;
+      markInvalid(form.size, sizeBad);
+      if (size === '') message = message || 'Size is required.';
+      else if (size.length > 11) message = message || 'Size must be 11 characters or fewer.';
+
+      const viss = form.viss.value.trim();
+      const vissNum = Number(viss);
+      const vissBad = viss === '' || Number.isNaN(vissNum) || vissNum <= 0 || viss.length > 11;
+      markInvalid(form.viss, vissBad);
+      if (vissBad) message = message || 'Viss must be a number greater than zero (11 characters or fewer).';
+
+      if (message) {
+        swal('Warning', message, 'warning');
+        return false;
+      }
+      form.size.value = size;
+      form.viss.value = viss;
+      return true;
+    }
+
+    function validatePcsPerF7(form) {
+      const value = form.pcsperf7.value.trim();
+      const bad = !/^\d+$/.test(value);
+      markInvalid(form.pcsperf7, bad);
+      if (bad) {
+        swal('Warning', 'Pcs per F-7 must be a whole number zero or greater.', 'warning');
+        return false;
+      }
+      return true;
+    }
+
+    function validateForm7Size(form) {
+      const size = form.size.value.trim();
+      const bad = size === '' || size.length > 11;
+      markInvalid(form.size, bad);
+      if (size === '') {
+        swal('Warning', 'Size is required.', 'warning');
+        return false;
+      }
+      if (size.length > 11) {
+        swal('Warning', 'Size must be 11 characters or fewer.', 'warning');
+        return false;
+      }
+      form.size.value = size;
+      return true;
+    }
+
+    function validateWaterKg(form) {
+      const value = form.waterkg.value.trim();
+      const max = parseFloat(form.waterkg.getAttribute('max'));
+      const whole = /^\d+$/.test(value);
+      const num = Number(value);
+      const overMax = whole && !Number.isNaN(max) && num > max;
+      const bad = !whole || overMax;
+      markInvalid(form.waterkg, bad);
+      if (!whole) {
+        swal('Warning', 'Water Kg must be a whole number zero or greater.', 'warning');
+        return false;
+      }
+      if (overMax) {
+        swal('Warning', 'Water Kg cannot be greater than Original Kg (' + max + ').', 'warning');
+        return false;
+      }
+      return true;
+    }
+
+    function validateBulkForm7(form) {
+      const country = form.bulk_country.value.trim();
+      const fish = form.bulk_fish_type.value;
+      const tooLong = country.length > 155;
+      const empty = country === '' && fish === '';
+      markInvalid(form.bulk_country, tooLong || empty);
+      markInvalid(form.bulk_fish_type, empty);
+
+      if (!form.bulk_ids.value) {
+        swal('Warning', 'Please select at least one row to update.', 'warning');
+        return false;
+      }
+      if (empty) {
+        swal('Warning', 'Enter a country or select a fish type. Leave a field blank only to keep its current value.', 'warning');
+        return false;
+      }
+      if (tooLong) {
+        swal('Warning', 'Country must be 155 characters or fewer.', 'warning');
+        return false;
+      }
+      form.bulk_country.value = country;
+      return true;
     }
 
     function openBulkModal() {

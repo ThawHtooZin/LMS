@@ -18,9 +18,17 @@
         return;
       }
       var form = button.closest('form');
-      if (form) {
-        form.submit();
+      if (!form) {
+        return;
       }
+      if (button.name) {
+        var hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = button.name;
+        hidden.value = button.value || '1';
+        form.appendChild(hidden);
+      }
+      form.submit();
     });
   };
 

@@ -145,7 +145,7 @@ $bootstrap->css();
                                         <input type="hidden" name="deleteid"
                                             value="<?php echo $supplierdata['supplier_id']; ?>">
                                         <?php if ($check === false) { ?>
-                                            <button type="submit" name="deletebutton" class="btn btn-sm btn-danger">Delete</button>
+                                            <button type="button" name="deletebutton" class="btn btn-sm btn-danger" onclick="lmsConfirmDelete(this, 'Are you sure you want to delete this supplier?');">Delete</button>
                                         <?php } ?>
                                     </form>
                                 </td>

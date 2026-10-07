@@ -179,7 +179,7 @@ $bootstrap->css();
                                         <input type="hidden" name="deleteid"
                                             value="<?php echo $customerdata['customer_id']; ?>">
                                         <?php if ($check === false) { ?>
-                                            <button type="submit" name="deletebutton" class="btn btn-danger btn-sm">
+                                            <button type="button" name="deletebutton" class="btn btn-danger btn-sm" onclick="lmsConfirmDelete(this, 'Are you sure you want to delete this customer?');">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                     fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
                                                     <path

@@ -545,7 +545,7 @@ $query = new Query();
                               <button type="submit" name="updatefishcoldstorebtn" class="btn btn-success">Update</button>
                             <?php else: ?>
                             <button type="button" data-bs-toggle="modal" class="btn btn-success">Cancel</button>
-                            <button type="submit" name="deletefishbtn" class="btn btn-danger">Delete</button>
+                            <button type="button" name="deletefishbtn" class="btn btn-danger" onclick="lmsConfirmDelete(this, 'Are you sure you want to delete this fish charge?');">Delete</button>
                           <?php endif; ?>
                           </div>
                         </div>
@@ -906,11 +906,11 @@ $query = new Query();
                             <input type="hidden" name="deletedatedryfish" value="<?= $dryfishcoldstoredata['date']; ?>">
                           <div class="modal-footer mt-3">
                             <?php if ($checkitedata == 1 && $dryfishcoldstoredata['ite'] != 'balance'): ?>
-                              <button type="submit" name="deletedryfishbtn" class="btn btn-danger">Delete</button>
+                              <button type="button" name="deletedryfishbtn" class="btn btn-danger" onclick="lmsConfirmDelete(this, 'Are you sure you want to delete this dry fish charge?');">Delete</button>
                               <button type="submit" name="updatedryfishcoldstorebtn" class="btn btn-success">Update</button>
                             <?php else: ?>
                             <button type="button" data-bs-toggle="modal" class="btn btn-success">Cancel</button>
-                            <button type="submit" name="deletedryfishbtn" class="btn btn-danger">Delete</button>
+                            <button type="button" name="deletedryfishbtn" class="btn btn-danger" onclick="lmsConfirmDelete(this, 'Are you sure you want to delete this dry fish charge?');">Delete</button>
                           <?php endif; ?>
                           </div>
                         </div>

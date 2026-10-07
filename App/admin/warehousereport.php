@@ -311,36 +311,36 @@ $bootstrap->css();
               $filtertype = $_SESSION['filtertype'];
 
               if ($filtertype == 'all') {
-                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id");
+                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `date` BETWEEN '$startdate' AND '$enddate' ORDER BY material_id, id");
                 $stmt->execute();
                 $rawResult = $stmt->fetchAll();
                 $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id LIMIT :offset, :numOfrecs");
+                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `date` BETWEEN '$startdate' AND '$enddate' ORDER BY material_id, id LIMIT :offset, :numOfrecs");
                 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
                 $stmt->bindValue(':numOfrecs', $numOfrecs, PDO::PARAM_INT);
                 $stmt->execute();
               }
 
               if ($filtertype == 'totalin') {
-                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `out_quantity` IS NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id");
+                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `out_quantity` IS NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY material_id, id");
                 $stmt->execute();
                 $rawResult = $stmt->fetchAll();
                 $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `out_quantity` IS NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id LIMIT :offset, :numOfrecs");
+                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `out_quantity` IS NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY material_id, id LIMIT :offset, :numOfrecs");
                 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
                 $stmt->bindValue(':numOfrecs', $numOfrecs, PDO::PARAM_INT);
                 $stmt->execute();
               }
 
               if ($filtertype == 'totalout') {
-                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `in_quantity` IS NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id");
+                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `in_quantity` IS NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY material_id, id");
                 $stmt->execute();
                 $rawResult = $stmt->fetchAll();
                 $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `in_quantity` IS NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY id LIMIT :offset, :numOfrecs");
+                $stmt = $pdo->prepare("SELECT * FROM material_store_house WHERE `in_quantity` IS NULL AND `date` BETWEEN '$startdate' AND '$enddate' ORDER BY material_id, id LIMIT :offset, :numOfrecs");
                 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
                 $stmt->bindValue(':numOfrecs', $numOfrecs, PDO::PARAM_INT);
                 $stmt->execute();
@@ -382,14 +382,49 @@ $bootstrap->css();
                 $stmt->execute();
               }
             }
-            $datas = $stmt->fetchAll();
+            $datas = isset($stmt) ? $stmt->fetchAll() : [];
+
+            $rowBalances = [];
+            $openingByMaterial = [];
+            if (!empty($_SESSION['filtertype']) && in_array($_SESSION['filtertype'], ['all', 'totalin', 'totalout'], true)) {
+              $ft = $_SESSION['filtertype'];
+              if ($ft === 'all') {
+                $openStmt = $pdo->prepare(
+                  "SELECT material_id,
+                    COALESCE(SUM(in_quantity), 0) - COALESCE(SUM(out_quantity), 0) AS opening
+                  FROM material_store_house
+                  WHERE `date` < :startdate
+                  GROUP BY material_id"
+                );
+                $openStmt->execute([':startdate' => $startdate]);
+                foreach ($openStmt->fetchAll(PDO::FETCH_ASSOC) as $obRow) {
+                  $openingByMaterial[(int) $obRow['material_id']] = (float) $obRow['opening'];
+                }
+              }
+
+              $runningByMaterial = [];
+              foreach ($rawResult as $row) {
+                $mid = (int) $row['material_id'];
+                if (!array_key_exists($mid, $runningByMaterial)) {
+                  $runningByMaterial[$mid] = $ft === 'all' ? ($openingByMaterial[$mid] ?? 0.0) : 0.0;
+                }
+                $inQty = (float) ($row['in_quantity'] ?? 0);
+                $outQty = (float) ($row['out_quantity'] ?? 0);
+                if ($ft === 'all') {
+                  $runningByMaterial[$mid] += $inQty - $outQty;
+                } elseif ($ft === 'totalin') {
+                  $runningByMaterial[$mid] += $inQty;
+                } else {
+                  $runningByMaterial[$mid] += $outQty;
+                }
+                $rowBalances[(int) $row['id']] = $runningByMaterial[$mid];
+              }
+            }
 
             ?>
             <?php
             $no = 1;
-            $inbalance = 0;
-            $outbalance = 0;
-            $balance = 0;
+            $lastGroupMaterialId = null;
             foreach ($datas as $data) {
               $material_id = $data['material_id'];
               $supplier_id = $data['supplier_id'] ?? null;
@@ -408,16 +443,11 @@ $bootstrap->css();
               $in = (float) ($data['in_quantity'] ?? $data['in'] ?? 0);
               $out = (float) ($data['out_quantity'] ?? $data['out'] ?? 0);
 
+              $balance = 0;
               if (!empty($_SESSION['filtertype'])) {
                 $filtertype = $_SESSION['filtertype'];
-                if ($filtertype == 'all') {
-                  $balance += $in - $out;
-                }
-                if ($filtertype == 'totalin') {
-                  $balance += $in;
-                }
-                if ($filtertype == 'totalout') {
-                  $balance += $out;
+                if (in_array($filtertype, ['all', 'totalin', 'totalout'], true)) {
+                  $balance = $rowBalances[(int) $data['id']] ?? 0;
                 }
                 if (str_contains($filtertype, 'eachmaterialtotalinout-')) {
                   $totalinstmt = $pdo->prepare("SELECT SUM(`in_quantity`) as totalin FROM material_store_house WHERE material_id='$material_id' AND `date` BETWEEN '$startdate' AND '$enddate'");
@@ -471,6 +501,30 @@ $bootstrap->css();
                 }
               }
             ?>
+
+              <?php
+              if (!empty($_SESSION['filtertype'])) {
+                $filtertype = $_SESSION['filtertype'];
+                if (in_array($filtertype, ['all', 'totalin', 'totalout'], true) && (int) $material_id !== $lastGroupMaterialId) {
+                  $lastGroupMaterialId = (int) $material_id;
+                  $groupColspan = $filtertype === 'all' ? 9 : 8;
+                  $groupOpening = ($filtertype === 'all') ? ($openingByMaterial[$lastGroupMaterialId] ?? 0) : null;
+              ?>
+                  <tr class="table-secondary">
+                    <td colspan="<?= (int) $groupColspan; ?>">
+                      <strong>Item:</strong> <?= htmlspecialchars($material['name'] ?? '-', ENT_QUOTES, 'UTF-8'); ?>
+                      <?php if (!empty($material['unit'])): ?>
+                        <span class="text-muted">(<?= htmlspecialchars($material['unit'], ENT_QUOTES, 'UTF-8'); ?>)</span>
+                      <?php endif; ?>
+                      <?php if ($filtertype === 'all' && $groupOpening != 0): ?>
+                        <span class="float-end text-muted">Opening balance before period: <?= $groupOpening; ?></span>
+                      <?php endif; ?>
+                    </td>
+                  </tr>
+              <?php
+                }
+              }
+              ?>
 
               <tr>
                 <?php

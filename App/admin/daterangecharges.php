@@ -1072,7 +1072,7 @@ $bootstrap->css();
                             </div>
                           </div>
                           <div class="modal-footer">
-                            <button type="submit" class="btn btn-danger" name="deletestockbtn" style="<?php if (!empty($editcheckdata)) {
+                            <button type="button" class="btn btn-danger" name="deletestockbtn" onclick="lmsConfirmDelete(this, 'Are you sure you want to delete this stock record?');" style="<?php if (!empty($editcheckdata)) {
                                                                                                         echo 'display:none;';
                                                                                                       } ?>">Delete</button>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="<?php if (empty($editcheckdata)) {

@@ -177,7 +177,7 @@ $type_to_class = [
                   <button type="button" class="btn btn-warning btn-sm text-light" data-bs-toggle="modal" data-bs-target="#updatemodal<?php echo $data['id']; ?>">Edit</button>
                   <form action="coa.php" method="post" style="display: inline !important;">
                     <input type="hidden" name="deleteid" value="<?php echo $data['id']; ?>">
-                    <button type="submit" name="deletebutton" class="btn btn-sm btn-danger">Delete</button>
+                    <button type="button" name="deletebutton" class="btn btn-sm btn-danger" onclick="lmsConfirmDelete(this, 'Are you sure you want to delete this account?');">Delete</button>
                   </form>
                 </td>
               </tr>
