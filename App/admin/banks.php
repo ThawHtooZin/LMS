@@ -99,7 +99,8 @@ $query = new Query();
                                         <form action="" method="post" style="display: inline !important;">
                                             <input type="hidden" name="deleteid" value="<?php echo $data['id']; ?>">
                                             <input type="hidden" name="account_code" value="<?php echo $data['account_code']; ?>">
-                                            <button type="submit" name="deletebutton" class="btn btn-sm btn-danger fw-bold" onclick="return confirm('Delete this Bank Account?');">Delete</button>
+                                            <input type="hidden" name="deletebutton" value="1">
+                                            <button type="button" class="btn btn-sm btn-danger fw-bold" onclick="lmsConfirmDelete(this, 'Delete this bank account?');">Delete</button>
                                         </form>
                                     </td>
                                 </tr>

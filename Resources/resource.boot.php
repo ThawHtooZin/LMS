@@ -25,6 +25,7 @@ class Bootstrap
   {
     echo '
       <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+      <script src="Resources/lms-swal-confirm.js" charset="utf-8"></script>
       <script src="Resources/bootstrap-5.3.1-dist/js/bootstrap.min.js" charset="utf-8"></script>
       <!-- jQuery -->
       <script src="Resources/plugins/jquery/jquery.min.js"></script>
@@ -479,6 +480,7 @@ class Bootstrap
         }
       </style>
       <script src="../../Resources/sweetalert.js" charset="utf-8"></script>
+      <script src="../../Resources/lms-swal-confirm.js" charset="utf-8"></script>
       <link rel="stylesheet" href="../../Resources/chosenselect/jquery-ui.css">
       <link rel="stylesheet" href="../../Resources/chosenselect/chosen.css">
       <script src="../../Resources/jquery.resc.js"></script>

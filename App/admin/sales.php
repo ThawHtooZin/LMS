@@ -139,7 +139,7 @@ function sale_status_badge_class($status)
                       <td><span class="status-badge <?= $status_class; ?>"><?= ucfirst(strtolower(str_replace('_', ' ', $sale['status']))); ?></span></td>
                       <td class="text-center">
                         <?php if ($sale['status'] === 'DRAFT'): ?>
-                          <form method="post" class="d-inline action-btn" onsubmit="return confirm('Delete this draft?');">
+                          <form method="post" class="d-inline action-btn" onsubmit="return lmsConfirmForm(this, 'Delete this draft?');">
                             <input type="hidden" name="delete_sale_id" value="<?= (int)$sale['id']; ?>">
                             <button type="submit" class="btn btn-sm btn-outline-danger border-0" title="Delete draft"><i class="bi bi-trash"></i></button>
                           </form>

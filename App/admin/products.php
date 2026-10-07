@@ -496,17 +496,7 @@ foreach ($all_accounts as $acc) {
     </script>
     <script>
         function confirmDelete(button, itemType) {
-            swal({
-                title: "Are you sure?",
-                text: "Do you really want to delete this " + itemType + "?",
-                icon: "warning",
-                buttons: ["Cancel", "Yes, Delete"],
-                dangerMode: true,
-            }).then((willDelete) => {
-                if (willDelete) {
-                    button.closest("form").submit();
-                }
-            });
+            lmsConfirmDelete(button, 'Do you really want to delete this ' + itemType + '?');
         }
     </script>
 </body>

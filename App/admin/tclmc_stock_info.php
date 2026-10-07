@@ -132,7 +132,8 @@ $query = new Query();
 
   if ($itemFilter === '' || $sizeFilter === '') {
 
-    echo '<script>alert("Missing stock info."); window.location.href="tclmcstock.php";</script>';
+    echo '<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>';
+    echo '<script>swal("Warning", "Missing stock info.", "warning").then(function () { window.location.href = "tclmcstock.php"; });</script>';
 
     exit;
 
@@ -178,7 +179,8 @@ $query = new Query();
 
   if (empty($stockRows)) {
 
-    echo '<script>alert("No records for this size."); window.location.href="tclmcstock.php";</script>';
+    echo '<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>';
+    echo '<script>swal("Warning", "No records for this size.", "warning").then(function () { window.location.href = "tclmcstock.php"; });</script>';
 
     exit;
 

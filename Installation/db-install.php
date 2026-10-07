@@ -16,4 +16,5 @@ set_time_limit(0);
     $result = mysqli_query($connection, $query);
   }
   fclose($handle);
-  echo "<script>alert('Database Installed Successfully'); window.location.href='login.php'</script>";
+  echo '<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>';
+  echo "<script>swal('Success', 'Database installed successfully.', 'success').then(function () { window.location.href = 'login.php'; });</script>";

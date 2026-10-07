@@ -119,7 +119,7 @@ $global_currencies = [
                                                 </div>
                                             </td>
                                             <td class="align-middle">
-                                                <button type="submit" name="delete_currency" class="btn btn-sm btn-danger" onclick="document.getElementById('delete_code').value='<?php echo $code; ?>'; return confirm('Are you sure you want to delete this currency? This will remove its exchange rate history as well.');">Delete</button>
+                                                <button type="button" class="btn btn-sm btn-danger" onclick="lmsConfirmSubmitButton(this, 'Are you sure you want to delete this currency? This will remove its exchange rate history as well.', function () { document.getElementById('delete_code').value='<?php echo htmlspecialchars($code, ENT_QUOTES); ?>'; });">Delete</button>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>

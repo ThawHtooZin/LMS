@@ -1508,10 +1508,8 @@ $query = new Query();
                    $tr.find('.chosen-select').chosen('destroy');
                  }
                  $tr.remove();
-               } else if (typeof swal === "function") {
-                 swal('Warning!', 'You must keep at least one entry line.', 'warning');
                } else {
-                 alert('You must keep at least one entry line.');
+                 swal('Warning!', 'You must keep at least one entry line.', 'warning');
                }
              }
              </script>

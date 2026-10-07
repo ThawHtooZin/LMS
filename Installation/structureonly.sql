@@ -232,6 +232,7 @@ CREATE TABLE `contacts` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `contact_type` varchar(50) NOT NULL DEFAULT 'Fish Supplier',
+  `details` text DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
   `phone` varchar(255) DEFAULT NULL,
   `address` text DEFAULT NULL,
