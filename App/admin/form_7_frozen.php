@@ -299,9 +299,8 @@ $bootstrap->css();
 
               $supplier_id = $form7data['supplier_name'] ?? '';
 
-              // REFACTORED: Direct Supplier Lookup from new accounts/contacts structure
-              $supStmt = $pdo->prepare("SELECT name FROM accodes WHERE code = ? UNION SELECT name FROM contacts WHERE id = ? LIMIT 1");
-              $supStmt->execute([$supplier_id, $supplier_id]);
+              $supStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ? LIMIT 1");
+              $supStmt->execute([$supplier_id]);
               $supplier_name_val = $supStmt->fetchColumn() ?: $supplier_id;
 
               // Accumulate totals dynamically
@@ -531,13 +530,13 @@ $bootstrap->css();
                 <select class="form-control inpv2 mb-2" name="supplier_id" required>
                   <option value="">Select Supplier</option>
                   <?php
-                  $supplierstmt = $pdo->prepare("SELECT code AS code_no, name AS ac_name FROM accodes UNION SELECT id AS code_no, name AS ac_name FROM contacts");
+                  $supplierstmt = $pdo->prepare("SELECT id, name FROM contacts WHERE is_supplier = 1 ORDER BY name ASC");
                   $supplierstmt->execute();
                   $supplierdatas = $supplierstmt->fetchAll(PDO::FETCH_ASSOC);
 
                   foreach ($supplierdatas as $supplierdata) {
                   ?>
-                    <option value="<?php echo htmlspecialchars($supplierdata['code_no']); ?>"><?php echo htmlspecialchars($supplierdata['ac_name']); ?></option>
+                    <option value="<?php echo htmlspecialchars($supplierdata['id']); ?>"><?php echo htmlspecialchars($supplierdata['name']); ?></option>
                   <?php } ?>
                 </select>
               </div>

@@ -469,7 +469,7 @@ $bootstrap->css();
                   <select class="form-control inpv2 mb-2" name="supplier_id" required>
                     <option value="">Select Supplier</option>
                     <?php
-                    $supplierstmt = $pdo->prepare("SELECT id, name FROM contacts WHERE is_supplier = 1 OR is_supplier = 0");
+                    $supplierstmt = $pdo->prepare("SELECT id, name FROM contacts WHERE is_supplier = 1 ORDER BY name ASC");
                     $supplierstmt->execute();
                     $supplierdatas = $supplierstmt->fetchAll(PDO::FETCH_ASSOC);
                     foreach ($supplierdatas as $supplierdata) {
