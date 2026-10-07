@@ -114,9 +114,10 @@ $query = new Query();
   </script>
 
   <?php
-  $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM hhkmcstock WHERE country IS NOT NULL");
+  $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM hhkmcstock WHERE country IS NOT NULL AND country != ''");
   $countrystmt->execute();
   $countrydatas = $countrystmt->fetchall();
+  $hhkStockCountries = $countrydatas;
   ?>
   <div class="row">
     <div class="sidebarcol" id="sidebar">
@@ -447,8 +448,8 @@ $query = new Query();
                         <label>Country</label>
                         <select class="form-control inpv2 mb-2" name="transfercountry">
                           <?php
-                          if (!empty($countrydatas)) {
-                            foreach ($countrydatas as $countrydata) {
+                          if (!empty($hhkStockCountries)) {
+                            foreach ($hhkStockCountries as $countrydata) {
                           ?>
                               <option value="<?php echo htmlspecialchars($countrydata['country']); ?>"><?php echo htmlspecialchars($countrydata['country']); ?></option>
                           <?php
@@ -545,8 +546,8 @@ $query = new Query();
                         <label>Country</label>
                         <select class="form-control inpv2 mb-2" name="repackingoutcountry">
                           <?php
-                          if (!empty($countrydatas)) {
-                            foreach ($countrydatas as $countrydata) {
+                          if (!empty($hhkStockCountries)) {
+                            foreach ($hhkStockCountries as $countrydata) {
                           ?>
                               <option value="<?php echo htmlspecialchars($countrydata['country']); ?>"><?php echo htmlspecialchars($countrydata['country']); ?></option>
                           <?php
