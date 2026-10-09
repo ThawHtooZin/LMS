@@ -86,7 +86,7 @@ $query = new Query();
                   <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                 </svg>
               </div>
-              <div class="nav-card-title">Packing Material Payable Report</div>
+              <div class="nav-card-title">Packing Material<br> Payable Report</div>
             </a>
           </div>
           <!-- Gate Pass Report -->

@@ -3963,9 +3963,9 @@ class Query
     $stmt->execute();
     $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $total_selling_price = $sellingpriceperkg * $data['kg'];
-    $profitorlossperkg = $sellingpriceperkg - $data['total_usd'];
-    $profit_amount = $data['kg'] * $profitorlossperkg;
+    $total_selling_price = floatval($sellingpriceperkg) * floatval($data['kg']);
+    $profitorlossperkg = floatval($sellingpriceperkg) - floatval($data['total_usd']);
+    $profit_amount = floatval($data['kg']) * floatval($profitorlossperkg);
 
     $pcsperkgstmt = $pdo->prepare("SELECT * FROM actualinvoice WHERE commondity_id='$commondity_id'");
     $pcsperkgstmt->execute();
@@ -4606,16 +4606,16 @@ class Query
     $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
     $total_kg = floatval($sizedata['total_kg']);
-    $profitperkg = $selling_rate - $data['costing_usd'];
-    $original_cost = floatval($sizedata['total_kg']) * $data['costing_usd'];
-    $selling_amount = floatval($sizedata['total_kg']) * $selling_rate;
+    $profitperkg = floatval($selling_rate) - floatval($data['costing_usd']);
+    $original_cost = floatval($sizedata['total_kg']) * floatval($data['costing_usd']);
+    $selling_amount = floatval($sizedata['total_kg']) * floatval($selling_rate);
     $profit = $selling_amount - $original_cost;
 
     $invoicestmt = $pdo->prepare("SELECT * FROM truckactualinvoice WHERE invoice_no='$invoice_no' AND item_id='$item_id' AND size='$size'");
     $invoicestmt->execute();
     $invoicedata = $invoicestmt->fetch(PDO::FETCH_ASSOC);
     $kgperbox = $invoicedata['kgperbox'];
-    $total_usd = $kgperbox * $selling_rate;
+    $total_usd = floatval($kgperbox) * floatval($selling_rate);
 
     $addusdstmt = $pdo->prepare("UPDATE truckactualinvoice SET usd='$selling_rate', total_usd='$total_usd' WHERE invoice_no='$invoice_no' AND item_id='$item_id' AND size='$size'");
     $addusdstmt->execute();
