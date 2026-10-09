@@ -182,6 +182,7 @@ $query = new Query();
           </form>
           <hr>
           <?php
+          $query->rebuildHhkMcBalances();
           foreach ($countrydatas as $countrydata) {
           ?>
             <table class="table table-hover table-bordered table-striped hide" id="<?php echo str_replace('/', '_', $countrydata['country']); ?>table">
@@ -189,6 +190,7 @@ $query = new Query();
                 <th>Commodity</th>
                 <th>Country</th>
                 <th>Size</th>
+                <th>Kg</th>
                 <th>Total Mc</th>
                 <th>Action</th>
               </tr>
@@ -197,11 +199,11 @@ $query = new Query();
               if (isset($_POST['searchcommonditybtn']) && !empty($_POST['search'])) {
                 $searchcommondity = $_POST['search'];
                 $searchtype = $_POST['searchtype'];
-                $searchcommonditystmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country = :country AND commondity_id=:searchcommondity AND fish_type = :searchtype AND remark NOT LIKE '%packing%' GROUP BY commondity_id,size");
+                $searchcommonditystmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country = :country AND commondity_id=:searchcommondity AND fish_type = :searchtype AND remark NOT LIKE '%packing%' GROUP BY commondity_id, size, kg, fish_type");
                 $searchcommonditystmt->execute([':country' => $_SESSION['tabs'], ':searchcommondity' => $searchcommondity, ':searchtype' => $searchtype]);
                 $datas = $searchcommonditystmt->fetchall();
               } else {
-                $stmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country=:country AND remark NOT LIKE '%packing%' GROUP BY commondity_id,size");
+                $stmt = $pdo->prepare("SELECT * FROM hhkmcstock WHERE country=:country AND remark NOT LIKE '%packing%' GROUP BY commondity_id, size, kg, fish_type");
                 $stmt->bindParam(':country', $country);
                 $stmt->execute();
                 $datas = $stmt->fetchall();
@@ -213,23 +215,7 @@ $query = new Query();
                 $size = $hhkstockdata['size'];
                 $kg = $hhkstockdata['kg'];
                 $commondity_id = $hhkstockdata['commondity_id'];
-
-                // Total In Mc Calculation
-                $totalmcstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular NOT LIKE '%out%' AND particular NOT LIKE '%to%'");
-                $totalmcstmt->execute();
-                $totalmcnotsub = $totalmcstmt->fetch(PDO::FETCH_ASSOC);
-
-                // Total Transfer Mc Calculation
-                $totalmcsubnumstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular NOT LIKE '%out%' AND particular LIKE '%to%'");
-                $totalmcsubnumstmt->execute();
-                $totalmcsubnum = $totalmcsubnumstmt->fetch(PDO::FETCH_ASSOC);
-
-                // Total Repacking Out Mc Calculation
-                $totalrepackinoutstmt = $pdo->prepare("SELECT SUM(mc) AS total_mc FROM hhkmcstock WHERE size='$size' AND country='$country' AND commondity_id='$commondity_id' AND particular LIKE '%out%' AND particular NOT LIKE '%to%'");
-                $totalrepackinoutstmt->execute();
-                $totalrepackinout = $totalrepackinoutstmt->fetch(PDO::FETCH_ASSOC);
-
-                $totalmc = ($totalmcnotsub['total_mc'] - $totalmcsubnum['total_mc']) - $totalrepackinout['total_mc'];
+                $totalmc = $query->hhkMcOnHand($hhkstockdata['country'], $commondity_id, $hhkstockdata['fish_type'], $size, $kg);
               ?>
                 <tr style="<?php if ($totalmc > 200) {
                               echo 'background-color:rgba(0, 255, 0, 0.4) !important;';
@@ -241,6 +227,7 @@ $query = new Query();
                       } ?></td>
                   <td><?php echo htmlspecialchars($countrydata['country']); ?></td>
                   <td><?php echo htmlspecialchars($hhkstockdata['size']); ?></td>
+                  <td><?php echo htmlspecialchars($hhkstockdata['kg']); ?></td>
                   <td><?php echo $totalmc; ?></td>
                   <td>
                     <a href="hhkmc_stock_info.php?sizeinfo=<?php echo urlencode($hhkstockdata['size']); ?>&commondity=<?php echo urlencode($hhkstockdata['commondity_id']); ?>&country=<?php echo urlencode($hhkstockdata['country']); ?>&fish_type=<?php echo urlencode($hhkstockdata['fish_type']); ?>" class="btn btn-info btn-sm text-light">

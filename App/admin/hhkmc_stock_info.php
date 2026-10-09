@@ -59,6 +59,8 @@ $query = new Query();
 
     $query->updatehhkmcstock($newdate, $newparticular, $newcommondity_id, $newfish_type, $newsize, $newkg, $newmc, $newremark, $newcountry, $updateid);
   }
+
+  $query->rebuildHhkMcBalances();
   ?>
   <div class="row">
     <div class="sidebarcol" id="sidebar">
