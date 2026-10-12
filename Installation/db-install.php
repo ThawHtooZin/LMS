@@ -1,20 +1,9 @@
 <?php
 
-// Set the maximum execution time to a large value (0 for no limit).
-set_time_limit(0);
-
-  $file_location = 'installdb.sql';
-  $conn = mysqli_connect('localhost', 'root', '');
-  mysqli_query($conn, "CREATE DATABASE lms");
-
-  $connection = mysqli_connect('localhost', 'root', '', 'lms');
-  $filename = $file_location;
-  $handle = fopen($filename, "r+");
-  $contents = fread($handle, filesize($filename));
-  $sql = explode(';', $contents);
-  foreach ($sql as $query) {
-    $result = mysqli_query($connection, $query);
-  }
-  fclose($handle);
-  echo '<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>';
-  echo "<script>swal('Success', 'Database installed successfully.', 'success').then(function () { window.location.href = 'login.php'; });</script>";
+// Structure and seed data live in Installation/database.
+// From the LMS folder: php Installation/migrate.php
+if (PHP_SAPI !== 'cli') {
+    http_response_code(403);
+}
+echo "This installer is retired. From the LMS folder run: php Installation/migrate.php\n";
+exit(1);

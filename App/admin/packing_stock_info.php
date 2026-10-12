@@ -27,26 +27,26 @@ $bootstrap->css();
 <body>
   <?php
   if (isset($_POST['add'])) {
-      $infoid = $_POST['infoid'] ?? '';
-      
-      // Check if commondity_id array exists
-      if (!empty($_POST['commondity_id']) && is_array($_POST['commondity_id'])) {
-          
-          foreach ($_POST['commondity_id'] as $key => $commondity) {
-              // Skip empty commodity selections
-              if (empty($commondity)) {
-                  continue;
-              }
+    $infoid = $_POST['infoid'] ?? '';
 
-              // Get matching row values by array key index
-              $size = $_POST['size'][$key] ?? '';
-              $packingkgperbox = $_POST['packingkgperbox'][$key] ?? '';
-              $mc = $_POST['mc'][$key] ?? '';
+    // Check if commondity_id array exists
+    if (!empty($_POST['commondity_id']) && is_array($_POST['commondity_id'])) {
 
-              // Execute database insert per row
-              $query->addpackinglistinfo($commondity, $size, $packingkgperbox, $mc, $infoid);
-          }
+      foreach ($_POST['commondity_id'] as $key => $commondity) {
+        // Skip empty commodity selections
+        if (empty($commondity)) {
+          continue;
+        }
+
+        // Get matching row values by array key index
+        $size = $_POST['size'][$key] ?? '';
+        $packingkgperbox = $_POST['packingkgperbox'][$key] ?? '';
+        $mc = $_POST['mc'][$key] ?? '';
+
+        // Execute database insert per row
+        $query->addpackinglistinfo($commondity, $size, $packingkgperbox, $mc, $infoid);
       }
+    }
   }
 
   if (isset($_POST['updatebtn'])) {
@@ -194,17 +194,17 @@ $bootstrap->css();
               // Customer Details (or customer_details)
               $details = $customerdata['customer_details'] ?? ($customerdata['details'] ?? '');
               if (!empty($details)) {
-                  echo '<br>' . htmlspecialchars($details);
+                echo '<br>' . htmlspecialchars($details);
               }
 
               // Phone
               if (!empty($customerdata['phone'])) {
-                  echo '<br>' . htmlspecialchars($customerdata['phone']);
+                echo '<br>' . htmlspecialchars($customerdata['phone']);
               }
 
               // Address
               if (!empty($customerdata['address'])) {
-                  echo '<br>' . htmlspecialchars($customerdata['address']);
+                echo '<br>' . htmlspecialchars($customerdata['address']);
               }
               ?>
             </div>
@@ -1032,7 +1032,7 @@ $bootstrap->css();
           <div class="modal fade" id="add" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
               <div class="modal-content" style="margin-top: 50px !important;">
-                
+
                 <!-- Modal Header -->
                 <div class="modal-header bg-info text-light">
                   <h5 class="modal-title fs-5">Add Packing Stock</h5>
@@ -1041,15 +1041,17 @@ $bootstrap->css();
 
                 <?php
                 // Fetch valid stock items FIRST
-                $form7commonditystmt =$pdo->prepare("SELECT DISTINCT item_id FROM form10stock WHERE item_id IS NOT NULL AND item_id != ''");
+                $form7commonditystmt = $pdo->prepare("SELECT DISTINCT item_id FROM form10stock WHERE item_id IS NOT NULL AND item_id != ''");
                 $form7commonditystmt->execute();
-                $form7commonditydatas =$form7commonditystmt->fetchAll();
+                $form7commonditydatas = $form7commonditystmt->fetchAll();
 
                 $validItems = [];
                 if (!empty($form7commonditydatas)) {
-                  foreach ($form7commonditydatas as $form7commonditydata) {$item_id = $form7commonditydata['item_id'];$commonditydata = $query->select('products',$item_id, 'id');
+                  foreach ($form7commonditydatas as $form7commonditydata) {
+                    $item_id = $form7commonditydata['item_id'];
+                    $commonditydata = $query->select('products', $item_id, 'id');
                     if ($commonditydata && !empty($commonditydata['name'])) {
-                      $validItems[] =$commonditydata;
+                      $validItems[] = $commonditydata;
                     }
                   }
                 }
@@ -1059,7 +1061,7 @@ $bootstrap->css();
                 <select id="itemTpl" style="display:none;">
                   <?php if (!empty($validItems)): ?>
                     <option value="">Select Item...</option>
-                    <?php foreach ($validItems as$cData): ?>
+                    <?php foreach ($validItems as $cData): ?>
                       <option value="<?php echo htmlspecialchars($cData['id']); ?>"><?php echo htmlspecialchars($cData['name']); ?></option>
                     <?php endforeach; ?>
                   <?php else: ?>
@@ -1094,7 +1096,7 @@ $bootstrap->css();
                               <select name="commondity_id[]" class="form-control form-control-sm chosen-select" <?php if (empty($validItems)) echo 'disabled required'; ?>>
                                 <?php if (!empty($validItems)): ?>
                                   <option value="">Select Item...</option>
-                                  <?php foreach ($validItems as$cData): ?>
+                                  <?php foreach ($validItems as $cData): ?>
                                     <option value="<?php echo htmlspecialchars($cData['id']); ?>"><?php echo htmlspecialchars($cData['name']); ?></option>
                                   <?php endforeach; ?>
                                 <?php else: ?>
@@ -1127,18 +1129,20 @@ $bootstrap->css();
 
           <!-- JavaScript for Dynamic Lines and Chosen Plugin Re-initialization -->
           <script>
-          $(document).ready(function() {
+            $(document).ready(function() {
               // Initialize Chosen plugin on initial load
               initChosen();
-          });
+            });
 
-          function initChosen() {
+            function initChosen() {
               if ($.fn.chosen) {
-                  $('.chosen-select').chosen({ width: '100%' });
+                $('.chosen-select').chosen({
+                  width: '100%'
+                });
               }
-          }
+            }
 
-          function addPackingLine() {
+            function addPackingLine() {
               let itemOptions = $('#itemTpl').html();
               let tr = `
                   <tr>
@@ -1155,28 +1159,30 @@ $bootstrap->css();
                       </td>
                   </tr>
               `;
-              
-              let $newRow =$(tr);
-              $('#packing-stock-lines').append($newRow);
-              
-              // Initialize Chosen on newly added dropdown
-              $newRow.find('.chosen-select').chosen({ width: '100%' });
-          }
 
-          function removePackingLine(button) {
+              let $newRow = $(tr);
+              $('#packing-stock-lines').append($newRow);
+
+              // Initialize Chosen on newly added dropdown
+              $newRow.find('.chosen-select').chosen({
+                width: '100%'
+              });
+            }
+
+            function removePackingLine(button) {
               let tbody = $('#packing-stock-lines');
               if (tbody.find('tr').length > 1) {
-                  let $tr =$(button).closest('tr');
-                  
-                  // Destroy chosen instance before removing DOM node
-                  if ($.fn.chosen) {
-                      $tr.find('.chosen-select').chosen('destroy');
-                  }
-                  $tr.remove();
+                let $tr = $(button).closest('tr');
+
+                // Destroy chosen instance before removing DOM node
+                if ($.fn.chosen) {
+                  $tr.find('.chosen-select').chosen('destroy');
+                }
+                $tr.remove();
               } else {
-                  swal('Warning!', 'You must keep at least one entry line.', 'warning');
+                swal('Warning!', 'You must keep at least one entry line.', 'warning');
               }
-          }
+            }
           </script>
         </div>
       </div>
