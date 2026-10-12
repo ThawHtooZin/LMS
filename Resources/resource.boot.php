@@ -507,10 +507,18 @@ class Bootstrap
   }
   function javascript()
   {
+    $resourcesFs = str_replace('\\', '/', __DIR__);
+    $docRoot = str_replace('\\', '/', rtrim($_SERVER['DOCUMENT_ROOT'] ?? '', '/\\'));
+    $resourcesWeb = ($docRoot !== '' && strpos($resourcesFs, $docRoot) === 0)
+      ? substr($resourcesFs, strlen($docRoot))
+      : '/Resources';
+    $jquerySrc = $resourcesWeb . '/jquery/jquery.min.js';
+    $jqueryWrite = json_encode('<script src="' . $jquerySrc . '"></script>', JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+    $bootstrapSrc = $resourcesWeb . '/bootstrap-5.3.1-dist/js/bootstrap.min.js';
     echo '
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-    <script src="jquery/jquery.min.js"></script>
-    <script src="../../Resources\bootstrap-5.3.1-dist\js\bootstrap.min.js" charset="utf-8"></script>
+    <script>if(typeof window.jQuery==="undefined"){document.write(' . $jqueryWrite . ');}</script>
+    <script src="' . htmlspecialchars($bootstrapSrc, ENT_QUOTES) . '" charset="utf-8"></script>
     ';
 ?>
     <script type="text/javascript">

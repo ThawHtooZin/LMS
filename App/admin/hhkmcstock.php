@@ -575,23 +575,29 @@ $query = new Query();
 
   <script type="text/javascript">
     <?php
-    $countrystmt = $pdo->prepare("SELECT DISTINCT country FROM hhkmcstock WHERE country IS NOT NULL");
-    $countrystmt->execute();
-    $hhkcountrydatas = $countrystmt->fetchall();
-
-    foreach ($hhkcountrydatas as $countrydata) {
-      if (isset($_SESSION['tabs']) && $_SESSION['tabs'] == $countrydata['country']) {
-        $escapedTabs = str_replace('/', '_', $_SESSION['tabs']);
-        echo "show" . $escapedTabs . "();";
-        echo ' function show' . $escapedTabs . '(){';
-        foreach ($countrydatas as $countrydata2) {
-          echo 'document.querySelector("#' . str_replace('/', '_', $countrydata2['country']) . 'table").classList.add(\'hide\');';
-          echo 'document.querySelector(".' . str_replace('/', '_', $countrydata2['country']) . 'link").classList.remove(\'color\');';
-        }
-        echo 'document.querySelector("#' . $escapedTabs . 'table").classList.remove(\'hide\');';
-        echo 'document.querySelector(".' . $escapedTabs . 'link").classList.add(\'color\');';
-        echo '}';
+    $activeCountry = $_SESSION['tabs'] ?? '';
+    $countryTokens = [];
+    foreach ($hhkStockCountries as $countrydata) {
+      $name = (string) ($countrydata['country'] ?? '');
+      if ($name === '') {
+        continue;
       }
+      $countryTokens[$name] = str_replace('/', '_', $name);
+    }
+    $activeToken = $countryTokens[$activeCountry] ?? '';
+    if ($activeToken !== '') {
+      $showFn = 'show' . preg_replace('/[^A-Za-z0-9_]/', '_', $activeToken);
+      echo 'function ' . $showFn . '(){';
+      foreach ($countryTokens as $token) {
+        $tokenJs = json_encode($token, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+        echo 'var stockTable=document.getElementById(' . $tokenJs . '+"table");if(stockTable){stockTable.classList.add("hide");}';
+        echo 'var stockLink=document.getElementsByClassName(' . $tokenJs . '+"link")[0];if(stockLink){stockLink.classList.remove("color");}';
+      }
+      $activeJs = json_encode($activeToken, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+      echo 'var activeTable=document.getElementById(' . $activeJs . '+"table");if(activeTable){activeTable.classList.remove("hide");}';
+      echo 'var activeLink=document.getElementsByClassName(' . $activeJs . '+"link")[0];if(activeLink){activeLink.classList.add("color");}';
+      echo '}';
+      echo $showFn . '();';
     }
     ?>
   </script>
