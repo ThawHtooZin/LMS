@@ -179,7 +179,7 @@ $bootstrap->css();
           <div class="card-header bg-info text-light pb-3">
 
             <b class="h5">Link Mark Limited (F-7) Frozen</b>
-            <button type="button" class="btn btn-warning btn-sm float-end ms-2" onclick="openBulkModal()">Bulk Update</button>
+            <button type="button" id="bulkUpdateBtn" class="btn btn-warning btn-sm float-end ms-2" onclick="openBulkModal()" disabled>Bulk Update</button>
             <button type="button" class="btn btn-success btn-sm float-end ms-2" data-bs-toggle="modal" data-bs-target="#addmodal">Add Data</button>
 
             <button type="submit" name="clearfilter" class="btn btn-secondary btn-sm float-end me-2" style="border-top-left-radius:0px; border-bottom-left-radius:0px;">Clear Filter</button>
@@ -569,9 +569,16 @@ $bootstrap->css();
   </div>
 
   <script type="text/javascript">
+    function refreshBulkButton() {
+      const btn = document.getElementById('bulkUpdateBtn');
+      if (!btn) return;
+      btn.disabled = document.querySelectorAll('.row-checkbox:checked').length === 0;
+    }
+
     function toggleAllRows(source) {
       const checkboxes = document.querySelectorAll('.row-checkbox');
       checkboxes.forEach(cb => cb.checked = source.checked);
+      refreshBulkButton();
     }
 
     function markInvalid(input, invalid) {
@@ -587,6 +594,9 @@ $bootstrap->css();
     document.addEventListener('change', function (event) {
       if (event.target && event.target.classList) {
         event.target.classList.remove('redborder');
+        if (event.target.classList.contains('row-checkbox')) {
+          refreshBulkButton();
+        }
       }
     });
 
