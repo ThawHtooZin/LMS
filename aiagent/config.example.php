@@ -1,0 +1,13 @@
+<?php
+
+// Copy this file to config.local.php and add your private provider API key.
+return [
+    'API_KEY' => '',
+    'MODEL' => 'openai/gpt-oss-20b',
+    'BASE_URL' => 'https://api.groq.com/openai/v1',
+    'TEMPERATURE' => 1,
+    'TOP_P' => 1,
+    'MAX_COMPLETION_TOKENS' => 1024,
+    'REASONING_EFFORT' => 'low',
+    'LMS_BASE' => 'http://127.0.0.1/LMS',
+];

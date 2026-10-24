@@ -1,4 +1,6 @@
 __pycache__/
 *.pyc
 config.py
-chats/
+config.local.php
+chats/*
+!chats/.htaccess
