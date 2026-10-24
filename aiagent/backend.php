@@ -11,34 +11,7 @@ function aiagent_config(): array
         return $config;
     }
 
-    $localPath = __DIR__ . '/config.local.php';
-    if (is_file($localPath)) {
-        $loaded = require $localPath;
-        $config = is_array($loaded) ? $loaded : [];
-        return $config;
-    }
-
-    // Read the existing ignored Python config during migration, so the saved
-    // model key and settings keep working without requiring Python to run.
-    $legacyPath = __DIR__ . '/config.py';
-    if (is_file($legacyPath)) {
-        $source = file_get_contents($legacyPath);
-        if ($source !== false) {
-            foreach (['API_KEY', 'MODEL', 'BASE_URL', 'TEMPERATURE', 'TOP_P', 'MAX_COMPLETION_TOKENS', 'REASONING_EFFORT', 'LMS_BASE'] as $name) {
-                if (preg_match('/^\s*' . preg_quote($name, '/') . '\s*=\s*(.+?)\s*$/m', $source, $match)) {
-                    $value = trim($match[1]);
-                    if (preg_match('/^(["\'])(.*)\1$/s', $value, $quoted)) {
-                        $config[$name] = stripcslashes($quoted[2]);
-                    } elseif (is_numeric($value)) {
-                        $config[$name] = str_contains($value, '.') ? (float)$value : (int)$value;
-                    }
-                }
-            }
-        }
-    }
-
-    $config ??= [];
-    $config += [
+    $defaults = [
         'API_KEY' => '',
         'MODEL' => '',
         'BASE_URL' => 'https://api.groq.com/openai/v1',
@@ -48,6 +21,34 @@ function aiagent_config(): array
         'REASONING_EFFORT' => 'medium',
         'LMS_BASE' => 'http://127.0.0.1/LMS',
     ];
+    $config = [];
+    $envPath = dirname(__DIR__) . '/.env';
+    if (is_file($envPath)) {
+        $source = file($envPath, FILE_IGNORE_NEW_LINES);
+        if ($source === false) {
+            throw new RuntimeException('Unable to read the project .env file.');
+        }
+        foreach ($source as $line) {
+            $line = trim($line);
+            if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) {
+                continue;
+            }
+            [$name, $value] = explode('=', $line, 2);
+            $name = trim($name);
+            $value = trim($value);
+            if (!array_key_exists($name, $defaults)) {
+                continue;
+            }
+            if (strlen($value) >= 2 && (($value[0] === '"' && str_ends_with($value, '"')) || ($value[0] === "'" && str_ends_with($value, "'")))) {
+                $value = stripcslashes(substr($value, 1, -1));
+            }
+            $config[$name] = $value;
+        }
+    }
+    $config = array_replace($defaults, $config);
+    foreach (['TEMPERATURE', 'TOP_P', 'MAX_COMPLETION_TOKENS'] as $numericKey) {
+        $config[$numericKey] = is_numeric($config[$numericKey]) ? (0 + $config[$numericKey]) : $defaults[$numericKey];
+    }
     return $config;
 }
 
@@ -431,7 +432,7 @@ function aiagent_llm(array $messages, ?string $toolChoice, array &$limits): arra
     $apiKey = trim((string)($config['API_KEY'] ?? ''));
     $model = trim((string)($config['MODEL'] ?? ''));
     if ($apiKey === '' || $model === '') {
-        throw new RuntimeException('Configure API_KEY and MODEL in aiagent/config.local.php.');
+        throw new RuntimeException('Set API_KEY and MODEL in the project-root .env file.');
     }
     $baseUrl = rtrim((string)($config['BASE_URL'] ?? 'https://api.groq.com/openai/v1'), '/');
     $body = [
