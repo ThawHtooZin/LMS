@@ -538,6 +538,15 @@ function aiagent_asks_for_rows(string $text): bool
     return false;
 }
 
+function aiagent_friendly_error(Throwable $exception): string
+{
+    $technicalMessage = mb_strtolower($exception->getMessage());
+    if (str_contains($technicalMessage, 'tool call validation failed') || str_contains($technicalMessage, 'did not match schema')) {
+        return "I couldn't apply that report request correctly. Try asking for the report first, then tell me what you want filtered.";
+    }
+    return "I couldn't complete that request right now. Please try again.";
+}
+
 function aiagent_chat(array $body): never
 {
     aiagent_require_login();
@@ -665,10 +674,12 @@ function aiagent_chat(array $body): never
             $debug[] = ['step' => 'skip', 'detail' => 'Question did not ask for rows, so no tool was required.'];
         }
     } catch (Throwable $exception) {
-        $debug[] = ['step' => 'error', 'detail' => $exception->getMessage()];
-        aiagent_remember_turn($record, 'assistant', $exception->getMessage(), [], $debug);
+        error_log('AI agent request failed: ' . $exception->getMessage());
+        $friendlyError = aiagent_friendly_error($exception);
+        $debug[] = ['step' => 'error', 'detail' => $friendlyError];
+        aiagent_remember_turn($record, 'assistant', $friendlyError, [], $debug);
         aiagent_json([
-            'error' => $exception->getMessage(),
+            'error' => $friendlyError,
             'debug' => $debug,
             'limits' => $limits,
             'chat_id' => $chatNumber,
