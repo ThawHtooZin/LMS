@@ -107,7 +107,6 @@ $permissions = $permission['permission'];
         str_contains($permissions, 'manage_sale') ||
         str_contains($permissions, 'manage_purchase') ||
         str_contains($permissions, 'manage_cashbook') ||
-        str_contains($permissions, 'manage_accountpayable') ||
         str_contains($permissions, 'manage_acreceivable') ||
         str_contains($permissions, 'manage_general_ledger') ||
         str_contains($permissions, 'manage_ledger_record') ||
@@ -150,13 +149,6 @@ $permissions = $permission['permission'];
                 <li class="nav-item">
                   <a href="acpayable.php" class="nav-link sub-menu  <?= ($current_page == 'acpayable.php') ? 'active' : ''; ?>" style="font-size:13px !important;">
                     - A/C Payable
-                  </a>
-                </li>
-              <?php } ?>
-              <?php if (str_contains($permissions, 'manage_accountpayable')) { ?>
-                <li class="nav-item">
-                  <a href="accountpayable.php" class="nav-link sub-menu  <?= ($current_page == 'accountpayable.php') ? 'active' : ''; ?>" style="font-size:13px !important;">
-                    - Account Payable
                   </a>
                 </li>
               <?php } ?>

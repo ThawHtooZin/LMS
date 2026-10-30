@@ -33,7 +33,7 @@ $query = new Query();
       'manage_cashbook',
       'manage_accountpayable',
       'manage_acpayable',
-      'manage_accountreceivable',
+      'manage_acreceivable',
       'manage_transaction',
       'manage_general_ledger',
       'manage_ledger_record',
@@ -165,8 +165,8 @@ $query = new Query();
                   <td><input type="checkbox" name="manage_form7" <?= isChecked('manage_form7', $permissionshow) ?>></td>
                 </tr>
                 <tr>
-                  <td>Manage Account Receivable</td>
-                  <td><input type="checkbox" name="manage_accountreceivable" <?= isChecked('manage_accountreceivable', $permissionshow) ?>></td>
+                  <td>Manage A/C Receivable</td>
+                  <td><input type="checkbox" name="manage_acreceivable" <?= isChecked('manage_acreceivable', $permissionshow) ?>></td>
                   <td>Manage Form10</td>
                   <td><input type="checkbox" name="manage_form10" <?= isChecked('manage_form10', $permissionshow) ?>></td>
                 </tr>
