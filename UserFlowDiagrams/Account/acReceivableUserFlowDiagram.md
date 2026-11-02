@@ -61,10 +61,31 @@ flowchart TD
     K --> L{Open invoices exist and amount is positive?}
     L -->|No| M[Show payment error]
     L -->|Yes| N[Allocate payment oldest invoice first]
-    N --> O[Update each invoice paid amount and status]
-    O --> P[Save a payment-history row for each allocation]
-    P --> Q[Commit transaction and show success]
-    Q --> R[Display detail page again]
+    N --> O[Save allocation rows under one generated payment batch key]
+    O --> P[Update each invoice paid amount and status]
+    P --> Q[Post debit to deposit account and credit Accounts Receivable 600]
+    Q --> R[Use entered payment reference as General Ledger voucher number]
+    R --> S[Commit transaction and show success]
+    S --> T[Display detail page again]
+```
+
+## 4. Edit a customer receipt
+
+```mermaid
+flowchart TD
+    A[Expand payment history for an invoice] --> B[Select Edit payment on any allocation in a batch]
+    B --> C[Enter the new total receipt amount]
+    C --> D[Submit the edit]
+    D --> E{All customer batches and ledger pairs validate?}
+    E -->|No| F[Reject the edit and show an error]
+    E -->|Yes| G[Remove batched allocations from invoice paid totals]
+    G --> H[Replay all customer receipts in General Ledger insertion order, FIFO]
+    H --> I{Can every receipt be fully allocated?}
+    I -->|No| F
+    I -->|Yes| J[Replace allocation rows and update invoice balances and statuses]
+    J --> K[Update edited receipt's General Ledger debit and credit]
+    K --> L[Commit and refresh customer details]
+    F --> M[Rollback; leave existing data unchanged]
 ```
 
 ## Rules and details
@@ -76,4 +97,6 @@ flowchart TD
 - Invoice payment status is displayed as **Paid** when no balance remains, **Partial** when some amount has been paid, and **Unpaid** otherwise.
 - The payment dialog is offered only if the listed invoices have a positive total outstanding balance. The deposit account list is drawn from Chart of Accounts asset accounts; registered bank accounts additionally show the optional Check Number field.
 - Receipts are allocated FIFO across open invoices. A fully covered invoice becomes **Paid**; an invoice with a remaining balance stays **Awaiting Payment**. Each invoice allocation is saved in `sale_payments` and can be reviewed by expanding its paid amount.
-- The server validates the amount against outstanding invoices and reports the actual amount allocated. Each receipt also posts a debit to the selected deposit account and a credit to Accounts Receivable control account `600` in the General Ledger.
+- The server validates the amount against outstanding invoices and reports the actual amount allocated. Each receipt also posts a debit to the selected deposit account and a credit to Accounts Receivable control account `600` in the General Ledger. The entered payment reference is the ledger `voucherno`; the generated batch key is the ledger `sr_no`.
+- New receipt allocation rows share a generated `sale_payments.payment_batches` key. Edit is available on every allocation in a verified batch; it recalculates all customer batches in General Ledger insertion order and updates invoices and the edited batch's ledger pair in one transaction. If a batch cannot be fully reallocated, no changes are saved.
+- Legacy receipts without a verified batch key remain visible but are not editable.

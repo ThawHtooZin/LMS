@@ -16,18 +16,26 @@ if (!isset($_GET['customer_id'])) {
 
 $customer_id = intval($_GET['customer_id']);
 $paymentResult = null;
+$paymentAction = null;
 
 // Handle Bulk/Waterfall Payment Reception
 if ($_SERVER['REQUEST_METHOD'] == 'POST' and isset($_POST['receive_bulk'])) {
     $payment_date = $_POST['payment_date'];
     $payment_account = $_POST['payment_account'];
-    $reference = $_POST['reference'];
+    $reference = trim($_POST['reference'] ?? '');
     $check_number = isset($_POST['check_number']) ? $_POST['check_number'] : null;
     $description = isset($_POST['description']) ? $_POST['description'] : null;
     $payment_amount = $_POST['payment_amount'];
 
-    // Assuming a method like receiveCustomerBalance exists in query.ctr.php
+    $paymentAction = 'received';
     $paymentResult = $query->receiveCustomerBalance($customer_id, $payment_date, $payment_account, $reference, $check_number, $description, $payment_amount);
+} elseif ($_SERVER['REQUEST_METHOD'] == 'POST' and isset($_POST['edit_receipt'])) {
+    $paymentAction = 'edited';
+    $paymentResult = $query->editCustomerPaymentBatch(
+        $customer_id,
+        trim($_POST['batch_id'] ?? ''),
+        $_POST['payment_amount'] ?? null
+    );
 }
 
 // Fetch Customer Info
@@ -70,6 +78,19 @@ if (!empty($bill_ids)) {
 $total_outstanding = 0;
 foreach ($bills as $b) {
     $total_outstanding += $b['outstanding'];
+}
+
+$batchStmt = $pdo->prepare("
+  SELECT sp.payment_batches, SUM(sp.amount) AS amount
+  FROM sale_payments sp
+  INNER JOIN sales s ON s.id = sp.sale_id
+  WHERE s.contact_id = ? AND sp.payment_batches IS NOT NULL
+  GROUP BY sp.payment_batches
+");
+$batchStmt->execute([$customer_id]);
+$payment_batches = [];
+foreach ($batchStmt->fetchAll(PDO::FETCH_ASSOC) as $batch) {
+    $payment_batches[$batch['payment_batches']] = (float) $batch['amount'];
 }
 
 // Fetch Bank/Cash Accounts for the deposit dropdown AND tag which ones are official banks
@@ -115,7 +136,7 @@ foreach ($asset_accounts as $acc) {
     <?php if ($paymentResult !== null): ?>
         <script>
             <?php if ($paymentResult['status'] === true): ?>
-                swal("Success!", "Payment of <?= format_lms_amount($paymentResult['amount']); ?> received and posted successfully across open invoices.", "success").then(function() {
+                swal("Success!", "<?= $paymentAction === 'edited' ? 'Receipt updated to ' : 'Payment of '; ?><?= format_lms_amount($paymentResult['amount']); ?> <?= $paymentAction === 'edited' ? 'successfully.' : 'received and posted successfully across open invoices.'; ?>", "success").then(function() {
                     window.location.href = "acreceivabledetail.php?customer_id=<?= $customer_id; ?>";
                 });
             <?php else: ?>
@@ -199,6 +220,7 @@ foreach ($asset_accounts as $acc) {
                                                         <th>Check #</th>
                                                         <th>Description</th>
                                                         <th>Amount</th>
+                                                        <th>Action</th>
                                                     </tr>
                                                     <?php if (!empty($payments_by_bill[$bill['id']])): ?>
                                                         <?php foreach ($payments_by_bill[$bill['id']] as $pay): ?>
@@ -209,11 +231,25 @@ foreach ($asset_accounts as $acc) {
                                                                 <td><?= htmlspecialchars($pay['check_number'] ?? '-'); ?></td>
                                                                 <td class="text-muted"><?= htmlspecialchars($pay['description'] ?? '-'); ?></td>
                                                                 <td class="fw-bold text-success"><?= format_lms_amount($pay['amount']); ?></td>
+                                                                <td>
+                                                                    <?php if (!empty($pay['payment_batches']) && isset($payment_batches[$pay['payment_batches']])): ?>
+                                                                        <button
+                                                                            type="button"
+                                                                            class="btn btn-sm btn-outline-primary edit-receipt-button"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#editReceiptModal"
+                                                                            data-batch-id="<?= htmlspecialchars($pay['payment_batches']); ?>"
+                                                                            data-batch-amount="<?= number_format($payment_batches[$pay['payment_batches']], 2, '.', ''); ?>"
+                                                                            data-max-amount="<?= number_format($total_outstanding + $payment_batches[$pay['payment_batches']], 2, '.', ''); ?>">
+                                                                            Edit payment
+                                                                        </button>
+                                                                    <?php endif; ?>
+                                                                </td>
                                                             </tr>
                                                         <?php endforeach; ?>
                                                     <?php else: ?>
                                                         <tr>
-                                                            <td colspan="6" class="text-center text-muted">Legacy payment record (No detailed breakdown available).</td>
+                                                            <td colspan="7" class="text-center text-muted">Legacy payment record (No detailed breakdown available).</td>
                                                         </tr>
                                                     <?php endif; ?>
                                                 </table>
@@ -228,6 +264,32 @@ foreach ($asset_accounts as $acc) {
             </div>
         </div>
     </div>
+
+    <?php if (!empty($payment_batches)): ?>
+        <div class="modal fade" id="editReceiptModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-light">
+                        <h5 class="modal-title">Edit Customer Receipt</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="" method="post">
+                        <div class="modal-body">
+                            <input type="hidden" name="edit_receipt" value="1">
+                            <input type="hidden" name="batch_id" id="editReceiptBatchId">
+                            <label class="form-label fw-bold" for="editReceiptAmount">New total receipt amount</label>
+                            <input type="number" name="payment_amount" id="editReceiptAmount" min="0.01" step="0.01" class="form-control" required>
+                            <small class="form-text text-muted">All customer receipts will be recalculated in their original posting order. Invoice allocations will be updated together.</small>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save receipt</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <?php if ($total_outstanding > 0): ?>
         <div class="modal fade" id="payModal" tabindex="-1" aria-hidden="true">
@@ -260,7 +322,7 @@ foreach ($asset_accounts as $acc) {
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold small">Payment Reference</label>
-                                    <input type="text" name="reference" class="form-control" placeholder="e.g. Bank Transfer Ref" required>
+                                    <input type="text" name="reference" maxlength="100" class="form-control" placeholder="e.g. Bank Transfer Ref" required>
                                 </div>
                                 <div class="col-md-6" id="checkNumberWrapper" style="display: none;">
                                     <label class="form-label fw-bold small">Check Number <span class="text-muted fw-normal">(Optional)</span></label>
@@ -297,6 +359,14 @@ foreach ($asset_accounts as $acc) {
         const bankCodes = <?= json_encode(empty($bank_codes) ? [] : $bank_codes); ?>;
 
         $(document).ready(function() {
+            $('#editReceiptModal').on('show.bs.modal', function(event) {
+                const button = $(event.relatedTarget);
+                $('#editReceiptBatchId').val(button.data('batch-id'));
+                $('#editReceiptAmount')
+                    .val(button.data('batch-amount'))
+                    .attr('max', button.data('max-amount'));
+            });
+
             $('select[name="payment_account"]').change(function() {
                 let selectedCode = $(this).val();
                 if (bankCodes.includes(selectedCode)) {
