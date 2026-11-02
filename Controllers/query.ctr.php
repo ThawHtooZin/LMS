@@ -1155,7 +1155,25 @@ class Query
     try {
       $pdo->beginTransaction();
 
-      $payment_amount = floatval($payment_amount);
+      $reference = trim((string) $reference);
+      if ($reference === '') {
+        throw new Exception("Payment reference is required.");
+      }
+      if (strlen($reference) > 100) {
+        throw new Exception("Payment reference cannot exceed 100 characters.");
+      }
+
+      $referenceStmt = $pdo->prepare("SELECT 1 FROM purchase_payments WHERE reference = ? LIMIT 1");
+      $referenceStmt->execute([$reference]);
+      if ($referenceStmt->fetchColumn()) {
+        throw new Exception("This payment reference has already been used. Enter a unique reference.");
+      }
+
+      $payment_amount = filter_var($payment_amount, FILTER_VALIDATE_FLOAT);
+      if ($payment_amount === false || !is_finite($payment_amount)) {
+        throw new Exception("Enter a valid payment amount.");
+      }
+      $payment_amount = round($payment_amount, 2);
       if ($payment_amount <= 0) {
         throw new Exception("Payment amount must be greater than zero.");
       }
@@ -1189,7 +1207,7 @@ class Query
       }
 
       $remaining_payment = $payment_amount;
-      $sr_no = 'PAY-' . time();
+      $batch_id = 'PAY-' . bin2hex(random_bytes(10));
 
       // Custom GL Narration Logic
       $narration = !empty($description) ? $description : "Payment to $supplier_name - Ref: $reference";
@@ -1197,7 +1215,7 @@ class Query
         $narration .= " (Check: $check_number)";
       }
 
-      $allocStmt = $pdo->prepare("INSERT INTO purchase_payments (purchase_id, payment_date, payment_account, reference, check_number, description, amount) VALUES (?, ?, ?, ?, ?, ?, ?)");
+      $allocStmt = $pdo->prepare("INSERT INTO purchase_payments (payment_batches, purchase_id, payment_date, payment_account, reference, check_number, description, amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
       foreach ($bills as $bill) {
         if ($remaining_payment <= 0) break;
@@ -1217,7 +1235,7 @@ class Query
         $upd = $pdo->prepare("UPDATE purchases SET paid_amount = ?, status = ? WHERE id = ?");
         $upd->execute([$new_paid, $new_status, $bill['id']]);
 
-        $allocStmt->execute([$bill['id'], $payment_date, $payment_account, $reference, $check_number, $description, $apply_amount]);
+        $allocStmt->execute([$batch_id, $bill['id'], $payment_date, $payment_account, $reference, $check_number, $description, $apply_amount]);
 
         $remaining_payment -= $apply_amount;
       }
@@ -1227,22 +1245,263 @@ class Query
       if ($actual_applied > 0) {
         // Debit Accounts Payable Control (e.g., Code 2000)
         $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, '2000', ?, '0', ?, ?)");
-        $glDebit->execute([$payment_date, $reference, $actual_applied, $narration, $sr_no]);
+        $glDebit->execute([$payment_date, $reference, $actual_applied, $narration, $batch_id]);
 
         // Credit the specific Asset/Bank Account used
         $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, ?, '0', ?, ?, ?)");
-        $glCredit->execute([$payment_date, $reference, $payment_account, $actual_applied, $narration, $sr_no]);
+        $glCredit->execute([$payment_date, $reference, $payment_account, $actual_applied, $narration, $batch_id]);
       }
 
       $pdo->commit();
 
       return [
         'status' => true,
-        'amount' => $actual_applied
+        'amount' => $actual_applied,
+        'action' => 'created'
       ];
     } catch (Exception $e) {
-      $pdo->rollBack();
+      if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+      }
 
+      return [
+        'status' => false,
+        'message' => $e instanceof PDOException && (int) ($e->errorInfo[1] ?? 0) === 1062
+          ? "This payment reference has already been used. Enter a unique reference."
+          : $e->getMessage()
+      ];
+    }
+  }
+
+  public function editSupplierPaymentBatch($supplier_id, $batch_id, $payment_amount)
+  {
+    global $pdo;
+    try {
+      $payment_amount = filter_var($payment_amount, FILTER_VALIDATE_FLOAT);
+      if ($payment_amount === false || !is_finite($payment_amount)) {
+        throw new Exception("Enter a valid payment amount.");
+      }
+      $new_amount_cents = (int) round($payment_amount * 100);
+      if ($new_amount_cents <= 0) {
+        throw new Exception("Payment amount must be greater than zero.");
+      }
+
+      $pdo->beginTransaction();
+
+      $billsStmt = $pdo->prepare("
+        SELECT id, grand_total, paid_amount, status
+        FROM purchases
+        WHERE contact_id = ? AND status IN ('AWAITING_PAYMENT', 'PAID')
+        ORDER BY date ASC, id ASC
+        FOR UPDATE
+      ");
+      $billsStmt->execute([$supplier_id]);
+      $bills = $billsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $allocStmt = $pdo->prepare("
+        SELECT pp.id, pp.payment_batches, pp.purchase_id, pp.payment_date,
+               pp.payment_account, pp.reference, pp.check_number, pp.description, pp.amount
+        FROM purchase_payments pp
+        INNER JOIN purchases p ON p.id = pp.purchase_id
+        WHERE p.contact_id = ? AND pp.payment_batches IS NOT NULL
+        ORDER BY pp.id ASC
+        FOR UPDATE
+      ");
+      $allocStmt->execute([$supplier_id]);
+      $allocations = $allocStmt->fetchAll(PDO::FETCH_ASSOC);
+      if (empty($allocations)) {
+        throw new Exception("Payment batch not found or has no bill allocations.");
+      }
+
+      $batches = [];
+      foreach ($allocations as $allocation) {
+        $key = $allocation['payment_batches'];
+        if (!isset($batches[$key])) {
+          $batches[$key] = [
+            'payment_date' => $allocation['payment_date'],
+            'payment_account' => $allocation['payment_account'],
+            'reference' => $allocation['reference'],
+            'check_number' => $allocation['check_number'],
+            'description' => $allocation['description'],
+            'amount_cents' => 0,
+            'allocations' => []
+          ];
+        } elseif (
+          $allocation['payment_date'] !== $batches[$key]['payment_date'] ||
+          $allocation['payment_account'] !== $batches[$key]['payment_account'] ||
+          $allocation['reference'] !== $batches[$key]['reference'] ||
+          $allocation['check_number'] !== $batches[$key]['check_number'] ||
+          $allocation['description'] !== $batches[$key]['description']
+        ) {
+          throw new Exception("Payment batch details are inconsistent. The batches cannot be edited safely.");
+        }
+
+        $purchase_id = (int) $allocation['purchase_id'];
+        $amount_cents = (int) round(floatval($allocation['amount']) * 100);
+        $batches[$key]['amount_cents'] += $amount_cents;
+        $batches[$key]['allocations'][$purchase_id] = ($batches[$key]['allocations'][$purchase_id] ?? 0) + $amount_cents;
+      }
+
+      if (!isset($batches[$batch_id])) {
+        throw new Exception("Payment batch not found for this supplier.");
+      }
+
+      $old_total_cents = $batches[$batch_id]['amount_cents'];
+
+      $bill_by_id = [];
+      $batch_allocations_by_bill = [];
+      foreach ($batches as $batch) {
+        foreach ($batch['allocations'] as $purchase_id => $amount_cents) {
+          $batch_allocations_by_bill[$purchase_id] = ($batch_allocations_by_bill[$purchase_id] ?? 0) + $amount_cents;
+        }
+      }
+
+      foreach ($bills as $bill) {
+        $purchase_id = (int) $bill['id'];
+        $grand_total_cents = (int) round(floatval($bill['grand_total']) * 100);
+        $paid_cents = (int) round(floatval($bill['paid_amount']) * 100);
+        $base_paid_cents = $paid_cents - ($batch_allocations_by_bill[$purchase_id] ?? 0);
+        if ($base_paid_cents < 0 || $base_paid_cents > $grand_total_cents) {
+          throw new Exception("Bill payment totals are inconsistent. The payments cannot be recalculated safely.");
+        }
+
+        $bill_by_id[$purchase_id] = [
+          'grand_total_cents' => $grand_total_cents,
+          'base_paid_cents' => $base_paid_cents,
+          'paid_cents' => $base_paid_cents,
+          'status' => $bill['status']
+        ];
+      }
+
+      foreach ($batch_allocations_by_bill as $purchase_id => $allocation_cents) {
+        if (!isset($bill_by_id[$purchase_id])) {
+          throw new Exception("A payment is linked to a bill that is no longer eligible. Payments cannot be recalculated safely.");
+        }
+      }
+
+      $ledgerStmt = $pdo->prepare("
+        SELECT id, ac_code, debit, credit
+        FROM general_ledger
+        WHERE voucherno = ? AND sr_no = ?
+        FOR UPDATE
+      ");
+      foreach ($batches as $key => &$batch) {
+        if ($batch['amount_cents'] <= 0) {
+          throw new Exception("A payment batch has an invalid allocation total.");
+        }
+
+        $ledgerStmt->execute([$batch['reference'], $key]);
+        $ledger_rows = $ledgerStmt->fetchAll(PDO::FETCH_ASSOC);
+        $debit_row = null;
+        $credit_row = null;
+        foreach ($ledger_rows as $ledger_row) {
+          if ($ledger_row['ac_code'] === '2000' && floatval($ledger_row['debit']) > 0 && floatval($ledger_row['credit']) == 0) {
+            if ($debit_row !== null) {
+              throw new Exception("A payment has duplicate debit entries in the General Ledger.");
+            }
+            $debit_row = $ledger_row;
+          } elseif ($ledger_row['ac_code'] === $batch['payment_account'] && floatval($ledger_row['credit']) > 0 && floatval($ledger_row['debit']) == 0) {
+            if ($credit_row !== null) {
+              throw new Exception("A payment has duplicate credit entries in the General Ledger.");
+            }
+            $credit_row = $ledger_row;
+          }
+        }
+        if (count($ledger_rows) !== 2 || $debit_row === null || $credit_row === null) {
+          throw new Exception("A matching General Ledger pair could not be verified. The payments cannot be recalculated safely.");
+        }
+        if (
+          (int) round(floatval($debit_row['debit']) * 100) !== $batch['amount_cents'] ||
+          (int) round(floatval($credit_row['credit']) * 100) !== $batch['amount_cents']
+        ) {
+          throw new Exception("A General Ledger amount does not match its payment batch. The payments cannot be recalculated safely.");
+        }
+
+        $batch['ledger_order'] = min((int) $debit_row['id'], (int) $credit_row['id']);
+        $batch['ledger_debit_id'] = (int) $debit_row['id'];
+        $batch['ledger_credit_id'] = (int) $credit_row['id'];
+      }
+      unset($batch);
+
+      uasort($batches, static function ($left, $right) {
+        return $left['ledger_order'] <=> $right['ledger_order'];
+      });
+
+      $target_batch_found = false;
+      $recalculated_allocations = [];
+      foreach ($batches as $key => $batch) {
+        $batch_amount_cents = $key === $batch_id ? $new_amount_cents : $batch['amount_cents'];
+        $target_batch_found = $target_batch_found || $key === $batch_id;
+        $remaining_cents = $batch_amount_cents;
+        $recalculated_allocations[$key] = [];
+
+        foreach ($bills as $bill) {
+          $purchase_id = (int) $bill['id'];
+          $due_cents = $bill_by_id[$purchase_id]['grand_total_cents'] - $bill_by_id[$purchase_id]['paid_cents'];
+          if ($due_cents <= 0 || $remaining_cents <= 0) {
+            continue;
+          }
+
+          $apply_cents = min($remaining_cents, $due_cents);
+          $recalculated_allocations[$key][$purchase_id] = $apply_cents;
+          $bill_by_id[$purchase_id]['paid_cents'] += $apply_cents;
+          $remaining_cents -= $apply_cents;
+        }
+
+        if ($remaining_cents > 0) {
+          throw new Exception("This edit would leave a payment partly unapplied. Reduce the edited payment or reconcile the supplier bills first.");
+        }
+      }
+      if (!$target_batch_found) {
+        throw new Exception("Payment batch not found for this supplier.");
+      }
+
+      $updateBillStmt = $pdo->prepare("UPDATE purchases SET paid_amount = ?, status = ? WHERE id = ? AND contact_id = ?");
+      foreach ($bill_by_id as $purchase_id => $bill) {
+        $status = $bill['paid_cents'] >= $bill['grand_total_cents'] ? 'PAID' : 'AWAITING_PAYMENT';
+        $updateBillStmt->execute([$bill['paid_cents'] / 100, $status, $purchase_id, $supplier_id]);
+      }
+
+      $deleteBatchKeys = array_keys($batches);
+      $deletePlaceholders = implode(',', array_fill(0, count($deleteBatchKeys), '?'));
+      $deleteStmt = $pdo->prepare("DELETE FROM purchase_payments WHERE payment_batches IN ($deletePlaceholders)");
+      $deleteStmt->execute($deleteBatchKeys);
+
+      $insertAllocation = $pdo->prepare("
+        INSERT INTO purchase_payments
+          (payment_batches, purchase_id, payment_date, payment_account, reference, check_number, description, amount)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      ");
+      foreach ($recalculated_allocations as $key => $batch_allocations) {
+        foreach ($batch_allocations as $purchase_id => $allocation_cents) {
+          $batch = $batches[$key];
+          $insertAllocation->execute([
+            $key,
+            $purchase_id,
+            $batch['payment_date'],
+            $batch['payment_account'],
+            $batch['reference'],
+            $batch['check_number'],
+            $batch['description'],
+            $allocation_cents / 100
+          ]);
+        }
+      }
+
+      $target_batch = $batches[$batch_id];
+      $pdo->prepare("UPDATE general_ledger SET debit = ? WHERE id = ?")->execute([$new_amount_cents / 100, $target_batch['ledger_debit_id']]);
+      $pdo->prepare("UPDATE general_ledger SET credit = ? WHERE id = ?")->execute([$new_amount_cents / 100, $target_batch['ledger_credit_id']]);
+
+      $pdo->commit();
+      return [
+        'status' => true,
+        'amount' => $new_amount_cents / 100,
+        'action' => 'edited'
+      ];
+    } catch (Exception $e) {
+      if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+      }
       return [
         'status' => false,
         'message' => $e->getMessage()

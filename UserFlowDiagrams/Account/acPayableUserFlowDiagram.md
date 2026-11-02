@@ -55,19 +55,40 @@ flowchart TD
     G --> H[Optionally enter description or notes]
     H --> I[Enter payment amount up to displayed total outstanding]
     I --> J[Select Apply Payment]
-    J --> K{Amount greater than zero?}
-    K -->|No| L[Reject payment and show error]
-    K -->|Yes| M[Apply payment to Awaiting Payment bills by oldest date, then ID]
-    M --> N{Payment covers each bill in full?}
-    N -->|Yes| O[Mark covered bills Paid]
-    N -->|No| P[Apply remaining amount to next bill; keep partial bill Awaiting Payment]
-    O --> Q[Record allocations and post debit to Accounts Payable control account 2000]
-    P --> Q
-    Q --> QA[Credit selected Asset account for amount applied]
+    J --> K{Reference has already been used?}
+    K -->|Yes| L[Reject payment and ask for a unique reference]
+    K -->|No| M{Amount greater than zero and within outstanding balance?}
+    M -->|No| N[Reject payment and show error]
+    M -->|Yes| O[Apply payment to Awaiting Payment bills by oldest date, then ID]
+    O --> P{Payment covers each bill in full?}
+    P -->|Yes| Q[Mark covered bills Paid]
+    P -->|No| R[Apply remaining amount to next bill; keep partial bill Awaiting Payment]
+    Q --> S[Record allocations and post debit to Accounts Payable control account 2000]
+    R --> S
+    S --> QA[Credit selected Asset account for amount applied]
     QA --> QB[Payment is visible in General Ledger]
-    QB --> R[Commit payment and show amount actually applied]
-    R --> S[Return to supplier detail and refresh balances/history]
-    L --> T[Stay on supplier detail]
+    QB --> T[Commit payment and show amount actually applied]
+    T --> U[Return to supplier detail and refresh balances/history]
+    L --> V[Stay on supplier detail]
+```
+
+## 4. Edit the most recent supplier payment
+
+```mermaid
+flowchart TD
+    A[Expand payment history on any bill allocated by the supplier's newest payment batch] --> B[Select Edit payment]
+    B --> C[Enter the new total amount for the whole payment]
+    C --> D[Submit the edit]
+    D --> E{All supplier batches and ledger pairs validate?}
+    E -->|No| F[Reject the edit and show an error]
+    E -->|Yes| G[Remove all batched allocations from bill paid totals]
+    G --> H[Replay every supplier batch in General Ledger insertion order, FIFO]
+    H --> I{Can every batch be fully allocated?}
+    I -->|No| F
+    I -->|Yes| J[Replace batch allocation rows and update bill paid amounts/statuses]
+    J --> K[Update edited batch's General Ledger debit and credit]
+    K --> L[Commit and refresh supplier details]
+    F --> M[Keep existing data unchanged]
 ```
 
 ## Rules and details
@@ -78,8 +99,11 @@ flowchart TD
 - **Balance owed** is the sum of each included bill's `grand_total - paid_amount`. The bottom row totals billed, paid, and owed across the displayed supplier rows.
 - Supplier detail lists bills in oldest-first order and labels them **Unpaid**, **Partial**, or **Paid**. A paid amount can be expanded to show its allocation history. Older records without detailed payment allocations show a legacy notice instead.
 - **Make Payment** appears only when the supplier's total outstanding balance is greater than zero. Required fields are payment date, payment account, reference, and a positive amount. Description/notes and check number are optional.
+- Payment references are required, limited to 100 characters, and must not already exist in `purchase_payments`. A single payment may still use the same reference on multiple bill allocations.
 - The account dropdown uses Asset-class accounts. Check Number appears only when the selected account is registered as a bank; switching to a non-bank account hides and clears it.
 - One payment is allocated automatically across the supplier's **Awaiting Payment** bills, oldest date and then lowest ID first. Bills fully covered become **Paid**; a bill that receives only part of the remaining payment stays **Awaiting Payment**.
 - Each allocation records date, account, reference, optional check number/description, and amount. The payment also posts a debit to Accounts Payable control account `2000` and a credit to the selected Asset account in the General Ledger. Supplier bill approval and supplier cash payment are separate ledger events.
 - The server validates the payment amount against total outstanding and reports the amount actually applied.
-- Use **Back** to return to the supplier balance summary. The detail page does not provide controls to edit or delete individual payment allocations.
+- Every new supplier payment gets a generated batch key stored in `purchase_payments.payment_batches` on each FIFO allocation row. The migration backfills existing payments only when their matching ledger pair identifies one unambiguous batch; unmatched legacy rows are not editable.
+- An **Edit payment** action appears on every allocation row that belongs to a verified batch. Editing a batch total replays all of that supplier's batched payments in their original General Ledger insertion order, recalculates FIFO allocations, updates bill statuses, and updates the edited batch's matching General Ledger debit/credit pair. Any resulting allocation rows that are no longer needed are removed. All batch/ledger pairs must validate and every payment must remain fully allocatable; otherwise the transaction is rolled back.
+- Use **Back** to return to the supplier balance summary. Individual allocation amounts cannot be edited independently.
