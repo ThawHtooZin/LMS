@@ -5396,6 +5396,164 @@ class Query
     }
   }
 
+  public function updateGeneralLedgerVoucher($voucher_no, $journal_date, $lines)
+  {
+    global $pdo;
+
+    try {
+      if (!is_string($voucher_no) || trim($voucher_no) === '') {
+        throw new Exception("Voucher number is required.");
+      }
+
+      $date = DateTime::createFromFormat('!Y-m-d', (string) $journal_date);
+      if (!$date || $date->format('Y-m-d') !== $journal_date || $date->format('Y-m') !== date('Y-m')) {
+        throw new Exception("Only transactions dated in the current month can be edited.");
+      }
+
+      if (!is_array($lines)) {
+        throw new Exception("Transaction lines are invalid.");
+      }
+
+      $pdo->beginTransaction();
+
+      $voucherStmt = $pdo->prepare("
+        SELECT id, date, sr_no
+        FROM general_ledger
+        WHERE voucherno = ?
+        ORDER BY id
+        FOR UPDATE
+      ");
+      $voucherStmt->execute([$voucher_no]);
+      $existingRows = $voucherStmt->fetchAll(PDO::FETCH_ASSOC);
+
+      if (count($existingRows) < 2) {
+        throw new Exception("A balanced voucher with at least two ledger lines is required.");
+      }
+
+      $existingIds = [];
+      $originalDate = $existingRows[0]['date'];
+      foreach ($existingRows as $row) {
+        if ($row['date'] !== $originalDate || substr($row['date'], 0, 7) !== date('Y-m')) {
+          throw new Exception("Only complete vouchers dated in the current month can be edited.");
+        }
+        $existingIds[(int) $row['id']] = true;
+      }
+
+      $accountStmt = $pdo->query("SELECT code FROM accodes");
+      $validAccounts = array_fill_keys($accountStmt->fetchAll(PDO::FETCH_COLUMN), true);
+
+      $validLines = [];
+      $submittedIds = [];
+      $totalDebit = 0.0;
+      $totalCredit = 0.0;
+
+      foreach ($lines as $line) {
+        if (!is_array($line)) {
+          throw new Exception("Transaction lines are invalid.");
+        }
+
+        $accountValue = $line['account_code'] ?? '';
+        $descriptionValue = $line['description'] ?? '';
+        $lineIdValue = $line['id'] ?? '';
+        if (!is_scalar($accountValue) || !is_scalar($descriptionValue) || !is_scalar($lineIdValue)) {
+          throw new Exception("Transaction lines are invalid.");
+        }
+
+        $accountCode = trim((string) $accountValue);
+        $description = trim((string) $descriptionValue);
+        $debitValue = $line['debit'] ?? null;
+        $creditValue = $line['credit'] ?? null;
+
+        if (!isset($validAccounts[$accountCode])) {
+          throw new Exception("Select a valid account for every transaction line.");
+        }
+        if (!is_numeric($debitValue) || !is_numeric($creditValue)) {
+          throw new Exception("Enter a valid debit and credit amount for every line.");
+        }
+
+        $debit = round((float) $debitValue, 2);
+        $credit = round((float) $creditValue, 2);
+        if (!is_finite($debit) || !is_finite($credit) || $debit < 0 || $credit < 0 || (($debit > 0) === ($credit > 0))) {
+          throw new Exception("Each line must contain a positive amount on either debit or credit, not both.");
+        }
+
+        $lineId = trim((string) $lineIdValue);
+        if ($lineId !== '') {
+          if (!ctype_digit($lineId) || !isset($existingIds[(int) $lineId]) || isset($submittedIds[(int) $lineId])) {
+            throw new Exception("A transaction line does not belong to this voucher.");
+          }
+          $submittedIds[(int) $lineId] = true;
+        }
+
+        $validLines[] = [
+          'id' => $lineId === '' ? null : (int) $lineId,
+          'account_code' => $accountCode,
+          'description' => $description,
+          'debit' => $debit,
+          'credit' => $credit
+        ];
+        $totalDebit += $debit;
+        $totalCredit += $credit;
+      }
+
+      if (count($validLines) < 2) {
+        throw new Exception("A voucher must contain at least two transaction lines.");
+      }
+      if (round($totalDebit, 2) !== round($totalCredit, 2) || $totalDebit <= 0) {
+        throw new Exception("Total debits must equal total credits before saving.");
+      }
+
+      $deleteIds = array_diff(array_keys($existingIds), array_keys($submittedIds));
+      if ($deleteIds) {
+        $deleteStmt = $pdo->prepare("DELETE FROM general_ledger WHERE id = ? AND voucherno = ?");
+        foreach ($deleteIds as $deleteId) {
+          $deleteStmt->execute([$deleteId, $voucher_no]);
+        }
+      }
+
+      $updateStmt = $pdo->prepare("
+        UPDATE general_ledger
+        SET date = ?, ac_code = ?, debit = ?, credit = ?, narration = ?
+        WHERE id = ? AND voucherno = ?
+      ");
+      $insertStmt = $pdo->prepare("
+        INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no)
+        VALUES (?, ?, ?, ?, ?, ?, '')
+      ");
+
+      foreach ($validLines as $line) {
+        if ($line['id'] === null) {
+          $insertStmt->execute([
+            $date->format('Y-m-d'),
+            $voucher_no,
+            $line['account_code'],
+            $line['debit'],
+            $line['credit'],
+            $line['description']
+          ]);
+        } else {
+          $updateStmt->execute([
+            $date->format('Y-m-d'),
+            $line['account_code'],
+            $line['debit'],
+            $line['credit'],
+            $line['description'],
+            $line['id'],
+            $voucher_no
+          ]);
+        }
+      }
+
+      $pdo->commit();
+      return ['status' => true, 'message' => 'General Ledger voucher updated successfully.'];
+    } catch (Exception $e) {
+      if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+      }
+      return ['status' => false, 'message' => $e->getMessage()];
+    }
+  }
+
   function savetransaction($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $sr_no, $container_no, $bank_charges)
   {
     global $pdo;

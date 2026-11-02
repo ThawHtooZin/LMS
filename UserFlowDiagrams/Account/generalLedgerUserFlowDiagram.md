@@ -32,7 +32,7 @@ flowchart TD
     D --> E[Review per-account debit total, credit total, and net movement]
     D --> F{Choose an action}
     F -->|Export| G[Export General Ledger; filtered export carries selected dates and account codes]
-    F -->|Edit action is available| H[Open Edit Transaction for that ledger entry]
+    F -->|Edit action is available| H[Open Manual Journal-style voucher editor]
     F -->|No further action| I[Finish]
 ```
 
@@ -56,5 +56,6 @@ flowchart LR
 - This page is the shared view of accounting postings made by other Account workflows; it is not the source screen for entering purchase bills, sales invoices, supplier payments, or manual journals. Approved purchases and sales create invoice-side postings; A/C Payable supplier payments and A/C Receivable customer receipts create cash-settlement postings; posted Manual Journals write their entered lines. See the [Purchase](./purchaseUserFlowDiagram.md), [A/C Payable](./acPayableUserFlowDiagram.md), [Sales](./salesUserFlowDiagram.md), [A/C Receivable](./acReceivableUserFlowDiagram.md), and [Manual Journals](./manualJournalUserFlowDiagram.md) workflows.
 - In this application’s current posting paths: purchase approval through **Account → Purchase** debits each selected purchase line account and credits Accounts Payable control account `2000`; supplier payment debits `2000` and credits the selected Asset account; sale approval debits Accounts Receivable control account `600` and credits each selected Revenue account; customer receipt debits the selected deposit account and credits Accounts Receivable `600`. Manual Journals write each line’s selected account and debit/credit amount. Packing Material purchases use the Material type in **Account → Purchase**, so they follow the same payable and ledger posting path while also adding Warehouse stock.
 - Currency is inferred from the account code: the page labels accounts containing `1502` or `3600/002` as USD and other accounts as MMK.
-- The per-entry edit control is hidden when the displayed offset account name contains “purchase”; otherwise it opens the transaction editor. Export is available for all ledger entries or the current filtered date/account selection.
+- An edit control appears only for complete vouchers whose rows share one date in the current month; it remains hidden when the displayed offset account name contains “purchase.” Editing loads all rows with that voucher number into a Manual Journal-style form. The line Description, account, debit, credit, and date are saved to `general_ledger`; debit and credit totals must balance. The General Ledger row description is stored in its legacy `narration` column; no `manual_journals` narration is created or changed.
+- Export is available for all ledger entries or the current filtered date/account selection.
 - When only Date From is supplied, the ledger includes entries on or after that date; when only Date To is supplied, it includes entries on or before that date. The running balance starts at zero within the displayed filtered rows rather than including a prior-period opening balance.
