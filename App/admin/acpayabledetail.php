@@ -35,6 +35,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' and isset($_POST['pay_bulk'])) {
   $paymentResult = $query->editSupplierPaymentBatch(
     $supplier_id,
     trim($_POST['batch_id'] ?? ''),
+    $_POST['payment_date'] ?? '',
+    $_POST['payment_account'] ?? '',
+    trim($_POST['reference'] ?? ''),
+    $_POST['check_number'] ?? null,
+    $_POST['description'] ?? null,
     $_POST['payment_amount'] ?? null
   );
 }
@@ -239,9 +244,14 @@ foreach ($asset_accounts as $acc) {
                                       class="btn btn-sm btn-outline-primary edit-payment-button"
                                       data-bs-toggle="modal"
                                       data-bs-target="#editPaymentModal"
-                                      data-batch-id="<?= htmlspecialchars($pay['payment_batches']); ?>"
+                                      data-batch-id="<?= htmlspecialchars($pay['payment_batches'], ENT_QUOTES, 'UTF-8'); ?>"
                                       data-batch-amount="<?= number_format($payment_batches[$pay['payment_batches']], 2, '.', ''); ?>"
-                                      data-max-amount="<?= number_format($total_outstanding + $payment_batches[$pay['payment_batches']], 2, '.', ''); ?>">
+                                      data-max-amount="<?= number_format($total_outstanding + $payment_batches[$pay['payment_batches']], 2, '.', ''); ?>"
+                                      data-payment-date="<?= htmlspecialchars($pay['payment_date'], ENT_QUOTES, 'UTF-8'); ?>"
+                                      data-payment-account="<?= htmlspecialchars($pay['payment_account'], ENT_QUOTES, 'UTF-8'); ?>"
+                                      data-reference="<?= htmlspecialchars($pay['reference'], ENT_QUOTES, 'UTF-8'); ?>"
+                                      data-check-number="<?= htmlspecialchars($pay['check_number'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                      data-description="<?= htmlspecialchars($pay['description'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                                       Edit payment
                                     </button>
                                   <?php endif; ?>
@@ -268,7 +278,7 @@ foreach ($asset_accounts as $acc) {
 
   <?php if (!empty($payment_batches)): ?>
     <div class="modal fade" id="editPaymentModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header bg-primary text-light">
             <h5 class="modal-title">Edit Supplier Payment</h5>
@@ -278,8 +288,43 @@ foreach ($asset_accounts as $acc) {
             <div class="modal-body">
               <input type="hidden" name="edit_payment" value="1">
               <input type="hidden" name="batch_id" id="editPaymentBatchId">
-              <label class="form-label fw-bold" for="editPaymentAmount">New total payment amount</label>
-              <input type="number" name="payment_amount" id="editPaymentAmount" min="0.01" step="0.01" class="form-control" required>
+
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label fw-bold small" for="editPaymentDate">Payment Date</label>
+                  <input type="date" name="payment_date" id="editPaymentDate" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold small" for="editPaymentAccount">Pay From (Bank/Cash Account)</label>
+                  <select name="payment_account" id="editPaymentAccount" class="form-select" required>
+                    <option value="">- Select Account -</option>
+                    <?php foreach ($asset_accounts as $acc): ?>
+                      <option value="<?= htmlspecialchars($acc['code'], ENT_QUOTES, 'UTF-8'); ?>"><?= htmlspecialchars($acc['name']); ?></option>
+                    <?php endforeach; ?>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label fw-bold small" for="editPaymentReference">Payment Reference</label>
+                  <input type="text" name="reference" id="editPaymentReference" class="form-control" maxlength="100" required>
+                </div>
+                <div class="col-md-6" id="editCheckNumberWrapper" style="display: none;">
+                  <label class="form-label fw-bold small" for="editPaymentCheckNumber">Check Number <span class="text-muted fw-normal">(Optional)</span></label>
+                  <input type="text" name="check_number" id="editPaymentCheckNumber" class="form-control" maxlength="50">
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-bold small" for="editPaymentDescription">Description / Notes <span class="text-muted fw-normal">(Optional)</span></label>
+                <textarea name="description" id="editPaymentDescription" class="form-control" rows="2"></textarea>
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label fw-bold small" for="editPaymentAmount">Payment Amount</label>
+                <input type="number" name="payment_amount" id="editPaymentAmount" min="0.01" step="0.01" class="form-control form-control-lg text-primary fw-bold" required>
+              </div>
               <small class="form-text text-muted">Bill allocations will be recalculated oldest first. Any no-longer-needed allocation row will be removed.</small>
             </div>
             <div class="modal-footer">
@@ -363,10 +408,28 @@ foreach ($asset_accounts as $acc) {
       $('#editPaymentModal').on('show.bs.modal', function(event) {
         const button = $(event.relatedTarget);
         $('#editPaymentBatchId').val(button.data('batch-id'));
+        $('#editPaymentDate').val(button.data('payment-date'));
+        $('#editPaymentAccount').val(button.data('payment-account'));
+        $('#editPaymentReference').val(button.data('reference'));
+        $('#editPaymentCheckNumber').val(button.data('check-number'));
+        $('#editPaymentDescription').val(button.data('description'));
         $('#editPaymentAmount')
           .val(button.data('batch-amount'))
           .attr('max', button.data('max-amount'));
+        toggleEditCheckNumber();
       });
+
+      function toggleEditCheckNumber() {
+        const selectedCode = $('#editPaymentAccount').val();
+        if (bankCodes.includes(selectedCode)) {
+          $('#editCheckNumberWrapper').show();
+        } else {
+          $('#editCheckNumberWrapper').hide();
+          $('#editPaymentCheckNumber').val('');
+        }
+      }
+
+      $('#editPaymentAccount').change(toggleEditCheckNumber);
 
       $('select[name="payment_account"]').change(function() {
         let selectedCode = $(this).val();
@@ -374,7 +437,7 @@ foreach ($asset_accounts as $acc) {
           $('#checkNumberWrapper').fadeIn(200);
         } else {
           $('#checkNumberWrapper').fadeOut(200);
-          $('input[name="check_number"]').val('');
+          $('#payModal input[name="check_number"]').val('');
         }
       });
     });

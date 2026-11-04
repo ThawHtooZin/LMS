@@ -111,7 +111,7 @@ if (isset($_GET['table_name']) && $_GET['table_name'] == 'general_ledger') {
         $t_debit += $debit;
         $t_credit += $credit;
 
-        $currency_display = str_contains((string)$current_ac_code, '1502') || str_contains((string)$current_ac_code, '3600/002') ? 'USD' : 'MMK';
+        $currency_display = $t['currency'] ?? '';
       ?>
         <tr>
           <td><?php echo date('d/m/Y', strtotime($t['date'])); ?></td>
@@ -120,7 +120,7 @@ if (isset($_GET['table_name']) && $_GET['table_name'] == 'general_ledger') {
           <td><?php echo htmlspecialchars($t['narration']); ?></td>
           <td><?php echo format_lms_amount($debit); ?></td>
           <td><?php echo format_lms_amount($credit); ?></td>
-          <td><?php echo $currency_display; ?></td>
+          <td><?php echo htmlspecialchars((string) $currency_display); ?></td>
           <td><?php echo format_lms_amount($realbalance); ?></td>
         </tr>
       <?php } ?>

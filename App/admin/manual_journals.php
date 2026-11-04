@@ -9,10 +9,12 @@ $auth->checkadmin();
 $bootstrap = new Bootstrap();
 $query = new Query();
 
-// Fetch all manual journals with their total amounts
+// Fetch each journal's debit totals separately by currency
 $stmt = $pdo->query("
     SELECT mj.*, 
-           (SELECT SUM(debit) FROM manual_journal_lines mjl WHERE mjl.journal_id = mj.id) as total_amount 
+           (SELECT SUM(debit) FROM manual_journal_lines mjl WHERE mjl.journal_id = mj.id AND mjl.currency = 'MMK') as total_mmk,
+           (SELECT SUM(debit) FROM manual_journal_lines mjl WHERE mjl.journal_id = mj.id AND mjl.currency = 'USD') as total_usd,
+           (SELECT rate FROM exchange_rates er WHERE er.currency_code = 'USD' AND er.effective_date <= mj.journal_date ORDER BY er.effective_date DESC LIMIT 1) AS transaction_usd_rate
     FROM manual_journals mj 
     ORDER BY mj.journal_date DESC, mj.id DESC
 ");
@@ -81,7 +83,7 @@ $journals = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <tr>
                                 <th>Date</th>
                                 <th>Narration</th>
-                                <th>Amount</th>
+                                <th>Total by currency</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -92,10 +94,23 @@ $journals = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($journals as $j): ?>
-                                    <tr class="clickable-row" onclick="window.location.href='view_journal.php?id=<?= $j['id'] ?>'">
+                                    <tr class="clickable-row" onclick="window.location.href='edit_journal.php?id=<?= $j['id'] ?><?= $j['status'] === 'POSTED' ? '&mode=gl' : '' ?>'">
                                         <td class="fw-bold text-primary"><?= date('d M Y', strtotime($j['journal_date'])) ?></td>
                                         <td><?= htmlspecialchars($j['narration']) ?></td>
-                                        <td><?= format_lms_amount($j['total_amount']) ?></td>
+                                        <td>
+                                            <?php if ((float) $j['total_mmk'] !== 0.0): ?>
+                                                MMK <?= format_lms_amount($j['total_mmk']) ?>
+                                            <?php endif; ?>
+                                            <?php if ((float) $j['total_usd'] !== 0.0): ?>
+                                                <?= (float) $j['total_mmk'] !== 0.0 ? ' / ' : '' ?>USD <?= format_lms_amount($j['total_usd']) ?>
+                                                <?php if (is_numeric($j['transaction_usd_rate'] ?? null)): ?>
+                                                    <small class="d-block text-muted">MMK equivalent at transaction-date rate: <?= format_lms_amount((float) $j['total_usd'] * (float) $j['transaction_usd_rate']) ?></small>
+                                                <?php endif; ?>
+                                            <?php endif; ?>
+                                            <?php if ((float) $j['total_mmk'] === 0.0 && (float) $j['total_usd'] === 0.0): ?>
+                                                -
+                                            <?php endif; ?>
+                                        </td>
                                         <td>
                                             <?php if ($j['status'] === 'DRAFT'): ?>
                                                 <span class="status-draft">Draft</span>

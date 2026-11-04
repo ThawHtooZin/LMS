@@ -15,20 +15,6 @@ function glReportAccountLabel(Query $query, string $acCode): string
   return !empty($row['ac_name']) ? $row['ac_name'] : $acCode;
 }
 
-function glReportVoucherCurrency(PDO $pdo, string $voucherNo): string
-{
-  $stmt = $pdo->prepare('SELECT currency FROM sales WHERE sr_no = ? LIMIT 1');
-  $stmt->execute([$voucherNo]);
-  $currency = $stmt->fetchColumn();
-  if ($currency) {
-    return (string)$currency;
-  }
-  $stmt = $pdo->prepare('SELECT currency FROM purchases WHERE voucher_no = ? LIMIT 1');
-  $stmt->execute([$voucherNo]);
-  $currency = $stmt->fetchColumn();
-  return $currency ? (string)$currency : 'MMK';
-}
-
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -232,17 +218,22 @@ $bootstrap->css();
                   <td colspan="8"><b><u><?= 'Account No. : ' . htmlspecialchars($sectionAcCode) . ' - ' . htmlspecialchars($sectionLabel); ?></u></b></td>
                 </tr>
                 <?php
-                $runningBalance = 0.0;
-                $totalDebit = 0.0;
-                $totalCredit = 0.0;
+                $runningBalances = [];
+                $totalDebits = [];
+                $totalCredits = [];
                 foreach ($gldatas as $gldata) {
                   $debit = (float)$gldata['debit'];
                   $credit = (float)$gldata['credit'];
-                  $runningBalance += $debit - $credit;
-                  $totalDebit += $debit;
-                  $totalCredit += $credit;
+                  $currency = $gldata['currency'] ?? 'MMK';
+                  if (!isset($runningBalances[$currency])) {
+                    $runningBalances[$currency] = 0.0;
+                    $totalDebits[$currency] = 0.0;
+                    $totalCredits[$currency] = 0.0;
+                  }
+                  $runningBalances[$currency] += $debit - $credit;
+                  $totalDebits[$currency] += $debit;
+                  $totalCredits[$currency] += $credit;
                   $acName = glReportAccountLabel($query, $gldata['ac_code']);
-                  $currency = glReportVoucherCurrency($pdo, $gldata['voucherno']);
                   ?>
                   <tr>
                     <td><?= date('d/m/Y', strtotime($gldata['date'])); ?></td>
@@ -252,15 +243,15 @@ $bootstrap->css();
                     <td class="text-end"><?= format_lms_amount($debit, true); ?></td>
                     <td class="text-end"><?= format_lms_amount($credit, true); ?></td>
                     <td><?= htmlspecialchars($currency); ?></td>
-                    <td class="text-end"><?= format_lms_amount($runningBalance); ?></td>
+                    <td class="text-end"><?= htmlspecialchars((string) $currency); ?> <?= format_lms_amount($runningBalances[$currency]); ?></td>
                   </tr>
                 <?php } ?>
                 <tr style="font-weight:bold;">
                   <td colspan="4" class="text-end">Total:</td>
-                  <td class="text-end"><?= format_lms_amount($totalDebit); ?></td>
-                  <td class="text-end"><?= format_lms_amount($totalCredit); ?></td>
+                  <td class="text-end"><?php foreach ($totalDebits as $currency => $amount): ?><?= htmlspecialchars((string) $currency); ?> <?= format_lms_amount($amount); ?><br><?php endforeach; ?></td>
+                  <td class="text-end"><?php foreach ($totalCredits as $currency => $amount): ?><?= htmlspecialchars((string) $currency); ?> <?= format_lms_amount($amount); ?><br><?php endforeach; ?></td>
                   <td></td>
-                  <td class="text-end"><?= format_lms_amount($runningBalance); ?></td>
+                  <td class="text-end"><?php foreach ($runningBalances as $currency => $balance): ?><?= htmlspecialchars((string) $currency); ?> <?= format_lms_amount($balance); ?><br><?php endforeach; ?></td>
                 </tr>
             <?php
               }
