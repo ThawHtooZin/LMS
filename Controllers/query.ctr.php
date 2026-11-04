@@ -3563,7 +3563,7 @@ class Query
     $addpaymentstmt->execute();
   }
 
-  public function receiveCustomerBalance($customer_id, $payment_date, $payment_account, $reference, $check_number, $description, $payment_amount)
+  public function receiveCustomerBalance($customer_id, $payment_date, $payment_account, $reference, $check_number, $description, $payment_amount, $expense_account = '', $expense_amount = '')
   {
     global $pdo;
     try {
@@ -3579,6 +3579,27 @@ class Query
       $original_amount = round($original_amount, 2);
       $original_amount_cents = (int) round($original_amount * 100);
 
+      $expense_account = trim((string) $expense_account);
+      $expense_amount_provided = $expense_amount !== '' && $expense_amount !== null;
+      $expense_amount_cents = 0;
+      if ($expense_account !== '' || $expense_amount_provided) {
+        if ($expense_account === '' || !$expense_amount_provided) {
+          throw new Exception("Select an expense account and enter its amount, or leave both blank.");
+        }
+
+        $validated_expense_amount = filter_var($expense_amount, FILTER_VALIDATE_FLOAT);
+        if ($validated_expense_amount === false || !is_finite($validated_expense_amount)) {
+          throw new Exception("Enter a valid expense amount.");
+        }
+        $expense_amount_cents = (int) round($validated_expense_amount * 100);
+        if ($expense_amount_cents <= 0) {
+          throw new Exception("Expense amount must be greater than zero.");
+        }
+        if ($expense_amount_cents > $original_amount_cents) {
+          throw new Exception("Expense amount cannot exceed the payment amount.");
+        }
+      }
+
       $pdo->beginTransaction();
 
       $customerStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ? AND is_customer = 1");
@@ -3592,6 +3613,14 @@ class Query
       $accountStmt->execute([$payment_account]);
       if (!$accountStmt->fetchColumn()) {
         throw new Exception("Select a valid Asset account for the deposit.");
+      }
+
+      if ($expense_amount_cents > 0) {
+        $expenseAccountStmt = $pdo->prepare("SELECT code FROM accodes WHERE code = ? AND class = 'EXPENSES'");
+        $expenseAccountStmt->execute([$expense_account]);
+        if (!$expenseAccountStmt->fetchColumn()) {
+          throw new Exception("Select a valid Expense account.");
+        }
       }
 
       $stmt = $pdo->prepare("
@@ -3664,6 +3693,15 @@ class Query
 
       $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency) VALUES (?, ?, '600', '0', ?, ?, ?, 'USD')");
       $glCredit->execute([$payment_date, $reference, $actual_applied, $narration, $batch_id]);
+
+      if ($expense_amount_cents > 0) {
+        $expense_amount = number_format($expense_amount_cents / 100, 2, '.', '');
+        $glExpenseDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency, contact_id) VALUES (?, ?, ?, ?, '0', ?, ?, 'USD', ?)");
+        $glExpenseDebit->execute([$payment_date, $reference, $expense_account, $expense_amount, $narration, $batch_id, $customer_id]);
+
+        $glDepositCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency) VALUES (?, ?, ?, '0', ?, ?, ?, 'USD')");
+        $glDepositCredit->execute([$payment_date, $reference, $payment_account, $expense_amount, $narration, $batch_id]);
+      }
 
       $pdo->commit();
       return ['status' => true, 'amount' => $actual_applied];
@@ -3781,9 +3819,14 @@ class Query
       }
 
       $ledgerStmt = $pdo->prepare("
-        SELECT id, ac_code, debit, credit
-        FROM general_ledger
-        WHERE voucherno = ? AND sr_no = ?
+        SELECT gl.id, gl.ac_code, gl.debit, gl.credit,
+               EXISTS (
+                 SELECT 1
+                 FROM accodes a
+                 WHERE a.code = gl.ac_code AND a.class = 'EXPENSES'
+               ) AS is_expense
+        FROM general_ledger gl
+        WHERE gl.voucherno = ? AND gl.sr_no = ?
         FOR UPDATE
       ");
       foreach ($batches as $key => &$batch) {
@@ -3791,6 +3834,8 @@ class Query
         $ledger_rows = $ledgerStmt->fetchAll(PDO::FETCH_ASSOC);
         $debit_row = null;
         $credit_row = null;
+        $expense_debit_row = null;
+        $expense_credit_row = null;
         foreach ($ledger_rows as $ledger_row) {
           if ($ledger_row['ac_code'] === $batch['payment_account'] && floatval($ledger_row['debit']) > 0 && floatval($ledger_row['credit']) == 0) {
             if ($debit_row !== null) {
@@ -3802,9 +3847,25 @@ class Query
               throw new Exception("A receipt has duplicate Accounts Receivable credits in the General Ledger.");
             }
             $credit_row = $ledger_row;
+          } elseif (!empty($ledger_row['is_expense']) && floatval($ledger_row['debit']) > 0 && floatval($ledger_row['credit']) == 0) {
+            if ($expense_debit_row !== null) {
+              throw new Exception("A receipt has duplicate expense debits in the General Ledger.");
+            }
+            $expense_debit_row = $ledger_row;
+          } elseif ($ledger_row['ac_code'] === $batch['payment_account'] && floatval($ledger_row['credit']) > 0 && floatval($ledger_row['debit']) == 0) {
+            if ($expense_credit_row !== null) {
+              throw new Exception("A receipt has duplicate expense deposit credits in the General Ledger.");
+            }
+            $expense_credit_row = $ledger_row;
           }
         }
-        if (count($ledger_rows) !== 2 || $debit_row === null || $credit_row === null) {
+        $has_expense_pair = $expense_debit_row !== null && $expense_credit_row !== null;
+        if (
+          $debit_row === null || $credit_row === null ||
+          ($has_expense_pair && count($ledger_rows) !== 4) ||
+          (!$has_expense_pair && count($ledger_rows) !== 2) ||
+          (($expense_debit_row === null) !== ($expense_credit_row === null))
+        ) {
           throw new Exception("A matching General Ledger pair could not be verified. The receipts cannot be recalculated safely.");
         }
         if (
@@ -3812,6 +3873,15 @@ class Query
           (int) round(floatval($credit_row['credit']) * 100) !== $batch['amount_cents']
         ) {
           throw new Exception("A General Ledger amount does not match its receipt batch. The receipts cannot be recalculated safely.");
+        }
+        $batch['expense_cents'] = 0;
+        if ($has_expense_pair) {
+          $expense_debit_cents = (int) round(floatval($expense_debit_row['debit']) * 100);
+          $expense_credit_cents = (int) round(floatval($expense_credit_row['credit']) * 100);
+          if ($expense_debit_cents <= 0 || $expense_debit_cents !== $expense_credit_cents) {
+            throw new Exception("A General Ledger expense pair does not balance. The receipts cannot be recalculated safely.");
+          }
+          $batch['expense_cents'] = $expense_debit_cents;
         }
 
         $batch['ledger_order'] = min((int) $debit_row['id'], (int) $credit_row['id']);
@@ -3827,6 +3897,9 @@ class Query
       $recalculated_allocations = [];
       foreach ($batches as $key => $batch) {
         $batch_amount_cents = $key === $batch_id ? $new_amount_cents : $batch['amount_cents'];
+        if ($batch['expense_cents'] > $batch_amount_cents) {
+          throw new Exception("The edited payment cannot be less than its recorded expense.");
+        }
         $remaining_cents = $batch_amount_cents;
         $recalculated_allocations[$key] = [];
 
