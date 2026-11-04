@@ -89,19 +89,18 @@ if (isset($_GET['table_name']) && $_GET['table_name'] == 'general_ledger') {
       foreach ($transactions as $t) {
         $offset_code = $t['offset_ac_code'];
 
-        if (str_contains((string)$offset_code, '4000/')) {
-          $offset_name = 'Supplier';
-        } elseif (!empty($offset_code)) {
+        if (!empty($offset_code)) {
           $offset_name = $allAccounts[$offset_code] ?? $offset_code;
         } else {
-          if (str_contains((string)$current_ac_code, '4000/')) {
-            if (stripos((string)$t['narration'], "balance") !== false) {
-              $offset_name = '';
-            } else {
-              $offset_name = 'Purchase';
-            }
+          $offset_name = $main_ac_name;
+        }
+        if (!empty($t['contact_name'])) {
+          if ($t['account_class'] === 'LIABILITIES') {
+            $offset_name = 'Payable to ' . $t['contact_name'];
+          } elseif ($t['account_class'] === 'ASSETS') {
+            $offset_name = 'Receivable from ' . $t['contact_name'];
           } else {
-            $offset_name = $main_ac_name;
+            $offset_name = $t['contact_name'];
           }
         }
 

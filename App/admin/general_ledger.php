@@ -100,6 +100,22 @@ $fullview = isset($_GET['fullview']) ? $_GET['fullview'] : '';
       background-color: #f8f9fa;
       color: #0d6efd;
     }
+
+    #content > .ledger-card {
+      width: max-content;
+      min-width: 100%;
+    }
+
+    #content > .ledger-card > .card-body {
+      width: max-content;
+      min-width: 100%;
+      background-color: #fff;
+    }
+
+    #content > .ledger-card #table {
+      width: max-content;
+      min-width: 100%;
+    }
   </style>
 </head>
 
@@ -112,7 +128,7 @@ $fullview = isset($_GET['fullview']) ? $_GET['fullview'] : '';
     </div>
     <div class="contentcol" id="content">
       <?php require 'navbar.php'; ?>
-      <div class="card">
+      <div class="card ledger-card">
         <div class="card-header bg-warning text-light">
           <form action="" class="d-inline" method="post">
             <?php

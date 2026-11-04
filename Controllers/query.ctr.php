@@ -120,6 +120,12 @@ class Query
               gl.debit,
               gl.credit,
               gl.currency,
+              gl.contact_id,
+              c.name AS contact_name,
+              (SELECT a.class
+               FROM accodes a
+               WHERE a.code = gl.ac_code
+               LIMIT 1) AS account_class,
               (SELECT er.rate
                FROM exchange_rates er
                WHERE er.currency_code = 'USD'
@@ -132,6 +138,7 @@ class Query
                  AND offset_gl.ac_code != gl.ac_code 
                LIMIT 1) AS offset_ac_code
           FROM general_ledger gl
+          LEFT JOIN contacts c ON c.id = gl.contact_id
           $whereClause
           ORDER BY gl.ac_code ASC, gl.date ASC, gl.id ASC
       ";
@@ -1130,8 +1137,8 @@ class Query
       $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency) VALUES (?, ?, '2000', ?, '0', ?, ?, 'MMK')");
       $glDebit->execute([$payment_date, $voucher_no, $amount, $narration, $sr_no]);
 
-      $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency) VALUES (?, ?, ?, '0', ?, ?, ?, 'MMK')");
-      $glCredit->execute([$payment_date, $voucher_no, $payment_account, $amount, $narration, $sr_no]);
+      $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency, contact_id) VALUES (?, ?, ?, '0', ?, ?, ?, 'MMK', ?)");
+      $glCredit->execute([$payment_date, $voucher_no, $payment_account, $amount, $narration, $sr_no, $supplier_id]);
 
       $pdo->commit();
 
@@ -1255,8 +1262,8 @@ class Query
         $glDebit->execute([$payment_date, $reference, $actual_applied, $narration, $batch_id]);
 
         // Credit the specific Asset/Bank Account used
-        $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency) VALUES (?, ?, ?, '0', ?, ?, ?, 'MMK')");
-        $glCredit->execute([$payment_date, $reference, $payment_account, $actual_applied, $narration, $batch_id]);
+        $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency, contact_id) VALUES (?, ?, ?, '0', ?, ?, ?, 'MMK', ?)");
+        $glCredit->execute([$payment_date, $reference, $payment_account, $actual_applied, $narration, $batch_id, $supplier_id]);
       }
 
       $pdo->commit();
@@ -1563,7 +1570,7 @@ class Query
       $target_batch = $batches[$batch_id];
       $updateLedgerDebit = $pdo->prepare("
         UPDATE general_ledger
-        SET date = ?, voucherno = ?, ac_code = '2000', debit = ?, credit = '0', narration = ?, currency = 'MMK'
+        SET date = ?, voucherno = ?, ac_code = '2000', debit = ?, credit = '0', narration = ?, currency = 'MMK', contact_id = NULL
         WHERE id = ? AND sr_no = ?
       ");
       $updateLedgerDebit->execute([
@@ -1577,7 +1584,7 @@ class Query
 
       $updateLedgerCredit = $pdo->prepare("
         UPDATE general_ledger
-        SET date = ?, voucherno = ?, ac_code = ?, debit = '0', credit = ?, narration = ?, currency = 'MMK'
+        SET date = ?, voucherno = ?, ac_code = ?, debit = '0', credit = ?, narration = ?, currency = 'MMK', contact_id = ?
         WHERE id = ? AND sr_no = ?
       ");
       $updateLedgerCredit->execute([
@@ -1586,6 +1593,7 @@ class Query
         $payment_account,
         $new_amount_cents / 100,
         $narration,
+        $supplier_id,
         $target_batch['ledger_credit_id'],
         $batch_id
       ]);
@@ -3651,8 +3659,8 @@ class Query
         $narration .= " (Check: $check_number)";
       }
 
-      $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency) VALUES (?, ?, ?, ?, '0', ?, ?, 'USD')");
-      $glDebit->execute([$payment_date, $reference, $payment_account, $actual_applied, $narration, $batch_id]);
+      $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency, contact_id) VALUES (?, ?, ?, ?, '0', ?, ?, 'USD', ?)");
+      $glDebit->execute([$payment_date, $reference, $payment_account, $actual_applied, $narration, $batch_id, $customer_id]);
 
       $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency) VALUES (?, ?, '600', '0', ?, ?, ?, 'USD')");
       $glCredit->execute([$payment_date, $reference, $actual_applied, $narration, $batch_id]);
@@ -3873,8 +3881,15 @@ class Query
       }
 
       $target_batch = $batches[$batch_id];
-      $pdo->prepare("UPDATE general_ledger SET debit = ? WHERE id = ?")->execute([$new_amount_cents / 100, $target_batch['ledger_debit_id']]);
-      $pdo->prepare("UPDATE general_ledger SET credit = ? WHERE id = ?")->execute([$new_amount_cents / 100, $target_batch['ledger_credit_id']]);
+      $pdo->prepare("UPDATE general_ledger SET debit = ?, contact_id = ? WHERE id = ?")->execute([
+        $new_amount_cents / 100,
+        $customer_id,
+        $target_batch['ledger_debit_id']
+      ]);
+      $pdo->prepare("UPDATE general_ledger SET credit = ?, contact_id = NULL WHERE id = ?")->execute([
+        $new_amount_cents / 100,
+        $target_batch['ledger_credit_id']
+      ]);
 
       $pdo->commit();
       return ['status' => true, 'amount' => $new_amount_cents / 100];

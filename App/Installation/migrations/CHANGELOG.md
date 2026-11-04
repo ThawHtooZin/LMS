@@ -28,3 +28,9 @@
 - Each voucher group must contain at least two amount-bearing lines. Posting requires debit and credit totals to balance in MMK within each voucher group.
 - Apply `2026_11_02_general_ledger_currency.sql` and `2026_11_02_general_ledger_currency_required.sql` first if the database predates General Ledger currency, then apply `2026_11_03_manual_journal_vouchers.sql` once. Existing manual journal rows remain unlinked and retain their existing amounts because their original voucher grouping and MMK source amounts cannot be inferred safely.
 - The automated migration runner reads `Installation/database/migrations`; keep the ordered upgrade SQL there as well as in this feature migration directory so the runner can apply and record upgrades.
+
+## 2026-11-04 - General Ledger contact links
+
+- Added nullable `general_ledger.contact_id`. Contact IDs are stored only on the selected bank/cash account row for supplier payments and customer receipts.
+- Apply `2026_11_04_general_ledger_contacts.sql` once after the existing General Ledger and payment-batch migrations.
+- The `2026_11_04_general_ledger_contact_counterparts.sql` and `2026_11_04_payment_contact_on_cash_account.sql` migrations were intermediate updates. Apply `2026_11_04_general_ledger_contacts_only_on_payment_accounts.sql` last to clear contacts from purchase, sales, payable-control, receivable-control, and other non-bank ledger rows, then retain only unambiguous Pay From and Deposit To bank/cash links.
