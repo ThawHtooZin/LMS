@@ -26,9 +26,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' and isset($_POST['receive_bulk'])) {
     $check_number = isset($_POST['check_number']) ? $_POST['check_number'] : null;
     $description = isset($_POST['description']) ? $_POST['description'] : null;
     $payment_amount = $_POST['payment_amount'];
+    $expense_account = $_POST['expense_account'] ?? '';
+    $expense_amount = $_POST['expense_amount'] ?? '';
 
     $paymentAction = 'received';
-    $paymentResult = $query->receiveCustomerBalance($customer_id, $payment_date, $payment_account, $reference, $check_number, $description, $payment_amount);
+    $paymentResult = $query->receiveCustomerBalance($customer_id, $payment_date, $payment_account, $reference, $check_number, $description, $payment_amount, $expense_account, $expense_amount);
 } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' and isset($_POST['edit_receipt'])) {
     $paymentAction = 'edited';
     $paymentResult = $query->editCustomerPaymentBatch(
@@ -102,6 +104,14 @@ $accStmt = $pdo->query("
     ORDER BY a.code ASC
 ");
 $asset_accounts = $accStmt->fetchAll(PDO::FETCH_ASSOC);
+
+$expenseStmt = $pdo->query("
+    SELECT code, name
+    FROM accodes
+    WHERE class = 'EXPENSES'
+    ORDER BY code ASC
+");
+$expense_accounts = $expenseStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Extract only the codes that belong to a Bank
 $bank_codes = [];
@@ -309,7 +319,7 @@ foreach ($asset_accounts as $acc) {
                                     <input type="date" name="payment_date" class="form-control" value="<?= date('Y-m-d'); ?>" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold small">Deposit To (Bank/Cash Account)</label>
+                                    <label class="form-label fw-bold small">Deposit From (Bank/Cash Account)</label>
                                     <select name="payment_account" class="form-select" required>
                                         <option value="">- Select Account -</option>
                                         <?php foreach ($asset_accounts as $acc): ?>
@@ -327,6 +337,24 @@ foreach ($asset_accounts as $acc) {
                                 <div class="col-md-6" id="checkNumberWrapper" style="display: none;">
                                     <label class="form-label fw-bold small">Check Number <span class="text-muted fw-normal">(Optional)</span></label>
                                     <input type="text" name="check_number" class="form-control" placeholder="e.g. 0001234">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold small">Expense Account <span class="text-muted fw-normal">(Optional)</span></label>
+                                        <select name="expense_account" class="form-select">
+                                            <option value="">- Select Expense Account -</option>
+                                            <?php foreach ($expense_accounts as $acc): ?>
+                                                <option value="<?= htmlspecialchars($acc['code']); ?>"><?= htmlspecialchars($acc['code'] . ' - ' . $acc['name']); ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold small">Expense Amount <span class="text-muted fw-normal">(Optional)</span></label>
+                                        <input type="number" name="expense_amount" step="0.01" min="0.01" class="form-control" placeholder="Expense amount">
+                                    </div>
                                 </div>
                             </div>
 

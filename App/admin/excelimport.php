@@ -158,7 +158,7 @@ if (isset($_REQUEST['excelimportbtn'])) {
               $balancecheckstmt->execute();
               $balancecheck = $balancecheckstmt->fetch(PDO::FETCH_ASSOC);
               $balance = $amount + $balancecheck['balance'];
-              $glstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, credit, balance) VALUES('$date', '$voucher_no', '$supplier_name', '$amount', '$balance')");
+              $glstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, credit, balance, currency) VALUES('$date', '$voucher_no', '$supplier_name', '$amount', '$balance', 'MMK')");
               $glstmt->execute();
             } else {
               $vouchercheckstmt = $pdo->prepare("SELECT SUM(credit) AS credit FROM general_ledger WHERE voucherno='$voucher_no' AND ac_code='$supplier_name'");

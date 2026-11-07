@@ -428,7 +428,10 @@ CREATE TABLE `general_ledger` (
   `credit` text NOT NULL,
   `narration` text NOT NULL,
   `sr_no` varchar(25) NOT NULL,
-  PRIMARY KEY (`id`)
+  `currency` varchar(10) NOT NULL DEFAULT 'MMK',
+  `manual_journal_line_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_gl_manual_journal_line_id` (`manual_journal_line_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -739,8 +742,13 @@ CREATE TABLE `manual_journal_lines` (
   `description` varchar(255) DEFAULT NULL,
   `debit` decimal(15,2) DEFAULT 0.00,
   `credit` decimal(15,2) DEFAULT 0.00,
+  `currency` varchar(10) NOT NULL DEFAULT 'MMK',
+  `voucher_no` varchar(255) DEFAULT NULL,
+  `debit_mmk` decimal(15,2) DEFAULT NULL,
+  `credit_mmk` decimal(15,2) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `journal_id` (`journal_id`),
+  KEY `idx_manual_journal_voucher_no` (`voucher_no`),
   CONSTRAINT `fk_journal_lines` FOREIGN KEY (`journal_id`) REFERENCES `manual_journals` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -760,6 +768,7 @@ CREATE TABLE `manual_journals` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `journal_date` date NOT NULL,
   `narration` varchar(255) NOT NULL,
+  `usd_exchange_rate` decimal(15,4) DEFAULT NULL,
   `status` enum('DRAFT','POSTED','VOIDED') DEFAULT 'DRAFT',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)

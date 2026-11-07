@@ -119,12 +119,26 @@ class Query
               gl.narration,
               gl.debit,
               gl.credit,
+              gl.currency,
+              gl.contact_id,
+              c.name AS contact_name,
+              (SELECT a.class
+               FROM accodes a
+               WHERE a.code = gl.ac_code
+               LIMIT 1) AS account_class,
+              (SELECT er.rate
+               FROM exchange_rates er
+               WHERE er.currency_code = 'USD'
+                 AND er.effective_date <= gl.date
+               ORDER BY er.effective_date DESC
+               LIMIT 1) AS transaction_usd_rate,
               (SELECT offset_gl.ac_code 
                FROM general_ledger offset_gl 
                WHERE offset_gl.voucherno = gl.voucherno 
                  AND offset_gl.ac_code != gl.ac_code 
                LIMIT 1) AS offset_ac_code
           FROM general_ledger gl
+          LEFT JOIN contacts c ON c.id = gl.contact_id
           $whereClause
           ORDER BY gl.ac_code ASC, gl.date ASC, gl.id ASC
       ";
@@ -916,14 +930,14 @@ class Query
             $storehousestmt->execute([$date, $voucher_no, $contact_id, $prod_id, $pcs, $line['description']]);
           }
 
-          $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, ?, ?, '0', ?, ?)");
+          $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency) VALUES (?, ?, ?, ?, '0', ?, ?, 'MMK')");
           $narration = !empty($line['description']) ? $line['description'] : 'Purchase Line Item';
           $glDebit->execute([$date, $voucher_no, $acc_id, $line['line_amount'], $narration, $sr_no]);
         }
       }
 
       if ($status === 'AWAITING_PAYMENT') {
-        $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, '2000', '0', ?, ?, ?)");
+        $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency) VALUES (?, ?, '2000', '0', ?, ?, ?, 'MMK')");
         $glCredit->execute([$date, $voucher_no, $grand_total, "Total Bill - $supplier_name", $sr_no]);
       }
 
@@ -1120,11 +1134,11 @@ class Query
       $sr_no = 'PAY-' . time();
       $narration = "Payment to $supplier_name - Ref: $reference";
 
-      $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, '2000', ?, '0', ?, ?)");
+      $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency) VALUES (?, ?, '2000', ?, '0', ?, ?, 'MMK')");
       $glDebit->execute([$payment_date, $voucher_no, $amount, $narration, $sr_no]);
 
-      $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, ?, '0', ?, ?, ?)");
-      $glCredit->execute([$payment_date, $voucher_no, $payment_account, $amount, $narration, $sr_no]);
+      $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency, contact_id) VALUES (?, ?, ?, '0', ?, ?, ?, 'MMK', ?)");
+      $glCredit->execute([$payment_date, $voucher_no, $payment_account, $amount, $narration, $sr_no, $supplier_id]);
 
       $pdo->commit();
 
@@ -1244,12 +1258,12 @@ class Query
 
       if ($actual_applied > 0) {
         // Debit Accounts Payable Control (e.g., Code 2000)
-        $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, '2000', ?, '0', ?, ?)");
+        $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency) VALUES (?, ?, '2000', ?, '0', ?, ?, 'MMK')");
         $glDebit->execute([$payment_date, $reference, $actual_applied, $narration, $batch_id]);
 
         // Credit the specific Asset/Bank Account used
-        $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, ?, '0', ?, ?, ?)");
-        $glCredit->execute([$payment_date, $reference, $payment_account, $actual_applied, $narration, $batch_id]);
+        $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency, contact_id) VALUES (?, ?, ?, '0', ?, ?, ?, 'MMK', ?)");
+        $glCredit->execute([$payment_date, $reference, $payment_account, $actual_applied, $narration, $batch_id, $supplier_id]);
       }
 
       $pdo->commit();
@@ -1273,10 +1287,40 @@ class Query
     }
   }
 
-  public function editSupplierPaymentBatch($supplier_id, $batch_id, $payment_amount)
+  public function editSupplierPaymentBatch($supplier_id, $batch_id, $payment_date, $payment_account, $reference, $check_number, $description, $payment_amount)
   {
     global $pdo;
     try {
+      $payment_date = trim((string) $payment_date);
+      if (
+        !preg_match('/^\d{4}-\d{2}-\d{2}$/', $payment_date) ||
+        !checkdate((int) substr($payment_date, 5, 2), (int) substr($payment_date, 8, 2), (int) substr($payment_date, 0, 4))
+      ) {
+        throw new Exception("Enter a valid payment date.");
+      }
+
+      $payment_account = trim((string) $payment_account);
+      $reference = trim((string) $reference);
+      if ($reference === '') {
+        throw new Exception("Payment reference is required.");
+      }
+      if (strlen($reference) > 100) {
+        throw new Exception("Payment reference cannot exceed 100 characters.");
+      }
+
+      $check_number = trim((string) ($check_number ?? ''));
+      if (strlen($check_number) > 50) {
+        throw new Exception("Check number cannot exceed 50 characters.");
+      }
+      $check_number = $check_number === '' ? null : $check_number;
+
+      $description = trim((string) ($description ?? ''));
+      $description = $description === '' ? null : $description;
+      $batch_id = trim((string) $batch_id);
+      if ($batch_id === '') {
+        throw new Exception("Payment batch not found for this supplier.");
+      }
+
       $payment_amount = filter_var($payment_amount, FILTER_VALIDATE_FLOAT);
       if ($payment_amount === false || !is_finite($payment_amount)) {
         throw new Exception("Enter a valid payment amount.");
@@ -1287,6 +1331,19 @@ class Query
       }
 
       $pdo->beginTransaction();
+
+      $accountStmt = $pdo->prepare("SELECT code FROM accodes WHERE code = ? AND class = 'ASSETS'");
+      $accountStmt->execute([$payment_account]);
+      if (!$accountStmt->fetchColumn()) {
+        throw new Exception("Select a valid Asset account for the payment.");
+      }
+
+      $supplierStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ?");
+      $supplierStmt->execute([$supplier_id]);
+      $supplier_name = $supplierStmt->fetchColumn();
+      if (!$supplier_name) {
+        throw new Exception("Supplier not found.");
+      }
 
       $billsStmt = $pdo->prepare("
         SELECT id, grand_total, paid_amount, status
@@ -1347,6 +1404,17 @@ class Query
       }
 
       $old_total_cents = $batches[$batch_id]['amount_cents'];
+
+      $referenceStmt = $pdo->prepare("
+        SELECT 1
+        FROM purchase_payments
+        WHERE reference = ? AND (payment_batches IS NULL OR payment_batches <> ?)
+        LIMIT 1
+      ");
+      $referenceStmt->execute([$reference, $batch_id]);
+      if ($referenceStmt->fetchColumn()) {
+        throw new Exception("This payment reference has already been used. Enter a unique reference.");
+      }
 
       $bill_by_id = [];
       $batch_allocations_by_bill = [];
@@ -1423,6 +1491,17 @@ class Query
       }
       unset($batch);
 
+      $batches[$batch_id]['payment_date'] = $payment_date;
+      $batches[$batch_id]['payment_account'] = $payment_account;
+      $batches[$batch_id]['reference'] = $reference;
+      $batches[$batch_id]['check_number'] = $check_number;
+      $batches[$batch_id]['description'] = $description;
+
+      $narration = !empty($description) ? $description : "Payment to $supplier_name - Ref: $reference";
+      if (!empty($check_number)) {
+        $narration .= " (Check: $check_number)";
+      }
+
       uasort($batches, static function ($left, $right) {
         return $left['ledger_order'] <=> $right['ledger_order'];
       });
@@ -1489,8 +1568,35 @@ class Query
       }
 
       $target_batch = $batches[$batch_id];
-      $pdo->prepare("UPDATE general_ledger SET debit = ? WHERE id = ?")->execute([$new_amount_cents / 100, $target_batch['ledger_debit_id']]);
-      $pdo->prepare("UPDATE general_ledger SET credit = ? WHERE id = ?")->execute([$new_amount_cents / 100, $target_batch['ledger_credit_id']]);
+      $updateLedgerDebit = $pdo->prepare("
+        UPDATE general_ledger
+        SET date = ?, voucherno = ?, ac_code = '2000', debit = ?, credit = '0', narration = ?, currency = 'MMK', contact_id = NULL
+        WHERE id = ? AND sr_no = ?
+      ");
+      $updateLedgerDebit->execute([
+        $payment_date,
+        $reference,
+        $new_amount_cents / 100,
+        $narration,
+        $target_batch['ledger_debit_id'],
+        $batch_id
+      ]);
+
+      $updateLedgerCredit = $pdo->prepare("
+        UPDATE general_ledger
+        SET date = ?, voucherno = ?, ac_code = ?, debit = '0', credit = ?, narration = ?, currency = 'MMK', contact_id = ?
+        WHERE id = ? AND sr_no = ?
+      ");
+      $updateLedgerCredit->execute([
+        $payment_date,
+        $reference,
+        $payment_account,
+        $new_amount_cents / 100,
+        $narration,
+        $supplier_id,
+        $target_batch['ledger_credit_id'],
+        $batch_id
+      ]);
 
       $pdo->commit();
       return [
@@ -1581,15 +1687,15 @@ class Query
 
         if ($status === 'AWAITING_PAYMENT') {
           // FIX: Removed 'container_no' from the GL insert to prevent the 1054 Crash
-          $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, ?, '0', ?, ?, ?)");
+          $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency) VALUES (?, ?, ?, '0', ?, ?, ?, ?)");
           $narr = !empty($line['container_no']) ? "Sale Revenue (Cont: " . $line['container_no'] . ")" : "Sale Revenue";
-          $glCredit->execute([$date, $voucher_no, $line['account_id'], $line['line_amount'], $narr, $sr_no]);
+          $glCredit->execute([$date, $voucher_no, $line['account_id'], $line['line_amount'], $narr, $sr_no, $currency]);
         }
       }
 
       if ($status === 'AWAITING_PAYMENT') {
-        $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, '600', ?, '0', ?, ?)");
-        $glDebit->execute([$date, $voucher_no, $grand_total, "Total Invoice - $customer_name", $sr_no]);
+        $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency) VALUES (?, ?, '600', ?, '0', ?, ?, ?)");
+        $glDebit->execute([$date, $voucher_no, $grand_total, "Total Invoice - $customer_name", $sr_no, $currency]);
       }
 
       $pdo->commit();
@@ -1677,15 +1783,15 @@ class Query
         ]);
 
         if ($status === 'AWAITING_PAYMENT') {
-          $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, ?, '0', ?, ?, ?)");
+          $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency) VALUES (?, ?, ?, '0', ?, ?, ?, ?)");
           $narr = !empty($line['container_no']) ? "Updated Sale Revenue (Cont: " . $line['container_no'] . ")" : "Updated Sale Revenue";
-          $glCredit->execute([$date, $voucher_no, $line['account_id'], $line['line_amount'], $narr, $sr_no]);
+          $glCredit->execute([$date, $voucher_no, $line['account_id'], $line['line_amount'], $narr, $sr_no, $currency]);
         }
       }
 
       if ($status === 'AWAITING_PAYMENT') {
-        $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, '600', ?, '0', ?, ?)");
-        $glDebit->execute([$date, $voucher_no, $grand_total, "Updated Invoice - $customer_name", $sr_no]);
+        $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency) VALUES (?, ?, '600', ?, '0', ?, ?, ?)");
+        $glDebit->execute([$date, $voucher_no, $grand_total, "Updated Invoice - $customer_name", $sr_no, $currency]);
       }
 
       $pdo->commit();
@@ -3457,7 +3563,7 @@ class Query
     $addpaymentstmt->execute();
   }
 
-  public function receiveCustomerBalance($customer_id, $payment_date, $payment_account, $reference, $check_number, $description, $payment_amount)
+  public function receiveCustomerBalance($customer_id, $payment_date, $payment_account, $reference, $check_number, $description, $payment_amount, $expense_account = '', $expense_amount = '')
   {
     global $pdo;
     try {
@@ -3473,6 +3579,27 @@ class Query
       $original_amount = round($original_amount, 2);
       $original_amount_cents = (int) round($original_amount * 100);
 
+      $expense_account = trim((string) $expense_account);
+      $expense_amount_provided = $expense_amount !== '' && $expense_amount !== null;
+      $expense_amount_cents = 0;
+      if ($expense_account !== '' || $expense_amount_provided) {
+        if ($expense_account === '' || !$expense_amount_provided) {
+          throw new Exception("Select an expense account and enter its amount, or leave both blank.");
+        }
+
+        $validated_expense_amount = filter_var($expense_amount, FILTER_VALIDATE_FLOAT);
+        if ($validated_expense_amount === false || !is_finite($validated_expense_amount)) {
+          throw new Exception("Enter a valid expense amount.");
+        }
+        $expense_amount_cents = (int) round($validated_expense_amount * 100);
+        if ($expense_amount_cents <= 0) {
+          throw new Exception("Expense amount must be greater than zero.");
+        }
+        if ($expense_amount_cents > $original_amount_cents) {
+          throw new Exception("Expense amount cannot exceed the payment amount.");
+        }
+      }
+
       $pdo->beginTransaction();
 
       $customerStmt = $pdo->prepare("SELECT name FROM contacts WHERE id = ? AND is_customer = 1");
@@ -3486,6 +3613,14 @@ class Query
       $accountStmt->execute([$payment_account]);
       if (!$accountStmt->fetchColumn()) {
         throw new Exception("Select a valid Asset account for the deposit.");
+      }
+
+      if ($expense_amount_cents > 0) {
+        $expenseAccountStmt = $pdo->prepare("SELECT code FROM accodes WHERE code = ? AND class = 'EXPENSES'");
+        $expenseAccountStmt->execute([$expense_account]);
+        if (!$expenseAccountStmt->fetchColumn()) {
+          throw new Exception("Select a valid Expense account.");
+        }
       }
 
       $stmt = $pdo->prepare("
@@ -3553,11 +3688,20 @@ class Query
         $narration .= " (Check: $check_number)";
       }
 
-      $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, ?, ?, '0', ?, ?)");
-      $glDebit->execute([$payment_date, $reference, $payment_account, $actual_applied, $narration, $batch_id]);
+      $glDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency, contact_id) VALUES (?, ?, ?, ?, '0', ?, ?, 'USD', ?)");
+      $glDebit->execute([$payment_date, $reference, $payment_account, $actual_applied, $narration, $batch_id, $customer_id]);
 
-      $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no) VALUES (?, ?, '600', '0', ?, ?, ?)");
+      $glCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency) VALUES (?, ?, '600', '0', ?, ?, ?, 'USD')");
       $glCredit->execute([$payment_date, $reference, $actual_applied, $narration, $batch_id]);
+
+      if ($expense_amount_cents > 0) {
+        $expense_amount = number_format($expense_amount_cents / 100, 2, '.', '');
+        $glExpenseDebit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency, contact_id) VALUES (?, ?, ?, ?, '0', ?, ?, 'USD', ?)");
+        $glExpenseDebit->execute([$payment_date, $reference, $expense_account, $expense_amount, $narration, $batch_id, $customer_id]);
+
+        $glDepositCredit = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency) VALUES (?, ?, ?, '0', ?, ?, ?, 'USD')");
+        $glDepositCredit->execute([$payment_date, $reference, $payment_account, $expense_amount, $narration, $batch_id]);
+      }
 
       $pdo->commit();
       return ['status' => true, 'amount' => $actual_applied];
@@ -3675,9 +3819,14 @@ class Query
       }
 
       $ledgerStmt = $pdo->prepare("
-        SELECT id, ac_code, debit, credit
-        FROM general_ledger
-        WHERE voucherno = ? AND sr_no = ?
+        SELECT gl.id, gl.ac_code, gl.debit, gl.credit,
+               EXISTS (
+                 SELECT 1
+                 FROM accodes a
+                 WHERE a.code = gl.ac_code AND a.class = 'EXPENSES'
+               ) AS is_expense
+        FROM general_ledger gl
+        WHERE gl.voucherno = ? AND gl.sr_no = ?
         FOR UPDATE
       ");
       foreach ($batches as $key => &$batch) {
@@ -3685,6 +3834,8 @@ class Query
         $ledger_rows = $ledgerStmt->fetchAll(PDO::FETCH_ASSOC);
         $debit_row = null;
         $credit_row = null;
+        $expense_debit_row = null;
+        $expense_credit_row = null;
         foreach ($ledger_rows as $ledger_row) {
           if ($ledger_row['ac_code'] === $batch['payment_account'] && floatval($ledger_row['debit']) > 0 && floatval($ledger_row['credit']) == 0) {
             if ($debit_row !== null) {
@@ -3696,9 +3847,25 @@ class Query
               throw new Exception("A receipt has duplicate Accounts Receivable credits in the General Ledger.");
             }
             $credit_row = $ledger_row;
+          } elseif (!empty($ledger_row['is_expense']) && floatval($ledger_row['debit']) > 0 && floatval($ledger_row['credit']) == 0) {
+            if ($expense_debit_row !== null) {
+              throw new Exception("A receipt has duplicate expense debits in the General Ledger.");
+            }
+            $expense_debit_row = $ledger_row;
+          } elseif ($ledger_row['ac_code'] === $batch['payment_account'] && floatval($ledger_row['credit']) > 0 && floatval($ledger_row['debit']) == 0) {
+            if ($expense_credit_row !== null) {
+              throw new Exception("A receipt has duplicate expense deposit credits in the General Ledger.");
+            }
+            $expense_credit_row = $ledger_row;
           }
         }
-        if (count($ledger_rows) !== 2 || $debit_row === null || $credit_row === null) {
+        $has_expense_pair = $expense_debit_row !== null && $expense_credit_row !== null;
+        if (
+          $debit_row === null || $credit_row === null ||
+          ($has_expense_pair && count($ledger_rows) !== 4) ||
+          (!$has_expense_pair && count($ledger_rows) !== 2) ||
+          (($expense_debit_row === null) !== ($expense_credit_row === null))
+        ) {
           throw new Exception("A matching General Ledger pair could not be verified. The receipts cannot be recalculated safely.");
         }
         if (
@@ -3706,6 +3873,15 @@ class Query
           (int) round(floatval($credit_row['credit']) * 100) !== $batch['amount_cents']
         ) {
           throw new Exception("A General Ledger amount does not match its receipt batch. The receipts cannot be recalculated safely.");
+        }
+        $batch['expense_cents'] = 0;
+        if ($has_expense_pair) {
+          $expense_debit_cents = (int) round(floatval($expense_debit_row['debit']) * 100);
+          $expense_credit_cents = (int) round(floatval($expense_credit_row['credit']) * 100);
+          if ($expense_debit_cents <= 0 || $expense_debit_cents !== $expense_credit_cents) {
+            throw new Exception("A General Ledger expense pair does not balance. The receipts cannot be recalculated safely.");
+          }
+          $batch['expense_cents'] = $expense_debit_cents;
         }
 
         $batch['ledger_order'] = min((int) $debit_row['id'], (int) $credit_row['id']);
@@ -3721,6 +3897,9 @@ class Query
       $recalculated_allocations = [];
       foreach ($batches as $key => $batch) {
         $batch_amount_cents = $key === $batch_id ? $new_amount_cents : $batch['amount_cents'];
+        if ($batch['expense_cents'] > $batch_amount_cents) {
+          throw new Exception("The edited payment cannot be less than its recorded expense.");
+        }
         $remaining_cents = $batch_amount_cents;
         $recalculated_allocations[$key] = [];
 
@@ -3775,8 +3954,15 @@ class Query
       }
 
       $target_batch = $batches[$batch_id];
-      $pdo->prepare("UPDATE general_ledger SET debit = ? WHERE id = ?")->execute([$new_amount_cents / 100, $target_batch['ledger_debit_id']]);
-      $pdo->prepare("UPDATE general_ledger SET credit = ? WHERE id = ?")->execute([$new_amount_cents / 100, $target_batch['ledger_credit_id']]);
+      $pdo->prepare("UPDATE general_ledger SET debit = ?, contact_id = ? WHERE id = ?")->execute([
+        $new_amount_cents / 100,
+        $customer_id,
+        $target_batch['ledger_debit_id']
+      ]);
+      $pdo->prepare("UPDATE general_ledger SET credit = ?, contact_id = NULL WHERE id = ?")->execute([
+        $new_amount_cents / 100,
+        $target_batch['ledger_credit_id']
+      ]);
 
       $pdo->commit();
       return ['status' => true, 'amount' => $new_amount_cents / 100];
@@ -5235,163 +5421,403 @@ class Query
   // MANUAL JOURNALS ENGINE
   // ==========================================
 
-  public function saveManualJournal($narration, $journal_date, $action, $lines)
+  private function manualJournalTextLength($value)
+  {
+    $matched = preg_match_all('/./us', $value, $matches);
+    if ($matched === false) {
+      throw new Exception("Journal text must be valid UTF-8.");
+    }
+    return $matched;
+  }
+
+  private function prepareManualJournalLines($lines, $exchange_rate, $action)
+  {
+    global $pdo;
+    if (!is_array($lines) || !in_array($action, ['draft', 'post'], true)) {
+      throw new Exception("Journal data is invalid.");
+    }
+
+    $accountStmt = $pdo->query("SELECT code FROM accodes");
+    $validAccounts = array_fill_keys($accountStmt->fetchAll(PDO::FETCH_COLUMN), true);
+    $validLines = [];
+    $groups = [];
+    $hasUsd = false;
+
+    foreach ($lines as $line) {
+      if (!is_array($line)) {
+        throw new Exception("Journal lines are invalid.");
+      }
+
+      $account = $line['account_code'] ?? '';
+      $description = $line['description'] ?? '';
+      $voucher = $line['voucher_no'] ?? '';
+      $currencyValue = $line['currency'] ?? 'MMK';
+      $debitValue = $line['debit'] ?? '0';
+      $creditValue = $line['credit'] ?? '0';
+      if (!is_scalar($account) || !is_scalar($description) || !is_scalar($voucher) ||
+          !is_scalar($currencyValue) || !is_scalar($debitValue) || !is_scalar($creditValue)) {
+        throw new Exception("Journal lines are invalid.");
+      }
+      $currency = strtoupper(trim((string) $currencyValue));
+      $debitValue = trim((string) $debitValue);
+      $creditValue = trim((string) $creditValue);
+      if ($debitValue === '') {
+        $debitValue = '0';
+      }
+      if ($creditValue === '') {
+        $creditValue = '0';
+      }
+
+      if (!is_numeric($debitValue) || !is_numeric($creditValue)) {
+        throw new Exception("Enter valid MMK debit and credit amounts.");
+      }
+      $debitMmk = round((float) $debitValue, 2);
+      $creditMmk = round((float) $creditValue, 2);
+      if (!is_finite($debitMmk) || !is_finite($creditMmk) || $debitMmk < 0 || $creditMmk < 0 ||
+          $debitMmk > 9999999999999.99 || $creditMmk > 9999999999999.99) {
+        throw new Exception("MMK amounts must be valid non-negative numbers.");
+      }
+
+      if ($debitMmk === 0.0 && $creditMmk === 0.0 && trim((string) $account) === '' && trim((string) $voucher) === '') {
+        continue;
+      }
+      if ($debitMmk <= 0 && $creditMmk <= 0) {
+        continue;
+      }
+      if (($debitMmk > 0) === ($creditMmk > 0)) {
+        throw new Exception("Each line must have an amount on either debit or credit, not both.");
+      }
+
+      $account = trim((string) $account);
+      $voucher = trim((string) $voucher);
+      if (!isset($validAccounts[$account])) {
+        throw new Exception("Select a valid account for every amount-bearing line.");
+      }
+      if ($voucher === '' || $this->manualJournalTextLength($voucher) > 255) {
+        throw new Exception("Enter a voucher number of up to 255 characters on every amount-bearing line.");
+      }
+      if ($this->manualJournalTextLength((string) $description) > 255) {
+        throw new Exception("Journal line descriptions must be 255 characters or fewer.");
+      }
+      if (!in_array($currency, ['MMK', 'USD'], true)) {
+        throw new Exception("Select MMK or USD for every journal line.");
+      }
+
+      $hasUsd = $hasUsd || $currency === 'USD';
+      $rate = $exchange_rate === null ? null : (float) $exchange_rate;
+      if ($currency === 'USD' && ($rate === null || !is_finite($rate) || $rate <= 0)) {
+        throw new Exception("A positive USD exchange rate in MMK per USD is required for USD lines.");
+      }
+      $validLines[] = [
+        'account_code' => $account,
+        'description' => trim((string) $description),
+        'voucher_no' => $voucher,
+        'currency' => $currency,
+        'debit_mmk' => $debitMmk,
+        'credit_mmk' => $creditMmk,
+        'debit' => $currency === 'USD' ? round($debitMmk / $rate, 2) : $debitMmk,
+        'credit' => $currency === 'USD' ? round($creditMmk / $rate, 2) : $creditMmk
+      ];
+      if ($validLines[array_key_last($validLines)]['debit'] > 9999999999999.99 ||
+          $validLines[array_key_last($validLines)]['credit'] > 9999999999999.99) {
+        throw new Exception("The converted amount exceeds the supported maximum.");
+      }
+      if (!isset($groups[$voucher])) {
+        $groups[$voucher] = ['count' => 0, 'debit' => 0.0, 'credit' => 0.0];
+      }
+      $groups[$voucher]['count']++;
+      $groups[$voucher]['debit'] += $debitMmk;
+      $groups[$voucher]['credit'] += $creditMmk;
+    }
+
+    if (!$validLines) {
+      throw new Exception("Journal must have at least one amount-bearing line.");
+    }
+    foreach ($groups as $voucher => $totals) {
+      if ($totals['count'] < 2) {
+        throw new Exception("Voucher {$voucher} must be used by at least two journal lines.");
+      }
+      if ($action === 'post' &&
+          (round($totals['debit'] * 100) !== round($totals['credit'] * 100) || $totals['debit'] <= 0)) {
+        throw new Exception("Voucher {$voucher} must balance its MMK debit and credit totals before posting.");
+      }
+    }
+    return ['lines' => $validLines, 'has_usd' => $hasUsd];
+  }
+
+  private function saveManualJournalRate($journalDate, $exchangeRate, $required)
+  {
+    global $pdo;
+    if ($exchangeRate === null || $exchangeRate === '') {
+      if ($required) {
+        throw new Exception("Enter the USD exchange rate in MMK per USD.");
+      }
+      return null;
+    }
+    if (!is_numeric($exchangeRate) || !is_finite((float) $exchangeRate) ||
+        (float) $exchangeRate <= 0 || (float) $exchangeRate > 99999999999.9999) {
+      throw new Exception("The USD exchange rate must be a positive number.");
+    }
+    $rate = round((float) $exchangeRate, 4);
+    $stmt = $pdo->prepare("
+      INSERT INTO exchange_rates (currency_code, rate, effective_date)
+      VALUES ('USD', ?, ?)
+      ON DUPLICATE KEY UPDATE rate = VALUES(rate)
+    ");
+    $stmt->execute([$rate, $journalDate]);
+    return $rate;
+  }
+
+  private function insertManualJournalLines($journalId, $journalDate, $narration, $lines, $posted)
+  {
+    global $pdo;
+    $lineStmt = $pdo->prepare("
+      INSERT INTO manual_journal_lines
+        (journal_id, account_code, description, debit, credit, currency, voucher_no, debit_mmk, credit_mmk)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ");
+    $ledgerStmt = $posted ? $pdo->prepare("
+      INSERT INTO general_ledger
+        (date, voucherno, ac_code, debit, credit, narration, sr_no, currency, manual_journal_line_id)
+      VALUES (?, ?, ?, ?, ?, ?, '', ?, ?)
+    ") : null;
+
+    foreach ($lines as $line) {
+      $lineStmt->execute([
+        $journalId,
+        $line['account_code'],
+        $line['description'],
+        $line['debit'],
+        $line['credit'],
+        $line['currency'],
+        $line['voucher_no'],
+        $line['debit_mmk'],
+        $line['credit_mmk']
+      ]);
+      if ($posted) {
+        $lineNarration = $line['description'] !== '' ? $line['description'] : $narration;
+        $ledgerStmt->execute([
+          $journalDate,
+          $line['voucher_no'],
+          $line['account_code'],
+          $line['debit'],
+          $line['credit'],
+          $lineNarration,
+          $line['currency'],
+          $pdo->lastInsertId()
+        ]);
+      }
+    }
+  }
+
+  private function assertManualJournalVouchersAvailable($lines, $journalId = 0)
+  {
+    global $pdo;
+    $manualStmt = $pdo->prepare("
+      SELECT id
+      FROM manual_journal_lines
+      WHERE voucher_no = ? AND journal_id <> ?
+      LIMIT 1
+      FOR UPDATE
+    ");
+    $ledgerStmt = $pdo->prepare("
+      SELECT gl.id
+      FROM general_ledger gl
+      LEFT JOIN manual_journal_lines mjl ON mjl.id = gl.manual_journal_line_id
+      WHERE gl.voucherno = ?
+        AND (mjl.id IS NULL OR mjl.journal_id <> ?)
+      LIMIT 1
+    ");
+    $checked = [];
+    foreach ($lines as $line) {
+      $voucher = $line['voucher_no'];
+      if (isset($checked[$voucher])) {
+        continue;
+      }
+      $checked[$voucher] = true;
+      $manualStmt->execute([$voucher, $journalId]);
+      $ledgerStmt->execute([$voucher, $journalId]);
+      if ($manualStmt->fetchColumn() !== false || $ledgerStmt->fetchColumn() !== false) {
+        throw new Exception("Voucher number {$voucher} is already in use.");
+      }
+    }
+  }
+
+  public function saveManualJournal($narration, $journal_date, $action, $lines, $exchange_rate = null)
   {
     global $pdo;
     try {
+      if (!is_string($narration) || trim($narration) === '' || $this->manualJournalTextLength($narration) > 255) {
+        throw new Exception("Journal narration is required and must be 255 characters or fewer.");
+      }
+      if (!is_string($journal_date)) {
+        throw new Exception("Enter a valid journal date.");
+      }
+      $date = DateTime::createFromFormat('!Y-m-d', $journal_date);
+      if (!$date || $date->format('Y-m-d') !== $journal_date) {
+        throw new Exception("Enter a valid journal date.");
+      }
+      $rate = $exchange_rate === '' ? null : $exchange_rate;
+      $prepared = $this->prepareManualJournalLines($lines, $rate, $action);
       $pdo->beginTransaction();
-
-      $total_debit = 0;
-      $total_credit = 0;
-      $valid_lines = [];
-
-      foreach ($lines as $line) {
-        if (!empty($line['account_code'])) {
-          $d = floatval($line['debit']);
-          $c = floatval($line['credit']);
-
-          if ($d > 0 || $c > 0) {
-            $total_debit += $d;
-            $total_credit += $c;
-            $valid_lines[] = [
-              'account_code' => $line['account_code'],
-              'description' => $line['description'],
-              'debit' => $d,
-              'credit' => $c
-            ];
-          }
-        }
-      }
-
-      if ($action === 'post' && round($total_debit, 2) !== round($total_credit, 2)) {
-        throw new Exception("Validation Failed: Debits and Credits must balance to post.");
-      }
-
-      if (empty($valid_lines)) {
-        throw new Exception("Journal must have at least one valid line with an amount.");
-      }
-
-      $status = ($action === 'post') ? 'POSTED' : 'DRAFT';
-
-      // Insert Header
-      $stmt = $pdo->prepare("INSERT INTO manual_journals (journal_date, narration, status) VALUES (?, ?, ?)");
-      $stmt->execute([$journal_date, $narration, $status]);
-      $journal_id = $pdo->lastInsertId();
-
-      if ($action === 'post') {
-        $voucher_no = 'MJ-' . time() . '-' . rand(10, 99);
-        $glStmt = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration) VALUES (?, ?, ?, ?, ?, ?)");
-      }
-
-      $lineStmt = $pdo->prepare("INSERT INTO manual_journal_lines (journal_id, account_code, description, debit, credit) VALUES (?, ?, ?, ?, ?)");
-
-      foreach ($valid_lines as $vl) {
-        $lineStmt->execute([$journal_id, $vl['account_code'], $vl['description'], $vl['debit'], $vl['credit']]);
-
-        if ($action === 'post') {
-          $line_narration = !empty($vl['description']) ? $vl['description'] : $narration;
-          $glStmt->execute([
-            $journal_date,
-            $voucher_no,
-            $vl['account_code'],
-            $vl['debit'],
-            $vl['credit'],
-            $line_narration
-          ]);
-        }
-      }
-
+      $this->assertManualJournalVouchersAvailable($prepared['lines']);
+      $rate = $this->saveManualJournalRate($date->format('Y-m-d'), $rate, $prepared['has_usd']);
+      $status = $action === 'post' ? 'POSTED' : 'DRAFT';
+      $stmt = $pdo->prepare("
+        INSERT INTO manual_journals (journal_date, narration, usd_exchange_rate, status)
+        VALUES (?, ?, ?, ?)
+      ");
+      $stmt->execute([$date->format('Y-m-d'), trim((string) $narration), $rate, $status]);
+      $journalId = (int) $pdo->lastInsertId();
+      $this->insertManualJournalLines($journalId, $date->format('Y-m-d'), trim((string) $narration), $prepared['lines'], $action === 'post');
       $pdo->commit();
-      return ['status' => true, 'message' => ($action === 'post') ? 'Journal successfully posted to General Ledger.' : 'Draft saved successfully.'];
+      return ['status' => true, 'message' => $action === 'post' ? 'Journal successfully posted to General Ledger.' : 'Draft saved successfully.'];
     } catch (Exception $e) {
-      $pdo->rollBack();
+      if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+      }
       return ['status' => false, 'message' => $e->getMessage()];
     }
   }
 
-  public function updateManualJournal($journal_id, $narration, $journal_date, $action, $lines)
+  public function updateManualJournal($journal_id, $narration, $journal_date, $action, $lines, $exchange_rate = null)
   {
     global $pdo;
     try {
+      if (!is_string($narration) || trim($narration) === '' || $this->manualJournalTextLength($narration) > 255) {
+        throw new Exception("Journal narration is required and must be 255 characters or fewer.");
+      }
+      if (!is_string($journal_date)) {
+        throw new Exception("Enter a valid journal date.");
+      }
+      $date = DateTime::createFromFormat('!Y-m-d', $journal_date);
+      if (!$date || $date->format('Y-m-d') !== $journal_date) {
+        throw new Exception("Enter a valid journal date.");
+      }
+      $rate = $exchange_rate === '' ? null : $exchange_rate;
+      $prepared = $this->prepareManualJournalLines($lines, $rate, $action);
       $pdo->beginTransaction();
-
       $statusStmt = $pdo->prepare("SELECT status FROM manual_journals WHERE id = ? FOR UPDATE");
       $statusStmt->execute([$journal_id]);
-      $current_status = $statusStmt->fetchColumn();
-      if ($current_status === false) {
+      $currentStatus = $statusStmt->fetchColumn();
+      if ($currentStatus === false) {
         throw new Exception("Manual journal not found.");
       }
-      if ($current_status !== 'DRAFT') {
-        throw new Exception("Posted journals are read-only and cannot be updated or posted again.");
+      if ($currentStatus !== 'DRAFT') {
+        throw new Exception("Posted journals can only be updated from their linked General Ledger voucher.");
       }
-
-      $total_debit = 0;
-      $total_credit = 0;
-      $valid_lines = [];
-
-      foreach ($lines as $line) {
-        if (!empty($line['account_code'])) {
-          $d = floatval($line['debit']);
-          $c = floatval($line['credit']);
-
-          if ($d > 0 || $c > 0) {
-            $total_debit += $d;
-            $total_credit += $c;
-            $valid_lines[] = [
-              'account_code' => $line['account_code'],
-              'description' => $line['description'],
-              'debit' => $d,
-              'credit' => $c
-            ];
-          }
-        }
-      }
-
-      if ($action === 'post' && round($total_debit, 2) !== round($total_credit, 2)) {
-        throw new Exception("Validation Failed: Debits and Credits must balance to post.");
-      }
-
-      if (empty($valid_lines)) {
-        throw new Exception("Journal must have at least one valid line with an amount.");
-      }
-
-      $status = ($action === 'post') ? 'POSTED' : 'DRAFT';
-
-      // Update Header
-      $stmt = $pdo->prepare("UPDATE manual_journals SET journal_date = ?, narration = ?, status = ? WHERE id = ?");
-      $stmt->execute([$journal_date, $narration, $status, $journal_id]);
-
-      // Clear old lines
-      $del = $pdo->prepare("DELETE FROM manual_journal_lines WHERE journal_id = ?");
-      $del->execute([$journal_id]);
-
-      $lineStmt = $pdo->prepare("INSERT INTO manual_journal_lines (journal_id, account_code, description, debit, credit) VALUES (?, ?, ?, ?, ?)");
-
-      if ($action === 'post') {
-        $voucher_no = 'MJ-' . time() . '-' . rand(10, 99);
-        $glStmt = $pdo->prepare("INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration) VALUES (?, ?, ?, ?, ?, ?)");
-      }
-
-      foreach ($valid_lines as $vl) {
-        $lineStmt->execute([$journal_id, $vl['account_code'], $vl['description'], $vl['debit'], $vl['credit']]);
-
-        if ($action === 'post') {
-          $line_narration = !empty($vl['description']) ? $vl['description'] : $narration;
-          $glStmt->execute([
-            $journal_date,
-            $voucher_no,
-            $vl['account_code'],
-            $vl['debit'],
-            $vl['credit'],
-            $line_narration
-          ]);
-        }
-      }
-
+      $this->assertManualJournalVouchersAvailable($prepared['lines'], (int) $journal_id);
+      $rate = $this->saveManualJournalRate($date->format('Y-m-d'), $rate, $prepared['has_usd']);
+      $stmt = $pdo->prepare("
+        UPDATE manual_journals
+        SET journal_date = ?, narration = ?, usd_exchange_rate = ?, status = ?
+        WHERE id = ?
+      ");
+      $stmt->execute([$date->format('Y-m-d'), trim((string) $narration), $rate, $action === 'post' ? 'POSTED' : 'DRAFT', $journal_id]);
+      $pdo->prepare("DELETE FROM manual_journal_lines WHERE journal_id = ?")->execute([$journal_id]);
+      $this->insertManualJournalLines(
+        (int) $journal_id,
+        $date->format('Y-m-d'),
+        trim((string) $narration),
+        $prepared['lines'],
+        $action === 'post'
+      );
       $pdo->commit();
-      return ['status' => true, 'message' => ($action === 'post') ? 'Journal posted to General Ledger successfully.' : 'Draft updated successfully.'];
+      return ['status' => true, 'message' => $action === 'post' ? 'Journal posted to General Ledger successfully.' : 'Draft updated successfully.'];
     } catch (Exception $e) {
-      $pdo->rollBack();
+      if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+      }
+      return ['status' => false, 'message' => $e->getMessage()];
+    }
+  }
+
+  public function updatePostedManualJournal($journal_id, $narration, $journal_date, $lines, $exchange_rate = null)
+  {
+    global $pdo;
+    try {
+      if (!is_string($narration) || trim($narration) === '' || $this->manualJournalTextLength($narration) > 255) {
+        throw new Exception("Journal narration is required and must be 255 characters or fewer.");
+      }
+      if (!is_string($journal_date)) {
+        throw new Exception("Enter a valid journal date.");
+      }
+      $date = DateTime::createFromFormat('!Y-m-d', $journal_date);
+      if (!$date || $date->format('Y-m-d') !== $journal_date || $date->format('Y-m') !== date('Y-m')) {
+        throw new Exception("Only posted manual journals dated in the current month can be edited from the General Ledger.");
+      }
+      $rate = $exchange_rate === '' ? null : $exchange_rate;
+      $prepared = $this->prepareManualJournalLines($lines, $rate, 'post');
+      $pdo->beginTransaction();
+      $headerStmt = $pdo->prepare("SELECT status, journal_date FROM manual_journals WHERE id = ? FOR UPDATE");
+      $headerStmt->execute([$journal_id]);
+      $header = $headerStmt->fetch(PDO::FETCH_ASSOC);
+      if (!$header || $header['status'] !== 'POSTED') {
+        throw new Exception("Only a posted manual journal can be edited from the General Ledger.");
+      }
+      if (substr($header['journal_date'], 0, 7) !== date('Y-m')) {
+        throw new Exception("Only posted manual journals from the current month can be edited from the General Ledger.");
+      }
+      $this->assertManualJournalVouchersAvailable($prepared['lines'], (int) $journal_id);
+      $linkedLinesStmt = $pdo->prepare("
+        SELECT mjl.id, mjl.voucher_no, gl.id AS ledger_id, gl.voucherno AS ledger_voucher_no
+        FROM manual_journal_lines mjl
+        LEFT JOIN general_ledger gl ON gl.manual_journal_line_id = mjl.id
+        WHERE mjl.journal_id = ?
+        FOR UPDATE
+      ");
+      $linkedLinesStmt->execute([$journal_id]);
+      $linkedLines = $linkedLinesStmt->fetchAll(PDO::FETCH_ASSOC);
+      if (!$linkedLines) {
+        throw new Exception("The posted journal has no linked General Ledger lines.");
+      }
+      foreach ($linkedLines as $linkedLine) {
+        if ($linkedLine['ledger_id'] === null ||
+            $linkedLine['ledger_voucher_no'] !== $linkedLine['voucher_no']) {
+          throw new Exception("The posted journal is not fully synchronized with its General Ledger rows.");
+        }
+      }
+      $extraRowsStmt = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM general_ledger gl
+        WHERE gl.voucherno IN (
+          SELECT voucher_no FROM manual_journal_lines WHERE journal_id = ?
+        )
+          AND (
+            gl.manual_journal_line_id IS NULL
+            OR gl.manual_journal_line_id NOT IN (
+              SELECT id FROM manual_journal_lines WHERE journal_id = ?
+            )
+          )
+      ");
+      $extraRowsStmt->execute([$journal_id, $journal_id]);
+      if ((int) $extraRowsStmt->fetchColumn() > 0) {
+        throw new Exception("The posted journal voucher contains General Ledger rows that are not linked to this journal.");
+      }
+      $rate = $this->saveManualJournalRate($date->format('Y-m-d'), $rate, $prepared['has_usd']);
+      $deleteLedger = $pdo->prepare("DELETE FROM general_ledger WHERE manual_journal_line_id = ?");
+      foreach ($linkedLines as $linkedLine) {
+        $deleteLedger->execute([$linkedLine['id']]);
+      }
+      $pdo->prepare("DELETE FROM manual_journal_lines WHERE journal_id = ?")->execute([$journal_id]);
+      $pdo->prepare("
+        UPDATE manual_journals
+        SET journal_date = ?, narration = ?, usd_exchange_rate = ?
+        WHERE id = ?
+      ")->execute([$date->format('Y-m-d'), trim((string) $narration), $rate, $journal_id]);
+      $this->insertManualJournalLines(
+        (int) $journal_id,
+        $date->format('Y-m-d'),
+        trim((string) $narration),
+        $prepared['lines'],
+        true
+      );
+      $pdo->commit();
+      return ['status' => true, 'message' => 'Manual journal and its General Ledger rows were updated successfully.'];
+    } catch (Exception $e) {
+      if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+      }
       return ['status' => false, 'message' => $e->getMessage()];
     }
   }
@@ -5417,7 +5843,7 @@ class Query
       $pdo->beginTransaction();
 
       $voucherStmt = $pdo->prepare("
-        SELECT id, date, sr_no
+        SELECT id, date, sr_no, currency, manual_journal_line_id
         FROM general_ledger
         WHERE voucherno = ?
         ORDER BY id
@@ -5429,6 +5855,12 @@ class Query
       if (count($existingRows) < 2) {
         throw new Exception("A balanced voucher with at least two ledger lines is required.");
       }
+      foreach ($existingRows as $row) {
+        if ($row['manual_journal_line_id'] === null) {
+          throw new Exception("Only linked manual journals can be edited from the General Ledger.");
+        }
+      }
+      throw new Exception("Linked manual journals must be edited through their journal form.");
 
       $existingIds = [];
       $originalDate = $existingRows[0]['date'];
@@ -5439,13 +5871,23 @@ class Query
         $existingIds[(int) $row['id']] = true;
       }
 
+      $rateStmt = $pdo->prepare("
+        SELECT rate
+        FROM exchange_rates
+        WHERE currency_code = 'USD' AND effective_date <= ?
+        ORDER BY effective_date DESC
+        LIMIT 1
+      ");
+      $rateStmt->execute([$date->format('Y-m-d')]);
+      $usdRate = $rateStmt->fetchColumn();
+      $usdRate = $usdRate === false ? 0.0 : (float) $usdRate;
+
       $accountStmt = $pdo->query("SELECT code FROM accodes");
       $validAccounts = array_fill_keys($accountStmt->fetchAll(PDO::FETCH_COLUMN), true);
 
       $validLines = [];
       $submittedIds = [];
-      $totalDebit = 0.0;
-      $totalCredit = 0.0;
+      $voucherTotals = [];
 
       foreach ($lines as $line) {
         if (!is_array($line)) {
@@ -5455,17 +5897,28 @@ class Query
         $accountValue = $line['account_code'] ?? '';
         $descriptionValue = $line['description'] ?? '';
         $lineIdValue = $line['id'] ?? '';
-        if (!is_scalar($accountValue) || !is_scalar($descriptionValue) || !is_scalar($lineIdValue)) {
+        $voucherValue = $line['voucher_no'] ?? '';
+        $currencyValue = $line['currency'] ?? 'MMK';
+        if (!is_scalar($accountValue) || !is_scalar($descriptionValue) ||
+            !is_scalar($lineIdValue) || !is_scalar($voucherValue) || !is_scalar($currencyValue)) {
           throw new Exception("Transaction lines are invalid.");
         }
 
         $accountCode = trim((string) $accountValue);
         $description = trim((string) $descriptionValue);
+        $lineVoucher = trim((string) $voucherValue);
+        $currency = strtoupper(trim((string) $currencyValue));
         $debitValue = $line['debit'] ?? null;
         $creditValue = $line['credit'] ?? null;
 
         if (!isset($validAccounts[$accountCode])) {
           throw new Exception("Select a valid account for every transaction line.");
+        }
+        if (!in_array($currency, ['MMK', 'USD'], true)) {
+          throw new Exception("Select MMK or USD for every transaction line.");
+        }
+        if ($lineVoucher === '' || $this->manualJournalTextLength($lineVoucher) > 255) {
+          throw new Exception("Enter a voucher number of up to 255 characters on every line.");
         }
         if (!is_numeric($debitValue) || !is_numeric($creditValue)) {
           throw new Exception("Enter a valid debit and credit amount for every line.");
@@ -5475,6 +5928,9 @@ class Query
         $credit = round((float) $creditValue, 2);
         if (!is_finite($debit) || !is_finite($credit) || $debit < 0 || $credit < 0 || (($debit > 0) === ($credit > 0))) {
           throw new Exception("Each line must contain a positive amount on either debit or credit, not both.");
+        }
+        if ($currency === 'USD' && ($usdRate <= 0 || !is_finite($usdRate))) {
+          throw new Exception("A transaction-date USD exchange rate is required to edit this voucher.");
         }
 
         $lineId = trim((string) $lineIdValue);
@@ -5487,20 +5943,49 @@ class Query
 
         $validLines[] = [
           'id' => $lineId === '' ? null : (int) $lineId,
+          'voucher_no' => $lineVoucher,
           'account_code' => $accountCode,
           'description' => $description,
           'debit' => $debit,
-          'credit' => $credit
+          'credit' => $credit,
+          'currency' => $currency
         ];
-        $totalDebit += $debit;
-        $totalCredit += $credit;
+        $conversionRate = $currency === 'USD' ? $usdRate : 1;
+        if (!isset($voucherTotals[$lineVoucher])) {
+          $voucherTotals[$lineVoucher] = ['count' => 0, 'debit' => 0.0, 'credit' => 0.0];
+        }
+        $voucherTotals[$lineVoucher]['count']++;
+        $voucherTotals[$lineVoucher]['debit'] += $debit * $conversionRate;
+        $voucherTotals[$lineVoucher]['credit'] += $credit * $conversionRate;
       }
 
       if (count($validLines) < 2) {
         throw new Exception("A voucher must contain at least two transaction lines.");
       }
-      if (round($totalDebit, 2) !== round($totalCredit, 2) || $totalDebit <= 0) {
-        throw new Exception("Total debits must equal total credits before saving.");
+      foreach ($voucherTotals as $lineVoucher => $totals) {
+        if ($totals['count'] < 2) {
+          throw new Exception("Voucher {$lineVoucher} must be used on at least two transaction lines.");
+        }
+        if (round($totals['debit'], 2) !== round($totals['credit'], 2) || $totals['debit'] <= 0) {
+          throw new Exception("Voucher {$lineVoucher} must balance its debit and credit totals before saving.");
+        }
+      }
+
+      $newVouchers = array_keys($voucherTotals);
+      $voucherPlaceholders = implode(',', array_fill(0, count($newVouchers), '?'));
+      $existingPlaceholders = implode(',', array_fill(0, count($existingIds), '?'));
+      $usedVoucherStmt = $pdo->prepare("
+        SELECT voucherno
+        FROM general_ledger
+        WHERE voucherno IN ({$voucherPlaceholders})
+          AND id NOT IN ({$existingPlaceholders})
+        LIMIT 1
+        FOR UPDATE
+      ");
+      $usedVoucherStmt->execute(array_merge($newVouchers, array_keys($existingIds)));
+      $usedVoucher = $usedVoucherStmt->fetchColumn();
+      if ($usedVoucher !== false) {
+        throw new Exception("Voucher number {$usedVoucher} is already in use.");
       }
 
       $deleteIds = array_diff(array_keys($existingIds), array_keys($submittedIds));
@@ -5513,31 +5998,34 @@ class Query
 
       $updateStmt = $pdo->prepare("
         UPDATE general_ledger
-        SET date = ?, ac_code = ?, debit = ?, credit = ?, narration = ?
+        SET date = ?, voucherno = ?, ac_code = ?, debit = ?, credit = ?, narration = ?, currency = ?
         WHERE id = ? AND voucherno = ?
       ");
       $insertStmt = $pdo->prepare("
-        INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no)
-        VALUES (?, ?, ?, ?, ?, ?, '')
+        INSERT INTO general_ledger (date, voucherno, ac_code, debit, credit, narration, sr_no, currency)
+        VALUES (?, ?, ?, ?, ?, ?, '', ?)
       ");
 
       foreach ($validLines as $line) {
         if ($line['id'] === null) {
           $insertStmt->execute([
             $date->format('Y-m-d'),
-            $voucher_no,
-            $line['account_code'],
-            $line['debit'],
-            $line['credit'],
-            $line['description']
-          ]);
-        } else {
-          $updateStmt->execute([
-            $date->format('Y-m-d'),
+            $line['voucher_no'],
             $line['account_code'],
             $line['debit'],
             $line['credit'],
             $line['description'],
+            $line['currency']
+          ]);
+        } else {
+          $updateStmt->execute([
+            $date->format('Y-m-d'),
+            $line['voucher_no'],
+            $line['account_code'],
+            $line['debit'],
+            $line['credit'],
+            $line['description'],
+            $line['currency'],
             $line['id'],
             $voucher_no
           ]);
@@ -5545,7 +6033,7 @@ class Query
       }
 
       $pdo->commit();
-      return ['status' => true, 'message' => 'General Ledger voucher updated successfully.'];
+      return ['status' => true, 'message' => 'General Ledger journal updated successfully.'];
     } catch (Exception $e) {
       if ($pdo->inTransaction()) {
         $pdo->rollBack();
@@ -5738,6 +6226,10 @@ class Query
   function updatetransaction_fromany($date, $voucher_no, $ac_code, $description, $currency, $rate, $debit, $credit, $id, $sr_no, $container_no, $bank_charges, $cash_id, $payableid)
   {
     global $pdo;
+    $glCurrency = strtoupper((string) $currency);
+    if ($glCurrency === '') {
+      $glCurrency = 'MMK';
+    }
 
     if ($currency == 'usd') {
       $mmkdebit = floatval($rate) * floatval($debit);
@@ -5843,11 +6335,12 @@ class Query
       $oldgeneralledgerbalance = $oldgeneralledgerdata['balance'];
 
       $balance = ($oldgeneralledgerbalance + $mmkdebit) - $mmkcredit;
-      $cashbookstmt = $pdo->prepare("UPDATE general_ledger SET date='$date', voucherno=:voucher_no, ac_code='$ac_code', narration=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no', container_no='$container_no', bank_charges='$bank_charges', balance='$balance' WHERE transactionid='$id'");
+      $cashbookstmt = $pdo->prepare("UPDATE general_ledger SET date='$date', voucherno=:voucher_no, ac_code='$ac_code', narration=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no', container_no='$container_no', bank_charges='$bank_charges', balance='$balance', currency=:currency WHERE transactionid='$id'");
       $cashbookstmt->execute(
         [
           ':voucher_no' => $voucher_no,
-          ':description' => $description
+          ':description' => $description,
+          ':currency' => $glCurrency
         ]
       );
 
@@ -5886,11 +6379,12 @@ class Query
       }
 
       $balance = ($oldgeneralledgerbalance + $mmkdebit) - $mmkcredit;
-      $cashbookstmt = $pdo->prepare("UPDATE general_ledger SET date='$date', voucherno=:voucher_no, ac_code='$ac_code', narration=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no', container_no='$container_no', bank_charges='$bank_charges', balance='$balance' WHERE transactionid='$id'");
+      $cashbookstmt = $pdo->prepare("UPDATE general_ledger SET date='$date', voucherno=:voucher_no, ac_code='$ac_code', narration=:description, debit='$mmkdebit', credit='$mmkcredit', sr_no='$sr_no', container_no='$container_no', bank_charges='$bank_charges', balance='$balance', currency=:currency WHERE transactionid='$id'");
       $cashbookstmt->execute(
         [
           ':voucher_no' => $voucher_no,
-          ':description' => $description
+          ':description' => $description,
+          ':currency' => $glCurrency
         ]
       );
 
@@ -6038,6 +6532,10 @@ class Query
       $ac_code = $transactiondata['ac_code'];
       $voucher_no = $transactiondata['voucher_no'];
       $description = $transactiondata['description'];
+      $glCurrency = strtoupper((string) ($transactiondata['currency'] ?? 'MMK'));
+      if ($glCurrency === '') {
+        $glCurrency = 'MMK';
+      }
       if (empty($transactiondata['debit'])) {
         $dollarratestmt = $pdo->prepare("SELECT * FROM currency WHERE voucher_no=:voucher_no AND debitorcredit='credit' AND transactionid='$transactionid'");
         $dollarratestmt->execute([
@@ -6119,7 +6617,7 @@ class Query
         $balance = $debit - $credit;
       }
 
-      $generalledgerstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, balance, narration,sr_no, container_no, bank_charges, acid, transactionid) VALUES('$date',:voucher_no,'$ac_code', '$debit', '$credit', '$balance', :description, '$sr_no', '$container_no', '$bank_charges', '$acid', '$transactionid')");
+      $generalledgerstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, balance, narration,sr_no, container_no, bank_charges, acid, transactionid, currency) VALUES('$date',:voucher_no,'$ac_code', '$debit', '$credit', '$balance', :description, '$sr_no', '$container_no', '$bank_charges', '$acid', '$transactionid', :currency)");
 
       $checkglstmt = $pdo->prepare("SELECT * FROM general_ledger WHERE transactionid=:transactionid AND ac_code='$ac_code'");
       $checkglstmt->execute([
@@ -6129,7 +6627,8 @@ class Query
       if (empty($checkgl)) {
         $generalledgerstmt->execute([
           ':voucher_no' => $voucher_no,
-          ':description' => $description
+          ':description' => $description,
+          ':currency' => $glCurrency
         ]);
       }
 
@@ -6403,6 +6902,10 @@ class Query
       $ac_code = $transactiondata['ac_code'];
       $voucher_no = $transactiondata['voucher_no'];
       $description = $transactiondata['description'];
+      $glCurrency = strtoupper((string) ($transactiondata['currency'] ?? 'MMK'));
+      if ($glCurrency === '') {
+        $glCurrency = 'MMK';
+      }
       if (empty($transactiondata['debit'])) {
         $debit = 0;
         $credit = $transactiondata['credit'];
@@ -6446,9 +6949,10 @@ class Query
           $balance = 0 - $credit;
         }
       }
-      $generalledgerstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, balance, narration,sr_no, container_no, bank_charges, acid) VALUES('$date',:voucher_no,'$ac_code', '$debit', '$credit', '$balance', '$description', '$sr_no', '$container_no', '$bank_charges', '$acid')");
+      $generalledgerstmt = $pdo->prepare("INSERT INTO general_ledger(date, voucherno, ac_code, debit, credit, balance, narration,sr_no, container_no, bank_charges, acid, currency) VALUES('$date',:voucher_no,'$ac_code', '$debit', '$credit', '$balance', '$description', '$sr_no', '$container_no', '$bank_charges', '$acid', :currency)");
       $generalledgerstmt->execute([
-        ':voucher_no' => $voucher_no
+        ':voucher_no' => $voucher_no,
+        ':currency' => $glCurrency
       ]);
       echo "<script>swal('Success', 'Accepted Successfully', 'success');</script>";
     }
@@ -7068,7 +7572,7 @@ class Query
       ':particular' => $particular
     ]);
 
-    $stmt = $pdo->prepare("INSERT INTO general_ledger(`date`, `ac_code`, `narration`, `balance`) VALUES ('$date', '$ac_code', :particular, '$balanceamount')");
+    $stmt = $pdo->prepare("INSERT INTO general_ledger(`date`, `ac_code`, `narration`, `balance`, `currency`) VALUES ('$date', '$ac_code', :particular, '$balanceamount', 'MMK')");
     $stmt->execute([
       ':particular' => $particular
     ]);
@@ -7108,7 +7612,7 @@ class Query
     $balancestmt = $pdo->prepare("INSERT INTO receivable(date, ac_code, particulars, balance) VALUES('$date', '$ac_name', '$description', '$balance')");
     $balancestmt->execute();
 
-    $balancestmt = $pdo->prepare("INSERT INTO general_ledger(date, ac_code, balance, narration, voucherno) VALUES('$date', '$ac_name', '$balance', '$description', '$description')");
+    $balancestmt = $pdo->prepare("INSERT INTO general_ledger(date, ac_code, balance, narration, voucherno, currency) VALUES('$date', '$ac_name', '$balance', '$description', '$description', 'USD')");
     $balancestmt->execute();
 
     $balancestmt = $pdo->prepare("INSERT INTO currency(dollar_rate, debitorcredit, usd_amount, voucher_no) VALUES(1, 'balance', '$balance', :description)");
@@ -7166,7 +7670,7 @@ class Query
     $stmt->execute([$supplier_id, $date, $voucher_no, $amount, $amount]);
 
     // Keep General Ledger intact
-    $glstmt = $pdo->prepare("INSERT INTO general_ledger(date, ac_code, narration ,balance) VALUES(?, ?, ?, ?)");
+    $glstmt = $pdo->prepare("INSERT INTO general_ledger(date, ac_code, narration ,balance, currency) VALUES(?, ?, ?, ?, 'MMK')");
     $glstmt->execute([$date, $supplier_id, $description, $amount]);
   }
 
